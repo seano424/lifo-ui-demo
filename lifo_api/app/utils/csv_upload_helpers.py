@@ -60,7 +60,7 @@ class CSVSecurityProcessor:
     @staticmethod
     def process_csv_security(
         file_content: bytes, file_name: str | None
-    ) -> Tuple[bytes, Dict[str, Any]]:
+    ) -> tuple[bytes, dict[str, Any]]:
         """
         Process CSV security validation and sanitization
 
@@ -105,7 +105,7 @@ class CSVDataProcessor:
     @staticmethod
     async def process_csv_data(
         sanitized_content: bytes, store_id: str, user_id: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Process CSV data using unified processor
 
@@ -144,7 +144,7 @@ class BatchConversionService:
     @staticmethod
     def convert_csv_to_batches(
         csv_data: list, store_id: str, user_id: str
-    ) -> Tuple[list, float]:
+    ) -> tuple[list, float]:
         """
         Convert CSV data to batch creation requests
 
@@ -196,7 +196,7 @@ class BatchCreationManager:
 
     async def create_batches(
         self, store_id: str, user_id: str, batch_requests: list, chunk_size: int
-    ) -> Tuple[Dict[str, Any], float]:
+    ) -> tuple[dict[str, Any], float]:
         """
         Create batches in database using bulk service
 
@@ -261,13 +261,13 @@ class CSVUploadResponseBuilder:
 
     @staticmethod
     def build_response(
-        csv_result: Dict[str, Any],
-        batch_results: Dict[str, Any],
+        csv_result: dict[str, Any],
+        batch_results: dict[str, Any],
         batch_requests: list,
-        security_result: Dict[str, Any],
+        security_result: dict[str, Any],
         store_id: str,
         user_id: str,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Build comprehensive response for CSV upload and batch creation
 
@@ -346,7 +346,7 @@ class CSVUploadOrchestrator:
         store_id: str,
         user_id: str,
         chunk_size: int = 100,  # Increased default from 50 to 100 for better performance
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Main workflow for CSV upload and batch creation with comprehensive timing
 

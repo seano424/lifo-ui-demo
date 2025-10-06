@@ -3,6 +3,7 @@ Optimized Batch Creation Service for High-Performance CSV Import
 Implements advanced database optimization techniques for 3x+ performance improvement
 """
 
+import asyncio
 import uuid
 from datetime import date, datetime, timedelta
 from typing import Any, Dict, List, Optional, Tuple
@@ -31,11 +32,12 @@ class OptimizedBatchCreationService:
     """
 
     # Optimal chunk sizes based on testing
-    OPTIMAL_CHUNK_SIZE = 100  # Increased from 50 for better throughput
+    OPTIMAL_CHUNK_SIZE = 50   # Smaller chunks for better concurrency
     MAX_CHUNK_SIZE = 500      # Maximum safe chunk size for memory
-    
+    MAX_CONCURRENT_CHUNKS = 5 # Concurrent chunk processing
+
     # Cache for category lookups
-    _category_cache: Dict[str, uuid.UUID] = {}
+    _category_cache: dict[str, uuid.UUID] = {}
     _cache_loaded = False
 
     def __init__(self):
@@ -95,9 +97,9 @@ class OptimizedBatchCreationService:
         self,
         store_id: str,
         user_id: str,
-        batch_requests: List[BatchFromScanRequest],
-        chunk_size: Optional[int] = None,
-    ) -> Dict[str, Any]:
+        batch_requests: list[BatchFromScanRequest],
+        chunk_size: int | None = None,
+    ) -> dict[str, Any]:
         """
         Ultra-optimized bulk batch creation with 3x+ performance improvement
         
@@ -138,51 +140,69 @@ class OptimizedBatchCreationService:
         async with self.async_session() as session:
             await self._preload_category_cache(session)
 
-        # Process in optimized chunks
+        # Prepare chunks for concurrent processing
+        chunks = []
         for chunk_start in range(0, total_requests, chunk_size):
             chunk_end = min(chunk_start + chunk_size, total_requests)
             chunk_requests = batch_requests[chunk_start:chunk_end]
-            
-            chunk_db_start = time.perf_counter()
-            
-            try:
-                chunk_results = await self._process_chunk_ultra_optimized(
-                    store_id, user_id, chunk_requests, chunk_start
-                )
-                
-                successful_batches.extend(chunk_results["successful"])
-                failed_batches.extend(chunk_results["failed"])
-                created_products.update(chunk_results["created_products"])
-                updated_products.update(chunk_results["updated_products"])
-                
-                chunk_db_time = time.perf_counter() - chunk_db_start
-                db_time_total += chunk_db_time
-                
-                logger.info(
-                    "Chunk processed successfully",
-                    chunk_start=chunk_start,
-                    chunk_end=chunk_end,
-                    successful=len(chunk_results["successful"]),
-                    failed=len(chunk_results["failed"]),
-                    chunk_time_ms=chunk_db_time * 1000,
-                )
-                
-            except Exception as e:
-                logger.error(
-                    "Chunk processing failed",
-                    chunk_start=chunk_start,
-                    chunk_end=chunk_end,
-                    error=str(e),
-                )
-                
-                # Mark entire chunk as failed
-                for i, request in enumerate(chunk_requests):
-                    failed_batches.append({
-                        "index": chunk_start + i,
-                        "barcode": request.barcode,
-                        "product_name": request.product_name,
-                        "error": f"Chunk processing failed: {str(e)}",
-                    })
+            chunks.append((chunk_requests, chunk_start, chunk_end))
+
+        # Process chunks concurrently with semaphore limiting
+        semaphore = asyncio.Semaphore(self.MAX_CONCURRENT_CHUNKS)
+
+        async def process_chunk_with_semaphore(chunk_data):
+            chunk_requests, chunk_start, chunk_end = chunk_data
+            async with semaphore:
+                chunk_db_start = time.perf_counter()
+                try:
+                    chunk_results = await self._process_chunk_ultra_optimized(
+                        store_id, user_id, chunk_requests, chunk_start
+                    )
+                    chunk_db_time = time.perf_counter() - chunk_db_start
+
+                    logger.info(
+                        "Chunk processed successfully",
+                        chunk_start=chunk_start,
+                        chunk_end=chunk_end,
+                        successful=len(chunk_results["successful"]),
+                        failed=len(chunk_results["failed"]),
+                        chunk_time_ms=chunk_db_time * 1000,
+                    )
+                    return chunk_results, chunk_db_time
+
+                except Exception as e:
+                    logger.error(
+                        "Chunk processing failed",
+                        chunk_start=chunk_start,
+                        chunk_end=chunk_end,
+                        error=str(e),
+                    )
+                    # Return failed results for entire chunk
+                    failed_results = []
+                    for i, request in enumerate(chunk_requests):
+                        failed_results.append({
+                            "index": chunk_start + i,
+                            "barcode": request.barcode,
+                            "product_name": request.product_name,
+                            "error": f"Chunk processing failed: {str(e)}",
+                        })
+                    return {"successful": [], "failed": failed_results, "created_products": set(), "updated_products": set()}, 0
+
+        # Execute all chunks concurrently
+        results_list = await asyncio.gather(*[process_chunk_with_semaphore(chunk) for chunk in chunks], return_exceptions=True)
+
+        # Aggregate results
+        for result in results_list:
+            if isinstance(result, Exception):
+                logger.error("Chunk processing exception", error=str(result))
+                continue
+
+            chunk_results, chunk_db_time = result
+            successful_batches.extend(chunk_results["successful"])
+            failed_batches.extend(chunk_results["failed"])
+            created_products.update(chunk_results["created_products"])
+            updated_products.update(chunk_results["updated_products"])
+            db_time_total += chunk_db_time
 
         # Calculate performance metrics
         total_time = time.perf_counter() - start_time
@@ -229,9 +249,9 @@ class OptimizedBatchCreationService:
         self,
         store_id: str,
         user_id: str,
-        chunk_requests: List[BatchFromScanRequest],
+        chunk_requests: list[BatchFromScanRequest],
         chunk_start: int,
-    ) -> Dict[str, List]:
+    ) -> dict[str, list]:
         """
         Ultra-optimized chunk processing with minimal database operations
         
@@ -319,8 +339,8 @@ class OptimizedBatchCreationService:
         self,
         session: AsyncSession,
         store_id: str,
-        barcodes: List[str],
-    ) -> Dict[str, Tuple[uuid.UUID, bool]]:
+        barcodes: list[str],
+    ) -> dict[str, tuple[uuid.UUID, bool]]:
         """
         Optimized bulk product lookup with single efficient query
         """
@@ -364,9 +384,9 @@ class OptimizedBatchCreationService:
         session: AsyncSession,
         store_id: str,
         user_id: str,
-        barcode_to_requests: Dict[str, List[BatchFromScanRequest]],
-        existing_products: Dict[str, Tuple[uuid.UUID, bool]],
-    ) -> Dict[str, Tuple[uuid.UUID, bool]]:
+        barcode_to_requests: dict[str, list[BatchFromScanRequest]],
+        existing_products: dict[str, tuple[uuid.UUID, bool]],
+    ) -> dict[str, tuple[uuid.UUID, bool]]:
         """
         Bulk UPSERT products using PostgreSQL ON CONFLICT for maximum efficiency
         Returns mapping of barcode -> (product_id, was_created)
@@ -608,10 +628,10 @@ class OptimizedBatchCreationService:
         session: AsyncSession,
         store_id: str,
         user_id: str,
-        batch_requests: List[BatchFromScanRequest],
-        product_mapping: Dict[str, Tuple[uuid.UUID, bool]],
+        batch_requests: list[BatchFromScanRequest],
+        product_mapping: dict[str, tuple[uuid.UUID, bool]],
         chunk_start: int,
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """
         Bulk insert all batches using single INSERT statement
         """
@@ -724,7 +744,7 @@ class OptimizedBatchCreationService:
         logger.info("Category pre-loading disabled for pgbouncer compatibility")
         self._cache_loaded = True
 
-    async def _get_category_id_cached(self, category_str: Optional[str]) -> Optional[uuid.UUID]:
+    async def _get_category_id_cached(self, category_str: str | None) -> uuid.UUID | None:
         """Get category ID from cache"""
         if not category_str:
             # Return default category

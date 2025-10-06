@@ -59,7 +59,7 @@ class WriteCache:
             for key in oldest_keys:
                 self.invalidate(key)
     
-    def get(self, prefix: str, identifier: str) -> Optional[Any]:
+    def get(self, prefix: str, identifier: str) -> Any | None:
         """Get value from cache"""
         key = self._generate_key(prefix, identifier)
         
@@ -110,7 +110,7 @@ class WriteCache:
             return len(keys_to_remove)
         return 0
     
-    def get_stats(self) -> Dict[str, Any]:
+    def get_stats(self) -> dict[str, Any]:
         """Get cache statistics"""
         total_requests = self.hit_count + self.miss_count
         hit_ratio = self.hit_count / total_requests if total_requests > 0 else 0
@@ -138,7 +138,7 @@ class WriteBehindProcessor:
         self.max_delay_seconds = 30
         self.processing = False
         
-    async def queue_write(self, operation: Dict[str, Any]) -> str:
+    async def queue_write(self, operation: dict[str, Any]) -> str:
         """Queue a write operation for batch processing"""
         operation_id = str(uuid.uuid4())
         operation.update({
@@ -187,7 +187,7 @@ class WriteBehindProcessor:
         finally:
             self.processing = False
     
-    async def _process_write_batch(self, batch: List[Dict[str, Any]]):
+    async def _process_write_batch(self, batch: list[dict[str, Any]]):
         """Process a batch of write operations"""
         async with async_session()() as session:
             try:
@@ -223,7 +223,7 @@ class WriteBehindProcessor:
     async def _process_operation_group(
         self,
         session: AsyncSession,
-        operations: List[Dict[str, Any]]
+        operations: list[dict[str, Any]]
     ):
         """Process a group of similar operations"""
         if not operations:
@@ -248,7 +248,7 @@ class WriteBehindProcessor:
         self,
         session: AsyncSession,
         table_name: str,
-        operations: List[Dict[str, Any]]
+        operations: list[dict[str, Any]]
     ):
         """Process bulk insert operations"""
         all_records = []
@@ -268,7 +268,7 @@ class WriteBehindProcessor:
         self,
         session: AsyncSession,
         table_name: str,
-        operations: List[Dict[str, Any]]
+        operations: list[dict[str, Any]]
     ):
         """Process bulk update operations"""
         all_updates = []
@@ -288,7 +288,7 @@ class WriteBehindProcessor:
         self,
         session: AsyncSession,
         table_name: str,
-        operations: List[Dict[str, Any]]
+        operations: list[dict[str, Any]]
     ):
         """Process bulk upsert operations"""
         all_records = []
@@ -331,8 +331,8 @@ class WriteCacheOptimizer:
     async def get_cached_products(
         self,
         store_id: str,
-        barcodes: List[str]
-    ) -> Tuple[Dict[str, str], List[str]]:
+        barcodes: list[str]
+    ) -> tuple[dict[str, str], list[str]]:
         """
         Get products from cache, return found products and missing barcodes
         """
@@ -350,7 +350,7 @@ class WriteCacheOptimizer:
     async def cache_products(
         self,
         store_id: str,
-        products: Dict[str, str]
+        products: dict[str, str]
     ) -> None:
         """Cache product data for future lookups"""
         if not products:
@@ -372,8 +372,8 @@ class WriteCacheOptimizer:
     async def get_cached_batch_data(
         self,
         store_id: str,
-        batch_ids: List[str]
-    ) -> Tuple[Dict[str, Dict[str, Any]], List[str]]:
+        batch_ids: list[str]
+    ) -> tuple[dict[str, dict[str, Any]], list[str]]:
         """Get batch data from cache"""
         found_batches = {}
         missing_batch_ids = []
@@ -393,7 +393,7 @@ class WriteCacheOptimizer:
         self,
         store_id: str,
         batch_id: str,
-        batch_data: Dict[str, Any]
+        batch_data: dict[str, Any]
     ) -> None:
         """Cache batch data"""
         cache_key = f"batch_{store_id}_{batch_id}"
@@ -402,7 +402,7 @@ class WriteCacheOptimizer:
     async def invalidate_batch_cache(
         self,
         store_id: str,
-        batch_ids: List[str] = None
+        batch_ids: list[str] = None
     ) -> int:
         """Invalidate batch cache entries"""
         if batch_ids:
@@ -419,16 +419,16 @@ class WriteCacheOptimizer:
     async def cache_store_metadata(
         self,
         store_id: str,
-        metadata: Dict[str, Any]
+        metadata: dict[str, Any]
     ) -> None:
         """Cache store metadata for write operations"""
         self.store_cache.put("store_metadata", store_id, metadata)
     
-    async def get_cached_store_metadata(self, store_id: str) -> Optional[Dict[str, Any]]:
+    async def get_cached_store_metadata(self, store_id: str) -> dict[str, Any] | None:
         """Get cached store metadata"""
         return self.store_cache.get("store_metadata", store_id)
     
-    async def warm_product_cache(self, store_id: str) -> Dict[str, Any]:
+    async def warm_product_cache(self, store_id: str) -> dict[str, Any]:
         """
         Warm the product cache with frequently accessed products
         """
@@ -490,7 +490,7 @@ class WriteCacheOptimizer:
         self,
         operation_type: str,
         table_name: str,
-        data: Dict[str, Any]
+        data: dict[str, Any]
     ) -> str:
         """
         Schedule a write-behind operation for batch processing
@@ -507,8 +507,8 @@ class WriteCacheOptimizer:
         self,
         operation_type: str,
         store_id: str,
-        data: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        data: dict[str, Any]
+    ) -> dict[str, Any]:
         """
         Apply optimal caching strategy for specific write operation
         """
@@ -563,7 +563,7 @@ class WriteCacheOptimizer:
         
         return optimization_result
     
-    async def get_cache_performance_report(self) -> Dict[str, Any]:
+    async def get_cache_performance_report(self) -> dict[str, Any]:
         """Get comprehensive cache performance report"""
         return {
             "product_cache": self.product_cache.get_stats(),
@@ -592,7 +592,7 @@ class WriteCacheOptimizer:
             }
         }
     
-    async def cleanup_expired_cache_entries(self) -> Dict[str, int]:
+    async def cleanup_expired_cache_entries(self) -> dict[str, int]:
         """Clean up expired cache entries across all caches"""
         cleanup_stats = {}
         

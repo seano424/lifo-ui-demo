@@ -31,18 +31,18 @@ class TimingMetrics:
     total_processing_ms: float = 0.0
     
     # Chunk processing metrics
-    chunk_timings: List[float] = field(default_factory=list)
+    chunk_timings: list[float] = field(default_factory=list)
     
     # Performance indicators
     items_processed: int = 0
     items_per_second: float = 0.0
-    memory_usage_mb: Optional[float] = None
+    memory_usage_mb: float | None = None
     
     # Detailed sub-metrics
-    sub_timings: Dict[str, float] = field(default_factory=dict)
+    sub_timings: dict[str, float] = field(default_factory=dict)
     
     # Threshold warnings
-    slow_operations: List[Dict[str, Any]] = field(default_factory=list)
+    slow_operations: list[dict[str, Any]] = field(default_factory=list)
     
     def calculate_throughput(self):
         """Calculate items per second throughput"""
@@ -61,7 +61,7 @@ class TimingMetrics:
                 "timestamp": datetime.utcnow().isoformat()
             })
     
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert metrics to dictionary for API response"""
         return {
             "file_upload_ms": round(self.file_upload_ms, 2),
@@ -112,10 +112,10 @@ class TimingMetrics:
 class PerformanceTimer:
     """High-precision performance timer with context manager support"""
     
-    def __init__(self, metrics: Optional[TimingMetrics] = None):
+    def __init__(self, metrics: TimingMetrics | None = None):
         self.metrics = metrics or TimingMetrics()
-        self.timers: Dict[str, float] = {}
-        self.active_timers: Dict[str, float] = {}
+        self.timers: dict[str, float] = {}
+        self.active_timers: dict[str, float] = {}
     
     @contextmanager
     def measure(self, operation: str, threshold_ms: float = 100):
@@ -174,7 +174,7 @@ class PerformanceTimer:
         
         return duration_ms
     
-    def get_timing(self, operation: str) -> Optional[float]:
+    def get_timing(self, operation: str) -> float | None:
         """Get timing for a specific operation"""
         return self.timers.get(operation)
     
@@ -189,8 +189,8 @@ class CSVProcessingTimer(PerformanceTimer):
     
     def __init__(self):
         super().__init__(TimingMetrics())
-        self.stage_start_times: Dict[str, float] = {}
-        self.stage_order: List[str] = []
+        self.stage_start_times: dict[str, float] = {}
+        self.stage_order: list[str] = []
     
     def start_stage(self, stage: str):
         """Start timing a processing stage"""
@@ -247,7 +247,7 @@ class CSVProcessingTimer(PerformanceTimer):
                 duration_ms=round(duration_ms, 2)
             )
     
-    def get_stage_summary(self) -> Dict[str, Any]:
+    def get_stage_summary(self) -> dict[str, Any]:
         """Get summary of all stages with timing breakdown"""
         total_ms = self.metrics.total_processing_ms or sum(self.metrics.sub_timings.values())
         
@@ -314,8 +314,8 @@ class PerformanceMonitor:
     """Monitor performance across multiple operations"""
     
     def __init__(self):
-        self.operations: Dict[str, List[float]] = {}
-        self.thresholds: Dict[str, float] = {
+        self.operations: dict[str, list[float]] = {}
+        self.thresholds: dict[str, float] = {
             "csv_upload": 500,
             "batch_creation": 1000,
             "product_resolution": 200,
@@ -338,7 +338,7 @@ class PerformanceMonitor:
                 threshold_ms=threshold
             )
     
-    def get_statistics(self, operation: str) -> Dict[str, float]:
+    def get_statistics(self, operation: str) -> dict[str, float]:
         """Get statistics for an operation"""
         if operation not in self.operations or not self.operations[operation]:
             return {}
@@ -352,7 +352,7 @@ class PerformanceMonitor:
             "total_ms": round(sum(timings), 2)
         }
     
-    def get_all_statistics(self) -> Dict[str, Any]:
+    def get_all_statistics(self) -> dict[str, Any]:
         """Get statistics for all operations"""
         return {
             op: self.get_statistics(op)

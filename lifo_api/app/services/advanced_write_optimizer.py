@@ -49,7 +49,7 @@ class WritePerformanceTracker:
         }
         return operation_id
         
-    def end_operation(self, operation_id: str) -> Dict[str, Any]:
+    def end_operation(self, operation_id: str) -> dict[str, Any]:
         """End tracking and return performance metrics"""
         if operation_id not in self.operation_metrics:
             return {}
@@ -108,7 +108,7 @@ class ConnectionPoolOptimizer:
         self.engines = {}
         self.pool_configs = self._get_pool_configurations()
         
-    def _get_pool_configurations(self) -> Dict[str, Dict[str, Any]]:
+    def _get_pool_configurations(self) -> dict[str, dict[str, Any]]:
         """Get optimized pool configurations for different write patterns"""
         return {
             "write_heavy": {
@@ -300,9 +300,9 @@ class BulkWriteOptimizer:
     async def bulk_upsert_with_conflict_resolution(
         self,
         table_name: str,
-        records: List[Dict[str, Any]],
-        conflict_columns: List[str],
-        update_columns: List[str],
+        records: list[dict[str, Any]],
+        conflict_columns: list[str],
+        update_columns: list[str],
         chunk_size: int = 1000
     ) -> int:
         """
@@ -363,7 +363,7 @@ class BulkWriteOptimizer:
     async def bulk_insert_ignore_duplicates(
         self,
         table_name: str,
-        records: List[Dict[str, Any]],
+        records: list[dict[str, Any]],
         chunk_size: int = 1000
     ) -> int:
         """
@@ -409,7 +409,7 @@ class BulkWriteOptimizer:
     async def bulk_update_optimized(
         self,
         table_name: str,
-        updates: List[Dict[str, Any]],
+        updates: list[dict[str, Any]],
         id_column: str = "id",
         chunk_size: int = 500
     ) -> int:
@@ -503,10 +503,10 @@ class AdvancedWriteOptimizer:
         self,
         store_id: str,
         user_id: str,
-        inventory_operations: List[Dict[str, Any]],
+        inventory_operations: list[dict[str, Any]],
         auto_score: bool = True,
         enable_caching: bool = True
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         OPTIMIZED: Unified inventory write operations with advanced optimizations
         
@@ -580,10 +580,10 @@ class AdvancedWriteOptimizer:
         session: AsyncSession,
         store_id: str,
         user_id: str,
-        operations: List[Dict[str, Any]],
+        operations: list[dict[str, Any]],
         enable_caching: bool,
         tx: AdvancedTransactionManager
-    ) -> Dict[str, str]:
+    ) -> dict[str, str]:
         """Bulk process product lookups and creations with caching"""
         
         # Extract all unique barcodes
@@ -663,11 +663,11 @@ class AdvancedWriteOptimizer:
         session: AsyncSession,
         store_id: str,
         user_id: str,
-        operations: List[Dict[str, Any]],
-        product_map: Dict[str, str],
+        operations: list[dict[str, Any]],
+        product_map: dict[str, str],
         bulk_optimizer: BulkWriteOptimizer,
         tx: AdvancedTransactionManager
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Bulk process batch operations"""
         
         batches_to_create = []
@@ -736,10 +736,10 @@ class AdvancedWriteOptimizer:
         self,
         session: AsyncSession,
         store_id: str,
-        batch_ids: List[str],
+        batch_ids: list[str],
         bulk_optimizer: BulkWriteOptimizer,
         tx: AdvancedTransactionManager
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Bulk process scoring operations"""
         
         if not batch_ids:
@@ -809,10 +809,10 @@ class AdvancedWriteOptimizer:
         session: AsyncSession,
         store_id: str,
         user_id: str,
-        high_urgency_batches: List[Dict[str, Any]],
+        high_urgency_batches: list[dict[str, Any]],
         bulk_optimizer: BulkWriteOptimizer,
         tx: AdvancedTransactionManager
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Bulk setup action tracking for high urgency batches"""
         
         if not high_urgency_batches:
@@ -855,7 +855,7 @@ class AdvancedWriteOptimizer:
             
         logger.info("Write cache cleaned", expired_entries=len(expired_keys))
         
-    async def get_performance_report(self) -> Dict[str, Any]:
+    async def get_performance_report(self) -> dict[str, Any]:
         """Get comprehensive performance report"""
         return {
             "cache_stats": {

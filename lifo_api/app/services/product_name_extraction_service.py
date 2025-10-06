@@ -17,15 +17,15 @@ logger = structlog.get_logger()
 class ProductNameResult:
     """Result of product name extraction"""
     product_name: str
-    brand_name: Optional[str]
-    product_description: Optional[str]
+    brand_name: str | None
+    product_description: str | None
     confidence: float
     name_type: str  # 'brand', 'product', 'combined', 'description'
     hierarchy_level: int  # 1=primary, 2=secondary, 3=tertiary
     raw_text: str
     font_size_score: float = 0.0
     position_score: float = 0.0
-    bounding_box: Optional[dict] = None
+    bounding_box: dict | None = None
 
 
 @dataclass
@@ -33,7 +33,7 @@ class TextBlock:
     """Enhanced text block with analysis metadata"""
     text: str
     original_text: str
-    bounding_box: Optional[dict]
+    bounding_box: dict | None
     index: int
     font_size_score: float = 0.0
     position_score: float = 0.0
@@ -201,7 +201,7 @@ class ProductNameExtractionService:
     async def extract_product_names_from_text_blocks(
         self,
         text_blocks: list[str],
-        bounding_boxes: Optional[list[dict]] = None,
+        bounding_boxes: list[dict] | None = None,
         language_preference: str = 'auto'
     ) -> list[ProductNameResult]:
         """
@@ -274,7 +274,7 @@ class ProductNameExtractionService:
     def _create_enhanced_blocks(
         self,
         text_blocks: list[str],
-        bounding_boxes: Optional[list[dict]]
+        bounding_boxes: list[dict] | None
     ) -> list[TextBlock]:
         """Create enhanced text blocks with analysis metadata"""
         enhanced_blocks = []
@@ -311,7 +311,7 @@ class ProductNameExtractionService:
 
         return enhanced_blocks
 
-    def _calculate_font_size_score(self, bounding_box: Optional[dict]) -> float:
+    def _calculate_font_size_score(self, bounding_box: dict | None) -> float:
         """Calculate font size score from bounding box dimensions"""
         if not bounding_box:
             return 0.5  # Neutral score
@@ -347,7 +347,7 @@ class ProductNameExtractionService:
         except (KeyError, TypeError, ZeroDivisionError):
             return 0.5
 
-    def _calculate_position_score(self, bounding_box: Optional[dict]) -> float:
+    def _calculate_position_score(self, bounding_box: dict | None) -> float:
         """Calculate position score based on typical product name placement"""
         if not bounding_box:
             return 0.5  # Neutral score
@@ -699,7 +699,7 @@ class ProductNameExtractionService:
 
         return hierarchy_level
 
-    def _separate_brand_and_product(self, text: str) -> tuple[Optional[str], Optional[str]]:
+    def _separate_brand_and_product(self, text: str) -> tuple[str | None, str | None]:
         """Attempt to separate brand name from product description"""
         words = text.split()
 
@@ -785,7 +785,7 @@ class ProductNameExtractionService:
 
 
 # Global service instance
-_product_name_extraction_service: Optional[ProductNameExtractionService] = None
+_product_name_extraction_service: ProductNameExtractionService | None = None
 
 def get_product_name_extraction_service() -> ProductNameExtractionService:
     """Get singleton instance of product name extraction service"""

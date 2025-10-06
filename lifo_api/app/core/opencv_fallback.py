@@ -13,8 +13,8 @@ import warnings
 logger = logging.getLogger(__name__)
 
 # Global flag to track OpenCV availability
-_opencv_available: Optional[bool] = None
-_cv2_module: Optional[Any] = None
+_opencv_available: bool | None = None
+_cv2_module: Any | None = None
 
 def is_opencv_available() -> bool:
     """
@@ -70,7 +70,7 @@ def get_cv2():
         "Consider using PIL-based fallbacks for basic image operations."
     )
 
-def safe_cv2_import() -> Optional[Any]:
+def safe_cv2_import() -> Any | None:
     """
     Safely import cv2 without raising exceptions.
 
