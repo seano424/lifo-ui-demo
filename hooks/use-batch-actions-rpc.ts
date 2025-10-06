@@ -313,6 +313,10 @@ export function useBatchActionRPC(providedStoreId?: string) {
         queryClient.invalidateQueries({
           queryKey: queryKeys.todos.dashboardSummary(storeId),
         }),
+        // Update urgent todos count (sidebar badge)
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.todos.urgentCount(storeId),
+        }),
       ]
 
       // Action-specific invalidations
