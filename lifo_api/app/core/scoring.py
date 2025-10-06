@@ -1113,19 +1113,19 @@ class BulkResultPersister:
         scores_data = []
         for result in results:
             scores_data.append({
-                "batch_id": result.batch_id,
-                "store_id": store_id,
-                "expiry_score": result.expiry_score,
-                "velocity_score": result.velocity_score,
-                "margin_score": result.margin_score,
-                "composite_score": result.composite_score,
-                "recommendation": result.recommendation,
-                "urgency_level": result.urgency_level,
-                "discount_percent": result.discount_percent,
-                "reason": result.reason,
-                "ml_enhanced": result.ml_enhanced,
-                "confidence_level": result.confidence_level,
-                "calculated_at": result.calculated_at,
+                "batch_id": str(result.batch_id),
+                "store_id": str(store_id),
+                "expiry_score": float(result.expiry_score),
+                "velocity_score": float(result.velocity_score),
+                "margin_score": float(result.margin_score),
+                "composite_score": float(result.composite_score),
+                "recommendation": str(result.recommendation),
+                "urgency_level": str(result.urgency_level),
+                "discount_percent": int(result.discount_percent),
+                "reason": str(result.reason),
+                "ml_enhanced": bool(result.ml_enhanced),
+                "confidence_level": float(result.confidence_level),
+                "calculated_at": result.calculated_at.isoformat() if hasattr(result.calculated_at, 'isoformat') else str(result.calculated_at),
             })
         return scores_data
 
