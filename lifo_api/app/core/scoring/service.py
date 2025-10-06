@@ -413,8 +413,10 @@ class ScoringService:
             if results:
                 # Use BulkResultPersister with DATABASE_DIRECT_URL for COPY commands
                 # This is 60x faster than REST API chunking (1-3s vs 3+ minutes)
+                # Convert Pydantic models to dictionaries for persistence layer
+                results_dicts = [result.model_dump() for result in results]
                 metrics = await self.result_persister.persist_scoring_results(
-                    results, store_id
+                    results_dicts, store_id
                 )
                 database_successful = metrics.get("successful", 0)
                 database_failed = metrics.get("failed", 0)

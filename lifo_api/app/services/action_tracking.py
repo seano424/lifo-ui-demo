@@ -45,12 +45,12 @@ class ActionTrackingService:
             batch_id=uuid.UUID(batch_id),
             store_id=uuid.UUID(store_id),
             recommended_action=ai_recommendation,
-            action_type="maintain",  # Default until user takes action
+            action_type=ActionType.IGNORED,  # Use IGNORED for AI recommendations (allows quantity_affected=0)
             ai_score=Decimal(str(ai_score)),
             performed_at=datetime.now(UTC).replace(tzinfo=None),
             performed_by=uuid.UUID(user_id) if user_id else None,
             # Required fields with defaults
-            quantity_affected=Decimal("0"),
+            quantity_affected=Decimal("0"),  # Zero is valid for 'ignored' action_type per DB constraint
             total_original_value=Decimal("0"),
             total_recovered_value=Decimal("0"),
             batch_initial_quantity=batch.initial_quantity,
