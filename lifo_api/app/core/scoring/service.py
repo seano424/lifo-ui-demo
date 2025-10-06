@@ -13,9 +13,10 @@ from typing import Any
 import structlog
 from sqlalchemy import and_, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
-
+from decimal import Decimal
 from app.core.config import get_scoring_weights
-
+from app.core.scoring.engine import InventoryScorer
+from app.utils.recommendation_migration import migrate_recommendation
 from .models import ScoringInput, ScoringResult
 from .services import (
     BulkDataRetriever,
@@ -412,9 +413,11 @@ class ScoringService:
             if results:
                 # Use BulkResultPersister with DATABASE_DIRECT_URL for COPY commands
                 # This is 60x faster than REST API chunking (1-3s vs 3+ minutes)
-                database_successful, database_failed = await self.result_persister.persist_results(
+                metrics = await self.result_persister.persist_scoring_results(
                     results, store_id
                 )
+                database_successful = metrics.get("successful", 0)
+                database_failed = metrics.get("failed", 0)
 
                 self.performance_monitor.log_milestone(
                     "persistence_complete",
@@ -815,8 +818,8 @@ class ScoringService:
                     ai_recommendation=db_action,
                     ai_score=result.composite_score,
                     user_id=None,  # System-generated recommendation
-                    discount_percent=result.discount_percent,
-                    reasoning=result.reason
+                    # discount_percent=result.discount_percent,
+                    # reasoning=result.reason
                 )
 
                 # Commit the tracking transaction

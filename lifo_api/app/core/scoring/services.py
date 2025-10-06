@@ -276,9 +276,7 @@ class InMemoryScoringEngine:
                 daily_sales = velocity_data_bulk.get(
                     batch_data["product_id"], {}
                 ).get("avg_daily_sales", 1.0)
-                category_weights = category_weights_bulk.get(
-                    batch_data.get("category"), {}
-                )
+                category_weights = category_weights_bulk.get(batch_data.get("category"), {})
 
                 # Score batch in memory
                 score_result = self.score_batch_in_memory(

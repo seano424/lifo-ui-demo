@@ -20,7 +20,7 @@ import asyncio
 import io
 import os
 import time
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 
 import asyncpg
@@ -141,7 +141,7 @@ class UnifiedScoringPersistence:
         3. Minimal network overhead (1 request vs 100s of requests)
         """
         # Get direct database URL (bypasses pgBouncer for COPY support)
-        db_url = os.getenv("DATABASE_DIRECT_URL") or os.getenv("DATABASE_URL")
+        db_url = os.getenv("DATABASE_DIRECT_URL")
 
         if not db_url:
             return {
@@ -158,7 +158,7 @@ class UnifiedScoringPersistence:
             db_url = db_url.replace("+asyncpg://", "://")
 
         # Determine table names
-        schema_prefix = "scoring." if os.getenv("ENVIRONMENT") != "testing" else ""
+        schema_prefix = "scoring."
         table_name = f"{schema_prefix}product_scores"
         staging_table = "temp_scores_staging"
 
@@ -184,8 +184,8 @@ class UnifiedScoringPersistence:
                 # Step 1: Create temporary staging table
                 await conn.execute(f"""
                     CREATE TEMPORARY TABLE {staging_table} (
-                        batch_id TEXT NOT NULL,
-                        store_id TEXT NOT NULL,
+                        batch_id UUID NOT NULL,
+                        store_id UUID NOT NULL,
                         expiry_score NUMERIC NOT NULL,
                         velocity_score NUMERIC NOT NULL,
                         margin_score NUMERIC NOT NULL,
@@ -217,7 +217,7 @@ class UnifiedScoringPersistence:
                         str(item.get("reason", "Auto-scored"))[:200].replace("\t", " ").replace("\n", " "),
                         "t" if item.get("ml_enhanced", True) else "f",
                         str(item.get("confidence_level", 0.85)),
-                        item.get("calculated_at", datetime.utcnow()).isoformat() if hasattr(item.get("calculated_at"), "isoformat") else datetime.utcnow().isoformat()
+                        item.get("calculated_at", datetime.now(UTC)).isoformat() if hasattr(item.get("calculated_at"), "isoformat") else datetime.now(UTC).isoformat()
                     ]
                     csv_buffer.write("\t".join(row_values) + "\n")
 
@@ -450,7 +450,7 @@ class UnifiedScoringPersistence:
                         "calculated_at": (
                             item.get("calculated_at").isoformat()
                             if hasattr(item.get("calculated_at"), "isoformat")
-                            else datetime.utcnow().isoformat()
+                            else datetime.now(UTC).isoformat()
                         )
                     })
 
