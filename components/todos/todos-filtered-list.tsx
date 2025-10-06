@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button'
 import { useMediaQuery } from '@/hooks/use-mobile'
 import {
   useCompletedTodos,
+  useExpiredTodos,
+  useExpiringTodos,
   useInProgressTodos,
   usePendingTodos,
 } from '@/hooks/use-todos-with-filters'
@@ -16,10 +18,12 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { TodoFiltersPanel, type TodoFiltersState } from './filters/todo-filters-panel'
 import type { SortDirection, SortField } from './filters/todo-sort-controls'
 import { CompletedTab } from './todos-main-tabs/completed-tab'
+import { ExpiredTab } from './todos-main-tabs/expired-tab'
+import { ExpiringTab } from './todos-main-tabs/expiring-tab'
 import { InProgressTab } from './todos-main-tabs/in-progress-tab'
 import { PendingTab } from './todos-main-tabs/pending-tab'
 
-export type TodoTabType = 'pending' | 'in_progress' | 'completed'
+export type TodoTabType = 'pending' | 'in_progress' | 'completed' | 'expiring' | 'expired'
 
 interface TodosFilteredListProps {
   initialFilters?: {
@@ -79,10 +83,27 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
   const { data: pendingTodos } = usePendingTodos(filters, pageSize)
   const { data: inProgressTodos } = useInProgressTodos(filters, pageSize)
   const { data: completedTodos } = useCompletedTodos(filters, pageSize)
+  const { data: expiringTodos } = useExpiringTodos(
+    {
+      urgency_level: filters.urgency_level,
+      action_type: filters.action_type,
+      product_name: filters.product_name,
+      days_to_expiry_min: filters.days_to_expiry_min,
+      days_to_expiry_max: filters.days_to_expiry_max,
+    },
+    pageSize,
+  )
+  const { data: expiredTodos } = useExpiredTodos(filters, pageSize)
 
   // Tab configuration
   const tabs = useMemo(
     () => [
+      {
+        id: 'expiring' as TodoTabType,
+        label: t('tabs.expiring'),
+        count: expiringTodos?.length || 0,
+        component: ExpiringTab,
+      },
       {
         id: 'pending' as TodoTabType,
         label: t('tabs.pending'),
@@ -101,8 +122,21 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
         count: completedTodos?.length || 0,
         component: CompletedTab,
       },
+      {
+        id: 'expired' as TodoTabType,
+        label: t('tabs.expired'),
+        count: expiredTodos?.length || 0,
+        component: ExpiredTab,
+      },
     ],
-    [pendingTodos?.length, inProgressTodos?.length, completedTodos?.length, t],
+    [
+      pendingTodos?.length,
+      inProgressTodos?.length,
+      expiringTodos?.length,
+      expiredTodos?.length,
+      completedTodos?.length,
+      t,
+    ],
   )
 
   // Update tab indicator position
@@ -194,6 +228,7 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
             filters={filters}
             onFiltersChange={handleFiltersChange}
             isLoading={false}
+            activeTab={activeTab}
           />
         </div>
       )}
@@ -203,6 +238,7 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
           filters={filters}
           onFiltersChange={handleFiltersChange}
           isLoading={false}
+          activeTab={activeTab}
         />
       </div>
 
@@ -263,6 +299,22 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
           }}
         >
           <InProgressTab filters={filters} pageSize={pageSize} />
+        </div>
+
+        <div
+          style={{
+            display: activeTab === 'expiring' ? 'block' : 'none',
+          }}
+        >
+          <ExpiringTab filters={filters} pageSize={pageSize} />
+        </div>
+
+        <div
+          style={{
+            display: activeTab === 'expired' ? 'block' : 'none',
+          }}
+        >
+          <ExpiredTab filters={filters} pageSize={pageSize} />
         </div>
 
         <div
