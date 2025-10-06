@@ -170,16 +170,46 @@ class ProductScanningService:
             logger.warning(f"Barcode extraction failed: {e}")
             return None
 
-    async def extract_expiry_date(self, image_data: bytes) -> datetime | None:
-        """Extract expiry date from image - simple wrapper for frontend"""
+    async def extract_expiry_date(self, image_data: bytes) -> dict[str, Any]:
+        """Extract expiry date from image - returns date, confidence, and raw text"""
         try:
             vision_result = await self._process_image_with_timeout(
                 image_data, timeout_ms=4000
             )
-            return self._extract_best_expiry_date(vision_result)
+            expiry_date = self._extract_best_expiry_date(vision_result)
+
+            # Extract confidence score from the best expiry date candidate
+            expiry_confidence = 0.0
+            raw_ocr_text = ""
+
+            if expiry_date and vision_result.expiry_dates:
+                # Find the matching expiry date result to get its confidence
+                for exp_result in vision_result.expiry_dates:
+                    if exp_result.date == expiry_date:
+                        expiry_confidence = exp_result.confidence
+                        raw_ocr_text = exp_result.raw_text
+                        break
+
+            # If no specific match, use average text confidence as fallback
+            if expiry_confidence == 0.0 and vision_result.text_confidence_avg > 0:
+                expiry_confidence = vision_result.text_confidence_avg
+
+            # Collect raw text blocks for context
+            if not raw_ocr_text and vision_result.raw_text:
+                raw_ocr_text = " | ".join([ocr.text for ocr in vision_result.raw_text[:5]])
+
+            return {
+                "expiry_date": expiry_date,
+                "confidence": expiry_confidence,
+                "raw_ocr_text": raw_ocr_text or "OCR processing completed",
+            }
         except Exception as e:
             logger.warning(f"Expiry date extraction failed: {e}")
-            return None
+            return {
+                "expiry_date": None,
+                "confidence": 0.0,
+                "raw_ocr_text": f"Extraction failed: {str(e)}",
+            }
 
     async def _process_image_with_timeout(
         self, image_data: bytes, timeout_ms: float
@@ -305,31 +335,56 @@ class ProductScanningService:
         expiry_metadata = {}
 
         if expiry_candidates:
-            # Prioritize by context strength, then by confidence (no date preference)
-            best_expiry_candidate = max(
-                expiry_candidates,
-                key=lambda x: (
-                    self._get_expiry_priority_score(x["date_type"]),
-                    x["type_confidence"],
-                ),
-            )
-            best_expiry = best_expiry_candidate["date"]
-            expiry_metadata = {
-                "context": best_expiry_candidate.get("date_type", "unknown"),
-                "confidence": best_expiry_candidate.get("type_confidence", 0.3),
-                "language": best_expiry_candidate.get("detected_language", "unknown"),
-                "raw_context": best_expiry_candidate.get("raw_text", ""),
-                "source": best_expiry_candidate.get("source", "unknown"),
-            }
-        elif unknown_candidates:
-            # Fallback: use latest unknown date as expiry
-            best_unknown = max(unknown_candidates, key=lambda x: x["date"])
-            best_expiry = best_unknown["date"]
-            expiry_metadata = {
-                "context": "inferred_from_latest_date",
-                "confidence": 0.5,
-                "source": best_unknown.get("source", "unknown"),
-            }
+            # Apply temporal validation to filter candidates
+            valid_expiry_candidates = []
+            for candidate in expiry_candidates:
+                is_valid, confidence_mult = self._validate_date_temporal(
+                    candidate["date"], "expiry"
+                )
+                if is_valid:
+                    # Adjust confidence based on temporal validation
+                    candidate["temporal_confidence"] = confidence_mult
+                    valid_expiry_candidates.append(candidate)
+
+            if valid_expiry_candidates:
+                # Prioritize by context strength, temporal validity, then original confidence
+                best_expiry_candidate = max(
+                    valid_expiry_candidates,
+                    key=lambda x: (
+                        self._get_expiry_priority_score(x["date_type"]),
+                        x.get("temporal_confidence", 1.0),
+                        x["type_confidence"],
+                    ),
+                )
+                best_expiry = best_expiry_candidate["date"]
+                expiry_metadata = {
+                    "context": best_expiry_candidate.get("date_type", "unknown"),
+                    "confidence": best_expiry_candidate.get("type_confidence", 0.3)
+                                  * best_expiry_candidate.get("temporal_confidence", 1.0),
+                    "language": best_expiry_candidate.get("detected_language", "unknown"),
+                    "raw_context": best_expiry_candidate.get("raw_text", ""),
+                    "source": best_expiry_candidate.get("source", "unknown"),
+                }
+            # If no valid candidates after temporal filtering, fall through to unknown dates
+        if not best_expiry and unknown_candidates:
+            # Fallback: use latest temporally valid unknown date as expiry
+            valid_unknown = []
+            for candidate in unknown_candidates:
+                is_valid, confidence_mult = self._validate_date_temporal(
+                    candidate["date"], "unknown"
+                )
+                if is_valid:
+                    candidate["temporal_confidence"] = confidence_mult
+                    valid_unknown.append(candidate)
+
+            if valid_unknown:
+                best_unknown = max(valid_unknown, key=lambda x: (x["date"], x.get("temporal_confidence", 1.0)))
+                best_expiry = best_unknown["date"]
+                expiry_metadata = {
+                    "context": "inferred_from_latest_date",
+                    "confidence": 0.5 * best_unknown.get("temporal_confidence", 1.0),
+                    "source": best_unknown.get("source", "unknown"),
+                }
 
         # Select best manufacture date
         best_manufacture = None
@@ -758,12 +813,24 @@ class ProductScanningService:
 
         # Look for date patterns in combined texts
         date_patterns = [
+            # Standard separator-based formats
             (r"(\d{1,2})[/\-\.\s]+(\d{1,2})[/\-\.\s]+(\d{4})", "DD/MM/YYYY"),
             (r"(\d{4})[/\-\.\s]+(\d{1,2})[/\-\.\s]+(\d{1,2})", "YYYY/MM/DD"),
             (r"(\d{1,2})[/\-\.\s]+(\d{1,2})[/\-\.\s]+(\d{2})", "DD/MM/YY"),
+
+            # CRITICAL: Compact European formats (common on dairy/bakery)
+            # Must come before month patterns to avoid false positives
+            (r"\b(\d{2})(\d{2})(\d{2})\b(?![/\-\.])", "DDMMYY_COMPACT"),  # 251126
+            (r"\b(\d{4})(\d{2})(\d{2})\b(?![/\-\.])", "YYYYMMDD_ISO"),    # 20241115
+
+            # European dot format (strict - common in Germany)
+            (r"\b(\d{1,2})\.(\d{1,2})\.(\d{2})\b", "DD.MM.YY_STRICT"),
+            (r"\b(\d{1,2})\.(\d{1,2})\.(\d{4})\b", "DD.MM.YYYY_STRICT"),
+
             # European month name patterns (e.g., "22NOV2017", "15 DEC 2024")
             (r"(\d{1,2})\s*([A-Za-zÀ-ÿ]{3,9})\s*(\d{4})", "DD MON YYYY"),
             (r"(\d{1,2})\s*([A-Za-zÀ-ÿ]{3,9})\s*(\d{2})", "DD MON YY"),
+
             # Partial date patterns (e.g., "SEP 30", "NOV 15", "DEC 2024")
             (r"([A-Za-zÀ-ÿ]{3,9})\s+(\d{1,2})(?:\s+(\d{4}))?", "MON DD [YYYY]"),
             (r"(\d{1,2})\s+([A-Za-zÀ-ÿ]{3,9})(?:\s+(\d{4}))?", "DD MON [YYYY]"),
@@ -792,6 +859,32 @@ class ProductScanningService:
                             else:
                                 year += 1900
                             parsed_date = datetime(year, int(month), int(day))
+                        elif format_name == "DDMMYY_COMPACT":
+                            # Compact format: 251126 = 25/11/26
+                            day, month, year = groups
+                            year = int(year)
+                            if year < 50:
+                                year += 2000
+                            else:
+                                year += 1900
+                            parsed_date = datetime(year, int(month), int(day))
+                        elif format_name == "YYYYMMDD_ISO":
+                            # ISO compact: 20241115 = 2024-11-15
+                            year, month, day = groups
+                            parsed_date = datetime(int(year), int(month), int(day))
+                        elif format_name == "DD.MM.YY_STRICT":
+                            # Strict dot format: 25.11.26
+                            day, month, year = groups
+                            year = int(year)
+                            if year < 50:
+                                year += 2000
+                            else:
+                                year += 1900
+                            parsed_date = datetime(year, int(month), int(day))
+                        elif format_name == "DD.MM.YYYY_STRICT":
+                            # Strict dot format: 25.11.2026
+                            day, month, year = groups
+                            parsed_date = datetime(int(year), int(month), int(day))
                         elif format_name in ["DD MON YYYY", "DD MON YY"]:
                             day, month_name, year = groups
 
@@ -809,7 +902,7 @@ class ProductScanningService:
 
                             parsed_date = datetime(year, month_num, int(day))
                         elif format_name in ["MON DD [YYYY]", "DD MON [YYYY]"]:
-                            # Handle partial dates with simple current year inference
+                            # Handle partial dates with intelligent year inference
                             if format_name == "MON DD [YYYY]":
                                 month_name, day, year = groups
                             else:  # DD MON [YYYY]
@@ -820,11 +913,12 @@ class ProductScanningService:
                             if not month_num:
                                 continue  # Skip if month not recognized
 
-                            # Use provided year or infer current year (user's simple approach)
+                            # Use provided year or intelligently infer year
                             if year:
                                 year = int(year)
                             else:
-                                year = datetime.now().year
+                                # Smart year inference for expiry dates
+                                year = self._infer_expiry_year(month_num, int(day))
 
                             parsed_date = datetime(year, month_num, int(day))
                         else:
@@ -942,6 +1036,76 @@ class ProductScanningService:
                 return months[month_normalized]
 
         return None
+
+    def _infer_expiry_year(self, month: int, day: int) -> int:
+        """
+        Intelligently infer missing year for expiry dates based on temporal logic.
+        Expiry dates are typically future dates, handling year boundaries correctly.
+        """
+        now = datetime.now()
+        current_year = now.year
+        current_month = now.month
+        current_day = now.day
+
+        # Try current year first
+        try:
+            candidate_current = datetime(current_year, month, day)
+
+            # If date is more than 3 months in the past, likely next year
+            days_diff = (now - candidate_current).days
+            if days_diff > 90:  # More than 3 months ago
+                return current_year + 1
+
+            # If date is 0-24 months in future, use current year
+            elif (candidate_current - now).days <= 730:  # Within 2 years future
+                return current_year
+
+            # Default to next year for ambiguous cases
+            else:
+                return current_year + 1
+
+        except ValueError:
+            # Invalid date for current year (e.g., Feb 30), try next year
+            return current_year + 1
+
+    def _validate_date_temporal(self, date: datetime, date_purpose: str) -> tuple[bool, float]:
+        """
+        Validate if a date is temporally reasonable for its purpose.
+        Returns (is_valid, confidence_multiplier)
+        """
+        now = datetime.now()
+        days_diff = (date - now).days
+
+        if date_purpose == "expiry":
+            # Expiry dates should be in the future (or very recent past for fresh scans)
+            if days_diff < -30:  # More than 1 month in past
+                return False, 0.3  # Very low confidence, likely wrong
+            elif days_diff > 5 * 365:  # More than 5 years in future
+                return False, 0.4  # Suspiciously far future
+            elif days_diff < 0:  # Recent past (0-30 days)
+                return True, 0.7  # Reduced confidence, might be stale
+            elif days_diff > 3 * 365:  # 3-5 years future
+                return True, 0.8  # Reduced confidence, unusual but possible
+            else:  # 0-3 years future (normal range)
+                return True, 1.0  # Full confidence
+
+        elif date_purpose == "manufacture":
+            # Manufacture dates should be in the past
+            if days_diff > 0:  # Future date
+                return False, 0.2  # Invalid for manufacture
+            elif days_diff < -10 * 365:  # More than 10 years old
+                return False, 0.4  # Too old
+            elif days_diff < -3 * 365:  # 3-10 years old
+                return True, 0.7  # Reduced confidence
+            else:  # 0-3 years old (normal)
+                return True, 1.0  # Full confidence
+
+        else:  # unknown purpose
+            # More permissive validation
+            if -5 * 365 <= days_diff <= 5 * 365:  # Within ±5 years
+                return True, 0.9
+            else:
+                return False, 0.5
 
     def get_last_date_metadata(self) -> dict | None:
         """Get metadata for the last selected expiry date"""
