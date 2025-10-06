@@ -4,7 +4,7 @@ Simple caching layer to optimize performance across 5-10 stores
 """
 
 import asyncio
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from typing import Any, Dict, Optional
 import structlog
 
@@ -36,11 +36,11 @@ class MultiStoreCache:
     
     def _is_expired(self, cache_entry: dict[str, Any]) -> bool:
         """Check if cache entry has expired"""
-        return datetime.utcnow() > cache_entry["expires_at"]
+        return datetime.now(UTC) > cache_entry["expires_at"]
     
     def _cleanup_expired(self) -> None:
         """Remove expired entries from cache - optimized single-pass"""
-        current_time = datetime.utcnow()
+        current_time = datetime.now(UTC)
         expired_keys = [
             key for key, entry in self._cache.items() 
             if current_time > entry["expires_at"]
@@ -72,7 +72,7 @@ class MultiStoreCache:
                 return None
             
             self._stats["hits"] += 1
-            cache_entry["last_accessed"] = datetime.utcnow()
+            cache_entry["last_accessed"] = datetime.now(UTC)
             
             logger.debug(
                 "Multi-store cache hit",
@@ -92,8 +92,8 @@ class MultiStoreCache:
         try:
             cache_key = self._generate_key(user_id, operation, params)
             ttl = timedelta(minutes=ttl_minutes or self._default_ttl.total_seconds() / 60)
-            
-            now = datetime.utcnow()
+
+            now = datetime.now(UTC)
             cache_entry = {
                 "data": data,
                 "created_at": now,
