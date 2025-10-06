@@ -105,7 +105,7 @@ async def get_batch_actions(
             query = query.where(BatchAction.store_id == store_id)
 
         if action_type:
-            query = query.where(BatchAction.actual_action == action_type)
+            query = query.where(BatchAction.action_type == action_type)
 
         query = query.order_by(desc(BatchAction.action_date)).limit(limit)
 
@@ -119,7 +119,7 @@ async def get_batch_actions(
                     "batch_id": str(action.batch_id),
                     "store_id": str(action.store_id),
                     "recommended_action": action.recommended_action.value,
-                    "actual_action": action.actual_action.value,
+                    "actual_action": action.action_type.value,
                     "ai_score": float(action.ai_score) if action.ai_score else None,
                     "action_date": action.action_date.isoformat()
                     if action.action_date
@@ -176,7 +176,7 @@ async def get_donation_analytics_summary(
 
         # Calculate summary statistics
         total_actions = len(actions)
-        donation_actions = [a for a in actions if a.actual_action == ActionType.DONATE]
+        donation_actions = [a for a in actions if a.action_type == ActionType.DONATE]
 
         total_donated_value = sum(
             float(action.original_value)
@@ -193,12 +193,12 @@ async def get_donation_analytics_summary(
         # Action type breakdown
         action_breakdown = {}
         for action_type in ActionType:
-            count = len([a for a in actions if a.actual_action == action_type])
+            count = len([a for a in actions if a.action_type == action_type])
             action_breakdown[action_type.value] = count
 
         # Recommendation vs actual analysis
         followed_recommendations = len(
-            [a for a in actions if a.recommended_action == a.actual_action]
+            [a for a in actions if a.recommended_action == a.action_type]
         )
 
         recommendation_accuracy = (

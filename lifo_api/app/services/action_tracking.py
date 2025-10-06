@@ -36,7 +36,7 @@ class ActionTrackingService:
             batch_id=uuid.UUID(batch_id),
             store_id=uuid.UUID(store_id),
             recommended_action=ai_recommendation,
-            actual_action="maintain",  # Default until user takes action
+            action_type="maintain",  # Default until user takes action
             ai_score=Decimal(str(ai_score)),
             action_date=datetime.utcnow(),
             performed_by=uuid.UUID(user_id) if user_id else None,
@@ -72,7 +72,7 @@ class ActionTrackingService:
             raise ValueError(f"Action record not found: {action_id}")
 
         # Update with actual action taken
-        action_record.actual_action = actual_action  # type: ignore
+        action_record.action_type = actual_action  # type: ignore
         action_record.performed_by = uuid.UUID(user_id)  # type: ignore
         action_record.action_date = datetime.utcnow()  # type: ignore
 
@@ -114,7 +114,7 @@ class ActionTrackingService:
             batch_id=uuid.UUID(batch_id),
             store_id=uuid.UUID(store_id),
             recommended_action=recommended_action,
-            actual_action=actual_action,
+            action_type=actual_action,
             ai_score=Decimal(str(ai_score)),
             action_date=datetime.utcnow(),
             performed_by=uuid.UUID(user_id),
@@ -146,7 +146,7 @@ class ActionTrackingService:
         result = await self.db.execute(
             select(
                 BatchAction.recommended_action,
-                BatchAction.actual_action,
+                BatchAction.action_type,
                 func.count().label("count"),
                 func.avg(BatchAction.ai_score).label("avg_ai_score"),
                 func.sum(BatchAction.original_value).label("total_original_value"),
@@ -159,7 +159,7 @@ class ActionTrackingService:
                     >= datetime.utcnow().replace(day=datetime.utcnow().day - days_back),
                 )
             )
-            .group_by(BatchAction.recommended_action, BatchAction.actual_action)
+            .group_by(BatchAction.recommended_action, BatchAction.action_type)
         )
 
         analytics_data = result.fetchall()
@@ -170,7 +170,7 @@ class ActionTrackingService:
             "recommendation_effectiveness": [
                 {
                     "recommended_action": row.recommended_action,
-                    "actual_action": row.actual_action,
+                    "actual_action": row.action_type,
                     "count": row.count,
                     "avg_ai_score": float(row.avg_ai_score) if row.avg_ai_score else 0,
                     "total_original_value": float(row.total_original_value)
@@ -180,7 +180,7 @@ class ActionTrackingService:
                     if row.total_recovered_value
                     else 0,
                     "follow_rate": 1.0
-                    if row.recommended_action == row.actual_action
+                    if row.recommended_action == row.action_type
                     else 0.0,
                 }
                 for row in analytics_data

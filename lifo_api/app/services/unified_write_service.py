@@ -783,7 +783,7 @@ class UnifiedWriteService:
                         and_(
                             BatchAction.batch_id == result["batch_id"],
                             BatchAction.store_id == store_id,
-                            BatchAction.actual_action == "maintain"  # Only update pending actions
+                            BatchAction.action_type == "maintain"  # Only update pending actions
                         )
                     )
                     .values(

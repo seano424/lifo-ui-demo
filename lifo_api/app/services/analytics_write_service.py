@@ -405,7 +405,7 @@ class AnalyticsWriteService:
                         and_(
                             BatchAction.batch_id == result["batch_id"],
                             BatchAction.store_id == store_id,
-                            BatchAction.actual_action == "maintain"
+                            BatchAction.action_type == "maintain"
                         )
                     )
                     .values(

@@ -387,8 +387,8 @@ class BatchAction(Base):
     )
 
     # What was recommended vs what was done
-    recommended_action: Column[SQLEnum] = Column(SQLEnum(ActionType), nullable=False)
-    actual_action: Column[SQLEnum] = Column(SQLEnum(ActionType), nullable=False)
+    action_type: Column[SQLEnum] = Column(SQLEnum(ActionType), nullable=False)
+    recommended_action: Column[SQLEnum] = Column(SQLEnum(ActionType), nullable=True)
     ai_score: Column[DECIMAL] = Column(
         DECIMAL(3, 2)
     )  # AI score that triggered recommendation (0.00-1.00)
