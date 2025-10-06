@@ -387,8 +387,8 @@ class BatchAction(Base):
     )
 
     # What was recommended vs what was done
-    action_type: Column[SQLEnum] = Column(SQLEnum(ActionType), nullable=False)
-    recommended_action: Column[SQLEnum] = Column(SQLEnum(ActionType), nullable=True)
+    action_type: Column[SQLEnum] = Column(SQLEnum(ActionType, name='action_type'), nullable=False)
+    recommended_action: Column[SQLEnum] = Column(SQLEnum(ActionType, name='action_type'), nullable=True)
     ai_score: Column[DECIMAL] = Column(
         DECIMAL(3, 2)
     )  # AI score that triggered recommendation (0.00-1.00)
@@ -452,7 +452,7 @@ class DonationRecipient(Base):
     contact_email = Column(String(255))
     contact_phone = Column(String(50))
     recipient_type: Column[SQLEnum] = Column(
-        SQLEnum(DonationRecipientType), nullable=False
+        SQLEnum(DonationRecipientType, name='donation_recipient_type'), nullable=False
     )
 
     # Minimal compliance fields
