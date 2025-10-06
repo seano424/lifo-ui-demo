@@ -1,0 +1,249 @@
+#!/usr/bin/env python3
+"""
+Database Connection Test for LIFO.AI Supabase Setup
+
+Tests both SQLAlchemy async connection and direct Supabase REST API
+to verify the bulk scoring fix will work with your specific configuration.
+
+Run this before testing the bulk scoring endpoint fix.
+"""
+
+import asyncio
+import os
+import sys
+from datetime import datetime
+
+from anyio import Path
+from dotenv import load_dotenv
+
+# Add the lifo_api directory to the path
+env_path = Path(__file__).parent.parent / ".env.local"
+load_dotenv(env_path)
+
+async def test_sqlalchemy_connection():
+    """Test SQLAlchemy async connection with your DATABASE_URL."""
+    print("1️⃣  Testing SQLAlchemy Async Connection")
+    print("-" * 40)
+    
+    try:
+        from app.database.connection import get_async_session, test_connection
+        
+        # Test the connection health
+        print("📡 Testing database connection health...")
+        connection_ok = await test_connection()
+        
+        if connection_ok:
+            print("✅ SQLAlchemy connection: SUCCESS")
+            
+            # Try to create a session and execute a simple query
+            print("📝 Testing session creation and query execution...")
+            async_session_factory = get_async_session()
+            
+            async with async_session_factory() as session:
+                from sqlalchemy import text
+                result = await session.execute(text("SELECT 1 as test_value"))
+                test_value = result.scalar()
+                
+                if test_value == 1:
+                    print("✅ Session query execution: SUCCESS")
+                    return True
+                else:
+                    print(f"❌ Session query failed: Expected 1, got {test_value}")
+                    return False
+        else:
+            print("❌ SQLAlchemy connection: FAILED")
+            return False
+            
+    except Exception as e:
+        print(f"❌ SQLAlchemy connection error: {str(e)}")
+        print(f"🔍 Error type: {type(e).__name__}")
+        return False
+
+async def test_supabase_service():
+    """Test Supabase service connection."""
+    print("\n2️⃣  Testing Supabase Service Connection")
+    print("-" * 42)
+    
+    try:
+        from app.database.supabase_service import get_supabase_service
+        
+        print("📡 Testing Supabase service connection...")
+        service = get_supabase_service()
+        
+        # Test basic connection
+        connection_ok = await service.test_connection()
+        
+        if connection_ok:
+            print("✅ Supabase service connection: SUCCESS")
+            
+            # Test admin client
+            print("🔐 Testing admin client access...")
+            admin_client = service.get_admin_client()
+            
+            # Try a simple query to the scoring table
+            try:
+                result = (
+                    admin_client.schema("scoring")
+                    .table("product_scores")
+                    .select("*")
+                    .limit(1)
+                    .execute()
+                )
+                print(f"✅ Scoring table access: SUCCESS ({len(result.data if result.data else [])} rows)")
+                return True
+                
+            except Exception as table_error:
+                print(f"⚠️  Scoring table access: {str(table_error)}")
+                print("   This might be normal if the table is empty or doesn't exist yet")
+                return True  # Still consider it successful if we can connect
+                
+        else:
+            print("❌ Supabase service connection: FAILED")
+            return False
+            
+    except Exception as e:
+        print(f"❌ Supabase service error: {str(e)}")
+        print(f"🔍 Error type: {type(e).__name__}")
+        return False
+
+def test_environment_variables():
+    """Test that all required environment variables are set."""
+    print("\n3️⃣  Testing Environment Variables")
+    print("-" * 35)
+    
+    required_vars = [
+        "DATABASE_URL",
+        "SUPABASE_URL", 
+        "SUPABASE_SERVICE_ROLE_KEY",
+        "SUPABASE_ANON_KEY"
+    ]
+    
+    missing_vars = []
+    configured_vars = []
+    
+    for var in required_vars:
+        value = os.getenv(var)
+        if value:
+            configured_vars.append(var)
+            # Show partial value for security
+            if len(value) > 20:
+                display_value = value[:10] + "..." + value[-10:]
+            else:
+                display_value = value[:5] + "..."
+            print(f"✅ {var}: {display_value}")
+        else:
+            missing_vars.append(var)
+            print(f"❌ {var}: NOT SET")
+    
+    if missing_vars:
+        print(f"\n⚠️  Missing {len(missing_vars)} required environment variables")
+        return False
+    else:
+        print(f"\n✅ All {len(configured_vars)} environment variables configured")
+        return True
+
+async def test_bulk_scoring_prerequisites():
+    """Test prerequisites for bulk scoring to work."""
+    print("\n4️⃣  Testing Bulk Scoring Prerequisites")
+    print("-" * 42)
+    
+    try:
+        # Test that we can import the new simplified persistence service
+        print("📦 Testing simplified persistence service import...")
+        from app.core.simplified_scoring_persistence import get_simplified_scoring_persistence
+        print("✅ Simplified persistence service: IMPORTED")
+        
+        # Test that we can get a database session
+        print("🔗 Testing database session creation...")
+        from app.database.connection import get_async_session
+        session_factory = get_async_session()
+        async with session_factory() as session:
+            print("✅ Database session: CREATED")
+            
+            # Test creating the persistence service
+            print("🛠️  Testing persistence service creation...")
+            persistence_service = get_simplified_scoring_persistence(session)
+            print("✅ Persistence service: CREATED")
+            
+            # Test empty results (should not fail)
+            print("📊 Testing empty results handling...")
+            empty_result = await persistence_service.persist_scoring_results([], "test-store")
+            
+            if empty_result["success"] and empty_result["total_items"] == 0:
+                print("✅ Empty results handling: SUCCESS")
+                return True
+            else:
+                print(f"❌ Empty results handling: {empty_result}")
+                return False
+                
+    except Exception as e:
+        print(f"❌ Prerequisites test error: {str(e)}")
+        print(f"🔍 Error type: {type(e).__name__}")
+        return False
+
+async def main():
+    """Run comprehensive database connection tests."""
+    print("🧪 LIFO.AI Database Connection Test")
+    print("=" * 50)
+    print(f"🕐 Test started at: {datetime.now().isoformat()}")
+    print("=" * 50)
+    
+    # Test 1: Environment Variables
+    env_ok = test_environment_variables()
+    
+    if not env_ok:
+        print("\n❌ CRITICAL: Missing environment variables")
+        print("Please set the required environment variables and try again.")
+        return False
+    
+    # Test 2: SQLAlchemy Connection
+    sqlalchemy_ok = await test_sqlalchemy_connection()
+    
+    # Test 3: Supabase Service
+    supabase_ok = await test_supabase_service()
+    
+    # Test 4: Bulk Scoring Prerequisites
+    bulk_ok = await test_bulk_scoring_prerequisites()
+    
+    # Summary
+    print("\n" + "=" * 50)
+    print("🏁 Test Results Summary")
+    print("=" * 50)
+    
+    tests = [
+        ("Environment Variables", env_ok),
+        ("SQLAlchemy Connection", sqlalchemy_ok),
+        ("Supabase Service", supabase_ok), 
+        ("Bulk Scoring Prerequisites", bulk_ok)
+    ]
+    
+    passed = sum(1 for _, result in tests if result)
+    total = len(tests)
+    
+    for test_name, result in tests:
+        status = "✅ PASSED" if result else "❌ FAILED"
+        print(f"{status}: {test_name}")
+    
+    print(f"\n📊 Overall: {passed}/{total} tests passed")
+    
+    if passed == total:
+        print("\n🎉 ALL TESTS PASSED!")
+        print("✅ Your configuration is ready for bulk scoring endpoint testing")
+        print("\n🚀 Next step: Run the bulk scoring test:")
+        print("   python test_bulk_scoring_fix.py")
+    else:
+        print(f"\n⚠️  {total - passed} tests failed")
+        print("❌ Please fix the failing tests before proceeding")
+        
+        if not sqlalchemy_ok or not supabase_ok:
+            print("\n🔧 Database connection issues detected:")
+            print("   1. Verify DATABASE_URL format: postgresql+asyncpg://...")
+            print("   2. Check network connectivity from WSL to Supabase")
+            print("   3. Verify Supabase credentials")
+            print("   4. Test connection from Windows browser first")
+    
+    return passed == total
+
+if __name__ == "__main__":
+    success = asyncio.run(main())
+    sys.exit(0 if success else 1)

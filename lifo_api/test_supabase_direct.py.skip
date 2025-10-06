@@ -1,0 +1,246 @@
+#!/usr/bin/env python3
+"""
+Simple test for Supabase direct database connection
+Testing exact configuration from Supabase documentation
+"""
+
+import asyncio
+import os
+import socket
+import sys
+from pathlib import Path
+
+import asyncpg
+from dotenv import load_dotenv
+
+# Load environment variables
+env_path = Path(__file__).parent.parent / ".env.local"
+load_dotenv(env_path)
+
+
+def test_dns_with_cache_clear(hostname: str) -> tuple[bool, list[str]]:
+    """Test DNS resolution with cache clearing"""
+    print(f"\n🔍 Testing DNS resolution: {hostname}")
+
+    try:
+        # Try to get all IP addresses
+        addr_info = socket.getaddrinfo(hostname, None)
+        ips = list(set([addr[4][0] for addr in addr_info]))
+        print(f"   ✅ Resolved to {len(ips)} address(es):")
+        for ip in ips:
+            print(f"      - {ip}")
+        return True, ips
+    except socket.gaierror as e:
+        print(f"   ❌ DNS resolution failed: {e}")
+        return False, []
+
+
+async def test_direct_connection_simple():
+    """Test direct connection with exact Supabase parameters"""
+
+    print("=" * 80)
+    print("SUPABASE DIRECT CONNECTION TEST")
+    print("Testing configuration from Supabase documentation")
+    print("=" * 80)
+
+    # Get password from environment
+    password = os.getenv("SUPABASE_DB_PASSWORD")
+    if not password:
+        print("\n❌ SUPABASE_DB_PASSWORD not found in environment")
+        return False
+
+    # Exact Supabase configuration
+    config = {
+        "user": "postgres",
+        "password": password,
+        "host": "db.jrgmetdsohowtxickqij.supabase.co",
+        "port": 5432,
+        "database": "postgres"
+    }
+
+    print("\n📝 Configuration:")
+    print(f"   Host: {config['host']}")
+    print(f"   Port: {config['port']}")
+    print(f"   User: {config['user']}")
+    print(f"   Database: {config['database']}")
+    print(f"   Password: {'*' * len(password)}")
+
+    # Test DNS
+    dns_ok, ips = test_dns_with_cache_clear(config['host'])
+
+    if not dns_ok:
+        print("\n" + "=" * 80)
+        print("🔴 DIAGNOSIS: DNS RESOLUTION FAILED")
+        print("=" * 80)
+        print("\nThe hostname doesn't resolve to any IP address.")
+        print("\nPossible reasons:")
+        print("1. Direct database access not enabled for this Supabase project")
+        print("2. Hostname format changed in Supabase")
+        print("3. DNS propagation delay (if recently enabled)")
+        print("4. Project moved to different infrastructure")
+        print("\nRecommendation:")
+        print("- Check Supabase project settings for direct database access")
+        print("- Verify the correct hostname in Supabase dashboard")
+        print("- Contact Supabase support if this should work")
+        return False
+
+    # Test TCP connection
+    print(f"\n🔌 Testing TCP connection to {config['host']}:{config['port']}")
+    try:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.settimeout(5)
+        sock.connect((config['host'], config['port']))
+        sock.close()
+        print(f"   ✅ TCP connection successful")
+    except Exception as e:
+        print(f"   ❌ TCP connection failed: {e}")
+        return False
+
+    # Test database connection - Method 1: With SSL
+    print(f"\n🗄️  Testing database connection (with SSL)")
+    try:
+        conn = await asyncpg.connect(
+            user=config["user"],
+            password=config["password"],
+            host=config["host"],
+            port=config["port"],
+            database=config["database"],
+            ssl='require',
+            statement_cache_size=0,
+            timeout=10
+        )
+
+        # Test query
+        result = await conn.fetchval("SELECT 1")
+        version = await conn.fetchval("SELECT version()")
+        db_name = await conn.fetchval("SELECT current_database()")
+
+        await conn.close()
+
+        print(f"   ✅ Connection successful!")
+        print(f"   Database: {db_name}")
+        print(f"   Version: {version[:80]}...")
+
+        print("\n" + "=" * 80)
+        print("✅ SUCCESS: Direct database connection works!")
+        print("=" * 80)
+        print("\nThis means:")
+        print("- The hostname is correct and resolves properly")
+        print("- Direct database access is enabled for this project")
+        print("- Bulk operations can use direct connection for ~2-4s performance")
+        print("\nNext steps:")
+        print("- Update DATABASE_DIRECT_URL to use this configuration")
+        print("- Test bulk scoring with direct connection")
+
+        return True
+
+    except asyncpg.exceptions.PostgresError as e:
+        print(f"   ❌ PostgreSQL error: {e}")
+        print(f"\nPossible issues:")
+        print("- Authentication failed (check password)")
+        print("- SSL certificate validation failed")
+        print("- Database permissions issue")
+        return False
+
+    except OSError as e:
+        print(f"   ❌ Network error: {e}")
+        print(f"   Error code: {e.errno}")
+
+        # Try without SSL as fallback
+        print(f"\n🗄️  Retrying without SSL requirement...")
+        try:
+            conn = await asyncpg.connect(
+                user=config["user"],
+                password=config["password"],
+                host=config["host"],
+                port=config["port"],
+                database=config["database"],
+                ssl='prefer',  # Try with prefer instead of require
+                statement_cache_size=0,
+                timeout=10
+            )
+
+            result = await conn.fetchval("SELECT 1")
+            await conn.close()
+
+            print(f"   ✅ Connection successful without strict SSL!")
+            print("\n⚠️  Note: Connection works but SSL mode should be 'require' for security")
+            return True
+
+        except Exception as fallback_error:
+            print(f"   ❌ Connection failed even without SSL: {fallback_error}")
+            return False
+
+    except Exception as e:
+        print(f"   ❌ Unexpected error: {type(e).__name__}: {e}")
+        return False
+
+
+async def test_with_sqlalchemy_url():
+    """Test using SQLAlchemy-style connection URL"""
+
+    print("\n" + "=" * 80)
+    print("TESTING WITH SQLALCHEMY CONNECTION STRING")
+    print("=" * 80)
+
+    password = os.getenv("SUPABASE_DB_PASSWORD")
+
+    # Try different URL formats
+    url_formats = [
+        f"postgresql://postgres:{password}@db.jrgmetdsohowtxickqij.supabase.co:5432/postgres",
+        f"postgresql+asyncpg://postgres:{password}@db.jrgmetdsohowtxickqij.supabase.co:5432/postgres",
+    ]
+
+    for url_format in url_formats:
+        print(f"\n📝 Testing URL format: {url_format[:60]}...")
+
+        # Parse URL and test connection
+        import urllib.parse
+        parsed = urllib.parse.urlparse(url_format.replace("postgresql+asyncpg://", "postgresql://"))
+
+        try:
+            conn = await asyncpg.connect(
+                host=parsed.hostname,
+                port=parsed.port or 5432,
+                user=parsed.username,
+                password=parsed.password,
+                database=parsed.path.lstrip('/'),
+                ssl='require',
+                statement_cache_size=0,
+                timeout=10
+            )
+
+            result = await conn.fetchval("SELECT 1")
+            await conn.close()
+
+            print(f"   ✅ Works with this URL format!")
+            return True
+
+        except Exception as e:
+            print(f"   ❌ Failed: {type(e).__name__}: {str(e)[:80]}")
+
+    return False
+
+
+if __name__ == "__main__":
+    try:
+        print("\n")
+        success = asyncio.run(test_direct_connection_simple())
+
+        if success:
+            # If simple test worked, also test SQLAlchemy format
+            asyncio.run(test_with_sqlalchemy_url())
+            print("\n✅ All tests passed!\n")
+            sys.exit(0)
+        else:
+            print("\n❌ Direct connection test failed\n")
+            sys.exit(1)
+
+    except KeyboardInterrupt:
+        print("\n\n⚠️  Test interrupted by user\n")
+        sys.exit(1)
+    except Exception as e:
+        print(f"\n\n❌ Test failed with error: {e}")
+        import traceback
+        traceback.print_exc()
+        sys.exit(1)

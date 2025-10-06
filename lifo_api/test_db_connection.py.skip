@@ -1,0 +1,319 @@
+#!/usr/bin/env python3
+"""
+Database Connection Diagnostic Tool
+Tests both pooler and direct database connections to identify network issues
+"""
+
+import asyncio
+import os
+import socket
+import sys
+import time
+from pathlib import Path
+
+import asyncpg
+from dotenv import load_dotenv
+
+# Load environment variables
+env_path = Path(__file__).parent.parent / ".env.local"
+load_dotenv(env_path)
+
+
+def test_dns_resolution(hostname: str) -> tuple[bool, str]:
+    """Test if DNS can resolve the hostname"""
+    print(f"\n🔍 Testing DNS resolution for: {hostname}")
+    try:
+        ip_address = socket.gethostbyname(hostname)
+        print(f"   ✅ DNS resolved to: {ip_address}")
+        return True, ip_address
+    except socket.gaierror as e:
+        print(f"   ❌ DNS resolution failed: {e}")
+        return False, str(e)
+
+
+def test_tcp_connection(hostname: str, port: int, timeout: int = 5) -> tuple[bool, str]:
+    """Test if TCP connection can be established"""
+    print(f"\n🔌 Testing TCP connection to: {hostname}:{port}")
+    try:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.settimeout(timeout)
+        start_time = time.time()
+        sock.connect((hostname, port))
+        elapsed = (time.time() - start_time) * 1000
+        sock.close()
+        print(f"   ✅ TCP connection successful ({elapsed:.0f}ms)")
+        return True, f"Connected in {elapsed:.0f}ms"
+    except socket.timeout:
+        print(f"   ❌ TCP connection timeout after {timeout}s")
+        return False, f"Timeout after {timeout}s"
+    except socket.error as e:
+        print(f"   ❌ TCP connection failed: {e}")
+        return False, str(e)
+    finally:
+        sock.close()
+
+
+async def test_asyncpg_connection(
+    host: str,
+    port: int,
+    user: str,
+    password: str,
+    database: str,
+    connection_name: str,
+    timeout: int = 10
+) -> tuple[bool, str]:
+    """Test asyncpg database connection"""
+    print(f"\n🗄️  Testing asyncpg connection: {connection_name}")
+    print(f"   Host: {host}:{port}")
+    print(f"   User: {user}")
+    print(f"   Database: {database}")
+
+    try:
+        start_time = time.time()
+        conn = await asyncpg.connect(
+            host=host,
+            port=port,
+            user=user,
+            password=password,
+            database=database,
+            ssl='require',
+            statement_cache_size=0,
+            timeout=timeout
+        )
+
+        # Test a simple query
+        result = await conn.fetchval("SELECT 1")
+        elapsed = (time.time() - start_time) * 1000
+
+        # Get server info
+        version = await conn.fetchval("SELECT version()")
+        db_name = await conn.fetchval("SELECT current_database()")
+
+        await conn.close()
+
+        print(f"   ✅ Connection successful ({elapsed:.0f}ms)")
+        print(f"   Database: {db_name}")
+        print(f"   Version: {version[:60]}...")
+
+        return True, f"Connected in {elapsed:.0f}ms"
+
+    except asyncio.TimeoutError:
+        elapsed = (time.time() - start_time) * 1000
+        print(f"   ❌ Connection timeout after {elapsed:.0f}ms")
+        return False, f"Timeout after {elapsed:.0f}ms"
+    except asyncpg.exceptions.PostgresError as e:
+        elapsed = (time.time() - start_time) * 1000
+        print(f"   ❌ PostgreSQL error: {e}")
+        return False, f"PostgreSQL error: {e}"
+    except OSError as e:
+        elapsed = (time.time() - start_time) * 1000
+        print(f"   ❌ OS/Network error: {e}")
+        print(f"   Error code: {e.errno}")
+        if e.errno == 101:
+            print(f"   🔴 NETWORK UNREACHABLE - This is the issue!")
+        return False, f"OS error {e.errno}: {e}"
+    except Exception as e:
+        elapsed = (time.time() - start_time) * 1000
+        print(f"   ❌ Unexpected error: {type(e).__name__}: {e}")
+        return False, f"{type(e).__name__}: {e}"
+
+
+def parse_database_url(url: str) -> dict:
+    """Parse database URL into components"""
+    # Remove postgresql+asyncpg:// or postgresql:// prefix
+    url = url.replace("postgresql+asyncpg://", "").replace("postgresql://", "")
+
+    # Parse user:password@host:port/database
+    if "@" in url:
+        auth, rest = url.split("@", 1)
+        user, password = auth.split(":", 1) if ":" in auth else (auth, "")
+
+        if "/" in rest:
+            host_port, database = rest.split("/", 1)
+        else:
+            host_port, database = rest, "postgres"
+
+        if ":" in host_port:
+            host, port = host_port.rsplit(":", 1)
+            port = int(port)
+        else:
+            host, port = host_port, 5432
+
+        return {
+            "host": host,
+            "port": port,
+            "user": user,
+            "password": password,
+            "database": database
+        }
+    else:
+        raise ValueError(f"Invalid database URL format: {url}")
+
+
+async def run_diagnostics():
+    """Run complete diagnostic suite"""
+    print("=" * 80)
+    print("DATABASE CONNECTION DIAGNOSTIC TOOL")
+    print("=" * 80)
+
+    # Get database URLs from environment
+    pooler_url = os.getenv("DATABASE_URL")
+    direct_url = os.getenv("DATABASE_DIRECT_URL")
+
+    if not pooler_url:
+        print("\n❌ DATABASE_URL not set in environment")
+        return
+
+    if not direct_url:
+        print("\n⚠️  DATABASE_DIRECT_URL not set in environment")
+
+    print(f"\n📝 Environment URLs:")
+    print(f"   DATABASE_URL: {pooler_url[:80]}...")
+    if direct_url:
+        print(f"   DATABASE_DIRECT_URL: {direct_url[:80]}...")
+
+    results = {
+        "pooler": {},
+        "direct": {}
+    }
+
+    # Test Pooler Connection
+    print("\n" + "=" * 80)
+    print("TEST 1: POOLER CONNECTION (pgBouncer)")
+    print("=" * 80)
+
+    try:
+        pooler_config = parse_database_url(pooler_url)
+
+        # DNS test
+        dns_ok, dns_result = test_dns_resolution(pooler_config["host"])
+        results["pooler"]["dns"] = {"success": dns_ok, "result": dns_result}
+
+        # TCP test
+        tcp_ok, tcp_result = test_tcp_connection(
+            pooler_config["host"],
+            pooler_config["port"]
+        )
+        results["pooler"]["tcp"] = {"success": tcp_ok, "result": tcp_result}
+
+        # Database connection test
+        db_ok, db_result = await test_asyncpg_connection(
+            pooler_config["host"],
+            pooler_config["port"],
+            pooler_config["user"],
+            pooler_config["password"],
+            pooler_config["database"],
+            "Pooler (pgBouncer)"
+        )
+        results["pooler"]["database"] = {"success": db_ok, "result": db_result}
+
+    except Exception as e:
+        print(f"\n❌ Pooler test failed: {e}")
+        results["pooler"]["error"] = str(e)
+
+    # Test Direct Connection
+    if direct_url:
+        print("\n" + "=" * 80)
+        print("TEST 2: DIRECT CONNECTION (Bypass pgBouncer)")
+        print("=" * 80)
+
+        try:
+            direct_config = parse_database_url(direct_url)
+
+            # DNS test
+            dns_ok, dns_result = test_dns_resolution(direct_config["host"])
+            results["direct"]["dns"] = {"success": dns_ok, "result": dns_result}
+
+            # TCP test
+            tcp_ok, tcp_result = test_tcp_connection(
+                direct_config["host"],
+                direct_config["port"]
+            )
+            results["direct"]["tcp"] = {"success": tcp_ok, "result": tcp_result}
+
+            # Database connection test
+            db_ok, db_result = await test_asyncpg_connection(
+                direct_config["host"],
+                direct_config["port"],
+                direct_config["user"],
+                direct_config["password"],
+                direct_config["database"],
+                "Direct Connection",
+                timeout=10
+            )
+            results["direct"]["database"] = {"success": db_ok, "result": db_result}
+
+        except Exception as e:
+            print(f"\n❌ Direct connection test failed: {e}")
+            results["direct"]["error"] = str(e)
+
+    # Summary
+    print("\n" + "=" * 80)
+    print("DIAGNOSTIC SUMMARY")
+    print("=" * 80)
+
+    print("\n📊 Pooler Connection (pgBouncer):")
+    if "error" in results["pooler"]:
+        print(f"   ❌ Error: {results['pooler']['error']}")
+    else:
+        for test_name, test_result in results["pooler"].items():
+            status = "✅" if test_result["success"] else "❌"
+            print(f"   {status} {test_name.upper()}: {test_result['result']}")
+
+    if direct_url:
+        print("\n📊 Direct Connection:")
+        if "error" in results["direct"]:
+            print(f"   ❌ Error: {results['direct']['error']}")
+        else:
+            for test_name, test_result in results["direct"].items():
+                status = "✅" if test_result["success"] else "❌"
+                print(f"   {status} {test_name.upper()}: {test_result['result']}")
+
+    # Diagnosis
+    print("\n" + "=" * 80)
+    print("🔬 DIAGNOSIS")
+    print("=" * 80)
+
+    if results["pooler"].get("database", {}).get("success"):
+        print("\n✅ Pooler connection works - Use this for all operations")
+        print("   Expected performance: ~8-10s for 1000 items")
+    else:
+        print("\n❌ Pooler connection failed - Check credentials and network")
+
+    if direct_url:
+        direct_db_ok = results["direct"].get("database", {}).get("success")
+        direct_tcp_ok = results["direct"].get("tcp", {}).get("success")
+
+        if direct_db_ok:
+            print("\n✅ Direct connection works - Use this for bulk operations!")
+            print("   Expected performance: ~2-4s for 1000 items")
+        elif not direct_tcp_ok:
+            print("\n⚠️  Direct connection TCP failed - Network/Firewall issue")
+            print("\n   POSSIBLE CAUSES:")
+            print("   1. WSL firewall blocking outbound connections to port 5432")
+            print("   2. Supabase IP whitelist blocking your IP")
+            print("   3. ISP/Router blocking PostgreSQL port (5432)")
+            print("   4. VPN interfering with connection")
+            print("\n   RECOMMENDATIONS:")
+            print("   - Test from production environment (not WSL)")
+            print("   - Check WSL firewall rules")
+            print("   - Try from different network (mobile hotspot)")
+            print("   - Check Supabase network settings")
+        else:
+            print("\n⚠️  Direct connection failed at database level")
+            print("   Check credentials and SSL settings")
+
+    print("\n" + "=" * 80)
+
+
+if __name__ == "__main__":
+    try:
+        asyncio.run(run_diagnostics())
+    except KeyboardInterrupt:
+        print("\n\n⚠️  Diagnostic interrupted by user")
+        sys.exit(1)
+    except Exception as e:
+        print(f"\n\n❌ Diagnostic failed: {e}")
+        import traceback
+        traceback.print_exc()
+        sys.exit(1)
