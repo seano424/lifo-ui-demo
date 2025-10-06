@@ -65,6 +65,11 @@
   "bottomSheet": {
     "units": "{count} unités"
   },
+  "completionStatus": {
+    "pending": "En attente",
+    "in_progress": "En cours",
+    "completed": "Terminé"
+  },
   "discount": {
     "success": "Remise de {percent}% appliquée avec succès à {product}",
     "error": "Échec de l'application de la remise : {error}",

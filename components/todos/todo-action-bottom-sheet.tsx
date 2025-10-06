@@ -13,7 +13,16 @@ import { DetailsTab } from './todos-dialog-tabs/details-tab'
 import { SoldTab } from './todos-dialog-tabs/sold-tab'
 import { Typography } from '../ui/typography'
 
-import { PercentIcon, PackageOpenIcon, TagIcon, PackageXIcon, SparklesIcon } from 'lucide-react'
+import {
+  PercentIcon,
+  PackageOpenIcon,
+  TagIcon,
+  PackageXIcon,
+  SparklesIcon,
+  CheckCircle2Icon,
+  CircleDashedIcon,
+  ClockIcon,
+} from 'lucide-react'
 
 interface TodoActionBottomSheetProps {
   isOpen: boolean
@@ -54,6 +63,35 @@ export function TodoActionBottomSheet({
     return t('card.daysLeft', { days: diffDays })
   }
 
+  // Get status badge configuration
+  const getStatusConfig = () => {
+    const status = currentBatch.completion_status || 'pending'
+    switch (status) {
+      case 'completed':
+        return {
+          icon: CheckCircle2Icon,
+          label: t('completionStatus.completed'),
+          className: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+        }
+      case 'in_progress':
+        return {
+          icon: ClockIcon,
+          label: t('completionStatus.in_progress'),
+          className: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
+        }
+      case 'pending':
+      default:
+        return {
+          icon: CircleDashedIcon,
+          label: t('completionStatus.pending'),
+          className: 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300',
+        }
+    }
+  }
+
+  const statusConfig = getStatusConfig()
+  const StatusIcon = statusConfig.icon
+
   // Tab configuration
   const tabs = [
     {
@@ -86,11 +124,22 @@ export function TodoActionBottomSheet({
       onClose={onClose}
       titleElement={
         <div className="flex flex-col gap-2">
-          <div className="w-80 overflow-hidden">
-            <div className="truncate">
-              <Typography className="leading-normal" variant="h4">
-                {currentBatch.product_name || ''}
-              </Typography>
+          <div className="flex items-center gap-2 w-full">
+            <div className="flex-1 overflow-hidden">
+              <div className="truncate">
+                <Typography className="leading-normal" variant="h4">
+                  {currentBatch.product_name || ''}
+                </Typography>
+              </div>
+            </div>
+            <div
+              className={cn(
+                'flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap flex-shrink-0',
+                statusConfig.className,
+              )}
+            >
+              <StatusIcon className="size-3.5" />
+              <span>{statusConfig.label}</span>
             </div>
           </div>
           <div className="flex flex-row sm:items-center divide-x">

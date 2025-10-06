@@ -65,6 +65,11 @@
   "bottomSheet": {
     "units": "{count} eenheden"
   },
+  "completionStatus": {
+    "pending": "In behandeling",
+    "in_progress": "Bezig",
+    "completed": "Voltooid"
+  },
   "discount": {
     "success": "{percent}% korting succesvol toegepast op {product}",
     "error": "Korting toepassen mislukt: {error}",
