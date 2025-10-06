@@ -438,9 +438,10 @@ if settings.enable_performance_monitoring:
         enable_detailed_logging=settings.enable_detailed_request_logging,
     )
 
-# Rate limiting middleware
-app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, rate_limit_handler)  # type: ignore
+# Rate limiting middleware (only if enabled)
+if settings.rate_limit_enabled:
+    app.state.limiter = limiter
+    app.add_exception_handler(RateLimitExceeded, rate_limit_handler)  # type: ignore
 
 # Security blocking middleware
 app.middleware("http")(check_blocked_ip)
