@@ -381,13 +381,16 @@ class UnifiedScoringPersistence:
 
                 if isinstance(result, Exception):
                     failed += len(chunk)
-                    errors.append(f"Chunk {chunk_num}: {str(result)}")
+                    error_msg = f"Chunk {chunk_num}: {str(result)}"
+                    errors.append(error_msg)
+                    self.logger.error("Chunk processing exception", chunk_num=chunk_num, error=str(result))
                 elif result and result.get("success"):
                     successful += result["processed"]
                 else:
                     failed += len(chunk)
                     if result and result.get("errors"):
                         errors.extend(result["errors"])
+                        self.logger.error("Chunk processing failed", chunk_num=chunk_num, errors=result.get("errors"))
 
             return {
                 "success": failed == 0,
@@ -510,7 +513,7 @@ class UnifiedScoringPersistence:
             return result and hasattr(result, 'data') and result.data is not None
 
         except Exception as e:
-            self.logger.debug("Supabase upsert error", error=str(e))
+            self.logger.error("Supabase upsert error", error=str(e), error_type=type(e).__name__)
             return False
 
 
