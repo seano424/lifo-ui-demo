@@ -47,7 +47,7 @@ class ActionTrackingService:
             recommended_action=ai_recommendation,
             action_type="maintain",  # Default until user takes action
             ai_score=Decimal(str(ai_score)),
-            performed_at=datetime.now(UTC),
+            performed_at=datetime.now(UTC).replace(tzinfo=None),
             performed_by=uuid.UUID(user_id) if user_id else None,
             # Required fields with defaults
             quantity_affected=Decimal("0"),
@@ -88,7 +88,7 @@ class ActionTrackingService:
         # Update with actual action taken
         action_record.action_type = actual_action  # type: ignore
         action_record.performed_by = uuid.UUID(user_id)  # type: ignore
-        action_record.performed_at = datetime.now(UTC)  # type: ignore
+        action_record.performed_at = datetime.now(UTC).replace(tzinfo=None)  # type: ignore
 
         if quantity_affected is not None:
             action_record.quantity_affected = Decimal(str(quantity_affected))  # type: ignore
@@ -139,7 +139,7 @@ class ActionTrackingService:
             recommended_action=recommended_action,
             action_type=actual_action,
             ai_score=Decimal(str(ai_score)),
-            performed_at=datetime.now(UTC),
+            performed_at=datetime.now(UTC).replace(tzinfo=None),
             performed_by=uuid.UUID(user_id),
             quantity_affected=Decimal(str(quantity_affected)) if quantity_affected else Decimal("0"),
             total_original_value=Decimal(str(total_original_value)) if total_original_value else Decimal("0"),

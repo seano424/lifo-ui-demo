@@ -470,7 +470,7 @@ class AnalyticsWriteService:
                                 recommended_action=result.get("recommendation", "discount"),
                                 action_type="maintain",
                                 ai_score=Decimal(str(urgency_score)),
-                                performed_at=datetime.now(UTC),
+                                performed_at=datetime.now(UTC).replace(tzinfo=None),
                                 # Required NOT NULL fields
                                 quantity_affected=Decimal("0"),
                                 total_original_value=Decimal("0"),

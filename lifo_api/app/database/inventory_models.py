@@ -425,7 +425,7 @@ class BatchAction(Base):
         ),
     )
 
-    created_at = Column(DateTime, nullable=False, default=lambda: datetime.now(UTC))
+    created_at = Column(DateTime, nullable=False, default=lambda: datetime.now(UTC).replace(tzinfo=None))
 
     # Relationships
     batch = relationship("Batch", back_populates="actions")
@@ -475,7 +475,7 @@ class DonationRecipient(Base):
     )
 
     is_active = Column(Boolean, default=True)
-    created_at = Column(DateTime, default=lambda: datetime.now(UTC))
+    created_at = Column(DateTime, default=lambda: datetime.now(UTC).replace(tzinfo=None))
     created_by = Column(
         get_uuid_type(),
         ForeignKey(get_auth_users_fk()),

@@ -641,7 +641,7 @@ class UnifiedWriteService:
             recommended_action=score_result["recommendation"],
             action_type="maintain",  # Default until user acts
             ai_score=Decimal(str(score_result["urgency_score"])),
-            performed_at=datetime.now(UTC),
+            performed_at=datetime.now(UTC).replace(tzinfo=None),
             performed_by=uuid.UUID(user_id),
             # Required NOT NULL fields
             quantity_affected=Decimal("0"),
@@ -862,7 +862,7 @@ class UnifiedWriteService:
                                 recommended_action=result["recommendation"],
                                 action_type="maintain",
                                 ai_score=Decimal(str(result["urgency_score"])),
-                                performed_at=datetime.now(UTC),
+                                performed_at=datetime.now(UTC).replace(tzinfo=None),
                                 # Required NOT NULL fields
                                 quantity_affected=Decimal("0"),
                                 total_original_value=Decimal("0"),
@@ -915,7 +915,7 @@ class UnifiedWriteService:
                     recommended_action=action_data.get("recommended_action", "maintain"),
                     action_type=action_data.get("actual_action", action_data.get("action_type", "maintain")),
                     ai_score=Decimal(str(action_data.get("ai_score", 0.5))),
-                    performed_at=datetime.fromisoformat(action_data.get("action_date", action_data.get("performed_at", datetime.now(UTC).isoformat()))),
+                    performed_at=datetime.fromisoformat(action_data.get("action_date", action_data.get("performed_at", datetime.now(UTC).replace(tzinfo=None).isoformat()))).replace(tzinfo=None),
                     performed_by=uuid.UUID(user_id),
                     quantity_affected=Decimal(str(action_data.get("quantity_affected", 0))),
                     total_original_value=Decimal(str(action_data.get("original_value", action_data.get("total_original_value", 0)))),
