@@ -6,6 +6,8 @@
   "tabs": {
     "pending": "En attente",
     "inProgress": "En cours",
+    "expiring": "Expirant",
+    "expired": "Expiré",
     "completed": "Terminé"
   },
   "pending": {

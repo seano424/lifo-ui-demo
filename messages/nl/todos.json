@@ -6,6 +6,8 @@
   "tabs": {
     "pending": "In afwachting",
     "inProgress": "Bezig",
+    "expiring": "Verlopen",
+    "expired": "Verlopen",
     "completed": "Voltooid"
   },
   "pending": {

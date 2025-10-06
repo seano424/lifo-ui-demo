@@ -125,6 +125,20 @@ export function useExpiringTodos(daysMax: number = 3, pageSize: number = 20) {
   )
 }
 
+// Expired items (already past expiry date)
+export function useExpiredTodos(
+  additionalFilters?: Omit<TodoFilters, 'batch_status'>,
+  pageSize: number = 20,
+) {
+  return useTodosWithFilters(
+    {
+      batch_status: ['expired'],
+      ...additionalFilters,
+    },
+    pageSize,
+  )
+}
+
 // Items ready for discount
 export function useDiscountableTodos(pageSize: number = 20) {
   return useTodosWithFilters(

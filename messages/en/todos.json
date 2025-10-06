@@ -6,6 +6,8 @@
   "tabs": {
     "pending": "Pending",
     "inProgress": "In Progress",
+    "expiring": "Expiring",
+    "expired": "Expired",
     "completed": "Completed"
   },
   "pending": {
@@ -28,6 +30,20 @@
     "noCompletedHeading": "No completed todos",
     "notFound": "No completed todos found.",
     "noMatch": "No completed todos match your filters"
+  },
+  "expiring": {
+    "errorLoading": "Error loading expiring todos",
+    "loading": "Loading expiring todos...",
+    "noExpiringHeading": "No expiring items!",
+    "allGood": "All items are fresh. No items expiring soon.",
+    "noMatch": "No expiring todos match your filters"
+  },
+  "expired": {
+    "errorLoading": "Error loading expired todos",
+    "loading": "Loading expired todos...",
+    "noExpiredHeading": "No expired items!",
+    "allCleared": "Great job! All expired items have been cleared.",
+    "noMatch": "No expired todos match your filters"
   },
   "emptyStateWithFilters": "Try adjusting your filters to see more items.",
   "card": {
