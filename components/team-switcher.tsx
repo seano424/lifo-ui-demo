@@ -1,6 +1,5 @@
 'use client'
 
-import { MapPin, Settings } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import {
   DropdownMenu,
@@ -20,6 +19,7 @@ import { useStoreActions, useUserStores } from '@/hooks/use-stores'
 import type { Store } from '@/lib/queries/stores'
 import { useStoreState } from '@/lib/stores/store-context'
 import { cn } from '@/lib/utils'
+import { MapPin, Settings, Store as StoreIcon } from 'lucide-react'
 import { Button } from './ui/button'
 import { Skeleton } from './ui/skeleton'
 
@@ -44,6 +44,7 @@ export function TeamSwitcher() {
               disabled
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground flex items-center gap-4 px-4 rounded-2xl border group-data-[state=collapsed]:border-none"
             >
+              <StoreIcon className="w-4 h-4 text-muted-foreground" />
               <div className="flex flex-col gap-1">
                 <Skeleton className="h-5 w-32 rounded-2xl bg-muted" />
               </div>
@@ -64,7 +65,7 @@ export function TeamSwitcher() {
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground flex items-center gap-4 px-4 py-2 rounded-2xl border group-data-[state=collapsed]:border-none"
             >
               <div className="flex aspect-square size-8 items-center justify-center rounded-2xl bg-muted">
-                <div className="flex aspect-square size-8 items-center justify-center rounded-2xl bg-muted" />
+                <StoreIcon className="w-4 h-4 text-muted-foreground" />
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="text-muted-foreground">No stores available</span>
@@ -82,7 +83,12 @@ export function TeamSwitcher() {
         <SidebarMenuItem>
           <DropdownMenu>
             <DropdownMenuTrigger asChild className="w-full">
-              <Button disabled={isChangingStore} variant="outline">
+              <Button
+                disabled={isChangingStore}
+                variant="outline"
+                className="flex items-center gap-2"
+              >
+                <StoreIcon className="w-4 h-4" />
                 {activeStore.store_name}
               </Button>
             </DropdownMenuTrigger>

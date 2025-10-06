@@ -1,5 +1,4 @@
 import { useLocale, useTranslations } from 'next-intl'
-import { useEffect, useState } from 'react'
 import {
   Select,
   SelectContent,
@@ -9,7 +8,8 @@ import {
 } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
 import { getLocalizedCategoryName } from '@/lib/category-translations'
-import { type Category, fetchCategories } from '@/lib/queries/products'
+import type { Category } from '@/lib/queries/products'
+import { useCategories } from '@/hooks/use-categories'
 
 interface ProductListFiltersProps {
   filters?: {
@@ -28,28 +28,11 @@ export function ProductListFilters({
 }: ProductListFiltersProps) {
   const t = useTranslations('productFilters')
   const locale = useLocale()
-  const [categories, setCategories] = useState<Category[]>([])
-  const [categoriesLoading, setCategoriesLoading] = useState(true)
+  const { categories, isLoading: categoriesLoading } = useCategories()
 
   const getCategoryDisplayName = (category: Category) => {
     return getLocalizedCategoryName(category, locale)
   }
-
-  useEffect(() => {
-    async function loadCategories() {
-      try {
-        setCategoriesLoading(true)
-        const data = await fetchCategories()
-        setCategories(data)
-      } catch (error) {
-        console.error('Failed to load categories:', error)
-      } finally {
-        setCategoriesLoading(false)
-      }
-    }
-
-    loadCategories()
-  }, [])
 
   if (!onFiltersChange) {
     return null

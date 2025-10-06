@@ -1,6 +1,7 @@
 {
   "marketing": {
     "nav": {
+      "menuButton": "Open menu",
       "about": "About",
       "features": "Features",
       "resources": "Resources",
@@ -160,14 +161,16 @@
   },
   "landingpage": {
     "hero": {
-      "title": "The Future of Inventory Management is Here.",
-      "subtitle": "The smart solution to reduce waste and increase your profits",
+      "title": "Smarter Inventory Decisions Batch by Batch",
+      "subtitle": "Reduce waste, optimize ordering, and boost your margins with AI-driven insights designed for store managers",
       "buttons": {
         "freeTrial": "Start my free trial",
-        "explore": "Explore the platform"
+        "explore": "Explore the platform",
+        "dashboard": "Go to my Dashboard"
       },
       "badge": {
-        "text": "Enjoy a 14-day free trial"
+        "text": "Enjoy a one month free trial",
+        "welcomeBack": "Your dashboard is ready"
       }
     },
     "features": {
@@ -345,8 +348,8 @@
         "title": "Free Trial",
         "subtitle": "Pilot shops",
         "price": "Free",
-        "period": "2 months",
-        "description": "All features, with no limitation, for a 2-month free trial.",
+        "period": "1 month",
+        "description": "All features, with no limitation, for a 1-month free trial.",
         "features": {
           "0": "1 day of Onboarding and Training",
           "1": "Full support included",

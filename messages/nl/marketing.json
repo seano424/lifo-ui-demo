@@ -1,6 +1,7 @@
 {
   "marketing": {
     "nav": {
+      "menuButton": "Menu openen",
       "about": "Over",
       "features": "Services",
       "resources": "Bronnen",
@@ -160,14 +161,16 @@
   },
   "landingpage": {
     "hero": {
-      "title": "De toekomst van voorraadbeheer is hier.",
-      "subtitle": "De slimme oplossing om verspilling te verminderen en uw winst te verhogen",
+      "title": "Slimmere voorraad beslissingen Batch per batch",
+      "subtitle": "Verminder verspilling, optimaliseer bestellingen en verhoog uw marges met AI-gestuurde inzichten ontwikkeld voor winkelmanagers",
       "buttons": {
         "freeTrial": "Start mijn gratis proefperiode",
-        "explore": "Verken het platform"
+        "explore": "Verken het platform",
+        "dashboard": "Naar mijn dashboard"
       },
       "badge": {
-        "text": "Geniet van een gratis proefperiode van 14 dagen"
+        "text": "Geniet van een gratis proefperiode van een maand",
+        "welcomeBack": "Uw dashboard is klaar"
       }
     },
     "features": {
@@ -264,8 +267,8 @@
         "title": "Gratis proefperiode",
         "subtitle": "Pilot winkels",
         "price": "Gratis",
-        "period": "2 maanden",
-        "description": "Alle functies, zonder beperkingen, voor een gratis proefperiode van 2 maanden.",
+        "period": "1 maand",
+        "description": "Alle functies, zonder beperkingen, voor een gratis proefperiode van 1 maand.",
         "features": {
           "0": "1 dag onboarding en training",
           "1": "Volledige ondersteuning inbegrepen",
