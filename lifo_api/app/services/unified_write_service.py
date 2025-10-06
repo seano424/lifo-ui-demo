@@ -7,7 +7,7 @@ Designed for the new architecture where the Python backend handles all database 
 import time
 import uuid
 from contextlib import asynccontextmanager
-from datetime import datetime
+from datetime import UTC, datetime
 from decimal import Decimal
 from typing import Any, Dict, List, Optional
 
@@ -627,9 +627,9 @@ class UnifiedWriteService:
             batch_id=uuid.UUID(batch_id),
             store_id=uuid.UUID(store_id),
             recommended_action=score_result["recommendation"],
-            actual_action="maintain",  # Default until user acts
+            action_type="maintain",  # Default until user acts
             ai_score=Decimal(str(score_result["urgency_score"])),
-            action_date=datetime.utcnow(),
+            performed_at=datetime.now(UTC),
             performed_by=uuid.UUID(user_id)
         )
         
@@ -872,9 +872,9 @@ class UnifiedWriteService:
                     batch_id=uuid.UUID(action_data["batch_id"]),
                     store_id=uuid.UUID(store_id),
                     recommended_action=action_data.get("recommended_action", "maintain"),
-                    actual_action=action_data["actual_action"],
+                    action_type=action_data.get("actual_action", action_data.get("action_type", "maintain")),
                     ai_score=Decimal(str(action_data.get("ai_score", 0.5))),
-                    action_date=datetime.fromisoformat(action_data["action_date"]),
+                    performed_at=datetime.fromisoformat(action_data.get("action_date", action_data.get("performed_at", datetime.now(UTC).isoformat()))),
                     performed_by=uuid.UUID(user_id),
                     quantity_affected=Decimal(str(action_data.get("quantity_affected", 0))),
                     notes=action_data.get("notes")

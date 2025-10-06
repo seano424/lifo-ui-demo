@@ -5,7 +5,7 @@ Consolidates analytics data persistence to reduce HTTP overhead
 """
 
 import time
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from typing import Any, Dict, List
 
@@ -460,9 +460,9 @@ class AnalyticsWriteService:
                             batch_id=result["batch_id"],
                             store_id=store_id,
                             recommended_action=result.get("recommendation", "discount"),
-                            actual_action="maintain",
+                            action_type="maintain",
                             ai_score=Decimal(str(urgency_score)),
-                            action_date=datetime.utcnow()
+                            performed_at=datetime.now(UTC)
                         )
                         session.add(recommendation)
                         recommendations_created += 1
@@ -597,13 +597,14 @@ class AnalyticsWriteService:
                     batch_id=action.get("batch_id"),
                     store_id=store_id,
                     recommended_action=action.get("recommended_action", "maintain"),
-                    actual_action=action.get("actual_action", action_type),
+                    action_type=action.get("actual_action", action.get("action_type", action_type)),
                     ai_score=Decimal(str(action.get("ai_score", 0.5))),
-                    action_date=datetime.utcnow(),
+                    performed_at=datetime.now(UTC),
                     performed_by=user_id,
                     quantity_affected=Decimal(str(action.get("quantity_affected", 0))),
-                    original_value=Decimal(str(action.get("original_value", 0))),
-                    recovered_value=Decimal(str(action.get("recovered_value", 0))),
+                    total_original_value=Decimal(str(action.get("original_value", action.get("total_original_value", 0)))),
+                    total_recovered_value=Decimal(str(action.get("recovered_value", action.get("total_recovered_value", 0)))),
+                    batch_initial_quantity=Decimal(str(action.get("batch_initial_quantity", 0))),
                     notes=action.get("notes")
                 )
                 

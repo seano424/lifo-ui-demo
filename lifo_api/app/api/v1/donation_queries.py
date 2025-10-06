@@ -99,7 +99,7 @@ async def get_batch_actions(
     try:
         cutoff_date = datetime.utcnow() - timedelta(days=days)
 
-        query = select(BatchAction).where(BatchAction.action_date >= cutoff_date)
+        query = select(BatchAction).where(BatchAction.performed_at >= cutoff_date)
 
         if store_id:
             query = query.where(BatchAction.store_id == store_id)
@@ -107,7 +107,7 @@ async def get_batch_actions(
         if action_type:
             query = query.where(BatchAction.action_type == action_type)
 
-        query = query.order_by(desc(BatchAction.action_date)).limit(limit)
+        query = query.order_by(desc(BatchAction.performed_at)).limit(limit)
 
         result = await db.execute(query)
         actions = result.scalars().all()
@@ -121,18 +121,18 @@ async def get_batch_actions(
                     "recommended_action": action.recommended_action.value,
                     "actual_action": action.action_type.value,
                     "ai_score": float(action.ai_score) if action.ai_score else None,
-                    "action_date": action.action_date.isoformat()
-                    if action.action_date
+                    "action_date": action.performed_at.isoformat()
+                    if action.performed_at
                     else None,
                     "quantity_affected": float(action.quantity_affected)
                     if action.quantity_affected
                     else None,
                     "notes": action.notes,
-                    "original_value": float(action.original_value)
-                    if action.original_value
+                    "original_value": float(action.total_original_value)
+                    if action.total_original_value
                     else None,
-                    "recovered_value": float(action.recovered_value)
-                    if action.recovered_value
+                    "recovered_value": float(action.total_recovered_value)
+                    if action.total_recovered_value
                     else None,
                     "donation_recipient_id": str(action.donation_recipient_id)
                     if action.donation_recipient_id
@@ -166,7 +166,7 @@ async def get_donation_analytics_summary(
         cutoff_date = datetime.utcnow() - timedelta(days=days)
 
         # Base query
-        query = select(BatchAction).where(BatchAction.action_date >= cutoff_date)
+        query = select(BatchAction).where(BatchAction.performed_at >= cutoff_date)
 
         if store_id:
             query = query.where(BatchAction.store_id == store_id)
@@ -179,15 +179,15 @@ async def get_donation_analytics_summary(
         donation_actions = [a for a in actions if a.action_type == ActionType.DONATE]
 
         total_donated_value = sum(
-            float(action.original_value)
+            float(action.total_original_value)
             for action in donation_actions
-            if action.original_value
+            if action.total_original_value
         )
 
         total_recovered_value = sum(
-            float(action.recovered_value)
+            float(action.total_recovered_value)
             for action in donation_actions
-            if action.recovered_value
+            if action.total_recovered_value
         )
 
         # Action type breakdown

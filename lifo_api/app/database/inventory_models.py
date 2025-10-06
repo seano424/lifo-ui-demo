@@ -393,20 +393,29 @@ class BatchAction(Base):
         DECIMAL(3, 2)
     )  # AI score that triggered recommendation (0.00-1.00)
 
-    # Tracking details
-    action_date = Column(DateTime, default=lambda: datetime.now(UTC))
-    quantity_affected: Column[DECIMAL] = Column(DECIMAL(12, 4))
-    notes = Column(Text)  # User notes (e.g., "donated to local food bank")
+    # Tracking details (from actual database schema)
+    quantity_affected: Column[DECIMAL] = Column(DECIMAL(12, 4), nullable=False)
+    total_original_value: Column[DECIMAL] = Column(DECIMAL(10, 2), nullable=False)  # Value before action
+    total_recovered_value: Column[DECIMAL] = Column(DECIMAL(10, 2), nullable=False)  # Value after action
+    batch_initial_quantity: Column[DECIMAL] = Column(DECIMAL(12, 4), nullable=False)
 
-    # Financial tracking (for ROI calculations)
-    original_value: Column[DECIMAL] = Column(DECIMAL(10, 2))  # Value before action
-    recovered_value: Column[DECIMAL] = Column(DECIMAL(10, 2))  # Value after action
+    # Optional tracking fields
+    discount_percentage: Column[DECIMAL] = Column(DECIMAL(5, 2))
+    disposal_reason = Column(Text)
+    notes = Column(Text)  # User notes (e.g., "donated to local food bank")
 
     # User and donation tracking
     performed_by = Column(
         get_uuid_type(),
         ForeignKey(get_auth_users_fk()),
     )
+    performed_at = Column(DateTime)  # When action was performed
+    verified_by = Column(
+        get_uuid_type(),
+        ForeignKey(get_auth_users_fk()),
+    )
+    verified_at = Column(DateTime)  # When action was verified
+
     donation_recipient_id = Column(
         get_uuid_type(),
         ForeignKey(
@@ -416,7 +425,7 @@ class BatchAction(Base):
         ),
     )
 
-    created_at = Column(DateTime, default=lambda: datetime.now(UTC))
+    created_at = Column(DateTime, nullable=False, default=lambda: datetime.now(UTC))
 
     # Relationships
     batch = relationship("Batch", back_populates="actions")
