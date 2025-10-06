@@ -7,7 +7,7 @@ import type { ExpiryDateInfo } from '@/lib/stores/scanning-workflow-store'
 import { createClient } from '@/lib/supabase/client'
 
 // Environment variables
-const FASTAPI_URL = process.env.FASTAPI_URL
+const FASTAPI_URL = process.env.NEXT_PUBLIC_FASTAPI_URL
 
 /**
  * Get authentication headers for FastAPI requests
