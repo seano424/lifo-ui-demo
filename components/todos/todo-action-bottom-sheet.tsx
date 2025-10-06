@@ -79,7 +79,6 @@ export function TodoActionBottomSheet({
           label: t('completionStatus.in_progress'),
           className: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
         }
-      case 'pending':
       default:
         return {
           icon: CircleDashedIcon,

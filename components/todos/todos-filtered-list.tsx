@@ -10,19 +10,12 @@ import {
   useInProgressTodos,
   usePendingTodos,
 } from '@/hooks/use-todos-with-filters'
-import type {
-  BatchStatus,
-  TodoActionType,
-  TodoUrgencyLevel,
-} from '@/lib/queries/todos-rpc'
+import type { BatchStatus, TodoActionType, TodoUrgencyLevel } from '@/lib/queries/todos-rpc'
 import { cn } from '@/lib/utils'
 import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import {
-  TodoFiltersPanel,
-  type TodoFiltersState,
-} from './filters/todo-filters-panel'
+import { TodoFiltersPanel, type TodoFiltersState } from './filters/todo-filters-panel'
 import type { SortDirection, SortField } from './filters/todo-sort-controls'
 import { CompletedTab } from './todos-main-tabs/completed-tab'
 import { ExpiredTab } from './todos-main-tabs/expired-tab'
@@ -30,12 +23,7 @@ import { ExpiringTab } from './todos-main-tabs/expiring-tab'
 import { InProgressTab } from './todos-main-tabs/in-progress-tab'
 import { PendingTab } from './todos-main-tabs/pending-tab'
 
-export type TodoTabType =
-  | 'pending'
-  | 'in_progress'
-  | 'completed'
-  | 'expiring'
-  | 'expired'
+export type TodoTabType = 'pending' | 'in_progress' | 'completed' | 'expiring' | 'expired'
 
 interface TodosFilteredListProps {
   initialFilters?: {
@@ -50,17 +38,14 @@ interface TodosFilteredListProps {
   pageSize?: number
 }
 
-export function TodosFilteredList({
-  initialFilters,
-  pageSize = 20,
-}: TodosFilteredListProps) {
+export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilteredListProps) {
   const t = useTranslations('todos')
   const router = useRouter()
   const { isMobile } = useMediaQuery()
   const [showFilters, setShowFilters] = useState(false)
 
   const [activeTab, setActiveTab] = useState<TodoTabType>(
-    (initialFilters?.tab as TodoTabType) || 'pending'
+    (initialFilters?.tab as TodoTabType) || 'pending',
   )
 
   // Tab indicator animation
@@ -76,7 +61,7 @@ export function TodosFilteredList({
       field: 'urgency' as const,
       direction: 'desc' as const,
     }),
-    []
+    [],
   )
 
   const [filters, setFilters] = useState<TodoFiltersState>(() => {
@@ -106,7 +91,7 @@ export function TodosFilteredList({
       days_to_expiry_min: filters.days_to_expiry_min,
       days_to_expiry_max: filters.days_to_expiry_max,
     },
-    pageSize
+    pageSize,
   )
   const { data: expiredTodos } = useExpiredTodos(filters, pageSize)
 
@@ -151,13 +136,13 @@ export function TodosFilteredList({
       expiredTodos?.length,
       completedTodos?.length,
       t,
-    ]
+    ],
   )
 
   // Update tab indicator position
   useEffect(() => {
     const updateIndicator = () => {
-      const activeIndex = tabs.findIndex((tab) => tab.id === activeTab)
+      const activeIndex = tabs.findIndex(tab => tab.id === activeTab)
       const activeButton = buttonRefs.current[activeIndex]
 
       if (activeButton) {
@@ -222,24 +207,17 @@ export function TodosFilteredList({
   }
 
   const handleFiltersChange = useCallback(
-    (
-      newFilters:
-        | TodoFiltersState
-        | ((prevFilters: TodoFiltersState) => TodoFiltersState)
-    ) => {
+    (newFilters: TodoFiltersState | ((prevFilters: TodoFiltersState) => TodoFiltersState)) => {
       setFilters(newFilters)
     },
-    []
+    [],
   )
 
   return (
     <div className="space-y-6">
       {/* Filter Panel */}
       <div className="flex sm:hidden justify-center py-4 border-y border-muted">
-        <Button
-          variant="subtleTertiary"
-          onClick={() => setShowFilters(!showFilters)}
-        >
+        <Button variant="subtleTertiary" onClick={() => setShowFilters(!showFilters)}>
           {t('filters.clearAll').replace(' all', 's')}
         </Button>
       </div>
@@ -279,9 +257,7 @@ export function TodosFilteredList({
               className={cn(
                 'rounded-none relative flex flex-col-reverse sm:flex-row items-center pb-4 whitespace-nowrap gap-1 gap-2',
                 'hover:bg-transparent group/tab',
-                activeTab === tab.id
-                  ? 'text-primary'
-                  : 'text-muted-foreground/90'
+                activeTab === tab.id ? 'text-primary' : 'text-muted-foreground/90',
               )}
             >
               {tab.label}
@@ -314,10 +290,7 @@ export function TodosFilteredList({
             display: activeTab === 'pending' ? 'block' : 'none',
           }}
         >
-          <PendingTab
-            filters={filters}
-            pageSize={pageSize}
-          />
+          <PendingTab filters={filters} pageSize={pageSize} />
         </div>
 
         <div
@@ -325,10 +298,7 @@ export function TodosFilteredList({
             display: activeTab === 'in_progress' ? 'block' : 'none',
           }}
         >
-          <InProgressTab
-            filters={filters}
-            pageSize={pageSize}
-          />
+          <InProgressTab filters={filters} pageSize={pageSize} />
         </div>
 
         <div
@@ -336,10 +306,7 @@ export function TodosFilteredList({
             display: activeTab === 'expiring' ? 'block' : 'none',
           }}
         >
-          <ExpiringTab
-            filters={filters}
-            pageSize={pageSize}
-          />
+          <ExpiringTab filters={filters} pageSize={pageSize} />
         </div>
 
         <div
@@ -347,10 +314,7 @@ export function TodosFilteredList({
             display: activeTab === 'expired' ? 'block' : 'none',
           }}
         >
-          <ExpiredTab
-            filters={filters}
-            pageSize={pageSize}
-          />
+          <ExpiredTab filters={filters} pageSize={pageSize} />
         </div>
 
         <div
@@ -358,10 +322,7 @@ export function TodosFilteredList({
             display: activeTab === 'completed' ? 'block' : 'none',
           }}
         >
-          <CompletedTab
-            filters={filters}
-            pageSize={pageSize}
-          />
+          <CompletedTab filters={filters} pageSize={pageSize} />
         </div>
       </div>
     </div>

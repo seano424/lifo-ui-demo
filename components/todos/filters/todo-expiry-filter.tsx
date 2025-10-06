@@ -1,6 +1,5 @@
 'use client'
 
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -26,25 +25,80 @@ interface TodoExpiryFilterProps {
 
 // Expiring presets (positive values - future dates)
 const EXPIRING_PRESETS = [
-  { value: 'all', translationKey: 'filters.expiry.expiring.all', min: 0, max: undefined },
-  { value: '3days', translationKey: 'filters.expiry.expiring.3days', min: 0, max: 3 },
-  { value: '1week', translationKey: 'filters.expiry.expiring.1week', min: 0, max: 7 },
-  { value: '2weeks', translationKey: 'filters.expiry.expiring.2weeks', min: 0, max: 14 },
-  { value: '1month', translationKey: 'filters.expiry.expiring.1month', min: 0, max: 30 },
+  {
+    value: 'all',
+    translationKey: 'filters.expiry.expiring.all',
+    min: 0,
+    max: undefined,
+  },
+  {
+    value: '3days',
+    translationKey: 'filters.expiry.expiring.3days',
+    min: 0,
+    max: 3,
+  },
+  {
+    value: '1week',
+    translationKey: 'filters.expiry.expiring.1week',
+    min: 0,
+    max: 7,
+  },
+  {
+    value: '2weeks',
+    translationKey: 'filters.expiry.expiring.2weeks',
+    min: 0,
+    max: 14,
+  },
+  {
+    value: '1month',
+    translationKey: 'filters.expiry.expiring.1month',
+    min: 0,
+    max: 30,
+  },
 ]
 
 // Expired presets (negative values - past dates)
 const EXPIRED_PRESETS = [
-  { value: 'all', translationKey: 'filters.expiry.expired.all', min: undefined, max: -1 },
-  { value: '3days', translationKey: 'filters.expiry.expired.3days', min: -3, max: -1 },
-  { value: '1week', translationKey: 'filters.expiry.expired.1week', min: -7, max: -1 },
-  { value: '2weeks', translationKey: 'filters.expiry.expired.2weeks', min: -14, max: -1 },
-  { value: '1month', translationKey: 'filters.expiry.expired.1month', min: -30, max: -1 },
+  {
+    value: 'all',
+    translationKey: 'filters.expiry.expired.all',
+    min: undefined,
+    max: -1,
+  },
+  {
+    value: '3days',
+    translationKey: 'filters.expiry.expired.3days',
+    min: -3,
+    max: -1,
+  },
+  {
+    value: '1week',
+    translationKey: 'filters.expiry.expired.1week',
+    min: -7,
+    max: -1,
+  },
+  {
+    value: '2weeks',
+    translationKey: 'filters.expiry.expired.2weeks',
+    min: -14,
+    max: -1,
+  },
+  {
+    value: '1month',
+    translationKey: 'filters.expiry.expired.1month',
+    min: -30,
+    max: -1,
+  },
 ]
 
 // General presets for other tabs
 const GENERAL_PRESETS = [
-  { value: 'all', translationKey: 'filters.expiry.general.all', min: undefined, max: undefined },
+  {
+    value: 'all',
+    translationKey: 'filters.expiry.general.all',
+    min: undefined,
+    max: undefined,
+  },
   {
     value: 'expiring_soon',
     translationKey: 'filters.expiry.general.expiringSoon',
@@ -108,18 +162,13 @@ export function TodoExpiryFilter({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
-          variant={isActive ? 'default' : 'outline'}
-          size="sm"
-          disabled={isLoading}
-          className="h-9 gap-2"
-        >
+        <Button variant={isActive ? 'default' : 'outline'} disabled={isLoading}>
           <Calendar className="h-4 w-4" />
           <span className="hidden sm:inline">{getFilterLabel()}</span>
           {currentPreset && (
-            <Badge variant={isActive ? 'secondary' : 'outline'} className="ml-1 px-2">
+            <span className="text-white ml-1 border border-gray-500 rounded-2xl px-2 py-1">
               {t(currentPreset.translationKey)}
-            </Badge>
+            </span>
           )}
           {isActive ? (
             <X className="h-3 w-3 ml-1 hover:scale-110" onClick={handleClear} />
