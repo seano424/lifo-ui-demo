@@ -45,12 +45,12 @@ class Alert:
     source: str
     category: str
     timestamp: datetime
-    metadata: Dict[str, Any]
-    tags: Set[str]
-    tenant_id: Optional[str] = None
-    store_id: Optional[str] = None
+    metadata: dict[str, Any]
+    tags: set[str]
+    tenant_id: str | None = None
+    store_id: str | None = None
     
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert alert to dictionary"""
         return {
             "id": self.id,
@@ -117,7 +117,7 @@ class AlertManager:
     """
     
     def __init__(self):
-        self.channels: Dict[AlertChannel, Any] = {}
+        self.channels: dict[AlertChannel, Any] = {}
         self.throttling = AlertThrottling()
         self.alert_history = deque(maxlen=1000)
         self.channel_configs = self._load_channel_configs()
@@ -126,7 +126,7 @@ class AlertManager:
         # Setup channels
         self._setup_channels()
     
-    def _load_channel_configs(self) -> Dict[str, Any]:
+    def _load_channel_configs(self) -> dict[str, Any]:
         """Load channel configurations from settings"""
         return {
             "slack": {
@@ -155,7 +155,7 @@ class AlertManager:
             }
         }
     
-    def _load_alert_rules(self) -> Dict[str, Dict[str, Any]]:
+    def _load_alert_rules(self) -> dict[str, dict[str, Any]]:
         """Load alert routing rules"""
         return {
             "performance_degradation": {
@@ -219,10 +219,10 @@ class AlertManager:
         message: str,
         source: str,
         category: str,
-        metadata: Optional[Dict[str, Any]] = None,
-        tags: Optional[Set[str]] = None,
-        tenant_id: Optional[str] = None,
-        store_id: Optional[str] = None,
+        metadata: dict[str, Any] | None = None,
+        tags: set[str] | None = None,
+        tenant_id: str | None = None,
+        store_id: str | None = None,
         force: bool = False
     ) -> str:
         """Send alert through appropriate channels"""
@@ -281,7 +281,7 @@ class AlertManager:
                     asyncio.gather(*send_tasks, return_exceptions=True),
                     timeout=30
                 )
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 logger.warning("Alert sending timed out", alert_id=alert.id)
         
         logger.info(
@@ -294,7 +294,7 @@ class AlertManager:
         
         return alert.id
     
-    def _get_channels_for_alert(self, alert: Alert) -> List[AlertChannel]:
+    def _get_channels_for_alert(self, alert: Alert) -> list[AlertChannel]:
         """Determine which channels should receive this alert"""
         channels = set()
         
@@ -326,7 +326,7 @@ class AlertManager:
                 error=str(e)
             )
     
-    def get_alert_history(self, hours: int = 24) -> List[Dict[str, Any]]:
+    def get_alert_history(self, hours: int = 24) -> list[dict[str, Any]]:
         """Get alert history for the specified time period"""
         cutoff_time = datetime.now(UTC) - timedelta(hours=hours)
         
@@ -336,7 +336,7 @@ class AlertManager:
             if alert.timestamp > cutoff_time
         ]
     
-    def get_alert_stats(self) -> Dict[str, Any]:
+    def get_alert_stats(self) -> dict[str, Any]:
         """Get alert statistics"""
         current_time = datetime.now(UTC)
         
@@ -364,7 +364,7 @@ class AlertManager:
 class SlackChannel:
     """Slack notification channel"""
     
-    def __init__(self, config: Dict[str, Any]):
+    def __init__(self, config: dict[str, Any]):
         self.webhook_url = config["webhook_url"]
         self.channel = config["channel"]
         self.username = config["username"]
@@ -441,7 +441,7 @@ class SlackChannel:
 class EmailChannel:
     """Email notification channel"""
     
-    def __init__(self, config: Dict[str, Any]):
+    def __init__(self, config: dict[str, Any]):
         self.smtp_server = config["smtp_server"]
         self.smtp_port = config["smtp_port"]
         self.smtp_username = config["smtp_username"]
@@ -463,7 +463,7 @@ class EmailChannel:
 class WebhookChannel:
     """Generic webhook notification channel"""
     
-    def __init__(self, config: Dict[str, Any]):
+    def __init__(self, config: dict[str, Any]):
         self.url = config["url"]
         self.headers = config["headers"]
     
@@ -482,7 +482,7 @@ class WebhookChannel:
 class PagerDutyChannel:
     """PagerDuty notification channel"""
     
-    def __init__(self, config: Dict[str, Any]):
+    def __init__(self, config: dict[str, Any]):
         self.integration_key = config["integration_key"]
     
     async def send_alert(self, alert: Alert) -> None:
@@ -510,7 +510,7 @@ async def send_performance_alert(
     title: str,
     message: str,
     severity: AlertSeverity = AlertSeverity.MEDIUM,
-    metadata: Optional[Dict[str, Any]] = None
+    metadata: dict[str, Any] | None = None
 ) -> str:
     """Send performance-related alert"""
     return await alert_manager.send_alert(
@@ -527,7 +527,7 @@ async def send_security_alert(
     title: str,
     message: str,
     severity: AlertSeverity = AlertSeverity.HIGH,
-    metadata: Optional[Dict[str, Any]] = None
+    metadata: dict[str, Any] | None = None
 ) -> str:
     """Send security-related alert"""
     return await alert_manager.send_alert(
@@ -544,8 +544,8 @@ async def send_business_alert(
     title: str,
     message: str,
     severity: AlertSeverity = AlertSeverity.HIGH,
-    store_id: Optional[str] = None,
-    metadata: Optional[Dict[str, Any]] = None
+    store_id: str | None = None,
+    metadata: dict[str, Any] | None = None
 ) -> str:
     """Send business-critical alert"""
     return await alert_manager.send_alert(

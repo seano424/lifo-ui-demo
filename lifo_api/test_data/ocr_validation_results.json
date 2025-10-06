@@ -1,0 +1,794 @@
+{
+  "validation_summary": {
+    "total_tests": 10,
+    "passed_tests": 3,
+    "failed_tests": 7,
+    "accuracy_by_service": {
+      "dates": 0.5666666666666667,
+      "barcodes": 0.7,
+      "product_names": 1.0
+    },
+    "performance_metrics": {
+      "dates": 1.855921745300293,
+      "barcodes": 0.33500194549560547,
+      "product_names": 1.1230230331420898
+    },
+    "language_performance": {
+      "french": 0.0,
+      "german": 0.0,
+      "spanish": 1.0,
+      "english": 0.0,
+      "multilingual": 1.0,
+      "italian": 1.0
+    },
+    "region_performance": {
+      "EU": 0.42857142857142855,
+      "US": 0.0
+    }
+  },
+  "detailed_results": [
+    {
+      "test_id": "EU_DAIRY_FR_001",
+      "description": "French butter with manufacturing and expiry dates",
+      "region": "EU",
+      "language": "french",
+      "category": "dairy",
+      "results": {
+        "dates": {
+          "extracted": [
+            {
+              "type": "manufactured",
+              "date": "2025-09-15",
+              "format": "DD/MM/YYYY",
+              "raw_text": "15/09/2025",
+              "confidence": 1.0
+            }
+          ],
+          "expected_count": 2,
+          "found_count": 1,
+          "accuracy": 0.5,
+          "performance_ms": 9.647607803344727,
+          "passed": false
+        },
+        "barcodes": {
+          "detected": [
+            {
+              "value": "3760020507980",
+              "format": "EAN-13",
+              "checksum_valid": false,
+              "confidence": 0.5
+            }
+          ],
+          "expected_count": 1,
+          "found_count": 1,
+          "accuracy": 1.0,
+          "performance_ms": 0.6208419799804688,
+          "passed": true
+        },
+        "product_names": {
+          "extracted": [
+            {
+              "name": "Président Beurre Doux",
+              "classification": "description",
+              "brand_detected": null,
+              "confidence": 0.85
+            },
+            {
+              "name": "Beurre de Crème Pasteurisée",
+              "classification": "description",
+              "brand_detected": null,
+              "confidence": 0.85
+            },
+            {
+              "name": "Fabriqué en France",
+              "classification": "description",
+              "brand_detected": null,
+              "confidence": 0.85
+            }
+          ],
+          "expected_count": 2,
+          "found_count": 3,
+          "accuracy": 1.0,
+          "performance_ms": 3.464937210083008,
+          "passed": true
+        }
+      },
+      "performance": {
+        "date_extraction_ms": 9.647607803344727,
+        "barcode_detection_ms": 0.6208419799804688,
+        "product_extraction_ms": 3.464937210083008
+      },
+      "passed": false
+    },
+    {
+      "test_id": "EU_BAKERY_DE_001",
+      "description": "German cookies with dots in date format",
+      "region": "EU",
+      "language": "german",
+      "category": "bakery",
+      "results": {
+        "dates": {
+          "extracted": [
+            {
+              "type": "best_before",
+              "date": "2026-02-22",
+              "format": "DD/MM/YYYY",
+              "raw_text": "Mindestens haltbar bis: 22.02.2026",
+              "confidence": 1.0
+            }
+          ],
+          "expected_count": 2,
+          "found_count": 1,
+          "accuracy": 0.5,
+          "performance_ms": 0.8144378662109375,
+          "passed": false
+        },
+        "barcodes": {
+          "detected": [],
+          "expected_count": 1,
+          "found_count": 0,
+          "accuracy": 0.0,
+          "performance_ms": 0.32210350036621094,
+          "passed": false
+        },
+        "product_names": {
+          "extracted": [
+            {
+              "name": "Bahlsen Butterkeks",
+              "classification": "description",
+              "brand_detected": null,
+              "confidence": 0.85
+            },
+            {
+              "name": "Knusprige Butterkekse",
+              "classification": "description",
+              "brand_detected": null,
+              "confidence": 0.85
+            },
+            {
+              "name": "Hergestellt in Deutschland",
+              "classification": "description",
+              "brand_detected": null,
+              "confidence": 0.85
+            },
+            {
+              "name": "Chargennummer: B67890",
+              "classification": "description",
+              "brand_detected": null,
+              "confidence": 0.85
+            }
+          ],
+          "expected_count": 1,
+          "found_count": 4,
+          "accuracy": 1.0,
+          "performance_ms": 0.8153915405273438,
+          "passed": true
+        }
+      },
+      "performance": {
+        "date_extraction_ms": 0.8144378662109375,
+        "barcode_detection_ms": 0.32210350036621094,
+        "product_extraction_ms": 0.8153915405273438
+      },
+      "passed": false
+    },
+    {
+      "test_id": "EU_ORGANIC_ES_001",
+      "description": "Spanish organic rice with ecological certification",
+      "region": "EU",
+      "language": "spanish",
+      "category": "organic",
+      "results": {
+        "dates": {
+          "extracted": [
+            {
+              "type": "best_before",
+              "date": "2025-10-07",
+              "format": "MM/DD/YYYY",
+              "raw_text": "10/07/2025",
+              "confidence": 1.0
+            },
+            {
+              "type": "best_before",
+              "date": "2026-07-10",
+              "format": "DD/MM/YYYY",
+              "raw_text": "Consumir Preferentemente antes de: 10/07/2026",
+              "confidence": 1.0
+            },
+            {
+              "type": "best_before",
+              "date": "2026-10-07",
+              "format": "MM/DD/YYYY",
+              "raw_text": "10/07/2026",
+              "confidence": 1.0
+            }
+          ],
+          "expected_count": 2,
+          "found_count": 3,
+          "accuracy": 1.0,
+          "performance_ms": 0.7252693176269531,
+          "passed": true
+        },
+        "barcodes": {
+          "detected": [
+            {
+              "value": "8410123456789",
+              "format": "EAN-13",
+              "checksum_valid": false,
+              "confidence": 0.6
+            }
+          ],
+          "expected_count": 1,
+          "found_count": 1,
+          "accuracy": 1.0,
+          "performance_ms": 0.29921531677246094,
+          "passed": true
+        },
+        "product_names": {
+          "extracted": [
+            {
+              "name": "Producto Ecológico - Arroz Integral",
+              "classification": "product",
+              "brand_detected": null,
+              "confidence": 1.0
+            },
+            {
+              "name": "Marca: Biopaís",
+              "classification": "brand",
+              "brand_detected": null,
+              "confidence": 1.0
+            },
+            {
+              "name": "Agricultura Ecológica - Certificado",
+              "classification": "brand",
+              "brand_detected": null,
+              "confidence": 1.0
+            },
+            {
+              "name": "Marca: Biopaís Producto Ecológico - Arroz Integral",
+              "classification": "combined",
+              "brand_detected": "Marca: Biopaís",
+              "confidence": 1.0
+            },
+            {
+              "name": "Agricultura Ecológica - Certificado Producto Ecológico - Arroz Integral",
+              "classification": "combined",
+              "brand_detected": "Agricultura Ecológica - Certificado",
+              "confidence": 1.0
+            }
+          ],
+          "expected_count": 2,
+          "found_count": 5,
+          "accuracy": 1.0,
+          "performance_ms": 0.8485317230224609,
+          "passed": true
+        }
+      },
+      "performance": {
+        "date_extraction_ms": 0.7252693176269531,
+        "barcode_detection_ms": 0.29921531677246094,
+        "product_extraction_ms": 0.8485317230224609
+      },
+      "passed": true
+    },
+    {
+      "test_id": "US_DAIRY_001",
+      "description": "US whole milk with MM/DD/YYYY format",
+      "region": "US",
+      "language": "english",
+      "category": "dairy",
+      "results": {
+        "dates": {
+          "extracted": [],
+          "expected_count": 2,
+          "found_count": 0,
+          "accuracy": 0.0,
+          "performance_ms": 0.8099079132080078,
+          "passed": false
+        },
+        "barcodes": {
+          "detected": [
+            {
+              "value": "078742032109",
+              "format": "UPC-A",
+              "checksum_valid": false,
+              "confidence": 0.5
+            }
+          ],
+          "expected_count": 1,
+          "found_count": 1,
+          "accuracy": 1.0,
+          "performance_ms": 0.31304359436035156,
+          "passed": true
+        },
+        "product_names": {
+          "extracted": [
+            {
+              "name": "Great Value Whole Milk",
+              "classification": "description",
+              "brand_detected": null,
+              "confidence": 0.85
+            },
+            {
+              "name": "Pasteurized Vitamin D Milk",
+              "classification": "description",
+              "brand_detected": null,
+              "confidence": 0.85
+            }
+          ],
+          "expected_count": 1,
+          "found_count": 2,
+          "accuracy": 1.0,
+          "performance_ms": 1.0251998901367188,
+          "passed": true
+        }
+      },
+      "performance": {
+        "date_extraction_ms": 0.8099079132080078,
+        "barcode_detection_ms": 0.31304359436035156,
+        "product_extraction_ms": 1.0251998901367188
+      },
+      "passed": false
+    },
+    {
+      "test_id": "US_BAKERY_001",
+      "description": "US bread with UPC-E barcode",
+      "region": "US",
+      "language": "english",
+      "category": "bakery",
+      "results": {
+        "dates": {
+          "extracted": [],
+          "expected_count": 2,
+          "found_count": 0,
+          "accuracy": 0.0,
+          "performance_ms": 0.9448528289794922,
+          "passed": false
+        },
+        "barcodes": {
+          "detected": [],
+          "expected_count": 1,
+          "found_count": 0,
+          "accuracy": 0.0,
+          "performance_ms": 0.213623046875,
+          "passed": false
+        },
+        "product_names": {
+          "extracted": [
+            {
+              "name": "Nature's Own Honey Wheat Bread",
+              "classification": "description",
+              "brand_detected": null,
+              "confidence": 0.85
+            },
+            {
+              "name": "Soft & Delicious Sandwich Bread",
+              "classification": "brand",
+              "brand_detected": null,
+              "confidence": 1.0
+            }
+          ],
+          "expected_count": 1,
+          "found_count": 2,
+          "accuracy": 1.0,
+          "performance_ms": 0.75531005859375,
+          "passed": true
+        }
+      },
+      "performance": {
+        "date_extraction_ms": 0.9448528289794922,
+        "barcode_detection_ms": 0.213623046875,
+        "product_extraction_ms": 0.75531005859375
+      },
+      "passed": false
+    },
+    {
+      "test_id": "MULTILINGUAL_001",
+      "description": "Nutella with multiple languages on single label",
+      "region": "EU",
+      "language": "multilingual",
+      "category": "packaged_goods",
+      "results": {
+        "dates": {
+          "extracted": [
+            {
+              "type": "best_before",
+              "date": "2026-03-15",
+              "format": "DD/MM/YYYY",
+              "raw_text": "15/03/2026",
+              "confidence": 1.0
+            },
+            {
+              "type": "manufactured",
+              "date": "2025-09-15",
+              "format": "DD/MM/YYYY",
+              "raw_text": "Prod: 15/09/2025",
+              "confidence": 1.0
+            }
+          ],
+          "expected_count": 2,
+          "found_count": 2,
+          "accuracy": 1.0,
+          "performance_ms": 1.6582012176513672,
+          "passed": true
+        },
+        "barcodes": {
+          "detected": [
+            {
+              "value": "8000500178501",
+              "format": "EAN-13",
+              "checksum_valid": false,
+              "confidence": 0.6
+            }
+          ],
+          "expected_count": 1,
+          "found_count": 1,
+          "accuracy": 1.0,
+          "performance_ms": 0.3371238708496094,
+          "passed": true
+        },
+        "product_names": {
+          "extracted": [
+            {
+              "name": "Nutella - Pâte à Tartiner",
+              "classification": "description",
+              "brand_detected": null,
+              "confidence": 0.85
+            },
+            {
+              "name": "Haselnuss-Kakao-Creme",
+              "classification": "description",
+              "brand_detected": null,
+              "confidence": 0.85
+            },
+            {
+              "name": "Spread • Crema Spalmabile",
+              "classification": "brand",
+              "brand_detected": null,
+              "confidence": 1.0
+            }
+          ],
+          "expected_count": 2,
+          "found_count": 3,
+          "accuracy": 1.0,
+          "performance_ms": 0.9412765502929688,
+          "passed": true
+        }
+      },
+      "performance": {
+        "date_extraction_ms": 1.6582012176513672,
+        "barcode_detection_ms": 0.3371238708496094,
+        "product_extraction_ms": 0.9412765502929688
+      },
+      "passed": true
+    },
+    {
+      "test_id": "COMPLEX_DATES_001",
+      "description": "Organic yogurt with multiple date types",
+      "region": "US",
+      "language": "english",
+      "category": "organic",
+      "results": {
+        "dates": {
+          "extracted": [
+            {
+              "type": "best_before",
+              "date": "2025-10-06",
+              "format": "MM/DD/YYYY",
+              "raw_text": "10/06/2025",
+              "confidence": 1.0
+            },
+            {
+              "type": "manufactured",
+              "date": "2025-09-15",
+              "format": "YYYY/MM/DD",
+              "raw_text": "Manufactured: 2025-09-15",
+              "confidence": 1.0
+            }
+          ],
+          "expected_count": 3,
+          "found_count": 2,
+          "accuracy": 0.6666666666666666,
+          "performance_ms": 0.965118408203125,
+          "passed": false
+        },
+        "barcodes": {
+          "detected": [
+            {
+              "value": "0712345678905",
+              "format": "EAN-13",
+              "checksum_valid": false,
+              "confidence": 0.5
+            }
+          ],
+          "expected_count": 1,
+          "found_count": 1,
+          "accuracy": 1.0,
+          "performance_ms": 0.3390312194824219,
+          "passed": true
+        },
+        "product_names": {
+          "extracted": [
+            {
+              "name": "Plain Greek Style",
+              "classification": "product",
+              "brand_detected": null,
+              "confidence": 1.0
+            },
+            {
+              "name": "Organic Yogurt",
+              "classification": "brand",
+              "brand_detected": null,
+              "confidence": 1.0
+            },
+            {
+              "name": "Organic Yogurt Plain Greek Style",
+              "classification": "combined",
+              "brand_detected": "Organic Yogurt",
+              "confidence": 1.0
+            }
+          ],
+          "expected_count": 1,
+          "found_count": 3,
+          "accuracy": 1.0,
+          "performance_ms": 1.3475418090820312,
+          "passed": true
+        }
+      },
+      "performance": {
+        "date_extraction_ms": 0.965118408203125,
+        "barcode_detection_ms": 0.3390312194824219,
+        "product_extraction_ms": 1.3475418090820312
+      },
+      "passed": false
+    },
+    {
+      "test_id": "EDGE_CASE_001",
+      "description": "Compact date format without separators",
+      "region": "EU",
+      "language": "english",
+      "category": "packaged_goods",
+      "results": {
+        "dates": {
+          "extracted": [],
+          "expected_count": 2,
+          "found_count": 0,
+          "accuracy": 0.0,
+          "performance_ms": 1.0387897491455078,
+          "passed": false
+        },
+        "barcodes": {
+          "detected": [
+            {
+              "value": "1234567890128",
+              "format": "EAN-13",
+              "checksum_valid": true,
+              "confidence": 1.0
+            },
+            {
+              "value": "150925",
+              "format": "UPC-E",
+              "checksum_valid": true,
+              "confidence": 0.95
+            },
+            {
+              "value": "150926",
+              "format": "UPC-E",
+              "checksum_valid": true,
+              "confidence": 0.95
+            }
+          ],
+          "expected_count": 1,
+          "found_count": 3,
+          "accuracy": 1.0,
+          "performance_ms": 0.3693103790283203,
+          "passed": true
+        },
+        "product_names": {
+          "extracted": [
+            {
+              "name": "Premium Blend",
+              "classification": "product",
+              "brand_detected": null,
+              "confidence": 1.0
+            },
+            {
+              "name": "Instant Coffee",
+              "classification": "brand",
+              "brand_detected": null,
+              "confidence": 1.0
+            },
+            {
+              "name": "Instant Coffee Premium Blend",
+              "classification": "combined",
+              "brand_detected": "Instant Coffee",
+              "confidence": 1.0
+            }
+          ],
+          "expected_count": 1,
+          "found_count": 3,
+          "accuracy": 1.0,
+          "performance_ms": 0.6325244903564453,
+          "passed": true
+        }
+      },
+      "performance": {
+        "date_extraction_ms": 1.0387897491455078,
+        "barcode_detection_ms": 0.3693103790283203,
+        "product_extraction_ms": 0.6325244903564453
+      },
+      "passed": false
+    },
+    {
+      "test_id": "IT_PASTA_001",
+      "description": "Italian pasta with Italian date format",
+      "region": "EU",
+      "language": "italian",
+      "category": "packaged_goods",
+      "results": {
+        "dates": {
+          "extracted": [
+            {
+              "type": "best_before",
+              "date": "2027-09-15",
+              "format": "DD/MM/YYYY",
+              "raw_text": "Da consumarsi preferibilmente entro: 15/09/2027",
+              "confidence": 1.0
+            },
+            {
+              "type": "manufactured",
+              "date": "2025-09-15",
+              "format": "DD/MM/YYYY",
+              "raw_text": "Prodotto il: 15/09/2025",
+              "confidence": 1.0
+            }
+          ],
+          "expected_count": 2,
+          "found_count": 2,
+          "accuracy": 1.0,
+          "performance_ms": 1.2667179107666016,
+          "passed": true
+        },
+        "barcodes": {
+          "detected": [
+            {
+              "value": "8076809513012",
+              "format": "EAN-13",
+              "checksum_valid": true,
+              "confidence": 1.0
+            }
+          ],
+          "expected_count": 1,
+          "found_count": 1,
+          "accuracy": 1.0,
+          "performance_ms": 0.3032684326171875,
+          "passed": true
+        },
+        "product_names": {
+          "extracted": [
+            {
+              "name": "Prodotto in Italia",
+              "classification": "product",
+              "brand_detected": null,
+              "confidence": 1.0
+            },
+            {
+              "name": "Pasta di Semola di Grano Duro",
+              "classification": "description",
+              "brand_detected": null,
+              "confidence": 0.75
+            },
+            {
+              "name": "Barilla Spaghetti",
+              "classification": "brand",
+              "brand_detected": null,
+              "confidence": 1.0
+            },
+            {
+              "name": "Barilla Spaghetti Prodotto in Italia",
+              "classification": "combined",
+              "brand_detected": "Barilla Spaghetti",
+              "confidence": 1.0
+            }
+          ],
+          "expected_count": 1,
+          "found_count": 4,
+          "accuracy": 1.0,
+          "performance_ms": 0.9043216705322266,
+          "passed": true
+        }
+      },
+      "performance": {
+        "date_extraction_ms": 1.2667179107666016,
+        "barcode_detection_ms": 0.3032684326171875,
+        "product_extraction_ms": 0.9043216705322266
+      },
+      "passed": true
+    },
+    {
+      "test_id": "CHALLENGING_001",
+      "description": "Poor quality label with ambiguous dates",
+      "region": "EU",
+      "language": "english",
+      "category": "packaged_goods",
+      "results": {
+        "dates": {
+          "extracted": [
+            {
+              "type": "best_before",
+              "date": "2025-11-12",
+              "format": "DD/MM/YYYY",
+              "raw_text": "12/11/25",
+              "confidence": 1.0
+            },
+            {
+              "type": "best_before",
+              "date": "2025-12-11",
+              "format": "MM/DD/YYYY",
+              "raw_text": "12/11/25",
+              "confidence": 1.0
+            },
+            {
+              "type": "best_before",
+              "date": "2025-11-15",
+              "format": "DD/MM/YYYY",
+              "raw_text": "BB 15/11/25",
+              "confidence": 1.0
+            }
+          ],
+          "expected_count": 1,
+          "found_count": 3,
+          "accuracy": 1.0,
+          "performance_ms": 0.6883144378662109,
+          "passed": true
+        },
+        "barcodes": {
+          "detected": [],
+          "expected_count": 1,
+          "found_count": 0,
+          "accuracy": 0.0,
+          "performance_ms": 0.23245811462402344,
+          "passed": false
+        },
+        "product_names": {
+          "extracted": [
+            {
+              "name": "Original Taste",
+              "classification": "product",
+              "brand_detected": null,
+              "confidence": 1.0
+            },
+            {
+              "name": "Crackers",
+              "classification": "description",
+              "brand_detected": null,
+              "confidence": 0.85
+            }
+          ],
+          "expected_count": 1,
+          "found_count": 2,
+          "accuracy": 1.0,
+          "performance_ms": 0.4951953887939453,
+          "passed": true
+        }
+      },
+      "performance": {
+        "date_extraction_ms": 0.6883144378662109,
+        "barcode_detection_ms": 0.23245811462402344,
+        "product_extraction_ms": 0.4951953887939453
+      },
+      "passed": false
+    }
+  ],
+  "dataset_info": {
+    "name": "Enhanced OCR Food Packaging Test Dataset",
+    "version": "2.0.0",
+    "created": "2025-01-15",
+    "description": "Comprehensive test data for date extraction, barcode detection, and product name extraction",
+    "total_test_cases": 25,
+    "languages": ["english", "french", "german", "spanish", "italian"],
+    "regions": ["EU", "US"],
+    "categories": ["dairy", "bakery", "organic", "packaged_goods", "beverages"]
+  },
+  "timestamp": "2025-09-29 03:19:00"
+}

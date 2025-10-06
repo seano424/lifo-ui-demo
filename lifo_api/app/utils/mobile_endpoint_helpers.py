@@ -57,7 +57,7 @@ class MobileItemProcessor:
         self.include_details = include_details
         self.urgency_calculator = MobileUrgencyCalculator()
 
-    def create_mobile_item(self, item: Dict[str, Any]) -> Dict[str, Any]:
+    def create_mobile_item(self, item: dict[str, Any]) -> dict[str, Any]:
         """Create mobile-optimized item representation"""
         days_to_expiry = item["days_to_expiry"]
         urgency_score = self.urgency_calculator.calculate_quick_urgency_score(days_to_expiry)
@@ -88,8 +88,8 @@ class MobileBatchCategorizer:
         self.item_processor = MobileItemProcessor()
 
     def categorize_inventory(
-        self, inventory_data: List[Dict[str, Any]], include_details: bool = False
-    ) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]], List[Dict[str, Any]], float]:
+        self, inventory_data: list[dict[str, Any]], include_details: bool = False
+    ) -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]], float]:
         """
         Categorize inventory for mobile display
 
@@ -157,9 +157,9 @@ class MobileResponseBuilder:
 
     @staticmethod
     def build_mobile_summary_response(
-        urgent_batches: List[Dict[str, Any]],
-        expiring_today: List[Dict[str, Any]],
-        action_needed: List[Dict[str, Any]],
+        urgent_batches: list[dict[str, Any]],
+        expiring_today: list[dict[str, Any]],
+        action_needed: list[dict[str, Any]],
         health_score: float,
         total_items: int,
     ) -> MobileBatchSummary:
@@ -197,10 +197,10 @@ class MobileBatchSummaryProcessor:
     async def process_mobile_summary(
         self,
         store_id: str,
-        inventory_data: List[Dict[str, Any]] | None,
+        inventory_data: list[dict[str, Any]] | None,
         include_details: bool = False,
         limit_urgent: int = 10,
-    ) -> Tuple[MobileBatchSummary, float]:
+    ) -> tuple[MobileBatchSummary, float]:
         """
         Process mobile batch summary
 
@@ -251,7 +251,7 @@ class MobileStoreHealthProcessor:
     """Processor for mobile store health"""
 
     @staticmethod
-    def process_store_health(analytics_data: Dict[str, Any] | None) -> MobileStoreHealth:
+    def process_store_health(analytics_data: dict[str, Any] | None) -> MobileStoreHealth:
         """Process store health data for mobile"""
         if not analytics_data:
             return MobileStoreHealth(
@@ -276,7 +276,7 @@ class MobileStoreHealthProcessor:
             overall_score = max(0.0, 1.0 - risk_ratio * 1.5)
 
         # Simplified trends for mobile (numeric values for mobile display)
-        trends: Dict[str, float] = {
+        trends: dict[str, float] = {
             "waste_reduction_score": 0.8,  # Numeric score 0-1 instead of string
             "efficiency_score": 0.85,
             "action_rate": 0.7,
@@ -312,12 +312,12 @@ class MobileBatchListProcessor:
 
     def process_batch_list(
         self,
-        inventory_data: List[Dict[str, Any]],
+        inventory_data: list[dict[str, Any]],
         category: str | None = None,
         urgency_filter: str | None = None,
         limit: int = 20,
         offset: int = 0,
-    ) -> Tuple[List[Dict[str, Any]], int, bool]:
+    ) -> tuple[list[dict[str, Any]], int, bool]:
         """
         Process batch list for mobile
 
@@ -370,7 +370,7 @@ class MobileBatchListProcessor:
 
 
 @lru_cache(maxsize=100)
-def get_cached_category_weights(category: str) -> Dict[str, float]:
+def get_cached_category_weights(category: str) -> dict[str, float]:
     """Cache category weights for faster mobile scoring"""
     # Default weights - in production this would cache from database
     weights_map = {
@@ -424,7 +424,7 @@ class MobileQuickScoreCalculator:
 
     def get_quick_recommendation(
         self, composite_score: float, days_to_expiry: int
-    ) -> Tuple[str, str, str, int | None]:
+    ) -> tuple[str, str, str, int | None]:
         """Get quick recommendation for mobile display"""
         if composite_score >= 0.8:
             return "critical", "Immediate action required", "Apply discount", 30

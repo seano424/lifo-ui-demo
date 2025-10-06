@@ -153,6 +153,9 @@ class Settings(BaseSettings):
     default_scoring_cron: str = Field(
         default="0 */4 * * *", description="Default cron expression for automated scoring (every 4 hours)"
     )
+    default_full_rescore_cron: str = Field(
+        default="0 2 * * *", description="Default cron expression for nightly full rescore (2 AM daily)"
+    )
     default_scoring_timezone: str = Field(
         default="UTC", description="Default timezone for automated scoring schedules"
     )
@@ -170,6 +173,42 @@ class Settings(BaseSettings):
     )
     max_concurrent_scoring_jobs: int = Field(
         default=5, description="Maximum concurrent scoring jobs allowed"
+    )
+
+
+    # OCR Configuration
+    ocr_max_image_width: int = Field(
+        default=1024, description="Maximum image width for OCR processing"
+    )
+    ocr_max_image_height: int = Field(
+        default=768, description="Maximum image height for OCR processing"
+    )
+    ocr_jpeg_quality: int = Field(
+        default=85, description="JPEG quality for OCR image preprocessing"
+    )
+    ocr_contrast_enhancement: float = Field(
+        default=1.2, description="Contrast enhancement factor for OCR"
+    )
+    ocr_timeout_seconds: int = Field(
+        default=10, description="Timeout for OCR API calls in seconds"
+    )
+    ocr_text_confidence_threshold: float = Field(
+        default=0.7, description="Minimum confidence threshold for OCR text"
+    )
+    ocr_barcode_confidence_threshold: float = Field(
+        default=0.8, description="Minimum confidence threshold for barcode detection"
+    )
+    ocr_date_confidence_threshold: float = Field(
+        default=0.65, description="Minimum confidence threshold for date parsing"
+    )
+    ocr_cache_ttl_seconds: int = Field(
+        default=3600, description="OCR result cache TTL in seconds (1 hour)"
+    )
+    ocr_enable_caching: bool = Field(
+        default=True, description="Enable OCR result caching"
+    )
+    ocr_enable_fallback_mock: bool = Field(
+        default=False, description="Enable dangerous mock fallback (NEVER in production)"
     )
 
     # Mobile performance thresholds
@@ -266,7 +305,12 @@ class Settings(BaseSettings):
                     # In production, only HTTPS is allowed
                     pass
 
-            # NO development origins in production
+            # For DigitalOcean App Platform health checks - add null origin for internal requests
+            # Health checks come from internal networks without proper origins
+            if not origins:
+                # Allow requests with no origin (internal health checks) and localhost for testing
+                origins.extend(["null", "http://localhost:3000"])  # More specific than wildcard
+
             return origins
 
         elif self.environment == "staging":
@@ -305,6 +349,7 @@ class Settings(BaseSettings):
             # Add DigitalOcean App Platform hosts for health checks
             hosts.extend([
                 "*.ondigitalocean.app",  # DigitalOcean App Platform domains
+                "*",  # Allow all hosts for health check compatibility (production override)
             ])
 
             return hosts if hosts else ["127.0.0.1", "*.ondigitalocean.app"]  # Fallback includes DO domains

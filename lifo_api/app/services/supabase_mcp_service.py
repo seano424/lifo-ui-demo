@@ -25,7 +25,7 @@ class SupabaseMCPService:
         self.logger = logger.bind(component="supabase_mcp_service")
         self.supabase_service = get_supabase_service()
 
-    async def create_store_if_not_exists(self, store_data: Dict[str, Any]) -> Dict[str, Any]:
+    async def create_store_if_not_exists(self, store_data: dict[str, Any]) -> dict[str, Any]:
         """
         Create store if it doesn't exist
         Currently a stub implementation
@@ -56,7 +56,7 @@ class SupabaseMCPService:
             self.logger.error("MCP: Transaction failed", transaction_id=transaction_id, error=str(e))
             raise
 
-    async def bulk_upsert_products(self, products_data: List[Dict[str, Any]], store_id: str) -> Dict[str, Any]:
+    async def bulk_upsert_products(self, products_data: list[dict[str, Any]], store_id: str) -> dict[str, Any]:
         """
         Bulk upsert products
         Currently a stub implementation
@@ -74,7 +74,7 @@ class SupabaseMCPService:
             "message": f"Products processed (MCP stub): {len(products_data)} items"
         }
 
-    async def bulk_create_batches(self, batches_data: List[Dict[str, Any]], store_id: str) -> Dict[str, Any]:
+    async def bulk_create_batches(self, batches_data: list[dict[str, Any]], store_id: str) -> dict[str, Any]:
         """
         Bulk create batches
         Currently a stub implementation
@@ -91,7 +91,7 @@ class SupabaseMCPService:
             "message": f"Batches created (MCP stub): {len(batches_data)} items"
         }
 
-    async def get_store_products_map(self, store_id: str) -> Dict[str, Any]:
+    async def get_store_products_map(self, store_id: str) -> dict[str, Any]:
         """
         Get existing products for store to avoid duplicates
         Currently a stub implementation

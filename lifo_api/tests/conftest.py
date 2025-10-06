@@ -17,6 +17,7 @@ from datetime import datetime, timedelta
 from unittest.mock import AsyncMock, patch
 
 import pytest
+import pytest_asyncio
 
 # =============================================================================
 # CRITICAL: Load test environment FIRST before any app imports
@@ -108,7 +109,7 @@ def event_loop():
     loop.close()
 
 
-@pytest.fixture(scope="session")
+@pytest_asyncio.fixture(scope="session")
 async def test_engine():
     """Create test database engine."""
     engine = create_async_engine(
@@ -130,7 +131,7 @@ async def test_engine():
     await engine.dispose()
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def test_db(test_engine) -> AsyncGenerator[AsyncSession, None]:
     """Create test database session."""
     async_session = async_sessionmaker(
@@ -418,7 +419,7 @@ def security_test_payloads():
     }
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def async_client(test_settings):
     """Async HTTP client for testing async endpoints."""
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:

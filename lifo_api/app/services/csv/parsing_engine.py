@@ -69,7 +69,7 @@ class CSVParsingEngine:
         content: bytes = None, 
         file_path: str = None,
         encoding: str = "utf-8"
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Parse CSV content with comprehensive validation
         
@@ -151,7 +151,7 @@ class CSVParsingEngine:
         elif file_path:
             # Load from file path
             try:
-                with open(file_path, 'r', encoding=encoding) as f:
+                with open(file_path, encoding=encoding) as f:
                     return f.read()
             except FileNotFoundError:
                 raise HTTPException(
@@ -169,7 +169,7 @@ class CSVParsingEngine:
                 detail="Either content or file_path must be provided"
             )
 
-    async def _parse_csv_structure(self, csv_content: str) -> Dict[str, Any]:
+    async def _parse_csv_structure(self, csv_content: str) -> dict[str, Any]:
         """
         Parse CSV structure using both csv module and pandas for flexibility
         
@@ -225,7 +225,7 @@ class CSVParsingEngine:
             self.logger.warning("CSV module parsing failed, trying pandas", error=str(e))
             return await self._parse_with_pandas_fallback(csv_content)
 
-    async def _parse_with_pandas_fallback(self, csv_content: str) -> Dict[str, Any]:
+    async def _parse_with_pandas_fallback(self, csv_content: str) -> dict[str, Any]:
         """
         Fallback CSV parsing using pandas for more flexibility
         
@@ -274,7 +274,7 @@ class CSVParsingEngine:
                 detail=f"CSV parsing failed: {str(e)}"
             ) from e
 
-    def _normalize_csv_structure(self, parsed_data: Dict[str, Any]) -> Dict[str, Any]:
+    def _normalize_csv_structure(self, parsed_data: dict[str, Any]) -> dict[str, Any]:
         """
         Normalize CSV structure with standardized column names
         
@@ -357,7 +357,7 @@ class CSVParsingEngine:
         # Apply known mappings
         return self.COLUMN_MAPPINGS.get(normalized, normalized)
 
-    def convert_to_dataframe(self, parsed_data: Dict[str, Any]) -> pd.DataFrame:
+    def convert_to_dataframe(self, parsed_data: dict[str, Any]) -> pd.DataFrame:
         """
         Convert parsed CSV data to pandas DataFrame
         
@@ -394,7 +394,7 @@ class CSVParsingEngine:
                 detail=f"Failed to convert CSV to DataFrame: {str(e)}"
             ) from e
 
-    def parse_date_field(self, date_value: Any, field_name: str = "date") -> Optional[date]:
+    def parse_date_field(self, date_value: Any, field_name: str = "date") -> date | None:
         """
         Parse date field with multiple format support
         
@@ -437,8 +437,8 @@ class CSVParsingEngine:
         value: Any, 
         field_name: str = "numeric",
         allow_negative: bool = False,
-        max_value: Optional[float] = None
-    ) -> Optional[float]:
+        max_value: float | None = None
+    ) -> float | None:
         """
         Parse numeric field with validation
         

@@ -5,6 +5,10 @@ Intelligent inventory scoring and waste reduction microservice
 
 import os
 import time
+import warnings
+
+# Suppress Google Cloud libraries' pkg_resources deprecation warnings
+warnings.filterwarnings("ignore", message="pkg_resources is deprecated")
 
 from dotenv import load_dotenv
 
@@ -43,6 +47,7 @@ from fastapi.encoders import jsonable_encoder  # noqa: E402
 from fastapi.middleware.cors import CORSMiddleware  # noqa: E402
 from fastapi.middleware.trustedhost import TrustedHostMiddleware  # noqa: E402
 from fastapi.responses import JSONResponse  # noqa: E402
+from starlette.middleware.base import BaseHTTPMiddleware  # noqa: E402
 from slowapi.errors import RateLimitExceeded  # noqa: E402
 
 from app.api.v1.router import router as api_v1_router  # noqa: E402
@@ -232,6 +237,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         else:
             logger.info("Automated scoring system disabled in configuration")
 
+
         # Log debug health endpoints availability for production troubleshooting
         debug_endpoints = [
             f"{settings.api_v1_prefix}/debug/minimal",
@@ -305,6 +311,14 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         except Exception as e:
             logger.error("Error shutting down automated scoring system", error=str(e))
 
+    # Shutdown bulk operations optimizer connection pool
+    try:
+        from app.database.bulk_operations_optimized import close_bulk_optimizer
+        await close_bulk_optimizer()
+        logger.info("Bulk operations optimizer shutdown completed")
+    except Exception as e:
+        logger.error("Error shutting down bulk optimizer", error=str(e))
+
     await engine().dispose()
 
 
@@ -343,39 +357,63 @@ app = FastAPI(
     default_response_class=CustomJSONResponse,
 )
 
-# Health check bypass middleware (MUST BE FIRST for proper health checks)
-@app.middleware("http")
-async def health_check_bypass_middleware_priority(request: Request, call_next: Any) -> Response:
-    """
-    Priority health check bypass - runs BEFORE TrustedHostMiddleware
-    Solves DigitalOcean App Platform health check 400 error issue
-    """
-    health_paths = ["/health", "/api/v1/health", "/api/v1/health/"]
 
-    if request.url.path in health_paths:
-        client_host = request.client.host if request.client else "unknown"
+# Health check bypass middleware (MUST BE FIRST - before any security middleware)
+class HealthCheckBypassMiddleware(BaseHTTPMiddleware):
+    """
+    Priority health check bypass middleware for DigitalOcean App Platform
+    MUST run before TrustedHostMiddleware and other security middleware
+    """
+    async def dispatch(self, request: Request, call_next: Any) -> Response:
+        health_paths = ["/health", "/api/v1/health", "/api/v1/health/", "/v1/health"]
 
-        # DigitalOcean internal network patterns
-        if client_host.startswith("10.244.") or client_host == "10.244.65.235":
-            logger.debug(
-                "Health check from DO load balancer - bypassing host validation",
-                client_host=client_host,
-                path=request.url.path
+        if request.url.path in health_paths:
+            client_host = request.client.host if request.client else "unknown"
+            user_agent = request.headers.get("user-agent", "").lower()
+
+            # DigitalOcean internal network patterns or health check user agents
+            is_do_health_check = (
+                client_host.startswith("10.244.") or  # DO internal network
+                client_host.startswith("10.") or      # Broader internal network range
+                "kube-probe" in user_agent or
+                "healthcheck" in user_agent or
+                "kube-" in user_agent or             # Kubernetes probes
+                user_agent == "" or                  # Empty user agent (internal calls)
+                client_host == "127.0.0.1" or       # Localhost health checks
+                client_host == "::1"                 # IPv6 localhost
             )
 
-            # Create a simple health response without complex middleware chain
-            if request.url.path in health_paths:
-                from app.models.base import HealthResponse
+            # Always log health check attempts for debugging
+            logger.info(
+                "Health check bypass middleware executed",
+                client_host=client_host,
+                user_agent=user_agent,
+                path=request.url.path,
+                is_do_health_check=is_do_health_check
+            )
+
+            if is_do_health_check:
+                logger.info(
+                    "Health check from DO platform - bypassing all middleware",
+                    client_host=client_host,
+                    user_agent=user_agent,
+                    path=request.url.path
+                )
+
+                # Return simple health response bypassing all middleware
                 return JSONResponse(
                     content={
                         "status": "healthy",
-                        "database_connected": True,  # Assume healthy for LB checks
-                        "version": settings.api_version,
-                        "uptime": None,
-                    }
+                        "timestamp": time.time(),
+                        "environment": settings.environment,
+                        "bypassed": True
+                    },
+                    status_code=200
                 )
 
-    return await call_next(request)
+        return await call_next(request)
+
+app.add_middleware(HealthCheckBypassMiddleware)
 
 # Security middleware (order matters - most restrictive first)
 app.add_middleware(TrustedHostMiddleware, allowed_hosts=settings.get_allowed_hosts())
@@ -400,9 +438,10 @@ if settings.enable_performance_monitoring:
         enable_detailed_logging=settings.enable_detailed_request_logging,
     )
 
-# Rate limiting middleware
-app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, rate_limit_handler)  # type: ignore
+# Rate limiting middleware (only if enabled)
+if settings.rate_limit_enabled:
+    app.state.limiter = limiter
+    app.add_exception_handler(RateLimitExceeded, rate_limit_handler)  # type: ignore
 
 # Security blocking middleware
 app.middleware("http")(check_blocked_ip)
@@ -425,7 +464,7 @@ async def health_check_debugging_middleware(request: Request, call_next: Any) ->
     """
     Debug health check requests to troubleshoot deployment issues
     """
-    health_paths = ["/health", "/api/v1/health", "/api/v1/health/"]
+    health_paths = ["/health", "/api/v1/health", "/api/v1/health/", "/v1/health"]
 
     if request.url.path in health_paths:
         client_host = request.client.host if request.client else "unknown"

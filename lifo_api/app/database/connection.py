@@ -1,15 +1,13 @@
 """
 Async PostgreSQL database connection for LIFO AI Engine
-Production-ready connection pool with proper error handling
+Production-ready connection pool with pgBouncer compatibility
 """
 
-import asyncio
 import re
 from collections.abc import AsyncGenerator
 
-import asyncpg
 import structlog
-from sqlalchemy import event, text
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import declarative_base
 from sqlalchemy.pool import NullPool
@@ -21,70 +19,29 @@ logger = structlog.get_logger()
 # Create the base class for models
 Base = declarative_base()
 
-# Lazy initialization for database engine and session
+# Lazy initialization for database engines and sessions
 _engine = None
 _async_session = None
+_direct_engine = None
+_direct_async_session = None
 
 
-def create_sync_asyncpg_connection():
-    """
-    Custom sync connection creator that returns an asyncpg connection
-    properly configured for pgbouncer compatibility
-    """
-    import asyncio
-    import urllib.parse
-
-    # Get the database URL and parse it
-    database_url = get_database_url().replace("postgresql+asyncpg://", "postgresql://")
-    parsed = urllib.parse.urlparse(database_url)
-
-    # Create an event loop if none exists (for sync context)
-    try:
-        loop = asyncio.get_event_loop()
-    except RuntimeError:
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-
-    # Create connection with statement_cache_size=0 for pgbouncer
-    async def create_conn():
-        conn = await asyncpg.connect(
-            host=parsed.hostname,
-            port=parsed.port or 5432,
-            user=parsed.username,
-            password=parsed.password,
-            database=parsed.path.lstrip('/'),
-            ssl='require',
-            statement_cache_size=0,  # Critical for pgbouncer transaction pooling
-            command_timeout=30
-        )
-        logger.info("Created direct asyncpg connection with statement_cache_size=0 for pgbouncer")
-        return conn
-
-    return loop.run_until_complete(create_conn())
-
-
-def _setup_engine_events(engine):
-    """Setup engine events to ensure pgbouncer compatibility"""
-
-    @event.listens_for(engine.sync_engine, "do_connect")
-    def _set_connection_params(dialect, conn_rec, cargs, cparams):
-        """Configure connection parameters before connection is created"""
-        # Force disable prepared statements for pgbouncer compatibility
-        # The error message specifically mentions "statement_cache_size" not "prepared_statement_cache_size"
-        cparams['statement_cache_size'] = 0
-        cparams['prepared_statement_cache_size'] = 0  # Also set this for good measure
-        cparams['prepared_statement_name_func'] = None
-
-        logger.debug("Forcing connection parameters for pgbouncer compatibility",
-                    statement_cache_size=cparams.get('statement_cache_size'),
-                    prepared_statement_cache_size=cparams.get('prepared_statement_cache_size'))
-
-    @event.listens_for(engine.sync_engine, "connect")
-    def _on_connect(dbapi_conn, connection_record):
-        """Handle connection setup after connection is established"""
-        logger.debug("Connection established with pgbouncer settings")
-
-    return engine
+def _get_pgbouncer_connect_args(timeout: int = 30) -> dict:
+    """Get standard pgBouncer-compatible connection arguments"""
+    return {
+        "ssl": "require",
+        "statement_cache_size": 0,  # Critical: Disable prepared statements for pgBouncer
+        "prepared_statement_cache_size": 0,
+        "prepared_statement_name_func": None,
+        "command_timeout": timeout,
+        "server_settings": {
+            "statement_timeout": f"{timeout - 5}s",
+            "lock_timeout": "5s",
+            "jit": "off",
+            "plan_cache_mode": "force_generic_plan",
+            "log_statement": "none",
+        },
+    }
 
 
 def get_engine():
@@ -94,7 +51,7 @@ def get_engine():
         database_url = get_database_url()
 
         if database_url.startswith("sqlite"):
-            # SQLite (testing): Use NullPool and no pooling parameters
+            # SQLite (testing): Simple config with NullPool
             _engine = create_async_engine(
                 database_url,
                 echo=settings.debug,
@@ -102,65 +59,21 @@ def get_engine():
                 poolclass=NullPool,
                 connect_args={"check_same_thread": False},
             )
-        elif settings.debug:
-            # PostgreSQL Development: AGGRESSIVE pgbouncer transaction pooler compatibility
-            # This prevents connection reuse which can cause prepared statement conflicts
-            _engine = create_async_engine(
-                database_url,
-                echo=False,  # Disable SQL echo to reduce prepared statement conflicts
-                future=True,
-                poolclass=NullPool,  # Critical: No pooling to avoid prepared statement conflicts
-                connect_args={
-                    "ssl": "require",  # Required for Supabase
-                    "statement_cache_size": 0,  # Critical: Disable prepared statements for pgbouncer
-                    "prepared_statement_cache_size": 0,  # Alternative parameter name
-                    "prepared_statement_name_func": None,  # Disable named prepared statements
-                    "command_timeout": 30,  # Add command timeout
-                    "server_settings": {
-                        "statement_timeout": "25s",
-                        "lock_timeout": "5s",
-                        "jit": "off",  # Disable JIT to prevent optimization-related prepared statements
-                        "plan_cache_mode": "force_generic_plan",  # Force generic plans
-                        "log_statement": "none",  # Disable query logging
-                    },
-                },
-                execution_options={
-                    "compiled_cache": {},  # Disable SQLAlchemy's compiled statement cache
-                    "schema_translate_map": None,  # Disable schema translation cache
-                }
-            )
-            # Setup engine events for pgbouncer compatibility
-            _engine = _setup_engine_events(_engine)
         else:
-            # PostgreSQL Production: AGGRESSIVE pgbouncer transaction pooler compatibility
-            # Note: pgbouncer handles the connection pooling, so SQLAlchemy should not pool
+            # PostgreSQL: pgBouncer-compatible config
+            # Note: pgBouncer handles connection pooling, so we use NullPool
             _engine = create_async_engine(
                 database_url,
                 echo=False,
                 future=True,
-                poolclass=NullPool,  # Critical: No pooling, pgbouncer handles this
-                connect_args={
-                    "command_timeout": 30,  # MOBILE: Faster timeout for mobile queries
-                    "ssl": "require",  # Required for Supabase
-                    "statement_cache_size": 0,  # Critical: Disable prepared statements for pgbouncer
-                    "prepared_statement_cache_size": 0,  # Alternative parameter name
-                    "prepared_statement_name_func": None,  # Disable named prepared statements
-                    "server_settings": {
-                        "jit": "off",  # Disable JIT for more predictable performance
-                        "statement_timeout": "25s",  # MOBILE: Hard limit for mobile queries
-                        "lock_timeout": "5s",  # MOBILE: Fast lock timeout
-                        "idle_in_transaction_session_timeout": "10min",  # MOBILE: Cleanup idle sessions
-                        "plan_cache_mode": "force_generic_plan",  # Force generic plans
-                        "log_statement": "none",  # Disable query logging in production
-                    },
-                },
+                poolclass=NullPool,  # pgBouncer handles pooling
+                query_cache_size=0,  # Disable query compilation cache
+                connect_args=_get_pgbouncer_connect_args(timeout=30),
                 execution_options={
-                    "compiled_cache": {},  # Disable SQLAlchemy's compiled statement cache
-                    "schema_translate_map": None,  # Disable schema translation cache
-                }
+                    "compiled_cache": {},
+                    "schema_translate_map": None,
+                },
             )
-            # Setup engine events for pgbouncer compatibility
-            _engine = _setup_engine_events(_engine)
     return _engine
 
 
@@ -172,112 +85,101 @@ def get_async_session():
         _async_session = async_sessionmaker(
             engine,
             class_=AsyncSession,
-            expire_on_commit=False,  # Keep objects accessible after commit
+            expire_on_commit=False,
             autocommit=False,
             autoflush=True,
-            # MOBILE OPTIMIZATION: Session configured for mobile performance
         )
     return _async_session
 
 
-# For backwards compatibility with existing code
-def engine():
-    """Get the database engine (lazy-initialized)"""
-    return get_engine()
+def get_direct_engine():
+    """
+    Get or create a direct database engine that bypasses pgBouncer.
+    Used for bulk operations (COPY) that need direct database access.
+    """
+    global _direct_engine
+    if _direct_engine is None:
+        import os
+
+        direct_url = os.getenv("DATABASE_DIRECT_URL")
+        if not direct_url:
+            logger.warning("DATABASE_DIRECT_URL not set, falling back to regular engine")
+            return get_engine()
+
+        logger.info("Creating direct database engine (bypassing pgBouncer)")
+        _direct_engine = create_async_engine(
+            direct_url,
+            echo=False,
+            future=True,
+            poolclass=NullPool,
+            query_cache_size=0,
+            connect_args=_get_pgbouncer_connect_args(timeout=60),  # Longer timeout for bulk ops
+            execution_options={
+                "compiled_cache": {},
+                "schema_translate_map": None,
+            },
+        )
+    return _direct_engine
 
 
-def async_session():
-    """Get the async session factory (lazy-initialized)"""
-    return get_async_session()
+def get_direct_async_session():
+    """Get or create the direct database async session factory"""
+    global _direct_async_session
+    if _direct_async_session is None:
+        engine = get_direct_engine()
+        _direct_async_session = async_sessionmaker(
+            engine,
+            class_=AsyncSession,
+            expire_on_commit=False,
+            autocommit=False,
+            autoflush=True,
+        )
+    return _direct_async_session
+
+
+# Backwards compatibility aliases
+engine = get_engine
+async_session = get_async_session
+direct_async_session = get_direct_async_session
 
 
 async def init_database():
-    """
-    Initialize database connection and create tables if needed
-    """
+    """Initialize database connection (creates tables if needed)"""
     try:
-        logger.info("Initializing database connection...")
-
-        # For pgbouncer transaction pooling, skip connection test during startup
-        # The connection will be tested on first actual use
-        logger.info("Skipping database connection test for pgbouncer compatibility")
-        logger.info("Database will be tested on first API request requiring database access")
-
-        logger.info("Database initialization completed successfully (deferred connection test)")
-
+        async with get_engine().begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+        logger.info("Database initialized successfully")
     except Exception as e:
         logger.error("Database initialization failed", error=str(e))
-        # Don't raise the error - let the app start and handle DB errors per request
-        logger.warning("Database connection will be attempted on first use")
+        raise
 
 
-async def test_connection() -> bool:
-    """
-    Test database connection health with pgbouncer compatibility
-
-    Returns:
-        bool: True if connection is healthy
-    """
+async def test_connection(db_manager=None) -> bool:
+    """Test database connectivity"""
     try:
-        # Use a fresh connection for each test to avoid prepared statement conflicts
-        async with get_async_session()() as session:
-            # Execute a simple query using the session
-            result = await session.execute(text("SELECT 1"))
-            test_result = result.scalar()
-
-            if test_result == 1:
-                logger.debug("Database connection test successful")
-                return True
-            else:
-                logger.error("Database connection test failed - unexpected result")
-                return False
-
-    except Exception as e:
-        if "prepared statement" in str(e).lower():
-            logger.warning("Prepared statement error in connection test - this is expected with pgbouncer transaction pooling", error=str(e))
-            # Try one more time with a different approach
-            try:
-                # Direct asyncpg connection test bypassing SQLAlchemy
-                import urllib.parse
-                database_url = get_database_url().replace("postgresql+asyncpg://", "postgresql://")
-                parsed = urllib.parse.urlparse(database_url)
-
-                conn = await asyncpg.connect(
-                    host=parsed.hostname,
-                    port=parsed.port or 5432,
-                    user=parsed.username,
-                    password=parsed.password,
-                    database=parsed.path.lstrip('/'),
-                    ssl='require',
-                    statement_cache_size=0
-                )
-
-                result = await conn.fetchval("SELECT 1")
-                await conn.close()
-
-                if result == 1:
-                    logger.debug("Direct asyncpg connection test successful")
-                    return True
-                else:
-                    logger.error("Direct asyncpg connection test failed - unexpected result")
-                    return False
-
-            except Exception as direct_error:
-                logger.error("Direct asyncpg connection test also failed", error=str(direct_error))
-                return False
+        if db_manager:
+            # Use provided database manager
+            async with db_manager.session_factory() as session:
+                result = await session.execute(text("SELECT 1"))
+                return result.scalar() == 1
         else:
-            logger.error("Database connection test failed", error=str(e))
-            return False
+            # Use global session factory
+            session_factory = get_async_session()
+            async with session_factory() as session:
+                result = await session.execute(text("SELECT 1"))
+                return result.scalar() == 1
+    except Exception as e:
+        logger.error("Database connection test failed", error=str(e))
+        return False
 
 
 async def get_database() -> AsyncGenerator[AsyncSession, None]:
     """
-    FastAPI dependency to get database session
-
-    Yields:
-        AsyncSession: Database session for request
+    FastAPI dependency for database sessions.
+    Yields a database session and ensures proper cleanup.
     """
-    async with async_session()() as session:
+    session_factory = get_async_session()
+    async with session_factory() as session:
         try:
             yield session
         except Exception as e:
@@ -288,48 +190,16 @@ async def get_database() -> AsyncGenerator[AsyncSession, None]:
             await session.close()
 
 
-# Alias for compatibility
+# Alias for convenience
 get_db = get_database
 
 
-async def get_database_session() -> AsyncSession:
-    """
-    Get a database session for manual management
-    Note: Remember to close the session when done
-
-    Returns:
-        AsyncSession: Database session
-    """
-    return async_session()()
-
-
-async def get_async_database_session() -> AsyncSession:
-    """
-    Get an async database session for use in async contexts
-    
-    Returns:
-        AsyncSession: Async database session
-    """
-    return async_session()()
-
-
-def get_db_sync():
-    """
-    Synchronous database session function for legacy CSV processor compatibility
-    Note: This returns None to trigger graceful fallback in CSV processor
-    The CSV processor will use hardcoded category codes instead of database lookups
-    """
-    return None
-
-
 class DatabaseManager:
-    """
-    Database manager for advanced operations
-    """
+    """Database manager for advanced operations"""
 
     def __init__(self):
-        self.engine = engine()
-        self.session_factory = async_session()
+        self.engine = get_engine()
+        self.session_factory = get_async_session()
         self.logger = structlog.get_logger().bind(component="db_manager")
 
     async def execute_safe_query(self, query: str, params: dict | None = None):
@@ -344,7 +214,7 @@ class DatabaseManager:
             Query result
 
         Raises:
-            SecurityError: If query contains potential SQL injection patterns
+            ValueError: If query contains potential SQL injection patterns
         """
         # Security validation: ensure query uses parameterized format
         if params and not all(f":{param}" in query for param in params):
@@ -423,11 +293,10 @@ class DatabaseManager:
             try:
                 for update_data in updates:
                     obj_id = update_data.pop("id")
-                    await session.execute(
-                        model_class.__table__.update()
-                        .where(model_class.id == obj_id)
-                        .values(**update_data)
-                    )
+                    obj = await session.get(model_class, obj_id)
+                    if obj:
+                        for key, value in update_data.items():
+                            setattr(obj, key, value)
 
                 await session.commit()
 
@@ -448,134 +317,78 @@ class DatabaseManager:
                 raise
 
     async def get_connection_info(self) -> dict:
-        """
-        Get database connection information
-
-        Returns:
-            dict: Connection information
-        """
+        """Get current database connection information"""
         try:
             async with self.session_factory() as session:
-                database_url = get_database_url()
+                # Get database version
+                version_result = await session.execute(text("SELECT version()"))
+                version = version_result.scalar()
 
-                if database_url.startswith("sqlite"):
-                    # SQLite connection info
-                    result = await session.execute(text("SELECT sqlite_version()"))
-                    version = result.scalar()
-
-                    return {
-                        "sqlite_version": version,
-                        "database_type": "SQLite",
-                        "database_url": "sqlite:///:memory:",
-                    }
-                else:
-                    # PostgreSQL connection info
-                    result = await session.execute(text("SELECT version()"))
-                    pg_version = result.scalar()
-
-                    # Get current database name
-                    result = await session.execute(text("SELECT current_database()"))
-                    db_name = result.scalar()
-
-                    # Get connection count
-                    result = await session.execute(
-                        text(
-                            "SELECT count(*) FROM pg_stat_activity WHERE state = 'active'"
-                        )
+                # Get connection count
+                conn_result = await session.execute(
+                    text(
+                        """
+                    SELECT count(*)
+                    FROM pg_stat_activity
+                    WHERE datname = current_database()
+                """
                     )
-                    active_connections = result.scalar()
+                )
+                connection_count = conn_result.scalar()
 
-                    return {
-                        "postgresql_version": pg_version,
-                        "database_name": db_name,
-                        "active_connections": active_connections,
-                        "pool_size": settings.db_pool_size,
-                        "max_overflow": settings.db_max_overflow,
-                    }
+                # Get database size
+                size_result = await session.execute(
+                    text(
+                        """
+                    SELECT pg_size_pretty(pg_database_size(current_database()))
+                """
+                    )
+                )
+                db_size = size_result.scalar()
+
+                return {
+                    "version": version,
+                    "connection_count": connection_count,
+                    "database_size": db_size,
+                    "engine_pool_size": (
+                        self.engine.pool.size()
+                        if hasattr(self.engine.pool, "size")
+                        else "N/A (NullPool)"
+                    ),
+                }
 
         except Exception as e:
             self.logger.error("Failed to get connection info", error=str(e))
             return {"error": str(e)}
 
     async def health_check(self) -> dict:
-        """
-        Comprehensive database health check
-
-        Returns:
-            dict: Health check results
-        """
-        start_time = asyncio.get_event_loop().time()
-
+        """Perform database health check"""
         try:
             async with self.session_factory() as session:
                 # Test basic connectivity
-                await session.execute(text("SELECT 1"))
+                result = await session.execute(text("SELECT 1"))
+                is_connected = result.scalar() == 1
 
-                database_url = get_database_url()
+                # Get connection stats
+                conn_info = await self.get_connection_info()
 
-                if database_url.startswith("sqlite"):
-                    # SQLite health check (simpler)
-                    end_time = asyncio.get_event_loop().time()
-                    response_time = (end_time - start_time) * 1000
-
-                    return {
-                        "status": "healthy",
-                        "response_time_ms": round(response_time, 2),
-                        "database_type": "SQLite",
-                        "connection_pool": "NullPool (no pooling)",
-                    }
-                else:
-                    # PostgreSQL health check
-                    result = await session.execute(
-                        text("SELECT COUNT(*) FROM business.stores")
-                    )
-                    store_count = result.scalar()
-
-                    end_time = asyncio.get_event_loop().time()
-                    response_time = (end_time - start_time) * 1000
-
-                    # Handle pool stats safely (different pool types have different methods)
-                    pool_stats = {}
-                    try:
-                        if hasattr(self.engine.pool, 'size'):
-                            pool_stats = {
-                                "size": self.engine.pool.size(),
-                                "checked_in": self.engine.pool.checkedin(),
-                                "checked_out": self.engine.pool.checkedout(),
-                                "overflow": self.engine.pool.overflow(),
-                                "invalid": self.engine.pool.invalid(),
-                            }
-                        else:
-                            pool_stats = {"type": "NullPool", "pooling_disabled": True}
-                    except AttributeError:
-                        pool_stats = {"error": "Unable to get pool stats"}
-
-                    return {
-                        "status": "healthy",
-                        "response_time_ms": round(response_time, 2),
-                        "store_count": store_count,
-                        "connection_pool": pool_stats,
-                    }
+                return {
+                    "status": "healthy" if is_connected else "unhealthy",
+                    "connected": is_connected,
+                    "connection_info": conn_info,
+                }
 
         except Exception as e:
-            end_time = asyncio.get_event_loop().time()
-            response_time = (end_time - start_time) * 1000
-
             self.logger.error("Database health check failed", error=str(e))
-
-            return {
-                "status": "unhealthy",
-                "response_time_ms": round(response_time, 2),
-                "error": str(e),
-            }
+            return {"status": "unhealthy", "error": str(e)}
 
 
-# Global database manager instance (lazy initialization)
+# Global database manager instance
 _db_manager = None
 
 
 def get_db_manager() -> DatabaseManager:
-    """Get or create the global DatabaseManager instance"""
+    """Get or create global database manager instance"""
     global _db_manager
     if _db_manager is None:
         _db_manager = DatabaseManager()
@@ -583,11 +396,17 @@ def get_db_manager() -> DatabaseManager:
 
 
 async def cleanup_database():
-    """
-    Cleanup database connections on application shutdown
-    """
-    try:
-        await engine().dispose()
-        logger.info("Database connections cleaned up")
-    except Exception as e:
-        logger.error("Error during database cleanup", error=str(e))
+    """Cleanup database connections"""
+    global _engine, _direct_engine, _async_session, _direct_async_session
+
+    if _engine:
+        await _engine.dispose()
+        _engine = None
+        _async_session = None
+        logger.info("Database engine disposed")
+
+    if _direct_engine:
+        await _direct_engine.dispose()
+        _direct_engine = None
+        _direct_async_session = None
+        logger.info("Direct database engine disposed")
