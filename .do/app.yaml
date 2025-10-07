@@ -68,7 +68,7 @@ services:
   
   # CORS settings for production
   - key: BACKEND_CORS_ORIGINS
-    value: "https://lifo-app.com,https://www.lifo-app.com"
+    value: "https://lifo-app.com,https://www.lifo-app.com,https://clownfish-app-y2uru.ondigitalocean.app"
   
   # Google Cloud (set in DO App Platform console)
   # - key: GOOGLE_APPLICATION_CREDENTIALS_JSON

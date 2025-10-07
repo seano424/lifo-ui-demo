@@ -55,7 +55,7 @@ services:
 
   # CORS settings for staging (more permissive for testing)
   - key: BACKEND_CORS_ORIGINS
-    value: "http://localhost:3000,http://localhost:3001,https://lifo-app.com,https://www.lifo-app.com"
+    value: "http://localhost:3000,http://localhost:3001,https://lifo-app.com,https://www.lifo-app.com,https://clownfish-app-y2uru.ondigitalocean.app"
 
   # Debug settings for staging
   - key: DEBUG
