@@ -413,6 +413,17 @@ class HealthCheckBypassMiddleware(BaseHTTPMiddleware):
 
         return await call_next(request)
 
+# CORS middleware for frontend integration
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.get_cors_origins(),
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["*"],
+    expose_headers=["*"],
+)
+
+
 app.add_middleware(HealthCheckBypassMiddleware)
 
 # Security middleware (order matters - most restrictive first)
@@ -445,17 +456,6 @@ if settings.rate_limit_enabled:
 
 # Security blocking middleware
 app.middleware("http")(check_blocked_ip)
-
-# CORS middleware for frontend integration
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=settings.get_cors_origins(),
-    allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allow_headers=["*"],
-    expose_headers=["*"],
-)
-
 
 
 # Health check debugging middleware (for production troubleshooting)
