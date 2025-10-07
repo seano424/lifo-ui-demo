@@ -7,11 +7,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import type {
-  BatchStatus,
-  TodoActionType,
-  TodoUrgencyLevel,
-} from '@/lib/queries/todos-rpc'
+import type { BatchStatus, TodoActionType, TodoUrgencyLevel } from '@/lib/queries/todos-rpc'
 import { useTranslations } from 'next-intl'
 import { ChevronDown, X } from 'lucide-react'
 
@@ -103,7 +99,7 @@ export function TodoFiltersBar({
 
     const current = filters.urgency_level || []
     const updated = current.includes(urgency)
-      ? current.filter((u) => u !== urgency)
+      ? current.filter(u => u !== urgency)
       : [...current, urgency]
 
     onFiltersChange({
@@ -123,7 +119,7 @@ export function TodoFiltersBar({
 
     const current = filters.action_type || []
     const updated = current.includes(action)
-      ? current.filter((a) => a !== action)
+      ? current.filter(a => a !== action)
       : [...current, action]
 
     onFiltersChange({
@@ -143,7 +139,7 @@ export function TodoFiltersBar({
 
     const current = filters.batch_status || []
     const updated = current.includes(status)
-      ? current.filter((s) => s !== status)
+      ? current.filter(s => s !== status)
       : [...current, status]
 
     onFiltersChange({
@@ -153,9 +149,7 @@ export function TodoFiltersBar({
   }
 
   const hasActiveFilters =
-    filters.urgency_level?.length ||
-    filters.action_type?.length ||
-    filters.batch_status?.length
+    filters.urgency_level?.length || filters.action_type?.length || filters.batch_status?.length
 
   return (
     <div className="space-y-3">
@@ -165,7 +159,7 @@ export function TodoFiltersBar({
           <DropdownMenuTrigger asChild>
             <Button
               variant="outline"
-              className="w-full sm:w-[180px] justify-between"
+              className="w-full sm:max-w-max sm:min-w-[180px] justify-between"
               disabled={isLoading}
               id="todos-urgency-filter-trigger"
             >
@@ -181,13 +175,11 @@ export function TodoFiltersBar({
           </DropdownMenuTrigger>
           <DropdownMenuContent className="min-w-[200px] p-2">
             <div className="space-y-1">
-              {URGENCY_OPTIONS.map((option) => {
+              {URGENCY_OPTIONS.map(option => {
                 const isAll = option.value === 'all'
                 const isSelected = isAll
                   ? !filters.urgency_level?.length
-                  : filters.urgency_level?.includes(
-                      option.value as TodoUrgencyLevel
-                    )
+                  : filters.urgency_level?.includes(option.value as TodoUrgencyLevel)
 
                 return (
                   <div
@@ -204,14 +196,6 @@ export function TodoFiltersBar({
                       />
                       {t(option.translationKey)}
                     </span>
-                    {!isAll && (
-                      <Badge
-                        variant={option.color}
-                        className="ml-2"
-                      >
-                        {option.value}
-                      </Badge>
-                    )}
                   </div>
                 )
               })}
@@ -240,13 +224,11 @@ export function TodoFiltersBar({
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-[200px] p-2">
             <div className="space-y-1">
-              {ACTION_OPTIONS.map((option) => {
+              {ACTION_OPTIONS.map(option => {
                 const isAll = option.value === 'all'
                 const isSelected = isAll
                   ? !filters.action_type?.length
-                  : filters.action_type?.includes(
-                      option.value as TodoActionType
-                    )
+                  : filters.action_type?.includes(option.value as TodoActionType)
 
                 return (
                   <div
@@ -294,7 +276,7 @@ export function TodoFiltersBar({
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-[200px] p-2">
             <div className="space-y-1">
-              {BATCH_STATUS_OPTIONS.map((option) => {
+              {BATCH_STATUS_OPTIONS.map(option => {
                 const isAll = option.value === 'all'
                 const isSelected = isAll
                   ? !filters.batch_status?.length
@@ -315,13 +297,6 @@ export function TodoFiltersBar({
                       />
                       {t(option.translationKey)}
                     </span>
-                    {!isAll && (
-                      <Badge
-                        variant={option.value === 'active' ? 'default' : 'gray'}
-                      >
-                        {option.value}
-                      </Badge>
-                    )}
                   </div>
                 )
               })}
@@ -333,47 +308,38 @@ export function TodoFiltersBar({
       {/* Active Filters Display */}
       {hasActiveFilters && (
         <div className="flex flex-wrap gap-2">
-          {filters.urgency_level?.map((urgency) => (
-            <Badge
-              key={urgency}
-              variant="default"
-              className="gap-1"
-            >
-              {t('filters.activeUrgency', { urgency })}
-              <X
-                className="h-3 w-3 cursor-pointer"
-                onClick={() => handleUrgencyChange(urgency)}
-              />
-            </Badge>
-          ))}
+          {filters.urgency_level?.map(urgency => {
+            const option = URGENCY_OPTIONS.find(o => o.value === urgency)
+            return (
+              <Badge key={urgency} variant="default" className="gap-1">
+                {option ? t(option.translationKey) : urgency}
+                <X
+                  className="h-3 w-3 cursor-pointer"
+                  onClick={() => handleUrgencyChange(urgency)}
+                />
+              </Badge>
+            )
+          })}
 
-          {filters.action_type?.map((action) => (
-            <Badge
-              key={action}
-              variant="default"
-              className="gap-1"
-            >
-              {t('filters.activeAction', { action })}
-              <X
-                className="h-3 w-3 cursor-pointer"
-                onClick={() => handleActionChange(action)}
-              />
-            </Badge>
-          ))}
+          {filters.action_type?.map(action => {
+            const option = ACTION_OPTIONS.find(o => o.value === action)
+            return (
+              <Badge key={action} variant="default" className="gap-1">
+                {option ? t(option.translationKey) : action}
+                <X className="h-3 w-3 cursor-pointer" onClick={() => handleActionChange(action)} />
+              </Badge>
+            )
+          })}
 
-          {filters.batch_status?.map((status) => (
-            <Badge
-              key={status}
-              variant="default"
-              className="gap-1"
-            >
-              {t('filters.activeStatus', { status })}
-              <X
-                className="h-3 w-3 cursor-pointer"
-                onClick={() => handleStatusChange(status)}
-              />
-            </Badge>
-          ))}
+          {filters.batch_status?.map(status => {
+            const option = BATCH_STATUS_OPTIONS.find(o => o.value === status)
+            return (
+              <Badge key={status} variant="default" className="gap-1">
+                {option ? t(option.translationKey) : status}
+                <X className="h-3 w-3 cursor-pointer" onClick={() => handleStatusChange(status)} />
+              </Badge>
+            )
+          })}
         </div>
       )}
     </div>
