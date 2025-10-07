@@ -52,40 +52,42 @@ export async function prefetchDashboardData() {
       throw new Error('Authentication required')
     }
 
-    // Prefetch shared data that rarely changes
-    await Promise.all([
+    // Prefetch all critical data in parallel for maximum performance
+    const [currentUserData, categories, userStores, userPreferences] = await Promise.all([
       // Current user data
+      fetchCurrentUser(supabase),
+      // Categories (shared across all stores and pages)
+      fetchCategories(supabase),
+      // User stores (fetch immediately for parallel execution)
+      fetchUserStores(user.id, supabase),
+      // User preferences using optimized RPC
+      fetchUserPreferencesRPC(supabase),
+    ])
+
+    // Prefetch all queries in parallel
+    await Promise.all([
       queryClient.prefetchQuery({
         queryKey: ['currentUser'],
-        queryFn: () => fetchCurrentUser(supabase),
+        queryFn: () => currentUserData,
         staleTime: 5 * 60 * 1000,
       }),
-      // Categories (shared across all stores and pages)
       queryClient.prefetchQuery({
         queryKey: queryKeys.categories.list,
-        queryFn: () => fetchCategories(supabase),
+        queryFn: () => categories,
         staleTime: 10 * 60 * 1000, // 10 minutes - categories rarely change
         gcTime: 30 * 60 * 1000, // 30 minutes
       }),
+      queryClient.prefetchQuery({
+        queryKey: queryKeys.stores.userStores(user.id),
+        queryFn: () => userStores,
+        staleTime: 2 * 60 * 1000, // 2 minutes - stores don't change often
+      }),
+      queryClient.prefetchQuery({
+        queryKey: queryKeys.userPreferences.detail(user.id),
+        queryFn: () => userPreferences,
+        staleTime: 10 * 60 * 1000, // 10 minutes - preferences rarely change
+      }),
     ])
-
-    // Fetch and prefetch user stores
-    const userStores = await fetchUserStores(user.id, supabase)
-
-    await queryClient.prefetchQuery({
-      queryKey: queryKeys.stores.userStores(user.id),
-      queryFn: () => userStores,
-      staleTime: 2 * 60 * 1000, // 2 minutes - stores don't change often
-    })
-
-    // Fetch user preferences using optimized RPC
-    const userPreferences = await fetchUserPreferencesRPC(supabase)
-
-    await queryClient.prefetchQuery({
-      queryKey: queryKeys.userPreferences.detail(user.id),
-      queryFn: () => userPreferences,
-      staleTime: 10 * 60 * 1000, // 10 minutes - preferences rarely change
-    })
 
     // Get active store from cookies and use smart selection
     const lastActiveStoreId = await getActiveStoreCookie()
