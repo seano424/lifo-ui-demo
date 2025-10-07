@@ -416,7 +416,8 @@ class HealthCheckBypassMiddleware(BaseHTTPMiddleware):
 # CORS middleware for frontend integration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.get_cors_origins(),
+    # allow_origins=settings.get_cors_origins(),
+    allow_origins=["http://localhost:3000", "http://localhost:3001", "https://lifo-app.com", "https://www.lifo-app.com", "https://clownfish-app-y2uru.ondigitalocean.app"],
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
