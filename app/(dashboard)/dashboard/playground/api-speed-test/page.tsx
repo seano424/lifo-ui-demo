@@ -1,10 +1,19 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 
 export default function APISpeedTest() {
+  const router = useRouter()
+
+  // Block access to playground in production
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'production') {
+      router.push('/dashboard')
+    }
+  }, [router])
   const [results, setResults] = useState<Record<string, number>>({})
   const supabase = createClient()
 

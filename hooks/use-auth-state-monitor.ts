@@ -103,6 +103,18 @@ export function useAuthStateMonitor() {
         logoutStateManager.reset()
         hasShownLogoutToast.current = false
 
+        // ✅ Skip invalidation if cache is fresh (data was prefetched)
+        const cacheTime = queryClient.getQueryState(queryKeys.auth.currentUser())?.dataUpdatedAt
+        const isCacheFresh = cacheTime && Date.now() - cacheTime < 5000 // Fresh if updated in last 5s
+
+        if (isCacheFresh) {
+          logger.log(
+            'AuthStateMonitor',
+            'Cache is fresh from prefetch, skipping invalidation on SIGNED_IN',
+          )
+          return
+        }
+
         // ✅ SOLUTION: Debounce invalidations to avoid cascading refetches
         if (invalidateTimeoutRef.current) {
           clearTimeout(invalidateTimeoutRef.current)

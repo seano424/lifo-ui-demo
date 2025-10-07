@@ -40,6 +40,7 @@ export async function prefetchCurrentUser() {
 export async function prefetchDashboardData() {
   const queryClient = createQueryClient()
   const supabase = await createServerClient()
+  const perfStart = performance.now()
 
   try {
     // Get the current authenticated user
@@ -52,67 +53,89 @@ export async function prefetchDashboardData() {
       throw new Error('Authentication required')
     }
 
-    // Prefetch all critical data in parallel for maximum performance
-    const [currentUserData, categories, userStores, userPreferences] = await Promise.all([
-      // Current user data
-      fetchCurrentUser(supabase),
-      // Categories (shared across all stores and pages)
-      fetchCategories(supabase),
-      // User stores (fetch immediately for parallel execution)
-      fetchUserStores(user.id, supabase),
-      // User preferences using optimized RPC
-      fetchUserPreferencesRPC(supabase),
-    ])
-
-    // Prefetch all queries in parallel
-    await Promise.all([
+    // Prefetch all critical data in parallel with Promise.allSettled for resilience
+    const prefetchStart = performance.now()
+    const results = await Promise.allSettled([
       queryClient.prefetchQuery({
         queryKey: ['currentUser'],
-        queryFn: () => currentUserData,
+        queryFn: () => fetchCurrentUser(supabase),
         staleTime: 5 * 60 * 1000,
       }),
       queryClient.prefetchQuery({
         queryKey: queryKeys.categories.list,
-        queryFn: () => categories,
+        queryFn: () => fetchCategories(supabase),
         staleTime: 10 * 60 * 1000, // 10 minutes - categories rarely change
         gcTime: 30 * 60 * 1000, // 30 minutes
       }),
       queryClient.prefetchQuery({
         queryKey: queryKeys.stores.userStores(user.id),
-        queryFn: () => userStores,
+        queryFn: () => fetchUserStores(user.id, supabase),
         staleTime: 2 * 60 * 1000, // 2 minutes - stores don't change often
       }),
       queryClient.prefetchQuery({
         queryKey: queryKeys.userPreferences.detail(user.id),
-        queryFn: () => userPreferences,
+        queryFn: () => fetchUserPreferencesRPC(supabase),
         staleTime: 10 * 60 * 1000, // 10 minutes - preferences rarely change
       }),
     ])
+    const prefetchDuration = performance.now() - prefetchStart
+
+    // Log any failed prefetches
+    results.forEach((result, index) => {
+      if (result.status === 'rejected') {
+        const queries = ['currentUser', 'categories', 'userStores', 'userPreferences']
+        console.error(`Failed to prefetch ${queries[index]}:`, result.reason)
+      }
+    })
+
+    // Retrieve cached data with proper type safety and null checks
+    type UserStore = Awaited<ReturnType<typeof fetchUserStores>>[number]
+    type UserPreferences = Awaited<ReturnType<typeof fetchUserPreferencesRPC>>
+
+    const userStores = queryClient.getQueryData<UserStore[]>(queryKeys.stores.userStores(user.id))
+    const userPreferences = queryClient.getQueryData<UserPreferences | null>(
+      queryKeys.userPreferences.detail(user.id),
+    )
 
     // Get active store from cookies and use smart selection
     const lastActiveStoreId = await getActiveStoreCookie()
     const primaryStoreId = userPreferences?.primary_store_id
 
-    // Use smart selection logic
-    const targetStore = selectDefaultStore(
-      userStores,
-      primaryStoreId || null,
-      lastActiveStoreId || null,
-    )
+    // Use smart selection logic with null safety
+    const targetStore =
+      userStores && userStores.length > 0
+        ? selectDefaultStore(userStores, primaryStoreId || null, lastActiveStoreId || null)
+        : null
 
     if (targetStore) {
-      await queryClient.prefetchQuery({
-        queryKey: ['activeStore'],
-        queryFn: async () => targetStore,
-        staleTime: 2 * 60 * 1000,
-      })
+      // Prefetch active store and urgent todos count in parallel
+      await Promise.all([
+        queryClient.prefetchQuery({
+          queryKey: ['activeStore'],
+          queryFn: async () => targetStore,
+          staleTime: 2 * 60 * 1000,
+        }),
+        queryClient.prefetchQuery({
+          queryKey: queryKeys.todos.urgentCount(targetStore.store_id),
+          queryFn: async () => {
+            const { fetchUrgentTodosCount } = await import('@/lib/queries/todos-urgent-count')
+            return fetchUrgentTodosCount(targetStore.store_id, supabase)
+          },
+          staleTime: 2 * 60 * 1000,
+        }),
+      ])
     }
+
+    const totalDuration = performance.now() - perfStart
+    console.log(
+      `[Performance] Dashboard prefetch completed in ${totalDuration.toFixed(0)}ms (prefetch: ${prefetchDuration.toFixed(0)}ms)`,
+    )
 
     return {
       queryClient,
       dehydratedState: dehydrate(queryClient),
       user,
-      userStores,
+      userStores: userStores || [],
       activeStore: targetStore,
     }
   } catch (error) {
