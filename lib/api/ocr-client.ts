@@ -366,26 +366,26 @@ export async function captureImageFromVideo(
 }
 
 /**
- * Utility function to check if FastAPI backend is available
- */
-export async function checkBackendHealth(): Promise<boolean> {
-  try {
-    // Validate API URL is configured
-    const apiUrl = validateFastApiUrl()
+//  * Utility function to check if FastAPI backend is available
+//  */
+// export async function checkBackendHealth(): Promise<boolean> {
+//   try {
+//     // Validate API URL is configured
+//     const apiUrl = validateFastApiUrl()
 
-    const response = await fetch(`${apiUrl}/health`, {
-      method: 'GET',
-      signal: AbortSignal.timeout(10000),
-    })
+//     const response = await fetch(`${apiUrl}/health`, {
+//       method: 'GET',
+//       signal: AbortSignal.timeout(10000),
+//     })
 
-    if (response.ok) {
-      const data = await response.json()
-      return data.status === 'healthy'
-    }
+//     if (response.ok) {
+//       const data = await response.json()
+//       return data.status === 'healthy'
+//     }
 
-    return false
-  } catch (error) {
-    console.warn('FastAPI backend not available:', error)
-    return false
-  }
-}
+//     return false
+//   } catch (error) {
+//     console.warn('FastAPI backend not available:', error)
+//     return false
+//   }
+// }
