@@ -55,6 +55,14 @@
     "disposedOn": "Éliminé le {date}",
     "noRecommendation": "Aucune recommandation"
   },
+  "recommendations": {
+    "dispose": "Éliminer immédiatement",
+    "discount_aggressive": "Appliquer une remise importante",
+    "discount_moderate": "Appliquer une remise modérée",
+    "alert": "Surveiller de près",
+    "monitor": "Surveillance de routine",
+    "maintain": "Aucune action nécessaire"
+  },
   "actions": {
     "discount": "Remise",
     "donate": "Faire un don",
