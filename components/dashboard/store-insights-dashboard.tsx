@@ -114,25 +114,25 @@ export function StoreInsightsDashboard({ storeId: propStoreId }: StoreInsightsDa
           <div className="flex flex-col gap-2 border rounded-2xl p-4">
             <Typography variant="h4">{t('metrics.urgentItems')}</Typography>
             <Typography variant="p">{t('metrics.urgentItemsDesc')}</Typography>
-            <Typography variant="p">will be added soon</Typography>
+            <Typography variant="p">{t('comingSoon')}</Typography>
           </div>
 
           <div className="flex flex-col gap-2 border rounded-2xl p-4">
             <Typography variant="h4">{t('metrics.actionsTaken')}</Typography>
             <Typography variant="p">{t('metrics.actionsTakenDesc')}</Typography>
-            <Typography variant="p">will be added soon</Typography>
+            <Typography variant="p">{t('comingSoon')}</Typography>
           </div>
 
           <div className="flex flex-col gap-2 border rounded-2xl p-4">
             <Typography variant="h4">{t('metrics.discountValue')}</Typography>
             <Typography variant="p">{t('metrics.discountValueDesc')}</Typography>
-            <Typography variant="p">will be added soon</Typography>
+            <Typography variant="p">{t('comingSoon')}</Typography>
           </div>
 
           <div className="flex flex-col gap-2 border rounded-2xl p-4">
             <Typography variant="h4">{t('metrics.avgScore')}</Typography>
             <Typography variant="p">{t('metrics.avgScoreDesc')}</Typography>
-            <Typography variant="p">will be added soon</Typography>
+            <Typography variant="p">{t('comingSoon')}</Typography>
           </div>
         </div>
 
@@ -144,8 +144,8 @@ export function StoreInsightsDashboard({ storeId: propStoreId }: StoreInsightsDa
             </CardTitle>
             <CardDescription className="text-center sm:text-left">
               {t('overview.description', {
-                actionsTaken: 'will be added soon',
-                urgentBatches: 'will be added soon',
+                actionsTaken: t('comingSoon'),
+                urgentBatches: t('comingSoon'),
               })}
             </CardDescription>
           </CardHeader>
@@ -157,7 +157,7 @@ export function StoreInsightsDashboard({ storeId: propStoreId }: StoreInsightsDa
                   <AlertDescription>
                     <strong>{t('overview.scoringAlert')}</strong>{' '}
                     {t('overview.urgentBatchesAlert', {
-                      urgentBatches: 'will be added soon',
+                      urgentBatches: t('comingSoon'),
                     })}
                   </AlertDescription>
                 </Alert>
@@ -171,7 +171,7 @@ export function StoreInsightsDashboard({ storeId: propStoreId }: StoreInsightsDa
                     <p className="font-medium">{t('overview.actionsTaken')}</p>
                     <p className="text-blue-600">
                       {t('overview.actionsTakenPeriod', {
-                        totalActions: 'will be added soon',
+                        totalActions: t('comingSoon'),
                       })}
                     </p>
                   </div>
@@ -179,7 +179,7 @@ export function StoreInsightsDashboard({ storeId: propStoreId }: StoreInsightsDa
                     <p className="font-medium">{t('overview.discountsApplied')}</p>
                     <p className="text-primary-600">
                       {t('overview.saved', {
-                        discountValue: 'will be added soon',
+                        discountValue: t('comingSoon'),
                       })}
                     </p>
                   </div>
@@ -189,8 +189,8 @@ export function StoreInsightsDashboard({ storeId: propStoreId }: StoreInsightsDa
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <p className="text-sm text-muted-foreground">
                   {t('overview.averageScore', {
-                    avgScore: 'will be added soon',
-                    discountValue: 'will be added soon',
+                    avgScore: t('comingSoon'),
+                    discountValue: t('comingSoon'),
                   })}
                 </p>
               </div>

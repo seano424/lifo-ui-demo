@@ -9,6 +9,7 @@ import {
 import { useTranslations } from 'next-intl'
 import { Calendar, ChevronDown, X } from 'lucide-react'
 import type { TodoTabType } from '../todos-filtered-list'
+import { cn } from '@/lib/utils'
 
 interface ExpiryFilterValue {
   min?: number
@@ -166,7 +167,12 @@ export function TodoExpiryFilter({
           <Calendar className="h-4 w-4" />
           <span className="hidden sm:inline">{getFilterLabel()}</span>
           {currentPreset && (
-            <span className="text-white ml-1 border border-gray-500 rounded-2xl px-2 py-1">
+            <span
+              className={cn(
+                'ml-1 border border-gray-500 rounded-2xl px-2',
+                isActive ? 'text-white' : 'text-gray-900',
+              )}
+            >
               {t(currentPreset.translationKey)}
             </span>
           )}

@@ -55,6 +55,14 @@
     "disposedOn": "Weggegooid op {date}",
     "noRecommendation": "Geen aanbeveling"
   },
+  "recommendations": {
+    "dispose": "Direct weggooien",
+    "discount_aggressive": "Grote korting toepassen",
+    "discount_moderate": "Matige korting toepassen",
+    "alert": "Nauwlettend monitoren",
+    "monitor": "Routine monitoring",
+    "maintain": "Geen actie nodig"
+  },
   "actions": {
     "discount": "Korting",
     "donate": "Doneren",

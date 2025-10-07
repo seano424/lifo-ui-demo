@@ -151,6 +151,7 @@
     "title": "Actions prioritaires d'aujourd'hui",
     "description": "Examinez et agissez sur les éléments les plus urgents.",
     "takeAction": "Passer à l'action",
+    "comingSoon": "Bientôt disponible",
     "loadingInsights": "Chargement des informations du magasin...",
     "dashboardTitle": "Tableau de bord des insights du magasin",
     "unableToLoad": "Impossible de charger les informations",
@@ -246,6 +247,7 @@
     "expiredItems": {
       "title": "Articles expirés",
       "subtitle": "Inventaire nécessitant des actions de gestion des déchets",
+      "totalExpired": "Total expiré",
       "recentlyExpired": "Récemment expirés",
       "weekOld": "Vieux d'une semaine",
       "older": "Plus anciens",

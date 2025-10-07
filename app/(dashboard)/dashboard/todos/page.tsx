@@ -6,7 +6,6 @@ import { fetchUserPreferences, fetchUserStores } from '@/lib/queries/stores'
 import { createPrefetchedQuery } from '@/lib/react-query/prefetch'
 import { createClient as createServerClient } from '@/lib/supabase/server'
 import { dehydrate, HydrationBoundary } from '@tanstack/react-query'
-import { getTranslations } from 'next-intl/server'
 import { redirect } from 'next/navigation'
 
 interface TodosPageProps {
@@ -23,7 +22,6 @@ interface TodosPageProps {
 
 export default async function TodosPage({ searchParams }: TodosPageProps) {
   const params = await searchParams
-  const t = await getTranslations('todos')
   const { queryClient } = await createPrefetchedQuery()
   const serverClient = await createServerClient()
 
@@ -62,7 +60,7 @@ export default async function TodosPage({ searchParams }: TodosPageProps) {
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <div className="flex flex-col gap-6">
-        <DashboardInsetHeader title={t('page.title')} description={t('page.description')} />
+        <DashboardInsetHeader page="todos" />
 
         <ErrorBoundary>
           <TodosFilteredList
