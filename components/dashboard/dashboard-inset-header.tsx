@@ -66,7 +66,7 @@ export default function DashboardInsetHeader({
 
       <div
         className={cn(
-          'relative flex flex-col lg:flex-row gap-6 justify-between items-start lg:items-center p-8 rounded-3xl border border-border/50 bg-background/80 shadow-sm backdrop-blur-sm transition-all duration-300 hover:shadow-lg hover:shadow-primary/5',
+          'relative flex flex-col lg:flex-row gap-6 justify-between items-start lg:items-center p-8 rounded-3xl border border-border/50 bg-background/80 shadow-sm backdrop-blur-sm transition-all duration-300 ',
           className,
         )}
       >
@@ -80,12 +80,12 @@ export default function DashboardInsetHeader({
             <>
               {/* Main title with dynamic icon */}
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-xl bg-primary/10 text-primary">
+                <div className="p-2 rounded-xl bg-primary/10 text-primary items-center">
                   <PageIcon className="h-6 w-6" />
                 </div>
                 <Typography
                   variant="h1"
-                  className="font-black bg-gradient-to-r from-gray-900 to-gray-600 dark:from-gray-100 dark:to-gray-400 bg-clip-text text-transparent capitalize pb-2"
+                  className="font-black bg-gradient-to-r from-gray-900 to-gray-600 dark:from-gray-100 dark:to-gray-400 bg-clip-text text-transparent capitalize pb-1"
                 >
                   {displayTitle}
                 </Typography>
