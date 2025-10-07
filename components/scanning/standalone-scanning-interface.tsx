@@ -61,7 +61,8 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
   const workflowActions = useScanningActions()
 
   // OCR processing
-  const { processExpiryDate, isLoading: isOCRProcessing, isBackendHealthy } = useOCRWithFallback()
+  // const { processExpiryDate, isLoading: isOCRProcessing, isBackendHealthy } = useOCRWithFallback()  //commented for debugging
+  const { processExpiryDate, isLoading: isOCRProcessing } = useOCRWithFallback()
 
   // Inventory submission
   const { submitBatch, isSubmittingBatch } = useInventoryActions()
@@ -406,7 +407,7 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
                     setOcrError(null)
                     workflowActions.setError(null)
                   }}
-                  isBackendHealthy={isBackendHealthy}
+                // isBackendHealthy={isBackendHealthy}
                 />
               )}
 
@@ -429,7 +430,7 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
                   onChange={setInventoryData}
                   onSubmit={handleInventoryFormSubmit}
                   title={
-                    ocrError || isBackendHealthy === false
+                    ocrError //|| isBackendHealthy === false
                       ? t('expiry.manualEntryFallback')
                       : t('expiry.orEnterManually')
                   }
@@ -590,9 +591,9 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
                 {submissionResult.successCount === submissionResult.totalCount
                   ? t('success.description.allSuccess', { count: submissionResult.successCount })
                   : t('success.description.partialSuccess', {
-                      successCount: submissionResult.successCount,
-                      totalCount: submissionResult.totalCount,
-                    })}
+                    successCount: submissionResult.successCount,
+                    totalCount: submissionResult.totalCount,
+                  })}
               </DialogDescription>
             </DialogHeader>
 
