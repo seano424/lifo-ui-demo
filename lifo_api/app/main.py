@@ -415,7 +415,6 @@ class HealthCheckBypassMiddleware(BaseHTTPMiddleware):
 
         return await call_next(request)
 
-
 app.add_middleware(HealthCheckBypassMiddleware)
 
 # Security middleware (order matters - most restrictive first)
