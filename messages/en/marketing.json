@@ -749,9 +749,12 @@
     "description": "Helping businesses optimize inventory management with intelligent solutions to reduce waste and maximize profits.",
     "quickLinks": "Quick Links",
     "links": {
+      "homepage": "Homepage",
+      "features": "Features",
       "aboutUs": "About Us",
       "products": "Products",
       "pricing": "Pricing",
+      "contact": "Contact",
       "blog": "Blog"
     },
     "contactUs": "Contact Us",

@@ -5,7 +5,7 @@ import { Typography } from '@/components/ui/typography'
 import type { TodoItem } from '@/lib/queries/todos-rpc'
 
 import { cn } from '@/lib/utils'
-import { formatRecommendation } from '@/lib/utils/todo-transformers'
+import { migrateRecommendation } from '@/lib/utils/recommendation-migration'
 import { Calendar, Package, PenLine, CheckIcon } from 'lucide-react'
 import { startOfDay, isToday, differenceInDays, addDays, isBefore } from 'date-fns'
 import { useTranslations } from 'next-intl'
@@ -72,6 +72,22 @@ export function TodoCard({ todo, onClick }: TodoCardProps) {
 
   const handleCardClick = () => {
     onClick?.()
+  }
+
+  // Get standardized recommendation and translate it
+  const getRecommendationText = (recommendation: string | null | undefined): string => {
+    if (!recommendation) return t('card.noRecommendation')
+
+    // Migrate legacy recommendations to standard format
+    const standardRec = migrateRecommendation(recommendation)
+
+    // Try to get translation, fallback to formatted text if translation doesn't exist
+    try {
+      return t(`recommendations.${standardRec}`)
+    } catch {
+      // Fallback: capitalize and format if translation missing
+      return standardRec.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+    }
   }
 
   // Format expiry date with reliable timezone handling using date-fns
@@ -156,7 +172,7 @@ export function TodoCard({ todo, onClick }: TodoCardProps) {
               <Typography className="flex gap-1 sm:w-8/12">
                 <span className="flex-shrink-0">{t('card.suggestion')}</span>
                 <span className="truncate lowercase">
-                  {formatRecommendation(todo.ai_recommendation || t('card.noRecommendation'))}
+                  {getRecommendationText(todo.ai_recommendation)}
                 </span>
               </Typography>
             </div>

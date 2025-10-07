@@ -14,9 +14,7 @@ const FASTAPI_URL = process.env.NEXT_PUBLIC_FASTAPI_URL
  */
 function validateFastApiUrl(): string {
   if (!FASTAPI_URL) {
-    throw new Error(
-      'NEXT_PUBLIC_FASTAPI_URL is not configured. Please check your .env.local file.',
-    )
+    throw new Error('NEXT_PUBLIC_FASTAPI_URL is not configured. Please check your .env.local file.')
   }
   return FASTAPI_URL
 }

@@ -152,6 +152,7 @@
     "title": "Today's priority actions",
     "description": "Review and take action on the most urgent items.",
     "takeAction": "Take Action",
+    "comingSoon": "Coming soon",
     "loadingInsights": "Loading store insights...",
     "dashboardTitle": "Store Insights Dashboard",
     "unableToLoad": "Unable to load insights",
@@ -247,6 +248,7 @@
     "expiredItems": {
       "title": "Expired Items",
       "subtitle": "Inventory requiring waste management actions",
+      "totalExpired": "Total Expired",
       "recentlyExpired": "Recently Expired",
       "weekOld": "Week Old",
       "older": "Older",

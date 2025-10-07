@@ -69,6 +69,14 @@
     "disposedOn": "Disposed on {date}",
     "noRecommendation": "No recommendation"
   },
+  "recommendations": {
+    "dispose": "Dispose immediately",
+    "discount_aggressive": "Apply heavy discount",
+    "discount_moderate": "Apply moderate discount",
+    "alert": "Monitor closely",
+    "monitor": "Routine monitoring",
+    "maintain": "No action needed"
+  },
   "actions": {
     "discount": "Discount",
     "donate": "Donate",
