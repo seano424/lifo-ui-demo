@@ -806,29 +806,6 @@ export default function StoreInformation({
               </div>
             )}
           </form>
-
-          {process.env.NODE_ENV === 'development' && (
-            <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-2xl">
-              <Typography variant="p" className="font-medium text-yellow-800 mb-2">
-                Debug: Store Information: Only visible in development mode
-              </Typography>
-              <pre className="text-xs bg-white p-2 rounded-2xl border overflow-auto max-h-32">
-                {JSON.stringify(
-                  {
-                    propStoreId,
-                    contextStoreId,
-                    effectiveStoreId,
-                    hasStoreData: !!storeData,
-                    isLoading,
-                    serverPermissions: !!serverPermissions,
-                    permissionsLoading: permissions.isLoading,
-                  },
-                  null,
-                  2,
-                )}
-              </pre>
-            </div>
-          )}
         </CardContent>
       </Card>
 
@@ -839,21 +816,13 @@ export default function StoreInformation({
             <Typography variant="h3" className="font-black text-destructive">
               Danger Zone
             </Typography>
-            <Typography variant="p" color="muted">
-              Irreversible actions that affect your store&apos;s status
-            </Typography>
           </CardHeader>
           <CardContent>
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-              <div className="space-y-1">
-                <Typography variant="h4" className="font-medium">
-                  Deactivate Store
-                </Typography>
-                <Typography variant="p" color="muted">
-                  Deactivate your store and anonymize employee data. This action is difficult to
-                  reverse.
-                </Typography>
-              </div>
+            <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-2">
+              <Typography variant="p" color="muted">
+                Deactivate your store and anonymize employee data.
+              </Typography>
+
               <DeactivateStoreDialog
                 store={storeData}
                 canDeactivate={permissions.isOwner ?? false}
