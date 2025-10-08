@@ -13,6 +13,7 @@ import {
 } from '@/lib/queries/stores'
 import { fetchUserPreferencesRPC } from '@/lib/queries/stores-rpc'
 import { useStoreState } from '@/lib/stores/store-context'
+import { logger } from '@/lib/utils/logger'
 import { useCurrentUser } from './use-users'
 
 const ACTIVE_STORE_KEY = 'activeStoreId'
@@ -72,7 +73,10 @@ export function useUserStores() {
           setActiveStore(storeToSelect)
           // Also sync cookie for server-side consistency
           setActiveStoreCookie(storeToSelect.store_id).catch(error => {
-            console.error('[useUserStores] Failed to sync active store cookie:', error)
+            logger.error('hooks/use-stores', 'Failed to sync active store cookie', {
+              error: error instanceof Error ? error.message : String(error),
+              storeId: storeToSelect.store_id,
+            })
           })
         }
       }
@@ -160,7 +164,11 @@ export function useStoreActions() {
         toast.success(`Switched to ${newStore.store_name}`)
       }
     } catch (error) {
-      console.error('[useStoreActions.switchStore] Error:', error)
+      logger.error('hooks/use-stores', 'Failed to switch stores', {
+        error: error instanceof Error ? error.message : String(error),
+        newStoreId: newStore.store_id,
+        newStoreName: newStore.store_name,
+      })
       toast.error('Failed to switch stores')
     } finally {
       setChangingStore(false)

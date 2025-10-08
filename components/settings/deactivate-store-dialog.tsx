@@ -58,8 +58,17 @@ export function DeactivateStoreDialog({ store, canDeactivate }: DeactivateStoreD
     })
 
     deactivateStore()
-    setIsOpen(false)
-    setConfirmText('') // Reset for next time
+    // Note: Dialog will remain open during deactivation
+    // onSuccess handler in useDeactivateStore will navigate away
+    // Only reset confirmText after successful deactivation
+  }
+
+  // Reset state when dialog closes naturally (not during deactivation)
+  const handleOpenChange = (open: boolean) => {
+    if (!open && !isDeactivating) {
+      setConfirmText('')
+    }
+    setIsOpen(open)
   }
 
   const handleButtonClick = () => {
@@ -70,7 +79,7 @@ export function DeactivateStoreDialog({ store, canDeactivate }: DeactivateStoreD
   }
 
   return (
-    <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
+    <AlertDialog open={isOpen} onOpenChange={handleOpenChange}>
       <AlertDialogTrigger asChild>
         <Button
           variant="destructive"
@@ -130,11 +139,12 @@ export function DeactivateStoreDialog({ store, canDeactivate }: DeactivateStoreD
               onChange={e => setConfirmText(e.target.value)}
               placeholder={store.store_name}
               className="font-mono"
+              disabled={isDeactivating}
             />
           </div>
         </div>
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={() => setConfirmText('')}>Cancel</AlertDialogCancel>
+          <AlertDialogCancel disabled={isDeactivating}>Cancel</AlertDialogCancel>
           <AlertDialogAction
             onClick={handleDeactivate}
             disabled={!isConfirmed || isDeactivating}

@@ -480,17 +480,22 @@ export function useDeactivateStore() {
       return deactivateStore(activeStoreId)
     },
     onSuccess: async data => {
-      // Clear the active store from Zustand state and localStorage
-      clearActiveStore()
-
-      // Clear the server-side cookie as well
+      // CRITICAL: Clear server-side cookie FIRST to prevent race condition
       await clearActiveStoreCookie()
 
-      // Invalidate all store-related queries
+      // Then clear the active store from Zustand state and localStorage
+      clearActiveStore()
+
+      // Invalidate all store-related queries including store details
       queryClient.invalidateQueries({ queryKey: queryKeys.stores.all })
       if (currentUser?.id) {
         queryClient.invalidateQueries({
           queryKey: queryKeys.stores.userStores(currentUser.id),
+        })
+      }
+      if (activeStoreId) {
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.stores.detail(activeStoreId),
         })
       }
 
