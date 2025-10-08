@@ -1,7 +1,8 @@
 import { OfflineIndicator } from '@/components/offline-indicator'
 import { IntlProvider } from '@/components/providers/intl-provider'
 import { LanguageProvider } from '@/components/providers/language-provider'
-import PWA from '@/components/pwa'
+// import PWAInstallPrompt from '@/components/pwa-install-prompt'
+import ServiceWorkerRegistrar from '@/components/service-worker-registrar'
 import { Toaster } from '@/components/ui/toaster'
 import { ReactQueryProvider } from '@/lib/react-query/provider'
 import type { Metadata } from 'next'
@@ -75,7 +76,8 @@ export default async function RootLayout({
               <IntlProvider initialMessages={messages}>{children}</IntlProvider>
             </LanguageProvider>
           </ReactQueryProvider>
-          <PWA />
+          <ServiceWorkerRegistrar />
+          {/* <PWAInstallPrompt /> */}
           <OfflineIndicator />
           <Toaster
             position="top-right"

@@ -24,7 +24,7 @@ interface BeforeInstallPromptEvent extends Event {
  * NOTE: Service worker registration is handled separately by ServiceWorkerRegistrar component
  */
 
-export default function PWA() {
+export default function PWAInstallPrompt() {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
   const [showInstallPrompt, setShowInstallPrompt] = useState(false)
   const [isInstalled, setIsInstalled] = useState(false)
