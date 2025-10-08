@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
+import { logger } from '@/lib/utils/logger'
 
 /**
  * Service Worker Registrar Component
@@ -24,15 +25,21 @@ export default function ServiceWorkerRegistrar() {
       navigator.serviceWorker
         .register('/sw.js')
         .then(registration => {
-          console.log('Service Worker registered successfully:', registration)
-          console.log('Service Worker scope:', registration.scope)
-          console.log('Service Worker state:', registration.active?.state)
+          logger.log('ServiceWorker', 'Registered successfully', {
+            scope: registration.scope,
+            state: registration.active?.state,
+          })
         })
-        .catch(registrationError => {
-          console.log('Service Worker registration failed:', registrationError)
+        .catch((registrationError: unknown) => {
+          logger.error('ServiceWorker', 'Registration failed', {
+            error:
+              registrationError instanceof Error
+                ? registrationError.message
+                : String(registrationError),
+          })
         })
     } else {
-      console.log('Service Worker not supported in this browser')
+      logger.warn('ServiceWorker', 'Not supported in this browser')
     }
   }, [])
 
