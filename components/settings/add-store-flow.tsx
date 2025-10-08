@@ -30,6 +30,8 @@ export function AddStoreFlow() {
     error,
     setError,
     selectedStoreForm,
+    createdStoreId,
+    setCreatedStoreId,
     initializeForGooglePlaces,
   } = useAddStoreStore()
 
@@ -84,6 +86,15 @@ export function AddStoreFlow() {
       if (!response.ok) {
         const errorData = await response.json()
         throw new Error(errorData.error || 'Failed to create store')
+      }
+
+      // Get the created store from the response
+      const responseData = await response.json()
+      const createdStore = responseData.store
+
+      // Store the created store ID for later use
+      if (createdStore?.store_id) {
+        setCreatedStoreId(createdStore.store_id)
       }
 
       // Batch invalidate related queries for better performance
@@ -157,7 +168,7 @@ export function AddStoreFlow() {
               <AddStoreDetailsStep onSubmit={handleCreateStore} isSubmitting={isCreating} />
             )}
             {currentStep === STORE_FLOW_STEPS.SUCCESS && isComplete && selectedStoreForm && (
-              <AddStoreSuccess storeName={selectedStoreForm.store_name} />
+              <AddStoreSuccess storeName={selectedStoreForm.store_name} storeId={createdStoreId} />
             )}
           </>
         ) : (
@@ -167,7 +178,12 @@ export function AddStoreFlow() {
             )}
             {currentStep === STORE_FLOW_STEPS_NO_GOOGLE_PLACES.SUCCESS &&
               isComplete &&
-              selectedStoreForm && <AddStoreSuccess storeName={selectedStoreForm.store_name} />}
+              selectedStoreForm && (
+                <AddStoreSuccess
+                  storeName={selectedStoreForm.store_name}
+                  storeId={createdStoreId}
+                />
+              )}
           </>
         )}
       </div>

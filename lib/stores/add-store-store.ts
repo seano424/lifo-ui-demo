@@ -37,6 +37,9 @@ export type AddStoreData = {
   isCreating: boolean
   isComplete: boolean
   error?: string
+
+  // Newly created store (returned from API)
+  createdStoreId?: string
 }
 
 export type AddStoreStore = AddStoreData & {
@@ -48,6 +51,7 @@ export type AddStoreStore = AddStoreData & {
   setIsCreating: (creating: boolean) => void
   setIsComplete: (complete: boolean) => void
   setError: (error: string | undefined) => void
+  setCreatedStoreId: (storeId: string | undefined) => void
   reset: () => void
 
   // Current step
@@ -67,6 +71,7 @@ const initialState: AddStoreData = {
   isCreating: false,
   isComplete: false,
   error: undefined,
+  createdStoreId: undefined,
 }
 
 export const useAddStoreStore = create<AddStoreStore>()(
@@ -82,6 +87,7 @@ export const useAddStoreStore = create<AddStoreStore>()(
       setIsCreating: creating => set({ isCreating: creating }),
       setIsComplete: complete => set({ isComplete: complete }),
       setError: error => set({ error }),
+      setCreatedStoreId: storeId => set({ createdStoreId: storeId }),
       setCurrentStep: step => set({ currentStep: step }),
       reset: () => set({ ...initialState, currentStep: 1 }),
       initializeForGooglePlaces: (hasGooglePlaces: boolean) =>
