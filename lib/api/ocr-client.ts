@@ -445,32 +445,6 @@ export async function captureImageFromVideo(
     blobType: blob.type,
   })
 
-  // For debugging: Auto-download captured image for inspection
-  const dataUrl = canvas.toDataURL('image/jpeg', quality)
-
-  try {
-    // Create download link
-    const downloadLink = document.createElement('a')
-    downloadLink.href = dataUrl
-    downloadLink.download = `ocr-capture-${Date.now()}.jpg`
-
-    logger.log('OCRClient', '📸 Captured image ready! Auto-downloading...', {
-      imageSize: `${Math.round(dataUrl.length / 1024)}KB`,
-      resolution: `${canvas.width}x${canvas.height}`,
-      fileName: downloadLink.download,
-      instructions: 'Check your Downloads folder for the captured image',
-    })
-
-    // Trigger download automatically
-    document.body.appendChild(downloadLink)
-    downloadLink.click()
-    document.body.removeChild(downloadLink)
-
-    logger.log('OCRClient', '✅ Image downloaded! Check your Downloads folder')
-  } catch (e) {
-    logger.warn('OCRClient', 'Could not download image', { error: e })
-  }
-
   return blob
 }
 
