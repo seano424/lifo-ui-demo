@@ -14,16 +14,25 @@ const CRITICAL_PAGES = [
   '/pricing',
 ]
 
-// Install event
+// Install event - cache critical pages with error handling
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
-      return cache.addAll(CRITICAL_PAGES)
+      // Add pages individually to prevent one failure from breaking all caching
+      return Promise.allSettled(
+        CRITICAL_PAGES.map(url =>
+          cache.add(url).catch(err => {
+            console.log(`Failed to cache ${url}:`, err.message)
+          }),
+        ),
+      )
     }),
   )
+  // Skip waiting to activate immediately
+  self.skipWaiting()
 })
 
-// Activate event
+// Activate event - clean up old caches
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(cacheNames => {
@@ -36,6 +45,8 @@ self.addEventListener('activate', event => {
       )
     }),
   )
+  // Take control of all clients immediately
+  return self.clients.claim()
 })
 
 // Fetch event with offline fallback
