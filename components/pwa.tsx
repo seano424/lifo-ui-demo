@@ -9,6 +9,32 @@ interface BeforeInstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>
 }
 
+/**
+ * PWA Installation Component
+ *
+ * This component provides a custom install prompt for the Progressive Web App.
+ * It offers a branded alternative to the browser's native install prompt.
+ *
+ * WHAT IT DOES:
+ * - Registers the service worker for offline functionality
+ * - Shows a custom install prompt when the browser supports PWA installation
+ * - Manages user interaction with install/dismiss actions
+ * - Implements a 1-minute cooldown to prevent spam
+ * - Detects when the app is already installed
+ *
+ * WHY YOU MIGHT REMOVE IT:
+ * - Prefer browser's native install experience
+ * - Want to reduce code complexity and bundle size
+ * - Users are familiar with native browser prompts
+ * - Less maintenance overhead
+ *
+ * IF REMOVING:
+ * 1. Remove this component from app/layout.tsx
+ * 2. Keep service worker registration in a separate utility
+ * 3. Users will still see browser's native install prompt
+ * 4. PWA functionality remains intact
+ */
+
 export default function PWA() {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
   const [showInstallPrompt, setShowInstallPrompt] = useState(false)
@@ -39,7 +65,7 @@ export default function PWA() {
       if (!lastPromptTime) return true
 
       const timeDiff = Date.now() - parseInt(lastPromptTime, 10)
-      const oneMinute = 1 * 60 * 1000 // 1 minute in milliseconds
+      const oneMinute = 5 * 60 * 1000 // 5 minutes in milliseconds
       return timeDiff > oneMinute
     }
 
@@ -98,7 +124,7 @@ export default function PWA() {
 
   const handleDismiss = () => {
     setShowInstallPrompt(false)
-    // Record the time when user dismissed to prevent showing again for 1 minute
+    // Record the time when user dismissed to prevent showing again for 5 minutes
     localStorage.setItem('pwa-prompt-time', Date.now().toString())
     // Don't clear deferredPrompt, user might want to install later
   }
