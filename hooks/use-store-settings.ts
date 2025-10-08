@@ -486,26 +486,32 @@ export function useDeactivateStore() {
       // Then clear the active store from Zustand state and localStorage
       clearActiveStore()
 
-      // Invalidate all store-related queries including store details
-      queryClient.invalidateQueries({ queryKey: queryKeys.stores.all })
-      if (currentUser?.id) {
-        queryClient.invalidateQueries({
-          queryKey: queryKeys.stores.userStores(currentUser.id),
-        })
-      }
-      if (activeStoreId) {
-        queryClient.invalidateQueries({
-          queryKey: queryKeys.stores.detail(activeStoreId),
-        })
-      }
-
       toast.success(data.message || 'Store deactivated successfully', {
         description: `${data.employees_anonymized} employee records anonymized for GDPR compliance.`,
       })
 
-      // Redirect to dashboard root (will trigger store selection)
+      // Redirect to dashboard root FIRST (will trigger store selection)
       router.push('/dashboard')
-      router.refresh() // Force server component refresh to pick up new cookie
+
+      // Delay query invalidation until after navigation starts
+      // This prevents race conditions with auth state during navigation
+      setTimeout(() => {
+        // Invalidate all store-related queries including store details
+        queryClient.invalidateQueries({ queryKey: queryKeys.stores.all })
+        if (currentUser?.id) {
+          queryClient.invalidateQueries({
+            queryKey: queryKeys.stores.userStores(currentUser.id),
+          })
+        }
+        if (activeStoreId) {
+          queryClient.invalidateQueries({
+            queryKey: queryKeys.stores.detail(activeStoreId),
+          })
+        }
+
+        // Force server component refresh after queries are invalidated
+        router.refresh()
+      }, 100)
     },
     onError: error => {
       toast.error(`Failed to deactivate store: ${error.message}`, {

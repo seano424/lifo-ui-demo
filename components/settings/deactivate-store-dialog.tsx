@@ -7,6 +7,7 @@ import {
   AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
+  AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
@@ -91,21 +92,17 @@ export function DeactivateStoreDialog({ store, canDeactivate }: DeactivateStoreD
           Deactivate Store
         </Button>
       </AlertDialogTrigger>
-      <AlertDialogContent aria-describedby="deactivate-store-description">
+      <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle className="flex items-center gap-2">
             <AlertTriangle className="h-5 w-5 text-destructive" />
             Deactivate Store
           </AlertDialogTitle>
-        </AlertDialogHeader>
-        <div
-          id="deactivate-store-description"
-          className="flex flex-col gap-4 text-left text-sm text-muted-foreground"
-        >
-          <Typography variant="p">
+          <AlertDialogDescription>
             This action will deactivate &quot;{store.store_name}&quot; and cannot be easily undone.
-          </Typography>
-
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <div className="flex flex-col gap-4 text-left text-sm text-muted-foreground">
           <div className="rounded-lg bg-destructive p-4 flex flex-col gap-2">
             <Typography className="text-white" variant="p">
               What will happen:
