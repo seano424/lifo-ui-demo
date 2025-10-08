@@ -25,10 +25,14 @@ export default function ServiceWorkerRegistrar() {
         .register('/sw.js')
         .then(registration => {
           console.log('Service Worker registered successfully:', registration)
+          console.log('Service Worker scope:', registration.scope)
+          console.log('Service Worker state:', registration.active?.state)
         })
         .catch(registrationError => {
           console.log('Service Worker registration failed:', registrationError)
         })
+    } else {
+      console.log('Service Worker not supported in this browser')
     }
   }, [])
 
