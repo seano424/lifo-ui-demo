@@ -355,9 +355,22 @@ class GoogleVisionService:
         self, image_data: bytes, start_time: datetime
     ) -> VisionScanResult:
         """Internal method for actual Vision API processing"""
+        # Log image input details
+        logger.info(
+            "Processing image with Vision API",
+            original_image_size=len(image_data),
+            client_initialized=bool(self.client)
+        )
+
         # Preprocess image with configurable settings
         preprocessed_data = await self._preprocess_image_for_eu_food_labels(image_data)
         image_dimensions = await self._get_image_dimensions(preprocessed_data)
+
+        logger.info(
+            "Image preprocessing completed",
+            preprocessed_size=len(preprocessed_data),
+            dimensions=image_dimensions
+        )
 
         # Create Vision API image object
         image = vision.Image(content=preprocessed_data)
@@ -520,7 +533,35 @@ class GoogleVisionService:
         """Extract OCR results from Vision API response"""
         ocr_results = []
 
+        # Debug: Log raw Vision API response structure
+        logger.info(
+            "Vision API response received",
+            has_text_annotations=bool(response.text_annotations),
+            text_annotation_count=len(response.text_annotations) if response.text_annotations else 0,
+            has_full_text=bool(hasattr(response, "full_text_annotation") and response.full_text_annotation),
+            has_error=bool(response.error.message if hasattr(response, 'error') and response.error else None)
+        )
+
         if response.text_annotations:
+            # Log the full text (first annotation is always the complete detected text)
+            full_text = response.text_annotations[0].description if response.text_annotations else ""
+            logger.info(
+                "Vision API full text detected",
+                full_text=full_text[:200] if full_text else "None",  # Log first 200 chars
+                text_length=len(full_text) if full_text else 0
+            )
+
+            # IMPORTANT: Add the full text as the first OCR result for date parsing
+            # The full text often contains dates that are split across individual annotations
+            if full_text:
+                ocr_results.append(OCRResult(
+                    text=full_text,
+                    confidence=0.8,
+                    bounding_box=self._extract_bounding_box(
+                        response.text_annotations[0].bounding_poly
+                    ) if response.text_annotations else None
+                ))
+
             # Process individual text annotations (skip full text at index 0)
             for annotation in response.text_annotations[1:]:
                 text = annotation.description.strip()
@@ -749,9 +790,12 @@ class GoogleVisionService:
                 "DD/MM/YYYY",
             ),
             (r"(?:exp|EXP|BEST\s*BY|BB)[\s:]*(\d{1,2})(\w{3})(\d{2,4})", "DD Mon YYYY"),
-            # Special format like '22NOV2017'
+            # Special format like '22NOV2017' or '03NOV26'
             (r"\b(\d{1,2})([A-Z]{3})(\d{4})\b", "DD Mon YYYY"),
             (r"\b(\d{1,2})([A-Z]{3})(\d{2})\b", "DD Mon YY"),
+            # Date with slashes and month names like '03/JUL/26'
+            (r"\b(\d{1,2})[/\-.]([A-Z]{3})[/\-.](\d{2,4})\b", "DD/Mon/YYYY"),
+            (r"\b(\d{1,2})[/\-.]([A-Za-z]{3,9})[/\-.](\d{2,4})\b", "DD/Mon/YYYY"),
         ]
 
         # Enhanced multilingual month mapping
@@ -824,6 +868,12 @@ class GoogleVisionService:
         # Parse dates from both individual OCR results and combined text
         texts_to_parse = [ocr.text for ocr in ocr_results] + [combined_text]
 
+        logger.info(
+            "Starting date parsing",
+            texts_to_parse=texts_to_parse,
+            combined_text=combined_text
+        )
+
         for text in texts_to_parse:
             for pattern, format_name in date_patterns:
                 matches = re.finditer(pattern, text, re.IGNORECASE)
@@ -834,11 +884,26 @@ class GoogleVisionService:
                         parsed_date = None
                         confidence = 0.6  # Base confidence
 
+                        logger.debug(
+                            "Date pattern matched",
+                            pattern=format_name,
+                            matched_text=match.group(),
+                            groups=groups
+                        )
+
                         if format_name in ["DD/MM/YYYY", "DD/MM/YY"]:
                             day, month, year = groups
                             year = int(year)
                             if year < 100:  # 2-digit year
                                 year += 2000 if year < 50 else 1900
+
+                            logger.debug(
+                                "Attempting to parse DD/MM/YYYY",
+                                day=day,
+                                month=month,
+                                year=year
+                            )
+
                             parsed_date = datetime(year, int(month), int(day))
 
                         elif format_name == "YYYY/MM/DD":
@@ -891,6 +956,22 @@ class GoogleVisionService:
                                 year += 2000 if year < 50 else 1900
                             parsed_date = datetime(year, int(month), int(day))
 
+                        elif format_name == "DD/Mon/YYYY":
+                            # Handle formats like '03/JUL/26' or '03-Jul-2026'
+                            day, month_str, year = groups
+                            # Try different cases for multilingual support
+                            month = (
+                                month_map.get(month_str.lower())
+                                or month_map.get(month_str.capitalize())
+                                or month_map.get(month_str.upper().lower())
+                            )
+                            if month:
+                                year = int(year)
+                                if year < 100:
+                                    year += 2000 if year < 50 else 1900
+                                parsed_date = datetime(year, month, int(day))
+                                confidence = 0.85  # High confidence for this explicit format
+
                         # Enhanced date validation - allow wide range for debugging
                         # In production, should be more restrictive (e.g., 6 months past, 3 years future)
                         if parsed_date:
@@ -915,8 +996,12 @@ class GoogleVisionService:
                                 expiry_dates.append(expiry_date)
 
                     except (ValueError, IndexError) as e:
-                        logger.debug(
-                            f"Failed to parse date from '{match.group()}': {e}"
+                        logger.warning(
+                            "Failed to parse date",
+                            matched_text=match.group() if match else "unknown",
+                            pattern=format_name,
+                            error=str(e),
+                            error_type=type(e).__name__
                         )
                         continue
 
