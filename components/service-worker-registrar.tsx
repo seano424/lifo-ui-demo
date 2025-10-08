@@ -30,9 +30,12 @@ export default function ServiceWorkerRegistrar() {
             state: registration.active?.state,
           })
         })
-        .catch(registrationError => {
+        .catch((registrationError: unknown) => {
           logger.error('ServiceWorker', 'Registration failed', {
-            error: registrationError.message,
+            error:
+              registrationError instanceof Error
+                ? registrationError.message
+                : String(registrationError),
           })
         })
     } else {
