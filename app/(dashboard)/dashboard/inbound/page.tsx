@@ -6,14 +6,14 @@ import ManualInboundEntry from '@/components/inbound/manual-inbound-entry'
 import ScanningInterface from '@/components/scanning/standalone-scanning-interface'
 import { Card } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { useMediaQuery } from '@/hooks/use-mobile'
+// import { useMediaQuery } from '@/hooks/use-mobile'
 import { useStoreState } from '@/lib/stores/store-context'
 import { Keyboard, Scan, Upload } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
 export default function InboundPage() {
   const { activeStore: currentStore } = useStoreState()
-  const { isTablet, isMobile } = useMediaQuery()
+  // const { isTablet, isMobile } = useMediaQuery()
   const t = useTranslations('dashboard.inbound')
 
   return (
@@ -33,7 +33,7 @@ export default function InboundPage() {
         </TabsList>
 
         <TabsContent value="scan" className="mt-6">
-          <div className="max-w-2xl mx-auto">{(isMobile || isTablet) && <ScanningInterface />}</div>
+          <div className="max-w-2xl mx-auto">{<ScanningInterface />}</div>
         </TabsContent>
 
         <TabsContent value="csv" className="mt-6">
@@ -58,6 +58,10 @@ export default function InboundPage() {
       <div className="hidden lg:block max-w-6xl mx-auto">
         <Tabs defaultValue="manual" className="w-full">
           <TabsList className="grid w-full grid-cols-2 max-w-xl mx-auto">
+            <TabsTrigger value="scan" className="flex items-center gap-2">
+              <Scan className="w-4 h-4 stroke-2 border-2 rounded-full p-[2px] bg-primary-100" />
+              {t('mobile.barcodeScanning')}
+            </TabsTrigger>
             <TabsTrigger value="manual" className="flex items-center gap-2">
               <Keyboard className="w-4 h-4" />
               {t('desktop.manualEntry')}
@@ -67,6 +71,10 @@ export default function InboundPage() {
               {t('desktop.csvBulkImport')}
             </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="scan" className="mt-6">
+            <div className="max-w-2xl mx-auto">{<ScanningInterface />}</div>
+          </TabsContent>
 
           <TabsContent value="manual" className="mt-6">
             <div className="max-w-6xl mx-auto">
