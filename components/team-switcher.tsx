@@ -89,7 +89,7 @@ export function TeamSwitcher() {
                 className="flex items-center gap-2"
               >
                 <StoreIcon className="w-4 h-4" />
-                {activeStore.store_name}
+                {activeStore?.store_name || 'No store selected'}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent
@@ -104,7 +104,7 @@ export function TeamSwitcher() {
 
               {userStores.map((userStore, index) => {
                 const store = userStore.store
-                const isActive = store.store_id === activeStore.store_id
+                const isActive = activeStore ? store.store_id === activeStore.store_id : false
 
                 return (
                   <DropdownMenuItem

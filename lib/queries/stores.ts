@@ -79,13 +79,15 @@ export async function fetchUserStores(
         throw new Error(`Failed to fetch user stores: ${error.message}`)
       }
 
-      const userStores = data.map(item => {
-        return {
-          store: item.stores as unknown as Store,
-          role: item.role_in_store as string,
-          permissions: item.permissions,
-        }
-      })
+      const userStores = data
+        .filter(item => item.stores !== null) // Filter out null stores (deactivated)
+        .map(item => {
+          return {
+            store: item.stores as unknown as Store,
+            role: item.role_in_store as string,
+            permissions: item.permissions,
+          }
+        })
 
       logger.log(context, 'User stores fetched successfully', {
         userId,
@@ -317,9 +319,16 @@ export function selectDefaultStore(
     return null
   }
 
+  // Filter out any stores that might be null (defensive)
+  const validUserStores = userStores.filter(us => us.store !== null)
+
+  if (validUserStores.length === 0) {
+    return null
+  }
+
   // 1. Try to use last active store if it's still accessible
   if (lastActiveStoreId) {
-    const lastActiveStore = userStores.find(us => us.store.store_id === lastActiveStoreId)
+    const lastActiveStore = validUserStores.find(us => us.store.store_id === lastActiveStoreId)
     if (lastActiveStore) {
       return lastActiveStore.store
     }
@@ -327,7 +336,7 @@ export function selectDefaultStore(
 
   // 2. Try to use primary store from database if set
   if (primaryStoreId) {
-    const primaryStore = userStores.find(us => us.store.store_id === primaryStoreId)
+    const primaryStore = validUserStores.find(us => us.store.store_id === primaryStoreId)
     if (primaryStore) {
       return primaryStore.store
     }
@@ -335,17 +344,17 @@ export function selectDefaultStore(
 
   // 3. Fallback to intelligent defaults
   // First, try to find a store where user is owner
-  const ownedStore = userStores.find(us => us.role === 'owner')
+  const ownedStore = validUserStores.find(us => us.role === 'owner')
   if (ownedStore) {
     return ownedStore.store
   }
 
   // Then try manager role
-  const managedStore = userStores.find(us => us.role === 'manager')
+  const managedStore = validUserStores.find(us => us.role === 'manager')
   if (managedStore) {
     return managedStore.store
   }
 
   // Finally, just use the first store
-  return userStores[0].store
+  return validUserStores[0].store
 }

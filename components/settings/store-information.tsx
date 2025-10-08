@@ -36,6 +36,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { AddStoreFlow } from './add-store-flow'
+import { DeactivateStoreDialog } from './deactivate-store-dialog'
 
 interface StoreInformationProps {
   serverPermissions?: UserStorePermissions // Server-computed permissions
@@ -241,13 +242,13 @@ export default function StoreInformation({
     return () => subscription.unsubscribe()
   }, [isEditing, form.watch]) // Removed form from dependencies as it's stable
 
-  const handleSave = async (data: StoreInfoFormData) => {
+  const handleSave = (data: StoreInfoFormData) => {
     try {
       const cleanedData = Object.fromEntries(
         Object.entries(data).map(([key, value]) => [key, value === '' ? null : value]),
       )
 
-      await updateBasicInfo(cleanedData)
+      updateBasicInfo(cleanedData)
       setIsEditing(false)
       setHasUnsavedChanges(false)
     } catch (error) {
@@ -830,6 +831,37 @@ export default function StoreInformation({
           )}
         </CardContent>
       </Card>
+
+      {/* Danger Zone - Store Deactivation */}
+      {permissions.isOwner && storeData && (
+        <Card className="border-destructive">
+          <CardHeader>
+            <Typography variant="h3" className="font-black text-destructive">
+              Danger Zone
+            </Typography>
+            <Typography variant="p" color="muted">
+              Irreversible actions that affect your store&apos;s status
+            </Typography>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div className="space-y-1">
+                <Typography variant="h4" className="font-medium">
+                  Deactivate Store
+                </Typography>
+                <Typography variant="p" color="muted">
+                  Deactivate your store and anonymize employee data. This action is difficult to
+                  reverse.
+                </Typography>
+              </div>
+              <DeactivateStoreDialog
+                store={storeData}
+                canDeactivate={permissions.isOwner ?? false}
+              />
+            </div>
+          </CardContent>
+        </Card>
+      )}
       <BottomSheet
         isOpen={isAddStoreOpen}
         variant="fullHeight"

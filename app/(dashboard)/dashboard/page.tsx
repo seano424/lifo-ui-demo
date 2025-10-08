@@ -11,6 +11,9 @@ export default async function DashboardPage() {
   // Show welcome screen if no active store or no batches exist
   const hasBatches = activeStoreId ? await hasBatchesRPC(activeStoreId, supabase) : false
 
+  console.log('hasBatches', hasBatches)
+  console.log('activeStoreId', activeStoreId)
+
   if (!activeStoreId || !hasBatches) {
     return <DashboardWelcome />
   }

@@ -424,3 +424,45 @@ export async function testTableAccess(
     error: 'All table access methods failed',
   }
 }
+
+// Deactivate store (soft delete with GDPR compliance)
+export async function deactivateStore(
+  storeId: string,
+  serverClient?: ServerClient,
+): Promise<{
+  success: boolean
+  store_id: string
+  store_name: string
+  deactivated_at: string
+  employees_anonymized: number
+  message: string
+}> {
+  return withPerformanceTracking(
+    'lib/queries/store-settings',
+    'deactivateStore',
+    { storeId },
+    async () => {
+      const supabase = serverClient || createClient()
+
+      const { data, error } = await supabase.schema('business').rpc('deactivate_store_safe', {
+        p_store_id: storeId,
+      })
+
+      if (error) {
+        logger.error('lib/queries/store-settings', 'Store deactivation error', {
+          error: error.message,
+          code: error.code,
+          storeId,
+        })
+        throw new Error(`Failed to deactivate store: ${error.message}`)
+      }
+
+      logger.log('lib/queries/store-settings', 'Store deactivated successfully', {
+        storeId,
+        employeesAnonymized: data.employees_anonymized,
+      })
+
+      return data
+    },
+  )
+}

@@ -18,6 +18,7 @@ interface StoreState {
   setUserStores: (userStores: UserStore[]) => void
   setLoadingStores: (loading: boolean) => void
   setChangingStore: (changing: boolean) => void
+  clearActiveStore: () => void
 
   getActiveStoreId: () => string | null
 
@@ -46,6 +47,12 @@ export const useStoreState = create<StoreState>()(
     setUserStores: userStores => set({ userStores }),
     setLoadingStores: loading => set({ isLoadingStores: loading }),
     setChangingStore: changing => set({ isChangingStore: changing }),
+    clearActiveStore: () => {
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem(ACTIVE_STORE_KEY)
+      }
+      set({ activeStore: null })
+    },
 
     getActiveStoreId: () => get().activeStore?.store_id || null,
     getStoresOnly: () => get().userStores.map(us => us.store),
