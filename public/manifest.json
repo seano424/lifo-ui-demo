@@ -3,9 +3,13 @@
   "short_name": "LIFO.AI",
   "description": "Reduce food waste through AI-driven inventory management",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#ffffff",
-  "theme_color": "#2563eb",
+  "theme_color": "#1E40AF",
+  "lang": "en",
+  "categories": ["business", "productivity", "utilities"],
   "icons": [
     {
       "src": "/icon-192.png",

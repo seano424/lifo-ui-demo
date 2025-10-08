@@ -1,3 +1,4 @@
+import { OfflineIndicator } from '@/components/offline-indicator'
 import { IntlProvider } from '@/components/providers/intl-provider'
 import { LanguageProvider } from '@/components/providers/language-provider'
 import PWA from '@/components/pwa'
@@ -75,6 +76,7 @@ export default async function RootLayout({
             </LanguageProvider>
           </ReactQueryProvider>
           <PWA />
+          <OfflineIndicator />
           <Toaster
             position="top-right"
             richColors
