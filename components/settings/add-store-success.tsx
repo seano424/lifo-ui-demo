@@ -3,24 +3,70 @@
 import { ArrowRight, Check } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
+import { useState } from 'react'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Typography } from '@/components/ui/typography'
+import { useStore } from '@/hooks/use-stores'
+import { useStoreState } from '@/lib/stores/store-context'
+import { setActiveStoreCookie } from '@/lib/actions/store-actions'
 
 interface AddStoreSuccessProps {
   storeName: string
+  storeId?: string
 }
 
-export function AddStoreSuccess({ storeName }: AddStoreSuccessProps) {
+export function AddStoreSuccess({ storeName, storeId }: AddStoreSuccessProps) {
   const router = useRouter()
   const t = useTranslations('store.creation.success')
+  const { setActiveStore } = useStoreState()
+  const [isSwitching, setIsSwitching] = useState(false)
 
-  const handleGoToSettings = () => {
-    router.push('/dashboard/settings?tab=store')
+  // Fetch the full store details if we have a storeId
+  const { data: newStore } = useStore(storeId || null)
+
+  // Helper function to switch to the new store
+  const switchToNewStore = async () => {
+    if (!newStore || !storeId) {
+      toast.error('Store information not available')
+      return false
+    }
+
+    setIsSwitching(true)
+
+    try {
+      // Set active store directly (newStore is already of type Store)
+      setActiveStore(newStore)
+
+      // Also set the cookie for server-side consistency
+      await setActiveStoreCookie(storeId)
+
+      toast.success(`Switched to ${storeName}`)
+      return true
+    } catch (error) {
+      console.error('Failed to set active store cookie:', error)
+      toast.error('Failed to switch to new store')
+      return false
+    } finally {
+      setIsSwitching(false)
+    }
   }
 
-  const handleGoToDashboard = () => {
-    router.push('/dashboard')
+  const handleGoToSettings = async () => {
+    // Switch to new store before navigating
+    const switched = await switchToNewStore()
+    if (switched || !storeId) {
+      router.push('/dashboard/settings?tab=store')
+    }
+  }
+
+  const handleGoToDashboard = async () => {
+    // Switch to new store before navigating
+    const switched = await switchToNewStore()
+    if (switched || !storeId) {
+      router.push('/dashboard')
+    }
   }
 
   return (
@@ -83,12 +129,17 @@ export function AddStoreSuccess({ storeName }: AddStoreSuccessProps) {
           </div>
 
           <div className="flex gap-3 pt-4">
-            <Button variant="outline" onClick={handleGoToDashboard} className="w-full">
-              {t('actions.goToDashboard')}
+            <Button
+              variant="outline"
+              onClick={handleGoToDashboard}
+              disabled={isSwitching}
+              className="w-full"
+            >
+              {isSwitching ? 'Switching...' : t('actions.goToDashboard')}
             </Button>
-            <Button onClick={handleGoToSettings} className="w-full">
-              {t('actions.goToSettings')}
-              <ArrowRight className="w-4 h-4 ml-2" />
+            <Button onClick={handleGoToSettings} disabled={isSwitching} className="w-full">
+              {isSwitching ? 'Switching...' : t('actions.goToSettings')}
+              {!isSwitching && <ArrowRight className="w-4 h-4 ml-2" />}
             </Button>
           </div>
         </CardContent>
