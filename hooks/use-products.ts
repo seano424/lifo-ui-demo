@@ -8,7 +8,6 @@ import {
   createProduct,
   deleteProduct,
   fetchProductById,
-  fetchProductsPage,
   type Product,
   type ProductFilters,
   type ProductSort,
@@ -17,6 +16,7 @@ import {
   type UpdateProductData,
   updateProduct,
 } from '@/lib/queries/products'
+import { fetchProductsPageRPC } from '@/lib/queries/products-rpc'
 import { queryKeys } from '@/lib/queries/query-keys'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 
@@ -30,7 +30,7 @@ export function useProducts(filters: ProductFilters = {}, pageSize: number = 20)
       if (!activeStoreId) {
         throw new Error('No active store selected')
       }
-      return fetchProductsPage(
+      return fetchProductsPageRPC(
         { page: pageParam, pageSize },
         { ...filters, storeId: activeStoreId },
         undefined,
@@ -40,7 +40,7 @@ export function useProducts(filters: ProductFilters = {}, pageSize: number = 20)
     initialPageParam: 0,
     enabled: !!activeStoreId, // Only fetch when we have a store
     retry: (failureCount, error: Error) => {
-      // Don't retry on PostgREST ordering errors
+      // Don't retry on PostgREST ordering errors (shouldn't happen with RPC but keep for safety)
       if (error?.message?.includes('failed to parse order')) {
         console.error('[useProducts] PostgREST ordering error - not retrying:', error)
         return false

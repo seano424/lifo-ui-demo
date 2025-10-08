@@ -88,6 +88,33 @@ class BatchCreationService:
 
     def __init__(self):
         self.async_session = async_session()
+        # System UUID for service_role and system operations
+        self.SYSTEM_USER_UUID = uuid.UUID("00000000-0000-0000-0000-000000000000")
+
+    def _parse_user_id_to_uuid(self, user_id: str) -> uuid.UUID:
+        """
+        Convert user_id string to UUID, handling special cases like service_role
+
+        Args:
+            user_id: User ID string (can be UUID or 'service_role')
+
+        Returns:
+            UUID object
+        """
+        # Handle service_role and other non-UUID user IDs
+        if user_id in ("service_role", "system", "service"):
+            return self.SYSTEM_USER_UUID
+
+        # Try to parse as UUID
+        try:
+            return uuid.UUID(user_id)
+        except (ValueError, AttributeError) as e:
+            logger.warning(
+                "Invalid user_id format, using system UUID",
+                user_id=user_id,
+                error=str(e)
+            )
+            return self.SYSTEM_USER_UUID
 
     async def create_batch_from_scan(
         self, store_id: str, user_id: str, batch_data: BatchFromScanRequest
@@ -98,13 +125,16 @@ class BatchCreationService:
         """
         async with self.async_session() as session:
             try:
+                # Convert user_id to UUID - handle service_role special case
+                user_uuid = self._parse_user_id_to_uuid(user_id)
+
                 # 1. Find or create product
                 (
                     product_id,
                     was_created,
                     was_updated,
                 ) = await self._find_or_create_product(
-                    session, store_id, user_id, batch_data
+                    session, store_id, user_uuid, batch_data
                 )
 
                 # 2. Use provided batch number or generate unique one
@@ -116,7 +146,7 @@ class BatchCreationService:
 
                 # 3. Create batch using existing schema
                 batch_id = await self._create_batch_record(
-                    session, store_id, user_id, product_id, batch_number, batch_data
+                    session, store_id, user_uuid, product_id, batch_number, batch_data
                 )
 
                 await session.commit()
@@ -159,7 +189,7 @@ class BatchCreationService:
         self,
         session: AsyncSession,
         store_id: str,
-        user_id: str,
+        user_uuid: uuid.UUID,
         batch_data: BatchFromScanRequest,
     ) -> tuple[uuid.UUID, bool, bool]:
         """Find existing product by barcode or create new one"""
@@ -193,12 +223,12 @@ class BatchCreationService:
         # Find or create category if provided
         if batch_data.category:
             await self._find_or_create_category(
-                session, batch_data.category, user_id
+                session, batch_data.category, user_uuid
             )
 
         # Create new product - use provided SKU or generate one
         product_sku = batch_data.sku if batch_data.sku else f"SCAN-{batch_data.barcode}"
-        
+
         new_product = Product(
             sku=product_sku,
             name=batch_data.product_name,
@@ -210,7 +240,7 @@ class BatchCreationService:
             typical_shelf_life_days=30,  # Default
             barcode=batch_data.barcode,
             is_verified=True,
-            created_by=uuid.UUID(user_id),
+            created_by=user_uuid,
             # Required pricing fields from Supabase schema (must be > 0 due to check constraints)
             base_cost_price=batch_data.cost_price
             if batch_data.cost_price and batch_data.cost_price > 0
@@ -229,7 +259,7 @@ class BatchCreationService:
             cost_price=batch_data.cost_price,
             selling_price=batch_data.selling_price,
             is_active=True,
-            added_by=uuid.UUID(user_id),
+            added_by=user_uuid,
         )
         session.add(store_product)
         await session.flush()  # Ensure store_product exists before batch creation
@@ -237,7 +267,7 @@ class BatchCreationService:
         return new_product.product_id, True, False  # type: ignore[return-value]
 
     async def _find_or_create_category(
-        self, session: AsyncSession, category_name: str, user_id: str
+        self, session: AsyncSession, category_name: str, user_uuid: uuid.UUID
     ) -> uuid.UUID:
         """Find existing category by name or create a new one"""
         from app.database.inventory_models import Category
@@ -303,7 +333,7 @@ class BatchCreationService:
         self,
         session: AsyncSession,
         store_id: str,
-        user_id: str,
+        user_uuid: uuid.UUID,
         product_id: uuid.UUID,
         batch_number: str,
         batch_data: BatchFromScanRequest,
@@ -333,7 +363,7 @@ class BatchCreationService:
             ocr_confidence=batch_data.ocr_confidence,
             # Store and audit
             store_id=uuid.UUID(store_id),
-            created_by=uuid.UUID(user_id),
+            created_by=user_uuid,
             status="active",
         )
 

@@ -35,11 +35,11 @@ class EnhancedBatchOperations:
         self,
         store_id: str,
         user_id: str,
-        batch_requests: List[BatchFromScanRequest],
+        batch_requests: list[BatchFromScanRequest],
         auto_score: bool = True,
         track_actions: bool = True,
         use_unified_service: bool = True
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         OPTIMIZED: Create batches from scan data with automatic service selection
         
@@ -63,10 +63,10 @@ class EnhancedBatchOperations:
         self,
         store_id: str,
         user_id: str,
-        csv_data: List[Dict[str, Any]],
+        csv_data: list[dict[str, Any]],
         auto_score: bool = True,
         chunk_size: int = 100
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         OPTIMIZED: Create batches from CSV data with unified write operations
         
@@ -168,8 +168,8 @@ class EnhancedBatchOperations:
         self,
         store_id: str,
         user_id: str,
-        batch_updates: List[Dict[str, Any]]
-    ) -> Dict[str, Any]:
+        batch_updates: list[dict[str, Any]]
+    ) -> dict[str, Any]:
         """
         OPTIMIZED: Bulk update batch statuses with unified write operations
         
@@ -245,8 +245,8 @@ class EnhancedBatchOperations:
         self,
         store_id: str,
         user_id: str,
-        actions: List[Dict[str, Any]]
-    ) -> Dict[str, Any]:
+        actions: list[dict[str, Any]]
+    ) -> dict[str, Any]:
         """
         OPTIMIZED: Execute batch action workflow with consolidated writes
         
@@ -338,10 +338,10 @@ class EnhancedBatchOperations:
         self,
         store_id: str,
         user_id: str,
-        batch_requests: List[BatchFromScanRequest],
+        batch_requests: list[BatchFromScanRequest],
         auto_score: bool,
         track_actions: bool
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Create batches using unified write service"""
         
         operations = []
@@ -388,8 +388,8 @@ class EnhancedBatchOperations:
         self,
         store_id: str,
         user_id: str,
-        batch_requests: List[BatchFromScanRequest]
-    ) -> Dict[str, Any]:
+        batch_requests: list[BatchFromScanRequest]
+    ) -> dict[str, Any]:
         """Create batches using traditional batch service"""
         
         result = await self.batch_service.create_batches_from_csv_bulk(
@@ -413,8 +413,8 @@ class EnhancedBatchOperations:
         store_id: str,
         user_id: str,
         action_type: str,
-        actions: List[Dict[str, Any]]
-    ) -> Dict[str, Any]:
+        actions: list[dict[str, Any]]
+    ) -> dict[str, Any]:
         """Process a group of actions of the same type"""
         
         processed = 0

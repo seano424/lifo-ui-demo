@@ -39,10 +39,10 @@ class MobileDataConflictResolver:
     async def resolve_conflicts(
         self,
         session: AsyncSession,
-        mobile_data: Dict[str, Any],
-        server_data: Dict[str, Any],
-        sync_metadata: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        mobile_data: dict[str, Any],
+        server_data: dict[str, Any],
+        sync_metadata: dict[str, Any]
+    ) -> dict[str, Any]:
         """
         Resolve conflicts between mobile and server data
         Returns merged data with conflict resolution details
@@ -75,10 +75,10 @@ class MobileDataConflictResolver:
         self,
         session: AsyncSession,
         data_type: str,
-        mobile_items: List[Dict[str, Any]],
-        server_items: List[Dict[str, Any]],
-        sync_metadata: Dict[str, Any]
-    ) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
+        mobile_items: list[dict[str, Any]],
+        server_items: list[dict[str, Any]],
+        sync_metadata: dict[str, Any]
+    ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
         """Check for conflicts between mobile and server data items"""
         
         conflicts = []
@@ -127,10 +127,10 @@ class MobileDataConflictResolver:
         self,
         session: AsyncSession,
         data_type: str,
-        mobile_item: Dict[str, Any],
-        server_item: Dict[str, Any],
-        sync_metadata: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        mobile_item: dict[str, Any],
+        server_item: dict[str, Any],
+        sync_metadata: dict[str, Any]
+    ) -> dict[str, Any]:
         """Resolve conflict for a specific item"""
         
         if data_type in self.conflict_strategies:
@@ -151,10 +151,10 @@ class MobileDataConflictResolver:
     async def _resolve_quantity_conflict(
         self,
         session: AsyncSession,
-        mobile_item: Dict[str, Any],
-        server_item: Dict[str, Any],
-        sync_metadata: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        mobile_item: dict[str, Any],
+        server_item: dict[str, Any],
+        sync_metadata: dict[str, Any]
+    ) -> dict[str, Any]:
         """Resolve quantity conflicts using business logic"""
         
         mobile_qty = float(mobile_item.get("current_quantity", 0))
@@ -179,10 +179,10 @@ class MobileDataConflictResolver:
     async def _resolve_status_conflict(
         self,
         session: AsyncSession,
-        mobile_item: Dict[str, Any],
-        server_item: Dict[str, Any],
-        sync_metadata: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        mobile_item: dict[str, Any],
+        server_item: dict[str, Any],
+        sync_metadata: dict[str, Any]
+    ) -> dict[str, Any]:
         """Resolve status conflicts with priority rules"""
         
         mobile_status = mobile_item.get("status")
@@ -217,10 +217,10 @@ class MobileDataConflictResolver:
     async def _resolve_action_conflict(
         self,
         session: AsyncSession,
-        mobile_item: Dict[str, Any],
-        server_item: Dict[str, Any],
-        sync_metadata: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        mobile_item: dict[str, Any],
+        server_item: dict[str, Any],
+        sync_metadata: dict[str, Any]
+    ) -> dict[str, Any]:
         """Resolve user action conflicts"""
         
         # For user actions, mobile typically wins as user initiated the action
@@ -236,10 +236,10 @@ class MobileDataConflictResolver:
     async def _resolve_scan_conflict(
         self,
         session: AsyncSession,
-        mobile_item: Dict[str, Any],
-        server_item: Dict[str, Any],
-        sync_metadata: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        mobile_item: dict[str, Any],
+        server_item: dict[str, Any],
+        sync_metadata: dict[str, Any]
+    ) -> dict[str, Any]:
         """Resolve scan data conflicts"""
         
         # For scan data, use the one with higher confidence
@@ -264,7 +264,7 @@ class MobileDataConflictResolver:
             }
         }
     
-    def _parse_timestamp(self, timestamp_str: Optional[str]) -> Optional[datetime]:
+    def _parse_timestamp(self, timestamp_str: str | None) -> datetime | None:
         """Parse timestamp string to datetime"""
         if not timestamp_str:
             return None
@@ -292,9 +292,9 @@ class MobileWriteService:
         self,
         user_id: str,
         store_id: str,
-        mobile_data: Dict[str, Any],
-        sync_metadata: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        mobile_data: dict[str, Any],
+        sync_metadata: dict[str, Any]
+    ) -> dict[str, Any]:
         """
         OPTIMIZED: Sync mobile app data with conflict resolution
         
@@ -391,10 +391,10 @@ class MobileWriteService:
         self,
         session: AsyncSession,
         store_id: str,
-        batch_updates: List[Dict[str, Any]],
-        sync_metadata: Dict[str, Any],
+        batch_updates: list[dict[str, Any]],
+        sync_metadata: dict[str, Any],
         tx
-    ) -> Dict[str, int]:
+    ) -> dict[str, int]:
         """Sync batch updates with conflict resolution"""
         
         synced_count = 0
@@ -465,10 +465,10 @@ class MobileWriteService:
         session: AsyncSession,
         user_id: str,
         store_id: str,
-        user_actions: List[Dict[str, Any]],
+        user_actions: list[dict[str, Any]],
         bulk_optimizer,
         tx
-    ) -> Dict[str, int]:
+    ) -> dict[str, int]:
         """Sync user actions from mobile app"""
         
         actions_to_create = []
@@ -511,10 +511,10 @@ class MobileWriteService:
         session: AsyncSession,
         store_id: str,
         user_id: str,
-        scan_data: List[Dict[str, Any]],
+        scan_data: list[dict[str, Any]],
         bulk_optimizer,
         tx
-    ) -> Dict[str, int]:
+    ) -> dict[str, int]:
         """Process scan data from mobile app"""
         
         # Convert scan data to batch creation requests
@@ -557,7 +557,7 @@ class MobileWriteService:
         session: AsyncSession,
         user_id: str,
         store_id: str,
-        analytics_events: List[Dict[str, Any]],
+        analytics_events: list[dict[str, Any]],
         tx
     ) -> int:
         """Record analytics events from mobile app"""
@@ -592,7 +592,7 @@ class MobileWriteService:
         
         return events_recorded
     
-    def _parse_mobile_timestamp(self, timestamp_str: Optional[str]) -> Optional[datetime]:
+    def _parse_mobile_timestamp(self, timestamp_str: str | None) -> datetime | None:
         """Parse mobile timestamp with various formats"""
         if not timestamp_str:
             return None
@@ -618,8 +618,8 @@ class MobileWriteService:
         self,
         user_id: str,
         store_id: str,
-        write_operations: List[Dict[str, Any]]
-    ) -> Dict[str, Any]:
+        write_operations: list[dict[str, Any]]
+    ) -> dict[str, Any]:
         """
         Queue mobile write operations for batch processing
         Useful for high-frequency mobile operations
@@ -695,7 +695,7 @@ class MobileWriteService:
         self,
         user_id: str,
         store_id: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Get mobile sync status and recommendations"""
         
         return {

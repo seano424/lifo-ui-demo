@@ -151,6 +151,7 @@
     "title": "Vandaag's prioriteitsacties",
     "description": "Beoordeel en onderneem actie op de meest urgente items.",
     "takeAction": "Actie ondernemen",
+    "comingSoon": "Binnenkort beschikbaar",
     "loadingInsights": "Winkel inzichten laden...",
     "dashboardTitle": "Winkel Inzichten Dashboard",
     "unableToLoad": "Kan inzichten niet laden",
@@ -246,6 +247,7 @@
     "expiredItems": {
       "title": "Verlopen artikelen",
       "subtitle": "Voorraad die afvalbeheer acties vereist",
+      "totalExpired": "Totaal verlopen",
       "recentlyExpired": "Recent verlopen",
       "weekOld": "Week oud",
       "older": "Ouder",

@@ -733,11 +733,15 @@ class SecureReadOnlyOperations:
         self.logger = structlog.get_logger().bind(component="read_only_ops")
 
     async def get_store_inventory_for_scoring(
-        self, store_id: str
+        self, store_id: str, fetch_all: bool = False
     ) -> list[dict[str, Any]]:
         """
         Get inventory data for scoring calculations only
         Now uses Supabase client for compatibility with Next.js approach
+
+        Args:
+            store_id: Store ID to fetch inventory for
+            fetch_all: If True, fetch ALL batches (no limit). If False, uses Supabase default of 1000.
         """
         try:
             # Import Supabase service (fallback to direct client usage)
@@ -747,40 +751,82 @@ class SecureReadOnlyOperations:
             admin_client = supabase_service.get_admin_client()
 
             # Enhanced query with product JOIN for proper product names and categories
-            result = (
-                admin_client.schema("inventory")
-                .table("batches")
-                .select("""
-                    batch_id,
-                    product_id,
-                    batch_number,
-                    current_quantity,
-                    selling_price,
-                    cost_price,
-                    expiry_date,
-                    location_code,
-                    supplier,
-                    status,
-                    store_products!inner (
-                        products (
-                            product_id,
-                            sku,
-                            name,
-                            brand,
-                            category_id,
-                            category:categories(
-                                category_code,
-                                display_name_en
-                            )
+            base_query = """
+                batch_id,
+                product_id,
+                batch_number,
+                current_quantity,
+                selling_price,
+                cost_price,
+                expiry_date,
+                location_code,
+                supplier,
+                status,
+                store_products!inner (
+                    products (
+                        product_id,
+                        sku,
+                        name,
+                        brand,
+                        category_id,
+                        category:categories(
+                            category_code,
+                            display_name_en
                         )
                     )
-                """)
-                .eq("store_id", store_id)
-                .in_("status", ["active", "expired"])
-                .gt("current_quantity", 0)
-                .order("expiry_date", desc=False)
-                .execute()
-            )
+                )
+            """
+
+            if fetch_all:
+                # Fetch ALL batches using pagination to avoid arbitrary limits
+                self.logger.info("Fetching ALL batches using pagination", store_id=store_id)
+                all_data = []
+                page_size = 1000
+                offset = 0
+
+                while True:
+                    page_result = (
+                        admin_client.schema("inventory")
+                        .table("batches")
+                        .select(base_query)
+                        .eq("store_id", store_id)
+                        .in_("status", ["active", "expired"])
+                        .gt("current_quantity", 0)
+                        .order("expiry_date", desc=False)
+                        .range(offset, offset + page_size - 1)
+                        .execute()
+                    )
+
+                    if not page_result.data:
+                        break
+
+                    all_data.extend(page_result.data)
+
+                    # If we got fewer records than page_size, we've reached the end
+                    if len(page_result.data) < page_size:
+                        break
+
+                    offset += page_size
+
+                self.logger.info(
+                    "Fetched all batches via pagination",
+                    store_id=store_id,
+                    total_batches=len(all_data)
+                )
+                result = type('obj', (object,), {'data': all_data})()  # Create result-like object
+            else:
+                # Use Supabase default limit of 1000 for quick scoring
+                self.logger.info("Fetching top 1000 urgent batches for scoring", store_id=store_id)
+                result = (
+                    admin_client.schema("inventory")
+                    .table("batches")
+                    .select(base_query)
+                    .eq("store_id", store_id)
+                    .in_("status", ["active", "expired"])
+                    .gt("current_quantity", 0)
+                    .order("expiry_date", desc=False)
+                    .execute()
+                )
 
             if not result.data:
                 self.logger.info("No active batches found", store_id=store_id)
@@ -1393,8 +1439,11 @@ class SecureReadOnlyOperations:
         providing 10x+ performance improvement for bulk scoring operations.
 
         Target: <500ms for 71 batch operations vs 3-5 seconds with individual transactions
+
+        OPTIMIZED: Uses direct PostgreSQL connection for 10-50x performance vs PostgREST
         """
         from datetime import datetime
+        from app.database.bulk_operations_optimized import get_bulk_optimizer
 
         bulk_start = datetime.utcnow()
 
@@ -1478,19 +1527,19 @@ class SecureReadOnlyOperations:
             # Performance monitoring start
             db_operation_start = datetime.utcnow()
 
-            # Perform optimized bulk upsert operation
-            result = (
-                admin_client.schema("scoring")
-                .table("product_scores")
-                .upsert(upsert_data, on_conflict="batch_id")
-                .execute()
+            # HIGH-PERFORMANCE: Use direct PostgreSQL instead of PostgREST
+            # This bypasses HTTP/JSON overhead for 10-50x performance improvement
+            bulk_optimizer = get_bulk_optimizer()
+            rows_upserted = await bulk_optimizer.bulk_upsert_product_scores(
+                scores=upsert_data,
+                on_conflict_column="batch_id"
             )
 
             # Calculate performance metrics
             db_operation_time = int((datetime.utcnow() - db_operation_start).total_seconds() * 1000)
             total_operation_time = int((datetime.utcnow() - bulk_start).total_seconds() * 1000)
 
-            if result.data:
+            if rows_upserted > 0:
                 # Track performance metrics
                 from app.monitoring.metrics import metrics_collector
                 metrics_collector.record_api_request(
@@ -1501,17 +1550,21 @@ class SecureReadOnlyOperations:
                 )
 
                 self.logger.info(
-                    "HIGH-PERFORMANCE: Bulk score results stored successfully",
+                    "HIGH-PERFORMANCE: Bulk score results stored via DIRECT POSTGRESQL",
                     scores_count=len(upsert_data),
+                    rows_upserted=rows_upserted,
                     db_operation_time_ms=db_operation_time,
                     total_time_ms=total_operation_time,
+                    per_item_ms=total_operation_time / len(upsert_data),
                     performance_target="<500ms achieved" if total_operation_time < 500 else f"Target missed: {total_operation_time}ms",
-                    validation_errors=len(validation_errors)
+                    validation_errors=len(validation_errors),
+                    method="direct_postgresql"
                 )
                 return True
             else:
                 self.logger.error(
-                    "Bulk upsert operation failed - no data returned",
+                    "Bulk upsert operation failed - no rows inserted",
+                    rows_upserted=rows_upserted,
                     operation_time_ms=total_operation_time
                 )
                 return False

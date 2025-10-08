@@ -25,7 +25,7 @@ class MultiTierCache:
     L3: Database cache (tens of milliseconds)
     """
 
-    def __init__(self, redis_client: Optional[aioredis.Redis] = None):
+    def __init__(self, redis_client: aioredis.Redis | None = None):
         self.l1_cache = {}  # In-memory cache
         self.redis_client = redis_client
         self.cache_stats = defaultdict(lambda: {"hits": 0, "misses": 0})
@@ -47,7 +47,7 @@ class MultiTierCache:
         # Start cache cleanup task
         asyncio.create_task(self._cleanup_l1_cache())
 
-    async def get(self, key: str, cache_type: str = "mobile") -> Optional[dict]:
+    async def get(self, key: str, cache_type: str = "mobile") -> dict | None:
         """Get value from cache with fallback through tiers"""
         
         # L1: Check in-memory cache
@@ -342,10 +342,10 @@ class CacheWarmer:
 
 
 # Global cache instance (to be initialized in app startup)
-_global_cache: Optional[MultiTierCache] = None
+_global_cache: MultiTierCache | None = None
 
 
-def init_cache(redis_url: Optional[str] = None) -> MultiTierCache:
+def init_cache(redis_url: str | None = None) -> MultiTierCache:
     """Initialize global cache instance"""
     global _global_cache
     
@@ -366,6 +366,6 @@ def init_cache(redis_url: Optional[str] = None) -> MultiTierCache:
     return _global_cache
 
 
-def get_cache() -> Optional[MultiTierCache]:
+def get_cache() -> MultiTierCache | None:
     """Get global cache instance"""
     return _global_cache

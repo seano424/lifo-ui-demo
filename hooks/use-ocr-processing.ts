@@ -5,7 +5,7 @@
 
 import { useMutation, useQuery } from '@tanstack/react-query'
 import {
-  checkBackendHealth,
+  // checkBackendHealth,
   extractExpiryDate,
   extractTextOnly,
   type OCRError,
@@ -26,14 +26,14 @@ export const ocrQueryKeys = {
 /**
  * Hook to check FastAPI backend health
  */
-export function useOCRBackendHealth() {
-  return useQuery({
-    queryKey: ocrQueryKeys.health(),
-    queryFn: checkBackendHealth,
-    staleTime: 30 * 1000, // 30 seconds
-    refetchInterval: 60 * 1000, // Check every minute
-  })
-}
+// export function useOCRBackendHealth() {
+//   return useQuery({
+//     queryKey: ocrQueryKeys.health(),
+//     queryFn: checkBackendHealth,
+//     staleTime: 30 * 1000, // 30 seconds
+//     refetchInterval: 60 * 1000, // Check every minute
+//   })
+// }
 
 /**
  * Hook for expiry date extraction
@@ -148,7 +148,7 @@ export function useTextExtraction() {
  * Falls back to manual entry if OCR fails or backend is unavailable
  */
 export function useOCRWithFallback() {
-  const { data: isBackendHealthy } = useOCRBackendHealth()
+  // const { data: isBackendHealthy } = useOCRBackendHealth()
   const expiryExtraction = useExpiryDateExtraction()
   const fullAnalysis = useFullOCRAnalysis()
 
@@ -166,17 +166,17 @@ export function useOCRWithFallback() {
     error?: OCRError
     fallbackToManual: boolean
   }> => {
-    // Check if backend is available
-    if (isBackendHealthy === false) {
-      return {
-        success: false,
-        error: {
-          message: 'OCR backend is not available',
-          type: 'network',
-        },
-        fallbackToManual: true,
-      }
-    }
+    // // Check if backend is available
+    // if (isBackendHealthy === false) {
+    //   return {
+    //     success: false,
+    //     error: {
+    //       message: 'OCR backend is not available',
+    //       type: 'network',
+    //     },
+    //     fallbackToManual: true,
+    //   }
+    // }
 
     try {
       if (options?.useFullAnalysis) {
@@ -223,7 +223,7 @@ export function useOCRWithFallback() {
 
   return {
     processExpiryDate,
-    isBackendHealthy,
+    // isBackendHealthy,
     isLoading: expiryExtraction.isPending || fullAnalysis.isPending,
     // Expose individual hooks for advanced usage
     expiryExtraction,

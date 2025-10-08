@@ -12,6 +12,7 @@ import {
   ScanSearch,
   SettingsIcon,
 } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { usePathname } from 'next/navigation'
 import { useMemo } from 'react'
 
@@ -34,13 +35,15 @@ function getPageIcon(pathname: string) {
 }
 
 export default function DashboardInsetHeader({
+  page,
   title,
   description,
   rightContent,
   isLoading,
   className,
 }: {
-  title: string
+  page?: string
+  title?: string
   description?: string
   rightContent?: React.ReactNode
   isLoading?: boolean
@@ -48,6 +51,13 @@ export default function DashboardInsetHeader({
 }) {
   const pathname = usePathname()
   const PageIcon = useMemo(() => getPageIcon(pathname), [pathname])
+
+  // Always call hook unconditionally, use fallback page key if not provided
+  const t = useTranslations(page || 'dashboard')
+
+  // Use translations if page key is provided, otherwise use direct props
+  const displayTitle = page ? t('page.title') : title
+  const displayDescription = page ? t('page.description') : description
 
   return (
     <div className="relative animate-in fade-in-0 slide-in-from-top-4 duration-700">
@@ -77,13 +87,13 @@ export default function DashboardInsetHeader({
                   variant="h1"
                   className="font-black bg-gradient-to-r from-gray-900 to-gray-600 dark:from-gray-100 dark:to-gray-400 bg-clip-text text-transparent capitalize pb-2"
                 >
-                  {title}
+                  {displayTitle}
                 </Typography>
               </div>
 
-              {description && (
+              {displayDescription && (
                 <Typography className="max-w-5xl text-muted-foreground leading-relaxed" variant="p">
-                  {description}
+                  {displayDescription}
                 </Typography>
               )}
             </>

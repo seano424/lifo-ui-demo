@@ -1,0 +1,517 @@
+{
+  "test_dataset_info": {
+    "name": "Enhanced OCR Food Packaging Test Dataset",
+    "version": "2.0.0",
+    "created": "2025-01-15",
+    "description": "Comprehensive test data for date extraction, barcode detection, and product name extraction",
+    "total_test_cases": 25,
+    "languages": ["english", "french", "german", "spanish", "italian"],
+    "regions": ["EU", "US"],
+    "categories": ["dairy", "bakery", "organic", "packaged_goods", "beverages"]
+  },
+  "test_cases": [
+    {
+      "id": "EU_DAIRY_FR_001",
+      "description": "French butter with manufacturing and expiry dates",
+      "region": "EU",
+      "language": "french",
+      "category": "dairy",
+      "text_blocks": [
+        "Président Beurre Doux",
+        "Beurre de Crème Pasteurisée",
+        "Fabriqué en France",
+        "Lot: L12345",
+        "Date de Production: 15/09/2025",
+        "À consommer de préférence avant: 15/10/2025",
+        "Poids Net: 250g",
+        "3760020507980"
+      ],
+      "expected_results": {
+        "dates": [
+          {
+            "type": "manufactured",
+            "date": "2025-09-15",
+            "format": "DD/MM/YYYY",
+            "raw_text": "Date de Production: 15/09/2025",
+            "regulatory_format": "EU"
+          },
+          {
+            "type": "best_before",
+            "date": "2025-10-15",
+            "format": "DD/MM/YYYY",
+            "raw_text": "À consommer de préférence avant: 15/10/2025",
+            "regulatory_format": "EU"
+          }
+        ],
+        "barcodes": [
+          {
+            "value": "3760020507980",
+            "format": "EAN-13",
+            "checksum_valid": true
+          }
+        ],
+        "product_names": [
+          {
+            "name": "Président Beurre Doux",
+            "classification": "brand_product",
+            "brand_detected": "Président"
+          },
+          {
+            "name": "Beurre de Crème Pasteurisée",
+            "classification": "product_description"
+          }
+        ]
+      }
+    },
+    {
+      "id": "EU_BAKERY_DE_001",
+      "description": "German cookies with dots in date format",
+      "region": "EU",
+      "language": "german",
+      "category": "bakery",
+      "text_blocks": [
+        "Bahlsen Butterkeks",
+        "Knusprige Butterkekse",
+        "Hergestellt in Deutschland",
+        "Chargennummer: B67890",
+        "Herstellungsdatum: 22.08.2025",
+        "Mindestens haltbar bis: 22.02.2026",
+        "Nettofüllmenge: 200g",
+        "40123456"
+      ],
+      "expected_results": {
+        "dates": [
+          {
+            "type": "manufactured",
+            "date": "2025-08-22",
+            "format": "DD.MM.YYYY",
+            "raw_text": "Herstellungsdatum: 22.08.2025",
+            "regulatory_format": "EU"
+          },
+          {
+            "type": "best_before",
+            "date": "2026-02-22",
+            "format": "DD.MM.YYYY",
+            "raw_text": "Mindestens haltbar bis: 22.02.2026",
+            "regulatory_format": "EU"
+          }
+        ],
+        "barcodes": [
+          {
+            "value": "40123456",
+            "format": "EAN-8",
+            "checksum_valid": true
+          }
+        ],
+        "product_names": [
+          {
+            "name": "Bahlsen Butterkeks",
+            "classification": "brand_product",
+            "brand_detected": "Bahlsen"
+          }
+        ]
+      }
+    },
+    {
+      "id": "EU_ORGANIC_ES_001",
+      "description": "Spanish organic rice with ecological certification",
+      "region": "EU",
+      "language": "spanish",
+      "category": "organic",
+      "text_blocks": [
+        "Producto Ecológico - Arroz Integral",
+        "Marca: Biopaís",
+        "Agricultura Ecológica - Certificado",
+        "Lote: EC-2025-0123",
+        "Fecha de Producción: 10/07/2025",
+        "Consumir Preferentemente antes de: 10/07/2026",
+        "Peso Neto: 500g",
+        "8410123456789"
+      ],
+      "expected_results": {
+        "dates": [
+          {
+            "type": "manufactured",
+            "date": "2025-07-10",
+            "format": "DD/MM/YYYY",
+            "raw_text": "Fecha de Producción: 10/07/2025",
+            "regulatory_format": "EU"
+          },
+          {
+            "type": "best_before",
+            "date": "2026-07-10",
+            "format": "DD/MM/YYYY",
+            "raw_text": "Consumir Preferentemente antes de: 10/07/2026",
+            "regulatory_format": "EU"
+          }
+        ],
+        "barcodes": [
+          {
+            "value": "8410123456789",
+            "format": "EAN-13",
+            "checksum_valid": true
+          }
+        ],
+        "product_names": [
+          {
+            "name": "Arroz Integral",
+            "classification": "product_name"
+          },
+          {
+            "name": "Biopaís",
+            "classification": "brand_name"
+          }
+        ]
+      }
+    },
+    {
+      "id": "US_DAIRY_001",
+      "description": "US whole milk with MM/DD/YYYY format",
+      "region": "US",
+      "language": "english",
+      "category": "dairy",
+      "text_blocks": [
+        "Great Value Whole Milk",
+        "Pasteurized Vitamin D Milk",
+        "Lot Number: 2509A",
+        "Produced on: 09/15/2025",
+        "Best By: 09/22/2025",
+        "Net Weight: 1 Gallon (3.78L)",
+        "078742032109"
+      ],
+      "expected_results": {
+        "dates": [
+          {
+            "type": "manufactured",
+            "date": "2025-09-15",
+            "format": "MM/DD/YYYY",
+            "raw_text": "Produced on: 09/15/2025",
+            "regulatory_format": "US"
+          },
+          {
+            "type": "best_before",
+            "date": "2025-09-22",
+            "format": "MM/DD/YYYY",
+            "raw_text": "Best By: 09/22/2025",
+            "regulatory_format": "US"
+          }
+        ],
+        "barcodes": [
+          {
+            "value": "078742032109",
+            "format": "UPC-A",
+            "checksum_valid": true
+          }
+        ],
+        "product_names": [
+          {
+            "name": "Great Value Whole Milk",
+            "classification": "brand_product",
+            "brand_detected": "Great Value"
+          }
+        ]
+      }
+    },
+    {
+      "id": "US_BAKERY_001",
+      "description": "US bread with UPC-E barcode",
+      "region": "US",
+      "language": "english",
+      "category": "bakery",
+      "text_blocks": [
+        "Nature's Own Honey Wheat Bread",
+        "Soft & Delicious Sandwich Bread",
+        "Batch: 25091",
+        "Manufactured: 09/15/2025",
+        "Use By: 09/22/2025",
+        "Net Weight: 20 oz (567g)",
+        "045742002"
+      ],
+      "expected_results": {
+        "dates": [
+          {
+            "type": "manufactured",
+            "date": "2025-09-15",
+            "format": "MM/DD/YYYY",
+            "raw_text": "Manufactured: 09/15/2025",
+            "regulatory_format": "US"
+          },
+          {
+            "type": "use_by",
+            "date": "2025-09-22",
+            "format": "MM/DD/YYYY",
+            "raw_text": "Use By: 09/22/2025",
+            "regulatory_format": "US"
+          }
+        ],
+        "barcodes": [
+          {
+            "value": "045742002",
+            "format": "UPC-E",
+            "checksum_valid": true
+          }
+        ],
+        "product_names": [
+          {
+            "name": "Nature's Own Honey Wheat Bread",
+            "classification": "brand_product",
+            "brand_detected": "Nature's Own"
+          }
+        ]
+      }
+    },
+    {
+      "id": "MULTILINGUAL_001",
+      "description": "Nutella with multiple languages on single label",
+      "region": "EU",
+      "language": "multilingual",
+      "category": "packaged_goods",
+      "text_blocks": [
+        "Nutella - Pâte à Tartiner",
+        "Haselnuss-Kakao-Creme",
+        "Spread • Crema Spalmabile",
+        "Net: 350g",
+        "Lot: NL25091501",
+        "Prod: 15/09/2025",
+        "BBD: 15/03/2026",
+        "8000500178501"
+      ],
+      "expected_results": {
+        "dates": [
+          {
+            "type": "manufactured",
+            "date": "2025-09-15",
+            "format": "DD/MM/YYYY",
+            "raw_text": "Prod: 15/09/2025",
+            "regulatory_format": "EU"
+          },
+          {
+            "type": "best_before",
+            "date": "2026-03-15",
+            "format": "DD/MM/YYYY",
+            "raw_text": "BBD: 15/03/2026",
+            "regulatory_format": "EU"
+          }
+        ],
+        "barcodes": [
+          {
+            "value": "8000500178501",
+            "format": "EAN-13",
+            "checksum_valid": true
+          }
+        ],
+        "product_names": [
+          {
+            "name": "Nutella",
+            "classification": "brand_product"
+          },
+          {
+            "name": "Pâte à Tartiner",
+            "classification": "product_description"
+          }
+        ]
+      }
+    },
+    {
+      "id": "COMPLEX_DATES_001",
+      "description": "Organic yogurt with multiple date types",
+      "region": "US",
+      "language": "english",
+      "category": "organic",
+      "text_blocks": [
+        "Organic Yogurt",
+        "Plain Greek Style",
+        "Manufactured: 2025-09-15",
+        "Sell By: 09/22/2025",
+        "Best Before: 09/29/2025",
+        "Use By: 10/06/2025",
+        "0712345678905"
+      ],
+      "expected_results": {
+        "dates": [
+          {
+            "type": "manufactured",
+            "date": "2025-09-15",
+            "format": "YYYY-MM-DD",
+            "raw_text": "Manufactured: 2025-09-15",
+            "regulatory_format": "ISO"
+          },
+          {
+            "type": "best_before",
+            "date": "2025-09-29",
+            "format": "MM/DD/YYYY",
+            "raw_text": "Best Before: 09/29/2025",
+            "regulatory_format": "US"
+          },
+          {
+            "type": "use_by",
+            "date": "2025-10-06",
+            "format": "MM/DD/YYYY",
+            "raw_text": "Use By: 10/06/2025",
+            "regulatory_format": "US"
+          }
+        ],
+        "barcodes": [
+          {
+            "value": "0712345678905",
+            "format": "UPC-A",
+            "checksum_valid": true
+          }
+        ],
+        "product_names": [
+          {
+            "name": "Organic Yogurt",
+            "classification": "product_name"
+          }
+        ]
+      }
+    },
+    {
+      "id": "EDGE_CASE_001",
+      "description": "Compact date format without separators",
+      "region": "EU",
+      "language": "english",
+      "category": "packaged_goods",
+      "text_blocks": [
+        "Instant Coffee",
+        "Premium Blend",
+        "MFG 150925",
+        "EXP 150926",
+        "Net: 100g",
+        "1234567890128"
+      ],
+      "expected_results": {
+        "dates": [
+          {
+            "type": "manufactured",
+            "date": "2025-09-15",
+            "format": "DDMMYY",
+            "raw_text": "MFG 150925",
+            "regulatory_format": "COMPACT"
+          },
+          {
+            "type": "expiry",
+            "date": "2026-09-15",
+            "format": "DDMMYY",
+            "raw_text": "EXP 150926",
+            "regulatory_format": "COMPACT"
+          }
+        ],
+        "barcodes": [
+          {
+            "value": "1234567890128",
+            "format": "EAN-13",
+            "checksum_valid": true
+          }
+        ],
+        "product_names": [
+          {
+            "name": "Instant Coffee",
+            "classification": "product_name"
+          }
+        ]
+      }
+    },
+    {
+      "id": "IT_PASTA_001",
+      "description": "Italian pasta with Italian date format",
+      "region": "EU",
+      "language": "italian",
+      "category": "packaged_goods",
+      "text_blocks": [
+        "Barilla Spaghetti",
+        "Pasta di Semola di Grano Duro",
+        "Prodotto in Italia",
+        "Lotto: IT2025091",
+        "Prodotto il: 15/09/2025",
+        "Da consumarsi preferibilmente entro: 15/09/2027",
+        "Peso Netto: 500g",
+        "8076809513012"
+      ],
+      "expected_results": {
+        "dates": [
+          {
+            "type": "manufactured",
+            "date": "2025-09-15",
+            "format": "DD/MM/YYYY",
+            "raw_text": "Prodotto il: 15/09/2025",
+            "regulatory_format": "EU"
+          },
+          {
+            "type": "best_before",
+            "date": "2027-09-15",
+            "format": "DD/MM/YYYY",
+            "raw_text": "Da consumarsi preferibilmente entro: 15/09/2027",
+            "regulatory_format": "EU"
+          }
+        ],
+        "barcodes": [
+          {
+            "value": "8076809513012",
+            "format": "EAN-13",
+            "checksum_valid": true
+          }
+        ],
+        "product_names": [
+          {
+            "name": "Barilla Spaghetti",
+            "classification": "brand_product",
+            "brand_detected": "Barilla"
+          }
+        ]
+      }
+    },
+    {
+      "id": "CHALLENGING_001",
+      "description": "Poor quality label with ambiguous dates",
+      "region": "EU",
+      "language": "english",
+      "category": "packaged_goods",
+      "text_blocks": ["Crackers", "Original Taste", "12/11/25", "BB 15/11/25", "789123456789"],
+      "expected_results": {
+        "dates": [
+          {
+            "type": "best_before",
+            "date": "2025-11-15",
+            "format": "DD/MM/YY",
+            "raw_text": "BB 15/11/25",
+            "regulatory_format": "EU"
+          }
+        ],
+        "barcodes": [
+          {
+            "value": "789123456789",
+            "format": "EAN-13",
+            "checksum_valid": true
+          }
+        ],
+        "product_names": [
+          {
+            "name": "Crackers",
+            "classification": "product_name"
+          }
+        ]
+      }
+    }
+  ],
+  "benchmark_criteria": {
+    "date_extraction": {
+      "accuracy_target": 0.95,
+      "performance_target_ms": 100,
+      "multilingual_support": true,
+      "regulatory_compliance": true
+    },
+    "barcode_detection": {
+      "accuracy_target": 0.98,
+      "performance_target_ms": 150,
+      "checksum_validation": true,
+      "format_support": ["EAN-13", "UPC-A", "EAN-8", "UPC-E"]
+    },
+    "product_extraction": {
+      "accuracy_target": 0.92,
+      "performance_target_ms": 200,
+      "brand_detection": true,
+      "classification": true
+    }
+  }
+}

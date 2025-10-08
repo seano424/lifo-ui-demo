@@ -16,6 +16,7 @@ import { useBatchActions } from '@/hooks/use-batches'
 import type { TodoItem } from '@/lib/queries/todos-rpc'
 import type { Database } from '@/types/supabase'
 import { cn } from '@/lib/utils'
+import { migrateRecommendation } from '@/lib/utils/recommendation-migration'
 import { Edit3, Save, X } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -569,7 +570,16 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
             <div className="bg-white rounded-2xl p-4 space-y-3 dark:bg-brand-dark">
               <div className="flex justify-between capitalize">
                 <span>{t('details.recommendation')}</span>
-                <span>{(selectedBatch.ai_recommendation || '').replace('_', ' ')}</span>
+                <span>
+                  {(() => {
+                    const standardRec = migrateRecommendation(selectedBatch.ai_recommendation)
+                    try {
+                      return t(`recommendations.${standardRec}`)
+                    } catch {
+                      return standardRec.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+                    }
+                  })()}
+                </span>
               </div>
               {selectedBatch.composite_score && (
                 <div className="flex justify-between capitalize">

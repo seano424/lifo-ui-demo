@@ -71,22 +71,25 @@ async def extract_expiry_date_ocr(
                 ],
             )
 
-        # Extract expiry date using simple method
-        expiry_date = await scanning_service.extract_expiry_date(image_data)
+        # Extract expiry date using simple method (now returns dict with confidence)
+        result = await scanning_service.extract_expiry_date(image_data)
 
         logger.info(
             "Expiry date extraction completed",
             store_id=store_id,
-            has_expiry=expiry_date is not None,
+            has_expiry=result["expiry_date"] is not None,
+            confidence=result["confidence"],
             user_id=current_user["sub"],
         )
 
-        # Create JSON-safe response
+        # Create JSON-safe response with actual confidence
         response_data = {
             "success": True,
             "scan_type": "expiry_date_extraction",
-            "expiry_date": expiry_date.isoformat() if expiry_date is not None else None,
-            "confidence_threshold": confidence_threshold,
+            "expiry_date": result["expiry_date"].isoformat() if result["expiry_date"] is not None else None,
+            "confidence_score": result["confidence"],  # Actual OCR confidence
+            "confidence_threshold": confidence_threshold,  # User's input threshold
+            "raw_ocr_text": result["raw_ocr_text"],
             "processing_type": "google_vision_ocr",
         }
 

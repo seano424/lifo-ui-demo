@@ -288,7 +288,7 @@ class CSVSecurityValidator:
 
         return sanitized
 
-    def validate_csv_structure_limits(self, rows: List[List[str]]) -> None:
+    def validate_csv_structure_limits(self, rows: list[list[str]]) -> None:
         """
         Validate CSV structure against security limits
         

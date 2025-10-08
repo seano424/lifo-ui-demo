@@ -5,7 +5,7 @@ Consolidates analytics data persistence to reduce HTTP overhead
 """
 
 import time
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from typing import Any, Dict, List
 
@@ -42,10 +42,10 @@ class AnalyticsWriteService:
     async def bulk_write_scoring_results(
         self,
         store_id: str,
-        scoring_results: List[Dict[str, Any]],
+        scoring_results: list[dict[str, Any]],
         include_recommendations: bool = True,
         update_actions: bool = True
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         OPTIMIZED: Bulk write scoring results with consolidated operations
         
@@ -148,9 +148,9 @@ class AnalyticsWriteService:
     
     async def batch_analytics_events(
         self,
-        events: List[Dict[str, Any]],
+        events: list[dict[str, Any]],
         flush_interval_seconds: int = 5
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         OPTIMIZED: Batch analytics events for efficient writes
         
@@ -211,9 +211,9 @@ class AnalyticsWriteService:
     async def write_performance_metrics(
         self,
         store_id: str,
-        metrics_data: Dict[str, Any],
+        metrics_data: dict[str, Any],
         time_window: timedelta = timedelta(minutes=5)
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         OPTIMIZED: Write performance metrics with aggregation
         
@@ -262,8 +262,8 @@ class AnalyticsWriteService:
         self,
         user_id: str,
         store_id: str,
-        actions: List[Dict[str, Any]]
-    ) -> Dict[str, Any]:
+        actions: list[dict[str, Any]]
+    ) -> dict[str, Any]:
         """
         OPTIMIZED: Bulk track user actions with analytics
         
@@ -337,7 +337,7 @@ class AnalyticsWriteService:
     async def _bulk_upsert_product_scores(
         self,
         session: AsyncSession,
-        scores_data: List[Dict[str, Any]],
+        scores_data: list[dict[str, Any]],
         tx: TransactionManager
     ) -> int:
         """Bulk upsert product scores with conflict resolution"""
@@ -389,7 +389,7 @@ class AnalyticsWriteService:
         self,
         session: AsyncSession,
         store_id: str,
-        scoring_results: List[Dict[str, Any]],
+        scoring_results: list[dict[str, Any]],
         tx: TransactionManager
     ) -> int:
         """Bulk update batch actions based on scoring results"""
@@ -405,7 +405,7 @@ class AnalyticsWriteService:
                         and_(
                             BatchAction.batch_id == result["batch_id"],
                             BatchAction.store_id == store_id,
-                            BatchAction.actual_action == "maintain"
+                            BatchAction.action_type == "maintain"
                         )
                     )
                     .values(
@@ -431,7 +431,7 @@ class AnalyticsWriteService:
         self,
         session: AsyncSession,
         store_id: str,
-        scoring_results: List[Dict[str, Any]],
+        scoring_results: list[dict[str, Any]],
         tx: TransactionManager
     ) -> int:
         """Create recommendation records for high urgency items"""
@@ -456,17 +456,30 @@ class AnalyticsWriteService:
                     )
                     
                     if not existing_check.scalar_one_or_none():
-                        recommendation = BatchAction(
-                            batch_id=result["batch_id"],
-                            store_id=store_id,
-                            recommended_action=result.get("recommendation", "discount"),
-                            actual_action="maintain",
-                            ai_score=Decimal(str(urgency_score)),
-                            action_date=datetime.utcnow()
+                        # Fetch batch to get initial quantity
+                        from app.database.inventory_models import Batch
+                        batch_result = await session.execute(
+                            select(Batch).where(Batch.batch_id == result["batch_id"])
                         )
-                        session.add(recommendation)
-                        recommendations_created += 1
-                        tx.increment_operation()
+                        batch = batch_result.scalar_one_or_none()
+
+                        if batch:
+                            recommendation = BatchAction(
+                                batch_id=result["batch_id"],
+                                store_id=store_id,
+                                recommended_action=result.get("recommendation", "discount"),
+                                action_type="maintain",
+                                ai_score=Decimal(str(urgency_score)),
+                                performed_at=datetime.now(UTC).replace(tzinfo=None),
+                                # Required NOT NULL fields
+                                quantity_affected=Decimal("0"),
+                                total_original_value=Decimal("0"),
+                                total_recovered_value=Decimal("0"),
+                                batch_initial_quantity=batch.initial_quantity,
+                            )
+                            session.add(recommendation)
+                            recommendations_created += 1
+                            tx.increment_operation()
                         
             except Exception as e:
                 logger.warning(
@@ -480,8 +493,8 @@ class AnalyticsWriteService:
     
     def _group_events_for_processing(
         self, 
-        events: List[Dict[str, Any]]
-    ) -> Dict[str, List[Dict[str, Any]]]:
+        events: list[dict[str, Any]]
+    ) -> dict[str, list[dict[str, Any]]]:
         """Group events by type and store for optimal processing"""
         
         grouped = {}
@@ -499,7 +512,7 @@ class AnalyticsWriteService:
     async def _process_event_group(
         self,
         event_group: str,
-        events: List[Dict[str, Any]]
+        events: list[dict[str, Any]]
     ):
         """Process a group of similar events"""
         
@@ -517,10 +530,10 @@ class AnalyticsWriteService:
         self,
         session: AsyncSession,
         store_id: str,
-        metrics_data: Dict[str, Any],
+        metrics_data: dict[str, Any],
         time_window: timedelta,
         tx: TransactionManager
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Aggregate performance metrics for the time window"""
         
         # Simple aggregation for now
@@ -542,7 +555,7 @@ class AnalyticsWriteService:
         self,
         session: AsyncSession,
         store_id: str,
-        aggregated_metrics: Dict[str, Any],
+        aggregated_metrics: dict[str, Any],
         tx: TransactionManager
     ) -> int:
         """Write aggregated metrics to storage"""
@@ -561,8 +574,8 @@ class AnalyticsWriteService:
     
     def _group_actions_by_type(
         self, 
-        actions: List[Dict[str, Any]]
-    ) -> Dict[str, List[Dict[str, Any]]]:
+        actions: list[dict[str, Any]]
+    ) -> dict[str, list[dict[str, Any]]]:
         """Group actions by type for optimized processing"""
         
         grouped = {}
@@ -581,9 +594,9 @@ class AnalyticsWriteService:
         user_id: str,
         store_id: str,
         action_type: str,
-        actions: List[Dict[str, Any]],
+        actions: list[dict[str, Any]],
         tx: TransactionManager
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Process a group of user actions of the same type"""
         
         tracked = 0
@@ -597,13 +610,14 @@ class AnalyticsWriteService:
                     batch_id=action.get("batch_id"),
                     store_id=store_id,
                     recommended_action=action.get("recommended_action", "maintain"),
-                    actual_action=action.get("actual_action", action_type),
+                    action_type=action.get("actual_action", action.get("action_type", action_type)),
                     ai_score=Decimal(str(action.get("ai_score", 0.5))),
-                    action_date=datetime.utcnow(),
+                    performed_at=datetime.now(UTC),
                     performed_by=user_id,
                     quantity_affected=Decimal(str(action.get("quantity_affected", 0))),
-                    original_value=Decimal(str(action.get("original_value", 0))),
-                    recovered_value=Decimal(str(action.get("recovered_value", 0))),
+                    total_original_value=Decimal(str(action.get("original_value", action.get("total_original_value", 0)))),
+                    total_recovered_value=Decimal(str(action.get("recovered_value", action.get("total_recovered_value", 0)))),
+                    batch_initial_quantity=Decimal(str(action.get("batch_initial_quantity", 0))),
                     notes=action.get("notes")
                 )
                 

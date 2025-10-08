@@ -50,7 +50,7 @@ class UnifiedCSVService:
         file: UploadFile,
         processing_mode: str = "validation_only",
         chunk_size: int = 50
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Main CSV processing endpoint - replaces all duplicate processing logic
         
@@ -135,7 +135,7 @@ class UnifiedCSVService:
                 metadata={"filename": file.filename}
             )
 
-    async def _validate_csv_structure(self, df: pd.DataFrame) -> Dict[str, Any]:
+    async def _validate_csv_structure(self, df: pd.DataFrame) -> dict[str, Any]:
         """Validate CSV structure with consolidated validation logic"""
         
         # Required columns check (consolidated from all modules)
@@ -268,7 +268,7 @@ class UnifiedCSVService:
                             suggestion="Use numeric values only (e.g., 10.50)"
                         )
 
-    async def _validate_data_only(self, df: pd.DataFrame) -> Dict[str, Any]:
+    async def _validate_data_only(self, df: pd.DataFrame) -> dict[str, Any]:
         """Process CSV for validation only - no imports"""
         
         validated_rows = []
@@ -301,7 +301,7 @@ class UnifiedCSVService:
             "ready_for_import": not self.error_handler.has_errors()
         }
 
-    async def _process_for_import(self, df: pd.DataFrame) -> Dict[str, Any]:
+    async def _process_for_import(self, df: pd.DataFrame) -> dict[str, Any]:
         """Process CSV for actual import"""
         
         processed_rows = []
@@ -334,7 +334,7 @@ class UnifiedCSVService:
             "batch_requests": await self._convert_to_batch_requests(processed_rows)
         }
 
-    async def _process_with_ai_features(self, df: pd.DataFrame) -> Dict[str, Any]:
+    async def _process_with_ai_features(self, df: pd.DataFrame) -> dict[str, Any]:
         """Process CSV with AI suggestions and enhancements"""
         
         # First do standard processing
@@ -354,7 +354,7 @@ class UnifiedCSVService:
         
         return import_result
 
-    async def _process_single_row(self, row: pd.Series, row_number: int) -> Optional[Dict[str, Any]]:
+    async def _process_single_row(self, row: pd.Series, row_number: int) -> dict[str, Any] | None:
         """Process a single CSV row with consolidated validation logic"""
         
         # Skip completely empty rows
@@ -414,7 +414,7 @@ class UnifiedCSVService:
         
         return processed
 
-    async def _validate_business_rules(self, data: Dict[str, Any], row_number: int) -> None:
+    async def _validate_business_rules(self, data: dict[str, Any], row_number: int) -> None:
         """Consolidated business rule validation from all modules"""
         
         # Price logic validation
@@ -445,7 +445,7 @@ class UnifiedCSVService:
                 column="quantity"
             )
 
-    async def _convert_to_batch_requests(self, processed_data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    async def _convert_to_batch_requests(self, processed_data: list[dict[str, Any]]) -> list[dict[str, Any]]:
         """Convert processed data to batch creation requests"""
         
         batch_requests = []
@@ -475,7 +475,7 @@ class UnifiedCSVService:
         
         return batch_requests
 
-    def _generate_batch_number(self, sku: str, expiry_date: Optional[date]) -> str:
+    def _generate_batch_number(self, sku: str, expiry_date: date | None) -> str:
         """Generate batch number (consolidated from csv_to_batch_adapter)"""
         timestamp = datetime.utcnow().strftime("%Y%m%d")
         
@@ -516,7 +516,7 @@ class UnifiedCSVService:
         
         return numeric_part + str(check_digit)
 
-    async def _generate_validation_insights(self, validated_rows: List[Dict[str, Any]]) -> Dict[str, Any]:
+    async def _generate_validation_insights(self, validated_rows: list[dict[str, Any]]) -> dict[str, Any]:
         """Generate insights for validation results"""
         
         if not validated_rows:
@@ -563,7 +563,7 @@ class UnifiedCSVService:
             "expiry_analysis": expiry_analysis
         }
 
-    async def _generate_ai_suggestions(self, processed_data: List[Dict[str, Any]]) -> List[Dict[str, str]]:
+    async def _generate_ai_suggestions(self, processed_data: list[dict[str, Any]]) -> list[dict[str, str]]:
         """Generate AI suggestions (consolidated from secure_csv_processor)"""
         
         suggestions = []
@@ -613,7 +613,7 @@ class UnifiedCSVService:
         
         return suggestions
 
-    async def _generate_category_suggestions(self, df: pd.DataFrame) -> Dict[str, List[str]]:
+    async def _generate_category_suggestions(self, df: pd.DataFrame) -> dict[str, list[str]]:
         """Generate category suggestions for unknown categories"""
         
         suggestions = {}
@@ -627,7 +627,7 @@ class UnifiedCSVService:
         
         return suggestions
 
-    async def _generate_optimization_tips(self, processed_data: List[Dict[str, Any]]) -> List[Dict[str, str]]:
+    async def _generate_optimization_tips(self, processed_data: list[dict[str, Any]]) -> list[dict[str, str]]:
         """Generate optimization tips for better inventory management"""
         
         tips = []
@@ -669,7 +669,7 @@ class UnifiedCSVService:
         """Generate category-specific template"""
         return self.template_generator.generate_category_specific_template(category_code)
 
-    def get_template_info(self) -> Dict[str, Any]:
+    def get_template_info(self) -> dict[str, Any]:
         """Get template information"""
         return self.template_generator.get_template_info()
 

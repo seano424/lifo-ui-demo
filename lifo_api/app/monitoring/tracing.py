@@ -36,8 +36,8 @@ class DistributedTracing:
     """
     
     def __init__(self):
-        self.tracer_provider: Optional[TracerProvider] = None
-        self.tracer: Optional[trace.Tracer] = None
+        self.tracer_provider: TracerProvider | None = None
+        self.tracer: trace.Tracer | None = None
         self.instrumentors = []
         
     def setup_tracing(self, app=None) -> None:
@@ -163,7 +163,7 @@ class DistributedTracing:
         self, 
         name: str, 
         kind: trace.SpanKind = trace.SpanKind.INTERNAL,
-        attributes: Optional[Dict[str, Any]] = None
+        attributes: dict[str, Any] | None = None
     ) -> trace.Span:
         """Create a new span with automatic correlation"""
         
@@ -196,9 +196,9 @@ class DistributedTracing:
         self,
         operation_name: str,
         operation_type: str,
-        store_id: Optional[str] = None,
-        batch_id: Optional[str] = None,
-        category: Optional[str] = None
+        store_id: str | None = None,
+        batch_id: str | None = None,
+        category: str | None = None
     ):
         """Decorator for tracing business operations"""
         
@@ -276,9 +276,9 @@ class DistributedTracing:
     
     def set_correlation_ids(
         self,
-        request_id: Optional[str] = None,
-        tenant_id: Optional[str] = None,
-        user_id: Optional[str] = None
+        request_id: str | None = None,
+        tenant_id: str | None = None,
+        user_id: str | None = None
     ) -> None:
         """Set correlation IDs for current context"""
         
@@ -289,7 +289,7 @@ class DistributedTracing:
         if user_id:
             user_id_var.set(user_id)
     
-    def get_correlation_ids(self) -> Dict[str, str]:
+    def get_correlation_ids(self) -> dict[str, str]:
         """Get current correlation IDs"""
         return {
             "request_id": request_id_var.get(),
@@ -322,7 +322,7 @@ def get_distributed_tracing() -> DistributedTracing:
     return distributed_tracing
 
 
-def get_current_trace_id() -> Optional[str]:
+def get_current_trace_id() -> str | None:
     """Get current trace ID for correlation"""
     current_span = trace.get_current_span()
     if current_span and current_span.is_recording():
@@ -330,7 +330,7 @@ def get_current_trace_id() -> Optional[str]:
     return None
 
 
-def get_current_span_id() -> Optional[str]:
+def get_current_span_id() -> str | None:
     """Get current span ID for correlation"""
     current_span = trace.get_current_span()
     if current_span and current_span.is_recording():
@@ -355,7 +355,7 @@ def trace_api_operation(operation_name: str):
     )
 
 
-def trace_scoring_operation(operation_name: str, category: Optional[str] = None):
+def trace_scoring_operation(operation_name: str, category: str | None = None):
     """Decorator for tracing scoring operations"""
     return distributed_tracing.trace_business_operation(
         operation_name,
@@ -364,7 +364,7 @@ def trace_scoring_operation(operation_name: str, category: Optional[str] = None)
     )
 
 
-def trace_batch_operation(operation_name: str, batch_id: Optional[str] = None):
+def trace_batch_operation(operation_name: str, batch_id: str | None = None):
     """Decorator for tracing batch operations"""
     return distributed_tracing.trace_business_operation(
         operation_name,

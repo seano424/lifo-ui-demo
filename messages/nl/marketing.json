@@ -749,9 +749,12 @@
     "description": "Bedrijven helpen voorraad te optimaliseren met intelligente oplossingen om afval te verminderen en winst te maximaliseren.",
     "quickLinks": "Snelle Links",
     "links": {
+      "homepage": "Startpagina",
+      "features": "Functies",
       "aboutUs": "Over Ons",
       "products": "Producten",
       "pricing": "Prijzen",
+      "contact": "Contact",
       "blog": "Blog"
     },
     "contactUs": "Neem Contact Op",

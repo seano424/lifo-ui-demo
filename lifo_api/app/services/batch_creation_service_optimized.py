@@ -3,6 +3,7 @@ Optimized Batch Creation Service for High-Performance CSV Import
 Implements advanced database optimization techniques for 3x+ performance improvement
 """
 
+import asyncio
 import uuid
 from datetime import date, datetime, timedelta
 from typing import Any, Dict, List, Optional, Tuple
@@ -12,7 +13,7 @@ import structlog
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.database.connection import async_session
+from app.database.connection import async_session, direct_async_session
 from app.services.batch_creation_service import BatchFromScanRequest
 
 logger = structlog.get_logger()
@@ -31,24 +32,74 @@ class OptimizedBatchCreationService:
     """
 
     # Optimal chunk sizes based on testing
-    OPTIMAL_CHUNK_SIZE = 100  # Increased from 50 for better throughput
+    OPTIMAL_CHUNK_SIZE = 50   # Smaller chunks for better concurrency
     MAX_CHUNK_SIZE = 500      # Maximum safe chunk size for memory
-    
+    MAX_CONCURRENT_CHUNKS = 5 # Concurrent chunk processing
+
     # Cache for category lookups
-    _category_cache: Dict[str, uuid.UUID] = {}
+    _category_cache: dict[str, uuid.UUID] = {}
     _cache_loaded = False
 
     def __init__(self):
+        # Use pooler connection for WSL/IPv4 compatibility (direct connection uses IPv6 which fails in WSL)
         self.async_session = async_session()
         self.performance_metrics = {}
+        # System UUID for service_role and system operations
+        self.SYSTEM_USER_UUID = uuid.UUID("00000000-0000-0000-0000-000000000000")
+        logger.info("OptimizedBatchCreationService initialized with pooler connection (IPv4-compatible for WSL)")
+
+    def _parse_user_id_to_uuid(self, user_id: str) -> uuid.UUID:
+        """
+        Convert user_id string to UUID, handling special cases like service_role
+
+        Args:
+            user_id: User ID string (can be UUID or 'service_role')
+
+        Returns:
+            UUID object
+        """
+        # Handle service_role and other non-UUID user IDs
+        if user_id in ("service_role", "system", "service"):
+            return self.SYSTEM_USER_UUID
+
+        # Try to parse as UUID
+        try:
+            return uuid.UUID(user_id)
+        except (ValueError, AttributeError) as e:
+            logger.warning(
+                "Invalid user_id format, using system UUID",
+                user_id=user_id,
+                error=str(e)
+            )
+            return self.SYSTEM_USER_UUID
+
+    async def _execute_raw_sql(self, session: AsyncSession, query: str, fetch: bool = True):
+        """
+        Execute raw SQL using direct database connection (supports prepared statements)
+
+        Args:
+            session: SQLAlchemy async session
+            query: Raw SQL query string
+            fetch: Whether to fetch results (True) or just execute (False)
+
+        Returns:
+            List of row dictionaries if fetch=True, None otherwise
+        """
+        if fetch:
+            result = await session.execute(text(query))
+            # Use mappings() to get dictionary-like row objects instead of tuples
+            return result.mappings().fetchall()
+        else:
+            await session.execute(text(query))
+            return None
 
     async def create_batches_from_csv_bulk_optimized(
         self,
         store_id: str,
         user_id: str,
-        batch_requests: List[BatchFromScanRequest],
-        chunk_size: Optional[int] = None,
-    ) -> Dict[str, Any]:
+        batch_requests: list[BatchFromScanRequest],
+        chunk_size: int | None = None,
+    ) -> dict[str, Any]:
         """
         Ultra-optimized bulk batch creation with 3x+ performance improvement
         
@@ -89,51 +140,69 @@ class OptimizedBatchCreationService:
         async with self.async_session() as session:
             await self._preload_category_cache(session)
 
-        # Process in optimized chunks
+        # Prepare chunks for concurrent processing
+        chunks = []
         for chunk_start in range(0, total_requests, chunk_size):
             chunk_end = min(chunk_start + chunk_size, total_requests)
             chunk_requests = batch_requests[chunk_start:chunk_end]
-            
-            chunk_db_start = time.perf_counter()
-            
-            try:
-                chunk_results = await self._process_chunk_ultra_optimized(
-                    store_id, user_id, chunk_requests, chunk_start
-                )
-                
-                successful_batches.extend(chunk_results["successful"])
-                failed_batches.extend(chunk_results["failed"])
-                created_products.update(chunk_results["created_products"])
-                updated_products.update(chunk_results["updated_products"])
-                
-                chunk_db_time = time.perf_counter() - chunk_db_start
-                db_time_total += chunk_db_time
-                
-                logger.info(
-                    "Chunk processed successfully",
-                    chunk_start=chunk_start,
-                    chunk_end=chunk_end,
-                    successful=len(chunk_results["successful"]),
-                    failed=len(chunk_results["failed"]),
-                    chunk_time_ms=chunk_db_time * 1000,
-                )
-                
-            except Exception as e:
-                logger.error(
-                    "Chunk processing failed",
-                    chunk_start=chunk_start,
-                    chunk_end=chunk_end,
-                    error=str(e),
-                )
-                
-                # Mark entire chunk as failed
-                for i, request in enumerate(chunk_requests):
-                    failed_batches.append({
-                        "index": chunk_start + i,
-                        "barcode": request.barcode,
-                        "product_name": request.product_name,
-                        "error": f"Chunk processing failed: {str(e)}",
-                    })
+            chunks.append((chunk_requests, chunk_start, chunk_end))
+
+        # Process chunks concurrently with semaphore limiting
+        semaphore = asyncio.Semaphore(self.MAX_CONCURRENT_CHUNKS)
+
+        async def process_chunk_with_semaphore(chunk_data):
+            chunk_requests, chunk_start, chunk_end = chunk_data
+            async with semaphore:
+                chunk_db_start = time.perf_counter()
+                try:
+                    chunk_results = await self._process_chunk_ultra_optimized(
+                        store_id, user_id, chunk_requests, chunk_start
+                    )
+                    chunk_db_time = time.perf_counter() - chunk_db_start
+
+                    logger.info(
+                        "Chunk processed successfully",
+                        chunk_start=chunk_start,
+                        chunk_end=chunk_end,
+                        successful=len(chunk_results["successful"]),
+                        failed=len(chunk_results["failed"]),
+                        chunk_time_ms=chunk_db_time * 1000,
+                    )
+                    return chunk_results, chunk_db_time
+
+                except Exception as e:
+                    logger.error(
+                        "Chunk processing failed",
+                        chunk_start=chunk_start,
+                        chunk_end=chunk_end,
+                        error=str(e),
+                    )
+                    # Return failed results for entire chunk
+                    failed_results = []
+                    for i, request in enumerate(chunk_requests):
+                        failed_results.append({
+                            "index": chunk_start + i,
+                            "barcode": request.barcode,
+                            "product_name": request.product_name,
+                            "error": f"Chunk processing failed: {str(e)}",
+                        })
+                    return {"successful": [], "failed": failed_results, "created_products": set(), "updated_products": set()}, 0
+
+        # Execute all chunks concurrently
+        results_list = await asyncio.gather(*[process_chunk_with_semaphore(chunk) for chunk in chunks], return_exceptions=True)
+
+        # Aggregate results
+        for result in results_list:
+            if isinstance(result, Exception):
+                logger.error("Chunk processing exception", error=str(result))
+                continue
+
+            chunk_results, chunk_db_time = result
+            successful_batches.extend(chunk_results["successful"])
+            failed_batches.extend(chunk_results["failed"])
+            created_products.update(chunk_results["created_products"])
+            updated_products.update(chunk_results["updated_products"])
+            db_time_total += chunk_db_time
 
         # Calculate performance metrics
         total_time = time.perf_counter() - start_time
@@ -180,9 +249,9 @@ class OptimizedBatchCreationService:
         self,
         store_id: str,
         user_id: str,
-        chunk_requests: List[BatchFromScanRequest],
+        chunk_requests: list[BatchFromScanRequest],
         chunk_start: int,
-    ) -> Dict[str, List]:
+    ) -> dict[str, list]:
         """
         Ultra-optimized chunk processing with minimal database operations
         
@@ -270,8 +339,8 @@ class OptimizedBatchCreationService:
         self,
         session: AsyncSession,
         store_id: str,
-        barcodes: List[str],
-    ) -> Dict[str, Tuple[uuid.UUID, bool]]:
+        barcodes: list[str],
+    ) -> dict[str, tuple[uuid.UUID, bool]]:
         """
         Optimized bulk product lookup with single efficient query
         """
@@ -288,23 +357,24 @@ class OptimizedBatchCreationService:
         store_uuid = str(uuid.UUID(store_id))  # Validate UUID format
         
         query = f"""
-            SELECT 
+            SELECT
                 p.barcode,
                 p.product_id,
                 sp.store_id IS NOT NULL as exists_in_store
             FROM inventory.products p
-            LEFT JOIN inventory.store_products sp 
-                ON p.product_id = sp.product_id 
+            LEFT JOIN inventory.store_products sp
+                ON p.product_id = sp.product_id
                 AND sp.store_id = '{store_uuid}'
                 AND sp.is_active = true
             WHERE p.barcode IN ({barcode_list})
         """
-        
-        result = await session.execute(text(query))
-        
+
+        # Use raw asyncpg to avoid prepared statements in pgBouncer transaction mode
+        rows = await self._execute_raw_sql(session, query, fetch=True)
+
         existing_products = {}
-        for row in result:
-            barcode, product_id, exists_in_store = row
+        for row in rows:
+            barcode, product_id, exists_in_store = row['barcode'], row['product_id'], row['exists_in_store']
             existing_products[barcode] = (product_id, exists_in_store)
         
         return existing_products
@@ -314,9 +384,9 @@ class OptimizedBatchCreationService:
         session: AsyncSession,
         store_id: str,
         user_id: str,
-        barcode_to_requests: Dict[str, List[BatchFromScanRequest]],
-        existing_products: Dict[str, Tuple[uuid.UUID, bool]],
-    ) -> Dict[str, Tuple[uuid.UUID, bool]]:
+        barcode_to_requests: dict[str, list[BatchFromScanRequest]],
+        existing_products: dict[str, tuple[uuid.UUID, bool]],
+    ) -> dict[str, tuple[uuid.UUID, bool]]:
         """
         Bulk UPSERT products using PostgreSQL ON CONFLICT for maximum efficiency
         Returns mapping of barcode -> (product_id, was_created)
@@ -335,46 +405,49 @@ class OptimizedBatchCreationService:
                 
                 # Add to store if not already there
                 if not exists_in_store:
+                    user_uuid = self._parse_user_id_to_uuid(user_id)
                     store_products_to_upsert.append({
                         "store_id": uuid.UUID(store_id),
                         "product_id": product_id,
                         "cost_price": request.cost_price or 0,
                         "selling_price": request.selling_price or 0,
                         "is_active": True,
-                        "added_by": uuid.UUID(user_id),
-                        "updated_by": uuid.UUID(user_id),
+                        "added_by": user_uuid,
+                        "updated_by": user_uuid,
                     })
             else:
                 # New product
                 product_id = uuid.uuid4()
                 product_mapping[barcode] = (product_id, True)
-                
+
                 # Generate SKU
                 sku = request.sku if hasattr(request, 'sku') and request.sku else f"CSV_{barcode[:10]}_{uuid.uuid4().hex[:8].upper()}"
-                
+
+                user_uuid = self._parse_user_id_to_uuid(user_id)
                 products_to_upsert.append({
                     "product_id": product_id,
                     "sku": sku,
-                    "name": request.product_name,
-                    "brand": request.brand,
+                    "name": request.product_name,  # Database column is 'name'
+                    "brand": request.brand or "",  # Ensure non-None for SQL escaping
                     "barcode": barcode,
                     "barcode_type": "CSV_IMPORT",
+                    "unit_type": "unit",
                     "typical_shelf_life_days": 30,
                     "base_cost_price": request.cost_price or 0.01,
                     "base_selling_price": request.selling_price or 0.01,
-                    "created_by": uuid.UUID(user_id),
+                    "created_by": user_uuid,  # Database column is 'created_by'
                     "is_verified": True,
                     "category_id": await self._get_category_id_cached(request.category),
                 })
-                
+
                 store_products_to_upsert.append({
                     "store_id": uuid.UUID(store_id),
                     "product_id": product_id,
                     "cost_price": request.cost_price or 0,
                     "selling_price": request.selling_price or 0,
                     "is_active": True,
-                    "added_by": uuid.UUID(user_id),
-                    "updated_by": uuid.UUID(user_id),
+                    "added_by": user_uuid,
+                    "updated_by": user_uuid,
                 })
 
         # Bulk insert products using PostgreSQL ON CONFLICT
@@ -388,36 +461,44 @@ class OptimizedBatchCreationService:
                 for p in products_to_upsert:
                     # Escape string values properly for SQL
                     escaped_barcode = p['barcode'].replace("'", "''")
-                    escaped_product_name = p['product_name'].replace("'", "''")
+                    escaped_name = p['name'].replace("'", "''")  # Database column is 'name'
                     escaped_brand = p['brand'].replace("'", "''")
                     escaped_unit_type = p['unit_type'].replace("'", "''")
-                    category_val = p['category_id'] if p['category_id'] is not None else 'NULL'
-                    
+                    escaped_barcode_type = p['barcode_type'].replace("'", "''")
+                    category_val = f"'{p['category_id']}'" if p['category_id'] is not None else 'NULL'
+
                     values_list.append(f"""(
                         '{str(p['product_id'])}',
-                        '{escaped_barcode}',
-                        '{escaped_product_name}',
+                        '{p['sku']}',
+                        '{escaped_name}',
                         {category_val},
                         '{escaped_brand}',
                         '{escaped_unit_type}',
-                        '{str(p['added_by'])}',
+                        {p['typical_shelf_life_days']},
+                        {p['base_cost_price']},
+                        {p['base_selling_price']},
+                        '{str(p['created_by'])}',
                         NOW(),
-                        '{str(p['updated_by'])}',
-                        NOW()
+                        NOW(),
+                        '{escaped_barcode}',
+                        '{escaped_barcode_type}',
+                        {str(p['is_verified']).upper()}
                     )""")
-                
+
                 values_clause = ',\n                    '.join(values_list)
-                
+
                 query = f"""
                     INSERT INTO inventory.products (
-                        product_id, barcode, product_name, category_id, brand,
-                        unit_type, added_by, date_added, updated_by, date_updated
+                        product_id, sku, name, category_id, brand,
+                        unit_type, typical_shelf_life_days, base_cost_price, base_selling_price,
+                        created_by, created_at, updated_at, barcode, barcode_type, is_verified
                     ) VALUES
                     {values_clause}
-                    ON CONFLICT (barcode) DO NOTHING
+                    ON CONFLICT (sku) DO NOTHING
                 """
-                
-                await session.execute(text(query))
+
+                # Use raw asyncpg to avoid prepared statements
+                await self._execute_raw_sql(session, query, fetch=False)
                 
                 # Since ON CONFLICT doesn't return which were inserted, assume all were created
                 # This is an optimistic estimate for performance metrics
@@ -448,9 +529,9 @@ class OptimizedBatchCreationService:
                         FROM inventory.products
                         WHERE barcode IN ({barcode_list})
                     """
-                    
-                    existing_products_query = await session.execute(text(query))
-                    existing_barcode_set = {row[0] for row in existing_products_query}
+
+                    rows = await self._execute_raw_sql(session, query, fetch=True)
+                    existing_barcode_set = {row['barcode'] for row in rows}
                     
                     # Filter out products that already exist
                     new_products = [
@@ -463,36 +544,44 @@ class OptimizedBatchCreationService:
                         values_list = []
                         for p in new_products:
                             # Escape string values properly for SQL
+                            escaped_sku = p['sku'].replace("'", "''")
                             escaped_barcode = p['barcode'].replace("'", "''")
-                            escaped_product_name = p['product_name'].replace("'", "''")
+                            escaped_name = p['name'].replace("'", "''")  # Dict key is 'name' not 'product_name'
                             escaped_brand = p['brand'].replace("'", "''")
                             escaped_unit_type = p['unit_type'].replace("'", "''")
-                            category_val = p['category_id'] if p['category_id'] is not None else 'NULL'
-                            
+                            escaped_barcode_type = p['barcode_type'].replace("'", "''")
+                            category_val = f"'{str(p['category_id'])}'" if p['category_id'] is not None else 'NULL'
+
                             values_list.append(f"""(
                                 '{str(p['product_id'])}',
-                                '{escaped_barcode}',
-                                '{escaped_product_name}',
+                                '{escaped_sku}',
+                                '{escaped_name}',
                                 {category_val},
                                 '{escaped_brand}',
                                 '{escaped_unit_type}',
-                                '{str(p['added_by'])}',
+                                {p['typical_shelf_life_days']},
+                                {p['base_cost_price']},
+                                {p['base_selling_price']},
+                                '{str(p['created_by'])}',
                                 NOW(),
-                                '{str(p['updated_by'])}',
-                                NOW()
+                                NOW(),
+                                '{escaped_barcode}',
+                                '{escaped_barcode_type}',
+                                {str(p['is_verified']).upper()}
                             )""")
-                        
+
                         values_clause = ',\n                            '.join(values_list)
-                        
+
                         query = f"""
                             INSERT INTO inventory.products (
-                                product_id, barcode, product_name, category_id, brand,
-                                unit_type, added_by, date_added, updated_by, date_updated
+                                product_id, sku, name, category_id, brand,
+                                unit_type, typical_shelf_life_days, base_cost_price, base_selling_price,
+                                created_by, created_at, updated_at, barcode, barcode_type, is_verified
                             ) VALUES
                             {values_clause}
                         """
-                        
-                        await session.execute(text(query))
+
+                        await self._execute_raw_sql(session, query, fetch=False)
                         
                     created_products = [p["barcode"] for p in new_products]
                     updated_products = [p["barcode"] for p in products_to_upsert if p["barcode"] in existing_barcode_set]
@@ -520,13 +609,14 @@ class OptimizedBatchCreationService:
             query = f"""
                 INSERT INTO inventory.store_products (
                     store_id, product_id, cost_price, selling_price, is_active,
-                    added_by, date_added, updated_by, date_updated
+                    added_by, created_at, updated_by, updated_at
                 ) VALUES
                 {values_clause}
                 ON CONFLICT (store_id, product_id) DO NOTHING
             """
-            
-            await session.execute(text(query))
+
+            # Use raw asyncpg to avoid prepared statements
+            await self._execute_raw_sql(session, query, fetch=False)
 
         # Single flush for both operations
         await session.flush()
@@ -538,10 +628,10 @@ class OptimizedBatchCreationService:
         session: AsyncSession,
         store_id: str,
         user_id: str,
-        batch_requests: List[BatchFromScanRequest],
-        product_mapping: Dict[str, Tuple[uuid.UUID, bool]],
+        batch_requests: list[BatchFromScanRequest],
+        product_mapping: dict[str, tuple[uuid.UUID, bool]],
         chunk_start: int,
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """
         Bulk insert all batches using single INSERT statement
         """
@@ -578,7 +668,7 @@ class OptimizedBatchCreationService:
                 "scan_confidence": 1.0,
                 "verification_status": "verified",
                 "store_id": uuid.UUID(store_id),
-                "created_by": uuid.UUID(user_id),
+                "created_by": self._parse_user_id_to_uuid(user_id),
                 "status": "active",
             })
             
@@ -633,12 +723,13 @@ class OptimizedBatchCreationService:
                 INSERT INTO inventory.batches (
                     batch_id, product_id, batch_number, initial_quantity, current_quantity,
                     manufacture_date, expiry_date, cost_price, selling_price, batch_source,
-                    scanned_barcode, scan_confidence, verification_status, store_id, 
+                    scanned_barcode, scan_confidence, verification_status, store_id,
                     created_by, status, created_at, updated_at
                 ) VALUES {values_clause}
             """
-            
-            await session.execute(text(query))
+
+            # Use raw asyncpg to avoid prepared statements
+            await self._execute_raw_sql(session, query, fetch=False)
             await session.flush()
         
         return successful_batches
@@ -653,7 +744,7 @@ class OptimizedBatchCreationService:
         logger.info("Category pre-loading disabled for pgbouncer compatibility")
         self._cache_loaded = True
 
-    async def _get_category_id_cached(self, category_str: Optional[str]) -> Optional[uuid.UUID]:
+    async def _get_category_id_cached(self, category_str: str | None) -> uuid.UUID | None:
         """Get category ID from cache"""
         if not category_str:
             # Return default category

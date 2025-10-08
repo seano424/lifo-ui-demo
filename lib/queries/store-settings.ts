@@ -73,7 +73,7 @@ export interface StoreSettingsData extends StoreBasicInfo {
   settings?: StoreAdvancedSettings
 }
 
-// Fetch store settings using RPC function
+// Fetch store settings using optimized combined RPC function
 export async function fetchStoreSettings(
   storeId: string,
   serverClient?: ServerClient,
@@ -85,18 +85,18 @@ export async function fetchStoreSettings(
     async () => {
       const supabase = serverClient || createClient()
 
-      // Use the RPC function to get store data
-      const { data: storeData, error: storeError } = await supabase.rpc('get_store_settings', {
+      // Use the optimized RPC that returns BOTH store and settings in one call
+      const { data, error } = await supabase.rpc('get_store_settings_complete', {
         store_id_param: storeId,
       })
 
-      if (storeError) {
+      if (error) {
         // Only suppress auth errors during logout - let other errors through normally
         if (
-          storeError.message?.includes('JWT') ||
-          storeError.message?.includes('invalid') ||
-          storeError.code === 'PGRST301' ||
-          storeError.message?.includes('Auth session missing')
+          error.message?.includes('JWT') ||
+          error.message?.includes('invalid') ||
+          error.code === 'PGRST301' ||
+          error.message?.includes('Auth session missing')
         ) {
           logger.log('lib/queries/store-settings', 'Store fetch skipped - user not authenticated', {
             storeId,
@@ -106,32 +106,17 @@ export async function fetchStoreSettings(
 
         // Log all other errors normally and let React Query handle them
         logger.error('lib/queries/store-settings', 'Store fetch error', {
-          error: storeError.message,
-          code: storeError.code,
+          error: error.message,
+          code: error.code,
           storeId,
         })
-        throw new Error(`Failed to fetch store: ${storeError.message}`)
+        throw new Error(`Failed to fetch store: ${error.message}`)
       }
 
-      // Still fetch store settings from business.store_settings if needed
-      const { data: settingsData, error: settingsError } = await supabase
-        .schema('business')
-        .from('store_settings')
-        .select('*')
-        .eq('store_id', storeId)
-        .single()
-
-      // Settings might not exist yet, that's OK
-      if (settingsError && settingsError.code !== 'PGRST116') {
-        logger.warn('lib/queries/store-settings', 'Failed to fetch store settings', {
-          error: settingsError.message,
-          storeId,
-        })
-      }
-
+      // Data comes as { store: {...}, settings: {...} }
       return {
-        ...storeData,
-        settings: settingsData || undefined,
+        ...data.store,
+        settings: data.settings || undefined,
       }
     },
   )

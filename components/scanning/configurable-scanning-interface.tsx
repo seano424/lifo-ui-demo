@@ -106,7 +106,8 @@ export function useBaseScanningLogic(
   const workflowActions = useScanningActions()
 
   // OCR processing
-  const { processExpiryDate, isLoading: isOCRProcessing, isBackendHealthy } = useOCRWithFallback()
+  // const { processExpiryDate, isLoading: isOCRProcessing, isBackendHealthy } = useOCRWithFallback() // debug
+  const { processExpiryDate, isLoading: isOCRProcessing } = useOCRWithFallback()
 
   // Local state
   const [state, setState] = useState<BaseScanningState>({
@@ -375,7 +376,7 @@ export function useBaseScanningLogic(
     isLookingUp,
     lookupError,
     isOCRProcessing,
-    isBackendHealthy,
+    // isBackendHealthy,
 
     // Event handlers
     handleBarcodeScanned,
@@ -501,7 +502,7 @@ export default function BaseScanningInterface({ config, callbacks, className }: 
                     logic.setState(prev => ({ ...prev, ocrError: null }))
                     logic.workflowActions.setError(null)
                   }}
-                  isBackendHealthy={logic.isBackendHealthy}
+                  // isBackendHealthy={logic.isBackendHealthy}
                 />
               )}
 
