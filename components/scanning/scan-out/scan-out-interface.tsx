@@ -242,9 +242,9 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
       prev.map(item =>
         item.batchId === batchId
           ? {
-            ...item,
-            quantity: Math.max(1, Math.min(newQuantity, item.maxQuantity)),
-          }
+              ...item,
+              quantity: Math.max(1, Math.min(newQuantity, item.maxQuantity)),
+            }
           : item,
       ),
     )
@@ -372,7 +372,7 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
           <ScanningCamera
             mode="barcode"
             onBarcodeScanned={handleCustomBarcodeScanned}
-            onScanError={_error => { }}
+            onScanError={_error => {}}
             showManualEntry={showManualEntry}
             onToggleManualEntry={() => setShowManualEntry(!showManualEntry)}
             onManualProductSelected={(barcode: string) => {
@@ -599,12 +599,12 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
               <DialogDescription>
                 {submissionResult.successCount === submissionResult.totalCount
                   ? t('successfullyRemoved', {
-                    count: submissionResult.successCount,
-                  })
+                      count: submissionResult.successCount,
+                    })
                   : t('partiallyRemoved', {
-                    success: submissionResult.successCount,
-                    total: submissionResult.totalCount,
-                  })}
+                      success: submissionResult.successCount,
+                      total: submissionResult.totalCount,
+                    })}
               </DialogDescription>
             </DialogHeader>
 

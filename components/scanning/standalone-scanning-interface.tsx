@@ -407,7 +407,7 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
                     setOcrError(null)
                     workflowActions.setError(null)
                   }}
-                // isBackendHealthy={isBackendHealthy}
+                  // isBackendHealthy={isBackendHealthy}
                 />
               )}
 
@@ -591,9 +591,9 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
                 {submissionResult.successCount === submissionResult.totalCount
                   ? t('success.description.allSuccess', { count: submissionResult.successCount })
                   : t('success.description.partialSuccess', {
-                    successCount: submissionResult.successCount,
-                    totalCount: submissionResult.totalCount,
-                  })}
+                      successCount: submissionResult.successCount,
+                      totalCount: submissionResult.totalCount,
+                    })}
               </DialogDescription>
             </DialogHeader>
 

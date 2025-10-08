@@ -502,7 +502,7 @@ export default function BaseScanningInterface({ config, callbacks, className }: 
                     logic.setState(prev => ({ ...prev, ocrError: null }))
                     logic.workflowActions.setError(null)
                   }}
-                // isBackendHealthy={logic.isBackendHealthy}
+                  // isBackendHealthy={logic.isBackendHealthy}
                 />
               )}
 
