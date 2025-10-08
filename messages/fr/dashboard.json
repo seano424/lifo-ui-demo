@@ -56,6 +56,10 @@
         "barcodeScanning": "Scanner",
         "csvBulkImport": "Import CSV",
         "manualEntry": "Saisie manuelle"
+      },
+      "messages": {
+        "selectStore": "Veuillez sélectionner un magasin",
+        "selectStoreInventory": "Veuillez sélectionner un magasin pour gérer l'inventaire"
       }
     },
     "scanOut": {

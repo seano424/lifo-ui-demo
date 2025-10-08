@@ -28,6 +28,7 @@ import {
   useScanningStep,
 } from '@/lib/stores/scanning-workflow-store'
 import { useStoreState } from '@/lib/stores/store-context'
+import { logger } from '@/lib/utils/logger'
 // Import shared components
 import {
   InventoryForm,
@@ -176,39 +177,111 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
 
   // Handle OCR capture
   const handleOCRCapture = async () => {
+    logger.log('StandaloneScanningInterface', 'handleOCRCapture called', {
+      hasActiveStore: !!activeStore,
+      storeId: activeStore?.store_id,
+      currentStep,
+      uiStep,
+    })
+
     if (!activeStore?.store_id) {
+      logger.error('StandaloneScanningInterface', 'No active store selected for OCR')
       workflowActions.setError('No active store selected')
       return
     }
 
     setOcrError(null)
     workflowActions.setExpiryDateProcessing(true)
+    logger.log('StandaloneScanningInterface', 'OCR processing started')
 
     try {
+      // Find video element
+      logger.log('StandaloneScanningInterface', 'Looking for video element in DOM')
       const videoElement = document.querySelector('video') as HTMLVideoElement
-      if (!videoElement || videoElement.readyState !== videoElement.HAVE_ENOUGH_DATA) {
-        throw new Error('Camera not ready')
+
+      if (!videoElement) {
+        logger.error('StandaloneScanningInterface', 'Video element not found in DOM')
+        throw new Error('Camera not ready - video element not found')
       }
 
+      logger.log('StandaloneScanningInterface', 'Video element found', {
+        readyState: videoElement.readyState,
+        HAVE_ENOUGH_DATA: videoElement.HAVE_ENOUGH_DATA,
+        videoWidth: videoElement.videoWidth,
+        videoHeight: videoElement.videoHeight,
+      })
+
+      if (videoElement.readyState !== videoElement.HAVE_ENOUGH_DATA) {
+        logger.error('StandaloneScanningInterface', 'Video element not ready', {
+          readyState: videoElement.readyState,
+          expected: videoElement.HAVE_ENOUGH_DATA,
+        })
+        throw new Error('Camera not ready - insufficient data')
+      }
+
+      // Capture image from video
+      logger.log('StandaloneScanningInterface', 'Capturing image from video...')
       const imageBlob = await captureImageFromVideo(videoElement)
+      logger.log('StandaloneScanningInterface', 'Image captured successfully', {
+        blobSize: imageBlob.size,
+        blobType: imageBlob.type,
+      })
+
+      // Process expiry date
+      logger.log('StandaloneScanningInterface', 'Processing expiry date with OCR', {
+        storeId: activeStore.store_id,
+        confidenceThreshold: 0.65,
+        maxProcessingTimeMs: 5000,
+      })
+
       const result = await processExpiryDate(imageBlob, activeStore.store_id, {
         confidenceThreshold: 0.65,
         maxProcessingTimeMs: 5000,
       })
 
+      logger.log('StandaloneScanningInterface', 'OCR processing completed', {
+        success: result.success,
+        hasExpiryDateInfo: !!result.expiryDateInfo,
+        extractedDate: result.expiryDateInfo?.extractedDate,
+        confidence: result.expiryDateInfo?.confidence,
+        fallbackToManual: result.fallbackToManual,
+        errorMessage: result.error?.message,
+      })
+
       if (result.success && result.expiryDateInfo) {
+        logger.log('StandaloneScanningInterface', 'Setting expiry date result in workflow', {
+          extractedDate: result.expiryDateInfo.extractedDate,
+          confidence: result.expiryDateInfo.confidence,
+        })
+
         workflowActions.setExpiryDateResult(result.expiryDateInfo)
+
         if (result.expiryDateInfo.extractedDate) {
           const formattedDate = result.expiryDateInfo.extractedDate.split('T')[0]
+          logger.log('StandaloneScanningInterface', 'Formatted expiry date', {
+            original: result.expiryDateInfo.extractedDate,
+            formatted: formattedDate,
+          })
           setInventoryData(prev => ({ ...prev, expiryDate: formattedDate }))
         }
         setOcrError(null)
       } else {
-        setOcrError(result.error?.message || 'OCR processing failed')
+        const errorMsg = result.error?.message || 'OCR processing failed'
+        logger.error('StandaloneScanningInterface', 'OCR processing failed', {
+          errorMessage: errorMsg,
+          errorType: result.error?.type,
+          fallbackToManual: result.fallbackToManual,
+        })
+        setOcrError(errorMsg)
         workflowActions.setExpiryDateProcessing(false)
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to capture image'
+      logger.error('StandaloneScanningInterface', 'OCR capture exception', {
+        error: errorMessage,
+        errorType: error instanceof Error ? error.constructor.name : typeof error,
+        stack: error instanceof Error ? error.stack : undefined,
+      })
       setOcrError(errorMessage)
       workflowActions.setError(errorMessage)
       workflowActions.setExpiryDateProcessing(false)
