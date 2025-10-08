@@ -48,26 +48,29 @@ export function useUserStores() {
 
   // Auto-select store when data loads
   useEffect(() => {
-    if (userStoresResult.data && userStoresResult.data.length > 0 && !activeStore) {
+    if (userStoresResult.data && userStoresResult.data.length > 0) {
       setLoadingStores(userStoresResult.isLoading)
 
-      // Store the complete UserStore objects
+      // Always sync Zustand with React Query data
       setUserStores(userStoresResult.data)
 
-      // Get last active store from localStorage
-      const lastActiveStoreId =
-        typeof window !== 'undefined' ? localStorage.getItem(ACTIVE_STORE_KEY) : null
-      const primaryStoreId = userPreferencesResult.data?.primary_store_id
+      // Only auto-select if no active store yet
+      if (!activeStore) {
+        // Get last active store from localStorage
+        const lastActiveStoreId =
+          typeof window !== 'undefined' ? localStorage.getItem(ACTIVE_STORE_KEY) : null
+        const primaryStoreId = userPreferencesResult.data?.primary_store_id
 
-      // Use smart selection logic
-      const storeToSelect = selectDefaultStore(
-        userStoresResult.data,
-        primaryStoreId || null,
-        lastActiveStoreId,
-      )
+        // Use smart selection logic
+        const storeToSelect = selectDefaultStore(
+          userStoresResult.data,
+          primaryStoreId || null,
+          lastActiveStoreId,
+        )
 
-      if (storeToSelect) {
-        setActiveStore(storeToSelect)
+        if (storeToSelect) {
+          setActiveStore(storeToSelect)
+        }
       }
     }
   }, [
