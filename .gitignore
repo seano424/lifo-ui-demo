@@ -106,12 +106,17 @@ report_*
 # Test data and debug files
 # test_data/
 test_archive/
+
+*debug*
+
 test_*.py
+
 debug/
 
 # Environment backups
 *.env.backup
 *.env.legacy
+
 
 # Development logs and temporary files (expanded)
 *.log
@@ -175,3 +180,7 @@ dmypy.json
 .do/ENVIRONMENT_VARIABLES_CHECKLIST.md
 
 certificates
+
+!dataset_tools/
+!test_data/
+CLAUDE.md

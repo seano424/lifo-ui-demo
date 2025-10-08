@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`,
       },
-      signal: AbortSignal.timeout(200000), // Allow 200 seconds for background scoring for now
+      signal: AbortSignal.timeout(60000), // Allow 60 seconds for background scoring for now
     })
 
     logger.log('scoring-trigger', 'FastAPI response received', {

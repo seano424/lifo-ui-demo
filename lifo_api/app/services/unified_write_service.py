@@ -7,7 +7,7 @@ Designed for the new architecture where the Python backend handles all database 
 import time
 import uuid
 from contextlib import asynccontextmanager
-from datetime import datetime
+from datetime import UTC, datetime
 from decimal import Decimal
 from typing import Any, Dict, List, Optional
 
@@ -32,7 +32,7 @@ metrics = get_metrics_collector()
 
 class WriteOperationError(Exception):
     """Custom exception for write operation failures"""
-    def __init__(self, message: str, operation: str, context: Dict[str, Any] = None):
+    def __init__(self, message: str, operation: str, context: dict[str, Any] = None):
         self.message = message
         self.operation = operation
         self.context = context or {}
@@ -139,10 +139,10 @@ class UnifiedWriteService:
         self,
         store_id: str,
         user_id: str,
-        batch_data: Dict[str, Any],
+        batch_data: dict[str, Any],
         auto_score: bool = True,
         track_action: bool = True
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         OPTIMIZED: Create inventory batch with unified operations
         
@@ -224,10 +224,10 @@ class UnifiedWriteService:
         self,
         store_id: str,
         user_id: str,
-        operations: List[Dict[str, Any]],
+        operations: list[dict[str, Any]],
         chunk_size: int = 50,
         auto_score: bool = True
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         OPTIMIZED: Process multiple inventory operations in optimized chunks
         
@@ -310,10 +310,10 @@ class UnifiedWriteService:
     async def unified_scoring_write(
         self,
         store_id: str,
-        scoring_results: List[Dict[str, Any]],
+        scoring_results: list[dict[str, Any]],
         batch_update_actions: bool = True,
         create_recommendations: bool = True
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         OPTIMIZED: Write scoring results with unified operations
         
@@ -380,9 +380,9 @@ class UnifiedWriteService:
         self,
         user_id: str,
         store_id: str,
-        mobile_data: Dict[str, Any],
-        sync_timestamp: Optional[datetime] = None
-    ) -> Dict[str, Any]:
+        mobile_data: dict[str, Any],
+        sync_timestamp: datetime | None = None
+    ) -> dict[str, Any]:
         """
         OPTIMIZED: Handle mobile app data persistence
         
@@ -457,9 +457,9 @@ class UnifiedWriteService:
         session: AsyncSession,
         store_id: str,
         user_id: str,
-        batch_data: Dict[str, Any],
+        batch_data: dict[str, Any],
         tx: TransactionManager
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Handle product creation or linking with optimized lookup"""
         
         # Try to find existing product by barcode
@@ -529,10 +529,10 @@ class UnifiedWriteService:
         session: AsyncSession,
         store_id: str,
         user_id: str,
-        product_result: Dict[str, Any],
-        batch_data: Dict[str, Any],
+        product_result: dict[str, Any],
+        batch_data: dict[str, Any],
         tx: TransactionManager
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Create optimized batch record"""
         
         batch_number = batch_data.get("batch_number") or f"UNIFIED-{int(time.time())}"
@@ -567,7 +567,7 @@ class UnifiedWriteService:
         batch_id: str,
         store_id: str,
         tx: TransactionManager
-    ) -> Optional[Dict[str, Any]]:
+    ) -> dict[str, Any] | None:
         """Create initial scoring record"""
         
         # Simple urgency scoring based on days to expiry
@@ -617,28 +617,45 @@ class UnifiedWriteService:
         session: AsyncSession,
         batch_id: str,
         store_id: str,
-        score_result: Dict[str, Any],
+        score_result: dict[str, Any],
         user_id: str,
         tx: TransactionManager
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Setup action tracking for AI recommendations"""
-        
+
+        # Fetch batch to get initial quantity
+        from app.database.inventory_models import Batch
+        from sqlalchemy import select
+
+        batch_result = await session.execute(
+            select(Batch).where(Batch.batch_id == uuid.UUID(batch_id))
+        )
+        batch = batch_result.scalar_one_or_none()
+
+        if not batch:
+            raise ValueError(f"Batch not found: {batch_id}")
+
         action_record = BatchAction(
             batch_id=uuid.UUID(batch_id),
             store_id=uuid.UUID(store_id),
             recommended_action=score_result["recommendation"],
-            actual_action="maintain",  # Default until user acts
+            action_type="maintain",  # Default until user acts
             ai_score=Decimal(str(score_result["urgency_score"])),
-            action_date=datetime.utcnow(),
-            performed_by=uuid.UUID(user_id)
+            performed_at=datetime.now(UTC).replace(tzinfo=None),
+            performed_by=uuid.UUID(user_id),
+            # Required NOT NULL fields
+            quantity_affected=Decimal("0"),
+            total_original_value=Decimal("0"),
+            total_recovered_value=Decimal("0"),
+            batch_initial_quantity=batch.initial_quantity,
         )
-        
+
         session.add(action_record)
         await session.flush()
         tx.increment_operation()
-        
+
         return {
-            "action_id": action_record.action_id,
+            "action_id": action_record.entry_id,
             "recommended_action": score_result["recommendation"]
         }
     
@@ -646,10 +663,10 @@ class UnifiedWriteService:
         self,
         store_id: str,
         user_id: str,
-        chunk_operations: List[Dict[str, Any]],
+        chunk_operations: list[dict[str, Any]],
         chunk_start: int,
         auto_score: bool
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Process a chunk of operations in a single transaction"""
         
         async with self.get_write_session() as session:
@@ -710,7 +727,7 @@ class UnifiedWriteService:
     async def _bulk_upsert_scores(
         self,
         session: AsyncSession,
-        scoring_results: List[Dict[str, Any]],
+        scoring_results: list[dict[str, Any]],
         tx: TransactionManager
     ) -> int:
         """Bulk upsert product scores with conflict resolution"""
@@ -767,7 +784,7 @@ class UnifiedWriteService:
         self,
         session: AsyncSession,
         store_id: str,
-        scoring_results: List[Dict[str, Any]],
+        scoring_results: list[dict[str, Any]],
         tx: TransactionManager
     ) -> int:
         """Bulk update batch actions based on scoring results"""
@@ -783,7 +800,7 @@ class UnifiedWriteService:
                         and_(
                             BatchAction.batch_id == result["batch_id"],
                             BatchAction.store_id == store_id,
-                            BatchAction.actual_action == "maintain"  # Only update pending actions
+                            BatchAction.action_type == "maintain"  # Only update pending actions
                         )
                     )
                     .values(
@@ -809,7 +826,7 @@ class UnifiedWriteService:
         self,
         session: AsyncSession,
         store_id: str,
-        scoring_results: List[Dict[str, Any]],
+        scoring_results: list[dict[str, Any]],
         tx: TransactionManager
     ) -> int:
         """Create recommendation records from scoring results"""
@@ -831,17 +848,30 @@ class UnifiedWriteService:
                     )
                     
                     if not existing_check.scalar_one_or_none():
-                        recommendation = BatchAction(
-                            batch_id=uuid.UUID(result["batch_id"]),
-                            store_id=uuid.UUID(store_id),
-                            recommended_action=result["recommendation"],
-                            actual_action="maintain",
-                            ai_score=Decimal(str(result["urgency_score"])),
-                            action_date=datetime.utcnow()
+                        # Fetch batch to get initial quantity
+                        from app.database.inventory_models import Batch
+                        batch_result = await session.execute(
+                            select(Batch).where(Batch.batch_id == uuid.UUID(result["batch_id"]))
                         )
-                        session.add(recommendation)
-                        recommendations_created += 1
-                        tx.increment_operation()
+                        batch = batch_result.scalar_one_or_none()
+
+                        if batch:
+                            recommendation = BatchAction(
+                                batch_id=uuid.UUID(result["batch_id"]),
+                                store_id=uuid.UUID(store_id),
+                                recommended_action=result["recommendation"],
+                                action_type="maintain",
+                                ai_score=Decimal(str(result["urgency_score"])),
+                                performed_at=datetime.now(UTC).replace(tzinfo=None),
+                                # Required NOT NULL fields
+                                quantity_affected=Decimal("0"),
+                                total_original_value=Decimal("0"),
+                                total_recovered_value=Decimal("0"),
+                                batch_initial_quantity=batch.initial_quantity,
+                            )
+                            session.add(recommendation)
+                            recommendations_created += 1
+                            tx.increment_operation()
                         
             except Exception as e:
                 logger.warning(
@@ -858,7 +888,7 @@ class UnifiedWriteService:
         session: AsyncSession,
         user_id: str,
         store_id: str,
-        mobile_actions: List[Dict[str, Any]],
+        mobile_actions: list[dict[str, Any]],
         tx: TransactionManager
     ) -> int:
         """Sync user actions from mobile app"""
@@ -867,19 +897,33 @@ class UnifiedWriteService:
         
         for action_data in mobile_actions:
             try:
+                # Fetch batch to get initial quantity
+                from app.database.inventory_models import Batch
+                batch_result = await session.execute(
+                    select(Batch).where(Batch.batch_id == uuid.UUID(action_data["batch_id"]))
+                )
+                batch = batch_result.scalar_one_or_none()
+
+                if not batch:
+                    logger.warning("Batch not found for mobile action", batch_id=action_data["batch_id"])
+                    continue
+
                 # Create or update action record
                 action = BatchAction(
                     batch_id=uuid.UUID(action_data["batch_id"]),
                     store_id=uuid.UUID(store_id),
                     recommended_action=action_data.get("recommended_action", "maintain"),
-                    actual_action=action_data["actual_action"],
+                    action_type=action_data.get("actual_action", action_data.get("action_type", "maintain")),
                     ai_score=Decimal(str(action_data.get("ai_score", 0.5))),
-                    action_date=datetime.fromisoformat(action_data["action_date"]),
+                    performed_at=datetime.fromisoformat(action_data.get("action_date", action_data.get("performed_at", datetime.now(UTC).replace(tzinfo=None).isoformat()))).replace(tzinfo=None),
                     performed_by=uuid.UUID(user_id),
                     quantity_affected=Decimal(str(action_data.get("quantity_affected", 0))),
+                    total_original_value=Decimal(str(action_data.get("original_value", action_data.get("total_original_value", 0)))),
+                    total_recovered_value=Decimal(str(action_data.get("recovered_value", action_data.get("total_recovered_value", 0)))),
+                    batch_initial_quantity=batch.initial_quantity,
                     notes=action_data.get("notes")
                 )
-                
+
                 session.add(action)
                 synced_count += 1
                 tx.increment_operation()
@@ -898,10 +942,10 @@ class UnifiedWriteService:
         self,
         session: AsyncSession,
         store_id: str,
-        batch_updates: List[Dict[str, Any]],
+        batch_updates: list[dict[str, Any]],
         sync_timestamp: datetime,
         tx: TransactionManager
-    ) -> Dict[str, int]:
+    ) -> dict[str, int]:
         """Sync batch updates from mobile with conflict resolution"""
         
         synced_count = 0
@@ -958,7 +1002,7 @@ class UnifiedWriteService:
         session: AsyncSession,
         user_id: str,
         store_id: str,
-        analytics_events: List[Dict[str, Any]],
+        analytics_events: list[dict[str, Any]],
         tx: TransactionManager
     ) -> int:
         """Record analytics events from mobile app"""
@@ -998,10 +1042,10 @@ class UnifiedWriteService:
         session: AsyncSession,
         store_id: str,
         user_id: str,
-        batch_data: Dict[str, Any],
+        batch_data: dict[str, Any],
         tx: TransactionManager,
         auto_score: bool
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Handle single batch creation within a transaction"""
         
         # Similar to create_unified_inventory_batch but simplified for bulk processing
@@ -1030,9 +1074,9 @@ class UnifiedWriteService:
         self,
         session: AsyncSession,
         batch_id: str,
-        update_data: Dict[str, Any],
+        update_data: dict[str, Any],
         tx: TransactionManager
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Handle single batch update within a transaction"""
         
         result = await session.execute(
@@ -1065,7 +1109,7 @@ class UnifiedWriteService:
         batch_id: str,
         new_status: str,
         tx: TransactionManager
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Handle single status update within a transaction"""
         
         result = await session.execute(

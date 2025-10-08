@@ -4,14 +4,14 @@ Handles tracking of AI recommendations vs actual user actions
 """
 
 import uuid
-from datetime import datetime
+from datetime import UTC, datetime
 from decimal import Decimal
 from typing import Any
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.database.inventory_models import ActionType, BatchAction
+from app.database.inventory_models import ActionType, BatchAction, Batch
 
 
 class ActionTrackingService:
@@ -32,14 +32,28 @@ class ActionTrackingService:
         Create a record when AI generates a recommendation
         This tracks what the AI recommended before any user action
         """
+        # Fetch batch to get initial quantity
+        batch_result = await self.db.execute(
+            select(Batch).where(Batch.batch_id == uuid.UUID(batch_id))
+        )
+        batch = batch_result.scalar_one_or_none()
+
+        if not batch:
+            raise ValueError(f"Batch not found: {batch_id}")
+
         action_record = BatchAction(
             batch_id=uuid.UUID(batch_id),
             store_id=uuid.UUID(store_id),
             recommended_action=ai_recommendation,
-            actual_action="maintain",  # Default until user takes action
+            action_type=ActionType.IGNORED,  # Use IGNORED for AI recommendations (allows quantity_affected=0)
             ai_score=Decimal(str(ai_score)),
-            action_date=datetime.utcnow(),
+            performed_at=datetime.now(UTC).replace(tzinfo=None),
             performed_by=uuid.UUID(user_id) if user_id else None,
+            # Required fields with defaults
+            quantity_affected=Decimal("0"),  # Zero is valid for 'ignored' action_type per DB constraint
+            total_original_value=Decimal("0"),
+            total_recovered_value=Decimal("0"),
+            batch_initial_quantity=batch.initial_quantity,
         )
 
         self.db.add(action_record)
@@ -54,8 +68,8 @@ class ActionTrackingService:
         actual_action: str,
         user_id: str,
         quantity_affected: float | None = None,
-        original_value: float | None = None,
-        recovered_value: float | None = None,
+        total_original_value: float | None = None,
+        total_recovered_value: float | None = None,
         notes: str | None = None,
         donation_recipient_id: str | None = None,
     ) -> BatchAction:
@@ -64,7 +78,7 @@ class ActionTrackingService:
         This completes the AI recommendation vs actual action tracking
         """
         result = await self.db.execute(
-            select(BatchAction).where(BatchAction.action_id == uuid.UUID(action_id))
+            select(BatchAction).where(BatchAction.entry_id == uuid.UUID(action_id))
         )
         action_record = result.scalar_one_or_none()
 
@@ -72,16 +86,16 @@ class ActionTrackingService:
             raise ValueError(f"Action record not found: {action_id}")
 
         # Update with actual action taken
-        action_record.actual_action = actual_action  # type: ignore
+        action_record.action_type = actual_action  # type: ignore
         action_record.performed_by = uuid.UUID(user_id)  # type: ignore
-        action_record.action_date = datetime.utcnow()  # type: ignore
+        action_record.performed_at = datetime.now(UTC).replace(tzinfo=None)  # type: ignore
 
         if quantity_affected is not None:
             action_record.quantity_affected = Decimal(str(quantity_affected))  # type: ignore
-        if original_value is not None:
-            action_record.original_value = Decimal(str(original_value))  # type: ignore
-        if recovered_value is not None:
-            action_record.recovered_value = Decimal(str(recovered_value))  # type: ignore
+        if total_original_value is not None:
+            action_record.total_original_value = Decimal(str(total_original_value))  # type: ignore
+        if total_recovered_value is not None:
+            action_record.total_recovered_value = Decimal(str(total_recovered_value))  # type: ignore
         if notes:
             action_record.notes = notes  # type: ignore
         if donation_recipient_id:
@@ -101,8 +115,8 @@ class ActionTrackingService:
         ai_score: float,
         user_id: str,
         quantity_affected: float | None = None,
-        original_value: float | None = None,
-        recovered_value: float | None = None,
+        total_original_value: float | None = None,
+        total_recovered_value: float | None = None,
         notes: str | None = None,
         donation_recipient_id: str | None = None,
     ) -> BatchAction:
@@ -110,19 +124,27 @@ class ActionTrackingService:
         Record when user immediately takes action based on AI recommendation
         This is for cases where recommendation and action happen at the same time
         """
+        # Fetch batch to get initial quantity
+        batch_result = await self.db.execute(
+            select(Batch).where(Batch.batch_id == uuid.UUID(batch_id))
+        )
+        batch = batch_result.scalar_one_or_none()
+
+        if not batch:
+            raise ValueError(f"Batch not found: {batch_id}")
+
         action_record = BatchAction(
             batch_id=uuid.UUID(batch_id),
             store_id=uuid.UUID(store_id),
             recommended_action=recommended_action,
-            actual_action=actual_action,
+            action_type=actual_action,
             ai_score=Decimal(str(ai_score)),
-            action_date=datetime.utcnow(),
+            performed_at=datetime.now(UTC).replace(tzinfo=None),
             performed_by=uuid.UUID(user_id),
-            quantity_affected=Decimal(str(quantity_affected))
-            if quantity_affected
-            else None,
-            original_value=Decimal(str(original_value)) if original_value else None,
-            recovered_value=Decimal(str(recovered_value)) if recovered_value else None,
+            quantity_affected=Decimal(str(quantity_affected)) if quantity_affected else Decimal("0"),
+            total_original_value=Decimal(str(total_original_value)) if total_original_value else Decimal("0"),
+            total_recovered_value=Decimal(str(total_recovered_value)) if total_recovered_value else Decimal("0"),
+            batch_initial_quantity=batch.initial_quantity,
             notes=notes,
             donation_recipient_id=uuid.UUID(donation_recipient_id)
             if donation_recipient_id
@@ -146,20 +168,20 @@ class ActionTrackingService:
         result = await self.db.execute(
             select(
                 BatchAction.recommended_action,
-                BatchAction.actual_action,
+                BatchAction.action_type,
                 func.count().label("count"),
                 func.avg(BatchAction.ai_score).label("avg_ai_score"),
-                func.sum(BatchAction.original_value).label("total_original_value"),
-                func.sum(BatchAction.recovered_value).label("total_recovered_value"),
+                func.sum(BatchAction.total_original_value).label("total_original_value"),
+                func.sum(BatchAction.total_recovered_value).label("total_recovered_value"),
             )
             .where(
                 and_(
                     BatchAction.store_id == uuid.UUID(store_id),
-                    BatchAction.action_date
-                    >= datetime.utcnow().replace(day=datetime.utcnow().day - days_back),
+                    BatchAction.performed_at
+                    >= datetime.now(UTC).replace(day=datetime.now(UTC).day - days_back),
                 )
             )
-            .group_by(BatchAction.recommended_action, BatchAction.actual_action)
+            .group_by(BatchAction.recommended_action, BatchAction.action_type)
         )
 
         analytics_data = result.fetchall()
@@ -170,7 +192,7 @@ class ActionTrackingService:
             "recommendation_effectiveness": [
                 {
                     "recommended_action": row.recommended_action,
-                    "actual_action": row.actual_action,
+                    "actual_action": row.action_type,
                     "count": row.count,
                     "avg_ai_score": float(row.avg_ai_score) if row.avg_ai_score else 0,
                     "total_original_value": float(row.total_original_value)
@@ -180,7 +202,7 @@ class ActionTrackingService:
                     if row.total_recovered_value
                     else 0,
                     "follow_rate": 1.0
-                    if row.recommended_action == row.actual_action
+                    if row.recommended_action == row.action_type
                     else 0.0,
                 }
                 for row in analytics_data

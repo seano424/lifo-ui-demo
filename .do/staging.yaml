@@ -13,8 +13,7 @@ services:
     branch: staging  # Deploy from staging branch
     deploy_on_push: true
 
-  # UV buildpack handles dependency installation automatically from pyproject.toml and uv.lock
-  # No build_command needed - UV will automatically run: uv sync --locked --no-default-groups
+
 
   # Run command for staging (with debug logging)
   run_command: gunicorn -w 1 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8080 --worker-tmp-dir /dev/shm --timeout 120 --max-requests 500 --log-level debug --preload app.main:app
@@ -22,6 +21,7 @@ services:
   # Resource allocation (smaller for staging)
   instance_count: 1
   instance_size_slug: basic-xxs  # Minimal resources for testing
+
 
   # Health check enabled for staging
   health_check:
@@ -31,6 +31,7 @@ services:
     timeout_seconds: 5
     failure_threshold: 3
     success_threshold: 1
+
   # Environment variables for staging
   # SECURITY NOTE: Secrets should be set manually in DigitalOcean console
   # Only non-sensitive configuration values are included here
@@ -85,6 +86,7 @@ services:
   # Let FastAPI handle all routing internally (no path stripping)
   routes:
   - path: /            # Forward all paths to FastAPI without modification
+    preserve_path_prefix: true
 
 # Optional: Separate staging database (recommended)
 databases:

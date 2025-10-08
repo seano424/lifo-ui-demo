@@ -6,6 +6,8 @@
   "tabs": {
     "pending": "En attente",
     "inProgress": "En cours",
+    "expiring": "Expirant",
+    "expired": "Expiré",
     "completed": "Terminé"
   },
   "pending": {
@@ -53,6 +55,14 @@
     "disposedOn": "Éliminé le {date}",
     "noRecommendation": "Aucune recommandation"
   },
+  "recommendations": {
+    "dispose": "Éliminer immédiatement",
+    "discount_aggressive": "Appliquer une remise importante",
+    "discount_moderate": "Appliquer une remise modérée",
+    "alert": "Surveiller de près",
+    "monitor": "Surveillance de routine",
+    "maintain": "Aucune action nécessaire"
+  },
   "actions": {
     "discount": "Remise",
     "donate": "Faire un don",
@@ -62,6 +72,11 @@
   },
   "bottomSheet": {
     "units": "{count} unités"
+  },
+  "completionStatus": {
+    "pending": "En attente",
+    "in_progress": "En cours",
+    "completed": "Terminé"
   },
   "discount": {
     "success": "Remise de {percent}% appliquée avec succès à {product}",
@@ -217,6 +232,30 @@
       "all": "Tous les statuts",
       "active": "Actif",
       "expired": "Expiré"
+    },
+    "expiry": {
+      "expiringWithin": "Expirant dans",
+      "expiredInLast": "Expiré dans le dernier",
+      "expiryRange": "Périmètre de péremption",
+      "expiring": {
+        "all": "Tous expirants",
+        "3days": "3 jours",
+        "1week": "1 semaine",
+        "2weeks": "2 semaines",
+        "1month": "1 mois"
+      },
+      "expired": {
+        "all": "Tous expirés",
+        "3days": "Derniers 3 jours",
+        "1week": "Dernière semaine",
+        "2weeks": "Derniers 2 semaines",
+        "1month": "Dernier mois"
+      },
+      "general": {
+        "all": "Tous les dates",
+        "expiringSoon": "Expirant bientôt (7 jours)",
+        "recentlyExpired": "Expiré récemment (7 jours)"
+      }
     },
     "urgencyCount": "Urgence ({count})",
     "filterByUrgency": "Filtrer par urgence",

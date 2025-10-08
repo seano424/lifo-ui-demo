@@ -8,6 +8,8 @@ import { useCallback } from 'react'
 import { TodoFiltersBar, type TodoFilterValues } from './todo-filters-bar'
 import { TodoSearchBar } from './todo-search-bar'
 import { TodoSortControls, type SortConfig } from './todo-sort-controls'
+import { TodoExpiryFilter } from './todo-expiry-filter'
+import type { TodoTabType } from '../todos-filtered-list'
 
 export interface TodoFiltersState {
   // Filters
@@ -15,6 +17,8 @@ export interface TodoFiltersState {
   action_type?: TodoFilterValues['action_type']
   batch_status?: TodoFilterValues['batch_status']
   product_name?: string
+  days_to_expiry_min?: number
+  days_to_expiry_max?: number
 
   // Sorting
   sortConfig?: SortConfig
@@ -27,6 +31,7 @@ interface TodoFiltersPanelProps {
   ) => void
   isLoading?: boolean
   className?: string
+  activeTab?: TodoTabType
 }
 
 export function TodoFiltersPanel({
@@ -34,6 +39,7 @@ export function TodoFiltersPanel({
   onFiltersChange,
   isLoading = false,
   className,
+  activeTab = 'pending',
 }: TodoFiltersPanelProps) {
   const t = useTranslations('todos')
 
@@ -67,6 +73,17 @@ export function TodoFiltersPanel({
     [onFiltersChange],
   )
 
+  const handleExpiryChange = useCallback(
+    (value: { min?: number; max?: number }) => {
+      onFiltersChange((prevFilters: TodoFiltersState) => ({
+        ...prevFilters,
+        days_to_expiry_min: value.min,
+        days_to_expiry_max: value.max,
+      }))
+    },
+    [onFiltersChange],
+  )
+
   const clearAllFilters = useCallback(() => {
     onFiltersChange((prevFilters: TodoFiltersState) => ({
       sortConfig: prevFilters.sortConfig, // Keep sort config
@@ -77,7 +94,9 @@ export function TodoFiltersPanel({
     filters.urgency_level?.length ||
     filters.action_type?.length ||
     filters.batch_status?.length ||
-    filters.product_name
+    filters.product_name ||
+    filters.days_to_expiry_min !== undefined ||
+    filters.days_to_expiry_max !== undefined
 
   return (
     <Card className={`p-4 space-y-4 ${className}`}>
@@ -109,7 +128,7 @@ export function TodoFiltersPanel({
       {/* Filter Controls */}
       <div className="space-y-4">
         <div className="flex flex-col lg:flex-row gap-2 items-start justify-between">
-          <div className="flex-1">
+          <div className="flex-1 flex flex-wrap gap-2">
             <TodoFiltersBar
               filters={{
                 urgency_level: filters.urgency_level,
@@ -117,6 +136,13 @@ export function TodoFiltersPanel({
                 batch_status: filters.batch_status,
               }}
               onFiltersChange={handleFilterChange}
+              isLoading={isLoading}
+            />
+            <TodoExpiryFilter
+              activeTab={activeTab}
+              daysToExpiryMin={filters.days_to_expiry_min}
+              daysToExpiryMax={filters.days_to_expiry_max}
+              onExpiryChange={handleExpiryChange}
               isLoading={isLoading}
             />
           </div>

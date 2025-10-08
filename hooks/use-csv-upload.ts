@@ -150,6 +150,10 @@ export function useCSVUpload() {
       queryClient.invalidateQueries({ queryKey: ['expiring-batches', storeId] })
       queryClient.invalidateQueries({ queryKey: ['batches', storeId] })
 
+      // Invalidate todos queries (CSV import affects urgency states)
+      queryClient.invalidateQueries({ queryKey: ['todos', 'urgent-count', storeId] })
+      queryClient.invalidateQueries({ queryKey: ['todos', 'summary', storeId] })
+
       // Cache upload results for error review
       queryClient.setQueryData(['csv-upload-results'], data)
 

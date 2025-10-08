@@ -4,7 +4,7 @@ Provides aggregated analytics, performance comparison, and alerts across multipl
 """
 
 import asyncio
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 
 import structlog
@@ -121,7 +121,7 @@ async def get_multi_store_overview(
                 "user_id": current_user["sub"],
                 "analysis_period": f"{days} days",
                 "aggregated_data": aggregated_data,
-                "generated_at": datetime.utcnow().isoformat()
+                "generated_at": datetime.now(UTC).isoformat()
             }
 
         # Get cached or fresh data

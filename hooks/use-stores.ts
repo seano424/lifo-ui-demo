@@ -6,12 +6,12 @@ import { setActiveStoreCookie } from '@/lib/actions/store-actions'
 import { queryKeys } from '@/lib/queries/query-keys'
 import {
   fetchStoreById,
-  fetchUserPreferences,
   fetchUserStores,
   type Store,
   selectDefaultStore,
   updateUserPrimaryStore,
 } from '@/lib/queries/stores'
+import { fetchUserPreferencesRPC } from '@/lib/queries/stores-rpc'
 import { useStoreState } from '@/lib/stores/store-context'
 import { useCurrentUser } from './use-users'
 
@@ -37,14 +37,13 @@ export function useUserStores() {
 
   const userPreferencesResult = useQuery({
     queryKey: queryKeys.userPreferences.detail(currentUser?.id || ''),
-    queryFn: () => {
-      return fetchUserPreferences()
-    },
+    queryFn: () => fetchUserPreferencesRPC(),
     enabled: !!currentUser?.id,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 10 * 60 * 1000, // 10 minutes
+    staleTime: 10 * 60 * 1000, // 10 minutes - preferences rarely change
+    gcTime: 30 * 60 * 1000, // 30 minutes
     refetchOnMount: false, // Don't refetch if we have cached data
     refetchOnWindowFocus: false, // Don't refetch on window focus
+    refetchOnReconnect: false, // Don't refetch on network reconnect
   })
 
   // Auto-select store when data loads

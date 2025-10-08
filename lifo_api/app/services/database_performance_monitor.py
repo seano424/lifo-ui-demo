@@ -87,7 +87,7 @@ class DatabasePerformanceMonitor:
         operation_func,
         *args,
         **kwargs
-    ) -> Tuple[Any, Dict[str, Any]]:
+    ) -> tuple[Any, dict[str, Any]]:
         """
         Monitor a write operation and collect performance metrics
         
@@ -166,9 +166,9 @@ class DatabasePerformanceMonitor:
     
     async def get_write_performance_report(
         self,
-        store_id: Optional[str] = None,
+        store_id: str | None = None,
         hours: int = 24
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Generate comprehensive write performance report
         
@@ -232,8 +232,8 @@ class DatabasePerformanceMonitor:
     
     async def optimize_write_operations(
         self,
-        optimization_targets: List[str] = None
-    ) -> Dict[str, Any]:
+        optimization_targets: list[str] = None
+    ) -> dict[str, Any]:
         """
         Apply automated optimizations to write operations
         
@@ -320,7 +320,7 @@ class DatabasePerformanceMonitor:
                 )
                 await asyncio.sleep(60)  # Wait longer on error
     
-    async def _collect_database_statistics(self) -> Dict[str, Any]:
+    async def _collect_database_statistics(self) -> dict[str, Any]:
         """Collect current database performance statistics"""
         async with self.session_factory() as session:
             try:
@@ -394,7 +394,7 @@ class DatabasePerformanceMonitor:
                 )
                 return {}
     
-    def _record_write_operation_metrics(self, performance_data: Dict[str, Any]):
+    def _record_write_operation_metrics(self, performance_data: dict[str, Any]):
         """Record write operation metrics for analysis"""
         operation_name = performance_data["operation_name"]
         store_id = performance_data["store_id"]
@@ -420,7 +420,7 @@ class DatabasePerformanceMonitor:
             error=performance_data.get("error")
         )
     
-    async def _check_performance_thresholds(self, performance_data: Dict[str, Any]):
+    async def _check_performance_thresholds(self, performance_data: dict[str, Any]):
         """Check if performance metrics exceed thresholds"""
         execution_time = performance_data["execution_time_ms"]
         operation_name = performance_data["operation_name"]
@@ -443,7 +443,7 @@ class DatabasePerformanceMonitor:
         self,
         severity: str,
         message: str,
-        context: Dict[str, Any]
+        context: dict[str, Any]
     ):
         """Trigger performance alert"""
         alert = {
@@ -468,9 +468,9 @@ class DatabasePerformanceMonitor:
     
     def _analyze_write_operations(
         self,
-        store_id: Optional[str],
+        store_id: str | None,
         cutoff_time: datetime
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Analyze write operation performance patterns"""
         
         analysis = {
@@ -526,7 +526,7 @@ class DatabasePerformanceMonitor:
     def _analyze_transaction_performance(
         self,
         cutoff_time: datetime
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Analyze transaction performance"""
         
         analysis = {
@@ -544,7 +544,7 @@ class DatabasePerformanceMonitor:
     def _analyze_slow_queries(
         self,
         cutoff_time: datetime
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Analyze slow query patterns"""
         
         analysis = {
@@ -582,11 +582,11 @@ class DatabasePerformanceMonitor:
     
     async def _generate_optimization_recommendations(
         self,
-        db_stats: Dict[str, Any],
-        write_analysis: Dict[str, Any],
-        transaction_analysis: Dict[str, Any],
-        slow_query_analysis: Dict[str, Any]
-    ) -> List[Dict[str, Any]]:
+        db_stats: dict[str, Any],
+        write_analysis: dict[str, Any],
+        transaction_analysis: dict[str, Any],
+        slow_query_analysis: dict[str, Any]
+    ) -> list[dict[str, Any]]:
         """Generate optimization recommendations"""
         
         recommendations = []
@@ -638,9 +638,9 @@ class DatabasePerformanceMonitor:
     
     def _calculate_health_score(
         self,
-        write_analysis: Dict[str, Any],
-        transaction_analysis: Dict[str, Any],
-        db_stats: Dict[str, Any]
+        write_analysis: dict[str, Any],
+        transaction_analysis: dict[str, Any],
+        db_stats: dict[str, Any]
     ) -> float:
         """Calculate overall database performance health score (0-100)"""
         
@@ -684,7 +684,7 @@ class DatabasePerformanceMonitor:
         except ImportError:
             return 0.0
     
-    async def _get_performance_baseline(self) -> Dict[str, Any]:
+    async def _get_performance_baseline(self) -> dict[str, Any]:
         """Get current performance baseline metrics"""
         return {
             "avg_write_time_ms": 0,
@@ -696,8 +696,8 @@ class DatabasePerformanceMonitor:
     async def _apply_optimization(
         self,
         target: str,
-        baseline_metrics: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        baseline_metrics: dict[str, Any]
+    ) -> dict[str, Any]:
         """Apply a specific optimization"""
         return {
             "target": target,
@@ -707,9 +707,9 @@ class DatabasePerformanceMonitor:
     
     def _calculate_improvements(
         self,
-        baseline: Dict[str, Any],
-        post_optimization: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        baseline: dict[str, Any],
+        post_optimization: dict[str, Any]
+    ) -> dict[str, Any]:
         """Calculate performance improvements"""
         return {
             "write_time_improvement": 0,

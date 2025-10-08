@@ -7,7 +7,17 @@ import type { ExpiryDateInfo } from '@/lib/stores/scanning-workflow-store'
 import { createClient } from '@/lib/supabase/client'
 
 // Environment variables
-const FASTAPI_URL = process.env.FASTAPI_URL
+const FASTAPI_URL = process.env.NEXT_PUBLIC_FASTAPI_URL
+
+/**
+ * Validate that the FastAPI URL is configured
+ */
+function validateFastApiUrl(): string {
+  if (!FASTAPI_URL) {
+    throw new Error('NEXT_PUBLIC_FASTAPI_URL is not configured. Please check your .env.local file.')
+  }
+  return FASTAPI_URL
+}
 
 /**
  * Get authentication headers for FastAPI requests
@@ -32,7 +42,9 @@ export interface OCRUploadResponse {
   success: boolean
   scan_type: string
   expiry_date?: string
-  confidence_threshold: number
+  confidence_score: number // Actual OCR confidence from Vision API
+  confidence_threshold: number // User's input threshold parameter
+  raw_ocr_text: string // Raw OCR text extracted from image
   processing_type: string
 }
 
@@ -102,6 +114,9 @@ export async function extractExpiryDate(
   const startTime = Date.now()
 
   try {
+    // Validate API URL is configured
+    const apiUrl = validateFastApiUrl()
+
     // Prepare form data
     const formData = new FormData()
     formData.append('image', imageBlob, 'expiry-scan.jpg')
@@ -118,7 +133,7 @@ export async function extractExpiryDate(
     const authHeaders = await getAuthHeaders()
 
     // Make API call
-    const response = await fetch(`${FASTAPI_URL}/api/v1/ocr/scan/ocr-expiry/${storeId}`, {
+    const response = await fetch(`${apiUrl}/api/v1/ocr/scan/ocr-expiry/${storeId}`, {
       method: 'POST',
       body: formData,
       headers: {
@@ -138,9 +153,9 @@ export async function extractExpiryDate(
     // Transform API response to ExpiryDateInfo
     return {
       extractedDate: data.expiry_date || undefined,
-      confidence: data.confidence_threshold || 0.65,
+      confidence: data.confidence_score, // Now using actual OCR confidence!
       isManual: false,
-      rawOcrText: 'OCR processing completed',
+      rawOcrText: data.raw_ocr_text, // Now using actual OCR text from backend
       processingTime,
     }
   } catch (error) {
@@ -193,6 +208,9 @@ export async function performFullOCRAnalysis(
   const startTime = Date.now()
 
   try {
+    // Validate API URL is configured
+    const apiUrl = validateFastApiUrl()
+
     // Prepare form data
     const formData = new FormData()
     formData.append('image', imageBlob, 'full-ocr-scan.jpg')
@@ -209,7 +227,7 @@ export async function performFullOCRAnalysis(
     const authHeaders = await getAuthHeaders()
 
     // Make API call
-    const response = await fetch(`${FASTAPI_URL}/api/v1/ocr/scan/full-ocr/${storeId}`, {
+    const response = await fetch(`${apiUrl}/api/v1/ocr/scan/full-ocr/${storeId}`, {
       method: 'POST',
       body: formData,
       headers: {
@@ -283,6 +301,9 @@ export async function extractTextOnly(
   const startTime = Date.now()
 
   try {
+    // Validate API URL is configured
+    const apiUrl = validateFastApiUrl()
+
     const formData = new FormData()
     formData.append('image', imageBlob, 'text-extraction.jpg')
     formData.append('confidence_threshold', confidenceThreshold.toString())
@@ -290,7 +311,7 @@ export async function extractTextOnly(
     // Get auth headers
     const authHeaders = await getAuthHeaders()
 
-    const response = await fetch(`${FASTAPI_URL}/api/v1/ocr/scan/text-extraction/${storeId}`, {
+    const response = await fetch(`${apiUrl}/api/v1/ocr/scan/text-extraction/${storeId}`, {
       method: 'POST',
       body: formData,
       headers: {
@@ -343,23 +364,26 @@ export async function captureImageFromVideo(
 }
 
 /**
- * Utility function to check if FastAPI backend is available
- */
-export async function checkBackendHealth(): Promise<boolean> {
-  try {
-    const response = await fetch(`${FASTAPI_URL}/health`, {
-      method: 'GET',
-      signal: AbortSignal.timeout(10000),
-    })
+//  * Utility function to check if FastAPI backend is available
+//  */
+// export async function checkBackendHealth(): Promise<boolean> {
+//   try {
+//     // Validate API URL is configured
+//     const apiUrl = validateFastApiUrl()
 
-    if (response.ok) {
-      const data = await response.json()
-      return data.status === 'healthy'
-    }
+//     const response = await fetch(`${apiUrl}/health`, {
+//       method: 'GET',
+//       signal: AbortSignal.timeout(10000),
+//     })
 
-    return false
-  } catch (error) {
-    console.warn('FastAPI backend not available:', error)
-    return false
-  }
-}
+//     if (response.ok) {
+//       const data = await response.json()
+//       return data.status === 'healthy'
+//     }
+
+//     return false
+//   } catch (error) {
+//     console.warn('FastAPI backend not available:', error)
+//     return false
+//   }
+// }

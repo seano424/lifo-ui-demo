@@ -20,7 +20,7 @@ class ProductValidator:
     @staticmethod
     async def validate_or_prepare_product(
         sku: str, store_id: str, read_ops
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Validate product exists or prepare data for creation"""
         # This would check if product exists in database
         # For MVP, we'll prepare data for frontend to create via Supabase
@@ -84,7 +84,7 @@ class ScoringCalculator:
     @staticmethod
     def calculate_initial_score(
         expiry_date: date, cost_price: float | None, selling_price: float | None
-    ) -> Tuple[float, str, list[str], list[str]]:
+    ) -> tuple[float, str, list[str], list[str]]:
         """
         Calculate initial score for immediate feedback
 
@@ -136,11 +136,11 @@ class BatchDataCreator:
     @staticmethod
     def create_batch_creation_data(
         batch_data: ScanInRequest,
-        product_info: Dict[str, Any],
+        product_info: dict[str, Any],
         store_id: str,
         batch_number: str,
         user_id: str,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Create batch data for creation (via frontend to Supabase)"""
         return {
             "batch_id": str(uuid.uuid4()),
@@ -177,7 +177,7 @@ class ScanInProcessor:
         batch_data: ScanInRequest,
         read_ops,
         user_id: str,
-    ) -> Tuple[Dict[str, Any], str, float, str, list[str], list[str]]:
+    ) -> tuple[dict[str, Any], str, float, str, list[str], list[str]]:
         """
         Process scan-in workflow
 
@@ -224,8 +224,8 @@ class QuantityValidator:
 
     @staticmethod
     def validate_quantity(
-        batch_data: Dict[str, Any], scan_out_data: ScanOutRequest
-    ) -> Tuple[float, str]:
+        batch_data: dict[str, Any], scan_out_data: ScanOutRequest
+    ) -> tuple[float, str]:
         """
         Validate quantity and calculate new status
 
@@ -259,8 +259,8 @@ class FinancialImpactCalculator:
 
     @staticmethod
     def calculate_financial_impact(
-        scan_out_data: ScanOutRequest, batch_data: Dict[str, Any]
-    ) -> Tuple[float, float]:
+        scan_out_data: ScanOutRequest, batch_data: dict[str, Any]
+    ) -> tuple[float, float]:
         """
         Calculate financial impact
 
@@ -295,11 +295,11 @@ class ActionDataCreator:
         scan_out_data: ScanOutRequest,
         batch_id: str,
         store_id: str,
-        batch_data: Dict[str, Any],
+        batch_data: dict[str, Any],
         revenue_impact: float,
         waste_prevented: float,
         user_id: str,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Create action record data"""
         action_id = str(uuid.uuid4())
         return {
@@ -325,7 +325,7 @@ class ActionEffectivenessCalculator:
 
     @staticmethod
     async def calculate_action_effectiveness(
-        action_data: Dict[str, Any], batch_data: Dict[str, Any], scan_out_data: ScanOutRequest
+        action_data: dict[str, Any], batch_data: dict[str, Any], scan_out_data: ScanOutRequest
     ) -> float:
         """Calculate effectiveness score for the action taken"""
         base_score = 0.5
@@ -357,7 +357,7 @@ class RealtimeUpdateTrigger:
 
     @staticmethod
     async def trigger_realtime_update(
-        store_id: str, batch_id: str, update_data: Dict[str, Any]
+        store_id: str, batch_id: str, update_data: dict[str, Any]
     ):
         """Trigger real-time update for frontend"""
         try:
@@ -389,9 +389,9 @@ class ScanOutProcessor:
         store_id: str,
         batch_id: str,
         scan_out_data: ScanOutRequest,
-        batch_data: Dict[str, Any],
+        batch_data: dict[str, Any],
         user_id: str,
-    ) -> Tuple[str, float, str, float, float, float, Dict[str, Any]]:
+    ) -> tuple[str, float, str, float, float, float, dict[str, Any]]:
         """
         Process scan-out workflow
 
@@ -446,7 +446,7 @@ class BarcodeProductLookup:
     @staticmethod
     async def lookup_product_by_barcode(
         barcode: str, store_id: str, read_ops
-    ) -> Dict[str, Any] | None:
+    ) -> dict[str, Any] | None:
         """Look up product by barcode"""
         # This would query the database for existing products with this barcode
         # For MVP implementation, return None to indicate new product needed
@@ -457,7 +457,7 @@ class UrgencyCalculator:
     """Calculates urgency scores for scanned items"""
 
     @staticmethod
-    def calculate_urgency_score(expiry_date: date, confidence_score: float | None) -> Tuple[float, list[str]]:
+    def calculate_urgency_score(expiry_date: date, confidence_score: float | None) -> tuple[float, list[str]]:
         """
         Calculate urgency based on expiry date and confidence
 

@@ -19,9 +19,9 @@ def mock_db_session():
 
 
 @pytest.fixture
-def csv_processor(mock_db_session):
+def csv_processor():
     """Create CSV processor instance."""
-    return CSVProcessor(mock_db_session)
+    return CSVProcessor()
 
 
 class TestCSVProcessor:

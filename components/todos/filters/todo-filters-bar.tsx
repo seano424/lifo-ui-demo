@@ -38,8 +38,16 @@ const URGENCY_OPTIONS: {
     | 'green'
 }[] = [
   { value: 'all', translationKey: 'filters.urgency.all', color: 'default' },
-  { value: 'critical', translationKey: 'filters.urgency.critical', color: 'destructive' },
-  { value: 'high', translationKey: 'filters.urgency.high', color: 'destructive' },
+  {
+    value: 'critical',
+    translationKey: 'filters.urgency.critical',
+    color: 'destructive',
+  },
+  {
+    value: 'high',
+    translationKey: 'filters.urgency.high',
+    color: 'destructive',
+  },
   { value: 'medium', translationKey: 'filters.urgency.medium', color: 'blue' },
   { value: 'low', translationKey: 'filters.urgency.low', color: 'blue' },
   { value: 'none', translationKey: 'filters.urgency.none', color: 'default' },
@@ -53,14 +61,21 @@ const ACTION_OPTIONS: {
   { value: 'all', translationKey: 'filters.action.all', icon: '🎯' },
   { value: 'discount', translationKey: 'filters.action.discount', icon: '🏷️' },
   { value: 'donate', translationKey: 'filters.action.donate', icon: '🤝' },
-  { value: 'donate_prepared', translationKey: 'filters.action.donatePrepared', icon: '📦' },
+  {
+    value: 'donate_prepared',
+    translationKey: 'filters.action.donatePrepared',
+    icon: '📦',
+  },
   { value: 'dispose', translationKey: 'filters.action.dispose', icon: '🗑️' },
   { value: 'maintain', translationKey: 'filters.action.maintain', icon: '📌' },
   { value: 'ignored', translationKey: 'filters.action.ignored', icon: '🚫' },
   { value: 'sold', translationKey: 'filters.action.sold', icon: '💰' },
 ]
 
-const BATCH_STATUS_OPTIONS: { value: BatchStatus | 'all'; translationKey: string }[] = [
+const BATCH_STATUS_OPTIONS: {
+  value: BatchStatus | 'all'
+  translationKey: string
+}[] = [
   { value: 'all', translationKey: 'filters.status.all' },
   { value: 'active', translationKey: 'filters.status.active' },
   { value: 'expired', translationKey: 'filters.status.expired' },
@@ -144,13 +159,15 @@ export function TodoFiltersBar({
           <DropdownMenuTrigger asChild>
             <Button
               variant="outline"
-              className="w-full sm:w-[180px] justify-between"
+              className="w-full sm:max-w-max sm:min-w-[180px] justify-between"
               disabled={isLoading}
               id="todos-urgency-filter-trigger"
             >
               <span>
                 {filters.urgency_level?.length
-                  ? t('filters.urgencyCount', { count: filters.urgency_level.length })
+                  ? t('filters.urgencyCount', {
+                      count: filters.urgency_level.length,
+                    })
                   : t('filters.filterByUrgency')}
               </span>
               <ChevronDown className="h-4 w-4" />
@@ -179,11 +196,6 @@ export function TodoFiltersBar({
                       />
                       {t(option.translationKey)}
                     </span>
-                    {!isAll && (
-                      <Badge variant={option.color} className="ml-2">
-                        {option.value}
-                      </Badge>
-                    )}
                   </div>
                 )
               })}
@@ -202,7 +214,9 @@ export function TodoFiltersBar({
             >
               <span>
                 {filters.action_type?.length
-                  ? t('filters.actionsCount', { count: filters.action_type.length })
+                  ? t('filters.actionsCount', {
+                      count: filters.action_type.length,
+                    })
                   : t('filters.filterByAction')}
               </span>
               <ChevronDown className="h-4 w-4" />
@@ -252,7 +266,9 @@ export function TodoFiltersBar({
             >
               <span>
                 {filters.batch_status?.length
-                  ? t('filters.statusCount', { count: filters.batch_status.length })
+                  ? t('filters.statusCount', {
+                      count: filters.batch_status.length,
+                    })
                   : t('filters.filterByStatus')}
               </span>
               <ChevronDown className="h-4 w-4" />
@@ -281,11 +297,6 @@ export function TodoFiltersBar({
                       />
                       {t(option.translationKey)}
                     </span>
-                    {!isAll && (
-                      <Badge variant={option.value === 'active' ? 'default' : 'gray'}>
-                        {option.value}
-                      </Badge>
-                    )}
                   </div>
                 )
               })}
@@ -297,26 +308,38 @@ export function TodoFiltersBar({
       {/* Active Filters Display */}
       {hasActiveFilters && (
         <div className="flex flex-wrap gap-2">
-          {filters.urgency_level?.map(urgency => (
-            <Badge key={urgency} variant="default" className="gap-1">
-              {t('filters.activeUrgency', { urgency })}
-              <X className="h-3 w-3 cursor-pointer" onClick={() => handleUrgencyChange(urgency)} />
-            </Badge>
-          ))}
+          {filters.urgency_level?.map(urgency => {
+            const option = URGENCY_OPTIONS.find(o => o.value === urgency)
+            return (
+              <Badge key={urgency} variant="default" className="gap-1">
+                {option ? t(option.translationKey) : urgency}
+                <X
+                  className="h-3 w-3 cursor-pointer"
+                  onClick={() => handleUrgencyChange(urgency)}
+                />
+              </Badge>
+            )
+          })}
 
-          {filters.action_type?.map(action => (
-            <Badge key={action} variant="default" className="gap-1">
-              {t('filters.activeAction', { action })}
-              <X className="h-3 w-3 cursor-pointer" onClick={() => handleActionChange(action)} />
-            </Badge>
-          ))}
+          {filters.action_type?.map(action => {
+            const option = ACTION_OPTIONS.find(o => o.value === action)
+            return (
+              <Badge key={action} variant="default" className="gap-1">
+                {option ? t(option.translationKey) : action}
+                <X className="h-3 w-3 cursor-pointer" onClick={() => handleActionChange(action)} />
+              </Badge>
+            )
+          })}
 
-          {filters.batch_status?.map(status => (
-            <Badge key={status} variant="default" className="gap-1">
-              {t('filters.activeStatus', { status })}
-              <X className="h-3 w-3 cursor-pointer" onClick={() => handleStatusChange(status)} />
-            </Badge>
-          ))}
+          {filters.batch_status?.map(status => {
+            const option = BATCH_STATUS_OPTIONS.find(o => o.value === status)
+            return (
+              <Badge key={status} variant="default" className="gap-1">
+                {option ? t(option.translationKey) : status}
+                <X className="h-3 w-3 cursor-pointer" onClick={() => handleStatusChange(status)} />
+              </Badge>
+            )
+          })}
         </div>
       )}
     </div>

@@ -39,11 +39,11 @@ class CSVError:
         message: str,
         error_type: ErrorType,
         severity: ErrorSeverity,
-        row_number: Optional[int] = None,
-        column: Optional[str] = None,
-        field_value: Optional[str] = None,
-        suggestion: Optional[str] = None,
-        error_code: Optional[str] = None
+        row_number: int | None = None,
+        column: str | None = None,
+        field_value: str | None = None,
+        suggestion: str | None = None,
+        error_code: str | None = None
     ):
         self.message = message
         self.error_type = error_type
@@ -55,7 +55,7 @@ class CSVError:
         self.error_code = error_code
         self.timestamp = datetime.utcnow()
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert error to dictionary format"""
         error_dict = {
             "message": self.message,
@@ -86,8 +86,8 @@ class CSVErrorHandler:
 
     def __init__(self):
         self.logger = logger.bind(component="csv_error_handler")
-        self.errors: List[CSVError] = []
-        self.warnings: List[CSVError] = []
+        self.errors: list[CSVError] = []
+        self.warnings: list[CSVError] = []
         self.processing_stats = {
             "total_rows": 0,
             "processed_rows": 0,
@@ -113,11 +113,11 @@ class CSVErrorHandler:
         message: str,
         error_type: ErrorType = ErrorType.VALIDATION,
         severity: ErrorSeverity = ErrorSeverity.ERROR,
-        row_number: Optional[int] = None,
-        column: Optional[str] = None,
-        field_value: Optional[str] = None,
-        suggestion: Optional[str] = None,
-        error_code: Optional[str] = None
+        row_number: int | None = None,
+        column: str | None = None,
+        field_value: str | None = None,
+        suggestion: str | None = None,
+        error_code: str | None = None
     ) -> None:
         """Add an error to the collection"""
         error = CSVError(
@@ -153,8 +153,8 @@ class CSVErrorHandler:
         field: str,
         value: Any,
         message: str,
-        row_number: Optional[int] = None,
-        suggestion: Optional[str] = None
+        row_number: int | None = None,
+        suggestion: str | None = None
     ) -> None:
         """Add a validation error with standardized formatting"""
         formatted_message = f"Invalid {field}: {message}"
@@ -175,9 +175,9 @@ class CSVErrorHandler:
     def add_security_error(
         self,
         message: str,
-        row_number: Optional[int] = None,
-        column: Optional[str] = None,
-        field_value: Optional[str] = None
+        row_number: int | None = None,
+        column: str | None = None,
+        field_value: str | None = None
     ) -> None:
         """Add a security error"""
         self.add_error(
@@ -193,8 +193,8 @@ class CSVErrorHandler:
     def add_parsing_error(
         self,
         message: str,
-        row_number: Optional[int] = None,
-        suggestion: Optional[str] = None
+        row_number: int | None = None,
+        suggestion: str | None = None
     ) -> None:
         """Add a parsing error"""
         self.add_error(
@@ -209,9 +209,9 @@ class CSVErrorHandler:
     def add_business_warning(
         self,
         message: str,
-        row_number: Optional[int] = None,
-        column: Optional[str] = None,
-        suggestion: Optional[str] = None
+        row_number: int | None = None,
+        column: str | None = None,
+        suggestion: str | None = None
     ) -> None:
         """Add a business logic warning"""
         self.add_error(
@@ -253,7 +253,7 @@ class CSVErrorHandler:
         """Check if there are any warnings"""
         return len(self.warnings) > 0
 
-    def get_error_summary(self) -> Dict[str, Any]:
+    def get_error_summary(self) -> dict[str, Any]:
         """Get summary of errors by type and severity"""
         summary = {
             "total_errors": len(self.errors),
@@ -289,7 +289,7 @@ class CSVErrorHandler:
 
         return summary
 
-    def format_errors_for_response(self, limit: int = 50) -> List[Dict[str, Any]]:
+    def format_errors_for_response(self, limit: int = 50) -> list[dict[str, Any]]:
         """Format errors for API response with limit"""
         error_list = []
         
@@ -307,7 +307,7 @@ class CSVErrorHandler:
         
         return error_list
 
-    def format_warnings_for_response(self, limit: int = 20) -> List[Dict[str, Any]]:
+    def format_warnings_for_response(self, limit: int = 20) -> list[dict[str, Any]]:
         """Format warnings for API response with limit"""
         return [warning.to_dict() for warning in self.warnings[:limit]]
 
@@ -315,8 +315,8 @@ class CSVErrorHandler:
         self,
         data: Any,
         processing_id: str = None,
-        metadata: Dict[str, Any] = None
-    ) -> Dict[str, Any]:
+        metadata: dict[str, Any] = None
+    ) -> dict[str, Any]:
         """Create standardized success response"""
         response = {
             "success": True,
@@ -342,8 +342,8 @@ class CSVErrorHandler:
         message: str,
         status_code: int = 400,
         processing_id: str = None,
-        metadata: Dict[str, Any] = None
-    ) -> Dict[str, Any]:
+        metadata: dict[str, Any] = None
+    ) -> dict[str, Any]:
         """Create standardized error response"""
         response = {
             "success": False,
@@ -364,7 +364,7 @@ class CSVErrorHandler:
         
         return response
 
-    def create_validation_response(self) -> Dict[str, Any]:
+    def create_validation_response(self) -> dict[str, Any]:
         """Create response for validation-only operations"""
         is_valid = not self.has_errors()
         
@@ -399,7 +399,7 @@ class CSVErrorHandler:
                 detail=combined_message
             )
 
-    def get_performance_metrics(self) -> Dict[str, Any]:
+    def get_performance_metrics(self) -> dict[str, Any]:
         """Get performance metrics for monitoring"""
         total_issues = len(self.errors) + len(self.warnings)
         total_rows = self.processing_stats["total_rows"]

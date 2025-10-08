@@ -221,8 +221,8 @@ class CategoryMappingService:
 
     def __init__(self):
         self.logger = logger.bind(component="category_mapper")
-        self._category_cache: Dict[str, str] = {}  # category_code -> category_uuid cache
-        self._reverse_cache: Dict[str, str] = {}   # category_uuid -> category_code cache
+        self._category_cache: dict[str, str] = {}  # category_code -> category_uuid cache
+        self._reverse_cache: dict[str, str] = {}   # category_uuid -> category_code cache
 
     def map_category(self, raw_category: str) -> str:
         """
@@ -261,7 +261,7 @@ class CategoryMappingService:
         )
         return "dry_goods"
 
-    def _fuzzy_match_category(self, category_str: str) -> Optional[str]:
+    def _fuzzy_match_category(self, category_str: str) -> str | None:
         """
         Perform fuzzy matching for category strings
         
@@ -398,7 +398,7 @@ class CategoryMappingService:
         """
         return self.RISK_LEVELS.get(category_code, "medium")  # Default medium risk
 
-    def get_all_categories(self) -> Dict[str, Dict[str, Any]]:
+    def get_all_categories(self) -> dict[str, dict[str, Any]]:
         """
         Get all category information
         
@@ -420,7 +420,7 @@ class CategoryMappingService:
         
         return categories
 
-    def get_category_suggestions(self, partial_category: str, limit: int = 5) -> List[str]:
+    def get_category_suggestions(self, partial_category: str, limit: int = 5) -> list[str]:
         """
         Get category suggestions for partial matches
         

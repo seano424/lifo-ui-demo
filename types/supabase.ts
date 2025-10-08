@@ -350,6 +350,14 @@ export type Database = {
           website_url: string | null
         }
       }
+      delete_store_and_data: {
+        Args: {
+          deletion_reason?: string
+          performed_by_user_id?: string
+          target_store_id: string
+        }
+        Returns: Json
+      }
       get_store_types: {
         Args: Record<PropertyKey, never>
         Returns: Database["business"]["Enums"]["store_type_enum"][]
@@ -1669,6 +1677,10 @@ export type Database = {
           store_id: string
         }[]
       }
+      check_pin_lock_status: {
+        Args: { p_username: string }
+        Returns: Json
+      }
       check_security_warnings: {
         Args: Record<PropertyKey, never>
         Returns: {
@@ -1914,8 +1926,17 @@ export type Database = {
           total_count: number
         }[]
       }
+      get_batch_todo_by_id: {
+        Args: { target_batch_id: string }
+        Returns: Json
+      }
       get_batch_todo_states: {
         Args:
+          | {
+              limit_count?: number
+              offset_count?: number
+              target_store_id: string
+            }
           | { limit_rows?: number; target_store_id?: string }
           | {
               p_limit?: number
@@ -1930,6 +1951,7 @@ export type Database = {
           batch_id: string
           batch_number: string
           batch_status: string
+          completion_status: string
           composite_score: number
           current_quantity: number
           days_to_expiry: number
@@ -1937,7 +1959,7 @@ export type Database = {
           hours_since_last_action: number
           last_action_quantity: number
           last_action_time: string
-          last_action_type: Database["public"]["Enums"]["action_type"]
+          last_action_type: string
           last_discount_percent: number
           priority_order: number
           product_brand: string
@@ -1948,8 +1970,46 @@ export type Database = {
           total_discounted_quantity: number
           total_disposed_quantity: number
           total_donated_quantity: number
+          total_ignored_quantity: number
+          total_sold_quantity: number
           urgency_level: string
           view_refreshed_at: string
+        }[]
+      }
+      get_batch_todo_summary: {
+        Args: { target_store_id: string }
+        Returns: {
+          completed_count: number
+          critical_urgency_count: number
+          high_urgency_count: number
+          immediate_action_count: number
+          in_progress_count: number
+          last_refreshed: string
+          pending_action_count: number
+          total_batches: number
+          total_potential_loss: number
+        }[]
+      }
+      get_batch_todos_by_state: {
+        Args: {
+          filter_todo_state?: string
+          limit_count?: number
+          offset_count?: number
+          target_store_id: string
+        }
+        Returns: {
+          ai_recommendation: string
+          batch_id: string
+          batch_number: string
+          current_quantity: number
+          current_selling_price: number
+          days_to_expiry: number
+          expiry_date: string
+          last_action_type: string
+          potential_loss_value: number
+          product_name: string
+          todo_state: string
+          urgency_level: string
         }[]
       }
       get_csv_upload_stats: {
@@ -2309,12 +2369,7 @@ export type Database = {
       }
       get_user_by_username: {
         Args: { p_username: string }
-        Returns: {
-          email: string
-          full_name: string
-          id: string
-          username: string
-        }[]
+        Returns: Json
       }
       get_user_complete_profile: {
         Args: { p_store_id?: string; p_user_id: string }
@@ -2378,6 +2433,10 @@ export type Database = {
           p_user_id?: string
         }
         Returns: boolean
+      }
+      reset_pin_attempts: {
+        Args: { p_username: string }
+        Returns: Json
       }
       resolve_bulk_products: {
         Args: { p_barcodes: string[]; p_names: string[]; p_skus: string[] }
@@ -2589,6 +2648,10 @@ export type Database = {
         Args: { new_phone: string; target_user_id: string }
         Returns: Json
       }
+      update_user_pin: {
+        Args: { p_new_pin: string; p_old_pin: string; p_username: string }
+        Returns: Json
+      }
       user_has_pin_access: {
         Args: { target_store_id: string }
         Returns: boolean
@@ -2596,6 +2659,10 @@ export type Database = {
       user_has_store_access: {
         Args: { required_role?: string; target_store_id: string }
         Returns: boolean
+      }
+      validate_pin_login: {
+        Args: { p_pin: string; p_username: string }
+        Returns: Json
       }
     }
     Enums: {
@@ -2735,6 +2802,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      calculate_batch_score: {
+        Args: {
+          p_category_id?: string
+          p_expiration_date: string
+          p_quantity?: number
+          p_store_id: string
+        }
+        Returns: Json
+      }
       recalculate_store_scores: {
         Args: { p_store_id: string }
         Returns: number
@@ -2891,6 +2967,45 @@ export type Database = {
   }
   user_mgmt: {
     Tables: {
+      gdpr_deletion_log: {
+        Row: {
+          business_impact_notes: string | null
+          created_at: string | null
+          deletion_completed_at: string | null
+          deletion_requested_at: string | null
+          deletion_type: string | null
+          id: string
+          performed_by: string | null
+          user_email: string | null
+          user_full_name: string | null
+          user_id: string | null
+        }
+        Insert: {
+          business_impact_notes?: string | null
+          created_at?: string | null
+          deletion_completed_at?: string | null
+          deletion_requested_at?: string | null
+          deletion_type?: string | null
+          id?: string
+          performed_by?: string | null
+          user_email?: string | null
+          user_full_name?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          business_impact_notes?: string | null
+          created_at?: string | null
+          deletion_completed_at?: string | null
+          deletion_requested_at?: string | null
+          deletion_type?: string | null
+          id?: string
+          performed_by?: string | null
+          user_email?: string | null
+          user_full_name?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       roles: {
         Row: {
           created_at: string | null
@@ -3000,6 +3115,23 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      gdpr_delete_user: {
+        Args: {
+          deletion_type?: string
+          performed_by_user_id?: string
+          target_user_id: string
+        }
+        Returns: Json
+      }
+      gdpr_delete_user_and_stores: {
+        Args: {
+          delete_owned_stores?: boolean
+          deletion_type?: string
+          performed_by_user_id?: string
+          target_user_id: string
+        }
+        Returns: Json
+      }
       get_user_roles: {
         Args: { user_uuid?: string }
         Returns: string[]
@@ -3011,6 +3143,10 @@ export type Database = {
       has_role_cached: {
         Args: { role_name: string; user_uuid: string }
         Returns: boolean
+      }
+      request_account_deletion: {
+        Args: { deletion_reason?: string }
+        Returns: Json
       }
       user_can_access_store: {
         Args: { store_uuid: string }

@@ -39,6 +39,9 @@ export const queryKeys = {
 
     overview: (storeId: string) => [...queryKeys.todos.all, 'overview', storeId] as const,
 
+    // Ultra-fast urgent count for sidebar badge (uses materialized view)
+    urgentCount: (storeId: string) => [...queryKeys.todos.all, 'urgent-count', storeId] as const,
+
     // Specific convenience keys for common combinations
     pending: (storeId: string, filters?: Partial<TodoFilters>, pageSize: number = 20) =>
       [...queryKeys.todos.all, 'pending', { storeId, filters, pageSize }] as const,

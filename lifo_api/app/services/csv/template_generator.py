@@ -110,7 +110,7 @@ class CSVTemplateGenerator:
 
     def generate_custom_template(
         self, 
-        columns: List[str], 
+        columns: list[str], 
         include_samples: bool = True,
         sample_count: int = 3
     ) -> str:
@@ -143,7 +143,7 @@ class CSVTemplateGenerator:
         
         return self._generate_csv_content(valid_columns, template_data)
 
-    def _generate_csv_content(self, columns: List[str], data: List[Dict[str, str]]) -> str:
+    def _generate_csv_content(self, columns: list[str], data: list[dict[str, str]]) -> str:
         """
         Generate CSV content from columns and data
         
@@ -176,7 +176,7 @@ class CSVTemplateGenerator:
         
         return content
 
-    def _get_basic_sample_data(self) -> List[Dict[str, str]]:
+    def _get_basic_sample_data(self) -> list[dict[str, str]]:
         """Get basic sample data for minimal template"""
         today = date.today()
         expiry1 = (today + timedelta(days=30)).isoformat()
@@ -199,7 +199,7 @@ class CSVTemplateGenerator:
             }
         ]
 
-    def _get_standard_sample_data(self) -> List[Dict[str, str]]:
+    def _get_standard_sample_data(self) -> list[dict[str, str]]:
         """Get standard sample data for full template"""
         today = date.today()
         expiry1 = (today + timedelta(days=30)).isoformat()
@@ -261,7 +261,7 @@ class CSVTemplateGenerator:
             }
         ]
 
-    def _get_extended_sample_data(self) -> List[Dict[str, str]]:
+    def _get_extended_sample_data(self) -> list[dict[str, str]]:
         """Get extended sample data with all columns"""
         standard_data = self._get_standard_sample_data()
         
@@ -288,7 +288,7 @@ class CSVTemplateGenerator:
         
         return standard_data
 
-    def _get_category_specific_sample_data(self, category_code: str) -> List[Dict[str, str]]:
+    def _get_category_specific_sample_data(self, category_code: str) -> list[dict[str, str]]:
         """Get sample data specific to a category"""
         today = date.today()
         shelf_life = self.category_mapper.get_shelf_life_days(category_code)
@@ -369,7 +369,7 @@ class CSVTemplateGenerator:
         
         return [sample_data]
 
-    def _get_custom_sample_data(self, columns: List[str], sample_count: int) -> List[Dict[str, str]]:
+    def _get_custom_sample_data(self, columns: list[str], sample_count: int) -> list[dict[str, str]]:
         """Generate custom sample data for specified columns"""
         sample_data = []
         
@@ -390,7 +390,7 @@ class CSVTemplateGenerator:
         
         return sample_data
 
-    def _generate_generic_sample(self, index: int) -> Dict[str, str]:
+    def _generate_generic_sample(self, index: int) -> dict[str, str]:
         """Generate a generic sample row"""
         today = date.today()
         expiry = (today + timedelta(days=30)).isoformat()
@@ -413,7 +413,7 @@ class CSVTemplateGenerator:
             "description": f"Sample product {index} for CSV template"
         }
 
-    def get_template_info(self) -> Dict[str, Any]:
+    def get_template_info(self) -> dict[str, Any]:
         """
         Get information about available templates
         
@@ -450,7 +450,7 @@ class CSVTemplateGenerator:
             "column_descriptions": self._get_column_descriptions()
         }
 
-    def _get_column_descriptions(self) -> Dict[str, str]:
+    def _get_column_descriptions(self) -> dict[str, str]:
         """Get descriptions for all available columns"""
         return {
             "sku": "Unique product identifier (Stock Keeping Unit)",

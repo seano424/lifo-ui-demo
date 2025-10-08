@@ -33,8 +33,8 @@ class QueryAnalyzer:
         self,
         session: AsyncSession,
         query: str,
-        params: Dict[str, Any] = None
-    ) -> Dict[str, Any]:
+        params: dict[str, Any] = None
+    ) -> dict[str, Any]:
         """
         Analyze query performance using EXPLAIN ANALYZE
         Returns detailed execution plan and performance metrics
@@ -74,7 +74,7 @@ class QueryAnalyzer:
             )
             return {"error": f"Analysis failed: {str(e)}"}
     
-    def _parse_explain_analyze(self, explain_json: Dict[str, Any]) -> Dict[str, Any]:
+    def _parse_explain_analyze(self, explain_json: dict[str, Any]) -> dict[str, Any]:
         """Parse EXPLAIN ANALYZE JSON output into performance metrics"""
         
         if not explain_json or "Plan" not in explain_json:
@@ -127,7 +127,7 @@ class QueryAnalyzer:
         
         return analysis
     
-    def _analyze_child_plan(self, plan: Dict[str, Any]) -> Dict[str, Any]:
+    def _analyze_child_plan(self, plan: dict[str, Any]) -> dict[str, Any]:
         """Analyze a child plan node"""
         return {
             "node_type": plan.get("Node Type"),
@@ -142,7 +142,7 @@ class QueryAnalyzer:
             "shared_read_blocks": plan.get("Shared Read Blocks", 0)
         }
     
-    def _identify_bottlenecks(self, analysis: Dict[str, Any]) -> List[str]:
+    def _identify_bottlenecks(self, analysis: dict[str, Any]) -> list[str]:
         """Identify performance bottlenecks from analysis"""
         bottlenecks = []
         
@@ -168,7 +168,7 @@ class QueryAnalyzer:
         
         return bottlenecks
     
-    def _generate_recommendations(self, analysis: Dict[str, Any]) -> List[str]:
+    def _generate_recommendations(self, analysis: dict[str, Any]) -> list[str]:
         """Generate performance recommendations based on analysis"""
         recommendations = []
         
@@ -211,8 +211,8 @@ class WriteOperationProfiler:
         operation_type: str,  # insert, update, delete, upsert
         record_count: int,
         query: str,
-        params: Dict[str, Any] = None
-    ) -> Dict[str, Any]:
+        params: dict[str, Any] = None
+    ) -> dict[str, Any]:
         """
         Profile a write operation with detailed analysis
         """
@@ -256,7 +256,7 @@ class WriteOperationProfiler:
         
         return profile
     
-    async def _get_table_stats(self, session: AsyncSession, table_name: str) -> Dict[str, Any]:
+    async def _get_table_stats(self, session: AsyncSession, table_name: str) -> dict[str, Any]:
         """Get table statistics before operation"""
         try:
             stats_query = text("""
@@ -313,7 +313,7 @@ class WriteOperationProfiler:
         else:
             return "very_slow"
     
-    def _generate_operation_recommendations(self, profile: Dict[str, Any]) -> List[str]:
+    def _generate_operation_recommendations(self, profile: dict[str, Any]) -> list[str]:
         """Generate recommendations for write operation optimization"""
         recommendations = []
         
@@ -341,7 +341,7 @@ class WriteOperationProfiler:
         
         return recommendations
     
-    def get_operation_summary(self, operation_name: str) -> Dict[str, Any]:
+    def get_operation_summary(self, operation_name: str) -> dict[str, Any]:
         """Get performance summary for a specific operation"""
         profiles = self.operation_profiles.get(operation_name, [])
         
@@ -384,7 +384,7 @@ class WriteOptimizationAdvisor:
         session: AsyncSession,
         store_id: str,
         time_window_hours: int = 24
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Analyze write patterns for a store and provide optimization recommendations
         """
@@ -419,7 +419,7 @@ class WriteOptimizationAdvisor:
             "performance_summary": self._summarize_performance(recent_operations)
         }
     
-    def _analyze_operation_patterns(self, operations: List[Dict[str, Any]]) -> Dict[str, Any]:
+    def _analyze_operation_patterns(self, operations: list[dict[str, Any]]) -> dict[str, Any]:
         """Analyze patterns in write operations"""
         
         # Group by operation type
@@ -470,9 +470,9 @@ class WriteOptimizationAdvisor:
     async def _generate_optimization_recommendations(
         self,
         session: AsyncSession,
-        pattern_analysis: Dict[str, Any],
+        pattern_analysis: dict[str, Any],
         store_id: str
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Generate specific optimization recommendations"""
         recommendations = []
         
@@ -561,7 +561,7 @@ class WriteOptimizationAdvisor:
         
         return recommendations
     
-    def _summarize_performance(self, operations: List[Dict[str, Any]]) -> Dict[str, Any]:
+    def _summarize_performance(self, operations: list[dict[str, Any]]) -> dict[str, Any]:
         """Summarize overall performance metrics"""
         if not operations:
             return {}
@@ -604,8 +604,8 @@ class WritePerformanceMonitor:
         operation_type: str,
         record_count: int,
         query: str,
-        params: Dict[str, Any] = None
-    ) -> Dict[str, Any]:
+        params: dict[str, Any] = None
+    ) -> dict[str, Any]:
         """
         Monitor a write operation with full performance analysis
         """
@@ -634,7 +634,7 @@ class WritePerformanceMonitor:
         self,
         store_id: str,
         time_window_hours: int = 24
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Get comprehensive optimization report for a store
         """
@@ -643,7 +643,7 @@ class WritePerformanceMonitor:
                 session, store_id, time_window_hours
             )
     
-    async def analyze_slow_queries(self) -> Dict[str, Any]:
+    async def analyze_slow_queries(self) -> dict[str, Any]:
         """
         Analyze slow write queries and provide optimization suggestions
         """
