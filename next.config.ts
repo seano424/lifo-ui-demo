@@ -55,6 +55,43 @@ const nextConfig: NextConfig = {
           },
         ],
       },
+      {
+        // Manifest specific headers
+        source: '/manifest.json',
+        headers: [
+          {
+            // Ensures manifest is served with correct content type
+            key: 'Content-Type',
+            value: 'application/manifest+json; charset=utf-8',
+          },
+          {
+            // Cache manifest for a short time but allow revalidation
+            key: 'Cache-Control',
+            value: 'public, max-age=3600, must-revalidate',
+          },
+        ],
+      },
+      {
+        // PWA icons headers - specific icons
+        source: '/icon-192.png',
+        headers: [
+          {
+            // Cache icons for longer since they don't change often
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        source: '/icon-512.png',
+        headers: [
+          {
+            // Cache icons for longer since they don't change often
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
     ]
   },
   async redirects() {
