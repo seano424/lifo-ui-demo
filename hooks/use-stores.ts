@@ -70,6 +70,10 @@ export function useUserStores() {
 
         if (storeToSelect) {
           setActiveStore(storeToSelect)
+          // Also sync cookie for server-side consistency
+          setActiveStoreCookie(storeToSelect.store_id).catch(error => {
+            console.error('[useUserStores] Failed to sync active store cookie:', error)
+          })
         }
       }
     }

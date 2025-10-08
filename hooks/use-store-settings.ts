@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
-import { setActiveStoreCookie } from '@/lib/actions/store-actions'
+import { clearActiveStoreCookie } from '@/lib/actions/store-actions'
 import { usePermissionsNew } from '@/hooks/use-complete-user-profile'
 import { useCurrentUser } from '@/hooks/use-users'
 import { queryKeys } from '@/lib/queries/query-keys'
@@ -484,7 +484,7 @@ export function useDeactivateStore() {
       clearActiveStore()
 
       // Clear the server-side cookie as well
-      await setActiveStoreCookie(null)
+      await clearActiveStoreCookie()
 
       // Invalidate all store-related queries
       queryClient.invalidateQueries({ queryKey: queryKeys.stores.all })
