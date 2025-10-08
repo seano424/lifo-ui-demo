@@ -1,11 +1,12 @@
-import type { Metadata } from 'next'
-import { Montserrat, Raleway, Roboto_Mono } from 'next/font/google'
-import { getMessages } from 'next-intl/server'
-import { ThemeProvider } from 'next-themes'
-import { Toaster } from '@/components/ui/toaster'
 import { IntlProvider } from '@/components/providers/intl-provider'
 import { LanguageProvider } from '@/components/providers/language-provider'
+import PWA from '@/components/pwa'
+import { Toaster } from '@/components/ui/toaster'
 import { ReactQueryProvider } from '@/lib/react-query/provider'
+import type { Metadata } from 'next'
+import { getMessages } from 'next-intl/server'
+import { ThemeProvider } from 'next-themes'
+import { Montserrat, Raleway, Roboto_Mono } from 'next/font/google'
 import './globals.css'
 
 const defaultUrl = process.env.VERCEL_URL
@@ -17,6 +18,12 @@ export const metadata: Metadata = {
   title: 'LIFO.AI - AI-Powered Food Waste Management',
   description:
     'LIFO.AI helps retailers reduce food waste through AI-driven inventory management. Scan products, track expiration dates, and optimize discounting and donations to maximize profitability.',
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'LIFO.AI',
+  },
 }
 
 // Raleway font for headings
@@ -67,6 +74,7 @@ export default async function RootLayout({
               <IntlProvider initialMessages={messages}>{children}</IntlProvider>
             </LanguageProvider>
           </ReactQueryProvider>
+          <PWA />
           <Toaster
             position="top-right"
             richColors
