@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label'
 import { Typography } from '@/components/ui/typography'
 import { cn } from '@/lib/utils'
 import { Building2 } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { useActionState, useEffect } from 'react'
 import { useFormStatus } from 'react-dom'
@@ -16,15 +17,17 @@ import { toast } from 'sonner'
 // Submit button component that uses form status
 function SubmitButton() {
   const { pending } = useFormStatus()
+  const t = useTranslations('auth.loginForm')
   return (
     <Button type="submit" className="w-full" disabled={pending}>
-      {pending ? 'Signing in...' : 'Sign In'}
+      {pending ? t('signingIn') : t('signIn')}
     </Button>
   )
 }
 
 export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
   const [state, formAction] = useActionState(loginWithCredentials, null)
+  const t = useTranslations('auth.loginForm')
 
   // Show error toast when state changes
   useEffect(() => {
@@ -42,11 +45,11 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
           </div>
           <div className="space-y-1.5 flex flex-col">
             <CardTitle>
-              <Typography variant="h1">Welcome to LIFO</Typography>
+              <Typography variant="h1">{t('welcomeTitle')}</Typography>
             </CardTitle>
             <CardDescription>
               <Typography variant="p" color="muted">
-                Sign in to manage your store inventory
+                {t('description')}
               </Typography>
             </CardDescription>
           </div>
@@ -55,12 +58,12 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
         <CardContent>
           <form action={formAction} className="space-y-4 font-mono uppercase">
             <div className="space-y-2">
-              <Label htmlFor="identifier">Username or Email</Label>
+              <Label htmlFor="identifier">{t('usernameOrEmail')}</Label>
               <Input
                 id="identifier"
                 name="identifier"
                 type="text"
-                placeholder="johnd"
+                placeholder={t('usernamePlaceholder')}
                 required
                 autoComplete="username"
               />
@@ -68,9 +71,9 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
 
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">{t('password')}</Label>
                 <Link href="/auth/forgot-password" className="text-sm text-primary hover:underline">
-                  Forgot password?
+                  {t('forgotPassword')}
                 </Link>
               </div>
               <Input
@@ -78,7 +81,7 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
                 name="password"
                 type="password"
                 showPasswordToggle
-                placeholder="••••••"
+                placeholder={t('passwordPlaceholder')}
                 required
                 autoComplete="current-password"
               />
@@ -98,12 +101,12 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
           {/* Footer for new accounts */}
           <div className="mt-6 text-center text-sm text-muted-foreground">
             <Typography variant="p" color="muted">
-              New store?{' '}
+              {t('newStore')}{' '}
               <Link
                 href="/onboarding/create-account"
                 className="text-primary hover:underline font-medium"
               >
-                Create an account
+                {t('createAccount')}
               </Link>
             </Typography>
           </div>
