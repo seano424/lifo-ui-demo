@@ -29,25 +29,27 @@ class BulkDataRetriever:
     async def get_store_inventory_data(self, store_id: str) -> list[dict[str, Any]]:
         """Get all inventory data for a store in a single optimized query"""
         try:
-            inventory_data = await self.read_ops.get_store_inventory_for_scoring(store_id)
+            inventory_data = await self.read_ops.get_store_inventory_for_scoring(
+                store_id
+            )
 
             if not inventory_data:
-                self.logger.warning("No inventory data found for store", store_id=store_id)
+                self.logger.warning(
+                    "No inventory data found for store", store_id=store_id
+                )
                 return []
 
             self.logger.info(
                 "Retrieved inventory data for bulk scoring",
                 store_id=store_id,
-                item_count=len(inventory_data)
+                item_count=len(inventory_data),
             )
 
             return inventory_data
 
         except Exception as e:
             self.logger.error(
-                "Failed to retrieve inventory data",
-                store_id=store_id,
-                error=str(e)
+                "Failed to retrieve inventory data", store_id=store_id, error=str(e)
             )
             return []
 
@@ -57,11 +59,9 @@ class BulkDataRetriever:
 
     def extract_categories(self, inventory_data: list[dict[str, Any]]) -> list[str]:
         """Extract unique categories from inventory data"""
-        return list({
-            item.get("category")
-            for item in inventory_data
-            if item.get("category")
-        })
+        return list(
+            {item.get("category") for item in inventory_data if item.get("category")}
+        )
 
 
 class VelocityCalculationService:
@@ -72,7 +72,9 @@ class VelocityCalculationService:
 
     def __init__(self, read_ops):
         self.read_ops = read_ops
-        self.logger = structlog.get_logger().bind(component="velocity_calculation_service")
+        self.logger = structlog.get_logger().bind(
+            component="velocity_calculation_service"
+        )
 
     async def get_bulk_velocity_data(
         self, store_id: str, product_ids: list[str], days: int = 30
@@ -88,16 +90,14 @@ class VelocityCalculationService:
                 store_id=store_id,
                 product_count=len(product_ids),
                 days=days,
-                results_count=len(velocity_data)
+                results_count=len(velocity_data),
             )
 
             return velocity_data
 
         except Exception as e:
             self.logger.error(
-                "Failed to retrieve bulk velocity data",
-                store_id=store_id,
-                error=str(e)
+                "Failed to retrieve bulk velocity data", store_id=store_id, error=str(e)
             )
             return {}
 
@@ -128,16 +128,13 @@ class CategoryWeightService:
             self.logger.debug(
                 "Retrieved bulk category weights",
                 category_count=len(categories),
-                results_count=len(category_weights)
+                results_count=len(category_weights),
             )
 
             return category_weights
 
         except Exception as e:
-            self.logger.error(
-                "Failed to retrieve bulk category weights",
-                error=str(e)
-            )
+            self.logger.error("Failed to retrieve bulk category weights", error=str(e))
             return {}
 
     def get_weights_for_category(
@@ -161,7 +158,7 @@ class InMemoryScoringEngine:
         batch_data: dict[str, Any],
         daily_sales: float,
         category_weights: dict[str, float],
-        store_id: str
+        store_id: str,
     ) -> ScoringResult | None:
         """Score a single batch using in-memory calculations only"""
         try:
@@ -257,7 +254,7 @@ class InMemoryScoringEngine:
         inventory_data: list[dict[str, Any]],
         velocity_data_bulk: dict[str, dict[str, float]],
         category_weights_bulk: dict[str, dict[str, float]],
-        store_id: str
+        store_id: str,
     ) -> tuple[list[ScoringResult], list[str], int]:
         """Score all batches using in-memory calculations"""
         results = []
@@ -267,16 +264,18 @@ class InMemoryScoringEngine:
         self.logger.info(
             "Starting bulk in-memory scoring",
             total_batches=len(inventory_data),
-            store_id=store_id
+            store_id=store_id,
         )
 
         for batch_data in inventory_data:
             try:
                 # Get pre-fetched data
-                daily_sales = velocity_data_bulk.get(
-                    batch_data["product_id"], {}
-                ).get("avg_daily_sales", 1.0)
-                category_weights = category_weights_bulk.get(batch_data.get("category"), {})
+                daily_sales = velocity_data_bulk.get(batch_data["product_id"], {}).get(
+                    "avg_daily_sales", 1.0
+                )
+                category_weights = category_weights_bulk.get(
+                    batch_data.get("category"), {}
+                )
 
                 # Score batch in memory
                 score_result = self.score_batch_in_memory(
@@ -305,7 +304,7 @@ class InMemoryScoringEngine:
             total_batches=len(inventory_data),
             successful=len(results),
             high_priority=high_priority_count,
-            errors=len(errors)
+            errors=len(errors),
         )
 
         return results, errors, high_priority_count

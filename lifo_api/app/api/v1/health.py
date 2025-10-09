@@ -518,7 +518,6 @@ def _assess_cache_performance(metrics_summary: dict[str, Any]) -> str:
         return "excellent"
 
 
-
 @router.get("/multi-store/status")
 async def multi_store_health_status(
     current_user: dict[str, Any] = Depends(get_current_user),
@@ -534,36 +533,36 @@ async def multi_store_health_status(
             "multi_store_status": "operational",
             "services": {
                 "cross_store_analytics": "healthy",
-                "multi_store_alerts": "healthy", 
+                "multi_store_alerts": "healthy",
                 "performance_comparison": "healthy",
-                "aggregated_metrics": "healthy"
+                "aggregated_metrics": "healthy",
             },
             "performance_targets": {
                 "cross_store_query_time": "< 2 seconds",
-                "alert_generation": "< 1 second", 
-                "comparison_analytics": "< 3 seconds"
+                "alert_generation": "< 1 second",
+                "comparison_analytics": "< 3 seconds",
             },
             "mvp_capabilities": [
                 "Cross-store overview dashboard",
-                "Performance comparison between stores", 
+                "Performance comparison between stores",
                 "Aggregated alerts across stores",
-                "Multi-store performance metrics"
+                "Multi-store performance metrics",
             ],
             "deployment_info": {
                 "target_scale": "5-10 stores",
                 "deployment_platform": "Digital Ocean App Platform",
                 "auto_scaling": "1-3 instances",
-                "monitoring": "Built-in health checks"
-            }
+                "monitoring": "Built-in health checks",
+            },
         }
-            
+
         return multi_store_health
-        
+
     except Exception as e:
         logger.error("Multi-store health check failed", error=str(e))
         return {
             "timestamp": datetime.utcnow().isoformat(),
             "multi_store_status": "error",
             "error": str(e),
-            "mvp_note": "Multi-store health monitoring requires proper authentication"
+            "mvp_note": "Multi-store health monitoring requires proper authentication",
         }

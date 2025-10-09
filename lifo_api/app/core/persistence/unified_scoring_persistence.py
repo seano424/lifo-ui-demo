@@ -51,12 +51,12 @@ class UnifiedScoringPersistence:
 
     def __init__(self, session: AsyncSession):
         self.session = session
-        self.logger = structlog.get_logger().bind(component="unified_scoring_persistence")
+        self.logger = structlog.get_logger().bind(
+            component="unified_scoring_persistence"
+        )
 
     async def persist_scoring_results(
-        self,
-        results: list[dict[str, Any]],
-        store_id: str
+        self, results: list[dict[str, Any]], store_id: str
     ) -> dict[str, Any]:
         """
         Persist scoring results using optimal method.
@@ -78,7 +78,7 @@ class UnifiedScoringPersistence:
                 "failed": 0,
                 "processing_time_ms": 0,
                 "method": "none",
-                "errors": []
+                "errors": [],
             }
 
         # CRITICAL FIX: Deduplicate results by batch_id to prevent upsert conflicts
@@ -100,14 +100,14 @@ class UnifiedScoringPersistence:
                 original_count=original_count,
                 deduplicated_count=total_items,
                 duplicates_removed=original_count - total_items,
-                store_id=store_id
+                store_id=store_id,
             )
 
         self.logger.info(
             "Starting unified scoring persistence",
             total_items=total_items,
             store_id=store_id,
-            copy_threshold=self.COPY_THRESHOLD
+            copy_threshold=self.COPY_THRESHOLD,
         )
 
         # Select optimal persistence method based on batch size
@@ -120,9 +120,11 @@ class UnifiedScoringPersistence:
                 self.logger.warning(
                     "COPY method failed, falling back to REST API",
                     total_items=total_items,
-                    copy_error=result.get("errors", ["Unknown error"])[0]
+                    copy_error=result.get("errors", ["Unknown error"])[0],
                 )
-                result = await self._persist_via_rest_chunked(results, store_id, start_time)
+                result = await self._persist_via_rest_chunked(
+                    results, store_id, start_time
+                )
         else:
             # Small batch: Use REST API directly (simpler, sufficient performance)
             result = await self._persist_via_rest_chunked(results, store_id, start_time)
@@ -131,7 +133,9 @@ class UnifiedScoringPersistence:
         result["processing_time_ms"] = round(processing_time_ms, 2)
 
         # Log performance summary
-        items_per_second = total_items / (processing_time_ms / 1000) if processing_time_ms > 0 else 0
+        items_per_second = (
+            total_items / (processing_time_ms / 1000) if processing_time_ms > 0 else 0
+        )
 
         self.logger.info(
             "Unified scoring persistence completed",
@@ -142,8 +146,8 @@ class UnifiedScoringPersistence:
                 "method": result.get("method", "unknown"),
                 "processing_time_ms": result["processing_time_ms"],
                 "items_per_second": round(items_per_second, 1),
-                "success_rate": f"{round(result.get('successful', 0) / total_items * 100, 1)}%"
-            }
+                "success_rate": f"{round(result.get('successful', 0) / total_items * 100, 1)}%",
+            },
         )
 
         # Check performance thresholds and alert
@@ -153,10 +157,7 @@ class UnifiedScoringPersistence:
         return result
 
     async def _persist_via_copy(
-        self,
-        results: list[dict[str, Any]],
-        store_id: str,
-        start_time: float
+        self, results: list[dict[str, Any]], store_id: str, start_time: float
     ) -> dict[str, Any]:
         """
         Persist using PostgreSQL COPY command (60x faster for large batches).
@@ -176,7 +177,7 @@ class UnifiedScoringPersistence:
                 "total_items": len(results),
                 "successful": 0,
                 "failed": len(results),
-                "errors": ["DATABASE_DIRECT_URL not configured"]
+                "errors": ["DATABASE_DIRECT_URL not configured"],
             }
 
         # Clean URL for asyncpg
@@ -193,7 +194,7 @@ class UnifiedScoringPersistence:
             conn = await asyncpg.connect(db_url, timeout=10)
             self.logger.info(
                 "Direct database connection established for COPY",
-                total_items=len(results)
+                total_items=len(results),
             )
         except Exception as e:
             return {
@@ -202,7 +203,7 @@ class UnifiedScoringPersistence:
                 "total_items": len(results),
                 "successful": 0,
                 "failed": len(results),
-                "errors": [f"Connection failed: {str(e)}"]
+                "errors": [f"Connection failed: {str(e)}"],
             }
 
         try:
@@ -240,10 +241,14 @@ class UnifiedScoringPersistence:
                         str(item.get("recommendation", "monitor")),
                         str(item.get("urgency_level", "low")),
                         str(int(item.get("discount_percent", 0))),
-                        str(item.get("reason", "Auto-scored"))[:200].replace("\t", " ").replace("\n", " "),
+                        str(item.get("reason", "Auto-scored"))[:200]
+                        .replace("\t", " ")
+                        .replace("\n", " "),
                         "t" if item.get("ml_enhanced", True) else "f",
                         str(item.get("confidence_level", 0.85)),
-                        item.get("calculated_at", datetime.now(UTC)).isoformat() if hasattr(item.get("calculated_at"), "isoformat") else datetime.now(UTC).isoformat()
+                        item.get("calculated_at", datetime.now(UTC)).isoformat()
+                        if hasattr(item.get("calculated_at"), "isoformat")
+                        else datetime.now(UTC).isoformat(),
                     ]
                     csv_buffer.write("\t".join(row_values) + "\n")
 
@@ -255,13 +260,22 @@ class UnifiedScoringPersistence:
                     staging_table,
                     source=csv_buffer,
                     columns=[
-                        "batch_id", "store_id", "expiry_score", "velocity_score",
-                        "margin_score", "composite_score", "recommendation", "urgency_level",
-                        "discount_percent", "reason", "ml_enhanced", "confidence_level",
-                        "calculated_at"
+                        "batch_id",
+                        "store_id",
+                        "expiry_score",
+                        "velocity_score",
+                        "margin_score",
+                        "composite_score",
+                        "recommendation",
+                        "urgency_level",
+                        "discount_percent",
+                        "reason",
+                        "ml_enhanced",
+                        "confidence_level",
+                        "calculated_at",
                     ],
                     format="text",
-                    delimiter="\t"
+                    delimiter="\t",
                 )
                 copy_time_ms = (time.perf_counter() - copy_start) * 1000
 
@@ -306,7 +320,9 @@ class UnifiedScoringPersistence:
                     rows_affected=rows_affected,
                     copy_time_ms=round(copy_time_ms, 2),
                     insert_time_ms=round(insert_time_ms, 2),
-                    records_per_second=int(len(results) / ((copy_time_ms + insert_time_ms) / 1000))
+                    records_per_second=int(
+                        len(results) / ((copy_time_ms + insert_time_ms) / 1000)
+                    ),
                 )
 
                 await conn.close()
@@ -320,8 +336,8 @@ class UnifiedScoringPersistence:
                     "errors": [],
                     "performance": {
                         "copy_time_ms": round(copy_time_ms, 2),
-                        "insert_time_ms": round(insert_time_ms, 2)
-                    }
+                        "insert_time_ms": round(insert_time_ms, 2),
+                    },
                 }
 
         except Exception as e:
@@ -329,12 +345,12 @@ class UnifiedScoringPersistence:
                 "COPY-based persistence failed",
                 error=str(e),
                 error_type=type(e).__name__,
-                total_items=len(results)
+                total_items=len(results),
             )
 
             try:
                 await conn.close()
-            except:
+            except Exception:
                 pass
 
             return {
@@ -343,14 +359,11 @@ class UnifiedScoringPersistence:
                 "total_items": len(results),
                 "successful": 0,
                 "failed": len(results),
-                "errors": [f"COPY failed: {str(e)}"]
+                "errors": [f"COPY failed: {str(e)}"],
             }
 
     async def _persist_via_rest_chunked(
-        self,
-        results: list[dict[str, Any]],
-        store_id: str,
-        start_time: float
+        self, results: list[dict[str, Any]], store_id: str, start_time: float
     ) -> dict[str, Any]:
         """
         Persist using Supabase REST API with chunking and concurrency.
@@ -366,7 +379,7 @@ class UnifiedScoringPersistence:
             # Create chunks
             chunks = []
             for i in range(0, len(results), self.CHUNK_SIZE):
-                chunk = results[i:i + self.CHUNK_SIZE]
+                chunk = results[i : i + self.CHUNK_SIZE]
                 chunks.append((chunk, i // self.CHUNK_SIZE + 1))
 
             total_chunks = len(chunks)
@@ -376,7 +389,7 @@ class UnifiedScoringPersistence:
                 total_items=len(results),
                 total_chunks=total_chunks,
                 chunk_size=self.CHUNK_SIZE,
-                max_concurrent=self.MAX_CONCURRENT_CHUNKS
+                max_concurrent=self.MAX_CONCURRENT_CHUNKS,
             )
 
             # Process chunks with controlled concurrency
@@ -409,14 +422,22 @@ class UnifiedScoringPersistence:
                     failed += len(chunk)
                     error_msg = f"Chunk {chunk_num}: {str(result)}"
                     errors.append(error_msg)
-                    self.logger.error("Chunk processing exception", chunk_num=chunk_num, error=str(result))
+                    self.logger.error(
+                        "Chunk processing exception",
+                        chunk_num=chunk_num,
+                        error=str(result),
+                    )
                 elif result and result.get("success"):
                     successful += result["processed"]
                 else:
                     failed += len(chunk)
                     if result and result.get("errors"):
                         errors.extend(result["errors"])
-                        self.logger.error("Chunk processing failed", chunk_num=chunk_num, errors=result.get("errors"))
+                        self.logger.error(
+                            "Chunk processing failed",
+                            chunk_num=chunk_num,
+                            errors=result.get("errors"),
+                        )
 
             return {
                 "success": failed == 0,
@@ -428,15 +449,15 @@ class UnifiedScoringPersistence:
                 "performance": {
                     "chunk_size": self.CHUNK_SIZE,
                     "total_chunks": total_chunks,
-                    "max_concurrent": self.MAX_CONCURRENT_CHUNKS
-                }
+                    "max_concurrent": self.MAX_CONCURRENT_CHUNKS,
+                },
             }
 
         except Exception as e:
             self.logger.error(
                 "REST chunked persistence failed",
                 error=str(e),
-                total_items=len(results)
+                total_items=len(results),
             )
 
             return {
@@ -445,7 +466,7 @@ class UnifiedScoringPersistence:
                 "total_items": len(results),
                 "successful": 0,
                 "failed": len(results),
-                "errors": [f"REST API failed: {str(e)}"]
+                "errors": [f"REST API failed: {str(e)}"],
             }
 
     async def _process_rest_chunk(
@@ -454,7 +475,7 @@ class UnifiedScoringPersistence:
         chunk: list[dict],
         chunk_num: int,
         total_chunks: int,
-        store_id: str
+        store_id: str,
     ) -> dict[str, Any]:
         """Process a single chunk via Supabase REST API with retry logic."""
 
@@ -463,38 +484,40 @@ class UnifiedScoringPersistence:
                 # Prepare upsert data
                 upsert_data = []
                 for item in chunk:
-                    upsert_data.append({
-                        "batch_id": str(item["batch_id"]),
-                        "store_id": store_id,
-                        "expiry_score": float(item.get("expiry_score", 0.0)),
-                        "velocity_score": float(item.get("velocity_score", 0.0)),
-                        "margin_score": float(item.get("margin_score", 0.0)),
-                        "composite_score": float(item.get("composite_score", 0.0)),
-                        "recommendation": str(item.get("recommendation", "monitor")),
-                        "urgency_level": str(item.get("urgency_level", "low")),
-                        "discount_percent": int(item.get("discount_percent", 0)),
-                        "reason": str(item.get("reason", "Auto-scored"))[:200],
-                        "ml_enhanced": bool(item.get("ml_enhanced", True)),
-                        "confidence_level": float(item.get("confidence_level", 0.85)),
-                        "calculated_at": (
-                            item.get("calculated_at").isoformat()
-                            if hasattr(item.get("calculated_at"), "isoformat")
-                            else datetime.now(UTC).isoformat()
-                        )
-                    })
+                    upsert_data.append(
+                        {
+                            "batch_id": str(item["batch_id"]),
+                            "store_id": store_id,
+                            "expiry_score": float(item.get("expiry_score", 0.0)),
+                            "velocity_score": float(item.get("velocity_score", 0.0)),
+                            "margin_score": float(item.get("margin_score", 0.0)),
+                            "composite_score": float(item.get("composite_score", 0.0)),
+                            "recommendation": str(
+                                item.get("recommendation", "monitor")
+                            ),
+                            "urgency_level": str(item.get("urgency_level", "low")),
+                            "discount_percent": int(item.get("discount_percent", 0)),
+                            "reason": str(item.get("reason", "Auto-scored"))[:200],
+                            "ml_enhanced": bool(item.get("ml_enhanced", True)),
+                            "confidence_level": float(
+                                item.get("confidence_level", 0.85)
+                            ),
+                            "calculated_at": (
+                                item.get("calculated_at").isoformat()
+                                if hasattr(item.get("calculated_at"), "isoformat")
+                                else datetime.now(UTC).isoformat()
+                            ),
+                        }
+                    )
 
                 # Execute upsert with timeout
                 result = await asyncio.wait_for(
                     self._execute_supabase_upsert(admin_client, upsert_data),
-                    timeout=self.CHUNK_TIMEOUT
+                    timeout=self.CHUNK_TIMEOUT,
                 )
 
                 if result:
-                    return {
-                        "success": True,
-                        "processed": len(chunk),
-                        "errors": []
-                    }
+                    return {"success": True, "processed": len(chunk), "errors": []}
                 else:
                     raise Exception("Upsert returned no result")
 
@@ -506,7 +529,7 @@ class UnifiedScoringPersistence:
                     return {
                         "success": False,
                         "processed": 0,
-                        "errors": [f"Timeout after {self.MAX_RETRIES} attempts"]
+                        "errors": [f"Timeout after {self.MAX_RETRIES} attempts"],
                     }
 
             except Exception as e:
@@ -517,16 +540,14 @@ class UnifiedScoringPersistence:
                     return {
                         "success": False,
                         "processed": 0,
-                        "errors": [f"Failed: {str(e)[:100]}"]
+                        "errors": [f"Failed: {str(e)[:100]}"],
                     }
 
-        return {
-            "success": False,
-            "processed": 0,
-            "errors": ["All retries exhausted"]
-        }
+        return {"success": False, "processed": 0, "errors": ["All retries exhausted"]}
 
-    async def _execute_supabase_upsert(self, admin_client, upsert_data: list[dict]) -> bool:
+    async def _execute_supabase_upsert(
+        self, admin_client, upsert_data: list[dict]
+    ) -> bool:
         """Execute Supabase upsert operation."""
         try:
             result = (
@@ -536,10 +557,12 @@ class UnifiedScoringPersistence:
                 .execute()
             )
 
-            return result and hasattr(result, 'data') and result.data is not None
+            return result and hasattr(result, "data") and result.data is not None
 
         except Exception as e:
-            self.logger.error("Supabase upsert error", error=str(e), error_type=type(e).__name__)
+            self.logger.error(
+                "Supabase upsert error", error=str(e), error_type=type(e).__name__
+            )
             return False
 
 

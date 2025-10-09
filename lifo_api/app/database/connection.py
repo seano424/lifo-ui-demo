@@ -103,7 +103,9 @@ def get_direct_engine():
 
         direct_url = os.getenv("DATABASE_DIRECT_URL")
         if not direct_url:
-            logger.warning("DATABASE_DIRECT_URL not set, falling back to regular engine")
+            logger.warning(
+                "DATABASE_DIRECT_URL not set, falling back to regular engine"
+            )
             return get_engine()
 
         logger.info("Creating direct database engine (bypassing pgBouncer)")
@@ -113,7 +115,9 @@ def get_direct_engine():
             future=True,
             poolclass=NullPool,
             query_cache_size=0,
-            connect_args=_get_pgbouncer_connect_args(timeout=60),  # Longer timeout for bulk ops
+            connect_args=_get_pgbouncer_connect_args(
+                timeout=60
+            ),  # Longer timeout for bulk ops
             execution_options={
                 "compiled_cache": {},
                 "schema_translate_map": None,

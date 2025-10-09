@@ -196,7 +196,9 @@ class ProductScanningService:
 
             # Collect raw text blocks for context
             if not raw_ocr_text and vision_result.raw_text:
-                raw_ocr_text = " | ".join([ocr.text for ocr in vision_result.raw_text[:5]])
+                raw_ocr_text = " | ".join(
+                    [ocr.text for ocr in vision_result.raw_text[:5]]
+                )
 
             return {
                 "expiry_date": expiry_date,
@@ -360,8 +362,10 @@ class ProductScanningService:
                 expiry_metadata = {
                     "context": best_expiry_candidate.get("date_type", "unknown"),
                     "confidence": best_expiry_candidate.get("type_confidence", 0.3)
-                                  * best_expiry_candidate.get("temporal_confidence", 1.0),
-                    "language": best_expiry_candidate.get("detected_language", "unknown"),
+                    * best_expiry_candidate.get("temporal_confidence", 1.0),
+                    "language": best_expiry_candidate.get(
+                        "detected_language", "unknown"
+                    ),
                     "raw_context": best_expiry_candidate.get("raw_text", ""),
                     "source": best_expiry_candidate.get("source", "unknown"),
                 }
@@ -378,7 +382,10 @@ class ProductScanningService:
                     valid_unknown.append(candidate)
 
             if valid_unknown:
-                best_unknown = max(valid_unknown, key=lambda x: (x["date"], x.get("temporal_confidence", 1.0)))
+                best_unknown = max(
+                    valid_unknown,
+                    key=lambda x: (x["date"], x.get("temporal_confidence", 1.0)),
+                )
                 best_expiry = best_unknown["date"]
                 expiry_metadata = {
                     "context": "inferred_from_latest_date",
@@ -817,20 +824,16 @@ class ProductScanningService:
             (r"(\d{1,2})[/\-\.\s]+(\d{1,2})[/\-\.\s]+(\d{4})", "DD/MM/YYYY"),
             (r"(\d{4})[/\-\.\s]+(\d{1,2})[/\-\.\s]+(\d{1,2})", "YYYY/MM/DD"),
             (r"(\d{1,2})[/\-\.\s]+(\d{1,2})[/\-\.\s]+(\d{2})", "DD/MM/YY"),
-
             # CRITICAL: Compact European formats (common on dairy/bakery)
             # Must come before month patterns to avoid false positives
             (r"\b(\d{2})(\d{2})(\d{2})\b(?![/\-\.])", "DDMMYY_COMPACT"),  # 251126
-            (r"\b(\d{4})(\d{2})(\d{2})\b(?![/\-\.])", "YYYYMMDD_ISO"),    # 20241115
-
+            (r"\b(\d{4})(\d{2})(\d{2})\b(?![/\-\.])", "YYYYMMDD_ISO"),  # 20241115
             # European dot format (strict - common in Germany)
             (r"\b(\d{1,2})\.(\d{1,2})\.(\d{2})\b", "DD.MM.YY_STRICT"),
             (r"\b(\d{1,2})\.(\d{1,2})\.(\d{4})\b", "DD.MM.YYYY_STRICT"),
-
             # European month name patterns (e.g., "22NOV2017", "15 DEC 2024")
             (r"(\d{1,2})\s*([A-Za-zÀ-ÿ]{3,9})\s*(\d{4})", "DD MON YYYY"),
             (r"(\d{1,2})\s*([A-Za-zÀ-ÿ]{3,9})\s*(\d{2})", "DD MON YY"),
-
             # Partial date patterns (e.g., "SEP 30", "NOV 15", "DEC 2024")
             (r"([A-Za-zÀ-ÿ]{3,9})\s+(\d{1,2})(?:\s+(\d{4}))?", "MON DD [YYYY]"),
             (r"(\d{1,2})\s+([A-Za-zÀ-ÿ]{3,9})(?:\s+(\d{4}))?", "DD MON [YYYY]"),
@@ -1044,8 +1047,6 @@ class ProductScanningService:
         """
         now = datetime.now()
         current_year = now.year
-        current_month = now.month
-        current_day = now.day
 
         # Try current year first
         try:
@@ -1068,7 +1069,9 @@ class ProductScanningService:
             # Invalid date for current year (e.g., Feb 30), try next year
             return current_year + 1
 
-    def _validate_date_temporal(self, date: datetime, date_purpose: str) -> tuple[bool, float]:
+    def _validate_date_temporal(
+        self, date: datetime, date_purpose: str
+    ) -> tuple[bool, float]:
         """
         Validate if a date is temporally reasonable for its purpose.
         Returns (is_valid, confidence_multiplier)

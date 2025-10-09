@@ -11,10 +11,21 @@ from pathlib import Path
 
 # Use the exact categories that the system recognizes (from UnifiedCSVProcessor)
 SAFE_CATEGORIES = [
-    "fresh_produce", "dairy_eggs", "bakery_fresh", "fresh_meat_fish",
-    "frozen_foods", "deli_prepared", "chilled_packaged", "canned_jarred",
-    "dry_goods", "beverages", "spices_condiments", "pantry_staples",
-    "household_other", "specialty_items", "bulk_items"
+    "fresh_produce",
+    "dairy_eggs",
+    "bakery_fresh",
+    "fresh_meat_fish",
+    "frozen_foods",
+    "deli_prepared",
+    "chilled_packaged",
+    "canned_jarred",
+    "dry_goods",
+    "beverages",
+    "spices_condiments",
+    "pantry_staples",
+    "household_other",
+    "specialty_items",
+    "bulk_items",
 ]
 
 # Simple product names to avoid complexity
@@ -28,13 +39,15 @@ SIMPLE_PRODUCTS = {
     "canned_jarred": ["Tomatoes", "Beans", "Soup", "Sauce", "Oil"],
     "dry_goods": ["Rice", "Pasta", "Flour", "Cereal", "Oats"],
     "pantry_staples": ["Salt", "Sugar", "Spices", "Vanilla", "Honey"],
-    "household_other": ["Soap", "Paper", "Detergent", "Bags", "Cleaner"]
+    "household_other": ["Soap", "Paper", "Detergent", "Bags", "Cleaner"],
 }
+
 
 def generate_unique_sku(run_id: str, category: str, index: int) -> str:
     """Generate unique SKU that won't conflict across runs"""
     category_code = category.upper()[:4]
     return f"{run_id}-{category_code}-{index:04d}"
+
 
 def generate_safe_csv_data(num_rows: int, run_id: str) -> list:
     """Generate CSV data that avoids foreign key constraint errors"""
@@ -59,7 +72,7 @@ def generate_safe_csv_data(num_rows: int, run_id: str) -> list:
             "canned_jarred": random.randint(365, 730),
             "dry_goods": random.randint(180, 545),
             "pantry_staples": random.randint(365, 730),
-            "household_other": random.randint(730, 1095)
+            "household_other": random.randint(730, 1095),
         }.get(category, 90)
 
         expiry_date = (date.today() + timedelta(days=expiry_days)).strftime("%Y-%m-%d")
@@ -76,11 +89,12 @@ def generate_safe_csv_data(num_rows: int, run_id: str) -> list:
             "expiry_date": expiry_date,
             "cost_price": cost_price,
             "selling_price": selling_price,
-            "batch_number": f"BATCH-{run_id}-{i+1:04d}"
+            "batch_number": f"BATCH-{run_id}-{i + 1:04d}",
         }
         data.append(row)
 
     return data
+
 
 def create_safe_csv_file(filename: str, num_rows: int):
     """Create a CSV file that won't cause foreign key errors"""
@@ -92,19 +106,31 @@ def create_safe_csv_file(filename: str, num_rows: int):
     data = generate_safe_csv_data(num_rows, run_id)
 
     # Minimal required headers only
-    headers = ["sku", "product_name", "category", "quantity", "expiry_date", "cost_price", "selling_price", "batch_number"]
+    headers = [
+        "sku",
+        "product_name",
+        "category",
+        "quantity",
+        "expiry_date",
+        "cost_price",
+        "selling_price",
+        "batch_number",
+    ]
 
     filepath = Path("test_data/csv") / filename
-    print (f"Writing to {filepath}...")
+    print(f"Writing to {filepath}...")
 
-    with open(filepath, 'w', newline='', encoding='utf-8') as csvfile:
+    with open(filepath, "w", newline="", encoding="utf-8") as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=headers)
         writer.writeheader()
         writer.writerows(data)
 
     file_size = filepath.stat().st_size
-    print(f"✅ Created {filename} - {num_rows:,} rows - {file_size:,} bytes ({file_size/1024/1024:.1f} MB)")
+    print(
+        f"✅ Created {filename} - {num_rows:,} rows - {file_size:,} bytes ({file_size / 1024 / 1024:.1f} MB)"
+    )
     print(f"   Run ID: {run_id} (ensures unique SKUs)")
+
 
 def main():
     """Generate safe CSV files for testing"""
@@ -126,6 +152,7 @@ def main():
         create_safe_csv_file(filename, num_rows)
         # Small delay to ensure unique run IDs
         import time
+
         time.sleep(0.1)
 
     print("\n✅ All SAFE test files created!")
@@ -139,6 +166,7 @@ def main():
     print('  -H "Authorization: Bearer YOUR_JWT_TOKEN" \\')
     print('  -F "file=@test_data/csv/safe_test_1000.csv" \\')
     print('  -F "store_id=420d140c-2386-4d85-9d0d-a69bbd384276"')
+
 
 if __name__ == "__main__":
     main()

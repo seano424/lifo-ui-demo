@@ -33,40 +33,54 @@ class SecureCSVProcessor:
         """
         try:
             # Use unified CSV service for all processing
-            unified_service = create_unified_csv_service(store_id=store_id, user_id=user_id)
-            
+            unified_service = create_unified_csv_service(
+                store_id=store_id, user_id=user_id
+            )
+
             # Process using validation_only mode
             result = await unified_service.process_csv_upload(
-                file=file,
-                processing_mode="validation_only"
+                file=file, processing_mode="validation_only"
             )
-            
+
             # Transform response to maintain backward compatibility
             if result.get("success"):
                 processing_data = result.get("data", {})
                 validation_data = processing_data.get("validated_rows", [])
-                
+
                 # Legacy format for backward compatibility
                 legacy_result = {
                     "upload_id": result.get("processing_id"),
                     "filename": file.filename,
                     "store_id": store_id,
                     "file_size": 0,  # File size not tracked in new system
-                    "total_rows": result.get("processing_stats", {}).get("total_rows", 0),
+                    "total_rows": result.get("processing_stats", {}).get(
+                        "total_rows", 0
+                    ),
                     "validation": {
-                        "is_valid": result.get("processing_stats", {}).get("error_count", 0) == 0,
-                        "valid_count": result.get("processing_stats", {}).get("processed_rows", 0),
-                        "error_count": result.get("processing_stats", {}).get("error_rows", 0),
-                        "warning_count": result.get("processing_stats", {}).get("warning_rows", 0),
+                        "is_valid": result.get("processing_stats", {}).get(
+                            "error_count", 0
+                        )
+                        == 0,
+                        "valid_count": result.get("processing_stats", {}).get(
+                            "processed_rows", 0
+                        ),
+                        "error_count": result.get("processing_stats", {}).get(
+                            "error_rows", 0
+                        ),
+                        "warning_count": result.get("processing_stats", {}).get(
+                            "warning_rows", 0
+                        ),
                         "valid_rows": validation_data,
                         "errors": result.get("errors", []),
-                        "warnings": result.get("warnings", [])
+                        "warnings": result.get("warnings", []),
                     },
                     "ai_suggestions": processing_data.get("ai_suggestions", {}),
                     "validated_data": validation_data,
-                    "processed_at": result.get("processed_at", datetime.utcnow().isoformat()),
+                    "processed_at": result.get(
+                        "processed_at", datetime.utcnow().isoformat()
+                    ),
                 }
-                
+
                 self.logger.info(
                     "CSV file processed securely using unified service",
                     upload_id=legacy_result["upload_id"],
@@ -75,13 +89,12 @@ class SecureCSVProcessor:
                     valid_rows=legacy_result["validation"]["valid_count"],
                     error_count=legacy_result["validation"]["error_count"],
                 )
-                
+
                 return legacy_result
             else:
                 # Handle error case
                 raise HTTPException(
-                    status_code=400,
-                    detail=result.get("error", "CSV processing failed")
+                    status_code=400, detail=result.get("error", "CSV processing failed")
                 )
 
         except HTTPException:
@@ -101,6 +114,7 @@ class SecureCSVProcessor:
         try:
             # Use unified template generator service
             from app.services.csv import get_csv_template_generator
+
             template_generator = get_csv_template_generator()
             return template_generator.generate_standard_template()
         except ImportError:

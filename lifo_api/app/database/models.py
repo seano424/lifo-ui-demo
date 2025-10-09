@@ -249,8 +249,8 @@ class StoreSettings(Base):
             "force_donation_categories": [],
             "min_margin_for_discount": 5.0,
             "donation_weight_multiplier": 1.0,
-            "social_impact_weight": 0.15
-        }
+            "social_impact_weight": 0.15,
+        },
     )
     critical_threshold: Column[NUMERIC] = Column(NUMERIC(3, 2), default=0.80)
     warning_threshold: Column[NUMERIC] = Column(NUMERIC(3, 2), default=0.60)

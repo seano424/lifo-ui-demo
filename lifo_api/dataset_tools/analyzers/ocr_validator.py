@@ -1,6 +1,7 @@
 """
 OCR validation and test case generation for food packaging images.
 """
+
 import asyncio
 import json
 from pathlib import Path
@@ -10,7 +11,6 @@ import cv2
 import numpy as np
 from datetime import datetime
 import re
-import logging
 
 from ..config import DatasetConfig
 from ..utils import ProgressTracker, extract_language_info, get_logger
@@ -19,6 +19,7 @@ from ..utils import ProgressTracker, extract_language_info, get_logger
 @dataclass
 class OCRTestCase:
     """Individual OCR test case with expected results."""
+
     image_path: str
     test_id: str
     image_name: str
@@ -37,6 +38,7 @@ class OCRTestCase:
 @dataclass
 class OCRValidationSuite:
     """Complete OCR validation test suite."""
+
     suite_name: str
     created_timestamp: str
     total_test_cases: int
@@ -61,7 +63,7 @@ class OCRValidator:
         dataset_path: Path,
         metadata_file: Optional[Path] = None,
         max_test_cases: int = 200,
-        progress_tracker: Optional[ProgressTracker] = None
+        progress_tracker: Optional[ProgressTracker] = None,
     ) -> OCRValidationSuite:
         """
         Create comprehensive OCR validation test suite.
@@ -80,7 +82,7 @@ class OCRValidator:
         # Load metadata if available
         metadata = {}
         if metadata_file and metadata_file.exists():
-            with open(metadata_file, 'r', encoding='utf-8') as f:
+            with open(metadata_file, "r", encoding="utf-8") as f:
                 metadata = json.load(f)
 
         # Find image files
@@ -93,6 +95,7 @@ class OCRValidator:
         if len(image_files) > max_test_cases:
             # Select diverse subset
             import random
+
             random.shuffle(image_files)
             image_files = image_files[:max_test_cases]
 
@@ -100,15 +103,15 @@ class OCRValidator:
         task_name = None
         if progress_tracker:
             task_name = progress_tracker.add_task(
-                "ocr_test_cases",
-                "Creating OCR test cases",
-                total=len(image_files)
+                "ocr_test_cases", "Creating OCR test cases", total=len(image_files)
             )
 
         # Create test cases
         test_case_tasks = []
         for i, image_path in enumerate(image_files):
-            task = self._create_test_case(image_path, f"test_{i:04d}", metadata, progress_tracker, task_name)
+            task = self._create_test_case(
+                image_path, f"test_{i:04d}", metadata, progress_tracker, task_name
+            )
             test_case_tasks.append(task)
 
         # Execute test case creation
@@ -129,13 +132,15 @@ class OCRValidator:
         suite_path = self.config.output_dir / "ocr_validation_suite.json"
         await self._save_validation_suite(suite, suite_path)
 
-        self.logger.info(f"Created OCR validation suite with {len(test_cases)} test cases")
+        self.logger.info(
+            f"Created OCR validation suite with {len(test_cases)} test cases"
+        )
 
         return suite
 
     def _find_image_files(self, dataset_path: Path) -> List[Path]:
         """Find all image files in dataset."""
-        image_extensions = {'.jpg', '.jpeg', '.png', '.webp'}
+        image_extensions = {".jpg", ".jpeg", ".png", ".webp"}
         image_files = []
 
         for ext in image_extensions:
@@ -150,7 +155,7 @@ class OCRValidator:
         test_id: str,
         metadata: Dict[str, Any],
         progress_tracker: Optional[ProgressTracker],
-        task_name: Optional[str]
+        task_name: Optional[str],
     ) -> Optional[OCRTestCase]:
         """Create individual OCR test case."""
         try:
@@ -198,7 +203,7 @@ class OCRValidator:
                 difficulty_level=difficulty,
                 text_regions=text_regions,
                 quality_score=quality_score,
-                notes=f"Auto-generated test case from {image_path.name}"
+                notes=f"Auto-generated test case from {image_path.name}",
             )
 
             if progress_tracker and task_name:
@@ -212,7 +217,9 @@ class OCRValidator:
                 progress_tracker.update(task_name, failed=True)
             return None
 
-    def _detect_text_regions(self, image: np.ndarray) -> List[Tuple[int, int, int, int]]:
+    def _detect_text_regions(
+        self, image: np.ndarray
+    ) -> List[Tuple[int, int, int, int]]:
         """Detect text regions using computer vision techniques."""
         try:
             # Convert to grayscale
@@ -230,7 +237,7 @@ class OCRValidator:
                     x, y, w, h = cv2.boundingRect(region.reshape(-1, 1, 2))
                     if w > 20 and h > 8 and w < image.shape[1] * 0.8:
                         regions.append((x, y, w, h))
-            except:
+            except Exception:
                 pass
 
             # Method 2: Morphological operations
@@ -239,14 +246,21 @@ class OCRValidator:
             eroded = cv2.erode(dilated, kernel, iterations=1)
 
             # Find contours
-            contours, _ = cv2.findContours(eroded, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            contours, _ = cv2.findContours(
+                eroded, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
+            )
 
             for contour in contours:
                 x, y, w, h = cv2.boundingRect(contour)
 
                 # Filter by size and aspect ratio
-                if (w > 15 and h > 10 and w < image.shape[1] * 0.9 and
-                    h < image.shape[0] * 0.3 and 0.1 < h/w < 5.0):
+                if (
+                    w > 15
+                    and h > 10
+                    and w < image.shape[1] * 0.9
+                    and h < image.shape[0] * 0.3
+                    and 0.1 < h / w < 5.0
+                ):
                     regions.append((x, y, w, h))
 
             # Remove overlapping regions
@@ -261,7 +275,9 @@ class OCRValidator:
             self.logger.debug(f"Error detecting text regions: {e}")
             return []
 
-    def _remove_overlapping_regions(self, regions: List[Tuple[int, int, int, int]]) -> List[Tuple[int, int, int, int]]:
+    def _remove_overlapping_regions(
+        self, regions: List[Tuple[int, int, int, int]]
+    ) -> List[Tuple[int, int, int, int]]:
         """Remove overlapping text regions."""
         if not regions:
             return regions
@@ -294,7 +310,9 @@ class OCRValidator:
 
         return filtered
 
-    async def _extract_text_content(self, image: np.ndarray, text_regions: List[Tuple[int, int, int, int]]) -> List[str]:
+    async def _extract_text_content(
+        self, image: np.ndarray, text_regions: List[Tuple[int, int, int, int]]
+    ) -> List[str]:
         """Extract text content from detected regions (placeholder implementation)."""
         # This is a placeholder - in practice, you would use OCR here
         # For now, we'll generate synthetic text based on region characteristics
@@ -320,13 +338,16 @@ class OCRValidator:
             "Made in Germany",
             "250g",
             "Organic",
-            "Gluten Free"
+            "Gluten Free",
         ]
 
         # Add a few synthetic examples based on image characteristics
         if len(text_regions) > 0:
             import random
-            extracted_texts.extend(random.sample(synthetic_examples, min(3, len(synthetic_examples))))
+
+            extracted_texts.extend(
+                random.sample(synthetic_examples, min(3, len(synthetic_examples)))
+            )
 
         return extracted_texts
 
@@ -334,11 +355,11 @@ class OCRValidator:
         """Extract date patterns from text."""
         dates = []
         date_patterns = [
-            r'\b\d{2}[/.]\d{2}[/.]\d{4}\b',  # DD/MM/YYYY or DD.MM.YYYY
-            r'\b\d{4}[/.]\d{2}[/.]\d{2}\b',  # YYYY/MM/DD or YYYY.MM.DD
-            r'\b\d{2}[/.]\d{4}\b',           # MM/YYYY or MM.YYYY
-            r'\bEXP\s+\d{2}[/.]\d{2}[/.]\d{4}\b',  # EXP DD/MM/YYYY
-            r'\bBest before\s+\d{2}[/.]\d{4}\b'    # Best before MM/YYYY
+            r"\b\d{2}[/.]\d{2}[/.]\d{4}\b",  # DD/MM/YYYY or DD.MM.YYYY
+            r"\b\d{4}[/.]\d{2}[/.]\d{2}\b",  # YYYY/MM/DD or YYYY.MM.DD
+            r"\b\d{2}[/.]\d{4}\b",  # MM/YYYY or MM.YYYY
+            r"\bEXP\s+\d{2}[/.]\d{2}[/.]\d{4}\b",  # EXP DD/MM/YYYY
+            r"\bBest before\s+\d{2}[/.]\d{4}\b",  # Best before MM/YYYY
         ]
 
         for text in texts:
@@ -352,11 +373,11 @@ class OCRValidator:
         """Extract barcode/product code patterns from text."""
         barcodes = []
         barcode_patterns = [
-            r'\b\d{13}\b',  # EAN-13
-            r'\b\d{12}\b',  # UPC-A
-            r'\b\d{8}\b',   # EAN-8
-            r'\bL\s*\d{8,}\b',  # Lot numbers
-            r'\b[A-Z]\d{8,}\b'  # Product codes
+            r"\b\d{13}\b",  # EAN-13
+            r"\b\d{12}\b",  # UPC-A
+            r"\b\d{8}\b",  # EAN-8
+            r"\bL\s*\d{8,}\b",  # Lot numbers
+            r"\b[A-Z]\d{8,}\b",  # Product codes
         ]
 
         for text in texts:
@@ -370,7 +391,7 @@ class OCRValidator:
         self,
         image: np.ndarray,
         text_regions: List[Tuple[int, int, int, int]],
-        texts: List[str]
+        texts: List[str],
     ) -> str:
         """Assess OCR difficulty level."""
         difficulty_score = 0
@@ -425,13 +446,15 @@ class OCRValidator:
             brightness_score = 1.0 - abs(brightness - 127.5) / 127.5
 
             # Combined quality score
-            quality = (sharpness * 0.4 + contrast * 0.4 + brightness_score * 0.2)
+            quality = sharpness * 0.4 + contrast * 0.4 + brightness_score * 0.2
             return max(0.0, min(1.0, quality))
 
         except Exception:
             return 0.5  # Default medium quality
 
-    def _create_validation_suite(self, test_cases: List[OCRTestCase]) -> OCRValidationSuite:
+    def _create_validation_suite(
+        self, test_cases: List[OCRTestCase]
+    ) -> OCRValidationSuite:
         """Create validation suite from test cases."""
         # Calculate distributions
         language_dist = {}
@@ -451,11 +474,7 @@ class OCRValidator:
             "min_barcode_detection_accuracy": 0.95,
             "max_false_positive_rate": 0.1,
             "supported_languages": self.config.supported_languages,
-            "quality_thresholds": {
-                "easy": 0.9,
-                "medium": 0.7,
-                "hard": 0.5
-            }
+            "quality_thresholds": {"easy": 0.9, "medium": 0.7, "hard": 0.5},
         }
 
         return OCRValidationSuite(
@@ -465,16 +484,18 @@ class OCRValidator:
             language_distribution=language_dist,
             difficulty_distribution=difficulty_dist,
             test_cases=test_cases,
-            validation_criteria=validation_criteria
+            validation_criteria=validation_criteria,
         )
 
-    async def _save_validation_suite(self, suite: OCRValidationSuite, output_path: Path) -> None:
+    async def _save_validation_suite(
+        self, suite: OCRValidationSuite, output_path: Path
+    ) -> None:
         """Save validation suite to JSON file."""
         output_path.parent.mkdir(parents=True, exist_ok=True)
 
         suite_dict = asdict(suite)
 
-        with open(output_path, 'w', encoding='utf-8') as f:
+        with open(output_path, "w", encoding="utf-8") as f:
             json.dump(suite_dict, f, indent=2, ensure_ascii=False)
 
         self.logger.info(f"OCR validation suite saved to {output_path}")
@@ -500,11 +521,12 @@ class OCRValidator:
             "tests_failed": 0,
             "accuracy_by_difficulty": {},
             "accuracy_by_language": {},
-            "detailed_results": []
+            "detailed_results": [],
         }
 
         # Simulate test results
         import random
+
         for test_case in suite.test_cases:
             # Simulate OCR accuracy based on difficulty
             if test_case.difficulty_level == "easy":
@@ -538,13 +560,23 @@ class OCRValidator:
 
         # Calculate accuracy percentages
         for diff, stats in results["accuracy_by_difficulty"].items():
-            stats["accuracy"] = stats["passed"] / stats["total"] if stats["total"] > 0 else 0
+            stats["accuracy"] = (
+                stats["passed"] / stats["total"] if stats["total"] > 0 else 0
+            )
 
         for lang, stats in results["accuracy_by_language"].items():
-            stats["accuracy"] = stats["passed"] / stats["total"] if stats["total"] > 0 else 0
+            stats["accuracy"] = (
+                stats["passed"] / stats["total"] if stats["total"] > 0 else 0
+            )
 
-        results["overall_accuracy"] = results["tests_passed"] / results["total_tests"] if results["total_tests"] > 0 else 0
+        results["overall_accuracy"] = (
+            results["tests_passed"] / results["total_tests"]
+            if results["total_tests"] > 0
+            else 0
+        )
 
-        self.logger.info(f"Validation completed: {results['overall_accuracy']:.2%} accuracy")
+        self.logger.info(
+            f"Validation completed: {results['overall_accuracy']:.2%} accuracy"
+        )
 
         return results

@@ -6,11 +6,10 @@ Intelligent inventory scoring and waste reduction microservice
 import os
 import time
 import warnings
+from dotenv import load_dotenv
 
 # Suppress Google Cloud libraries' pkg_resources deprecation warnings
 warnings.filterwarnings("ignore", message="pkg_resources is deprecated")
-
-from dotenv import load_dotenv
 
 # CRITICAL: Load environment variables FIRST before any other imports
 # This ensures all modules can access environment variables during import
@@ -222,21 +221,21 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         if settings.enable_automated_scoring:
             try:
                 from app.core.automated_scoring import initialize_automated_scoring
+
                 await initialize_automated_scoring()
                 logger.info(
                     "Automated scoring system initialized successfully",
                     default_cron=settings.default_scoring_cron,
-                    timezone=settings.default_scoring_timezone
+                    timezone=settings.default_scoring_timezone,
                 )
             except Exception as auto_score_error:
                 logger.error(
                     "Failed to initialize automated scoring system",
-                    error=str(auto_score_error)
+                    error=str(auto_score_error),
                 )
                 # Don't fail startup for automated scoring issues
         else:
             logger.info("Automated scoring system disabled in configuration")
-
 
         # Log debug health endpoints availability for production troubleshooting
         debug_endpoints = [
@@ -245,12 +244,12 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
             f"{settings.api_v1_prefix}/debug/middleware-check",
             f"{settings.api_v1_prefix}/debug/environment-status",
             f"{settings.api_v1_prefix}/debug/database-connectivity",
-            f"{settings.api_v1_prefix}/debug/production-troubleshoot"
+            f"{settings.api_v1_prefix}/debug/production-troubleshoot",
         ]
         logger.info(
             "Debug health endpoints available for production troubleshooting",
             endpoints=debug_endpoints,
-            environment=settings.environment
+            environment=settings.environment,
         )
 
         # Validate Google Cloud credentials during startup (helps with deployment debugging)
@@ -263,20 +262,20 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
                 logger.info(
                     "Google Cloud Vision API credentials validated successfully",
                     client_available=True,
-                    credential_method="validated_during_startup"
+                    credential_method="validated_during_startup",
                 )
             else:
                 logger.warning(
                     "Google Cloud Vision API client not available",
                     client_available=False,
-                    note="Vision API features will be disabled"
+                    note="Vision API features will be disabled",
                 )
         except Exception as vision_error:
             logger.error(
                 "Failed to initialize Google Vision service during startup",
                 error=str(vision_error),
                 error_type=type(vision_error).__name__,
-                note="Vision API features will be unavailable"
+                note="Vision API features will be unavailable",
             )
 
     except Exception as e:
@@ -306,6 +305,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     if settings.enable_automated_scoring:
         try:
             from app.core.automated_scoring import shutdown_automated_scoring
+
             await shutdown_automated_scoring()
             logger.info("Automated scoring system shutdown completed")
         except Exception as e:
@@ -314,6 +314,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     # Shutdown bulk operations optimizer connection pool
     try:
         from app.database.bulk_operations_optimized import close_bulk_optimizer
+
         await close_bulk_optimizer()
         logger.info("Bulk operations optimizer shutdown completed")
     except Exception as e:
@@ -364,6 +365,7 @@ class HealthCheckBypassMiddleware(BaseHTTPMiddleware):
     Priority health check bypass middleware for DigitalOcean App Platform
     MUST run before TrustedHostMiddleware and other security middleware
     """
+
     async def dispatch(self, request: Request, call_next: Any) -> Response:
         health_paths = ["/health", "/api/v1/health", "/api/v1/health/", "/v1/health"]
 
@@ -373,14 +375,14 @@ class HealthCheckBypassMiddleware(BaseHTTPMiddleware):
 
             # DigitalOcean internal network patterns or health check user agents
             is_do_health_check = (
-                client_host.startswith("10.244.") or  # DO internal network
-                client_host.startswith("10.") or      # Broader internal network range
-                "kube-probe" in user_agent or
-                "healthcheck" in user_agent or
-                "kube-" in user_agent or             # Kubernetes probes
-                user_agent == "" or                  # Empty user agent (internal calls)
-                client_host == "127.0.0.1" or       # Localhost health checks
-                client_host == "::1"                 # IPv6 localhost
+                client_host.startswith("10.244.")  # DO internal network
+                or client_host.startswith("10.")  # Broader internal network range
+                or "kube-probe" in user_agent
+                or "healthcheck" in user_agent
+                or "kube-" in user_agent  # Kubernetes probes
+                or user_agent == ""  # Empty user agent (internal calls)
+                or client_host == "127.0.0.1"  # Localhost health checks
+                or client_host == "::1"  # IPv6 localhost
             )
 
             # Always log health check attempts for debugging
@@ -389,7 +391,7 @@ class HealthCheckBypassMiddleware(BaseHTTPMiddleware):
                 client_host=client_host,
                 user_agent=user_agent,
                 path=request.url.path,
-                is_do_health_check=is_do_health_check
+                is_do_health_check=is_do_health_check,
             )
 
             if is_do_health_check:
@@ -397,7 +399,7 @@ class HealthCheckBypassMiddleware(BaseHTTPMiddleware):
                     "Health check from DO platform - bypassing all middleware",
                     client_host=client_host,
                     user_agent=user_agent,
-                    path=request.url.path
+                    path=request.url.path,
                 )
 
                 # Return simple health response bypassing all middleware
@@ -406,12 +408,13 @@ class HealthCheckBypassMiddleware(BaseHTTPMiddleware):
                         "status": "healthy",
                         "timestamp": time.time(),
                         "environment": settings.environment,
-                        "bypassed": True
+                        "bypassed": True,
                     },
-                    status_code=200
+                    status_code=200,
                 )
 
         return await call_next(request)
+
 
 app.add_middleware(HealthCheckBypassMiddleware)
 
@@ -457,10 +460,11 @@ app.add_middleware(
 )
 
 
-
 # Health check debugging middleware (for production troubleshooting)
 @app.middleware("http")
-async def health_check_debugging_middleware(request: Request, call_next: Any) -> Response:
+async def health_check_debugging_middleware(
+    request: Request, call_next: Any
+) -> Response:
     """
     Debug health check requests to troubleshoot deployment issues
     """
@@ -479,19 +483,22 @@ async def health_check_debugging_middleware(request: Request, call_next: Any) ->
                 method=request.method,
                 user_agent=user_agent[:100],  # Truncate long user agents
                 headers=dict(request.headers),  # Log all headers for debugging
-                environment=settings.environment
+                environment=settings.environment,
             )
 
     response = await call_next(request)
 
     # Log health check responses in production/staging
-    if request.url.path in health_paths and settings.environment in ["production", "staging"]:
+    if request.url.path in health_paths and settings.environment in [
+        "production",
+        "staging",
+    ]:
         logger.info(
             "Health check response sent",
             status_code=response.status_code,
             path=request.url.path,
             client_host=request.client.host if request.client else "unknown",
-            environment=settings.environment
+            environment=settings.environment,
         )
 
     return response
@@ -764,10 +771,12 @@ async def get_endpoint_error_analysis(endpoint_path: str):
             },
         )
 
+
 @app.get("/api/v1/test")
 @app.get("/v1/test")  # Digital Ocean App Platform compatibility
 async def test_endpoint():
     return {"msg": "Test endpoint works"}
+
 
 if __name__ == "__main__":
     # For development

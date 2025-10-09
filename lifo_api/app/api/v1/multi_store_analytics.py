@@ -36,13 +36,13 @@ async def get_multi_store_overview(
         # Validate authentication
         if current_user is None or "sub" not in current_user:
             raise HTTPException(status_code=401, detail="Authentication required")
-        
+
         if not user_stores:
             return {
                 "user_id": current_user["sub"],
                 "total_stores": 0,
                 "overview": {},
-                "message": "No stores accessible to this user"
+                "message": "No stores accessible to this user",
             }
 
         # Use caching for performance optimization (5-minute cache for MVP)
@@ -52,18 +52,23 @@ async def get_multi_store_overview(
             read_ops = get_read_only_operations(db)
 
             # Process stores concurrently for 10x performance improvement
-            async def fetch_store_analytics(store_id: str) -> tuple[str, dict[str, Any]]:
+            async def fetch_store_analytics(
+                store_id: str,
+            ) -> tuple[str, dict[str, Any]]:
                 try:
                     analytics = await read_ops.get_store_analytics(store_id, days)
                     return store_id, analytics
                 except Exception as e:
-                    logger.warning(f"Failed to get analytics for store {store_id}", error=str(e))
+                    logger.warning(
+                        f"Failed to get analytics for store {store_id}", error=str(e)
+                    )
                     return store_id, {}
 
             # Execute all store queries concurrently
-            store_results = await asyncio.gather(*[
-                fetch_store_analytics(store_id) for store_id in user_stores
-            ], return_exceptions=True)
+            store_results = await asyncio.gather(
+                *[fetch_store_analytics(store_id) for store_id in user_stores],
+                return_exceptions=True,
+            )
 
             # Aggregate data across all user stores
             aggregated_data = {
@@ -73,7 +78,7 @@ async def get_multi_store_overview(
                 "total_expiring_soon": 0,
                 "total_high_priority": 0,
                 "combined_waste_reduction": 0.0,
-                "store_summaries": []
+                "store_summaries": [],
             }
 
             # Process results and aggregate metrics
@@ -89,13 +94,21 @@ async def get_multi_store_overview(
                 inventory_summary = store_analytics.get("inventory_summary", {})
 
                 # Aggregate metrics
-                aggregated_data["total_inventory_items"] += int(inventory_summary.get("total_products", 0))
-                aggregated_data["total_expired"] += int(inventory_summary.get("expired_count", 0))
-                aggregated_data["total_expiring_soon"] += int(inventory_summary.get("expiring_soon_count", 0))
+                aggregated_data["total_inventory_items"] += int(
+                    inventory_summary.get("total_products", 0)
+                )
+                aggregated_data["total_expired"] += int(
+                    inventory_summary.get("expired_count", 0)
+                )
+                aggregated_data["total_expiring_soon"] += int(
+                    inventory_summary.get("expiring_soon_count", 0)
+                )
 
                 # Count high priority batches efficiently
                 actionable_batches = store_analytics.get("actionable_batches", [])
-                high_priority_count = sum(1 for batch in actionable_batches if batch.get("urgency", 0) > 0.7)
+                high_priority_count = sum(
+                    1 for batch in actionable_batches if batch.get("urgency", 0) > 0.7
+                )
                 aggregated_data["total_high_priority"] += high_priority_count
 
                 # Store-specific summary
@@ -105,14 +118,18 @@ async def get_multi_store_overview(
                     "expired_items": inventory_summary.get("expired_count", 0),
                     "expiring_soon": inventory_summary.get("expiring_soon_count", 0),
                     "high_priority_batches": high_priority_count,
-                    "health_score": max(0, 100 - (inventory_summary.get("expired_count", 0) * 10))
+                    "health_score": max(
+                        0, 100 - (inventory_summary.get("expired_count", 0) * 10)
+                    ),
                 }
                 aggregated_data["store_summaries"].append(store_summary)  # type: ignore[attr-defined]
 
             # Calculate overall health metrics
             total_items = int(aggregated_data["total_inventory_items"])
             if total_items > 0:
-                expired_rate = (int(aggregated_data["total_expired"]) / total_items) * 100
+                expired_rate = (
+                    int(aggregated_data["total_expired"]) / total_items
+                ) * 100
                 aggregated_data["overall_health_score"] = max(0, 100 - expired_rate)
             else:
                 aggregated_data["overall_health_score"] = 100
@@ -121,7 +138,7 @@ async def get_multi_store_overview(
                 "user_id": current_user["sub"],
                 "analysis_period": f"{days} days",
                 "aggregated_data": aggregated_data,
-                "generated_at": datetime.now(UTC).isoformat()
+                "generated_at": datetime.now(UTC).isoformat(),
             }
 
         # Get cached or fresh data
@@ -130,14 +147,14 @@ async def get_multi_store_overview(
             operation="overview",
             data_fetcher=fetch_overview_data,
             params=cache_params,
-            ttl_minutes=5  # 5-minute cache for MVP performance
+            ttl_minutes=5,  # 5-minute cache for MVP performance
         )  # type: ignore[no-any-return]
 
         logger.info(
             "Multi-store overview served",
             user_id=current_user["sub"],
             stores_count=len(user_stores),
-            cached=True  # Could be enhanced to track cache hits/misses
+            cached=True,  # Could be enhanced to track cache hits/misses
         )
 
         return result
@@ -146,9 +163,11 @@ async def get_multi_store_overview(
         logger.error(
             "Failed to generate multi-store overview",
             user_id=current_user["sub"],
-            error=str(e)
+            error=str(e),
         )
-        raise HTTPException(status_code=500, detail="Failed to generate multi-store overview") from None
+        raise HTTPException(
+            status_code=500, detail="Failed to generate multi-store overview"
+        ) from None
 
 
 @router.get("/comparison")
@@ -166,12 +185,12 @@ async def get_store_performance_comparison(
         # Validate authentication
         if current_user is None or "sub" not in current_user:
             raise HTTPException(status_code=401, detail="Authentication required")
-        
+
         if not user_stores:
             return {
                 "user_id": current_user["sub"],
                 "comparison": [],
-                "message": "No stores accessible for comparison"
+                "message": "No stores accessible for comparison",
             }
 
         read_ops = get_read_only_operations(db)
@@ -189,10 +208,14 @@ async def get_store_performance_comparison(
                 expiring_soon = inventory_summary.get("expiring_soon_count", 0)
 
                 # Performance scoring
-                waste_score = 0 if total_items == 0 else (1 - (expired_items / total_items)) * 100
-                urgency_score = 100 - min(len(actionable_batches) * 5, 100)  # Fewer urgent batches = better score
+                waste_score = (
+                    0 if total_items == 0 else (1 - (expired_items / total_items)) * 100
+                )
+                urgency_score = 100 - min(
+                    len(actionable_batches) * 5, 100
+                )  # Fewer urgent batches = better score
 
-                overall_score = (waste_score * 0.6 + urgency_score * 0.4)
+                overall_score = waste_score * 0.6 + urgency_score * 0.4
 
                 store_performance = {
                     "store_id": store_id,
@@ -203,19 +226,27 @@ async def get_store_performance_comparison(
                         "actionable_batches": len(actionable_batches),
                         "waste_score": round(waste_score, 1),
                         "urgency_score": round(urgency_score, 1),
-                        "overall_score": round(overall_score, 1)
+                        "overall_score": round(overall_score, 1),
                     },
-                    "performance_tier": "excellent" if overall_score >= 80 else "good" if overall_score >= 60 else "needs_attention"
+                    "performance_tier": "excellent"
+                    if overall_score >= 80
+                    else "good"
+                    if overall_score >= 60
+                    else "needs_attention",
                 }
 
                 store_comparisons.append(store_performance)
 
             except Exception as e:
-                logger.warning(f"Failed to analyze store {store_id} for comparison", error=str(e))
+                logger.warning(
+                    f"Failed to analyze store {store_id} for comparison", error=str(e)
+                )
                 continue
 
         # Sort by overall score (best performing first)
-        store_comparisons.sort(key=lambda x: x["metrics"]["overall_score"], reverse=True)  # type: ignore[index]
+        store_comparisons.sort(
+            key=lambda x: x["metrics"]["overall_score"], reverse=True
+        )  # type: ignore[index]
 
         # Add rankings
         for i, store in enumerate(store_comparisons):
@@ -225,7 +256,7 @@ async def get_store_performance_comparison(
             "Store performance comparison generated",
             user_id=current_user["sub"],
             stores_analyzed=len(store_comparisons),
-            period_days=days
+            period_days=days,
         )
 
         return {
@@ -233,24 +264,34 @@ async def get_store_performance_comparison(
             "analysis_period": f"{days} days",
             "store_comparisons": store_comparisons,
             "summary": {
-                "best_performing": store_comparisons[0]["store_id"] if store_comparisons else None,
-                "needs_attention": [s["store_id"] for s in store_comparisons if s["performance_tier"] == "needs_attention"]
+                "best_performing": store_comparisons[0]["store_id"]
+                if store_comparisons
+                else None,
+                "needs_attention": [
+                    s["store_id"]
+                    for s in store_comparisons
+                    if s["performance_tier"] == "needs_attention"
+                ],
             },
-            "generated_at": datetime.utcnow().isoformat()
+            "generated_at": datetime.utcnow().isoformat(),
         }
 
     except Exception as e:
         logger.error(
             "Failed to generate store performance comparison",
             user_id=current_user["sub"],
-            error=str(e)
+            error=str(e),
         )
-        raise HTTPException(status_code=500, detail="Failed to generate store comparison") from None
+        raise HTTPException(
+            status_code=500, detail="Failed to generate store comparison"
+        ) from None
 
 
 @router.get("/alerts")
 async def get_cross_store_alerts(
-    priority: str = Query("all", description="Alert priority filter (all, high, critical)"),
+    priority: str = Query(
+        "all", description="Alert priority filter (all, high, critical)"
+    ),
     db: AsyncSession = Depends(get_db),
     current_user: dict[str, Any] = Depends(get_current_user),
     user_stores: list[str] = Depends(get_user_stores),
@@ -263,12 +304,12 @@ async def get_cross_store_alerts(
         # Validate authentication
         if current_user is None or "sub" not in current_user:
             raise HTTPException(status_code=401, detail="Authentication required")
-        
+
         if not user_stores:
             return {
                 "user_id": current_user["sub"],
                 "alerts": [],
-                "message": "No stores accessible for alerts monitoring"
+                "message": "No stores accessible for alerts monitoring",
             }
 
         read_ops = get_read_only_operations(db)
@@ -276,7 +317,9 @@ async def get_cross_store_alerts(
 
         for store_id in user_stores:
             try:
-                store_analytics = await read_ops.get_store_analytics(store_id, 7)  # Last 7 days for alerts
+                store_analytics = await read_ops.get_store_analytics(
+                    store_id, 7
+                )  # Last 7 days for alerts
                 inventory_summary = store_analytics.get("inventory_summary", {})
                 actionable_batches = store_analytics.get("actionable_batches", [])
 
@@ -286,35 +329,43 @@ async def get_cross_store_alerts(
                 # Critical: Expired items
                 expired_count = inventory_summary.get("expired_count", 0)
                 if expired_count > 0:
-                    store_alerts.append({
-                        "alert_type": "expired_inventory",
-                        "priority": "critical",
-                        "message": f"{expired_count} expired items require immediate attention",
-                        "count": expired_count,
-                        "action_required": "Remove expired items and review inventory rotation"
-                    })
+                    store_alerts.append(
+                        {
+                            "alert_type": "expired_inventory",
+                            "priority": "critical",
+                            "message": f"{expired_count} expired items require immediate attention",
+                            "count": expired_count,
+                            "action_required": "Remove expired items and review inventory rotation",
+                        }
+                    )
 
                 # High: Items expiring soon
                 expiring_soon = inventory_summary.get("expiring_soon_count", 0)
                 if expiring_soon > 10:  # Threshold for alert
-                    store_alerts.append({
-                        "alert_type": "expiring_soon",
-                        "priority": "high",
-                        "message": f"{expiring_soon} items expiring within 3 days",
-                        "count": expiring_soon,
-                        "action_required": "Apply discounts or promotions to move inventory"
-                    })
+                    store_alerts.append(
+                        {
+                            "alert_type": "expiring_soon",
+                            "priority": "high",
+                            "message": f"{expiring_soon} items expiring within 3 days",
+                            "count": expiring_soon,
+                            "action_required": "Apply discounts or promotions to move inventory",
+                        }
+                    )
 
                 # Medium: High urgency batches
-                high_urgency_batches = [b for b in actionable_batches if b.get("urgency", 0) > 0.8]
+                high_urgency_batches = [
+                    b for b in actionable_batches if b.get("urgency", 0) > 0.8
+                ]
                 if len(high_urgency_batches) > 5:
-                    store_alerts.append({
-                        "alert_type": "high_urgency_batches",
-                        "priority": "medium",
-                        "message": f"{len(high_urgency_batches)} batches require urgent action",
-                        "count": len(high_urgency_batches),
-                        "action_required": "Review AI recommendations for urgent batches"
-                    })
+                    store_alerts.append(
+                        {
+                            "alert_type": "high_urgency_batches",
+                            "priority": "medium",
+                            "message": f"{len(high_urgency_batches)} batches require urgent action",
+                            "count": len(high_urgency_batches),
+                            "action_required": "Review AI recommendations for urgent batches",
+                        }
+                    )
 
                 # Add store context to each alert
                 for alert in store_alerts:
@@ -324,12 +375,16 @@ async def get_cross_store_alerts(
                 all_alerts.extend(store_alerts)
 
             except Exception as e:
-                logger.warning(f"Failed to generate alerts for store {store_id}", error=str(e))
+                logger.warning(
+                    f"Failed to generate alerts for store {store_id}", error=str(e)
+                )
                 continue
 
         # Filter by priority if specified
         if priority != "all":
-            all_alerts = [alert for alert in all_alerts if alert["priority"] == priority]
+            all_alerts = [
+                alert for alert in all_alerts if alert["priority"] == priority
+            ]
 
         # Sort by priority (critical first)
         priority_order = {"critical": 0, "high": 1, "medium": 2, "low": 3}
@@ -339,7 +394,7 @@ async def get_cross_store_alerts(
             "Cross-store alerts generated",
             user_id=current_user["sub"],
             total_alerts=len(all_alerts),
-            priority_filter=priority
+            priority_filter=priority,
         )
 
         return {
@@ -347,20 +402,24 @@ async def get_cross_store_alerts(
             "alerts": all_alerts,
             "summary": {
                 "total_alerts": len(all_alerts),
-                "critical_count": len([a for a in all_alerts if a["priority"] == "critical"]),
+                "critical_count": len(
+                    [a for a in all_alerts if a["priority"] == "critical"]
+                ),
                 "high_count": len([a for a in all_alerts if a["priority"] == "high"]),
-                "stores_with_alerts": len({alert["store_id"] for alert in all_alerts})
+                "stores_with_alerts": len({alert["store_id"] for alert in all_alerts}),
             },
-            "generated_at": datetime.utcnow().isoformat()
+            "generated_at": datetime.utcnow().isoformat(),
         }
 
     except Exception as e:
         logger.error(
             "Failed to generate cross-store alerts",
             user_id=current_user["sub"],
-            error=str(e)
+            error=str(e),
         )
-        raise HTTPException(status_code=500, detail="Failed to generate cross-store alerts") from None
+        raise HTTPException(
+            status_code=500, detail="Failed to generate cross-store alerts"
+        ) from None
 
 
 @router.get("/performance-metrics")
@@ -378,12 +437,12 @@ async def get_multi_store_performance_metrics(
         # Validate authentication
         if current_user is None or "sub" not in current_user:
             raise HTTPException(status_code=401, detail="Authentication required")
-        
+
         if not user_stores:
             return {
                 "user_id": current_user["sub"],
                 "metrics": {},
-                "message": "No stores accessible for performance metrics"
+                "message": "No stores accessible for performance metrics",
             }
 
         read_ops = get_read_only_operations(db)
@@ -402,7 +461,11 @@ async def get_multi_store_performance_metrics(
 
                 # Calculate store-specific metrics
                 store_actions = len(recent_actions)
-                store_successful = sum(1 for action in recent_actions if action.get("effectiveness_score", 0) > 0.5)
+                store_successful = sum(
+                    1
+                    for action in recent_actions
+                    if action.get("effectiveness_score", 0) > 0.5
+                )
                 store_revenue = sum(
                     abs(action.get("new_price", 0) - action.get("original_price", 0))
                     for action in recent_actions
@@ -414,15 +477,21 @@ async def get_multi_store_performance_metrics(
                 successful_actions += store_successful
                 total_revenue_recovered += store_revenue
 
-                store_metrics.append({
-                    "store_id": store_id,
-                    "actions_taken": store_actions,
-                    "success_rate": (store_successful / max(store_actions, 1)) * 100,
-                    "revenue_recovered": store_revenue
-                })
+                store_metrics.append(
+                    {
+                        "store_id": store_id,
+                        "actions_taken": store_actions,
+                        "success_rate": (store_successful / max(store_actions, 1))
+                        * 100,
+                        "revenue_recovered": store_revenue,
+                    }
+                )
 
             except Exception as e:
-                logger.warning(f"Failed to get performance metrics for store {store_id}", error=str(e))
+                logger.warning(
+                    f"Failed to get performance metrics for store {store_id}",
+                    error=str(e),
+                )
                 continue
 
         # Calculate aggregated metrics
@@ -435,31 +504,36 @@ async def get_multi_store_performance_metrics(
                 "total_actions_taken": total_actions_taken,
                 "overall_success_rate": round(overall_success_rate, 1),
                 "total_revenue_recovered": round(total_revenue_recovered, 2),
-                "average_revenue_per_store": round(total_revenue_recovered / max(len(user_stores), 1), 2),
-                "estimated_waste_prevented": round(total_waste_prevented, 2)
+                "average_revenue_per_store": round(
+                    total_revenue_recovered / max(len(user_stores), 1), 2
+                ),
+                "estimated_waste_prevented": round(total_waste_prevented, 2),
             },
             "store_breakdown": store_metrics,
-            "top_performers": sorted(store_metrics, key=lambda x: x["success_rate"], reverse=True)[:3]
+            "top_performers": sorted(
+                store_metrics, key=lambda x: x["success_rate"], reverse=True
+            )[:3],
         }
 
         logger.info(
             "Multi-store performance metrics generated",
             user_id=current_user["sub"],
             stores_analyzed=len(user_stores),
-            total_actions=total_actions_taken
+            total_actions=total_actions_taken,
         )
 
         return {
             "user_id": current_user["sub"],
             "performance_metrics": performance_metrics,
-            "generated_at": datetime.utcnow().isoformat()
+            "generated_at": datetime.utcnow().isoformat(),
         }
 
     except Exception as e:
         logger.error(
             "Failed to generate multi-store performance metrics",
             user_id=current_user["sub"],
-            error=str(e)
+            error=str(e),
         )
-        raise HTTPException(status_code=500, detail="Failed to generate performance metrics") from None
-
+        raise HTTPException(
+            status_code=500, detail="Failed to generate performance metrics"
+        ) from None

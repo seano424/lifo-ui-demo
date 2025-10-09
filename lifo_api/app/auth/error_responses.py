@@ -21,7 +21,7 @@ class StandardAuthErrors:
             detail={
                 "error": "invalid_token",
                 "message": "The provided authentication token is invalid",
-                "code": "AUTH_001"
+                "code": "AUTH_001",
             },
             headers={"WWW-Authenticate": "Bearer"},
         )
@@ -34,7 +34,7 @@ class StandardAuthErrors:
             detail={
                 "error": "token_expired",
                 "message": "The authentication token has expired",
-                "code": "AUTH_002"
+                "code": "AUTH_002",
             },
             headers={"WWW-Authenticate": "Bearer"},
         )
@@ -47,13 +47,15 @@ class StandardAuthErrors:
             detail={
                 "error": "missing_token",
                 "message": "Authentication token is required",
-                "code": "AUTH_003"
+                "code": "AUTH_003",
             },
             headers={"WWW-Authenticate": "Bearer"},
         )
 
     @staticmethod
-    def insufficient_permissions(required_permission: str | None = None) -> HTTPException:
+    def insufficient_permissions(
+        required_permission: str | None = None,
+    ) -> HTTPException:
         """User lacks required permissions"""
         message = "Insufficient permissions to access this resource"
         if required_permission:
@@ -65,8 +67,8 @@ class StandardAuthErrors:
                 "error": "insufficient_permissions",
                 "message": message,
                 "code": "AUTH_004",
-                "required_permission": required_permission
-            }
+                "required_permission": required_permission,
+            },
         )
 
     @staticmethod
@@ -77,8 +79,8 @@ class StandardAuthErrors:
             detail={
                 "error": "auth_service_unavailable",
                 "message": "Authentication service is temporarily unavailable",
-                "code": "AUTH_005"
-            }
+                "code": "AUTH_005",
+            },
         )
 
     @staticmethod
@@ -89,8 +91,8 @@ class StandardAuthErrors:
             detail={
                 "error": "invalid_service_key",
                 "message": "Invalid service role authentication",
-                "code": "AUTH_006"
-            }
+                "code": "AUTH_006",
+            },
         )
 
     @staticmethod
@@ -106,9 +108,9 @@ class StandardAuthErrors:
                 "error": "rate_limit_exceeded",
                 "message": "Too many authentication attempts. Please try again later.",
                 "code": "AUTH_007",
-                "retry_after": retry_after
+                "retry_after": retry_after,
             },
-            headers=headers
+            headers=headers,
         )
 
     @staticmethod
@@ -120,8 +122,8 @@ class StandardAuthErrors:
                 "error": "store_access_denied",
                 "message": f"Access denied to store {store_id}",
                 "code": "AUTH_008",
-                "store_id": store_id
-            }
+                "store_id": store_id,
+            },
         )
 
     @staticmethod
@@ -132,8 +134,8 @@ class StandardAuthErrors:
             detail={
                 "error": "auth_config_error",
                 "message": "Authentication system configuration error",
-                "code": "AUTH_009"
-            }
+                "code": "AUTH_009",
+            },
         )
 
 
@@ -163,10 +165,7 @@ def map_supabase_error(error: Exception) -> HTTPException:
 
 
 def create_auth_error_response(
-    error_type: str,
-    message: str | None = None,
-    status_code: int = 401,
-    **kwargs
+    error_type: str, message: str | None = None, status_code: int = 401, **kwargs
 ) -> dict[str, Any]:
     """
     Create a standardized authentication error response
@@ -184,7 +183,7 @@ def create_auth_error_response(
         "error": error_type,
         "message": message or "Authentication failed",
         "timestamp": "2025-01-15T10:00:00Z",  # Would be actual timestamp in production
-        **kwargs
+        **kwargs,
     }
 
     return response
@@ -200,5 +199,5 @@ AUTH_ERROR_CODES = {
     "AUTH_006": "Invalid service role authentication key",
     "AUTH_007": "Rate limit exceeded for authentication requests",
     "AUTH_008": "Access denied to specified store resource",
-    "AUTH_009": "Authentication system configuration error"
+    "AUTH_009": "Authentication system configuration error",
 }

@@ -47,7 +47,7 @@ class DatabaseHealthMonitor:
                     "Database health check failed - unexpected result",
                     expected=1,
                     actual=test_result,
-                    consecutive_failures=self._consecutive_failures
+                    consecutive_failures=self._consecutive_failures,
                 )
                 return False
 
@@ -65,7 +65,7 @@ class DatabaseHealthMonitor:
                 error=str(e),
                 error_type=error_type,
                 consecutive_failures=self._consecutive_failures,
-                error_counts=self._error_counts
+                error_counts=self._error_counts,
             )
             return False
 
@@ -86,7 +86,7 @@ class DatabaseHealthMonitor:
             "commands ignored until end of transaction block",
             "transaction is aborted",
             "transaction was aborted",
-            "current transaction is aborted, commands ignored"
+            "current transaction is aborted, commands ignored",
         ]
 
         return any(indicator in error_str for indicator in aborted_indicators)
@@ -111,12 +111,14 @@ class DatabaseHealthMonitor:
             "broken pipe",
             "network error",
             "server closed the connection",
-            "connection already closed"
+            "connection already closed",
         ]
 
         return any(indicator in error_str for indicator in connection_indicators)
 
-    async def should_retry_operation(self, error: Exception, retry_count: int, max_retries: int = 3) -> bool:
+    async def should_retry_operation(
+        self, error: Exception, retry_count: int, max_retries: int = 3
+    ) -> bool:
         """
         Determine if an operation should be retried based on the error type
 
@@ -147,7 +149,7 @@ class DatabaseHealthMonitor:
             "timeout expired",
             "temporary failure",
             "could not serialize",
-            "serialization failure"
+            "serialization failure",
         ]
 
         return any(indicator in error_str for indicator in transient_indicators)
@@ -170,15 +172,22 @@ class DatabaseHealthMonitor:
             base_delay = 0.5
 
         # Exponential backoff with jitter
-        delay = base_delay * (2 ** retry_count)
+        delay = base_delay * (2**retry_count)
 
         # Add some randomization to avoid thundering herd
         import random
+
         jitter = random.uniform(0.8, 1.2)
 
         return min(delay * jitter, 5.0)  # Cap at 5 seconds
 
-    async def log_operation_metrics(self, operation: str, success: bool, duration_ms: float, error: Exception | None = None):
+    async def log_operation_metrics(
+        self,
+        operation: str,
+        success: bool,
+        duration_ms: float,
+        error: Exception | None = None,
+    ):
         """
         Log detailed metrics for database operations
 
@@ -193,16 +202,20 @@ class DatabaseHealthMonitor:
             "success": success,
             "duration_ms": round(duration_ms, 2),
             "consecutive_failures": self._consecutive_failures,
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.utcnow().isoformat(),
         }
 
         if error:
-            metrics.update({
-                "error_type": type(error).__name__,
-                "error_message": str(error),
-                "is_transaction_aborted": await self.is_transaction_aborted_error(error),
-                "is_connection_error": await self.is_connection_error(error)
-            })
+            metrics.update(
+                {
+                    "error_type": type(error).__name__,
+                    "error_message": str(error),
+                    "is_transaction_aborted": await self.is_transaction_aborted_error(
+                        error
+                    ),
+                    "is_connection_error": await self.is_connection_error(error),
+                }
+            )
 
         if success:
             self.logger.info("Database operation succeeded", **metrics)
@@ -218,10 +231,12 @@ class DatabaseHealthMonitor:
         """
         return {
             "consecutive_failures": self._consecutive_failures,
-            "last_health_check": self._last_health_check.isoformat() if self._last_health_check else None,
+            "last_health_check": self._last_health_check.isoformat()
+            if self._last_health_check
+            else None,
             "error_counts": self._error_counts.copy(),
             "is_healthy": self._consecutive_failures < 5,
-            "needs_attention": self._consecutive_failures >= 3
+            "needs_attention": self._consecutive_failures >= 3,
         }
 
 
@@ -230,11 +245,7 @@ database_health_monitor = DatabaseHealthMonitor()
 
 
 async def execute_with_retry(
-    operation_name: str,
-    operation_func,
-    max_retries: int = 3,
-    *args,
-    **kwargs
+    operation_name: str, operation_func, max_retries: int = 3, *args, **kwargs
 ) -> tuple[bool, Any, Exception | None]:
     """
     Execute a database operation with automatic retry logic
@@ -281,7 +292,7 @@ async def execute_with_retry(
                     error=str(e),
                     retry_count=retry_count,
                     max_retries=max_retries,
-                    retry_delay=delay
+                    retry_delay=delay,
                 )
 
                 await asyncio.sleep(delay)
@@ -313,7 +324,7 @@ async def create_fresh_session():
     # Since we're using a fresh session from the PgBouncer-compatible factory, it should be healthy
     logger.debug(
         "Created fresh database session with PgBouncer compatibility",
-        session_id=id(session)
+        session_id=id(session),
     )
 
     return session

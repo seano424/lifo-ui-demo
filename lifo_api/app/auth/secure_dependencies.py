@@ -45,8 +45,11 @@ async def get_current_user(
         AuthenticationException: If authentication fails
     """
     import time
+
     start_time = time.time()
-    client_ip = getattr(request.client, 'host', None) if hasattr(request, 'client') else None
+    client_ip = (
+        getattr(request.client, "host", None) if hasattr(request, "client") else None
+    )
 
     try:
         # Use the new API key authentication system
@@ -60,7 +63,7 @@ async def get_current_user(
         record_login_success(
             user_id=user.user_id,
             ip_address=client_ip,
-            response_time_ms=response_time_ms
+            response_time_ms=response_time_ms,
         )
 
         # Log successful authentication (without sensitive data)
@@ -68,7 +71,7 @@ async def get_current_user(
             "User authenticated successfully",
             user_id=user.user_id,
             role=user.role,
-            response_time_ms=response_time_ms
+            response_time_ms=response_time_ms,
         )
 
         return {
@@ -85,8 +88,7 @@ async def get_current_user(
 
         # Record authentication failure
         record_login_failure(
-            ip_address=client_ip,
-            error_code=str(getattr(e, 'status_code', 401))
+            ip_address=client_ip, error_code=str(getattr(e, "status_code", 401))
         )
 
         # Map to standardized error response
@@ -95,10 +97,7 @@ async def get_current_user(
         logger.error("Authentication error", error=str(e))
 
         # Record authentication failure
-        record_login_failure(
-            ip_address=client_ip,
-            error_code="AUTH_009"
-        )
+        record_login_failure(ip_address=client_ip, error_code="AUTH_009")
 
         raise StandardAuthErrors.auth_configuration_error() from e
 
@@ -112,7 +111,9 @@ async def get_optional_user(
     """
     try:
         # Check if Authorization header exists (case-insensitive)
-        authorization = request.headers.get("Authorization") or request.headers.get("authorization")
+        authorization = request.headers.get("Authorization") or request.headers.get(
+            "authorization"
+        )
         if not authorization:
             return None
 
@@ -383,7 +384,7 @@ async def validate_store_access(store_id: str, current_user: dict[str, Any]) -> 
     """
     from app.auth.monitoring import record_suspicious_activity
     from app.database.supabase_service import SupabaseService
-    
+
     # Validate store ID format first (prevent injection)
     try:
         validated_store_id = validate_store_id_format(store_id)
@@ -396,7 +397,7 @@ async def validate_store_access(store_id: str, current_user: dict[str, Any]) -> 
         logger.info(
             "Service role accessing store",
             store_id=validated_store_id,
-            user_role="service_role"
+            user_role="service_role",
         )
         return True
 
@@ -408,11 +409,11 @@ async def validate_store_access(store_id: str, current_user: dict[str, Any]) -> 
 
     # Initialize Supabase service for database queries
     supabase_service = SupabaseService()
-    
+
     try:
         # Use service role client for authorization checks (bypass RLS)
         admin_client = supabase_service.get_admin_client()
-        
+
         # Check 1: Is user the owner of the store?
         store_response = (
             admin_client.schema("business")
@@ -422,43 +423,43 @@ async def validate_store_access(store_id: str, current_user: dict[str, Any]) -> 
             .single()
             .execute()
         )
-        
+
         if not store_response.data:
             # Store doesn't exist - deny access without revealing this
             logger.warning(
                 "Access attempt to non-existent store",
                 store_id=validated_store_id,
-                user_id=user_id
+                user_id=user_id,
             )
             record_suspicious_activity(
                 activity_type="non_existent_store_access",
                 details={"store_id": validated_store_id},
-                user_id=user_id
+                user_id=user_id,
             )
             raise AuthorizationException("Access denied")
-        
+
         store_data = store_response.data
-        
+
         # Check if store is active
         if not store_data.get("is_active", False):
             logger.warning(
                 "Access attempt to inactive store",
                 store_id=validated_store_id,
                 user_id=user_id,
-                store_name=store_data.get("store_name")
+                store_name=store_data.get("store_name"),
             )
             raise AuthorizationException("Store is not active")
-        
+
         # Check if user is the owner
         if str(store_data.get("owner_id")) == str(user_id):
             logger.info(
                 "Store owner accessing their store",
                 store_id=validated_store_id,
                 user_id=user_id,
-                store_name=store_data.get("store_name")
+                store_name=store_data.get("store_name"),
             )
             return True
-        
+
         # Check 2: Is user a member of the store with active access?
         member_response = (
             admin_client.schema("business")
@@ -470,7 +471,7 @@ async def validate_store_access(store_id: str, current_user: dict[str, Any]) -> 
             .single()
             .execute()
         )
-        
+
         if member_response.data:
             member_data = member_response.data
             logger.info(
@@ -478,32 +479,30 @@ async def validate_store_access(store_id: str, current_user: dict[str, Any]) -> 
                 store_id=validated_store_id,
                 user_id=user_id,
                 role_in_store=member_data.get("role_in_store"),
-                store_name=store_data.get("store_name")
+                store_name=store_data.get("store_name"),
             )
             return True
-        
+
         # User has no access to this store
         logger.warning(
             "Unauthorized store access attempt",
             store_id=validated_store_id,
             user_id=user_id,
-            store_name=store_data.get("store_name")
+            store_name=store_data.get("store_name"),
         )
-        
+
         # Record this as a security event
         record_suspicious_activity(
             activity_type="unauthorized_store_access",
             details={
                 "store_id": validated_store_id,
-                "store_name": store_data.get("store_name")
+                "store_name": store_data.get("store_name"),
             },
-            user_id=user_id
+            user_id=user_id,
         )
-        
-        raise AuthorizationException(
-            "You do not have permission to access this store"
-        )
-        
+
+        raise AuthorizationException("You do not have permission to access this store")
+
     except AuthorizationException:
         # Re-raise authorization exceptions
         raise
@@ -513,14 +512,12 @@ async def validate_store_access(store_id: str, current_user: dict[str, Any]) -> 
             "Database error during store access validation",
             store_id=validated_store_id,
             user_id=user_id,
-            error=str(e)
+            error=str(e),
         )
-        
+
         # Fail safe - deny access on any error
         # This follows the principle of least privilege
-        raise AuthorizationException(
-            "Unable to verify store access permissions"
-        ) from e
+        raise AuthorizationException("Unable to verify store access permissions") from e
 
 
 def validate_api_key(api_key: str) -> bool:
@@ -549,11 +546,15 @@ def rate_limit_key_func(request: Request) -> str:
     """
     try:
         # Try to get user ID from JWT token (case-insensitive)
-        auth_header = request.headers.get("Authorization") or request.headers.get("authorization") or ""
+        auth_header = (
+            request.headers.get("Authorization")
+            or request.headers.get("authorization")
+            or ""
+        )
 
         # Ensure header is a string (handle potential bytes issues)
         if isinstance(auth_header, bytes):
-            auth_header = auth_header.decode('utf-8')
+            auth_header = auth_header.decode("utf-8")
 
         if auth_header.startswith("Bearer "):
             token = auth_header[7:]

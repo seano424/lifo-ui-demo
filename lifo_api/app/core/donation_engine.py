@@ -222,9 +222,7 @@ class SimplifiedDonationEngine:
             )
 
             # Return safe fallback recommendation
-            return self._create_simple_fallback_recommendation(
-                batch_data, str(e)
-            )
+            return self._create_simple_fallback_recommendation(batch_data, str(e))
 
     def _determine_simple_action(
         self,
@@ -255,15 +253,9 @@ class SimplifiedDonationEngine:
         donation_config = store_donation_config or {}
         strategy = donation_config.get("strategy", "balanced")
         # Get threshold for donation decisions (currently unused but may be needed)
-        _donation_first_threshold = donation_config.get(
-            "donation_first_threshold", 0.6
-        )
-        force_donation_categories = donation_config.get(
-            "force_donation_categories", []
-        )
-        min_margin_for_discount = donation_config.get(
-            "min_margin_for_discount", 5.0
-        )
+        _donation_first_threshold = donation_config.get("donation_first_threshold", 0.6)
+        force_donation_categories = donation_config.get("force_donation_categories", [])
+        min_margin_for_discount = donation_config.get("min_margin_for_discount", 5.0)
 
         # CRITICAL: Check for bulk quantity vs velocity mismatch
         # More realistic daily sales estimation based on quantity ranges
@@ -293,12 +285,10 @@ class SimplifiedDonationEngine:
 
         # BULK QUANTITY OVERRIDE - If sellout time > expiry time, act
         # Focus on bulk quantities (20+) or medium with severe time pressure
-        is_bulk_quantity = (
-            current_quantity >= 20 or (
-                current_quantity >= 15
-                and days_to_expiry <= 2
-                and sellout_days > days_to_expiry * 2
-            )
+        is_bulk_quantity = current_quantity >= 20 or (
+            current_quantity >= 15
+            and days_to_expiry <= 2
+            and sellout_days > days_to_expiry * 2
         )
         if sellout_days > days_to_expiry and is_bulk_quantity:
             if category in self.donation_suitable_categories:
@@ -313,8 +303,8 @@ class SimplifiedDonationEngine:
                     "factors": [
                         "Bulk quantity mismatch",
                         f"Sellout time: {sellout_days:.0f} days",
-                        f"Expiry time: {days_to_expiry} days"
-                    ]
+                        f"Expiry time: {days_to_expiry} days",
+                    ],
                 }
             elif margin_percent > 30:  # European threshold
                 reasoning = (
@@ -326,8 +316,8 @@ class SimplifiedDonationEngine:
                     "reasoning": reasoning,
                     "factors": [
                         "Bulk quantity with decent margin",
-                        "Accelerated clearance needed"
-                    ]
+                        "Accelerated clearance needed",
+                    ],
                 }
             else:
                 reasoning = (
@@ -339,15 +329,15 @@ class SimplifiedDonationEngine:
                     "reasoning": reasoning,
                     "factors": [
                         "Bulk quantity with low margin",
-                        "Disposal cost avoidance"
-                    ]
+                        "Disposal cost avoidance",
+                    ],
                 }
 
         # Store preference thresholds for donation recommendation (European pilot adjusted)
         donation_thresholds = {
-            "donation_first": 0.4,    # Aggressive donation preference
-            "balanced": 0.6,          # Standard threshold
-            "discount_first": 0.8     # Conservative donation approach
+            "donation_first": 0.4,  # Aggressive donation preference
+            "balanced": 0.6,  # Standard threshold
+            "discount_first": 0.8,  # Conservative donation approach
         }
 
         donation_threshold = donation_thresholds.get(strategy, 0.6)
@@ -369,15 +359,23 @@ class SimplifiedDonationEngine:
                 action = ActionType.DONATE
                 reasoning = "Store policy: forced donation for this category"
                 factors.append("Force donation category")
-            elif ai_score >= donation_threshold and category in self.donation_suitable_categories:
+            elif (
+                ai_score >= donation_threshold
+                and category in self.donation_suitable_categories
+            ):
                 action = ActionType.DONATE
                 reasoning = f"Donation-first approach: AI score {ai_score:.2f} exceeds threshold for {strategy} strategy"
                 factors.append(f"Donation suitable (threshold: {donation_threshold})")
-            elif margin_percent > 40.0:  # European threshold - higher margin needed for discount
+            elif (
+                margin_percent > 40.0
+            ):  # European threshold - higher margin needed for discount
                 action = ActionType.DISCOUNT
                 reasoning = f"High margin ({margin_percent:.1f}%) allows profitable discounting (European threshold)"
                 factors.append("High margin enables discount")
-            elif margin_percent <= european_disposal_threshold and category in self.donation_suitable_categories:
+            elif (
+                margin_percent <= european_disposal_threshold
+                and category in self.donation_suitable_categories
+            ):
                 action = ActionType.DONATE
                 reasoning = f"Margin {margin_percent:.1f}% ≤ {european_disposal_threshold}% - donation avoids European disposal costs"
                 factors.append("European disposal cost avoidance")
@@ -399,11 +397,17 @@ class SimplifiedDonationEngine:
                 action = ActionType.DISCOUNT
                 reasoning = f"High margin ({margin_percent:.1f}%) enables profitable discounting (European threshold)"
                 factors.append("European high margin discount opportunity")
-            elif ai_score >= donation_threshold and category in self.donation_suitable_categories:
+            elif (
+                ai_score >= donation_threshold
+                and category in self.donation_suitable_categories
+            ):
                 action = ActionType.DONATE
                 reasoning = f"Good donation timing with {strategy} strategy (score: {ai_score:.2f})"
                 factors.append("Perfect donation planning window")
-            elif margin_percent <= european_disposal_threshold and category in self.donation_suitable_categories:
+            elif (
+                margin_percent <= european_disposal_threshold
+                and category in self.donation_suitable_categories
+            ):
                 action = ActionType.DONATE
                 reasoning = f"Margin {margin_percent:.1f}% ≤ {european_disposal_threshold}% - donation preferred over unprofitable discount"
                 factors.append("European disposal cost threshold")
@@ -425,11 +429,17 @@ class SimplifiedDonationEngine:
         elif days_to_expiry <= 7:
             # Medium priority (4-7 days) - donation preparation phase
 
-            if strategy == "donation_first" and category in self.donation_suitable_categories:
+            if (
+                strategy == "donation_first"
+                and category in self.donation_suitable_categories
+            ):
                 action = ActionType.DONATE
                 reasoning = "Donation-first store: prepare donation pickup"
                 factors.append("Advance donation planning")
-            elif ai_score >= donation_threshold and category in self.donation_suitable_categories:
+            elif (
+                ai_score >= donation_threshold
+                and category in self.donation_suitable_categories
+            ):
                 action = ActionType.DONATE
                 reasoning = f"AI score ({ai_score:.2f}) exceeds {strategy} threshold with donation-suitable category"
                 factors.append("Good donation opportunity")
@@ -572,9 +582,7 @@ class SimplifiedDonationEngine:
             "urgency_reason": urgency_reason,
         }
 
-    def _get_suitable_recipients(
-        self, category: str
-    ) -> list[DonationRecipientType]:
+    def _get_suitable_recipients(self, category: str) -> list[DonationRecipientType]:
         """Get suitable recipient types for a product category.
 
         Args:
@@ -614,9 +622,7 @@ class SimplifiedDonationEngine:
         return base_recipients
 
     def _create_simple_fallback_recommendation(
-        self,
-        batch_data: dict[str, Any],
-        error: str
+        self, batch_data: dict[str, Any], error: str
     ) -> SimpleActionRecommendation:
         """Create safe fallback recommendation when evaluation fails.
 

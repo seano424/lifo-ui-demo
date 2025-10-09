@@ -5,7 +5,6 @@ Implements sophisticated detection algorithms with checksum validation
 
 import re
 import time
-from typing import Any, Optional
 from dataclasses import dataclass
 
 import structlog
@@ -16,6 +15,7 @@ logger = structlog.get_logger()
 @dataclass
 class BarcodeDetectionResult:
     """Result of barcode detection with validation"""
+
     value: str
     format: str  # 'EAN-13', 'UPC-A', 'EAN-8', 'UPC-E', 'CODE-128'
     confidence: float
@@ -29,6 +29,7 @@ class BarcodeDetectionResult:
 @dataclass
 class BarcodeCandidate:
     """Intermediate barcode candidate for processing"""
+
     text: str
     clean_digits: str
     original_text: str
@@ -53,104 +54,99 @@ class BarcodeDetectionService:
     def __init__(self):
         self.barcode_formats = self._initialize_barcode_formats()
         self.context_indicators = self._initialize_context_indicators()
-        self.confidence_thresholds = {
-            'high': 0.85,
-            'medium': 0.70,
-            'low': 0.50
-        }
+        self.confidence_thresholds = {"high": 0.85, "medium": 0.70, "low": 0.50}
         self.date_exclusion_patterns = self._initialize_date_exclusion_patterns()
 
         logger.info(
             "BarcodeDetectionService initialized",
             supported_formats=list(self.barcode_formats.keys()),
-            context_indicators_count=len(self.context_indicators)
+            context_indicators_count=len(self.context_indicators),
         )
 
     def _initialize_barcode_formats(self) -> dict[str, dict]:
         """Initialize barcode format specifications and validation rules"""
         return {
-            'EAN-13': {
-                'length': 13,
-                'priority': 'very_high',  # Most common in Europe
-                'pattern': r'\b\d{13}\b',
-                'checksum_validator': self._validate_ean13,
-                'common_prefixes': ['4', '5', '6', '7', '8', '9'],  # European prefixes
-                'description': 'European Article Number (13 digits)'
+            "EAN-13": {
+                "length": 13,
+                "priority": "very_high",  # Most common in Europe
+                "pattern": r"\b\d{13}\b",
+                "checksum_validator": self._validate_ean13,
+                "common_prefixes": ["4", "5", "6", "7", "8", "9"],  # European prefixes
+                "description": "European Article Number (13 digits)",
             },
-            'UPC-A': {
-                'length': 12,
-                'priority': 'high',
-                'pattern': r'\b\d{12}\b',
-                'checksum_validator': self._validate_upc_a,
-                'common_prefixes': ['0', '1', '2', '3'],  # North American prefixes
-                'description': 'Universal Product Code A (12 digits)'
+            "UPC-A": {
+                "length": 12,
+                "priority": "high",
+                "pattern": r"\b\d{12}\b",
+                "checksum_validator": self._validate_upc_a,
+                "common_prefixes": ["0", "1", "2", "3"],  # North American prefixes
+                "description": "Universal Product Code A (12 digits)",
             },
-            'EAN-8': {
-                'length': 8,
-                'priority': 'medium',
-                'pattern': r'\b\d{8}\b',
-                'checksum_validator': self._validate_ean8,
-                'common_prefixes': ['2', '3', '4', '5', '6', '7', '8', '9'],
-                'description': 'European Article Number (8 digits)'
+            "EAN-8": {
+                "length": 8,
+                "priority": "medium",
+                "pattern": r"\b\d{8}\b",
+                "checksum_validator": self._validate_ean8,
+                "common_prefixes": ["2", "3", "4", "5", "6", "7", "8", "9"],
+                "description": "European Article Number (8 digits)",
             },
-            'UPC-E': {
-                'length': 6,
-                'priority': 'low',
-                'pattern': r'\b\d{6}\b',
-                'checksum_validator': self._validate_upc_e,
-                'common_prefixes': ['0', '1'],
-                'description': 'Universal Product Code E (6 digits compressed)'
+            "UPC-E": {
+                "length": 6,
+                "priority": "low",
+                "pattern": r"\b\d{6}\b",
+                "checksum_validator": self._validate_upc_e,
+                "common_prefixes": ["0", "1"],
+                "description": "Universal Product Code E (6 digits compressed)",
             },
-            'CODE-128': {
-                'length': None,  # Variable length
-                'priority': 'low',
-                'pattern': r'\b\d{8,14}\b',  # 8-14 digits typical
-                'checksum_validator': self._validate_code128,
-                'common_prefixes': [],
-                'description': 'Code 128 (variable length)'
-            }
+            "CODE-128": {
+                "length": None,  # Variable length
+                "priority": "low",
+                "pattern": r"\b\d{8,14}\b",  # 8-14 digits typical
+                "checksum_validator": self._validate_code128,
+                "common_prefixes": [],
+                "description": "Code 128 (variable length)",
+            },
         }
 
     def _initialize_context_indicators(self) -> dict[str, float]:
         """Initialize context indicators that suggest barcode presence"""
         return {
-            'barcode': 1.0,
-            'ean': 0.9,
-            'upc': 0.9,
-            'gtin': 0.8,
-            'code': 0.7,
-            'article': 0.6,
-            'product': 0.5,
-            'item': 0.5,
-            'ref': 0.4,
-            'numero': 0.4,  # French: number
-            'nummer': 0.4,  # German: number
-            'numero': 0.4,  # Spanish/Italian: number
+            "barcode": 1.0,
+            "ean": 0.9,
+            "upc": 0.9,
+            "gtin": 0.8,
+            "code": 0.7,
+            "article": 0.6,
+            "product": 0.5,
+            "item": 0.5,
+            "ref": 0.4,
+            "numero": 0.4,  # French/Spanish/Italian: number
+            "nummer": 0.4,  # German: number
         }
 
     def _initialize_date_exclusion_patterns(self) -> list[str]:
         """Initialize patterns that indicate date content (to exclude from barcode detection)"""
         return [
             # Date keywords that indicate this is NOT a barcode
-            r'\b(?:exp|expiry|expires?|expiration)\b',
-            r'\b(?:best\s*before|best\s*by|bb)\b',
-            r'\b(?:use\s*by|use\s*before)\b',
-            r'\b(?:sell\s*by|sell\s*before)\b',
-            r'\b(?:display\s*until|display\s*by)\b',
-            r'\b(?:mfg|manufactured|production|prod|made)\b',
+            r"\b(?:exp|expiry|expires?|expiration)\b",
+            r"\b(?:best\s*before|best\s*by|bb)\b",
+            r"\b(?:use\s*by|use\s*before)\b",
+            r"\b(?:sell\s*by|sell\s*before)\b",
+            r"\b(?:display\s*until|display\s*by)\b",
+            r"\b(?:mfg|manufactured|production|prod|made)\b",
             # Non-English date indicators
-            r'\b(?:à\s*consommer|mindestens\s*haltbar|consumir\s*preferentemente)\b',
-            r'\b(?:da\s*consumarsi|vendre\s*avant|verkaufen\s*bis|scade\s*il)\b',
+            r"\b(?:à\s*consommer|mindestens\s*haltbar|consumir\s*preferentemente)\b",
+            r"\b(?:da\s*consumarsi|vendre\s*avant|verkaufen\s*bis|scade\s*il)\b",
             # Date format patterns with context
-            r'\b\d{1,2}[/\-.]\d{1,2}[/\-.]\d{2,4}\b',  # Traditional date formats
-            r'\b\d{4}[/\-.]\d{1,2}[/\-.]\d{1,2}\b',    # ISO-style dates
+            r"\b\d{1,2}[/\-.]\d{1,2}[/\-.]\d{2,4}\b",  # Traditional date formats
+            r"\b\d{4}[/\-.]\d{1,2}[/\-.]\d{1,2}\b",  # ISO-style dates
         ]
 
     async def detect_barcodes_from_text_blocks(
         self,
         text_blocks: list[str],
         bounding_boxes: list[dict] | None = None,
-        region_preference: str = 'EU'
+        region_preference: str = "EU",
     ) -> list[BarcodeDetectionResult]:
         """
         Detect barcodes from OCR text blocks with advanced algorithms
@@ -169,15 +165,17 @@ class BarcodeDetectionService:
         logger.debug(
             "Starting barcode detection",
             text_blocks_count=len(text_blocks),
-            region_preference=region_preference
+            region_preference=region_preference,
         )
 
         # Extract barcode candidates from text blocks
         for i, text_block in enumerate(text_blocks):
             block_candidates = self._extract_candidates_from_block(
                 text_block,
-                bounding_boxes[i] if bounding_boxes and i < len(bounding_boxes) else None,
-                i
+                bounding_boxes[i]
+                if bounding_boxes and i < len(bounding_boxes)
+                else None,
+                i,
             )
             candidates.extend(block_candidates)
 
@@ -191,14 +189,14 @@ class BarcodeDetectionService:
         results.extend(single_block_results)
 
         # 2. Fragmented barcode detection (if no high-confidence single blocks)
-        if not any(r.confidence >= self.confidence_thresholds['high'] for r in results):
+        if not any(r.confidence >= self.confidence_thresholds["high"] for r in results):
             fragmented_results = await self._detect_fragmented_barcodes(
                 candidates, region_preference
             )
             results.extend(fragmented_results)
 
         # 3. Zero-padding enhancement for UPC codes
-        if region_preference in ['US', 'AUTO']:
+        if region_preference in ["US", "AUTO"]:
             padded_results = await self._detect_zero_padded_barcodes(
                 candidates, region_preference
             )
@@ -206,14 +204,19 @@ class BarcodeDetectionService:
 
         # Remove duplicates and validate
         unique_results = self._remove_duplicate_barcodes(results)
-        validated_results = [r for r in unique_results if self._validate_barcode_result(r)]
+        validated_results = [
+            r for r in unique_results if self._validate_barcode_result(r)
+        ]
 
         # Sort by confidence and format priority
-        validated_results.sort(key=lambda x: (
-            self._get_format_priority(x.format, region_preference),
-            x.confidence,
-            x.position_score
-        ), reverse=True)
+        validated_results.sort(
+            key=lambda x: (
+                self._get_format_priority(x.format, region_preference),
+                x.confidence,
+                x.position_score,
+            ),
+            reverse=True,
+        )
 
         processing_time = (time.time() - start_time) * 1000
 
@@ -221,16 +224,13 @@ class BarcodeDetectionService:
             "Barcode detection completed",
             total_results=len(validated_results),
             processing_time_ms=processing_time,
-            region_preference=region_preference
+            region_preference=region_preference,
         )
 
         return validated_results[:3]  # Return top 3 results
 
     def _extract_candidates_from_block(
-        self,
-        text_block: str,
-        bounding_box: dict | None,
-        index: int
+        self, text_block: str, bounding_box: dict | None, index: int
     ) -> list[BarcodeCandidate]:
         """Extract potential barcode candidates from a text block"""
         candidates = []
@@ -239,28 +239,27 @@ class BarcodeDetectionService:
         if self._is_likely_date_context(text_block):
             logger.debug(
                 "Skipping potential date context for barcode detection",
-                text_block=text_block[:50]
+                text_block=text_block[:50],
             )
             return candidates
 
         # Find all numeric sequences
         numeric_patterns = [
-            r'\d{6,}',  # 6 or more consecutive digits
-            r'\d{3,}\s+\d{3,}',  # Digits with spaces
-            r'\d{3,}[-]\d{3,}',  # Digits with hyphens
+            r"\d{6,}",  # 6 or more consecutive digits
+            r"\d{3,}\s+\d{3,}",  # Digits with spaces
+            r"\d{3,}[-]\d{3,}",  # Digits with hyphens
         ]
 
         for pattern in numeric_patterns:
             matches = re.finditer(pattern, text_block)
             for match in matches:
-                clean_digits = re.sub(r'[^\d]', '', match.group())
+                clean_digits = re.sub(r"[^\d]", "", match.group())
                 if len(clean_digits) >= 6:  # Minimum barcode length
-
                     # Additional date exclusion check for the specific match
                     if self._is_likely_date_sequence(match.group(), text_block):
                         logger.debug(
                             "Excluding likely date sequence from barcode candidates",
-                            sequence=match.group()
+                            sequence=match.group(),
                         )
                         continue
 
@@ -272,7 +271,7 @@ class BarcodeDetectionService:
                         original_text=text_block,
                         bounding_box=bounding_box,
                         index=index,
-                        context_score=context_score
+                        context_score=context_score,
                     )
                     candidates.append(candidate)
 
@@ -307,6 +306,7 @@ class BarcodeDetectionService:
         try:
             # Lazy import to avoid circular dependency
             from .date_extraction_service import get_date_extraction_service
+
             date_service = get_date_extraction_service()
             is_date, confidence = date_service.is_likely_date(text)
             return is_date and confidence > 0.6
@@ -317,14 +317,23 @@ class BarcodeDetectionService:
     def _is_likely_date_sequence(self, sequence: str, context: str) -> bool:
         """Check if a specific numeric sequence is likely a date"""
         # Check for date-like patterns in the sequence itself
-        sequence_clean = re.sub(r'[^\d]', '', sequence)
+        sequence_clean = re.sub(r"[^\d]", "", sequence)
 
         # Common date formats that shouldn't be barcodes
         if len(sequence_clean) == 8:  # DDMMYYYY or YYYYMMDD
             # Check if it could be a valid date
             try:
                 # Try YYYYMMDD format
-                if sequence_clean[:4] in ['2019', '2020', '2021', '2022', '2023', '2024', '2025', '2026']:
+                if sequence_clean[:4] in [
+                    "2019",
+                    "2020",
+                    "2021",
+                    "2022",
+                    "2023",
+                    "2024",
+                    "2025",
+                    "2026",
+                ]:
                     month = int(sequence_clean[4:6])
                     day = int(sequence_clean[6:8])
                     if 1 <= month <= 12 and 1 <= day <= 31:
@@ -345,7 +354,15 @@ class BarcodeDetectionService:
                 # Multiple potential date interpretations
                 # If context contains date keywords, more likely to be a date
                 context_lower = context.lower()
-                date_indicators = ['exp', 'expiry', 'best', 'use', 'sell', 'mfg', 'prod']
+                date_indicators = [
+                    "exp",
+                    "expiry",
+                    "best",
+                    "use",
+                    "sell",
+                    "mfg",
+                    "prod",
+                ]
                 if any(indicator in context_lower for indicator in date_indicators):
                     return True
             except (ValueError, IndexError):
@@ -354,9 +371,7 @@ class BarcodeDetectionService:
         return False
 
     async def _detect_single_block_barcodes(
-        self,
-        candidates: list[BarcodeCandidate],
-        region_preference: str
+        self, candidates: list[BarcodeCandidate], region_preference: str
     ) -> list[BarcodeDetectionResult]:
         """Detect barcodes from single text blocks"""
         results = []
@@ -369,23 +384,24 @@ class BarcodeDetectionService:
                 format_info = self.barcode_formats[format_name]
 
                 # Check length match (for fixed-length formats)
-                if format_info['length'] and len(candidate.clean_digits) == format_info['length']:
+                if (
+                    format_info["length"]
+                    and len(candidate.clean_digits) == format_info["length"]
+                ):
                     result = self._create_barcode_result(
-                        candidate,
-                        format_name,
-                        format_info,
-                        'single_block'
+                        candidate, format_name, format_info, "single_block"
                     )
 
-                    if result and result.confidence >= self.confidence_thresholds['low']:
+                    if (
+                        result
+                        and result.confidence >= self.confidence_thresholds["low"]
+                    ):
                         results.append(result)
 
         return results
 
     async def _detect_fragmented_barcodes(
-        self,
-        candidates: list[BarcodeCandidate],
-        region_preference: str
+        self, candidates: list[BarcodeCandidate], region_preference: str
     ) -> list[BarcodeDetectionResult]:
         """Detect barcodes that are split across multiple text blocks"""
         results = []
@@ -393,18 +409,21 @@ class BarcodeDetectionService:
         # Try combining adjacent candidates
         for i, candidate1 in enumerate(candidates):
             if len(candidate1.clean_digits) >= 4:  # First part must be substantial
-
                 # Look for adjacent candidates
                 for j in range(i + 1, min(i + 4, len(candidates))):
                     candidate2 = candidates[j]
 
                     if len(candidate2.clean_digits) >= 2:  # Second part minimum
-                        combined_digits = candidate1.clean_digits + candidate2.clean_digits
+                        combined_digits = (
+                            candidate1.clean_digits + candidate2.clean_digits
+                        )
 
                         # Check if combined length matches any format
                         for format_name, format_info in self.barcode_formats.items():
-                            if format_info['length'] and len(combined_digits) == format_info['length']:
-
+                            if (
+                                format_info["length"]
+                                and len(combined_digits) == format_info["length"]
+                            ):
                                 # Create combined candidate
                                 combined_candidate = BarcodeCandidate(
                                     text=f"{candidate1.text} {candidate2.text}",
@@ -412,17 +431,25 @@ class BarcodeDetectionService:
                                     original_text=f"{candidate1.original_text} {candidate2.original_text}",
                                     bounding_box=candidate1.bounding_box,
                                     index=candidate1.index,
-                                    context_score=(candidate1.context_score + candidate2.context_score) / 2
+                                    context_score=(
+                                        candidate1.context_score
+                                        + candidate2.context_score
+                                    )
+                                    / 2,
                                 )
 
                                 result = self._create_barcode_result(
                                     combined_candidate,
                                     format_name,
                                     format_info,
-                                    'fragmented'
+                                    "fragmented",
                                 )
 
-                                if result and result.confidence >= self.confidence_thresholds['low']:
+                                if (
+                                    result
+                                    and result.confidence
+                                    >= self.confidence_thresholds["low"]
+                                ):
                                     # Reduce confidence for fragmented detection
                                     result.confidence *= 0.85
                                     results.append(result)
@@ -430,9 +457,7 @@ class BarcodeDetectionService:
         return results
 
     async def _detect_zero_padded_barcodes(
-        self,
-        candidates: list[BarcodeCandidate],
-        region_preference: str
+        self, candidates: list[BarcodeCandidate], region_preference: str
     ) -> list[BarcodeDetectionResult]:
         """Detect UPC-A barcodes that need zero padding"""
         results = []
@@ -442,24 +467,21 @@ class BarcodeDetectionService:
             if len(candidate.clean_digits) == 11:
                 padded_digits = "0" + candidate.clean_digits
 
-                upc_a_info = self.barcode_formats['UPC-A']
+                upc_a_info = self.barcode_formats["UPC-A"]
                 padded_candidate = BarcodeCandidate(
                     text=candidate.text,
                     clean_digits=padded_digits,
                     original_text=candidate.original_text,
                     bounding_box=candidate.bounding_box,
                     index=candidate.index,
-                    context_score=candidate.context_score
+                    context_score=candidate.context_score,
                 )
 
                 result = self._create_barcode_result(
-                    padded_candidate,
-                    'UPC-A',
-                    upc_a_info,
-                    'zero_padded'
+                    padded_candidate, "UPC-A", upc_a_info, "zero_padded"
                 )
 
-                if result and result.confidence >= self.confidence_thresholds['low']:
+                if result and result.confidence >= self.confidence_thresholds["low"]:
                     # Slightly reduce confidence for padding
                     result.confidence *= 0.95
                     results.append(result)
@@ -471,12 +493,12 @@ class BarcodeDetectionService:
         candidate: BarcodeCandidate,
         format_name: str,
         format_info: dict,
-        source: str
+        source: str,
     ) -> BarcodeDetectionResult | None:
         """Create a BarcodeDetectionResult from a candidate"""
         try:
             # Validate checksum
-            checksum_valid = format_info['checksum_validator'](candidate.clean_digits)
+            checksum_valid = format_info["checksum_validator"](candidate.clean_digits)
 
             # Calculate confidence score
             confidence = self._calculate_barcode_confidence(
@@ -494,7 +516,7 @@ class BarcodeDetectionService:
                 source=source,
                 raw_text=candidate.text,
                 bounding_box=candidate.bounding_box,
-                position_score=position_score
+                position_score=position_score,
             )
 
         except Exception as e:
@@ -506,7 +528,7 @@ class BarcodeDetectionService:
         candidate: BarcodeCandidate,
         format_info: dict,
         checksum_valid: bool,
-        source: str
+        source: str,
     ) -> float:
         """Calculate confidence score for barcode detection"""
         base_confidence = 0.3
@@ -518,23 +540,18 @@ class BarcodeDetectionService:
             base_confidence -= 0.2
 
         # Format priority boost
-        priority_boost = {
-            'very_high': 0.3,
-            'high': 0.2,
-            'medium': 0.1,
-            'low': 0.05
-        }
-        base_confidence += priority_boost.get(format_info.get('priority', 'low'), 0.05)
+        priority_boost = {"very_high": 0.3, "high": 0.2, "medium": 0.1, "low": 0.05}
+        base_confidence += priority_boost.get(format_info.get("priority", "low"), 0.05)
 
         # Context indicators boost
         base_confidence += candidate.context_score * 0.2
 
         # Source reliability adjustment
         source_multiplier = {
-            'single_block': 1.0,
-            'fragmented': 0.85,
-            'zero_padded': 0.95,
-            'context_enhanced': 0.9
+            "single_block": 1.0,
+            "fragmented": 0.85,
+            "zero_padded": 0.95,
+            "context_enhanced": 0.9,
         }
         base_confidence *= source_multiplier.get(source, 1.0)
 
@@ -562,10 +579,10 @@ class BarcodeDetectionService:
 
         try:
             x, y, width, height = (
-                bounding_box.get('x', 0),
-                bounding_box.get('y', 0),
-                bounding_box.get('width', 0),
-                bounding_box.get('height', 0)
+                bounding_box.get("x", 0),
+                bounding_box.get("y", 0),
+                bounding_box.get("width", 0),
+                bounding_box.get("height", 0),
             )
 
             # Aspect ratio check (barcodes are typically wide)
@@ -594,9 +611,9 @@ class BarcodeDetectionService:
     def _has_consistent_digit_pattern(self, digits: str) -> bool:
         """Check if digits have consistent patterns"""
         # Avoid obviously non-barcode patterns
-        if digits == '0' * len(digits):  # All zeros
+        if digits == "0" * len(digits):  # All zeros
             return False
-        if digits == '1' * len(digits):  # All ones
+        if digits == "1" * len(digits):  # All ones
             return False
         if len(set(digits)) < 3:  # Too few unique digits
             return False
@@ -605,44 +622,36 @@ class BarcodeDetectionService:
 
     def _has_valid_prefix(self, digits: str, format_info: dict) -> bool:
         """Check if barcode has valid prefix for format"""
-        if not digits or not format_info.get('common_prefixes'):
+        if not digits or not format_info.get("common_prefixes"):
             return True  # No specific requirements
 
         first_digit = digits[0]
-        return first_digit in format_info['common_prefixes']
+        return first_digit in format_info["common_prefixes"]
 
     def _get_format_priority(self, format_name: str, region_preference: str) -> int:
         """Get priority score for barcode format"""
-        base_priority = {
-            'EAN-13': 5,
-            'UPC-A': 4,
-            'EAN-8': 3,
-            'UPC-E': 2,
-            'CODE-128': 1
-        }
+        base_priority = {"EAN-13": 5, "UPC-A": 4, "EAN-8": 3, "UPC-E": 2, "CODE-128": 1}
 
         priority = base_priority.get(format_name, 1)
 
         # Regional adjustments
-        if region_preference == 'EU':
-            if format_name.startswith('EAN'):
+        if region_preference == "EU":
+            if format_name.startswith("EAN"):
                 priority += 2
-        elif region_preference == 'US':
-            if format_name.startswith('UPC'):
+        elif region_preference == "US":
+            if format_name.startswith("UPC"):
                 priority += 2
 
         return priority
 
     def _get_format_priority_list(self, region_preference: str) -> list[str]:
         """Get ordered list of formats by priority"""
-        formats = list(self.barcode_formats.keys())
-
-        if region_preference == 'EU':
-            return ['EAN-13', 'EAN-8', 'UPC-A', 'UPC-E', 'CODE-128']
-        elif region_preference == 'US':
-            return ['UPC-A', 'EAN-13', 'UPC-E', 'EAN-8', 'CODE-128']
+        if region_preference == "EU":
+            return ["EAN-13", "EAN-8", "UPC-A", "UPC-E", "CODE-128"]
+        elif region_preference == "US":
+            return ["UPC-A", "EAN-13", "UPC-E", "EAN-8", "CODE-128"]
         else:  # AUTO
-            return ['EAN-13', 'UPC-A', 'EAN-8', 'UPC-E', 'CODE-128']
+            return ["EAN-13", "UPC-A", "EAN-8", "UPC-E", "CODE-128"]
 
     # Checksum validation methods
     def _validate_ean13(self, digits: str) -> bool:
@@ -716,7 +725,9 @@ class BarcodeDetectionService:
         except ValueError:
             return False
 
-    def _remove_duplicate_barcodes(self, results: list[BarcodeDetectionResult]) -> list[BarcodeDetectionResult]:
+    def _remove_duplicate_barcodes(
+        self, results: list[BarcodeDetectionResult]
+    ) -> list[BarcodeDetectionResult]:
         """Remove duplicate barcode detections, keeping highest confidence"""
         if not results:
             return []
@@ -742,7 +753,7 @@ class BarcodeDetectionService:
             return False
 
         # Minimum confidence threshold
-        if result.confidence < self.confidence_thresholds['low']:
+        if result.confidence < self.confidence_thresholds["low"]:
             return False
 
         # Must have valid digits
@@ -751,22 +762,24 @@ class BarcodeDetectionService:
 
         # Format-specific validation
         format_info = self.barcode_formats.get(result.format)
-        if format_info and format_info['length']:
-            if len(result.value) != format_info['length']:
+        if format_info and format_info["length"]:
+            if len(result.value) != format_info["length"]:
                 return False
 
         return True
 
     def is_barcode_likely(self, text: str) -> tuple[bool, float]:
         """Check if text is likely a barcode (complementary to date detection)"""
-        text_clean = re.sub(r'[^\d]', '', text)
+        text_clean = re.sub(r"[^\d]", "", text)
 
         # Must have sufficient digits
         if len(text_clean) < 6:
             return False, 0.0
 
         # Check for date exclusions first
-        if self._is_likely_date_context(text) or self._is_likely_date_sequence(text, text):
+        if self._is_likely_date_context(text) or self._is_likely_date_sequence(
+            text, text
+        ):
             return False, 0.0
 
         confidence = 0.0
@@ -796,6 +809,7 @@ class BarcodeDetectionService:
 
 # Global service instance
 _barcode_detection_service: BarcodeDetectionService | None = None
+
 
 def get_barcode_detection_service() -> BarcodeDetectionService:
     """Get singleton instance of barcode detection service"""
