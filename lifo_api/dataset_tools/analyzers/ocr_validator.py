@@ -94,9 +94,9 @@ class OCRValidator:
         # Limit number of images to process
         if len(image_files) > max_test_cases:
             # Select diverse subset
-            import random
+            import random  # noqa: S311  # Not for cryptographic use - test data selection only
 
-            random.shuffle(image_files)
+            random.shuffle(image_files)  # noqa: S311
             image_files = image_files[:max_test_cases]
 
         # Create progress task
@@ -343,10 +343,10 @@ class OCRValidator:
 
         # Add a few synthetic examples based on image characteristics
         if len(text_regions) > 0:
-            import random
+            import random  # noqa: S311  # Not for cryptographic use - test data generation only
 
             extracted_texts.extend(
-                random.sample(synthetic_examples, min(3, len(synthetic_examples)))
+                random.sample(synthetic_examples, min(3, len(synthetic_examples)))  # noqa: S311
             )
 
         return extracted_texts
@@ -525,7 +525,7 @@ class OCRValidator:
         }
 
         # Simulate test results
-        import random
+        import random  # noqa: S311  # Not for cryptographic use - test simulation only
 
         for test_case in suite.test_cases:
             # Simulate OCR accuracy based on difficulty
@@ -536,7 +536,7 @@ class OCRValidator:
             else:
                 success_prob = 0.5
 
-            passed = random.random() < success_prob
+            passed = random.random() < success_prob  # noqa: S311
             if passed:
                 results["tests_passed"] += 1
             else:

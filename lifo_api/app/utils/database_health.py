@@ -177,7 +177,7 @@ class DatabaseHealthMonitor:
         # Add some randomization to avoid thundering herd
         import random
 
-        jitter = random.uniform(0.8, 1.2)
+        jitter = random.uniform(0.8, 1.2)  # noqa: S311  # Not for cryptographic use - retry jitter only
 
         return min(delay * jitter, 5.0)  # Cap at 5 seconds
 

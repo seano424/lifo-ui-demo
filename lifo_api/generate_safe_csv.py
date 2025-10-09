@@ -5,7 +5,7 @@ Creates unique SKUs and uses proper categories for each run
 """
 
 import csv
-import random
+import random  # noqa: S311  # Not for cryptographic use - test data generation only
 from datetime import date, datetime, timedelta
 from pathlib import Path
 
@@ -54,38 +54,38 @@ def generate_safe_csv_data(num_rows: int, run_id: str) -> list:
     data = []
 
     for i in range(num_rows):
-        category = random.choice(SAFE_CATEGORIES)
+        category = random.choice(SAFE_CATEGORIES)  # noqa: S311
         product_names = SIMPLE_PRODUCTS.get(category, ["Generic Item"])
-        base_name = random.choice(product_names)
+        base_name = random.choice(product_names)  # noqa: S311
 
         # Generate unique timestamps to avoid duplicates
         now = datetime.now()
         now += timedelta(microseconds=i)
 
         expiry_days = {
-            "fresh_produce": random.randint(3, 14),
-            "fresh_meat_fish": random.randint(2, 10),
-            "dairy_eggs": random.randint(5, 21),
-            "bakery_fresh": random.randint(2, 7),
-            "frozen_foods": random.randint(60, 365),
-            "beverages": random.randint(30, 180),
-            "canned_jarred": random.randint(365, 730),
-            "dry_goods": random.randint(180, 545),
-            "pantry_staples": random.randint(365, 730),
-            "household_other": random.randint(730, 1095),
+            "fresh_produce": random.randint(3, 14),  # noqa: S311
+            "fresh_meat_fish": random.randint(2, 10),  # noqa: S311
+            "dairy_eggs": random.randint(5, 21),  # noqa: S311
+            "bakery_fresh": random.randint(2, 7),  # noqa: S311
+            "frozen_foods": random.randint(60, 365),  # noqa: S311
+            "beverages": random.randint(30, 180),  # noqa: S311
+            "canned_jarred": random.randint(365, 730),  # noqa: S311
+            "dry_goods": random.randint(180, 545),  # noqa: S311
+            "pantry_staples": random.randint(365, 730),  # noqa: S311
+            "household_other": random.randint(730, 1095),  # noqa: S311
         }.get(category, 90)
 
         expiry_date = (date.today() + timedelta(days=expiry_days)).strftime("%Y-%m-%d")
 
         # Simple pricing
-        cost_price = round(random.uniform(1.0, 20.0), 2)
-        selling_price = round(cost_price * random.uniform(1.3, 1.8), 2)
+        cost_price = round(random.uniform(1.0, 20.0), 2)  # noqa: S311
+        selling_price = round(cost_price * random.uniform(1.3, 1.8), 2)  # noqa: S311
 
         row = {
             "sku": generate_unique_sku(run_id, category, i + 1),
-            "product_name": f"{base_name} {random.choice(['Regular', 'Premium', 'Organic'])}",
+            "product_name": f"{base_name} {random.choice(['Regular', 'Premium', 'Organic'])}",  # noqa: S311
             "category": category,
-            "quantity": random.randint(5, 100),
+            "quantity": random.randint(5, 100),  # noqa: S311
             "expiry_date": expiry_date,
             "cost_price": cost_price,
             "selling_price": selling_price,
