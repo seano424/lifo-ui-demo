@@ -1,0 +1,43 @@
+{
+  "ocrFrameQuality": {
+    "textDetected": "Text detected",
+    "datePattern": "Date pattern",
+    "lighting": "Good lighting",
+    "focus": "In focus",
+    "contrast": "Good contrast",
+    "quality": "Quality",
+    "readyToScan": "📸 Scanning...",
+    "hintMoveCloser": "Move closer to text",
+    "hintMoreLight": "Need more light",
+    "hintTooLight": "Too bright, adjust angle",
+    "hintHoldSteady": "Hold steady to focus",
+    "hintFindDate": "Point at expiry date",
+    "hintImproveAngle": "Adjust angle for clarity",
+    "hintPositioning": "Keep positioning..."
+  },
+  "scanningCamera": {
+    "titles": {
+      "scanProduct": "Scan Product",
+      "scanExpiryDate": "Scan Expiry Date"
+    },
+    "subtitles": {
+      "pointAtBarcode": "Point camera at barcode",
+      "pointAtExpiryDate": "Point camera at expiry date"
+    },
+    "permissions": {
+      "barcodeRequired": "Camera access required for barcode scanning",
+      "expiryRequired": "Camera access required for expiry date scanning"
+    },
+    "buttons": {
+      "processingOCR": "Processing...",
+      "captureExpiryDate": "Capture Expiry Date",
+      "clearError": "Clear",
+      "manualEntry": "Manual Entry"
+    },
+    "alerts": {
+      "serviceUnavailable": "OCR service temporarily unavailable. Please use manual entry.",
+      "ocrError": "Error: {error}",
+      "backendUnavailable": "Backend service is not responding"
+    }
+  }
+}
