@@ -14,6 +14,7 @@ logger = structlog.get_logger()
 
 class Environment(str, Enum):
     """Available environments"""
+
     DEVELOPMENT = "development"
     STAGING = "staging"
     PRODUCTION = "production"
@@ -38,7 +39,9 @@ class EnvironmentConfig:
         elif env_var in ["prod", "production"]:
             return Environment.PRODUCTION
         else:
-            logger.warning(f"Unknown environment '{env_var}', defaulting to development")
+            logger.warning(
+                f"Unknown environment '{env_var}', defaulting to development"
+            )
             return Environment.DEVELOPMENT
 
     @property
@@ -135,24 +138,25 @@ class EnvironmentConfig:
         if self.is_production:
             # Production should have specific domains only
             default_origins = os.getenv(
-                "BACKEND_CORS_ORIGINS",
-                "https://yourdomain.com"
+                "BACKEND_CORS_ORIGINS", "https://yourdomain.com"
             )
         elif self.is_staging:
             # Staging can be more permissive for testing
             default_origins = os.getenv(
                 "BACKEND_CORS_ORIGINS",
-                "http://localhost:3000,http://localhost:3001,https://staging-domain.com,https://preview-*.vercel.app"
+                "http://localhost:3000,http://localhost:3001,https://staging-domain.com,https://preview-*.vercel.app",
             )
         else:  # development
             # Development allows localhost
             default_origins = os.getenv(
                 "BACKEND_CORS_ORIGINS",
-                "http://localhost:3000,http://localhost:3001,http://127.0.0.1:3000"
+                "http://localhost:3000,http://localhost:3001,http://127.0.0.1:3000",
             )
 
         return {
-            "allow_origins": default_origins.split(",") if isinstance(default_origins, str) else default_origins,
+            "allow_origins": default_origins.split(",")
+            if isinstance(default_origins, str)
+            else default_origins,
             "allow_credentials": True,
             "allow_methods": ["*"],
             "allow_headers": ["*"],
@@ -170,16 +174,20 @@ class EnvironmentConfig:
         }
 
         if self.is_development:
-            base_flags.update({
-                "enable_test_endpoints": True,
-                "enable_debug_routes": True,
-                "enable_experimental_features": True,
-            })
+            base_flags.update(
+                {
+                    "enable_test_endpoints": True,
+                    "enable_debug_routes": True,
+                    "enable_experimental_features": True,
+                }
+            )
         elif self.is_staging:
-            base_flags.update({
-                "enable_test_endpoints": True,
-                "enable_experimental_features": True,
-            })
+            base_flags.update(
+                {
+                    "enable_test_endpoints": True,
+                    "enable_experimental_features": True,
+                }
+            )
         # Production keeps the base flags (most restrictive)
 
         # Allow override from environment variables
@@ -210,9 +218,11 @@ class EnvironmentConfig:
 
     def should_seed_test_data(self) -> bool:
         """Check if test data should be seeded"""
-        return (
-            self.is_staging and
-            os.getenv("SEED_TEST_DATA", "false").lower() in ("true", "1", "yes", "on")
+        return self.is_staging and os.getenv("SEED_TEST_DATA", "false").lower() in (
+            "true",
+            "1",
+            "yes",
+            "on",
         )
 
     def get_app_info(self) -> dict[str, Any]:
@@ -229,18 +239,23 @@ class EnvironmentConfig:
 # Global instance
 env_config = EnvironmentConfig()
 
+
 # Convenience functions
 def is_development() -> bool:
     return env_config.is_development
 
+
 def is_staging() -> bool:
     return env_config.is_staging
+
 
 def is_production() -> bool:
     return env_config.is_production
 
+
 def is_deployed() -> bool:
     return env_config.is_deployed
+
 
 def get_current_environment() -> Environment:
     return env_config.current_env

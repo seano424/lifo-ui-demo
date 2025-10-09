@@ -28,6 +28,7 @@ import {
   useScanningStep,
 } from '@/lib/stores/scanning-workflow-store'
 import { useStoreState } from '@/lib/stores/store-context'
+import { logger } from '@/lib/utils/logger'
 // Import shared components
 import {
   InventoryForm,
@@ -74,6 +75,7 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
   const [scannedItems, setScannedItems] = useState<ScannedItem[]>([])
   const [lookupBarcode, setLookupBarcode] = useState<string | null>(null)
   const [ocrError, setOcrError] = useState<string | null>(null)
+  const [detectedText, setDetectedText] = useState<string | null>(null)
 
   // Form data
   const [inventoryData, setInventoryData] = useState<InventoryFormData>({
@@ -176,39 +178,138 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
 
   // Handle OCR capture
   const handleOCRCapture = async () => {
+    logger.log('StandaloneScanningInterface', 'handleOCRCapture called', {
+      hasActiveStore: !!activeStore,
+      storeId: activeStore?.store_id,
+      currentStep,
+      uiStep,
+    })
+
     if (!activeStore?.store_id) {
+      logger.error('StandaloneScanningInterface', 'No active store selected for OCR')
       workflowActions.setError('No active store selected')
       return
     }
 
     setOcrError(null)
     workflowActions.setExpiryDateProcessing(true)
+    logger.log('StandaloneScanningInterface', 'OCR processing started')
 
     try {
+      // Find video element
+      logger.log('StandaloneScanningInterface', 'Looking for video element in DOM')
       const videoElement = document.querySelector('video') as HTMLVideoElement
-      if (!videoElement || videoElement.readyState !== videoElement.HAVE_ENOUGH_DATA) {
-        throw new Error('Camera not ready')
+
+      if (!videoElement) {
+        logger.error('StandaloneScanningInterface', 'Video element not found in DOM')
+        throw new Error('Camera not ready - video element not found')
       }
 
+      logger.log('StandaloneScanningInterface', 'Video element found', {
+        readyState: videoElement.readyState,
+        HAVE_ENOUGH_DATA: videoElement.HAVE_ENOUGH_DATA,
+        videoWidth: videoElement.videoWidth,
+        videoHeight: videoElement.videoHeight,
+      })
+
+      if (videoElement.readyState !== videoElement.HAVE_ENOUGH_DATA) {
+        logger.error('StandaloneScanningInterface', 'Video element not ready', {
+          readyState: videoElement.readyState,
+          expected: videoElement.HAVE_ENOUGH_DATA,
+        })
+        throw new Error('Camera not ready - insufficient data')
+      }
+
+      // Capture image from video
+      logger.log('StandaloneScanningInterface', 'Capturing image from video...')
       const imageBlob = await captureImageFromVideo(videoElement)
-      const result = await processExpiryDate(imageBlob, activeStore.store_id, {
-        confidenceThreshold: 0.65,
+      logger.log('StandaloneScanningInterface', 'Image captured successfully', {
+        blobSize: imageBlob.size,
+        blobType: imageBlob.type,
+      })
+
+      // Process expiry date
+      logger.log('StandaloneScanningInterface', 'Processing expiry date with OCR', {
+        storeId: activeStore.store_id,
+        confidenceThreshold: 0.5,
         maxProcessingTimeMs: 5000,
       })
 
+      const result = await processExpiryDate(imageBlob, activeStore.store_id, {
+        confidenceThreshold: 0.5, // Lowered from 0.65 to 0.5 to catch more date candidates
+        maxProcessingTimeMs: 5000,
+      })
+
+      logger.log('StandaloneScanningInterface', 'OCR processing completed', {
+        success: result.success,
+        hasExpiryDateInfo: !!result.expiryDateInfo,
+        extractedDate: result.expiryDateInfo?.extractedDate,
+        confidence: result.expiryDateInfo?.confidence,
+        rawOcrText: result.expiryDateInfo?.rawOcrText,
+        fallbackToManual: result.fallbackToManual,
+        errorMessage: result.error?.message,
+        detectedText,
+      })
+
       if (result.success && result.expiryDateInfo) {
+        logger.log('StandaloneScanningInterface', 'Setting expiry date result in workflow', {
+          extractedDate: result.expiryDateInfo.extractedDate,
+          confidence: result.expiryDateInfo.confidence,
+          detectedText,
+        })
+
         workflowActions.setExpiryDateResult(result.expiryDateInfo)
+
         if (result.expiryDateInfo.extractedDate) {
+          // Date was successfully extracted!
           const formattedDate = result.expiryDateInfo.extractedDate.split('T')[0]
+          logger.log('StandaloneScanningInterface', 'Formatted expiry date', {
+            original: result.expiryDateInfo.extractedDate,
+            formatted: formattedDate,
+          })
           setInventoryData(prev => ({ ...prev, expiryDate: formattedDate }))
+          setDetectedText(null)
+          setOcrError(null)
+        } else if (
+          result.expiryDateInfo.rawOcrText &&
+          result.expiryDateInfo.rawOcrText !== 'OCR processing completed'
+        ) {
+          // Text was detected but no date pattern found
+          logger.warn(
+            'StandaloneScanningInterface',
+            'OCR detected text but no date pattern found',
+            {
+              detectedText: result.expiryDateInfo.rawOcrText,
+              suggestion:
+                'Try to include the full date in the camera view (e.g., "BEST IF 12/25/2025")',
+            },
+          )
+          setDetectedText(result.expiryDateInfo.rawOcrText)
+          setOcrError(
+            `Detected text: "${result.expiryDateInfo.rawOcrText}" - but no date found. Try showing the full date.`,
+          )
+        } else {
+          // No text detected at all
+          setDetectedText(null)
+          setOcrError('No text detected in image. Try improving lighting or getting closer.')
         }
-        setOcrError(null)
       } else {
-        setOcrError(result.error?.message || 'OCR processing failed')
+        const errorMsg = result.error?.message || 'OCR processing failed'
+        logger.error('StandaloneScanningInterface', 'OCR processing failed', {
+          errorMessage: errorMsg,
+          errorType: result.error?.type,
+          fallbackToManual: result.fallbackToManual,
+        })
+        setOcrError(errorMsg)
         workflowActions.setExpiryDateProcessing(false)
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to capture image'
+      logger.error('StandaloneScanningInterface', 'OCR capture exception', {
+        error: errorMessage,
+        errorType: error instanceof Error ? error.constructor.name : typeof error,
+        stack: error instanceof Error ? error.stack : undefined,
+      })
       setOcrError(errorMessage)
       workflowActions.setError(errorMessage)
       workflowActions.setExpiryDateProcessing(false)
@@ -357,7 +458,9 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
                 <Alert variant="destructive">
                   <AlertCircle className="h-4 w-4" />
                   <AlertDescription>
-                    {t('lookupErrors.lookupFailed', { error: lookupError.message })}
+                    {t('lookupErrors.lookupFailed', {
+                      error: lookupError.message,
+                    })}
                   </AlertDescription>
                 </Alert>
               )}
@@ -463,7 +566,9 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
           {scannedItems.length > 0 && uiStep === 'camera-barcode' && (
             <Alert className="font-mono flex items-center justify-center border-none">
               <AlertDescription>
-                {t('inventory.addedToList', { productName: scannedItems[0].productName })}
+                {t('inventory.addedToList', {
+                  productName: scannedItems[0].productName,
+                })}
               </AlertDescription>
             </Alert>
           )}
@@ -489,7 +594,9 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
             }
             showPrimaryAction={scannedItems.length > 0}
             onPrimaryAction={handleFinalSubmission}
-            primaryActionText={t('inventory.finishAndSubmit', { count: scannedItems.length })}
+            primaryActionText={t('inventory.finishAndSubmit', {
+              count: scannedItems.length,
+            })}
           />
         </div>
       </div>
@@ -589,7 +696,9 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
               </DialogTitle>
               <DialogDescription>
                 {submissionResult.successCount === submissionResult.totalCount
-                  ? t('success.description.allSuccess', { count: submissionResult.successCount })
+                  ? t('success.description.allSuccess', {
+                      count: submissionResult.successCount,
+                    })
                   : t('success.description.partialSuccess', {
                       successCount: submissionResult.successCount,
                       totalCount: submissionResult.totalCount,

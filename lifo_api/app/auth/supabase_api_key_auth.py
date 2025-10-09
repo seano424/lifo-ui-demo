@@ -63,7 +63,9 @@ class SupabaseAPIKeyAuth:
 
         # Check for new keys first, fall back to legacy keys
         if not self.publishable_key and not self.anon_key:
-            raise ValueError("Either SUPABASE_PUBLISHABLE_KEY or SUPABASE_ANON_KEY is required for API key authentication")
+            raise ValueError(
+                "Either SUPABASE_PUBLISHABLE_KEY or SUPABASE_ANON_KEY is required for API key authentication"
+            )
 
         # Determine which key system to use
         self.use_new_keys = bool(self.publishable_key and self.secret_key)
@@ -73,7 +75,9 @@ class SupabaseAPIKeyAuth:
         else:
             self.logger.info("Using legacy Supabase JWT key system")
             if not self.anon_key:
-                raise ValueError("SUPABASE_ANON_KEY is required when using legacy JWT system")
+                raise ValueError(
+                    "SUPABASE_ANON_KEY is required when using legacy JWT system"
+                )
 
     async def verify_user_token(self, access_token: str) -> APIKeyUser:
         """
@@ -200,11 +204,13 @@ class SupabaseAPIKeyAuth:
             bool: True if valid service key
         """
         try:
-            self.logger.debug("Service key verification attempt",
-                            use_new_keys=self.use_new_keys,
-                            secret_key_present=bool(self.secret_key),
-                            service_role_key_present=bool(self.service_role_key),
-                            api_key_prefix=api_key[:10] if api_key else None)
+            self.logger.debug(
+                "Service key verification attempt",
+                use_new_keys=self.use_new_keys,
+                secret_key_present=bool(self.secret_key),
+                service_role_key_present=bool(self.service_role_key),
+                api_key_prefix=api_key[:10] if api_key else None,
+            )
 
             # Use constant-time comparison to prevent timing attacks
             # Check new secret key first, then fall back to legacy service role key
@@ -216,7 +222,9 @@ class SupabaseAPIKeyAuth:
                     self.logger.debug("Secret key comparison failed")
 
             # Fall back to legacy service role key
-            if self.service_role_key and hmac.compare_digest(api_key, self.service_role_key):
+            if self.service_role_key and hmac.compare_digest(
+                api_key, self.service_role_key
+            ):
                 self.logger.info("Service role key verified (legacy system)")
                 return True
             else:
@@ -290,7 +298,11 @@ class SupabaseAPIKeyAuth:
         """
         # Check for API key header FIRST (for service role operations)
         api_key = request.headers.get("apikey")
-        self.logger.debug("API key header check", api_key_present=bool(api_key), api_key_length=len(api_key) if api_key else 0)
+        self.logger.debug(
+            "API key header check",
+            api_key_present=bool(api_key),
+            api_key_length=len(api_key) if api_key else 0,
+        )
 
         if api_key and await self.verify_service_key(api_key):
             # Service role authentication - apikey header is sufficient
@@ -302,17 +314,21 @@ class SupabaseAPIKeyAuth:
             )
 
         # Check for Authorization header (case-insensitive)
-        authorization = request.headers.get("Authorization") or request.headers.get("authorization")
+        authorization = request.headers.get("Authorization") or request.headers.get(
+            "authorization"
+        )
         if not authorization:
             raise SupabaseAPIKeyError("Authorization header or valid apikey required")
 
         # Ensure authorization header is a string (handle potential bytes issues)
         if isinstance(authorization, bytes):
             try:
-                authorization = authorization.decode('utf-8')
+                authorization = authorization.decode("utf-8")
             except UnicodeDecodeError as e:
                 self.logger.error("Failed to decode authorization header", error=str(e))
-                raise SupabaseAPIKeyError("Invalid authorization header encoding") from e
+                raise SupabaseAPIKeyError(
+                    "Invalid authorization header encoding"
+                ) from e
 
         # Extract token from Authorization header
         if authorization.startswith("Bearer "):

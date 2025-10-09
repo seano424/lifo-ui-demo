@@ -59,7 +59,9 @@ class SupabaseAuth:
             raise ValueError("SUPABASE_URL is required for authentication")
 
         if not settings.supabase_anon_key and not settings.supabase_service_role_key:
-            raise ValueError("Either SUPABASE_ANON_KEY or SUPABASE_SERVICE_ROLE_KEY is required")
+            raise ValueError(
+                "Either SUPABASE_ANON_KEY or SUPABASE_SERVICE_ROLE_KEY is required"
+            )
 
     async def verify_token(self, token: str) -> SupabaseUser:
         """

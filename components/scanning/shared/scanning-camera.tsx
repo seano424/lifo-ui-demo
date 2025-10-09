@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect } from 'react'
 import { AlertCircle, Camera, Keyboard } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import BarcodeScanner, { type BarcodeDetection } from '@/components/barcode/barcode-scanner'
@@ -7,6 +8,7 @@ import ManualBarcodeEntry from '@/components/barcode/manual-barcode-entry'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { logger } from '@/lib/utils/logger'
 
 export interface ScanningCameraProps {
   // Camera mode
@@ -62,6 +64,32 @@ export default function ScanningCamera({
 }: ScanningCameraProps) {
   const t = useTranslations('scanningCamera')
 
+  // Logging for debugging OCR capture flow
+  const handleOCRCapture = async () => {
+    logger.log('ScanningCamera', 'OCR Capture button clicked', {
+      mode,
+      isOCRProcessing,
+      isBackendHealthy,
+      hasOCRCaptureHandler: !!onOCRCapture,
+    })
+
+    if (!onOCRCapture) {
+      logger.error('ScanningCamera', 'OCR Capture handler is not defined')
+      return
+    }
+
+    try {
+      logger.log('ScanningCamera', 'Calling OCR capture handler...')
+      await onOCRCapture()
+      logger.log('ScanningCamera', 'OCR capture handler completed successfully')
+    } catch (error) {
+      logger.error('ScanningCamera', 'OCR capture handler failed', {
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+      })
+    }
+  }
+
   // Get appropriate title based on mode
   const cameraTitle =
     title || (mode === 'barcode' ? t('titles.scanProduct') : t('titles.scanExpiryDate'))
@@ -70,6 +98,34 @@ export default function ScanningCamera({
     (mode === 'barcode' ? t('subtitles.pointAtBarcode') : t('subtitles.pointAtExpiryDate'))
   const permissionMessage =
     mode === 'barcode' ? t('permissions.barcodeRequired') : t('permissions.expiryRequired')
+
+  // Log component mount and state changes
+  useEffect(() => {
+    logger.log('ScanningCamera', 'Component mounted/updated', {
+      mode,
+      autoStart,
+      isBackendHealthy,
+      isOCRProcessing,
+      hasOCRError: !!ocrError,
+      showManualEntry,
+    })
+  }, [mode, autoStart, isBackendHealthy, isOCRProcessing, ocrError, showManualEntry])
+
+  // Log OCR processing state changes
+  useEffect(() => {
+    if (mode === 'ocr' && isOCRProcessing) {
+      logger.log('ScanningCamera', 'OCR processing started')
+    } else if (mode === 'ocr' && !isOCRProcessing) {
+      logger.log('ScanningCamera', 'OCR processing ended')
+    }
+  }, [mode, isOCRProcessing])
+
+  // Log OCR errors
+  useEffect(() => {
+    if (ocrError) {
+      logger.error('ScanningCamera', 'OCR error occurred', { error: ocrError })
+    }
+  }, [ocrError])
 
   return (
     <div className={cn(className, 'space-y-4')}>
@@ -112,7 +168,7 @@ export default function ScanningCamera({
           {/* OCR Action Buttons */}
           {isBackendHealthy !== false && (
             <div className="flex gap-2">
-              <Button onClick={onOCRCapture} className="flex-1 " disabled={isOCRProcessing}>
+              <Button onClick={handleOCRCapture} className="flex-1 " disabled={isOCRProcessing}>
                 <Camera className="w-4 h-4 mr-2" />
                 {isOCRProcessing ? t('buttons.processingOCR') : t('buttons.captureExpiryDate')}
               </Button>

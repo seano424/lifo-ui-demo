@@ -17,10 +17,11 @@ from app.services.database_monitoring import get_db_monitor
 router = APIRouter()
 logger = structlog.get_logger()
 
+
 @router.get("/health/comprehensive")
 async def get_comprehensive_database_health(
     current_user: dict[str, Any] = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
     """
     Get comprehensive database health assessment
@@ -48,23 +49,26 @@ async def get_comprehensive_database_health(
                 "collected_at": datetime.utcnow().isoformat(),
                 "collected_by": current_user["sub"],
                 "enterprise_monitoring": True,
-                "pgbouncer_aware": True
-            }
+                "pgbouncer_aware": True,
+            },
         }
 
     except Exception as e:
-        logger.error("Comprehensive health check failed",
-                   user_id=current_user["sub"], error=str(e))
+        logger.error(
+            "Comprehensive health check failed",
+            user_id=current_user["sub"],
+            error=str(e),
+        )
 
         raise HTTPException(
-            status_code=500,
-            detail=f"Health check failed: {str(e)}"
+            status_code=500, detail=f"Health check failed: {str(e)}"
         ) from e
+
 
 @router.get("/connections")
 async def get_connection_stats(
     current_user: dict[str, Any] = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
     """
     Monitor database connections and connection pooling
@@ -81,24 +85,25 @@ async def get_connection_stats(
             "connection_statistics": connection_stats,
             "pgbouncer_monitoring": {
                 "prepared_statement_conflicts_monitored": True,
-                "connection_pooling_aware": True
+                "connection_pooling_aware": True,
             },
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.utcnow().isoformat(),
         }
 
     except Exception as e:
-        logger.error("Connection stats failed",
-                   user_id=current_user["sub"], error=str(e))
+        logger.error(
+            "Connection stats failed", user_id=current_user["sub"], error=str(e)
+        )
 
         raise HTTPException(
-            status_code=500,
-            detail=f"Connection monitoring failed: {str(e)}"
+            status_code=500, detail=f"Connection monitoring failed: {str(e)}"
         ) from e
+
 
 @router.get("/performance/queries")
 async def get_query_performance_stats(
     current_user: dict[str, Any] = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
     """
     Monitor query performance and identify slow queries
@@ -114,11 +119,13 @@ async def get_query_performance_stats(
         mobile_performance_alerts = []
         for query in query_stats.get("slow_queries", []):
             if query.get("avg_time_ms", 0) > 500:  # Mobile target
-                mobile_performance_alerts.append({
-                    "query": query["query"][:100] + "...",
-                    "avg_time_ms": query["avg_time_ms"],
-                    "impact": "mobile_performance_violation"
-                })
+                mobile_performance_alerts.append(
+                    {
+                        "query": query["query"][:100] + "...",
+                        "avg_time_ms": query["avg_time_ms"],
+                        "impact": "mobile_performance_violation",
+                    }
+                )
 
         return {
             "success": True,
@@ -126,24 +133,27 @@ async def get_query_performance_stats(
             "mobile_optimization": {
                 "target_response_time_ms": 500,
                 "violations": mobile_performance_alerts,
-                "violation_count": len(mobile_performance_alerts)
+                "violation_count": len(mobile_performance_alerts),
             },
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.utcnow().isoformat(),
         }
 
     except Exception as e:
-        logger.error("Query performance monitoring failed",
-                   user_id=current_user["sub"], error=str(e))
+        logger.error(
+            "Query performance monitoring failed",
+            user_id=current_user["sub"],
+            error=str(e),
+        )
 
         raise HTTPException(
-            status_code=500,
-            detail=f"Query performance monitoring failed: {str(e)}"
+            status_code=500, detail=f"Query performance monitoring failed: {str(e)}"
         ) from e
+
 
 @router.get("/storage/tables")
 async def get_table_size_stats(
     current_user: dict[str, Any] = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
     """
     Monitor table sizes and growth patterns
@@ -163,29 +173,37 @@ async def get_table_size_stats(
             "table_statistics": table_stats,
             "enterprise_scaling": {
                 "large_tables_count": len(large_tables),
-                "largest_table_size_gb": large_tables[0]["size_gb"] if large_tables else 0,
+                "largest_table_size_gb": large_tables[0]["size_gb"]
+                if large_tables
+                else 0,
                 "capacity_planning_needed": len(large_tables) > 5,
                 "scaling_to_10k_stores": {
-                    "current_monitored_size_gb": table_stats.get("total_monitored_size_gb", 0),
-                    "projected_at_10k_stores_gb": table_stats.get("total_monitored_size_gb", 0) * 10  # Rough estimate
-                }
+                    "current_monitored_size_gb": table_stats.get(
+                        "total_monitored_size_gb", 0
+                    ),
+                    "projected_at_10k_stores_gb": table_stats.get(
+                        "total_monitored_size_gb", 0
+                    )
+                    * 10,  # Rough estimate
+                },
             },
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.utcnow().isoformat(),
         }
 
     except Exception as e:
-        logger.error("Table size monitoring failed",
-                   user_id=current_user["sub"], error=str(e))
+        logger.error(
+            "Table size monitoring failed", user_id=current_user["sub"], error=str(e)
+        )
 
         raise HTTPException(
-            status_code=500,
-            detail=f"Table size monitoring failed: {str(e)}"
+            status_code=500, detail=f"Table size monitoring failed: {str(e)}"
         ) from e
+
 
 @router.get("/replication")
 async def get_replication_stats(
     current_user: dict[str, Any] = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
     """
     Monitor replication lag and status
@@ -199,7 +217,10 @@ async def get_replication_stats(
 
         # Assess replication health for enterprise deployments
         replication_health = "healthy"
-        if replication_stats.get("is_replica") and replication_stats.get("lag_seconds", 0) > 60:
+        if (
+            replication_stats.get("is_replica")
+            and replication_stats.get("lag_seconds", 0) > 60
+        ):
             replication_health = "warning"
         if replication_stats.get("lag_seconds", 0) > 300:
             replication_health = "critical"
@@ -211,24 +232,25 @@ async def get_replication_stats(
                 "replication_health": replication_health,
                 "disaster_recovery_ready": replication_stats.get("is_replica", False),
                 "rpo_estimate_seconds": replication_stats.get("lag_seconds", 0),
-                "enterprise_ready": replication_stats.get("lag_seconds", 0) < 300
+                "enterprise_ready": replication_stats.get("lag_seconds", 0) < 300,
             },
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.utcnow().isoformat(),
         }
 
     except Exception as e:
-        logger.error("Replication monitoring failed",
-                   user_id=current_user["sub"], error=str(e))
+        logger.error(
+            "Replication monitoring failed", user_id=current_user["sub"], error=str(e)
+        )
 
         raise HTTPException(
-            status_code=500,
-            detail=f"Replication monitoring failed: {str(e)}"
+            status_code=500, detail=f"Replication monitoring failed: {str(e)}"
         ) from e
+
 
 @router.get("/locks")
 async def get_lock_stats(
     current_user: dict[str, Any] = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
     """
     Monitor database locks and deadlocks
@@ -254,24 +276,25 @@ async def get_lock_stats(
                 "impact_level": csv_impact_assessment,
                 "blocked_operations": lock_stats.get("blocked_locks", 0),
                 "bulk_operation_safe": lock_stats.get("blocked_locks", 0) < 10,
-                "mcp_recommended": lock_stats.get("blocked_locks", 0) > 10
+                "mcp_recommended": lock_stats.get("blocked_locks", 0) > 10,
             },
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.utcnow().isoformat(),
         }
 
     except Exception as e:
-        logger.error("Lock monitoring failed",
-                   user_id=current_user["sub"], error=str(e))
+        logger.error(
+            "Lock monitoring failed", user_id=current_user["sub"], error=str(e)
+        )
 
         raise HTTPException(
-            status_code=500,
-            detail=f"Lock monitoring failed: {str(e)}"
+            status_code=500, detail=f"Lock monitoring failed: {str(e)}"
         ) from e
+
 
 @router.get("/cache")
 async def get_cache_stats(
     current_user: dict[str, Any] = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
     """
     Monitor buffer cache hit ratios
@@ -299,24 +322,25 @@ async def get_cache_stats(
                 "cache_impact_on_mobile": mobile_impact,
                 "mobile_performance_affected": hit_ratio < 0.85,
                 "optimization_needed": hit_ratio < 0.80,
-                "target_hit_ratio": 0.95
+                "target_hit_ratio": 0.95,
             },
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.utcnow().isoformat(),
         }
 
     except Exception as e:
-        logger.error("Cache monitoring failed",
-                   user_id=current_user["sub"], error=str(e))
+        logger.error(
+            "Cache monitoring failed", user_id=current_user["sub"], error=str(e)
+        )
 
         raise HTTPException(
-            status_code=500,
-            detail=f"Cache monitoring failed: {str(e)}"
+            status_code=500, detail=f"Cache monitoring failed: {str(e)}"
         ) from e
+
 
 @router.get("/metrics/lifo")
 async def get_lifo_specific_metrics(
     current_user: dict[str, Any] = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
     """
     Get LIFO.AI specific business metrics
@@ -351,31 +375,37 @@ async def get_lifo_specific_metrics(
                 "health_score": max(health_score, 0),
                 "alerts": alerts,
                 "data_quality": "good" if health_score > 80 else "needs_attention",
-                "inventory_turnover_health": data_health.get("expired_batch_ratio", 0) < 0.10
+                "inventory_turnover_health": data_health.get("expired_batch_ratio", 0)
+                < 0.10,
             },
             "enterprise_insights": {
                 "stores_ready_for_scaling": business_metrics.get("store_count", 0),
                 "products_under_management": business_metrics.get("product_count", 0),
                 "active_inventory_items": business_metrics.get("active_batch_count", 0),
-                "data_processing_volume": "enterprise_scale" if business_metrics.get("active_batch_count", 0) > 10000 else "standard"
+                "data_processing_volume": "enterprise_scale"
+                if business_metrics.get("active_batch_count", 0) > 10000
+                else "standard",
             },
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.utcnow().isoformat(),
         }
 
     except Exception as e:
-        logger.error("LIFO metrics monitoring failed",
-                   user_id=current_user["sub"], error=str(e))
+        logger.error(
+            "LIFO metrics monitoring failed", user_id=current_user["sub"], error=str(e)
+        )
 
         raise HTTPException(
-            status_code=500,
-            detail=f"LIFO metrics monitoring failed: {str(e)}"
+            status_code=500, detail=f"LIFO metrics monitoring failed: {str(e)}"
         ) from e
+
 
 @router.get("/alerts/generate")
 async def generate_monitoring_alerts(
-    threshold_level: str = Query("warning", description="Alert threshold: warning, critical"),
+    threshold_level: str = Query(
+        "warning", description="Alert threshold: warning, critical"
+    ),
     current_user: dict[str, Any] = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
     """
     Generate monitoring alerts based on current system status
@@ -394,58 +424,74 @@ async def generate_monitoring_alerts(
         # Connection alerts
         connections = health_data.get("checks", {}).get("connections", {})
         if connections.get("utilization_percent", 0) > 90:
-            alerts.append({
-                "severity": "critical" if connections.get("utilization_percent", 0) > 95 else "warning",
-                "component": "connections",
-                "message": f"High connection utilization: {connections.get('utilization_percent')}%",
-                "action": "Check for connection leaks or increase max_connections",
-                "impact": "New connections may be rejected"
-            })
+            alerts.append(
+                {
+                    "severity": "critical"
+                    if connections.get("utilization_percent", 0) > 95
+                    else "warning",
+                    "component": "connections",
+                    "message": f"High connection utilization: {connections.get('utilization_percent')}%",
+                    "action": "Check for connection leaks or increase max_connections",
+                    "impact": "New connections may be rejected",
+                }
+            )
 
         # Query performance alerts
         query_perf = health_data.get("checks", {}).get("query_performance", {})
-        long_queries = [q for q in query_perf.get("active_queries", []) if q.get("duration_seconds", 0) > 30]
+        long_queries = [
+            q
+            for q in query_perf.get("active_queries", [])
+            if q.get("duration_seconds", 0) > 30
+        ]
         if long_queries:
-            alerts.append({
-                "severity": "warning",
-                "component": "query_performance",
-                "message": f"{len(long_queries)} long-running queries detected",
-                "action": "Review and optimize slow queries",
-                "impact": "Mobile performance may be affected"
-            })
+            alerts.append(
+                {
+                    "severity": "warning",
+                    "component": "query_performance",
+                    "message": f"{len(long_queries)} long-running queries detected",
+                    "action": "Review and optimize slow queries",
+                    "impact": "Mobile performance may be affected",
+                }
+            )
 
         # Cache performance alerts
         cache_stats = health_data.get("checks", {}).get("cache", {})
         if cache_stats.get("overall_hit_ratio", 1) < 0.80:
-            alerts.append({
-                "severity": "warning",
-                "component": "cache",
-                "message": f"Low cache hit ratio: {cache_stats.get('overall_hit_ratio', 0):.2%}",
-                "action": "Consider increasing shared_buffers",
-                "impact": "Query performance degradation"
-            })
+            alerts.append(
+                {
+                    "severity": "warning",
+                    "component": "cache",
+                    "message": f"Low cache hit ratio: {cache_stats.get('overall_hit_ratio', 0):.2%}",
+                    "action": "Consider increasing shared_buffers",
+                    "impact": "Query performance degradation",
+                }
+            )
 
         # Replication alerts
         replication = health_data.get("checks", {}).get("replication", {})
         if replication.get("lag_seconds", 0) > 300:
-            alerts.append({
-                "severity": "critical",
-                "component": "replication",
-                "message": f"High replication lag: {replication.get('lag_seconds')} seconds",
-                "action": "Check replica connectivity and resources",
-                "impact": "Data consistency at risk"
-            })
+            alerts.append(
+                {
+                    "severity": "critical",
+                    "component": "replication",
+                    "message": f"High replication lag: {replication.get('lag_seconds')} seconds",
+                    "action": "Check replica connectivity and resources",
+                    "impact": "Data consistency at risk",
+                }
+            )
 
         # Lock alerts
         locks = health_data.get("checks", {}).get("locks", {})
         if locks.get("blocked_locks", 0) > 10:
-            alerts.append({
-                "severity": "warning",
-                "component": "locks",
-                "message": f"{locks.get('blocked_locks')} blocked locks detected",
-                "action": "Check for long-running transactions",
-                "impact": "CSV uploads and bulk operations may fail"
-            })
+            alerts.append(
+                {
+                    "severity": "warning",
+                    "component": "locks",
+                    "message": f"{locks.get('blocked_locks')} blocked locks detected",
+                    "action": "Check for long-running transactions",
+                    "impact": "CSV uploads and bulk operations may fail",
+                }
+            )
 
         # Filter by threshold level
         if threshold_level == "critical":
@@ -455,31 +501,38 @@ async def generate_monitoring_alerts(
             "success": True,
             "alert_summary": {
                 "total_alerts": len(alerts),
-                "critical_alerts": len([a for a in alerts if a["severity"] == "critical"]),
-                "warning_alerts": len([a for a in alerts if a["severity"] == "warning"]),
+                "critical_alerts": len(
+                    [a for a in alerts if a["severity"] == "critical"]
+                ),
+                "warning_alerts": len(
+                    [a for a in alerts if a["severity"] == "warning"]
+                ),
                 "overall_status": health_data.get("overall_status", "unknown"),
-                "emergency_action_required": any(a["severity"] == "critical" for a in alerts)
+                "emergency_action_required": any(
+                    a["severity"] == "critical" for a in alerts
+                ),
             },
             "alerts": alerts,
             "recommendations": health_data.get("recommendations", []),
             "generated_at": datetime.utcnow().isoformat(),
             "generated_by": current_user["sub"],
-            "for_3am_emergencies": True
+            "for_3am_emergencies": True,
         }
 
     except Exception as e:
-        logger.error("Alert generation failed",
-                   user_id=current_user["sub"], error=str(e))
+        logger.error(
+            "Alert generation failed", user_id=current_user["sub"], error=str(e)
+        )
 
         raise HTTPException(
-            status_code=500,
-            detail=f"Alert generation failed: {str(e)}"
+            status_code=500, detail=f"Alert generation failed: {str(e)}"
         ) from e
+
 
 @router.post("/maintenance/analyze")
 async def analyze_maintenance_needs(
     current_user: dict[str, Any] = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
     """
     Analyze database maintenance needs
@@ -496,18 +549,18 @@ async def analyze_maintenance_needs(
             "vacuum_needed": {
                 "tables": [],  # Would be populated based on actual analysis
                 "priority": "medium",
-                "estimated_duration_minutes": 30
+                "estimated_duration_minutes": 30,
             },
             "reindex_needed": {
                 "indexes": [],  # Would be populated based on index bloat analysis
                 "priority": "low",
-                "estimated_duration_minutes": 15
+                "estimated_duration_minutes": 15,
             },
             "analyze_needed": {
                 "tables": [],  # Would be populated based on statistics staleness
                 "priority": "high",
-                "estimated_duration_minutes": 10
-            }
+                "estimated_duration_minutes": 10,
+            },
         }
 
         return {
@@ -516,14 +569,14 @@ async def analyze_maintenance_needs(
             "next_maintenance_window": "Schedule during low-traffic hours",
             "estimated_total_duration_minutes": 55,
             "analyzed_at": datetime.utcnow().isoformat(),
-            "analyzed_by": current_user["sub"]
+            "analyzed_by": current_user["sub"],
         }
 
     except Exception as e:
-        logger.error("Maintenance analysis failed",
-                   user_id=current_user["sub"], error=str(e))
+        logger.error(
+            "Maintenance analysis failed", user_id=current_user["sub"], error=str(e)
+        )
 
         raise HTTPException(
-            status_code=500,
-            detail=f"Maintenance analysis failed: {str(e)}"
+            status_code=500, detail=f"Maintenance analysis failed: {str(e)}"
         ) from e

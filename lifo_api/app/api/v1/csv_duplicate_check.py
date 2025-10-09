@@ -107,7 +107,7 @@ async def check_csv_duplicates(
             "Starting duplicate check",
             store_id=store_id,
             filename=file.filename,
-            user_id=current_user["sub"]
+            user_id=current_user["sub"],
         )
 
         # Read and validate file
@@ -131,7 +131,9 @@ async def check_csv_duplicates(
         import tempfile
         import os
 
-        with tempfile.NamedTemporaryFile(mode="wb", suffix=".csv", delete=False) as temp_file:
+        with tempfile.NamedTemporaryFile(
+            mode="wb", suffix=".csv", delete=False
+        ) as temp_file:
             temp_file.write(sanitized_content)
             temp_file_path = temp_file.name
 
@@ -145,8 +147,8 @@ async def check_csv_duplicates(
                     detail={
                         "message": "CSV parsing failed",
                         "errors": result["errors"],
-                        "warnings": result.get("warnings", [])
-                    }
+                        "warnings": result.get("warnings", []),
+                    },
                 )
 
             csv_data = result.get("data", [])
@@ -159,16 +161,16 @@ async def check_csv_duplicates(
                         "in_database": {
                             "products": 0,
                             "batches": 0,
-                            "duplicate_rows": 0
+                            "duplicate_rows": 0,
                         },
                         "duplicate_rows": 0,
-                        "conflict_percentage": 0.0
+                        "conflict_percentage": 0.0,
                     },
                     "recommendations": {
                         "action": "proceed",
                         "message": "No data found in CSV file",
                         "can_update": False,
-                        "can_skip_duplicates": False
+                        "can_skip_duplicates": False,
                     },
                     "details": {
                         "total_rows": 0,
@@ -176,16 +178,15 @@ async def check_csv_duplicates(
                         "existing_products": 0,
                         "existing_batches": 0,
                         "conflict_details": [],
-                        "total_conflict_details": 0
+                        "total_conflict_details": 0,
                     },
-                    "update_preview": None
+                    "update_preview": None,
                 }
 
             # Use duplicate detection service to analyze
             detection_service = DuplicateDetectionService()
             duplicate_analysis = await detection_service.analyze_csv_duplicates(
-                csv_data=csv_data,
-                store_id=store_id
+                csv_data=csv_data, store_id=store_id
             )
 
             logger.info(
@@ -193,9 +194,13 @@ async def check_csv_duplicates(
                 store_id=store_id,
                 filename=file.filename,
                 has_duplicates=duplicate_analysis["has_duplicates"],
-                duplicate_rows=duplicate_analysis["duplicate_analysis"]["duplicate_rows"],
-                conflict_percentage=duplicate_analysis["duplicate_analysis"]["conflict_percentage"],
-                recommended_action=duplicate_analysis["recommendations"]["action"]
+                duplicate_rows=duplicate_analysis["duplicate_analysis"][
+                    "duplicate_rows"
+                ],
+                conflict_percentage=duplicate_analysis["duplicate_analysis"][
+                    "conflict_percentage"
+                ],
+                recommended_action=duplicate_analysis["recommendations"]["action"],
             )
 
             return duplicate_analysis
@@ -215,9 +220,8 @@ async def check_csv_duplicates(
             store_id=store_id,
             filename=file.filename if file else "unknown",
             error=str(e),
-            error_type=type(e).__name__
+            error_type=type(e).__name__,
         )
         raise HTTPException(
-            status_code=500,
-            detail=f"Duplicate check failed: {str(e)}"
+            status_code=500, detail=f"Duplicate check failed: {str(e)}"
         ) from None

@@ -1,25 +1,26 @@
 """
 FooDI-ML dataset downloader from AWS S3 with efficient handling of large datasets.
 """
+
 import asyncio
 import json
 from pathlib import Path
-from typing import Dict, List, Any, Optional, Tuple
+from typing import Dict, List, Any, Optional
 import boto3
 from botocore.exceptions import ClientError, NoCredentialsError
 import aiofiles
 from dataclasses import dataclass
-import logging
 from concurrent.futures import ThreadPoolExecutor
 import threading
 
-from ..config import FoodiMLConfig, DatasetConfig
+from ..config import DatasetConfig
 from ..utils import ProgressTracker, validate_image_quality, get_logger
 
 
 @dataclass
 class S3ObjectInfo:
     """Information about an S3 object."""
+
     key: str
     size: int
     last_modified: str
@@ -33,7 +34,7 @@ class S3ObjectInfo:
     @property
     def is_image(self) -> bool:
         """Check if object is an image based on extension."""
-        return Path(self.key).suffix.lower() in ['.jpg', '.jpeg', '.png', '.webp']
+        return Path(self.key).suffix.lower() in [".jpg", ".jpeg", ".png", ".webp"]
 
 
 class FoodiMLDownloader:
@@ -47,23 +48,26 @@ class FoodiMLDownloader:
         self.foodiml_config = config.foodiml
         self.logger = get_logger(__name__)
         self.s3_client: Optional[boto3.client] = None
-        self.executor = ThreadPoolExecutor(max_workers=self.foodiml_config.concurrent_downloads)
+        self.executor = ThreadPoolExecutor(
+            max_workers=self.foodiml_config.concurrent_downloads
+        )
         self._lock = threading.Lock()
 
     def __enter__(self):
         """Context manager entry."""
         try:
             # Initialize S3 client
-            self.s3_client = boto3.client(
-                's3',
-                region_name=self.foodiml_config.region
-            )
+            self.s3_client = boto3.client("s3", region_name=self.foodiml_config.region)
             # Test connection
             self.s3_client.head_bucket(Bucket=self.foodiml_config.bucket_name)
-            self.logger.info(f"Connected to S3 bucket: {self.foodiml_config.bucket_name}")
+            self.logger.info(
+                f"Connected to S3 bucket: {self.foodiml_config.bucket_name}"
+            )
 
         except NoCredentialsError:
-            self.logger.error("AWS credentials not configured. Please set AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY")
+            self.logger.error(
+                "AWS credentials not configured. Please set AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY"
+            )
             raise
         except ClientError as e:
             self.logger.error(f"Error accessing S3 bucket: {e}")
@@ -76,7 +80,9 @@ class FoodiMLDownloader:
         if self.executor:
             self.executor.shutdown(wait=True)
 
-    def list_objects(self, prefix: str = "", max_objects: Optional[int] = None) -> List[S3ObjectInfo]:
+    def list_objects(
+        self, prefix: str = "", max_objects: Optional[int] = None
+    ) -> List[S3ObjectInfo]:
         """
         List objects in S3 bucket with optional filtering.
 
@@ -91,22 +97,21 @@ class FoodiMLDownloader:
             raise RuntimeError("S3 client not initialized")
 
         objects = []
-        paginator = self.s3_client.get_paginator('list_objects_v2')
+        paginator = self.s3_client.get_paginator("list_objects_v2")
 
         try:
             page_iterator = paginator.paginate(
-                Bucket=self.foodiml_config.bucket_name,
-                Prefix=prefix
+                Bucket=self.foodiml_config.bucket_name, Prefix=prefix
             )
 
             for page in page_iterator:
-                if 'Contents' in page:
-                    for obj in page['Contents']:
+                if "Contents" in page:
+                    for obj in page["Contents"]:
                         s3_info = S3ObjectInfo(
-                            key=obj['Key'],
-                            size=obj['Size'],
-                            last_modified=obj['LastModified'].isoformat(),
-                            etag=obj['ETag'].strip('"')
+                            key=obj["Key"],
+                            size=obj["Size"],
+                            last_modified=obj["LastModified"].isoformat(),
+                            etag=obj["ETag"].strip('"'),
                         )
 
                         # Filter for images only
@@ -128,7 +133,7 @@ class FoodiMLDownloader:
         self,
         sample_size: int = 1000,
         prefix: str = "",
-        progress_tracker: Optional[ProgressTracker] = None
+        progress_tracker: Optional[ProgressTracker] = None,
     ) -> Dict[str, Any]:
         """
         Download a sample subset of the dataset.
@@ -160,7 +165,7 @@ class FoodiMLDownloader:
             task_name = progress_tracker.add_task(
                 "s3_downloads",
                 "Downloading FooDI-ML images",
-                total=len(selected_objects)
+                total=len(selected_objects),
             )
 
         # Download files concurrently
@@ -192,10 +197,12 @@ class FoodiMLDownloader:
             "downloaded": downloaded,
             "failed": failed,
             "total_size": total_size,
-            "download_directory": str(self.config.foodiml_dir / "images")
+            "download_directory": str(self.config.foodiml_dir / "images"),
         }
 
-    def _select_diverse_sample(self, objects: List[S3ObjectInfo], sample_size: int) -> List[S3ObjectInfo]:
+    def _select_diverse_sample(
+        self, objects: List[S3ObjectInfo], sample_size: int
+    ) -> List[S3ObjectInfo]:
         """
         Select a diverse sample of objects for download.
         Tries to get variety in file sizes and names.
@@ -218,6 +225,7 @@ class FoodiMLDownloader:
         # Fill remaining slots randomly
         remaining = [obj for obj in objects if obj not in selected]
         import random
+
         random.shuffle(remaining)
 
         while len(selected) < sample_size and remaining:
@@ -229,7 +237,7 @@ class FoodiMLDownloader:
         self,
         obj_info: S3ObjectInfo,
         progress_tracker: Optional[ProgressTracker],
-        task_name: Optional[str]
+        task_name: Optional[str],
     ) -> Dict[str, Any]:
         """Download a single object from S3."""
         # Create local path
@@ -246,10 +254,7 @@ class FoodiMLDownloader:
             # Download file using thread executor
             loop = asyncio.get_event_loop()
             await loop.run_in_executor(
-                self.executor,
-                self._download_file_sync,
-                obj_info.key,
-                local_path
+                self.executor, self._download_file_sync, obj_info.key, local_path
             )
 
             # Validate downloaded image
@@ -257,13 +262,15 @@ class FoodiMLDownloader:
                 local_path,
                 self.config.min_image_width,
                 self.config.min_image_height,
-                self.config.max_image_size_mb
+                self.config.max_image_size_mb,
             )
 
             if not is_valid:
                 # Remove invalid file
                 local_path.unlink(missing_ok=True)
-                self.logger.debug(f"Removed invalid image {obj_info.filename}: {issues}")
+                self.logger.debug(
+                    f"Removed invalid image {obj_info.filename}: {issues}"
+                )
 
                 if progress_tracker and task_name:
                     progress_tracker.update(task_name, failed=True)
@@ -292,12 +299,12 @@ class FoodiMLDownloader:
 
         # Use download_file for efficient streaming
         self.s3_client.download_file(
-            self.foodiml_config.bucket_name,
-            s3_key,
-            str(local_path)
+            self.foodiml_config.bucket_name, s3_key, str(local_path)
         )
 
-    async def save_metadata(self, objects: List[S3ObjectInfo], filename: str = "s3_objects.json") -> Path:
+    async def save_metadata(
+        self, objects: List[S3ObjectInfo], filename: str = "s3_objects.json"
+    ) -> Path:
         """Save S3 object metadata to JSON file."""
         output_path = self.config.foodiml_dir / filename
 
@@ -311,13 +318,13 @@ class FoodiMLDownloader:
                     "size": obj.size,
                     "last_modified": obj.last_modified,
                     "etag": obj.etag,
-                    "filename": obj.filename
+                    "filename": obj.filename,
                 }
                 for obj in objects
-            ]
+            ],
         }
 
-        async with aiofiles.open(output_path, 'w', encoding='utf-8') as f:
+        async with aiofiles.open(output_path, "w", encoding="utf-8") as f:
             await f.write(json.dumps(metadata, indent=2))
 
         self.logger.info(f"Saved metadata for {len(objects)} objects to {output_path}")
@@ -366,17 +373,19 @@ class FoodiMLDownloader:
 
         analysis = {
             "total_objects": len(objects),
-            "total_size_gb": total_size / (1024 ** 3),
+            "total_size_gb": total_size / (1024**3),
             "file_extensions": extensions,
             "size_distribution": size_distribution,
             "directory_structure": sorted(list(directories)[:20]),  # Top 20 directories
             "sample_files": [obj.key for obj in objects[:10]],
-            "avg_file_size_mb": (total_size / len(objects)) / (1024 * 1024) if objects else 0
+            "avg_file_size_mb": (total_size / len(objects)) / (1024 * 1024)
+            if objects
+            else 0,
         }
 
         # Save analysis
         analysis_path = self.config.foodiml_dir / "bucket_analysis.json"
-        async with aiofiles.open(analysis_path, 'w', encoding='utf-8') as f:
+        async with aiofiles.open(analysis_path, "w", encoding="utf-8") as f:
             await f.write(json.dumps(analysis, indent=2))
 
         self.logger.info(f"Bucket analysis saved to {analysis_path}")
@@ -398,13 +407,9 @@ class FoodiMLDownloader:
 
             # Download sample dataset
             download_stats = await self.download_sample_dataset(
-                sample_size=sample_size,
-                progress_tracker=progress
+                sample_size=sample_size, progress_tracker=progress
             )
 
             progress.print_summary()
 
-            return {
-                "bucket_analysis": analysis,
-                "download_stats": download_stats
-            }
+            return {"bucket_analysis": analysis, "download_stats": download_stats}

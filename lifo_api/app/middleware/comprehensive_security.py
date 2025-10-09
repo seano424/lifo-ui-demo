@@ -41,7 +41,7 @@ class ComprehensiveSecurityMiddleware(BaseHTTPMiddleware):
             "/openapi.json",
             "/favicon.ico",
             "/robots.txt",
-            "/api/v1/test"
+            "/api/v1/test",
         }
 
         # High-security endpoints requiring extra validation
@@ -64,7 +64,7 @@ class ComprehensiveSecurityMiddleware(BaseHTTPMiddleware):
                 path=path,
                 bypass_paths=list(self.bypass_paths),
                 should_bypass=should_bypass,
-                exact_match=path in self.bypass_paths
+                exact_match=path in self.bypass_paths,
             )
 
         return should_bypass
@@ -255,10 +255,12 @@ class ComprehensiveSecurityMiddleware(BaseHTTPMiddleware):
             # Only require Content-Type for endpoints that actually need a request body
             # Scoring and trigger endpoints may use query parameters, not request body
             trigger_endpoint = "/trigger/" in request.url.path
-            if (not content_type and
-                request.url.path.startswith("/api/") and
-                not request.url.path.startswith("/api/v1/scoring/") and
-                not trigger_endpoint):
+            if (
+                not content_type
+                and request.url.path.startswith("/api/")
+                and not request.url.path.startswith("/api/v1/scoring/")
+                and not trigger_endpoint
+            ):
                 validation_result["valid"] = False
                 validation_result["details"]["missing_content_type"] = True
 
@@ -334,11 +336,15 @@ class ComprehensiveSecurityMiddleware(BaseHTTPMiddleware):
             # Additional authentication checks for admin endpoints
             if "/admin" in request.url.path:
                 # Require additional authentication headers (case-insensitive)
-                auth_header = request.headers.get("Authorization") or request.headers.get("authorization") or ""
+                auth_header = (
+                    request.headers.get("Authorization")
+                    or request.headers.get("authorization")
+                    or ""
+                )
 
                 # Ensure header is a string (handle potential bytes issues)
                 if isinstance(auth_header, bytes):
-                    auth_header = auth_header.decode('utf-8')
+                    auth_header = auth_header.decode("utf-8")
 
                 if not auth_header.startswith("Bearer "):
                     return False
@@ -470,7 +476,10 @@ class ComprehensiveSecurityMiddleware(BaseHTTPMiddleware):
 
             # Get endpoint type
             endpoint_type = "general"
-            if "/scoring/" in request.url.path or "/automated-scoring/" in request.url.path:
+            if (
+                "/scoring/" in request.url.path
+                or "/automated-scoring/" in request.url.path
+            ):
                 endpoint_type = "scoring"
             elif "/analytics/" in request.url.path:
                 endpoint_type = "analytics"
@@ -532,7 +541,12 @@ class ComprehensiveSecurityMiddleware(BaseHTTPMiddleware):
                 except ValueError:
                     return False
 
-            elif param_name in ["force_recalculate", "save_to_database", "include_donation_rationale", "enabled"]:
+            elif param_name in [
+                "force_recalculate",
+                "save_to_database",
+                "include_donation_rationale",
+                "enabled",
+            ]:
                 # Boolean parameters
                 return value.lower() in ["true", "false", "1", "0"]
 

@@ -1,16 +1,19 @@
 """
 Data validation utilities for dataset quality control.
 """
+
 import re
 from pathlib import Path
-from typing import Dict, Any, List, Optional, Tuple
+from typing import Dict, Any, List, Tuple
 from datetime import datetime
 import logging
 
 logger = logging.getLogger(__name__)
 
 
-def validate_product_data(product: Dict[str, Any], required_fields: List[str]) -> Tuple[bool, List[str]]:
+def validate_product_data(
+    product: Dict[str, Any], required_fields: List[str]
+) -> Tuple[bool, List[str]]:
     """
     Validate product data for completeness and quality.
 
@@ -39,7 +42,7 @@ def validate_product_data(product: Dict[str, Any], required_fields: List[str]) -
     # Validate barcode/code
     if "code" in product:
         code = str(product["code"])
-        if not re.match(r'^\d{8,14}$', code):
+        if not re.match(r"^\d{8,14}$", code):
             issues.append("Invalid barcode format (should be 8-14 digits)")
 
     # Validate expiration date format
@@ -57,10 +60,7 @@ def validate_product_data(product: Dict[str, Any], required_fields: List[str]) -
 
 
 def validate_image_quality(
-    image_path: Path,
-    min_width: int = 300,
-    min_height: int = 300,
-    max_size_mb: int = 10
+    image_path: Path, min_width: int = 300, min_height: int = 300, max_size_mb: int = 10
 ) -> Tuple[bool, List[str]]:
     """
     Validate image quality for OCR suitability.
@@ -92,6 +92,7 @@ def validate_image_quality(
 
     try:
         from PIL import Image
+
         with Image.open(image_path) as img:
             width, height = img.size
 
@@ -115,24 +116,24 @@ def validate_image_quality(
 def _is_valid_date_format(date_string: str) -> bool:
     """Check if date string is in a valid format."""
     date_patterns = [
-        r'^\d{4}-\d{2}-\d{2}$',  # YYYY-MM-DD
-        r'^\d{2}/\d{2}/\d{4}$',  # DD/MM/YYYY
-        r'^\d{2}-\d{2}-\d{4}$',  # DD-MM-YYYY
-        r'^\d{2}\.\d{2}\.\d{4}$',  # DD.MM.YYYY
+        r"^\d{4}-\d{2}-\d{2}$",  # YYYY-MM-DD
+        r"^\d{2}/\d{2}/\d{4}$",  # DD/MM/YYYY
+        r"^\d{2}-\d{2}-\d{4}$",  # DD-MM-YYYY
+        r"^\d{2}\.\d{2}\.\d{4}$",  # DD.MM.YYYY
     ]
 
     for pattern in date_patterns:
         if re.match(pattern, date_string):
             try:
                 # Try to parse the date to ensure it's valid
-                if '-' in date_string and len(date_string) == 10:
-                    datetime.strptime(date_string, '%Y-%m-%d')
-                elif '/' in date_string:
-                    datetime.strptime(date_string, '%d/%m/%Y')
-                elif '-' in date_string:
-                    datetime.strptime(date_string, '%d-%m-%Y')
-                elif '.' in date_string:
-                    datetime.strptime(date_string, '%d.%m.%Y')
+                if "-" in date_string and len(date_string) == 10:
+                    datetime.strptime(date_string, "%Y-%m-%d")
+                elif "/" in date_string:
+                    datetime.strptime(date_string, "%d/%m/%Y")
+                elif "-" in date_string:
+                    datetime.strptime(date_string, "%d-%m-%Y")
+                elif "." in date_string:
+                    datetime.strptime(date_string, "%d.%m.%Y")
                 return True
             except ValueError:
                 continue
@@ -143,12 +144,14 @@ def _is_valid_date_format(date_string: str) -> bool:
 def _is_valid_url(url: str) -> bool:
     """Check if URL is in a valid format."""
     url_pattern = re.compile(
-        r'^https?://'  # http:// or https://
-        r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+[A-Z]{2,6}\.?|'  # domain...
-        r'localhost|'  # localhost...
-        r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'  # ...or ip
-        r'(?::\d+)?'  # optional port
-        r'(?:/?|[/?]\S+)$', re.IGNORECASE)
+        r"^https?://"  # http:// or https://
+        r"(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+[A-Z]{2,6}\.?|"  # domain...
+        r"localhost|"  # localhost...
+        r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})"  # ...or ip
+        r"(?::\d+)?"  # optional port
+        r"(?:/?|[/?]\S+)$",
+        re.IGNORECASE,
+    )
 
     return url_pattern.match(url) is not None
 
@@ -168,11 +171,11 @@ def extract_language_info(text: str) -> Dict[str, Any]:
 
     # Character frequency analysis for European languages
     language_patterns = {
-        "french": [r'[àâäéèêëïîôöùûüÿç]', r'\b(le|la|les|de|du|des|et|ou|un|une)\b'],
-        "german": [r'[äöüß]', r'\b(der|die|das|und|oder|ein|eine|mit|von)\b'],
-        "italian": [r'[àèéìíîòóùú]', r'\b(il|la|le|di|da|in|con|per|un|una)\b'],
-        "spanish": [r'[áéíóúñü¿¡]', r'\b(el|la|los|las|de|del|en|con|por|un|una)\b'],
-        "english": [r'\b(the|and|or|of|in|to|for|with|a|an)\b']
+        "french": [r"[àâäéèêëïîôöùûüÿç]", r"\b(le|la|les|de|du|des|et|ou|un|une)\b"],
+        "german": [r"[äöüß]", r"\b(der|die|das|und|oder|ein|eine|mit|von)\b"],
+        "italian": [r"[àèéìíîòóùú]", r"\b(il|la|le|di|da|in|con|per|un|una)\b"],
+        "spanish": [r"[áéíóúñü¿¡]", r"\b(el|la|los|las|de|del|en|con|por|un|una)\b"],
+        "english": [r"\b(the|and|or|of|in|to|for|with|a|an)\b"],
     }
 
     detected_languages = []
@@ -192,8 +195,10 @@ def extract_language_info(text: str) -> Dict[str, Any]:
 
     return {
         "detected_languages": detected_languages,
-        "primary_language": detected_languages[0][0] if detected_languages else "unknown",
+        "primary_language": detected_languages[0][0]
+        if detected_languages
+        else "unknown",
         "text_length": len(text),
-        "has_special_chars": bool(re.search(r'[^\w\s]', text)),
-        "has_numbers": bool(re.search(r'\d', text))
+        "has_special_chars": bool(re.search(r"[^\w\s]", text)),
+        "has_numbers": bool(re.search(r"\d", text)),
     }

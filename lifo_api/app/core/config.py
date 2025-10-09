@@ -49,27 +49,26 @@ class Settings(BaseSettings):
 
     # Supabase Authentication
     supabase_url: str = Field(
-        default="",
-        description="Supabase project URL for authentication and database"
+        default="", description="Supabase project URL for authentication and database"
     )
     supabase_jwt_secret: str = ""  # Keep for compatibility
     supabase_anon_key: str = Field(
         default="",
-        description="Supabase anonymous key for public operations (legacy JWT)"
+        description="Supabase anonymous key for public operations (legacy JWT)",
     )
     supabase_service_role_key: str = Field(
         default="",
-        description="Supabase service role key for admin operations (legacy JWT)"
+        description="Supabase service role key for admin operations (legacy JWT)",
     )
 
     # New Supabase API Keys (recommended over legacy JWT keys)
     supabase_publishable_key: str = Field(
         default="",
-        description="Supabase publishable key (new API key system) for client-side auth"
+        description="Supabase publishable key (new API key system) for client-side auth",
     )
     supabase_secret_key: str = Field(
         default="",
-        description="Supabase secret key (new API key system) for server-side admin operations"
+        description="Supabase secret key (new API key system) for server-side admin operations",
     )
 
     # JWT Configuration
@@ -151,10 +150,12 @@ class Settings(BaseSettings):
         default=True, description="Enable automated scoring scheduler"
     )
     default_scoring_cron: str = Field(
-        default="0 */4 * * *", description="Default cron expression for automated scoring (every 4 hours)"
+        default="0 */4 * * *",
+        description="Default cron expression for automated scoring (every 4 hours)",
     )
     default_full_rescore_cron: str = Field(
-        default="0 2 * * *", description="Default cron expression for nightly full rescore (2 AM daily)"
+        default="0 2 * * *",
+        description="Default cron expression for nightly full rescore (2 AM daily)",
     )
     default_scoring_timezone: str = Field(
         default="UTC", description="Default timezone for automated scoring schedules"
@@ -174,7 +175,6 @@ class Settings(BaseSettings):
     max_concurrent_scoring_jobs: int = Field(
         default=5, description="Maximum concurrent scoring jobs allowed"
     )
-
 
     # OCR Configuration
     ocr_max_image_width: int = Field(
@@ -208,7 +208,8 @@ class Settings(BaseSettings):
         default=True, description="Enable OCR result caching"
     )
     ocr_enable_fallback_mock: bool = Field(
-        default=False, description="Enable dangerous mock fallback (NEVER in production)"
+        default=False,
+        description="Enable dangerous mock fallback (NEVER in production)",
     )
 
     # Mobile performance thresholds
@@ -309,7 +310,9 @@ class Settings(BaseSettings):
             # Health checks come from internal networks without proper origins
             if not origins:
                 # Allow requests with no origin (internal health checks) and localhost for testing
-                origins.extend(["null", "http://localhost:3000"])  # More specific than wildcard
+                origins.extend(
+                    ["null", "http://localhost:3000"]
+                )  # More specific than wildcard
 
             return origins
 
@@ -347,21 +350,27 @@ class Settings(BaseSettings):
                     hosts.append(host)
 
             # Add DigitalOcean App Platform hosts for health checks
-            hosts.extend([
-                "*.ondigitalocean.app",  # DigitalOcean App Platform domains
-                "*",  # Allow all hosts for health check compatibility (production override)
-            ])
+            hosts.extend(
+                [
+                    "*.ondigitalocean.app",  # DigitalOcean App Platform domains
+                    "*",  # Allow all hosts for health check compatibility (production override)
+                ]
+            )
 
-            return hosts if hosts else ["127.0.0.1", "*.ondigitalocean.app"]  # Fallback includes DO domains
+            return (
+                hosts if hosts else ["127.0.0.1", "*.ondigitalocean.app"]
+            )  # Fallback includes DO domains
 
         elif self.environment == "staging":
             # Staging - limited hosts
             hosts = ["localhost", "127.0.0.1"]
 
             # Add DigitalOcean staging domains
-            hosts.extend([
-                "*.ondigitalocean.app",
-            ])
+            hosts.extend(
+                [
+                    "*.ondigitalocean.app",
+                ]
+            )
 
             if self.frontend_url:
                 host = self.frontend_url.replace("https://", "").replace("http://", "")
@@ -373,7 +382,11 @@ class Settings(BaseSettings):
         return self.allowed_hosts_list
 
     model_config = SettingsConfigDict(
-        env_file=[".env.local", "../.env.local", "../../.env.local"],  # Try multiple paths for .env file
+        env_file=[
+            ".env.local",
+            "../.env.local",
+            "../../.env.local",
+        ],  # Try multiple paths for .env file
         env_file_encoding="utf-8",
         case_sensitive=False,
         extra="ignore",  # Ignore extra environment variables not defined in the model

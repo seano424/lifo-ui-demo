@@ -47,7 +47,11 @@ class DuplicateDetectionService:
         # Check for duplicates within the CSV itself
         sku_counts = Counter(skus)
         within_csv_duplicates = [
-            {"sku": sku, "count": count, "message": f"SKU '{sku}' appears {count} times in your CSV"}
+            {
+                "sku": sku,
+                "count": count,
+                "message": f"SKU '{sku}' appears {count} times in your CSV",
+            }
             for sku, count in sku_counts.items()
             if count > 1
         ]
@@ -74,54 +78,62 @@ class DuplicateDetectionService:
             if row_sku in existing_product_skus:
                 product = existing_product_skus[row_sku]
                 duplicate_rows.add(idx)
-                row_conflicts.append({
-                    "row_index": idx + 1,  # 1-indexed for user display
-                    "sku": row_sku,
-                    "batch_number": row_batch,
-                    "product_name_csv": csv_row.get("product_name"),
-                    "product_name_db": product.get("name"),
-                    "quantity_csv": csv_row.get("quantity"),
-                    "cost_price_csv": csv_row.get("cost_price"),
-                    "cost_price_db": product.get("base_cost_price"),
-                    "selling_price_csv": csv_row.get("selling_price"),
-                    "selling_price_db": product.get("base_selling_price"),
-                    "product_id": product.get("product_id"),
-                    "conflict_type": "existing_product",
-                    "can_update": True,
-                    "suggested_action": "update_product_prices",
-                    "message": f"Product with SKU '{row_sku}' already exists. Prices will be updated."
-                })
+                row_conflicts.append(
+                    {
+                        "row_index": idx + 1,  # 1-indexed for user display
+                        "sku": row_sku,
+                        "batch_number": row_batch,
+                        "product_name_csv": csv_row.get("product_name"),
+                        "product_name_db": product.get("name"),
+                        "quantity_csv": csv_row.get("quantity"),
+                        "cost_price_csv": csv_row.get("cost_price"),
+                        "cost_price_db": product.get("base_cost_price"),
+                        "selling_price_csv": csv_row.get("selling_price"),
+                        "selling_price_db": product.get("base_selling_price"),
+                        "product_id": product.get("product_id"),
+                        "conflict_type": "existing_product",
+                        "can_update": True,
+                        "suggested_action": "update_product_prices",
+                        "message": f"Product with SKU '{row_sku}' already exists. Prices will be updated.",
+                    }
+                )
 
             # Check if batch already exists
             if row_batch in existing_batch_numbers:
                 batch = existing_batch_numbers[row_batch]
                 duplicate_rows.add(idx)
-                row_conflicts.append({
-                    "row_index": idx + 1,
-                    "sku": row_sku,
-                    "batch_number": row_batch,
-                    "product_name_csv": csv_row.get("product_name"),
-                    "quantity_csv": csv_row.get("quantity"),
-                    "quantity_db": batch.get("current_quantity"),
-                    "expiry_date_csv": csv_row.get("expiry_date"),
-                    "expiry_date_db": batch.get("expiry_date"),
-                    "batch_id": batch.get("batch_id"),
-                    "conflict_type": "existing_batch",
-                    "can_update": True,
-                    "suggested_action": "update_batch_quantities",
-                    "message": f"Batch '{row_batch}' already exists. Quantity will be updated."
-                })
+                row_conflicts.append(
+                    {
+                        "row_index": idx + 1,
+                        "sku": row_sku,
+                        "batch_number": row_batch,
+                        "product_name_csv": csv_row.get("product_name"),
+                        "quantity_csv": csv_row.get("quantity"),
+                        "quantity_db": batch.get("current_quantity"),
+                        "expiry_date_csv": csv_row.get("expiry_date"),
+                        "expiry_date_db": batch.get("expiry_date"),
+                        "batch_id": batch.get("batch_id"),
+                        "conflict_type": "existing_batch",
+                        "can_update": True,
+                        "suggested_action": "update_batch_quantities",
+                        "message": f"Batch '{row_batch}' already exists. Quantity will be updated.",
+                    }
+                )
 
             conflicts.extend(row_conflicts)
 
         # Count unique duplicate rows (not individual conflicts)
         total_duplicate_rows = len(duplicate_rows)
-        conflict_percentage = (total_duplicate_rows / total_rows * 100) if total_rows > 0 else 0
+        conflict_percentage = (
+            (total_duplicate_rows / total_rows * 100) if total_rows > 0 else 0
+        )
 
         # Determine recommended action with user-friendly messages
         if total_duplicate_rows == 0:
             action = "proceed"
-            message = "No duplicates detected. All data is new and can be safely uploaded."
+            message = (
+                "No duplicates detected. All data is new and can be safely uploaded."
+            )
         elif conflict_percentage < 20:
             action = "proceed_with_caution"
             message = (
@@ -145,7 +157,9 @@ class DuplicateDetectionService:
             )
 
         # Generate update preview
-        update_preview = self._generate_update_preview(conflicts[:10]) if conflicts else None
+        update_preview = (
+            self._generate_update_preview(conflicts[:10]) if conflicts else None
+        )
 
         return {
             "has_duplicates": total_duplicate_rows > 0,
@@ -154,17 +168,17 @@ class DuplicateDetectionService:
                 "in_database": {
                     "products": len(existing_products),
                     "batches": len(existing_batches),
-                    "duplicate_rows": total_duplicate_rows
+                    "duplicate_rows": total_duplicate_rows,
                 },
                 "duplicate_rows": total_duplicate_rows,
-                "conflict_percentage": round(conflict_percentage, 2)
+                "conflict_percentage": round(conflict_percentage, 2),
             },
             "recommendations": {
                 "action": action,
                 "message": message,
                 "can_update": total_duplicate_rows > 0,
                 "can_skip_duplicates": True,
-                "severity": self._determine_severity(conflict_percentage)
+                "severity": self._determine_severity(conflict_percentage),
             },
             "details": {
                 "total_rows": total_rows,
@@ -172,9 +186,9 @@ class DuplicateDetectionService:
                 "existing_products": len(existing_products),
                 "existing_batches": len(existing_batches),
                 "conflict_details": conflicts[:10],  # First 10 for preview
-                "total_conflict_details": len(conflicts)
+                "total_conflict_details": len(conflicts),
             },
-            "update_preview": update_preview
+            "update_preview": update_preview,
         }
 
     async def _check_existing_products(
@@ -199,7 +213,9 @@ class DuplicateDetectionService:
             response = (
                 client.schema("inventory")
                 .table("products")
-                .select("product_id, sku, name, base_cost_price, base_selling_price, category_id, brand")
+                .select(
+                    "product_id, sku, name, base_cost_price, base_selling_price, category_id, brand"
+                )
                 .eq("store_id", store_id)  # Scope to store
                 .in_("sku", skus)
                 .execute()
@@ -209,7 +225,7 @@ class DuplicateDetectionService:
                 "Checked existing products",
                 store_id=store_id,
                 skus_checked=len(skus),
-                products_found=len(response.data) if response.data else 0
+                products_found=len(response.data) if response.data else 0,
             )
 
             return response.data if response.data else []
@@ -219,7 +235,7 @@ class DuplicateDetectionService:
                 "Error checking existing products",
                 error=str(e),
                 store_id=store_id,
-                sku_count=len(skus)
+                sku_count=len(skus),
             )
             return []
 
@@ -245,7 +261,9 @@ class DuplicateDetectionService:
             response = (
                 client.schema("inventory")
                 .table("batches")
-                .select("batch_id, batch_number, current_quantity, expiry_date, product_id")
+                .select(
+                    "batch_id, batch_number, current_quantity, expiry_date, product_id"
+                )
                 .eq("store_id", store_id)  # Scope to store
                 .in_("batch_number", batch_numbers)
                 .execute()
@@ -255,7 +273,7 @@ class DuplicateDetectionService:
                 "Checked existing batches",
                 store_id=store_id,
                 batch_numbers_checked=len(batch_numbers),
-                batches_found=len(response.data) if response.data else 0
+                batches_found=len(response.data) if response.data else 0,
             )
 
             return response.data if response.data else []
@@ -265,11 +283,13 @@ class DuplicateDetectionService:
                 "Error checking existing batches",
                 error=str(e),
                 store_id=store_id,
-                batch_count=len(batch_numbers)
+                batch_count=len(batch_numbers),
             )
             return []
 
-    def _generate_update_preview(self, conflicts: list[dict[str, Any]]) -> dict[str, Any]:
+    def _generate_update_preview(
+        self, conflicts: list[dict[str, Any]]
+    ) -> dict[str, Any]:
         """
         Generate a preview of what will be updated
 
@@ -284,40 +304,44 @@ class DuplicateDetectionService:
 
         for conflict in conflicts:
             if conflict["conflict_type"] == "existing_product":
-                product_updates.append({
-                    "sku": conflict["sku"],
-                    "product_name": conflict["product_name_csv"],
-                    "changes": {
-                        "cost_price": {
-                            "old": conflict.get("cost_price_db"),
-                            "new": conflict.get("cost_price_csv")
+                product_updates.append(
+                    {
+                        "sku": conflict["sku"],
+                        "product_name": conflict["product_name_csv"],
+                        "changes": {
+                            "cost_price": {
+                                "old": conflict.get("cost_price_db"),
+                                "new": conflict.get("cost_price_csv"),
+                            },
+                            "selling_price": {
+                                "old": conflict.get("selling_price_db"),
+                                "new": conflict.get("selling_price_csv"),
+                            },
                         },
-                        "selling_price": {
-                            "old": conflict.get("selling_price_db"),
-                            "new": conflict.get("selling_price_csv")
-                        }
                     }
-                })
+                )
             elif conflict["conflict_type"] == "existing_batch":
-                batch_updates.append({
-                    "batch_number": conflict["batch_number"],
-                    "sku": conflict["sku"],
-                    "changes": {
-                        "quantity": {
-                            "old": conflict.get("quantity_db"),
-                            "new": conflict.get("quantity_csv")
+                batch_updates.append(
+                    {
+                        "batch_number": conflict["batch_number"],
+                        "sku": conflict["sku"],
+                        "changes": {
+                            "quantity": {
+                                "old": conflict.get("quantity_db"),
+                                "new": conflict.get("quantity_csv"),
+                            },
+                            "expiry_date": {
+                                "old": conflict.get("expiry_date_db"),
+                                "new": conflict.get("expiry_date_csv"),
+                            },
                         },
-                        "expiry_date": {
-                            "old": conflict.get("expiry_date_db"),
-                            "new": conflict.get("expiry_date_csv")
-                        }
                     }
-                })
+                )
 
         return {
             "products": product_updates,
             "batches": batch_updates,
-            "total_updates": len(product_updates) + len(batch_updates)
+            "total_updates": len(product_updates) + len(batch_updates),
         }
 
     def _determine_severity(self, conflict_percentage: float) -> str:

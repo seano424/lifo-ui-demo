@@ -86,7 +86,9 @@ async def extract_expiry_date_ocr(
         response_data = {
             "success": True,
             "scan_type": "expiry_date_extraction",
-            "expiry_date": result["expiry_date"].isoformat() if result["expiry_date"] is not None else None,
+            "expiry_date": result["expiry_date"].isoformat()
+            if result["expiry_date"] is not None
+            else None,
             "confidence_score": result["confidence"],  # Actual OCR confidence
             "confidence_threshold": confidence_threshold,  # User's input threshold
             "raw_ocr_text": result["raw_ocr_text"],

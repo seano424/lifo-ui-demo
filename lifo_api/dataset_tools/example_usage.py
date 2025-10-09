@@ -1,8 +1,8 @@
 """
 Example usage of the dataset tools for various scenarios.
 """
+
 import asyncio
-from pathlib import Path
 
 from .config import DatasetConfig
 from .downloaders import OpenFoodFactsDownloader, FoodiMLDownloader
@@ -21,7 +21,7 @@ async def example_download_openfoodfacts():
     config.log_level = "INFO"
 
     # Set up logging
-    logger = setup_logger("example_off", config.log_level)
+    setup_logger("example_off", config.log_level)
 
     # Download dataset
     async with OpenFoodFactsDownloader(config) as downloader:
@@ -60,7 +60,7 @@ async def example_download_foodiml():
             with ProgressTracker() as progress:
                 results = await downloader.download_sample_dataset(
                     sample_size=50,  # Small sample for demo
-                    progress_tracker=progress
+                    progress_tracker=progress,
                 )
 
             print(f"Downloaded {results['downloaded']} images")
@@ -80,10 +80,7 @@ async def example_analyze_dataset():
     config = DatasetConfig()
 
     # Check if we have any images to analyze
-    image_dirs = [
-        config.openfoodfacts_dir / "images",
-        config.foodiml_dir / "images"
-    ]
+    image_dirs = [config.openfoodfacts_dir / "images", config.foodiml_dir / "images"]
 
     for images_dir in image_dirs:
         if images_dir.exists() and any(images_dir.iterdir()):
@@ -102,8 +99,9 @@ async def example_analyze_dataset():
                     print(f"  OCR suitability: {stats['ocr_suitability_distribution']}")
 
                     # Create validation subset
-                    if stats['total_images'] > 10:
+                    if stats["total_images"] > 10:
                         from .analyzers.dataset_analyzer import ImageAnalysis
+
                         image_analyses = [
                             ImageAnalysis(**item) for item in analysis["image_analyses"]
                         ]
@@ -111,10 +109,12 @@ async def example_analyze_dataset():
                         validation_info = await analyzer.create_validation_subset(
                             image_analyses,
                             subset_size=min(20, len(image_analyses) // 5),
-                            quality_threshold=0.5
+                            quality_threshold=0.5,
                         )
 
-                        print(f"  Created validation subset: {validation_info['files_count']} images")
+                        print(
+                            f"  Created validation subset: {validation_info['files_count']} images"
+                        )
 
             print()
         else:
@@ -130,10 +130,7 @@ async def example_create_ocr_tests():
     config = DatasetConfig()
 
     # Find datasets to create tests from
-    image_dirs = [
-        config.openfoodfacts_dir / "images",
-        config.foodiml_dir / "images"
-    ]
+    image_dirs = [config.openfoodfacts_dir / "images", config.foodiml_dir / "images"]
 
     for images_dir in image_dirs:
         if images_dir.exists() and any(images_dir.iterdir()):
@@ -146,7 +143,7 @@ async def example_create_ocr_tests():
                 suite = await validator.create_validation_suite(
                     images_dir,
                     max_test_cases=20,  # Small number for demo
-                    progress_tracker=progress
+                    progress_tracker=progress,
                 )
 
                 print(f"  Created {suite.total_test_cases} test cases")
@@ -171,10 +168,7 @@ async def example_custom_quality_analysis():
     config = DatasetConfig()
 
     # Find some images to analyze
-    image_dirs = [
-        config.openfoodfacts_dir / "images",
-        config.foodiml_dir / "images"
-    ]
+    image_dirs = [config.openfoodfacts_dir / "images", config.foodiml_dir / "images"]
 
     for images_dir in image_dirs:
         if images_dir.exists():

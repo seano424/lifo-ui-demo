@@ -125,18 +125,15 @@ async def score_store_batch(
                 select(StoreSettings).where(StoreSettings.store_id == store_id)
             )
             store_settings = result.scalar_one_or_none()
-            if (store_settings
-                and store_settings.donation_preference_config):
-                store_donation_config = (
-                    store_settings.donation_preference_config
-                )
+            if store_settings and store_settings.donation_preference_config:
+                store_donation_config = store_settings.donation_preference_config
 
         # Score store inventory using secure read-only operations
         results = await scoring_service.score_store_inventory(
             store_id,
             recalculate_all=force_recalculate,
             store_donation_config=store_donation_config,
-            include_donation_rationale=include_donation_rationale
+            include_donation_rationale=include_donation_rationale,
         )
 
         # NEW: Save scores to database if requested
@@ -149,13 +146,10 @@ async def score_store_batch(
                 logger.info(
                     "Scores saved to database successfully",
                     store_id=store_id,
-                    scores_saved=len(results["scores"])
+                    scores_saved=len(results["scores"]),
                 )
             else:
-                logger.warning(
-                    "Failed to save scores to database",
-                    store_id=store_id
-                )
+                logger.warning("Failed to save scores to database", store_id=store_id)
 
         logger.info(
             "Store inventory scored with database writes enabled",
@@ -182,14 +176,16 @@ async def score_store_batch(
             if store_donation_config:
                 strategy = store_donation_config.get("strategy", "balanced")
 
-            response_data.update({
-                "donation_insights": results.get("donation_insights"),
-                "store_donation_strategy": strategy,
-                "donation_suitable_categories": results.get(
-                    "donation_suitable_categories", []
-                ),
-                "rationale_included": True
-            })
+            response_data.update(
+                {
+                    "donation_insights": results.get("donation_insights"),
+                    "store_donation_strategy": strategy,
+                    "donation_suitable_categories": results.get(
+                        "donation_suitable_categories", []
+                    ),
+                    "rationale_included": True,
+                }
+            )
 
         return response_data
 
@@ -351,8 +347,9 @@ async def get_ai_recommendations(
 
         # Get existing scores from database
         from app.database.read_only_operations import AnalyticsDataFetcher
+
         data_fetcher = AnalyticsDataFetcher(logger)
-        
+
         # Fetch existing scores and inventory data
         scoring_data = await data_fetcher.fetch_scoring_data(store_id)
         inventory_data = await read_ops.get_store_inventory_for_scoring(store_id)
@@ -371,16 +368,16 @@ async def get_ai_recommendations(
         for score in scoring_data:
             batch_id = score["batch_id"]
             inventory_item = inventory_by_batch.get(batch_id)
-            
+
             if not inventory_item:
                 continue
-                
+
             # Filter by category if specified
             if category and inventory_item.get("category_code") != category:
                 continue
-                
+
             processed_batches.add(batch_id)
-            
+
             # Map database recommendation to API format
             recommendation = _create_recommendation_from_score(score, inventory_item)
             if recommendation:
@@ -391,11 +388,11 @@ async def get_ai_recommendations(
             batch_id = item["batch_id"]
             if batch_id in processed_batches:
                 continue
-                
+
             # Filter by category if specified
             if category and item.get("category_code") != category:
                 continue
-                
+
             # Use basic logic for items without scores
             recommendation = _create_fallback_recommendation(item)
             if recommendation:
@@ -403,9 +400,7 @@ async def get_ai_recommendations(
 
         # Sort by priority and limit
         priority_order = {"critical": 0, "high": 1, "medium": 2, "low": 3}
-        recommendations.sort(
-            key=lambda x: priority_order.get(x["priority"], 4)
-        )
+        recommendations.sort(key=lambda x: priority_order.get(x["priority"], 4))
         recommendations = recommendations[:limit]
 
         logger.info(
@@ -452,39 +447,43 @@ async def get_ai_recommendations(
 
 def _create_recommendation_from_score(score: dict, inventory_item: dict) -> dict | None:
     """Create recommendation from existing database score.
-    
+
     Args:
         score: Score data from database with recommendation, urgency_level, etc.
         inventory_item: Inventory item data
-        
+
     Returns:
         Formatted recommendation or None if invalid
     """
     try:
         days_to_expiry = inventory_item["days_to_expiry"]
-        
+
         # Map urgency levels to priorities
         urgency_to_priority = {
             "critical": "critical",
-            "high": "high", 
+            "high": "high",
             "medium": "medium",
-            "low": "low"
+            "low": "low",
         }
-        
+
         priority = urgency_to_priority.get(score.get("urgency_level", "low"), "low")
         recommendation_type = score.get("recommendation", "monitor")
         discount_percent = score.get("discount_percent", 0)
         reason = score.get("reason", "AI recommendation")
-        
+
         # Map database recommendations to API format
         action_mapping = {
-            "dispose": "Remove from inventory immediately - product expired" if days_to_expiry < 0 else "Dispose for safety",
-            "discount": f"Apply {discount_percent}% discount" if discount_percent > 0 else "Apply discount",
+            "dispose": "Remove from inventory immediately - product expired"
+            if days_to_expiry < 0
+            else "Dispose for safety",
+            "discount": f"Apply {discount_percent}% discount"
+            if discount_percent > 0
+            else "Apply discount",
             "monitor": "Monitor closely for changes",
             "promote": "Create promotion or bundle",
-            "donate": "Consider donation if suitable"
+            "donate": "Consider donation if suitable",
         }
-        
+
         # Determine recommendation type and action
         if days_to_expiry < 0:
             # Expired - must dispose (food safety critical)
@@ -493,7 +492,7 @@ def _create_recommendation_from_score(score: dict, inventory_item: dict) -> dict
             food_safety_alert = True
             suggested_discount = 0
         elif recommendation_type == "dispose":
-            recommendation_type_api = "disposal_required" 
+            recommendation_type_api = "disposal_required"
             action = action_mapping.get("dispose", "Dispose for safety")
             food_safety_alert = True
             suggested_discount = 0
@@ -502,22 +501,30 @@ def _create_recommendation_from_score(score: dict, inventory_item: dict) -> dict
                 recommendation_type_api = "urgent_discount"
             else:
                 recommendation_type_api = "discount"
-            action = action_mapping.get("discount", f"Apply {discount_percent}% discount")
+            action = action_mapping.get(
+                "discount", f"Apply {discount_percent}% discount"
+            )
             food_safety_alert = days_to_expiry <= 0
             suggested_discount = discount_percent
         else:
             recommendation_type_api = recommendation_type
-            action = action_mapping.get(recommendation_type, "Monitor and take action as needed")
+            action = action_mapping.get(
+                recommendation_type, "Monitor and take action as needed"
+            )
             food_safety_alert = days_to_expiry <= 0
             suggested_discount = discount_percent
 
         # Calculate potential savings/loss
         if days_to_expiry < 0 or recommendation_type == "dispose":
-            potential_value = inventory_item["current_quantity"] * inventory_item["cost_price"]
+            potential_value = (
+                inventory_item["current_quantity"] * inventory_item["cost_price"]
+            )
             potential_savings = 0
             potential_loss = potential_value
         else:
-            potential_value = inventory_item["current_quantity"] * inventory_item["selling_price"]
+            potential_value = (
+                inventory_item["current_quantity"] * inventory_item["selling_price"]
+            )
             if discount_percent > 0:
                 potential_savings = potential_value * (discount_percent / 100)
                 potential_loss = 0
@@ -536,7 +543,7 @@ def _create_recommendation_from_score(score: dict, inventory_item: dict) -> dict
             "suggested_discount": suggested_discount,
             "composite_score": score.get("composite_score", 0.0),
         }
-        
+
         # Add conditional fields
         if potential_savings > 0:
             recommendation["potential_savings"] = round(potential_savings, 2)
@@ -544,30 +551,30 @@ def _create_recommendation_from_score(score: dict, inventory_item: dict) -> dict
             recommendation["potential_loss"] = round(potential_loss, 2)
         if food_safety_alert:
             recommendation["food_safety_alert"] = True
-            
+
         return recommendation
-        
+
     except Exception as e:
         logger.warning(
             "Error creating recommendation from score",
             batch_id=score.get("batch_id"),
-            error=str(e)
+            error=str(e),
         )
         return None
 
 
 def _create_fallback_recommendation(inventory_item: dict) -> dict | None:
     """Create basic recommendation for items without scores using urgency logic.
-    
+
     Args:
         inventory_item: Inventory item data
-        
+
     Returns:
         Basic recommendation or None if invalid
     """
     try:
         days_to_expiry = inventory_item["days_to_expiry"]
-        
+
         # Basic urgency-based logic (same as original)
         if days_to_expiry < 0:
             # CRITICAL: Expired products must be disposed for food safety
@@ -580,7 +587,8 @@ def _create_fallback_recommendation(inventory_item: dict) -> dict | None:
                 "reason": f"Expired {abs(days_to_expiry)} day(s) ago",
                 "priority": "critical",
                 "suggested_discount": 0,
-                "potential_loss": inventory_item["current_quantity"] * inventory_item["cost_price"],
+                "potential_loss": inventory_item["current_quantity"]
+                * inventory_item["cost_price"],
                 "food_safety_alert": True,
                 "composite_score": 0.9,
             }
@@ -594,7 +602,8 @@ def _create_fallback_recommendation(inventory_item: dict) -> dict | None:
                 "reason": "Expires today",
                 "priority": "critical",
                 "suggested_discount": 0,
-                "potential_loss": inventory_item["current_quantity"] * inventory_item["cost_price"],
+                "potential_loss": inventory_item["current_quantity"]
+                * inventory_item["cost_price"],
                 "food_safety_alert": True,
                 "composite_score": 0.85,
             }
@@ -608,7 +617,9 @@ def _create_fallback_recommendation(inventory_item: dict) -> dict | None:
                 "reason": f"Expires in {days_to_expiry} day(s)",
                 "priority": "critical",
                 "suggested_discount": 40,
-                "potential_savings": inventory_item["current_quantity"] * inventory_item["selling_price"] * 0.8,
+                "potential_savings": inventory_item["current_quantity"]
+                * inventory_item["selling_price"]
+                * 0.8,
                 "composite_score": 0.7,
             }
         elif days_to_expiry <= 3:
@@ -621,7 +632,9 @@ def _create_fallback_recommendation(inventory_item: dict) -> dict | None:
                 "reason": f"Expires in {days_to_expiry} day(s)",
                 "priority": "high",
                 "suggested_discount": 20,
-                "potential_savings": inventory_item["current_quantity"] * inventory_item["selling_price"] * 0.6,
+                "potential_savings": inventory_item["current_quantity"]
+                * inventory_item["selling_price"]
+                * 0.6,
                 "composite_score": 0.5,
             }
         elif inventory_item["current_quantity"] > 50:  # High quantity
@@ -634,17 +647,19 @@ def _create_fallback_recommendation(inventory_item: dict) -> dict | None:
                 "reason": f"High quantity ({inventory_item['current_quantity']}) may not sell in time",
                 "priority": "medium",
                 "suggested_discount": 10,
-                "potential_savings": inventory_item["current_quantity"] * inventory_item["selling_price"] * 0.3,
+                "potential_savings": inventory_item["current_quantity"]
+                * inventory_item["selling_price"]
+                * 0.3,
                 "composite_score": 0.4,
             }
-        
+
         return None  # No recommendation needed
-        
+
     except Exception as e:
         logger.warning(
             "Error creating fallback recommendation",
             batch_id=inventory_item.get("batch_id"),
-            error=str(e)
+            error=str(e),
         )
         return None
 
@@ -711,10 +726,9 @@ async def get_scoring_analytics(
 
         total_value = analytics_data.get("total_value", 0)
         if total_value > 0:
-            at_risk_items = (
-                analytics_data.get("critical_items", 0)
-                + analytics_data.get("high_urgency_items", 0)
-            )
+            at_risk_items = analytics_data.get(
+                "critical_items", 0
+            ) + analytics_data.get("high_urgency_items", 0)
             total_batches = analytics_data.get("total_batches", 1)
             at_risk_value = at_risk_items * (total_value / total_batches)
             # More than 10% of value at risk

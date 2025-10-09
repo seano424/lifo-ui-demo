@@ -12,6 +12,7 @@ import {
   performFullOCRAnalysis,
 } from '@/lib/api/ocr-client'
 import type { ExpiryDateInfo } from '@/lib/stores/scanning-workflow-store'
+import { logger } from '@/lib/utils/logger'
 
 // Query keys for React Query caching
 export const ocrQueryKeys = {
@@ -166,6 +167,14 @@ export function useOCRWithFallback() {
     error?: OCRError
     fallbackToManual: boolean
   }> => {
+    logger.log('useOCRWithFallback', 'processExpiryDate called', {
+      imageBlobSize: imageBlob.size,
+      imageBlobType: imageBlob.type,
+      storeId,
+      options,
+      useFullAnalysis: options?.useFullAnalysis || false,
+    })
+
     // // Check if backend is available
     // if (isBackendHealthy === false) {
     //   return {
@@ -180,10 +189,17 @@ export function useOCRWithFallback() {
 
     try {
       if (options?.useFullAnalysis) {
+        logger.log('useOCRWithFallback', 'Using full OCR analysis')
         const result = await fullAnalysis.mutateAsync({
           imageBlob,
           storeId,
           options,
+        })
+
+        logger.log('useOCRWithFallback', 'Full OCR analysis successful', {
+          hasExpiryDateInfo: !!result.expiryDateInfo,
+          extractedDate: result.expiryDateInfo?.extractedDate,
+          confidence: result.expiryDateInfo?.confidence,
         })
 
         return {
@@ -192,10 +208,17 @@ export function useOCRWithFallback() {
           fallbackToManual: false,
         }
       } else {
+        logger.log('useOCRWithFallback', 'Using expiry date extraction')
         const expiryDateInfo = await expiryExtraction.mutateAsync({
           imageBlob,
           storeId,
           options,
+        })
+
+        logger.log('useOCRWithFallback', 'Expiry date extraction successful', {
+          extractedDate: expiryDateInfo?.extractedDate,
+          confidence: expiryDateInfo?.confidence,
+          processingTime: expiryDateInfo?.processingTime,
         })
 
         return {
@@ -207,11 +230,22 @@ export function useOCRWithFallback() {
     } catch (error) {
       const ocrError = error as OCRError
 
+      logger.error('useOCRWithFallback', 'OCR processing failed', {
+        errorMessage: ocrError.message,
+        errorType: ocrError.type,
+        errorDetails: ocrError.details,
+      })
+
       // Determine if we should fallback to manual entry
       const shouldFallback =
         ocrError.type === 'network' ||
         ocrError.type === 'timeout' ||
         (ocrError.type === 'api' && ocrError.message.includes('processing failed'))
+
+      logger.log('useOCRWithFallback', 'Fallback decision', {
+        shouldFallback,
+        errorType: ocrError.type,
+      })
 
       return {
         success: false,

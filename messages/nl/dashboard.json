@@ -56,6 +56,10 @@
         "barcodeScanning": "Scannen",
         "csvBulkImport": "CSV Import",
         "manualEntry": "Handmatige Invoer"
+      },
+      "messages": {
+        "selectStore": "Selecteer een winkel",
+        "selectStoreInventory": "Selecteer een winkel om de voorraad te beheren"
       }
     },
     "scanOut": {
