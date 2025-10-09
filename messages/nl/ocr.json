@@ -1,43 +1,43 @@
 {
   "ocrFrameQuality": {
-    "textDetected": "Text detected",
-    "datePattern": "Date pattern",
-    "lighting": "Good lighting",
-    "focus": "In focus",
-    "contrast": "Good contrast",
-    "quality": "Quality",
-    "readyToScan": "📸 Scanning...",
-    "hintMoveCloser": "Move closer to text",
-    "hintMoreLight": "Need more light",
-    "hintTooLight": "Too bright, adjust angle",
-    "hintHoldSteady": "Hold steady to focus",
-    "hintFindDate": "Point at expiry date",
-    "hintImproveAngle": "Adjust angle for clarity",
-    "hintPositioning": "Keep positioning..."
+    "textDetected": "Tekst gedetecteerd",
+    "datePattern": "Datumpatroon",
+    "lighting": "Goede belichting",
+    "focus": "Scherp gesteld",
+    "contrast": "Goed contrast",
+    "quality": "Kwaliteit",
+    "readyToScan": "📸 Scannen...",
+    "hintMoveCloser": "Ga dichter bij de tekst",
+    "hintMoreLight": "Meer licht nodig",
+    "hintTooLight": "Te helder, pas de hoek aan",
+    "hintHoldSteady": "Houd stil voor scherpstelling",
+    "hintFindDate": "Richt op de houdbaarheidsdatum",
+    "hintImproveAngle": "Pas de hoek aan voor duidelijkheid",
+    "hintPositioning": "Positioneren..."
   },
   "scanningCamera": {
     "titles": {
-      "scanProduct": "Scan Product",
-      "scanExpiryDate": "Scan Expiry Date"
+      "scanProduct": "Product scannen",
+      "scanExpiryDate": "Houdbaarheidsdatum scannen"
     },
     "subtitles": {
-      "pointAtBarcode": "Point camera at barcode",
-      "pointAtExpiryDate": "Point camera at expiry date"
+      "pointAtBarcode": "Richt de camera op de barcode",
+      "pointAtExpiryDate": "Richt de camera op de houdbaarheidsdatum"
     },
     "permissions": {
-      "barcodeRequired": "Camera access required for barcode scanning",
-      "expiryRequired": "Camera access required for expiry date scanning"
+      "barcodeRequired": "Cameratoegang vereist voor barcode scannen",
+      "expiryRequired": "Cameratoegang vereist voor houdbaarheidsdatum scannen"
     },
     "buttons": {
-      "processingOCR": "Processing...",
-      "captureExpiryDate": "Capture Expiry Date",
-      "clearError": "Clear",
-      "manualEntry": "Manual Entry"
+      "processingOCR": "Verwerken...",
+      "captureExpiryDate": "Houdbaarheidsdatum vastleggen",
+      "clearError": "Wissen",
+      "manualEntry": "Handmatige invoer"
     },
     "alerts": {
-      "serviceUnavailable": "OCR service temporarily unavailable. Please use manual entry.",
-      "ocrError": "Error: {error}",
-      "backendUnavailable": "Backend service is not responding"
+      "serviceUnavailable": "OCR-service tijdelijk niet beschikbaar. Gebruik handmatige invoer.",
+      "ocrError": "Fout: {error}",
+      "backendUnavailable": "Backend-service reageert niet"
     }
   }
 }

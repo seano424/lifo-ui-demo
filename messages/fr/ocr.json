@@ -1,43 +1,43 @@
 {
   "ocrFrameQuality": {
-    "textDetected": "Text detected",
-    "datePattern": "Date pattern",
-    "lighting": "Good lighting",
-    "focus": "In focus",
-    "contrast": "Good contrast",
-    "quality": "Quality",
-    "readyToScan": "📸 Scanning...",
-    "hintMoveCloser": "Move closer to text",
-    "hintMoreLight": "Need more light",
-    "hintTooLight": "Too bright, adjust angle",
-    "hintHoldSteady": "Hold steady to focus",
-    "hintFindDate": "Point at expiry date",
-    "hintImproveAngle": "Adjust angle for clarity",
-    "hintPositioning": "Keep positioning..."
+    "textDetected": "Texte détecté",
+    "datePattern": "Format de date",
+    "lighting": "Bon éclairage",
+    "focus": "Mise au point",
+    "contrast": "Bon contraste",
+    "quality": "Qualité",
+    "readyToScan": "📸 Numérisation...",
+    "hintMoveCloser": "Approchez-vous du texte",
+    "hintMoreLight": "Plus de lumière nécessaire",
+    "hintTooLight": "Trop lumineux, ajustez l'angle",
+    "hintHoldSteady": "Tenez fermement pour la mise au point",
+    "hintFindDate": "Pointez sur la date de péremption",
+    "hintImproveAngle": "Ajustez l'angle pour plus de clarté",
+    "hintPositioning": "Positionnement en cours..."
   },
   "scanningCamera": {
     "titles": {
-      "scanProduct": "Scan Product",
-      "scanExpiryDate": "Scan Expiry Date"
+      "scanProduct": "Scanner le produit",
+      "scanExpiryDate": "Scanner la date de péremption"
     },
     "subtitles": {
-      "pointAtBarcode": "Point camera at barcode",
-      "pointAtExpiryDate": "Point camera at expiry date"
+      "pointAtBarcode": "Pointez l'appareil photo sur le code-barres",
+      "pointAtExpiryDate": "Pointez l'appareil photo sur la date de péremption"
     },
     "permissions": {
-      "barcodeRequired": "Camera access required for barcode scanning",
-      "expiryRequired": "Camera access required for expiry date scanning"
+      "barcodeRequired": "Accès à l'appareil photo requis pour scanner le code-barres",
+      "expiryRequired": "Accès à l'appareil photo requis pour scanner la date de péremption"
     },
     "buttons": {
-      "processingOCR": "Processing...",
-      "captureExpiryDate": "Capture Expiry Date",
-      "clearError": "Clear",
-      "manualEntry": "Manual Entry"
+      "processingOCR": "Traitement en cours...",
+      "captureExpiryDate": "Capturer la date de péremption",
+      "clearError": "Effacer",
+      "manualEntry": "Saisie manuelle"
     },
     "alerts": {
-      "serviceUnavailable": "OCR service temporarily unavailable. Please use manual entry.",
-      "ocrError": "Error: {error}",
-      "backendUnavailable": "Backend service is not responding"
+      "serviceUnavailable": "Service OCR temporairement indisponible. Veuillez utiliser la saisie manuelle.",
+      "ocrError": "Erreur : {error}",
+      "backendUnavailable": "Le service backend ne répond pas"
     }
   }
 }
