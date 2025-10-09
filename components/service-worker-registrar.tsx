@@ -38,6 +38,18 @@ export default function ServiceWorkerRegistrar() {
                 : String(registrationError),
           })
         })
+
+      // Listen for service worker updates and force reload
+      // This prevents stale server action errors after deployments
+      navigator.serviceWorker.addEventListener('message', event => {
+        if (event.data?.type === 'SW_UPDATED') {
+          logger.log('ServiceWorker', 'New version detected, reloading page...')
+          // Wait a bit to allow any pending requests to complete
+          setTimeout(() => {
+            window.location.reload()
+          }, 1000)
+        }
+      })
     } else {
       logger.warn('ServiceWorker', 'Not supported in this browser')
     }

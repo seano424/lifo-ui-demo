@@ -1,18 +1,8 @@
-const CACHE_NAME = 'lifo-ai-v2'
+const CACHE_NAME = 'lifo-ai-v3'
 
 // Critical pages to cache for offline access
-const CRITICAL_PAGES = [
-  '/',
-  '/manifest.json',
-  '/offline',
-  '/dashboard',
-  '/scanning',
-  '/products',
-  '/batches',
-  '/settings',
-  '/auth/login',
-  '/pricing',
-]
+// Only cache public pages that don't require authentication
+const CRITICAL_PAGES = ['/manifest.json', '/offline', '/auth/login', '/pricing']
 
 // Install event - cache critical pages with error handling
 self.addEventListener('install', event => {
@@ -36,7 +26,7 @@ self.addEventListener('install', event => {
   )
 })
 
-// Activate event - clean up old caches
+// Activate event - clean up old caches and force reload on update
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches
@@ -45,6 +35,7 @@ self.addEventListener('activate', event => {
         return Promise.all(
           cacheNames.map(cacheName => {
             if (cacheName !== CACHE_NAME) {
+              console.log('Deleting old cache:', cacheName)
               return caches.delete(cacheName)
             }
           }),
@@ -53,6 +44,15 @@ self.addEventListener('activate', event => {
       .then(() => {
         // Take control of all clients immediately
         return self.clients.claim()
+      })
+      .then(() => {
+        // Force reload all clients when service worker updates
+        // This prevents stale server action errors after deployments
+        return self.clients.matchAll({ type: 'window' }).then(clients => {
+          clients.forEach(client => {
+            client.postMessage({ type: 'SW_UPDATED' })
+          })
+        })
       }),
   )
 })
