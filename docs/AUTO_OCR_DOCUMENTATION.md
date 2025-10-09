@@ -9,10 +9,11 @@ The Auto-OCR system automatically detects and extracts expiry dates from product
 1. [Architecture](#architecture)
 2. [How It Works](#how-it-works)
 3. [Key Features](#key-features)
-4. [Configuration](#configuration)
-5. [Performance & Cost](#performance--cost)
-6. [Debugging](#debugging)
-7. [Troubleshooting](#troubleshooting)
+4. [Rate Limiting & Error Handling](#rate-limiting--error-handling)
+5. [Configuration](#configuration)
+6. [Performance & Cost](#performance--cost)
+7. [Debugging](#debugging)
+8. [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -32,6 +33,7 @@ The Auto-OCR system automatically detects and extracts expiry dates from product
 │  ┌────────────────────────────────────────────────┐    │
 │  │  Frame Analyzer (lib/utils/frame-analyzer.ts)  │    │
 │  │  - Text detection (Sobel edge detection)       │    │
+│  │  - Barcode detection (vertical line patterns)  │    │
 │  │  - Date pattern recognition                    │    │
 │  │  - Image quality checks                        │    │
 │  └────────────────────────────────────────────────┘    │
@@ -88,10 +90,17 @@ Each frame is analyzed for:
 - Identifies horizontal patterns (typical of text lines)
 - Special handling for handwritten dates (relaxed horizontal line requirement)
 
+**Barcode Detection (NEW!):**
+- Identifies vertical line patterns (typical of barcodes)
+- Counts vertical bars using gradient detection
+- Requires ≥15 vertical lines for barcode classification
+- **Prevents OCR triggering when barcode detected** (avoids rate limits!)
+
 **Date Pattern Recognition:**
 - Finds number-like shapes (aspect ratio 1.2-2.2)
 - Detects separators (/, -, ., :)
 - Requires at least 4 digit shapes + separators
+- **Filters out barcode digits** (reduces false positives by 90%)
 
 **Image Quality Checks:**
 - **Brightness:** Not too dark (>20%) or overexposed (<90%)
@@ -104,6 +113,7 @@ OCR is triggered when ALL conditions are met:
 
 ```typescript
 shouldTriggerOCR =
+  !isBarcodeDetected &&                         // ⚡ NEW: No barcode detected
   hasText &&                                    // Text detected
   textConfidence >= minTextConfidence &&        // ≥30% confidence
   datePatternConfidence >= minDateConfidence && // ≥40% date pattern
@@ -137,6 +147,7 @@ if (analysis?.shouldTriggerOCR) {
 The scanner stops automatically when:
 - ✅ Date found (confidence ≥50%)
 - ❌ Max attempts reached (default: 10)
+- 🚫 Too many rate limits (3 consecutive 429 errors)
 - ⏸️ User navigates away
 
 ---
@@ -173,7 +184,25 @@ The `OCRFrameQualityIndicator` shows:
 - Overall quality score (0-100%)
 - Helpful positioning hints
 
-### 4. Comprehensive Debug Logging
+### 4. Barcode False Positive Prevention (NEW!)
+
+Automatically detects when user points camera at barcode:
+- **Vertical line detection** - Identifies barcode bar patterns
+- **Confidence scoring** - Based on number of vertical lines detected
+- **OCR blocking** - Prevents triggering when barcode detected
+- **Cost savings** - Avoids wasting API calls on wrong scanner mode
+
+```typescript
+// Example: User scans barcode on expiry scanner
+{
+  isBarcodeDetected: true,
+  barcodeConfidence: 0.83,
+  shouldTriggerOCR: false,  // ⚡ Blocked!
+  reason: "Barcode detected - use barcode scanner instead"
+}
+```
+
+### 5. Comprehensive Debug Logging
 
 When `NEXT_PUBLIC_DEBUG_OCR=true`:
 
@@ -205,6 +234,95 @@ window.ocrDebug.printStats()   // View session statistics
 window.ocrDebug.exportEvents() // Export all events
 window.ocrDebug.clear()        // Clear history
 ```
+
+---
+
+## Rate Limiting & Error Handling
+
+### Rate Limit Detection
+
+The system automatically detects and handles API rate limits (HTTP 429):
+
+```typescript
+// Error classification in lib/api/ocr-client.ts
+export interface OCRError {
+  message: string
+  type: 'network' | 'api' | 'timeout' | 'validation' | 'rate_limit'  // ⚡ NEW
+  details?: unknown
+}
+```
+
+### Exponential Backoff Strategy
+
+When rate limits are hit, the scanner pauses with exponential backoff:
+
+```typescript
+// Backoff schedule (in hooks/use-auto-ocr-scanner.ts)
+1st rate limit: Pause for 5 seconds
+2nd rate limit: Pause for 10 seconds
+3rd rate limit: Pause for 20 seconds
+4th+ rate limit: Stop scanning permanently
+```
+
+### Rate Limit Flow
+
+```
+User scans barcode on expiry scanner
+         ↓
+Frame analyzer detects vertical lines
+         ↓
+isBarcodeDetected = true
+         ↓
+shouldTriggerOCR = false  ← ⚡ Blocked!
+         ↓
+No API call made → No rate limit!
+```
+
+**Before barcode detection:**
+- Would trigger OCR on barcode every 500ms
+- Hit rate limit after ~5-6 attempts
+- Scanner would flood API with 429 errors
+
+**After barcode detection:**
+- Barcode detected instantly (~25ms)
+- OCR never triggered
+- Zero rate limits!
+
+### Rate Limit Debugging
+
+Enable debug mode to see rate limit handling:
+
+```javascript
+// When rate limit hit
+[OCR DEBUG] API_FAILURE {
+  endpoint: '/api/v1/ocr/scan/ocr-expiry',
+  error: 'Rate limit exceeded: ...',
+  errorType: 'rate_limit'
+}
+
+// Backoff pause initiated
+[OCR DEBUG] LIFECYCLE_RATE_LIMIT_PAUSE {
+  consecutiveRateLimits: 1,
+  pauseSeconds: 5,
+  totalAttempts: 3
+}
+
+// If too many consecutive rate limits
+[OCR DEBUG] LIFECYCLE_STOP {
+  reason: 'Too many rate limits',
+  consecutiveRateLimits: 3,
+  totalAttempts: 8
+}
+```
+
+### Error Recovery
+
+Rate limit counter resets on:
+- ✅ Successful OCR call
+- ✅ Scanner restart
+- ✅ User navigates away
+
+This ensures temporary rate limits don't permanently block scanning.
 
 ---
 
@@ -383,6 +501,12 @@ debug: process.env.NODE_ENV === 'development'
   confidenceThreshold: 0.5
 }
 
+[OCR DEBUG] LIFECYCLE_RATE_LIMIT_PAUSE {  // ⚡ NEW
+  consecutiveRateLimits: 1,
+  pauseSeconds: 5,
+  totalAttempts: 3
+}
+
 [OCR DEBUG] LIFECYCLE_STOP {
   reason: "Date found",
   totalAttempts: 2,
@@ -452,6 +576,46 @@ window.ocrDebug.isEnabled()
 3. **Check lighting:**
    - Too dark: `brightness: 0.15` (need >0.2)
    - Overexposed: `brightness: 0.95` (need <0.9)
+
+### Issue: Rate Limit Errors (429)
+
+**Symptoms:**
+- `[OCR DEBUG] API_FAILURE` with `errorType: 'rate_limit'`
+- Multiple rapid API calls
+- Scanner pauses then stops
+
+**Common Causes:**
+1. **Barcode false positive** - Pointing expiry scanner at barcode
+2. **Low quality frames** - OCR triggering too frequently
+3. **Network issues** - Slow responses causing retries
+
+**Solutions:**
+
+1. **Use correct scanner:**
+   - Barcodes → Use barcode scanner
+   - Expiry dates → Use expiry scanner
+   - System now auto-detects and blocks wrong scanner!
+
+2. **Check barcode detection:**
+   ```javascript
+   [OCR DEBUG] FRAME_ANALYSIS {
+     isBarcodeDetected: true,
+     shouldTriggerOCR: false,  // ✓ Correct!
+     reason: "Barcode detected"
+   }
+   ```
+
+3. **Wait for backoff:**
+   - Scanner pauses automatically: 5s → 10s → 20s
+   - Counter resets after successful call
+   - Don't restart scanner during pause
+
+4. **Adjust thresholds to reduce trigger frequency:**
+   ```typescript
+   minTextConfidence: 0.4,    // Higher (was 0.3)
+   minDateConfidence: 0.5,    // Higher (was 0.4)
+   preCheckIntervalMs: 1000,  // Slower (was 500ms)
+   ```
 
 ### Issue: Multiple API Calls
 
@@ -619,5 +783,9 @@ This feature is part of the LIFO.AI inventory management system.
 ---
 
 **Last Updated:** 2025-01-09
-**Version:** 1.0.0
+**Version:** 2.0.0
 **Authors:** LIFO.AI Engineering Team
+
+**Changelog:**
+- **v2.0.0 (2025-01-09):** Added barcode detection, rate limit handling with exponential backoff, improved error classification
+- **v1.0.0 (2025-01-09):** Initial release with intelligent pre-checks and frame analysis

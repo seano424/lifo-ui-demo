@@ -4,7 +4,7 @@
  * before making expensive OCR API calls
  */
 
-import { logger } from './logger'
+import { ocrDebugLogger } from './ocr-debug-logger'
 
 export interface FrameAnalysis {
   // Text detection
@@ -14,6 +14,10 @@ export interface FrameAnalysis {
   // Date-specific detection
   hasDatePattern: boolean
   datePatternConfidence: number
+
+  // Barcode detection
+  isBarcodeDetected: boolean
+  barcodeConfidence: number
 
   // Image quality metrics
   brightness: number // 0-1 (0=dark, 1=bright)
@@ -32,6 +36,8 @@ export interface FrameAnalysis {
     numberLikeShapes: number
     hasSeparators: boolean
     horizontalPatterns: boolean
+    verticalLineCount: number
+    hasVerticalPattern: boolean
   }
 }
 
@@ -66,7 +72,9 @@ export function analyzeFrame(
 
   const ctx = canvas.getContext('2d')
   if (!ctx) {
-    logger.error('FrameAnalyzer', 'Failed to get canvas context')
+    ocrDebugLogger.log('FRAME_ANALYZER_ERROR', {
+      error: 'Failed to get canvas context',
+    })
     return createEmptyAnalysis()
   }
 
@@ -74,7 +82,8 @@ export function analyzeFrame(
 
   // Run all detections
   const textDetection = detectTextLikeContent(imageData)
-  const dateDetection = detectDatePattern(imageData)
+  const barcodeDetection = detectBarcode(imageData)
+  const dateDetection = detectDatePattern(imageData, barcodeDetection.isBarcode)
   const quality = analyzeImageQuality(imageData)
 
   // Calculate overall score (weighted combination)
@@ -85,7 +94,9 @@ export function analyzeFrame(
     quality.contrast * 0.15 // 15% weight on contrast
 
   // Determine if we should trigger OCR
+  // IMPORTANT: Skip OCR if barcode is detected (wrong scanner mode!)
   const shouldTriggerOCR =
+    !barcodeDetection.isBarcode && // No barcode detected
     textDetection.hasText &&
     textDetection.confidence >= minTextConfidence &&
     dateDetection.confidence >= minDateConfidence &&
@@ -99,6 +110,8 @@ export function analyzeFrame(
     textConfidence: textDetection.confidence,
     hasDatePattern: dateDetection.hasDatePattern,
     datePatternConfidence: dateDetection.confidence,
+    isBarcodeDetected: barcodeDetection.isBarcode,
+    barcodeConfidence: barcodeDetection.confidence,
     brightness: quality.brightness,
     contrast: quality.contrast,
     sharpness: quality.sharpness,
@@ -114,9 +127,17 @@ export function analyzeFrame(
       numberLikeShapes: dateDetection.debugInfo?.numberLikeShapes || 0,
       hasSeparators: dateDetection.debugInfo?.hasSeparators || false,
       horizontalPatterns: textDetection.debugInfo?.horizontalPatterns || false,
+      verticalLineCount: barcodeDetection.debugInfo?.verticalLineCount || 0,
+      hasVerticalPattern: barcodeDetection.debugInfo?.hasVerticalPattern || false,
     }
 
-    logger.log('FrameAnalyzer', 'Frame analysis complete', analysis)
+    ocrDebugLogger.log('FRAME_ANALYZER_COMPLETE', {
+      shouldTriggerOCR: analysis.shouldTriggerOCR,
+      textConfidence: analysis.textConfidence,
+      datePatternConfidence: analysis.datePatternConfidence,
+      overallScore: analysis.overallScore,
+      debugInfo: analysis.debugInfo,
+    })
   }
 
   return analysis
@@ -188,9 +209,48 @@ function detectTextLikeContent(imageData: ImageData): {
 }
 
 /**
- * Detect date-like patterns in the image
+ * Detect barcode patterns in the image
+ * Barcodes have strong vertical line patterns with regular spacing
  */
-function detectDatePattern(imageData: ImageData): {
+function detectBarcode(imageData: ImageData): {
+  isBarcode: boolean
+  confidence: number
+  debugInfo?: {
+    verticalLineCount: number
+    hasVerticalPattern: boolean
+  }
+} {
+  // Convert to grayscale
+  const grayscale = toGrayscale(imageData)
+
+  // Detect vertical lines (barcode bars)
+  const verticalLines = detectVerticalLines(grayscale, imageData.width, imageData.height)
+
+  // Barcodes typically have many vertical lines (at least 15-20 bars)
+  const isBarcode = verticalLines >= 15
+
+  // Calculate confidence based on vertical line count
+  // More vertical lines = higher barcode confidence
+  const confidence = Math.min(verticalLines / 30, 1)
+
+  return {
+    isBarcode,
+    confidence,
+    debugInfo: {
+      verticalLineCount: verticalLines,
+      hasVerticalPattern: verticalLines >= 15,
+    },
+  }
+}
+
+/**
+ * Detect date-like patterns in the image
+ * Now with barcode filtering - if barcode detected, reduce date confidence
+ */
+function detectDatePattern(
+  imageData: ImageData,
+  isBarcodeDetected: boolean,
+): {
   hasDatePattern: boolean
   confidence: number
   debugInfo?: {
@@ -231,8 +291,14 @@ function detectDatePattern(imageData: ImageData): {
     confidence += 0.3 // Boost for separators
   }
 
+  // IMPORTANT: If barcode detected, severely reduce date confidence
+  // Barcode digits at bottom are NOT expiry dates!
+  if (isBarcodeDetected) {
+    confidence *= 0.1 // Reduce to 10% if barcode detected
+  }
+
   return {
-    hasDatePattern,
+    hasDatePattern: hasDatePattern && !isBarcodeDetected, // No date pattern if barcode
     confidence: Math.min(confidence, 1),
     debugInfo: {
       numberLikeShapes: numberLikeShapes.length,
@@ -381,6 +447,44 @@ function detectHorizontalLines(edges: Uint8ClampedArray, width: number, height: 
 
   // Text typically has at least 2-3 horizontal patterns
   return horizontalLinesFound >= 2
+}
+
+/**
+ * Detect vertical line patterns (for barcode detection)
+ */
+function detectVerticalLines(grayscale: Uint8ClampedArray, width: number, height: number): number {
+  const threshold = 100 // Higher threshold for strong vertical edges
+  const minLineHeight = Math.floor(height * 0.3) // Line must be at least 30% of image height
+
+  let verticalLinesFound = 0
+
+  // Scan vertical columns
+  for (let x = 0; x < width; x += 2) {
+    // Check every 2nd column for performance
+    let consecutiveEdges = 0
+
+    for (let y = 1; y < height - 1; y++) {
+      // Calculate vertical gradient (simplified edge detection)
+      const top = grayscale[(y - 1) * width + x]
+      const bottom = grayscale[(y + 1) * width + x]
+      const gradient = Math.abs(bottom - top)
+
+      if (gradient > threshold) {
+        consecutiveEdges++
+      } else {
+        if (consecutiveEdges >= minLineHeight) {
+          verticalLinesFound++
+        }
+        consecutiveEdges = 0
+      }
+    }
+
+    if (consecutiveEdges >= minLineHeight) {
+      verticalLinesFound++
+    }
+  }
+
+  return verticalLinesFound
 }
 
 /**
@@ -550,6 +654,8 @@ function createEmptyAnalysis(): FrameAnalysis {
     textConfidence: 0,
     hasDatePattern: false,
     datePatternConfidence: 0,
+    isBarcodeDetected: false,
+    barcodeConfidence: 0,
     brightness: 0,
     contrast: 0,
     sharpness: 0,

@@ -122,7 +122,10 @@ class OCRDebugLogger {
   /**
    * Log auto-scan lifecycle event
    */
-  logLifecycle(event: 'START' | 'STOP' | 'RESET' | 'MAX_ATTEMPTS', data: Record<string, unknown> = {}) {
+  logLifecycle(
+    event: 'START' | 'STOP' | 'RESET' | 'MAX_ATTEMPTS' | 'RATE_LIMIT_PAUSE',
+    data: Record<string, unknown> = {},
+  ) {
     this.log(`LIFECYCLE_${event}`, data)
   }
 

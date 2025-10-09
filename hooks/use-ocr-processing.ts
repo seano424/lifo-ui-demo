@@ -237,6 +237,7 @@ export function useOCRWithFallback() {
       })
 
       // Determine if we should fallback to manual entry
+      // For rate limits, we should NOT fallback - just fail and let auto-scanner handle it
       const shouldFallback =
         ocrError.type === 'network' ||
         ocrError.type === 'timeout' ||
@@ -245,6 +246,7 @@ export function useOCRWithFallback() {
       logger.log('useOCRWithFallback', 'Fallback decision', {
         shouldFallback,
         errorType: ocrError.type,
+        isRateLimit: ocrError.type === 'rate_limit',
       })
 
       return {

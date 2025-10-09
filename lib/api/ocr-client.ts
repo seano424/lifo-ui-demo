@@ -78,7 +78,7 @@ export interface OCRFullAnalysisResponse {
 
 export interface OCRError {
   message: string
-  type: 'network' | 'api' | 'timeout' | 'validation'
+  type: 'network' | 'api' | 'timeout' | 'validation' | 'rate_limit'
   details?: unknown
 }
 
@@ -180,6 +180,17 @@ export async function extractExpiryDate(
         statusText: response.statusText,
         errorText,
       })
+
+      // Check for rate limit error (429)
+      if (response.status === 429) {
+        const rateLimitError: OCRError = {
+          message: `Rate limit exceeded: ${errorText}`,
+          type: 'rate_limit',
+          details: { status: response.status, errorText },
+        }
+        throw rateLimitError
+      }
+
       throw new Error(`API error ${response.status}: ${errorText}`)
     }
 

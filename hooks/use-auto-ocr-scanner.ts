@@ -4,7 +4,7 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { captureImageFromVideo } from '@/lib/api/ocr-client'
+import { captureImageFromVideo, type OCRError } from '@/lib/api/ocr-client'
 import type { ExpiryDateInfo } from '@/lib/stores/scanning-workflow-store'
 import { analyzeFrame, type FrameAnalysis } from '@/lib/utils/frame-analyzer'
 import { logger } from '@/lib/utils/logger'
@@ -80,6 +80,10 @@ export function useAutoOCRScanner(options: AutoOCRScannerOptions): AutoOCRScanne
   // Refs to prevent stale closures
   const preCheckIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const isProcessingOCRRef = useRef(false)
+
+  // Rate limit tracking
+  const rateLimitPausedUntilRef = useRef<number>(0)
+  const consecutiveRateLimitsRef = useRef<number>(0)
 
   // OCR processing hook
   const { processExpiryDate, isLoading: isOCRProcessing } = useOCRWithFallback()
@@ -175,6 +179,17 @@ export function useAutoOCRScanner(options: AutoOCRScannerOptions): AutoOCRScanne
    * Trigger OCR processing on current frame
    */
   const triggerOCR = useCallback(async () => {
+    // Check if we're in rate limit pause period
+    const now = Date.now()
+    if (rateLimitPausedUntilRef.current > now) {
+      const remainingPause = Math.ceil((rateLimitPausedUntilRef.current - now) / 1000)
+      logger.log('AutoOCRScanner', 'Rate limit pause active, skipping OCR', {
+        remainingSeconds: remainingPause,
+        consecutiveRateLimits: consecutiveRateLimitsRef.current,
+      })
+      return
+    }
+
     if (isProcessingOCRRef.current) {
       logger.log('AutoOCRScanner', 'OCR already in progress, skipping', {
         isProcessing: isProcessingOCRRef.current,
@@ -243,7 +258,10 @@ export function useAutoOCRScanner(options: AutoOCRScannerOptions): AutoOCRScanne
       })
 
       if (result.success && result.expiryDateInfo?.extractedDate) {
-        // Success! Stop auto-scanning
+        // Success! Reset rate limit tracking and stop auto-scanning
+        consecutiveRateLimitsRef.current = 0
+        rateLimitPausedUntilRef.current = 0
+
         ocrDebugLogger.logAPISuccess(
           '/api/v1/ocr/scan/ocr-expiry',
           {
@@ -308,12 +326,61 @@ export function useAutoOCRScanner(options: AutoOCRScannerOptions): AutoOCRScanne
 
       ocrDebugLogger.logAPIFailure('/api/v1/ocr/scan/ocr-expiry', error, apiDuration)
 
+      const ocrError = error as OCRError
+
       logger.error('AutoOCRScanner', 'OCR processing failed', {
-        error: error instanceof Error ? error.message : String(error),
+        error: ocrError.message || String(error),
+        errorType: ocrError.type,
         attemptCount: attemptCount + 1,
       })
 
-      // Continue scanning on error (unless max attempts reached)
+      // Special handling for rate limit errors
+      if (ocrError.type === 'rate_limit') {
+        consecutiveRateLimitsRef.current += 1
+
+        // Calculate backoff time (exponential: 5s, 10s, 20s, 30s max)
+        const backoffSeconds = Math.min(5 * 2 ** (consecutiveRateLimitsRef.current - 1), 30)
+        rateLimitPausedUntilRef.current = Date.now() + backoffSeconds * 1000
+
+        logger.warn('AutoOCRScanner', 'Rate limit hit - pausing auto-scan', {
+          consecutiveRateLimits: consecutiveRateLimitsRef.current,
+          pauseSeconds: backoffSeconds,
+          pausedUntil: new Date(rateLimitPausedUntilRef.current).toISOString(),
+        })
+
+        ocrDebugLogger.logLifecycle('RATE_LIMIT_PAUSE', {
+          consecutiveRateLimits: consecutiveRateLimitsRef.current,
+          pauseSeconds: backoffSeconds,
+          totalAttempts: attemptCount + 1,
+        })
+
+        // If too many consecutive rate limits (>3), stop auto-scanning entirely
+        if (consecutiveRateLimitsRef.current >= 3) {
+          logger.error(
+            'AutoOCRScanner',
+            'Too many consecutive rate limits - stopping auto-scan permanently',
+            {
+              consecutiveRateLimits: consecutiveRateLimitsRef.current,
+            },
+          )
+
+          ocrDebugLogger.logLifecycle('STOP', {
+            reason: 'Too many rate limits',
+            consecutiveRateLimits: consecutiveRateLimitsRef.current,
+            totalAttempts: attemptCount + 1,
+          })
+
+          isProcessingOCRRef.current = false
+          setIsAnalyzing(false)
+          return
+        }
+
+        // Otherwise, pause and continue after backoff
+        isProcessingOCRRef.current = false
+        return
+      }
+
+      // Continue scanning on other errors (unless max attempts reached)
       if (attemptCount + 1 >= maxAttempts) {
         logger.warn('AutoOCRScanner', 'Max OCR attempts reached after error, stopping')
 
@@ -336,7 +403,6 @@ export function useAutoOCRScanner(options: AutoOCRScannerOptions): AutoOCRScanne
     ocrConfidenceThreshold,
     onExpiryDetected,
     processExpiryDate,
-    debug,
   ])
 
   /**

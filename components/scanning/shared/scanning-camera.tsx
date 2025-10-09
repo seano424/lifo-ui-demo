@@ -153,7 +153,7 @@ export default function ScanningCamera({
             isAnalyzing={autoOCRState.isAnalyzing}
             attemptCount={autoOCRState.attemptCount}
             maxAttempts={10}
-            showDebugInfo={process.env.NODE_ENV === 'development'}
+            showDebugInfo={process.env.NEXT_PUBLIC_DEBUG_OCR === 'true'}
           />
         )}
       </div>
@@ -199,7 +199,7 @@ export default function ScanningCamera({
               </div>
 
               {/* Auto-Scan Stats (Debug) */}
-              {autoOCRState?.isAnalyzing && process.env.NODE_ENV === 'development' && (
+              {autoOCRState?.isAnalyzing && process.env.NEXT_PUBLIC_DEBUG_OCR === 'true' && (
                 <div className="text-xs text-gray-500 text-center">
                   Auto-scanning... Frames: {autoOCRState.totalFramesAnalyzed} | OCR:{' '}
                   {autoOCRState.ocrTriggeredCount}
