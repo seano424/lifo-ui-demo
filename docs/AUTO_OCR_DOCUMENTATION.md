@@ -328,13 +328,42 @@ This ensures temporary rate limits don't permanently block scanning.
 
 ## Configuration
 
+### Feature Flag: Auto vs Manual Mode
+
+**Environment Variable:** `NEXT_PUBLIC_AUTO_OCR_ENABLED`
+
+**Auto Mode (enabled, default):**
+```bash
+NEXT_PUBLIC_AUTO_OCR_ENABLED=true
+```
+- Automatically scans frames every 500ms
+- Triggers OCR when quality thresholds met
+- Hands-free experience (like barcode scanning)
+- Shows: "🤖 Auto-scanning active... Hold camera steady"
+
+**Manual Mode (disabled):**
+```bash
+NEXT_PUBLIC_AUTO_OCR_ENABLED=false
+```
+- User clicks "Capture Expiry Date" button to trigger OCR
+- Only one API call per click
+- More control, lower costs
+- Shows: "📸 Manual mode: Click button to capture expiry date"
+
 ### Basic Configuration
 
 ```typescript
 // In components/scanning/standalone-scanning-interface.tsx
+// Check feature flag
+const isAutoOCREnabled = process.env.NEXT_PUBLIC_AUTO_OCR_ENABLED === 'true'
+
 const autoOCRScanner = useAutoOCRScanner({
-  // Enable/disable
-  isEnabled: currentStep === 'ocr' && uiStep === 'camera-expiry' && !inventoryData.expiryDate,
+  // Enable/disable (respects feature flag)
+  isEnabled:
+    isAutoOCREnabled &&  // Feature flag check
+    currentStep === 'ocr' &&
+    uiStep === 'camera-expiry' &&
+    !inventoryData.expiryDate,
 
   // Core settings
   storeId: activeStore?.store_id || '',
@@ -381,12 +410,24 @@ minSharpness: 0.03,           // Very low sharpness threshold
 ### Environment Variables
 
 ```bash
+# Feature flag: Enable/disable auto-OCR scanning
+# true  = Auto-scan every 500ms (hands-free, default)
+# false = Manual capture with button click (user-controlled)
+NEXT_PUBLIC_AUTO_OCR_ENABLED=true
+
 # Enable debug logging (development only)
 NEXT_PUBLIC_DEBUG_OCR=true
 
 # FastAPI endpoint
 NEXT_PUBLIC_FASTAPI_URL=https://lifo-ai-api-staging-d5tjh.ondigitalocean.app
 ```
+
+**When to Use Manual Mode (`NEXT_PUBLIC_AUTO_OCR_ENABLED=false`):**
+- Testing environments
+- Cost-sensitive deployments (reduce API calls)
+- User preference for more control
+- Regions with strict privacy requirements
+- Debugging OCR issues
 
 ---
 
@@ -783,9 +824,10 @@ This feature is part of the LIFO.AI inventory management system.
 ---
 
 **Last Updated:** 2025-01-09
-**Version:** 2.0.0
+**Version:** 2.1.0
 **Authors:** LIFO.AI Engineering Team
 
 **Changelog:**
+- **v2.1.0 (2025-01-09):** Added feature flag `NEXT_PUBLIC_AUTO_OCR_ENABLED` for auto vs manual mode toggle
 - **v2.0.0 (2025-01-09):** Added barcode detection, rate limit handling with exponential backoff, improved error classification
 - **v1.0.0 (2025-01-09):** Initial release with intelligent pre-checks and frame analysis

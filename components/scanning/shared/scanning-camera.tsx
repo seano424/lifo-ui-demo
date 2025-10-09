@@ -189,7 +189,12 @@ export default function ScanningCamera({
               <div className="flex gap-2">
                 <Button onClick={handleOCRCapture} className="flex-1" disabled={isOCRProcessing}>
                   <Camera className="w-4 h-4 mr-2" />
-                  {isOCRProcessing ? t('buttons.processingOCR') : t('buttons.captureExpiryDate')}
+                  {isOCRProcessing
+                    ? t('buttons.processingOCR')
+                    : autoOCRState
+                      ? t('buttons.captureExpiryDate') // Auto-OCR enabled - button is fallback
+                      : t('buttons.captureExpiryDate')}{' '}
+                  {/* Manual mode only */}
                 </Button>
                 {ocrError && onClearOCRError && (
                   <Button onClick={onClearOCRError} variant="outline" size="sm">
@@ -198,11 +203,24 @@ export default function ScanningCamera({
                 )}
               </div>
 
+              {/* Mode Indicator */}
+              {!autoOCRState && (
+                <div className="text-xs text-gray-600 text-center bg-gray-50 p-2 rounded">
+                  📸 Manual mode: Click button to capture expiry date
+                </div>
+              )}
+
               {/* Auto-Scan Stats (Debug) */}
               {autoOCRState?.isAnalyzing && process.env.NEXT_PUBLIC_DEBUG_OCR === 'true' && (
                 <div className="text-xs text-gray-500 text-center">
                   Auto-scanning... Frames: {autoOCRState.totalFramesAnalyzed} | OCR:{' '}
                   {autoOCRState.ocrTriggeredCount}
+                </div>
+              )}
+
+              {autoOCRState?.isAnalyzing && process.env.NEXT_PUBLIC_DEBUG_OCR !== 'true' && (
+                <div className="text-xs text-primary-600 text-center bg-primary-50 p-2 rounded animate-pulse">
+                  🤖 Auto-scanning active... Hold camera steady on expiry date
                 </div>
               )}
             </div>

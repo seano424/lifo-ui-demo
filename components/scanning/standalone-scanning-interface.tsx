@@ -81,9 +81,16 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
   // const { processExpiryDate, isLoading: isOCRProcessing, isBackendHealthy } = useOCRWithFallback()  //commented for debugging
   const { processExpiryDate, isLoading: isOCRProcessing } = useOCRWithFallback()
 
+  // Check if auto-OCR is enabled via environment variable
+  const isAutoOCREnabled = process.env.NEXT_PUBLIC_AUTO_OCR_ENABLED === 'true'
+
   // Auto-OCR scanner with intelligent pre-checks
   const autoOCRScanner = useAutoOCRScanner({
-    isEnabled: currentStep === 'ocr' && uiStep === 'camera-expiry' && !inventoryData.expiryDate,
+    isEnabled:
+      isAutoOCREnabled && // Feature flag check
+      currentStep === 'ocr' &&
+      uiStep === 'camera-expiry' &&
+      !inventoryData.expiryDate,
     storeId: activeStore?.store_id || '',
     onExpiryDetected: expiryInfo => {
       logger.log('StandaloneScanningInterface', 'Auto-OCR detected expiry date', {
@@ -538,7 +545,7 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
                     workflowActions.setError(null)
                   }}
                   // Auto-OCR props - auto-scan starts automatically when enabled
-                  autoOCRState={autoOCRScanner}
+                  autoOCRState={isAutoOCREnabled ? autoOCRScanner : undefined}
                   // isBackendHealthy={isBackendHealthy}
                 />
               )}
