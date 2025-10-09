@@ -1,8 +1,27 @@
 const CACHE_NAME = 'lifo-ai-v3'
 
 // Critical pages to cache for offline access
-// Only cache public pages that don't require authentication
-const CRITICAL_PAGES = ['/manifest.json', '/offline', '/auth/login', '/pricing']
+// Only cache public pages that don't require authentication (from middleware.ts line 76-86)
+const CRITICAL_PAGES = [
+  '/manifest.json',
+  '/offline',
+  // Auth pages (all public)
+  '/auth/login',
+  '/auth/sign-up',
+  '/auth/forgot-password',
+  '/auth/update-password',
+  '/auth/error',
+  '/auth/sign-up-success',
+  // Onboarding (public)
+  '/onboarding/create-account',
+  '/onboarding/success',
+  // Marketing pages (public)
+  '/',
+  '/contact',
+  '/features',
+  '/pricing',
+  '/support',
+]
 
 // Install event - cache critical pages with error handling
 self.addEventListener('install', event => {
