@@ -617,13 +617,13 @@
     "email": "Email",
     "role": "Role",
     "status": "Status",
-    "pinStatus": "PIN Status",
+    "passwordStatus": "Password Status",
     "actions": "Actions",
     "active": "Active",
     "inactive": "Inactive",
     "locked": "Locked",
-    "pinActive": "PIN Active",
-    "noPin": "No PIN",
+    "passwordActive": "Password Active",
+    "noPassword": "No Password",
     "loadMoreUsers": "Load More Users",
     "loadingMore": "Loading more...",
     "noUsersMessage": "This store doesn't have any users yet.",
@@ -645,8 +645,8 @@
       "makeEmployee": "Make Employee",
       "makeManager": "Make Manager",
       "makeOwner": "Make Owner",
-      "resetPin": "Reset PIN",
-      "unlockPin": "Unlock PIN",
+      "resetPassword": "Reset Password",
+      "unlockPassword": "Unlock Password",
       "deactivateUser": "Deactivate User",
       "reactivateUser": "Reactivate User",
       "removeFromStore": "Remove from Store"
@@ -667,8 +667,8 @@
         "confirm": "Remove from Store"
       },
       "resetPin": {
-        "title": "Reset PIN for {name}",
-        "description": "This will generate a new PIN and send it to the employee by email. Their current PIN will no longer work.",
+        "title": "Reset Password for {name}",
+        "description": "This will generate a new password and send it to the employee by email. Their current password will no longer work.",
         "employee": "Employee",
         "username": "Username",
         "email": "Email",
@@ -676,16 +676,16 @@
         "statusLocked": "Locked",
         "statusActive": "Active",
         "cancel": "Cancel",
-        "confirm": "Reset PIN"
+        "confirm": "Reset Password"
       },
-      "unlockPin": {
-        "title": "Unlock PIN for {name}",
-        "description": "This will immediately unlock the employee's PIN and reset their failed attempts counter.",
+      "unlockPassword": {
+        "title": "Unlock Password for {name}",
+        "description": "This will immediately unlock the employee's password and reset their failed attempts counter.",
         "employee": "Employee",
         "username": "Username",
-        "lockedMessage": "The account is currently locked due to failed PIN attempts",
+        "lockedMessage": "The account is currently locked due to failed password attempts",
         "cancel": "Cancel",
-        "confirm": "Unlock PIN"
+        "confirm": "Unlock Password"
       }
     },
     "roles": {
@@ -698,19 +698,19 @@
       "unknown": "Unknown"
     },
     "card": {
-      "pinStatus": {
-        "disabled": "PIN Disabled",
-        "locked": "PIN Locked",
-        "pending": "PIN Pending",
-        "active": "PIN Active"
+      "passwordStatus": {
+        "disabled": "Password Disabled",
+        "locked": "Password Locked",
+        "pending": "Password Pending",
+        "active": "Password Active"
       },
       "inactive": "Inactive",
       "username": "Username",
       "permissions": "Permissions",
       "lastLogin": "Last login",
-      "failedAttempts": "{count} failed PIN attempt{plural}",
-      "enablePin": "Enable PIN",
-      "disablePin": "Disable PIN",
+      "failedAttempts": "{count} failed password attempt{plural}",
+      "enablePassword": "Enable Password",
+      "disablePassword": "Disable Password",
       "removeDialog": {
         "title": "Remove User from Store",
         "description": "Are you sure you want to remove {name} from this store? This will deactivate their access but won't delete their account.",
@@ -721,7 +721,7 @@
   },
   "addEmployee": {
     "title": "Add New Employee",
-    "description": "Create a new employee account with PIN authentication. Login credentials will be sent by email.",
+    "description": "Create a new employee account with password authentication. Login credentials will be sent by email.",
     "form": {
       "firstName": "First Name",
       "lastName": "Last Name",
@@ -752,9 +752,9 @@
     },
     "preview": {
       "username": "Username:",
-      "pin": "PIN:",
-      "pinNote": "Will be generated automatically (6 digits)",
-      "loginNote": "The employee can log in using the \"Employee\" tab with their username and PIN"
+      "password": "Password:",
+      "passwordNote": "Will be generated automatically (6 digits)",
+      "loginNote": "The employee can log in with their username and password"
     },
     "buttons": {
       "cancel": "Cancel",
@@ -775,13 +775,13 @@
     "credentials": {
       "email": "Email",
       "username": "Username",
-      "pin": "PIN"
+      "password": "Password"
     },
     "nextSteps": {
       "title": "Next Steps:",
-      "loginTab": "• The employee can log in using the \"Employee\" tab on the login page",
-      "useCredentials": "• Use username: {username} and PIN: {pin}",
-      "resetPin": "• The PIN can be reset at any time from the team management page",
+      "loginTab": "• The employee can log in with their username and password",
+      "useCredentials": "• Use username: {username} and password: {password}",
+      "resetPassword": "• The password can be reset at any time from the team management page",
       "permissions": "• The employee can scan products and manage basic inventory"
     },
     "errors": {

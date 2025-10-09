@@ -1,6 +1,6 @@
 // app/api/email/test/route.ts
+import { sendPasswordResetEmail, sendWelcomeEmail } from '@/lib/email/resend'
 import { type NextRequest, NextResponse } from 'next/server'
-import { sendPinResetEmail, sendWelcomeEmail } from '@/lib/email/resend'
 
 export async function POST(request: NextRequest) {
   // Only allow in development
@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
 
     const testCredentials = {
       username: 'testuser',
-      pin: '1234',
+      password: '1234',
       email: email,
       full_name: name,
       store_name: 'Test Store LIFO',
@@ -33,11 +33,11 @@ export async function POST(request: NextRequest) {
     let result: { data?: unknown; error?: unknown; success?: boolean; messageId?: string }
     if (type === 'welcome') {
       result = await sendWelcomeEmail(testCredentials)
-    } else if (type === 'pin_reset') {
-      result = await sendPinResetEmail(testCredentials)
+    } else if (type === 'password_reset') {
+      result = await sendPasswordResetEmail(testCredentials)
     } else {
       return NextResponse.json(
-        { success: false, error: 'Type must be "welcome" or "pin_reset"' },
+        { success: false, error: 'Type must be "welcome" or "password_reset"' },
         { status: 400 },
       )
     }
