@@ -47,6 +47,7 @@ export async function prefetchCurrentUser() {
 export async function prefetchDashboardData() {
   const queryClient = createQueryClient()
   const supabase = await createServerClient()
+  const perfStart = performance.now()
 
   try {
     // Get the current authenticated user
@@ -94,15 +95,14 @@ export async function prefetchDashboardData() {
       throw new Error('Authentication required')
     }
 
-    // Prefetch shared data that rarely changes
-    await Promise.all([
-      // Current user data
+    // Prefetch all critical data in parallel with Promise.allSettled for resilience
+    const prefetchStart = performance.now()
+    const results = await Promise.allSettled([
       queryClient.prefetchQuery({
         queryKey: ['currentUser'],
         queryFn: () => fetchCurrentUser(supabase),
         staleTime: 5 * 60 * 1000,
       }),
-      // Categories (shared across all stores and pages)
       queryClient.prefetchQuery({
         queryKey: queryKeys.categories.list,
         queryFn: () => fetchCategories(supabase),
@@ -110,6 +110,17 @@ export async function prefetchDashboardData() {
         gcTime: 30 * 60 * 1000, // 30 minutes
       }),
     ])
+    const prefetchDuration = performance.now() - prefetchStart
+
+    // Log any failed prefetches
+    results.forEach((result, index) => {
+      if (result.status === 'rejected') {
+        const queries = ['currentUser', 'categories']
+        logger.queryWarn('prefetchDashboardData', `Failed to prefetch ${queries[index]}`, {
+          error: result.reason,
+        })
+      }
+    })
 
     // Fetch and prefetch user stores (with graceful fallback)
     let userStores: UserStore[] = []
@@ -167,19 +178,36 @@ export async function prefetchDashboardData() {
       )
 
       if (targetStore) {
-        await queryClient.prefetchQuery({
-          queryKey: ['activeStore'],
-          queryFn: async () => targetStore,
-          staleTime: 2 * 60 * 1000,
-        })
+        const storeId = targetStore.store_id
+        // Prefetch active store and urgent todos count in parallel
+        await Promise.all([
+          queryClient.prefetchQuery({
+            queryKey: ['activeStore'],
+            queryFn: async () => targetStore,
+            staleTime: 2 * 60 * 1000,
+          }),
+          queryClient.prefetchQuery({
+            queryKey: queryKeys.todos.urgentCount(storeId),
+            queryFn: async () => {
+              const { fetchUrgentTodosCount } = await import('@/lib/queries/todos-urgent-count')
+              return fetchUrgentTodosCount(storeId, supabase)
+            },
+            staleTime: 2 * 60 * 1000,
+          }),
+        ])
       }
     }
+
+    const totalDuration = performance.now() - perfStart
+    console.log(
+      `[Performance] Dashboard prefetch completed in ${totalDuration.toFixed(0)}ms (prefetch: ${prefetchDuration.toFixed(0)}ms)`,
+    )
 
     return {
       queryClient,
       dehydratedState: dehydrate(queryClient),
       user,
-      userStores,
+      userStores: userStores || [],
       activeStore: targetStore,
     }
   } catch (error) {
