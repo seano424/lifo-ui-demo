@@ -1,4 +1,4 @@
-const CACHE_NAME = 'lifo-ai-v3'
+const CACHE_NAME = 'lifo-ai-v4'
 
 // Critical pages to cache for offline access
 // Only cache public pages that don't require authentication (from middleware.ts line 76-86)

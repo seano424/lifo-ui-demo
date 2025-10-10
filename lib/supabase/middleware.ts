@@ -54,12 +54,29 @@ export async function updateSession(request: NextRequest) {
         // Handle different error types appropriately
         if (error.message?.includes('refresh_token_not_found')) {
           // This is expected when tokens expire - not an error condition
-          logger.queryWarn('middleware', 'Session expired, user needs to re-authenticate')
+          logger.queryWarn('middleware', 'Session expired, clearing invalid tokens')
+          // Clear ALL Supabase auth cookies to prevent repeated errors
+          const response = NextResponse.next({ request })
+          // Clear all cookies that start with 'sb-' (Supabase cookies are project-specific)
+          request.cookies.getAll().forEach(cookie => {
+            if (cookie.name.startsWith('sb-')) {
+              response.cookies.delete(cookie.name)
+            }
+          })
+          supabaseResponse = response
         } else if (error.message?.includes('Auth session missing')) {
           // Normal for logged-out users - don't log
         } else if (error.message?.includes('JWT')) {
           // Token format issues
           logger.queryWarn('middleware', 'Invalid token format, clearing session')
+          // Clear ALL Supabase auth cookies
+          const response = NextResponse.next({ request })
+          request.cookies.getAll().forEach(cookie => {
+            if (cookie.name.startsWith('sb-')) {
+              response.cookies.delete(cookie.name)
+            }
+          })
+          supabaseResponse = response
         } else if (error.message?.includes('fetch failed') && retryCount < maxRetries) {
           // Retry on transient fetch failures
           logger.queryWarn('middleware', 'Fetch failed, retrying', {
