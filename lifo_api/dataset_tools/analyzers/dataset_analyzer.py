@@ -1,6 +1,7 @@
 """
 Comprehensive dataset analysis for food packaging images.
 """
+
 import json
 import asyncio
 from pathlib import Path
@@ -8,22 +9,22 @@ from typing import Dict, List, Any, Tuple, Optional
 from dataclasses import dataclass, asdict
 import cv2
 import numpy as np
-from PIL import Image
-import logging
 from concurrent.futures import ThreadPoolExecutor
-import re
 from collections import Counter
 
 from ..config import DatasetConfig
 from ..utils import (
-    ProgressTracker, get_image_metadata, calculate_image_quality_score,
-    extract_language_info, get_logger
+    ProgressTracker,
+    get_image_metadata,
+    calculate_image_quality_score,
+    get_logger,
 )
 
 
 @dataclass
 class ImageAnalysis:
     """Results of image analysis for OCR suitability."""
+
     file_path: str
     filename: str
     width: int
@@ -43,6 +44,7 @@ class ImageAnalysis:
 @dataclass
 class DatasetStatistics:
     """Overall dataset statistics."""
+
     total_images: int
     valid_images: int
     invalid_images: int
@@ -75,9 +77,7 @@ class DatasetAnalyzer:
             self.executor.shutdown(wait=True)
 
     async def analyze_dataset(
-        self,
-        dataset_path: Path,
-        progress_tracker: Optional[ProgressTracker] = None
+        self, dataset_path: Path, progress_tracker: Optional[ProgressTracker] = None
     ) -> Dict[str, Any]:
         """
         Analyze complete dataset for OCR suitability and quality metrics.
@@ -104,7 +104,7 @@ class DatasetAnalyzer:
             task_name = progress_tracker.add_task(
                 "image_analysis",
                 "Analyzing images for OCR suitability",
-                total=len(image_files)
+                total=len(image_files),
             )
 
         # Analyze images concurrently
@@ -133,18 +133,22 @@ class DatasetAnalyzer:
             "analysis_timestamp": asyncio.get_event_loop().time(),
             "statistics": asdict(statistics),
             "image_analyses": [asdict(analysis) for analysis in image_analyses],
-            "recommendations": self._generate_recommendations(statistics, image_analyses)
+            "recommendations": self._generate_recommendations(
+                statistics, image_analyses
+            ),
         }
 
         # Save report
-        report_path = self.config.analysis_dir / f"dataset_analysis_{dataset_path.name}.json"
+        report_path = (
+            self.config.analysis_dir / f"dataset_analysis_{dataset_path.name}.json"
+        )
         await self._save_report(report, report_path)
 
         return report
 
     def _find_image_files(self, dataset_path: Path) -> List[Path]:
         """Find all image files in dataset directory."""
-        image_extensions = {'.jpg', '.jpeg', '.png', '.webp', '.bmp', '.tiff'}
+        image_extensions = {".jpg", ".jpeg", ".png", ".webp", ".bmp", ".tiff"}
         image_files = []
 
         for ext in image_extensions:
@@ -157,16 +161,14 @@ class DatasetAnalyzer:
         self,
         image_path: Path,
         progress_tracker: Optional[ProgressTracker],
-        task_name: Optional[str]
+        task_name: Optional[str],
     ) -> Optional[ImageAnalysis]:
         """Analyze a single image for OCR suitability."""
         try:
             # Run CPU-intensive analysis in thread executor
             loop = asyncio.get_event_loop()
             analysis = await loop.run_in_executor(
-                self.executor,
-                self._analyze_image_sync,
-                image_path
+                self.executor, self._analyze_image_sync, image_path
             )
 
             if progress_tracker and task_name:
@@ -213,8 +215,11 @@ class DatasetAnalyzer:
 
         # Determine OCR suitability
         ocr_suitability = self._assess_ocr_suitability(
-            quality_score, brightness_score, contrast_score,
-            sharpness_score, estimated_text_count
+            quality_score,
+            brightness_score,
+            contrast_score,
+            sharpness_score,
+            estimated_text_count,
         )
 
         return ImageAnalysis(
@@ -231,10 +236,12 @@ class DatasetAnalyzer:
             brightness_score=brightness_score,
             contrast_score=contrast_score,
             sharpness_score=sharpness_score,
-            ocr_suitability=ocr_suitability
+            ocr_suitability=ocr_suitability,
         )
 
-    def _extract_dominant_colors(self, image: np.ndarray, num_colors: int = 5) -> List[Tuple[int, int, int]]:
+    def _extract_dominant_colors(
+        self, image: np.ndarray, num_colors: int = 5
+    ) -> List[Tuple[int, int, int]]:
         """Extract dominant colors from image using K-means clustering."""
         try:
             # Reshape image to list of pixels
@@ -242,6 +249,7 @@ class DatasetAnalyzer:
 
             # Use KMeans to find dominant colors
             from sklearn.cluster import KMeans
+
             kmeans = KMeans(n_clusters=num_colors, random_state=42, n_init=10)
             kmeans.fit(pixels)
 
@@ -253,7 +261,9 @@ class DatasetAnalyzer:
             # Fallback: simple color analysis
             return [(128, 128, 128)]  # Gray fallback
 
-    def _detect_text_regions_basic(self, gray_image: np.ndarray) -> Tuple[List[Tuple], int]:
+    def _detect_text_regions_basic(
+        self, gray_image: np.ndarray
+    ) -> Tuple[List[Tuple], int]:
         """Basic text region detection using edge detection and morphology."""
         try:
             # Edge detection
@@ -264,7 +274,9 @@ class DatasetAnalyzer:
             dilated = cv2.dilate(edges, kernel, iterations=1)
 
             # Find contours
-            contours, _ = cv2.findContours(dilated, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            contours, _ = cv2.findContours(
+                dilated, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
+            )
 
             # Filter contours that might be text
             text_regions = []
@@ -272,12 +284,19 @@ class DatasetAnalyzer:
                 x, y, w, h = cv2.boundingRect(contour)
 
                 # Filter by size and aspect ratio (typical for text)
-                if (w > 10 and h > 8 and w < gray_image.shape[1] * 0.8 and
-                    h < gray_image.shape[0] * 0.3 and 0.1 < h/w < 3.0):
+                if (
+                    w > 10
+                    and h > 8
+                    and w < gray_image.shape[1] * 0.8
+                    and h < gray_image.shape[0] * 0.3
+                    and 0.1 < h / w < 3.0
+                ):
                     text_regions.append((x, y, w, h))
 
             # Estimate text count based on regions
-            estimated_text_count = min(len(text_regions), 50)  # Cap at reasonable number
+            estimated_text_count = min(
+                len(text_regions), 50
+            )  # Cap at reasonable number
 
             return text_regions, estimated_text_count
 
@@ -290,7 +309,7 @@ class DatasetAnalyzer:
         brightness_score: float,
         contrast_score: float,
         sharpness_score: float,
-        text_count: int
+        text_count: int,
     ) -> str:
         """Assess overall OCR suitability based on various metrics."""
         # Normalize brightness score (ideal around 0.4-0.7)
@@ -299,11 +318,11 @@ class DatasetAnalyzer:
 
         # Combined score
         ocr_score = (
-            quality_score * 0.3 +
-            normalized_brightness * 0.2 +
-            contrast_score * 0.2 +
-            sharpness_score * 0.2 +
-            min(text_count / 10.0, 1.0) * 0.1
+            quality_score * 0.3
+            + normalized_brightness * 0.2
+            + contrast_score * 0.2
+            + sharpness_score * 0.2
+            + min(text_count / 10.0, 1.0) * 0.1
         )
 
         if ocr_score >= 0.8:
@@ -319,11 +338,16 @@ class DatasetAnalyzer:
         """Calculate comprehensive dataset statistics."""
         if not analyses:
             return DatasetStatistics(
-                total_images=0, valid_images=0, invalid_images=0,
-                avg_quality_score=0.0, language_distribution={},
-                format_distribution={}, size_distribution={},
-                ocr_suitability_distribution={}, avg_dimensions=(0, 0),
-                total_size_mb=0.0
+                total_images=0,
+                valid_images=0,
+                invalid_images=0,
+                avg_quality_score=0.0,
+                language_distribution={},
+                format_distribution={},
+                size_distribution={},
+                ocr_suitability_distribution={},
+                avg_dimensions=(0, 0),
+                total_size_mb=0.0,
             )
 
         # Basic counts
@@ -373,20 +397,18 @@ class DatasetAnalyzer:
             size_distribution=size_categories,
             ocr_suitability_distribution=ocr_suitability_distribution,
             avg_dimensions=(int(avg_width), int(avg_height)),
-            total_size_mb=total_size_mb
+            total_size_mb=total_size_mb,
         )
 
     def _generate_recommendations(
-        self,
-        statistics: DatasetStatistics,
-        analyses: List[ImageAnalysis]
+        self, statistics: DatasetStatistics, analyses: List[ImageAnalysis]
     ) -> Dict[str, List[str]]:
         """Generate recommendations based on dataset analysis."""
         recommendations = {
             "quality_improvements": [],
             "ocr_optimization": [],
             "dataset_curation": [],
-            "technical_notes": []
+            "technical_notes": [],
         }
 
         # Quality recommendations
@@ -398,7 +420,7 @@ class DatasetAnalyzer:
         poor_quality_count = statistics.ocr_suitability_distribution.get("poor", 0)
         if poor_quality_count > statistics.total_images * 0.3:
             recommendations["quality_improvements"].append(
-                f"{poor_quality_count} images ({poor_quality_count/statistics.total_images*100:.1f}%) "
+                f"{poor_quality_count} images ({poor_quality_count / statistics.total_images * 100:.1f}%) "
                 "have poor OCR suitability. Consider removing them from training data."
             )
 
@@ -429,7 +451,7 @@ class DatasetAnalyzer:
         """Save analysis report to JSON file."""
         output_path.parent.mkdir(parents=True, exist_ok=True)
 
-        with open(output_path, 'w', encoding='utf-8') as f:
+        with open(output_path, "w", encoding="utf-8") as f:
             json.dump(report, f, indent=2, ensure_ascii=False)
 
         self.logger.info(f"Dataset analysis report saved to {output_path}")
@@ -438,7 +460,7 @@ class DatasetAnalyzer:
         self,
         analyses: List[ImageAnalysis],
         subset_size: int = 100,
-        quality_threshold: float = 0.6
+        quality_threshold: float = 0.6,
     ) -> Dict[str, Any]:
         """
         Create a validation subset with high-quality images for OCR testing.
@@ -453,8 +475,10 @@ class DatasetAnalyzer:
         """
         # Filter high-quality images
         high_quality = [
-            a for a in analyses
-            if a.quality_score >= quality_threshold and a.ocr_suitability in ["excellent", "good"]
+            a
+            for a in analyses
+            if a.quality_score >= quality_threshold
+            and a.ocr_suitability in ["excellent", "good"]
         ]
 
         if len(high_quality) < subset_size:
@@ -482,6 +506,7 @@ class DatasetAnalyzer:
 
             # Copy file (using sync I/O for simplicity)
             import shutil
+
             shutil.copy2(source_path, dest_path)
             copied_files.append(str(dest_path))
 
@@ -490,30 +515,33 @@ class DatasetAnalyzer:
             "total_selected": len(validation_subset),
             "selection_criteria": {
                 "min_quality_score": quality_threshold,
-                "ocr_suitability": ["excellent", "good"]
+                "ocr_suitability": ["excellent", "good"],
             },
-            "avg_quality_score": sum(a.quality_score for a in validation_subset) / len(validation_subset),
+            "avg_quality_score": sum(a.quality_score for a in validation_subset)
+            / len(validation_subset),
             "files": [
                 {
                     "filename": Path(a.file_path).name,
                     "validation_filename": Path(copied_files[i]).name,
                     "quality_score": a.quality_score,
                     "ocr_suitability": a.ocr_suitability,
-                    "estimated_text_count": a.estimated_text_count
+                    "estimated_text_count": a.estimated_text_count,
                 }
                 for i, a in enumerate(validation_subset)
-            ]
+            ],
         }
 
         metadata_path = validation_dir / "validation_metadata.json"
-        with open(metadata_path, 'w', encoding='utf-8') as f:
+        with open(metadata_path, "w", encoding="utf-8") as f:
             json.dump(subset_metadata, f, indent=2)
 
-        self.logger.info(f"Created validation subset with {len(validation_subset)} images in {validation_dir}")
+        self.logger.info(
+            f"Created validation subset with {len(validation_subset)} images in {validation_dir}"
+        )
 
         return {
             "validation_directory": str(validation_dir),
             "files_count": len(validation_subset),
             "avg_quality": subset_metadata["avg_quality_score"],
-            "metadata_file": str(metadata_path)
+            "metadata_file": str(metadata_path),
         }

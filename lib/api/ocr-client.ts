@@ -5,6 +5,7 @@
 
 import type { ExpiryDateInfo } from '@/lib/stores/scanning-workflow-store'
 import { createClient } from '@/lib/supabase/client'
+import { logger } from '@/lib/utils/logger'
 
 // Environment variables
 const FASTAPI_URL = process.env.NEXT_PUBLIC_FASTAPI_URL
@@ -113,9 +114,17 @@ export async function extractExpiryDate(
 ): Promise<ExpiryDateInfo> {
   const startTime = Date.now()
 
+  logger.log('OCRClient', 'extractExpiryDate called', {
+    imageBlobSize: imageBlob.size,
+    imageBlobType: imageBlob.type,
+    storeId,
+    options,
+  })
+
   try {
     // Validate API URL is configured
     const apiUrl = validateFastApiUrl()
+    logger.log('OCRClient', 'FastAPI URL validated', { apiUrl })
 
     // Prepare form data
     const formData = new FormData()
@@ -129,11 +138,27 @@ export async function extractExpiryDate(
       formData.append('max_processing_time_ms', options.maxProcessingTimeMs.toString())
     }
 
+    logger.log('OCRClient', 'FormData prepared', {
+      hasImage: formData.has('image'),
+      confidenceThreshold: options?.confidenceThreshold,
+      maxProcessingTimeMs: options?.maxProcessingTimeMs,
+    })
+
     // Get auth headers
+    logger.log('OCRClient', 'Getting auth headers...')
     const authHeaders = await getAuthHeaders()
+    logger.log('OCRClient', 'Auth headers obtained', {
+      hasAuthorization: !!authHeaders.Authorization,
+    })
 
     // Make API call
-    const response = await fetch(`${apiUrl}/api/v1/ocr/scan/ocr-expiry/${storeId}`, {
+    const endpoint = `${apiUrl}/api/v1/ocr/scan/ocr-expiry/${storeId}`
+    logger.log('OCRClient', 'Making API call to FastAPI', {
+      endpoint,
+      method: 'POST',
+    })
+
+    const response = await fetch(endpoint, {
       method: 'POST',
       body: formData,
       headers: {
@@ -142,24 +167,60 @@ export async function extractExpiryDate(
       },
     })
 
+    logger.log('OCRClient', 'API response received', {
+      status: response.status,
+      statusText: response.statusText,
+      ok: response.ok,
+    })
+
     if (!response.ok) {
       const errorText = await response.text()
+      logger.error('OCRClient', 'API returned error response', {
+        status: response.status,
+        statusText: response.statusText,
+        errorText,
+      })
       throw new Error(`API error ${response.status}: ${errorText}`)
     }
 
     const data: OCRUploadResponse = await response.json()
     const processingTime = Date.now() - startTime
 
+    logger.log('OCRClient', 'OCR API response parsed', {
+      success: data.success,
+      scanType: data.scan_type,
+      hasExpiryDate: !!data.expiry_date,
+      expiryDate: data.expiry_date,
+      confidenceScore: data.confidence_score,
+      confidenceThreshold: data.confidence_threshold,
+      processingType: data.processing_type,
+      rawOcrText: data.raw_ocr_text,
+      processingTime,
+    })
+
+    logger.log('OCRClient', 'Raw OCR text extracted from image:', {
+      text: data.raw_ocr_text,
+      textLength: data.raw_ocr_text?.length || 0,
+    })
+
     // Transform API response to ExpiryDateInfo
-    return {
+    const result = {
       extractedDate: data.expiry_date || undefined,
       confidence: data.confidence_score, // Now using actual OCR confidence!
       isManual: false,
       rawOcrText: data.raw_ocr_text, // Now using actual OCR text from backend
       processingTime,
     }
+
+    logger.log('OCRClient', 'Returning ExpiryDateInfo', result)
+
+    return result
   } catch (error) {
-    console.error('OCR extraction failed:', error)
+    logger.error('OCRClient', 'OCR extraction failed', {
+      error: error instanceof Error ? error.message : String(error),
+      errorType: error instanceof Error ? error.constructor.name : typeof error,
+      stack: error instanceof Error ? error.stack : undefined,
+    })
 
     // Create OCR error with type classification
     const ocrError: OCRError = {
@@ -171,10 +232,13 @@ export async function extractExpiryDate(
     // Classify error type
     if (error instanceof TypeError && error.message.includes('fetch')) {
       ocrError.type = 'network'
+      logger.error('OCRClient', 'Classified as network error')
     } else if (error instanceof Error && error.message.includes('timeout')) {
       ocrError.type = 'timeout'
+      logger.error('OCRClient', 'Classified as timeout error')
     } else if (error instanceof Error && error.message.includes('validation')) {
       ocrError.type = 'validation'
+      logger.error('OCRClient', 'Classified as validation error')
     }
 
     throw ocrError
@@ -345,45 +409,66 @@ export async function captureImageFromVideo(
   videoElement: HTMLVideoElement,
   quality = 0.8,
 ): Promise<Blob> {
+  logger.log('OCRClient', 'captureImageFromVideo called', {
+    videoWidth: videoElement.videoWidth,
+    videoHeight: videoElement.videoHeight,
+    width: videoElement.width,
+    height: videoElement.height,
+    quality,
+  })
+
   // Create canvas with video dimensions
   const canvas = document.createElement('canvas')
   const ctx = canvas.getContext('2d')
 
   if (!ctx) {
+    logger.error('OCRClient', 'Failed to get canvas context')
     throw new Error('Failed to get canvas context')
   }
 
   canvas.width = videoElement.videoWidth || videoElement.width
   canvas.height = videoElement.videoHeight || videoElement.height
 
+  logger.log('OCRClient', 'Drawing video frame to canvas', {
+    canvasWidth: canvas.width,
+    canvasHeight: canvas.height,
+  })
+
   // Draw video frame to canvas
   ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height)
 
   // Convert canvas to blob
-  return canvasToBlob(canvas, quality)
+  logger.log('OCRClient', 'Converting canvas to blob...')
+  const blob = await canvasToBlob(canvas, quality)
+  logger.log('OCRClient', 'Canvas converted to blob', {
+    blobSize: blob.size,
+    blobType: blob.type,
+  })
+
+  return blob
 }
 
 /**
- * Utility function to check if FastAPI backend is available
- */
-export async function checkBackendHealth(): Promise<boolean> {
-  try {
-    // Validate API URL is configured
-    const apiUrl = validateFastApiUrl()
+//  * Utility function to check if FastAPI backend is available
+//  */
+// export async function checkBackendHealth(): Promise<boolean> {
+//   try {
+//     // Validate API URL is configured
+//     const apiUrl = validateFastApiUrl()
 
-    const response = await fetch(`${apiUrl}/health`, {
-      method: 'GET',
-      signal: AbortSignal.timeout(10000),
-    })
+//     const response = await fetch(`${apiUrl}/health`, {
+//       method: 'GET',
+//       signal: AbortSignal.timeout(10000),
+//     })
 
-    if (response.ok) {
-      const data = await response.json()
-      return data.status === 'healthy'
-    }
+//     if (response.ok) {
+//       const data = await response.json()
+//       return data.status === 'healthy'
+//     }
 
-    return false
-  } catch (error) {
-    console.warn('FastAPI backend not available:', error)
-    return false
-  }
-}
+//     return false
+//   } catch (error) {
+//     console.warn('FastAPI backend not available:', error)
+//     return false
+//   }
+// }

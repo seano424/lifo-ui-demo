@@ -2,7 +2,7 @@
 
 export interface EmailCredentials {
   username: string
-  pin: string
+  password: string
   email: string
   full_name: string
   store_name?: string
@@ -19,7 +19,7 @@ export interface WelcomeEmailParams {
   storeId: string
 }
 
-export interface PinResetEmailParams {
+export interface PasswordResetEmailParams {
   credentials: EmailCredentials
   storeId: string
 }
@@ -66,14 +66,14 @@ export async function sendWelcomeEmail({
 }
 
 /**
- * Send PIN reset email to employee
+ * Send password reset email to employee
  */
-export async function sendPinResetEmail({
+export async function sendPasswordResetEmail({
   credentials,
   storeId,
-}: PinResetEmailParams): Promise<EmailSendResult> {
+}: PasswordResetEmailParams): Promise<EmailSendResult> {
   try {
-    const response = await fetch('/api/email/send-pin-reset', {
+    const response = await fetch('/api/email/send-password-reset', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

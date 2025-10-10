@@ -5,13 +5,6 @@ Provides dependency injection for authentication and authorization
 """
 
 import warnings
-
-warnings.warn(
-    "app.auth.dependencies is deprecated. Use app.auth.secure_dependencies instead.",
-    DeprecationWarning,
-    stacklevel=2
-)
-
 import structlog
 from fastapi import Depends, HTTPException, Security, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
@@ -19,6 +12,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.supabase_jwt import SupabaseAuthError, SupabaseUser, supabase_auth
 from app.database.connection import get_database
+
+warnings.warn(
+    "app.auth.dependencies is deprecated. Use app.auth.secure_dependencies instead.",
+    DeprecationWarning,
+    stacklevel=2,
+)
 
 logger = structlog.get_logger()
 

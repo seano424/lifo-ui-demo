@@ -56,6 +56,10 @@
         "barcodeScanning": "Scannen",
         "csvBulkImport": "CSV Import",
         "manualEntry": "Handmatige Invoer"
+      },
+      "messages": {
+        "selectStore": "Selecteer een winkel",
+        "selectStoreInventory": "Selecteer een winkel om de voorraad te beheren"
       }
     },
     "scanOut": {
@@ -151,6 +155,7 @@
     "title": "Vandaag's prioriteitsacties",
     "description": "Beoordeel en onderneem actie op de meest urgente items.",
     "takeAction": "Actie ondernemen",
+    "comingSoon": "Binnenkort beschikbaar",
     "loadingInsights": "Winkel inzichten laden...",
     "dashboardTitle": "Winkel Inzichten Dashboard",
     "unableToLoad": "Kan inzichten niet laden",
@@ -246,6 +251,7 @@
     "expiredItems": {
       "title": "Verlopen artikelen",
       "subtitle": "Voorraad die afvalbeheer acties vereist",
+      "totalExpired": "Totaal verlopen",
       "recentlyExpired": "Recent verlopen",
       "weekOld": "Week oud",
       "older": "Ouder",
@@ -610,13 +616,13 @@
     "email": "E-mail",
     "role": "Rol",
     "status": "Status",
-    "pinStatus": "PIN Status",
+    "passwordStatus": "Wachtwoord Status",
     "actions": "Acties",
     "active": "Actief",
     "inactive": "Inactief",
     "locked": "Vergrendeld",
-    "pinActive": "PIN Actief",
-    "noPin": "Geen PIN",
+    "passwordActive": "Wachtwoord Actief",
+    "noPassword": "Geen Wachtwoord",
     "loadMoreUsers": "Meer gebruikers laden",
     "loadingMore": "Laden...",
     "noUsersMessage": "Deze winkel heeft nog geen gebruikers.",
@@ -638,8 +644,8 @@
       "makeEmployee": "Maak medewerker",
       "makeManager": "Maak gérant",
       "makeOwner": "Maak eigenaar",
-      "resetPin": "PIN resetten",
-      "unlockPin": "PIN ontgrendelen",
+      "resetPassword": "Wachtwoord resetten",
+      "unlockPassword": "Wachtwoord ontgrendelen",
       "deactivateUser": "Gebruiker deactiveren",
       "reactivateUser": "Gebruiker reactiveren",
       "removeFromStore": "Verwijderen uit winkel"
@@ -660,8 +666,8 @@
         "confirm": "Verwijderen uit winkel"
       },
       "resetPin": {
-        "title": "PIN resetten voor {name}",
-        "description": "Dit genereert een nieuwe PIN en stuurt deze naar de medewerker via e-mail. Hun huidige PIN werkt niet meer.",
+        "title": "Reset wachtwoord voor {name}",
+        "description": "Dit genereert een nieuw wachtwoord en stuurt deze naar de medewerker via e-mail. Hun huidige wachtwoord werkt niet meer.",
         "employee": "Medewerker",
         "username": "Gebruikersnaam",
         "email": "E-mail",
@@ -669,16 +675,16 @@
         "statusLocked": "Vergrendeld",
         "statusActive": "Actief",
         "cancel": "Annuleren",
-        "confirm": "PIN resetten"
+        "confirm": "Wachtwoord resetten"
       },
-      "unlockPin": {
-        "title": "PIN ontgrendelen voor {name}",
-        "description": "Dit ontgrendelt onmiddellijk de PIN van de medewerker en reset hun teller voor mislukte pogingen.",
+      "unlockPassword": {
+        "title": "Wachtwoord ontgrendelen voor {name}",
+        "description": "Dit ontgrendelt onmiddellijk het wachtwoord van de medewerker en reset hun teller voor mislukte pogingen.",
         "employee": "Medewerker",
         "username": "Gebruikersnaam",
-        "lockedMessage": "Het account is momenteel vergrendeld vanwege mislukte PIN-pogingen",
+        "lockedMessage": "Het account is momenteel vergrendeld vanwege mislukte wachtwoord-pogingen",
         "cancel": "Annuleren",
-        "confirm": "PIN ontgrendelen"
+        "confirm": "Wachtwoord ontgrendelen"
       }
     },
     "roles": {
@@ -691,19 +697,19 @@
       "unknown": "Onbekend"
     },
     "card": {
-      "pinStatus": {
-        "disabled": "PIN Uitgeschakeld",
-        "locked": "PIN Vergrendeld",
-        "pending": "PIN In afwachting",
-        "active": "PIN Actief"
+      "passwordStatus": {
+        "disabled": "Wachtwoord Uitgeschakeld",
+        "locked": "Wachtwoord Vergrendeld",
+        "pending": "Wachtwoord In afwachting",
+        "active": "Wachtwoord Actief"
       },
       "inactive": "Inactief",
       "username": "Gebruikersnaam",
       "permissions": "Machtigingen",
       "lastLogin": "Laatste aanmelding",
-      "failedAttempts": "{count} mislukte PIN poging{plural}",
-      "enablePin": "PIN inschakelen",
-      "disablePin": "PIN uitschakelen",
+      "failedAttempts": "{count} mislukte wachtwoord poging{plural}",
+      "enablePassword": "Wachtwoord inschakelen",
+      "disablePassword": "Wachtwoord uitschakelen",
       "removeDialog": {
         "title": "Gebruiker uit winkel verwijderen",
         "description": "Weet u zeker dat u {name} uit deze winkel wilt verwijderen? Dit deactiveert hun toegang maar verwijdert hun account niet.",
@@ -714,7 +720,7 @@
   },
   "addEmployee": {
     "title": "Nieuwe medewerker toevoegen",
-    "description": "Maak een nieuw medewerkersaccount aan met PIN-authenticatie. Inloggegevens worden per e-mail verzonden.",
+    "description": "Maak een nieuw medewerkersaccount aan met wachtwoord-authenticatie. Inloggegevens worden per e-mail verzonden.",
     "form": {
       "firstName": "Voornaam",
       "lastName": "Achternaam",
@@ -745,9 +751,9 @@
     },
     "preview": {
       "username": "Gebruikersnaam:",
-      "pin": "PIN:",
-      "pinNote": "Wordt automatisch gegenereerd (6 cijfers)",
-      "loginNote": "De medewerker kan inloggen via het \"Medewerker\" tabblad met hun gebruikersnaam en PIN"
+      "password": "Wachtwoord:",
+      "passwordNote": "Wordt automatisch gegenereerd (6 cijfers)",
+      "loginNote": "De medewerker kan inloggen met hun gebruikersnaam en wachtwoord"
     },
     "buttons": {
       "cancel": "Annuleren",
@@ -768,13 +774,13 @@
     "credentials": {
       "email": "E-mail",
       "username": "Gebruikersnaam",
-      "pin": "PIN"
+      "password": "Wachtwoord"
     },
     "nextSteps": {
       "title": "Volgende stappen:",
-      "loginTab": "• De medewerker kan inloggen via het \"Medewerker\" tabblad op de inlogpagina",
-      "useCredentials": "• Gebruik gebruikersnaam: {username} en PIN: {pin}",
-      "resetPin": "• De PIN kan op elk moment worden gereset vanaf de teambeheerpagina",
+      "loginTab": "• De medewerker kan inloggen met hun gebruikersnaam en wachtwoord",
+      "useCredentials": "• Gebruik gebruikersnaam: {username} en wachtwoord: {password}",
+      "resetPassword": "• Het wachtwoord kan op elk moment worden gereset vanaf de teambeheerpagina",
       "permissions": "• De medewerker kan producten scannen en basisvoorraad beheren"
     },
     "errors": {

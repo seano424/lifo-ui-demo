@@ -253,13 +253,19 @@ async def get_ml_models_status(
                 "accuracy": 0.95,
                 "last_updated": "2025-01-15T12:00:00Z",
                 "supported_formats": [
-                    "DD/MM/YYYY", "MM/DD/YYYY", "YYYY-MM-DD", "DD.MM.YYYY",
-                    "DD-MM-YYYY", "DDMMYYYY", "DD Month YYYY", "Month DD, YYYY"
+                    "DD/MM/YYYY",
+                    "MM/DD/YYYY",
+                    "YYYY-MM-DD",
+                    "DD.MM.YYYY",
+                    "DD-MM-YYYY",
+                    "DDMMYYYY",
+                    "DD Month YYYY",
+                    "Month DD, YYYY",
                 ],
                 "supported_languages": ["EN", "FR", "DE", "ES", "IT"],
                 "date_types": ["expiry", "best_before", "use_by", "manufactured"],
                 "regulatory_compliance": ["EU_1169_2011", "US_FDA"],
-                "features": ["multilingual", "context_aware", "confidence_calibration"]
+                "features": ["multilingual", "context_aware", "confidence_calibration"],
             },
             "enhanced_barcode_detection": {
                 "status": "ready",
@@ -267,9 +273,13 @@ async def get_ml_models_status(
                 "accuracy": 0.98,
                 "last_updated": "2025-01-15T12:00:00Z",
                 "supported_types": ["EAN-13", "UPC-A", "EAN-8", "UPC-E", "CODE-128"],
-                "features": ["checksum_validation", "fragmented_reconstruction", "region_preference"],
+                "features": [
+                    "checksum_validation",
+                    "fragmented_reconstruction",
+                    "region_preference",
+                ],
                 "regional_optimization": ["EU", "US"],
-                "performance": "sub_150ms"
+                "performance": "sub_150ms",
             },
             "enhanced_product_extraction": {
                 "status": "ready",
@@ -277,21 +287,42 @@ async def get_ml_models_status(
                 "accuracy": 0.92,
                 "last_updated": "2025-01-15T12:00:00Z",
                 "supported_categories": [
-                    "fresh_produce", "dairy", "bakery", "packaged_goods",
-                    "beverages", "frozen", "organic", "processed"
+                    "fresh_produce",
+                    "dairy",
+                    "bakery",
+                    "packaged_goods",
+                    "beverages",
+                    "frozen",
+                    "organic",
+                    "processed",
                 ],
-                "features": ["nlp_classification", "brand_detection", "hierarchy_analysis"],
+                "features": [
+                    "nlp_classification",
+                    "brand_detection",
+                    "hierarchy_analysis",
+                ],
                 "languages": ["EN", "FR", "DE", "ES", "IT"],
-                "performance": "sub_200ms"
+                "performance": "sub_200ms",
             },
             "image_quality_assessment": {
                 "status": "ready",
                 "version": "v1.0.0",
                 "accuracy": 0.89,
                 "last_updated": "2025-01-15T12:00:00Z",
-                "metrics": ["blur", "contrast", "brightness", "noise", "rotation", "perspective"],
-                "features": ["ocr_readiness_scoring", "issue_detection", "recommendations"],
-                "performance": "sub_300ms"
+                "metrics": [
+                    "blur",
+                    "contrast",
+                    "brightness",
+                    "noise",
+                    "rotation",
+                    "perspective",
+                ],
+                "features": [
+                    "ocr_readiness_scoring",
+                    "issue_detection",
+                    "recommendations",
+                ],
+                "performance": "sub_300ms",
             },
         }
 
@@ -303,37 +334,37 @@ async def get_ml_models_status(
             "models": model_status,
             "performance_summary": {
                 "average_processing_time_ms": 180,  # Improved with enhanced services
-                "daily_analysis_count": 2456,      # Increased throughput
-                "overall_accuracy": 0.94,          # Improved accuracy
-                "cache_hit_rate": 0.15,            # 15% cache hits
+                "daily_analysis_count": 2456,  # Increased throughput
+                "overall_accuracy": 0.94,  # Improved accuracy
+                "cache_hit_rate": 0.15,  # 15% cache hits
                 "concurrent_processing": True,
                 "quality_assessment_enabled": True,
-                "multilingual_support": True
+                "multilingual_support": True,
             },
             "capabilities": {
                 "date_extraction": {
                     "formats_supported": 11,
                     "languages_supported": 5,
                     "regulatory_compliance": True,
-                    "manufacturing_dates": True
+                    "manufacturing_dates": True,
                 },
                 "barcode_detection": {
                     "formats_supported": 5,
                     "checksum_validation": True,
                     "fragmented_reconstruction": True,
-                    "regional_optimization": True
+                    "regional_optimization": True,
                 },
                 "product_extraction": {
                     "nlp_classification": True,
                     "brand_detection": True,
                     "hierarchy_analysis": True,
-                    "multilingual": True
+                    "multilingual": True,
                 },
                 "image_quality": {
                     "assessment_metrics": 7,
                     "ocr_readiness_scoring": True,
-                    "automated_recommendations": True
-                }
+                    "automated_recommendations": True,
+                },
             },
             "maintenance_window": "2025-01-20T02:00:00Z to 2025-01-20T04:00:00Z",
         }
@@ -379,49 +410,64 @@ async def _analyze_with_enhanced_vision(
         # Convert enhanced results to expected API format
         for date_result in enhanced_result.dates:
             if date_result.confidence >= confidence_threshold:
-                detections.append({
-                    "type": f"{date_result.date_type}_date",
-                    "value": date_result.date.strftime("%Y-%m-%d") if date_result.date else date_result.raw_text,
-                    "confidence": date_result.confidence,
-                    "bounding_box": date_result.bounding_box or {"x": 0, "y": 0, "width": 0, "height": 0},
-                    "original_text": date_result.raw_text,
-                    "format_detected": date_result.format_detected,
-                    "date_type": date_result.date_type,
-                    "regulatory_format": date_result.regulatory_format,
-                    "language_detected": date_result.language_detected
-                })
+                detections.append(
+                    {
+                        "type": f"{date_result.date_type}_date",
+                        "value": date_result.date.strftime("%Y-%m-%d")
+                        if date_result.date
+                        else date_result.raw_text,
+                        "confidence": date_result.confidence,
+                        "bounding_box": date_result.bounding_box
+                        or {"x": 0, "y": 0, "width": 0, "height": 0},
+                        "original_text": date_result.raw_text,
+                        "format_detected": date_result.format_detected,
+                        "date_type": date_result.date_type,
+                        "regulatory_format": date_result.regulatory_format,
+                        "language_detected": date_result.language_detected,
+                    }
+                )
 
         for barcode_result in enhanced_result.barcodes:
             if barcode_result.confidence >= confidence_threshold:
-                detections.append({
-                    "type": f"barcode_{barcode_result.format.lower().replace('-', '_')}",
-                    "value": barcode_result.value,
-                    "confidence": barcode_result.confidence,
-                    "bounding_box": barcode_result.bounding_box or {"x": 0, "y": 0, "width": 0, "height": 0},
-                    "barcode_type": barcode_result.format,
-                    "checksum_valid": barcode_result.checksum_valid,
-                    "region_preference": barcode_result.region_preference
-                })
+                detections.append(
+                    {
+                        "type": f"barcode_{barcode_result.format.lower().replace('-', '_')}",
+                        "value": barcode_result.value,
+                        "confidence": barcode_result.confidence,
+                        "bounding_box": barcode_result.bounding_box
+                        or {"x": 0, "y": 0, "width": 0, "height": 0},
+                        "barcode_type": barcode_result.format,
+                        "checksum_valid": barcode_result.checksum_valid,
+                        "region_preference": barcode_result.region_preference,
+                    }
+                )
 
         for product_result in enhanced_result.product_names:
             if product_result.confidence >= confidence_threshold:
-                detections.append({
-                    "type": "product_name",
-                    "value": product_result.name,
-                    "confidence": product_result.confidence,
-                    "bounding_box": product_result.bounding_box or {"x": 0, "y": 0, "width": 0, "height": 0},
-                    "classification": product_result.classification,
-                    "brand_detected": product_result.brand_detected,
-                    "hierarchy_level": product_result.hierarchy_level
-                })
+                detections.append(
+                    {
+                        "type": "product_name",
+                        "value": product_result.name,
+                        "confidence": product_result.confidence,
+                        "bounding_box": product_result.bounding_box
+                        or {"x": 0, "y": 0, "width": 0, "height": 0},
+                        "classification": product_result.classification,
+                        "brand_detected": product_result.brand_detected,
+                        "hierarchy_level": product_result.hierarchy_level,
+                    }
+                )
 
         processing_time_ms = (time.time() - start_time) * 1000
 
         return {
             "detections": detections,
             "analysis_metadata": {
-                "image_quality": enhanced_result.quality_assessment.overall_quality.value if enhanced_result.quality_assessment else "unknown",
-                "ocr_readiness_score": enhanced_result.quality_assessment.ocr_readiness_score if enhanced_result.quality_assessment else 0.0,
+                "image_quality": enhanced_result.quality_assessment.overall_quality.value
+                if enhanced_result.quality_assessment
+                else "unknown",
+                "ocr_readiness_score": enhanced_result.quality_assessment.ocr_readiness_score
+                if enhanced_result.quality_assessment
+                else 0.0,
                 "total_regions_found": len(enhanced_result.raw_text_blocks),
                 "processing_confidence": enhanced_result.overall_confidence,
                 "processing_time_ms": processing_time_ms,
@@ -434,11 +480,17 @@ async def _analyze_with_enhanced_vision(
                         "type": issue.issue_type.value,
                         "severity": issue.severity,
                         "description": issue.description,
-                        "suggestion": issue.suggestion
+                        "suggestion": issue.suggestion,
                     }
-                    for issue in (enhanced_result.quality_assessment.issues if enhanced_result.quality_assessment else [])
+                    for issue in (
+                        enhanced_result.quality_assessment.issues
+                        if enhanced_result.quality_assessment
+                        else []
+                    )
                 ],
-                "quality_recommendations": enhanced_result.quality_assessment.recommendations if enhanced_result.quality_assessment else []
+                "quality_recommendations": enhanced_result.quality_assessment.recommendations
+                if enhanced_result.quality_assessment
+                else [],
             },
         }
 
@@ -470,30 +522,42 @@ async def _extract_expiry_date_with_enhanced_vision(
 
         # Find best expiry/use by date (prioritize over manufacturing dates)
         expiry_dates = [
-            d for d in enhanced_result.dates
-            if d.date_type in ['expiry', 'use_by', 'best_before']
+            d
+            for d in enhanced_result.dates
+            if d.date_type in ["expiry", "use_by", "best_before"]
         ]
 
         if expiry_dates:
             # Sort by confidence and date type priority
-            best_expiry = max(expiry_dates, key=lambda x: (x.confidence,
-                {'use_by': 3, 'expiry': 2, 'best_before': 1}.get(x.date_type, 0)))
+            best_expiry = max(
+                expiry_dates,
+                key=lambda x: (
+                    x.confidence,
+                    {"use_by": 3, "expiry": 2, "best_before": 1}.get(x.date_type, 0),
+                ),
+            )
 
             processing_time_ms = (time.time() - start_time) * 1000
 
             # Prepare alternative interpretations
             alternatives = []
             for date_result in enhanced_result.dates[:5]:  # Top 5 alternatives
-                alternatives.append({
-                    "date": date_result.date.strftime("%Y-%m-%d") if date_result.date else date_result.raw_text,
-                    "format": date_result.format_detected,
-                    "confidence": date_result.confidence,
-                    "date_type": date_result.date_type,
-                    "regulatory_format": date_result.regulatory_format
-                })
+                alternatives.append(
+                    {
+                        "date": date_result.date.strftime("%Y-%m-%d")
+                        if date_result.date
+                        else date_result.raw_text,
+                        "format": date_result.format_detected,
+                        "confidence": date_result.confidence,
+                        "date_type": date_result.date_type,
+                        "regulatory_format": date_result.regulatory_format,
+                    }
+                )
 
             return {
-                "detected_date": best_expiry.date.strftime("%Y-%m-%d") if best_expiry.date else best_expiry.raw_text,
+                "detected_date": best_expiry.date.strftime("%Y-%m-%d")
+                if best_expiry.date
+                else best_expiry.raw_text,
                 "original_text": best_expiry.raw_text,
                 "confidence": best_expiry.confidence,
                 "date_format_detected": best_expiry.format_detected,
@@ -505,11 +569,15 @@ async def _extract_expiry_date_with_enhanced_vision(
                 "extraction_metadata": {
                     "text_regions_analyzed": len(enhanced_result.raw_text_blocks),
                     "date_patterns_found": len(enhanced_result.dates),
-                    "image_quality": enhanced_result.quality_assessment.overall_quality.value if enhanced_result.quality_assessment else "unknown",
-                    "ocr_readiness_score": enhanced_result.quality_assessment.ocr_readiness_score if enhanced_result.quality_assessment else 0.0,
+                    "image_quality": enhanced_result.quality_assessment.overall_quality.value
+                    if enhanced_result.quality_assessment
+                    else "unknown",
+                    "ocr_readiness_score": enhanced_result.quality_assessment.ocr_readiness_score
+                    if enhanced_result.quality_assessment
+                    else 0.0,
                     "processing_time_ms": processing_time_ms,
                     "quality_profile_used": enhanced_result.quality_profile_used,
-                    "cache_hit": enhanced_result.cache_hit
+                    "cache_hit": enhanced_result.cache_hit,
                 },
             }
         else:
@@ -527,18 +595,24 @@ async def _extract_expiry_date_with_enhanced_vision(
                 "extraction_metadata": {
                     "text_regions_analyzed": len(enhanced_result.raw_text_blocks),
                     "date_patterns_found": len(enhanced_result.dates),
-                    "image_quality": enhanced_result.quality_assessment.overall_quality.value if enhanced_result.quality_assessment else "unknown",
-                    "ocr_readiness_score": enhanced_result.quality_assessment.ocr_readiness_score if enhanced_result.quality_assessment else 0.0,
+                    "image_quality": enhanced_result.quality_assessment.overall_quality.value
+                    if enhanced_result.quality_assessment
+                    else "unknown",
+                    "ocr_readiness_score": enhanced_result.quality_assessment.ocr_readiness_score
+                    if enhanced_result.quality_assessment
+                    else 0.0,
                     "processing_time_ms": (time.time() - start_time) * 1000,
                     "quality_profile_used": enhanced_result.quality_profile_used,
-                    "cache_hit": enhanced_result.cache_hit
+                    "cache_hit": enhanced_result.cache_hit,
                 },
             }
 
     except Exception as e:
         logger.error("Enhanced expiry date extraction failed", error=str(e))
         # Fallback to original vision service
-        logger.warning("Falling back to legacy vision service for expiry date extraction")
+        logger.warning(
+            "Falling back to legacy vision service for expiry date extraction"
+        )
         vision_service = GoogleVisionService()
         return await _extract_expiry_date_with_vision(
             vision_service, image_data, date_format_hint
@@ -616,10 +690,11 @@ async def _analyze_with_vision_api(
         logger.error("Google Vision analysis failed", error=str(e))
         # Only fallback to mock data if explicitly enabled (never in production)
         from app.core.config import settings
+
         if settings.ocr_enable_fallback_mock:
             logger.warning(
                 "Using mock fallback - this should NEVER happen in production",
-                analysis_type=analysis_type
+                analysis_type=analysis_type,
             )
             return await _mock_image_analysis(
                 image_data, analysis_type, confidence_threshold
@@ -628,7 +703,7 @@ async def _analyze_with_vision_api(
             # Fail properly instead of masking issues with mock data
             raise HTTPException(
                 status_code=503,
-                detail="Image analysis service temporarily unavailable. Please try again later."
+                detail="Image analysis service temporarily unavailable. Please try again later.",
             ) from e
 
 
@@ -704,16 +779,20 @@ async def _extract_expiry_date_with_vision(
             processing_time_ms = (time.time() - start_time) * 1000
 
             return {
-                "detected_date": best_expiry.date.strftime("%Y-%m-%d") if best_expiry.date else best_expiry.raw_text,
+                "detected_date": best_expiry.date.strftime("%Y-%m-%d")
+                if best_expiry.date
+                else best_expiry.raw_text,
                 "original_text": best_expiry.raw_text,
                 "confidence": best_expiry.confidence,
                 "date_format_detected": best_expiry.format_detected,
                 "date_format_hint_used": date_format_hint,
                 "alternative_interpretations": [
                     {
-                        "date": exp.date.strftime("%Y-%m-%d") if exp.date else exp.raw_text,
+                        "date": exp.date.strftime("%Y-%m-%d")
+                        if exp.date
+                        else exp.raw_text,
                         "format": exp.format_detected,
-                        "confidence": exp.confidence
+                        "confidence": exp.confidence,
                     }
                     for exp in vision_result.expiry_dates[:3]  # Top 3 alternatives
                 ],
@@ -745,6 +824,7 @@ async def _extract_expiry_date_with_vision(
         logger.error("Vision-based expiry date extraction failed", error=str(e))
         # Only fallback to mock if explicitly enabled
         from app.core.config import settings
+
         if settings.ocr_enable_fallback_mock:
             logger.warning(
                 "Using mock fallback for expiry date extraction - this should NEVER happen in production"
@@ -754,7 +834,7 @@ async def _extract_expiry_date_with_vision(
             # Fail properly instead of masking issues
             raise HTTPException(
                 status_code=503,
-                detail="Expiry date extraction service temporarily unavailable. Please try again later."
+                detail="Expiry date extraction service temporarily unavailable. Please try again later.",
             ) from e
 
 

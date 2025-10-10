@@ -6,16 +6,20 @@ Extracted from large upload_csv_and_create_batches function for better maintaina
 import time
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, Tuple
+from typing import Any
 
 import structlog
 from fastapi import HTTPException
 
 from app.security.csv_security import CSVSecurityError, validate_and_sanitize_csv
 from app.services.batch_creation_service import BatchCreationService
+
 try:
     # Try to import optimized service first
-    from app.services.batch_creation_service_optimized import OptimizedBatchCreationService
+    from app.services.batch_creation_service_optimized import (
+        OptimizedBatchCreationService,
+    )
+
     USE_OPTIMIZED_SERVICE = True
 except ImportError:
     USE_OPTIMIZED_SERVICE = False
@@ -42,7 +46,8 @@ class CSVUploadValidator:
         max_size_bytes = max_size_mb * 1024 * 1024
         if len(file_content) > max_size_bytes:
             raise HTTPException(
-                status_code=400, detail=f"File too large. Maximum size is {max_size_mb}MB."
+                status_code=400,
+                detail=f"File too large. Maximum size is {max_size_mb}MB.",
             )
 
     @staticmethod
@@ -87,13 +92,13 @@ class CSVSecurityProcessor:
         if security_result["sanitization_changes"]:
             logger.info(
                 "CSV Security: sanitization changes applied",
-                changes_count=len(security_result["sanitization_changes"])
+                changes_count=len(security_result["sanitization_changes"]),
             )
 
         if security_result["validation"]["security_issues"]:
             logger.info(
                 "CSV Security: security issues detected",
-                issues_count=len(security_result["validation"]["security_issues"])
+                issues_count=len(security_result["validation"]["security_issues"]),
             )
 
         return sanitized_content, security_result
@@ -211,14 +216,18 @@ class BatchCreationManager:
         """
         # Time the database operations
         db_operations_start = time.time()
-        
+
         # Use optimized method if available
-        if USE_OPTIMIZED_SERVICE and hasattr(self.batch_service, 'create_batches_from_csv_bulk_optimized'):
-            batch_results = await self.batch_service.create_batches_from_csv_bulk_optimized(
-                store_id=store_id,
-                user_id=user_id,
-                batch_requests=batch_requests,
-                chunk_size=chunk_size,
+        if USE_OPTIMIZED_SERVICE and hasattr(
+            self.batch_service, "create_batches_from_csv_bulk_optimized"
+        ):
+            batch_results = (
+                await self.batch_service.create_batches_from_csv_bulk_optimized(
+                    store_id=store_id,
+                    user_id=user_id,
+                    batch_requests=batch_requests,
+                    chunk_size=chunk_size,
+                )
             )
         else:
             batch_results = await self.batch_service.create_batches_from_csv_bulk(
@@ -227,7 +236,7 @@ class BatchCreationManager:
                 batch_requests=batch_requests,
                 chunk_size=chunk_size,
             )
-        
+
         db_operations_time_ms = (time.time() - db_operations_start) * 1000
 
         # Extract performance metrics if available
@@ -299,7 +308,8 @@ class CSVUploadResponseBuilder:
                 "csv_warnings": csv_result.get("warnings", []),
                 "csv_errors": csv_result.get("errors", []),
                 "security_status": security_result["security_status"],
-                "sanitization_applied": len(security_result["sanitization_changes"]) > 0,
+                "sanitization_applied": len(security_result["sanitization_changes"])
+                > 0,
             },
             "batch_creation": {
                 "total_requests": batch_results["total_requests"],
@@ -362,10 +372,10 @@ class CSVUploadOrchestrator:
         """
         # Start overall timing
         overall_start = time.perf_counter()
-        
+
         # Capture initial memory usage
         initial_memory = get_memory_usage_mb()
-        
+
         # Step 1: Validate file and parameters
         self.timer.start_stage("file_validation")
         self.validator.validate_file_type(file_name)
@@ -375,8 +385,8 @@ class CSVUploadOrchestrator:
 
         # Step 2: Security validation and sanitization
         self.timer.start_stage("security_validation")
-        sanitized_content, security_result = self.security_processor.process_csv_security(
-            file_content, file_name
+        sanitized_content, security_result = (
+            self.security_processor.process_csv_security(file_content, file_name)
         )
         self.timer.end_stage("security_validation")
 
@@ -386,14 +396,16 @@ class CSVUploadOrchestrator:
             sanitized_content, store_id, user_id
         )
         self.timer.end_stage("csv_parsing")
-        
+
         # Record items processed
         self.timer.metrics.items_processed = len(csv_result.get("data", []))
 
         # Step 4: Convert CSV data to batch requests
         self.timer.start_stage("batch_creation")
-        batch_requests, conversion_time_ms = self.batch_converter.convert_csv_to_batches(
-            csv_result["data"], store_id, user_id
+        batch_requests, conversion_time_ms = (
+            self.batch_converter.convert_csv_to_batches(
+                csv_result["data"], store_id, user_id
+            )
         )
         self.timer.metrics.batch_creation_ms = conversion_time_ms
         self.timer.end_stage("batch_creation")
@@ -414,23 +426,30 @@ class CSVUploadOrchestrator:
         self.timer.end_stage("batch_insertion")
 
         # Calculate total time and throughput
-        self.timer.metrics.total_processing_ms = (time.perf_counter() - overall_start) * 1000
+        self.timer.metrics.total_processing_ms = (
+            time.perf_counter() - overall_start
+        ) * 1000
         self.timer.metrics.calculate_throughput()
-        
+
         # Capture final memory usage
         final_memory = get_memory_usage_mb()
         self.timer.metrics.memory_usage_mb = final_memory - initial_memory
 
         # Step 6: Build response with timing metrics
         response_data = self.response_builder.build_response(
-            csv_result, batch_results, batch_requests, security_result, store_id, user_id
+            csv_result,
+            batch_results,
+            batch_requests,
+            security_result,
+            store_id,
+            user_id,
         )
-        
+
         # Add comprehensive timing metrics to response
         response_data["performance_metrics"] = self.timer.metrics.to_dict()
         response_data["timing_summary"] = self.timer.get_stage_summary()
-        
+
         # Log performance summary
         self.timer.metrics.log_summary("CSV Upload and Batch Creation")
-        
+
         return response_data

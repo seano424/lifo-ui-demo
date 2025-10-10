@@ -68,6 +68,7 @@ async def get_mobile_batch_summary(
     Returns only essential data for quick mobile consumption
     Target: <0.3s response time
     """
+    start_time = time.time()
     try:
         store_id = validate_store_id_format(store_id)
 

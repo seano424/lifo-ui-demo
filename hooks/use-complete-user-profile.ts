@@ -60,6 +60,8 @@ export function useCompleteUserProfile() {
       }
       return failureCount < 2
     },
+    // Prevent throwing errors to error boundaries - handle them gracefully
+    throwOnError: false,
   })
 
   const profile = result.data

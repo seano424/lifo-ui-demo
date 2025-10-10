@@ -5,13 +5,12 @@ Provides comprehensive image quality analysis to improve OCR accuracy
 
 import logging
 import numpy as np
-from typing import Dict, List, Optional, Tuple, Any
 from dataclasses import dataclass
 from enum import Enum
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
 import io
-from PIL import Image, ImageStat
+from PIL import Image
 
 # Import OpenCV with fallback handling
 from app.core.opencv_fallback import (
@@ -19,10 +18,10 @@ from app.core.opencv_fallback import (
     safe_laplacian_variance,
     safe_rgb_to_grayscale,
     pil_to_cv2_fallback,
-    is_opencv_available
 )
 
 logger = logging.getLogger(__name__)
+
 
 class QualityLevel(Enum):
     EXCELLENT = "excellent"
@@ -30,6 +29,7 @@ class QualityLevel(Enum):
     FAIR = "fair"
     POOR = "poor"
     UNUSABLE = "unusable"
+
 
 class IssueType(Enum):
     BLUR = "blur"
@@ -41,12 +41,14 @@ class IssueType(Enum):
     ROTATION = "rotation"
     PERSPECTIVE_DISTORTION = "perspective_distortion"
 
+
 @dataclass
 class QualityIssue:
     issue_type: IssueType
     severity: float  # 0.0 (minor) to 1.0 (severe)
     description: str
     suggestion: str
+
 
 @dataclass
 class ImageQualityMetrics:
@@ -59,6 +61,7 @@ class ImageQualityMetrics:
     perspective_score: float  # Perspective distortion measure
     text_area_ratio: float  # Ratio of image containing detectable text
 
+
 @dataclass
 class ImageQualityAssessment:
     overall_quality: QualityLevel
@@ -68,11 +71,14 @@ class ImageQualityAssessment:
     recommendations: list[str]
     ocr_readiness_score: float  # 0.0 to 1.0, specific to OCR tasks
 
+
 class ImageQualityService:
     """Service for comprehensive image quality assessment optimized for OCR tasks"""
 
     def __init__(self):
-        self.executor = ThreadPoolExecutor(max_workers=2, thread_name_prefix="quality_assessment")
+        self.executor = ThreadPoolExecutor(
+            max_workers=2, thread_name_prefix="quality_assessment"
+        )
 
         # Quality thresholds for OCR optimization
         self.thresholds = {
@@ -91,9 +97,7 @@ class ImageQualityService:
         }
 
     async def assess_image_quality(
-        self,
-        image_data: bytes,
-        focus_areas: list[dict] | None = None
+        self, image_data: bytes, focus_areas: list[dict] | None = None
     ) -> ImageQualityAssessment:
         """
         Comprehensive image quality assessment for OCR optimization
@@ -109,14 +113,13 @@ class ImageQualityService:
             # Run quality analysis in thread pool for CPU-intensive operations
             loop = asyncio.get_event_loop()
             assessment = await loop.run_in_executor(
-                self.executor,
-                self._analyze_image_quality,
-                image_data,
-                focus_areas
+                self.executor, self._analyze_image_quality, image_data, focus_areas
             )
 
-            logger.info(f"Image quality assessment completed: {assessment.overall_quality.value} "
-                       f"(OCR readiness: {assessment.ocr_readiness_score:.2f})")
+            logger.info(
+                f"Image quality assessment completed: {assessment.overall_quality.value} "
+                f"(OCR readiness: {assessment.ocr_readiness_score:.2f})"
+            )
 
             return assessment
 
@@ -127,20 +130,24 @@ class ImageQualityService:
                 overall_quality=QualityLevel.POOR,
                 confidence=0.0,
                 metrics=self._get_default_metrics(),
-                issues=[QualityIssue(
-                    issue_type=IssueType.NOISE,
-                    severity=1.0,
-                    description="Assessment failed",
-                    suggestion="Retake image with better conditions"
-                )],
-                recommendations=["Retake image", "Ensure good lighting", "Hold device steady"],
-                ocr_readiness_score=0.0
+                issues=[
+                    QualityIssue(
+                        issue_type=IssueType.NOISE,
+                        severity=1.0,
+                        description="Assessment failed",
+                        suggestion="Retake image with better conditions",
+                    )
+                ],
+                recommendations=[
+                    "Retake image",
+                    "Ensure good lighting",
+                    "Hold device steady",
+                ],
+                ocr_readiness_score=0.0,
             )
 
     def _analyze_image_quality(
-        self,
-        image_data: bytes,
-        focus_areas: list[dict] | None = None
+        self, image_data: bytes, focus_areas: list[dict] | None = None
     ) -> ImageQualityAssessment:
         """Internal method for comprehensive quality analysis"""
 
@@ -151,10 +158,14 @@ class ImageQualityService:
         cv2 = safe_cv2_import()
         if cv2 is not None:
             try:
-                image_cv = cv2.imdecode(np.frombuffer(image_data, np.uint8), cv2.IMREAD_COLOR)
+                image_cv = cv2.imdecode(
+                    np.frombuffer(image_data, np.uint8), cv2.IMREAD_COLOR
+                )
                 gray = cv2.cvtColor(image_cv, cv2.COLOR_BGR2GRAY)
             except Exception as e:
-                logger.warning(f"OpenCV image processing failed: {e}, using PIL fallback")
+                logger.warning(
+                    f"OpenCV image processing failed: {e}, using PIL fallback"
+                )
                 image_cv = pil_to_cv2_fallback(image_pil)
                 gray = safe_rgb_to_grayscale(image_cv)
         else:
@@ -163,7 +174,9 @@ class ImageQualityService:
             gray = safe_rgb_to_grayscale(image_cv)
 
         # Calculate comprehensive metrics
-        metrics = self._calculate_quality_metrics(image_pil, image_cv, gray, focus_areas)
+        metrics = self._calculate_quality_metrics(
+            image_pil, image_cv, gray, focus_areas
+        )
 
         # Identify quality issues
         issues = self._identify_quality_issues(metrics)
@@ -181,7 +194,7 @@ class ImageQualityService:
             metrics=metrics,
             issues=issues,
             recommendations=recommendations,
-            ocr_readiness_score=ocr_readiness_score
+            ocr_readiness_score=ocr_readiness_score,
         )
 
     def _calculate_quality_metrics(
@@ -189,7 +202,7 @@ class ImageQualityService:
         image_pil: Image.Image,
         image_cv: np.ndarray,
         gray: np.ndarray,
-        focus_areas: list[dict] | None = None
+        focus_areas: list[dict] | None = None,
     ) -> ImageQualityMetrics:
         """Calculate comprehensive quality metrics"""
 
@@ -227,7 +240,7 @@ class ImageQualityService:
             noise_score=noise_score,
             rotation_angle=rotation_angle,
             perspective_score=perspective_score,
-            text_area_ratio=text_area_ratio
+            text_area_ratio=text_area_ratio,
         )
 
     def _estimate_noise(self, gray: np.ndarray) -> float:
@@ -244,14 +257,18 @@ class ImageQualityService:
                 # Fallback using scipy or manual convolution
                 try:
                     from scipy import ndimage
+
                     high_freq = ndimage.convolve(gray.astype(np.float64), kernel)
                 except ImportError:
                     # Manual convolution fallback
-                    high_freq = self._manual_convolution(gray.astype(np.float64), kernel)
+                    high_freq = self._manual_convolution(
+                        gray.astype(np.float64), kernel
+                    )
         else:
             # Use fallback convolution
             try:
                 from scipy import ndimage
+
                 high_freq = ndimage.convolve(gray.astype(np.float64), kernel)
             except ImportError:
                 high_freq = self._manual_convolution(gray.astype(np.float64), kernel)
@@ -271,7 +288,7 @@ class ImageQualityService:
         pad_h, pad_w = kernel_h // 2, kernel_w // 2
 
         # Pad image
-        padded = np.pad(image, ((pad_h, pad_h), (pad_w, pad_w)), mode='edge')
+        padded = np.pad(image, ((pad_h, pad_h), (pad_w, pad_w)), mode="edge")
 
         # Initialize output
         output = np.zeros_like(image)
@@ -279,7 +296,7 @@ class ImageQualityService:
         # Apply convolution
         for i in range(image.shape[0]):
             for j in range(image.shape[1]):
-                region = padded[i:i+kernel_h, j:j+kernel_w]
+                region = padded[i : i + kernel_h, j : j + kernel_w]
                 output[i, j] = np.sum(region * kernel)
 
         return output
@@ -292,9 +309,11 @@ class ImageQualityService:
                 # Edge detection
                 edges = cv2.Canny(gray, 50, 150, apertureSize=3)
                 # Hough line detection
-                lines = cv2.HoughLines(edges, 1, np.pi/180, threshold=100)
+                lines = cv2.HoughLines(edges, 1, np.pi / 180, threshold=100)
             else:
-                logger.info("OpenCV not available for rotation detection, using gradient-based fallback")
+                logger.info(
+                    "OpenCV not available for rotation detection, using gradient-based fallback"
+                )
                 return self._detect_rotation_fallback(gray)
 
             if lines is not None and len(lines) > 5:
@@ -352,9 +371,13 @@ class ImageQualityService:
             if cv2 is not None:
                 # Find contours
                 edges = cv2.Canny(gray, 50, 150)
-                contours, _ = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+                contours, _ = cv2.findContours(
+                    edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
+                )
             else:
-                logger.info("OpenCV not available for perspective analysis, using simplified fallback")
+                logger.info(
+                    "OpenCV not available for perspective analysis, using simplified fallback"
+                )
                 return self._assess_perspective_fallback(gray)
 
             if not contours:
@@ -371,7 +394,7 @@ class ImageQualityService:
                     if len(approx) == 4:  # Quadrilateral
                         # Calculate aspect ratio consistency
                         rect = cv2.boundingRect(approx)
-                        aspect_ratio = rect[2] / rect[3] if rect[3] > 0 else 1.0
+                        # aspect_ratio = rect[2] / rect[3] if rect[3] > 0 else 1.0
 
                         # Score based on how "rectangular" the quad is
                         hull_area = cv2.contourArea(approx)
@@ -398,20 +421,24 @@ class ImageQualityService:
             strip_height = h // 10
             h_variances = []
             for i in range(0, h - strip_height, strip_height):
-                strip = gray[i:i+strip_height, :]
+                strip = gray[i : i + strip_height, :]
                 h_variances.append(np.var(strip))
 
             # Calculate variance in vertical strips
             strip_width = w // 10
             v_variances = []
             for i in range(0, w - strip_width, strip_width):
-                strip = gray[:, i:i+strip_width]
+                strip = gray[:, i : i + strip_width]
                 v_variances.append(np.var(strip))
 
             # Perspective distortion causes uneven variance distribution
             if len(h_variances) > 1 and len(v_variances) > 1:
-                h_consistency = 1.0 - (np.std(h_variances) / (np.mean(h_variances) + 1e-6))
-                v_consistency = 1.0 - (np.std(v_variances) / (np.mean(v_variances) + 1e-6))
+                h_consistency = 1.0 - (
+                    np.std(h_variances) / (np.mean(h_variances) + 1e-6)
+                )
+                v_consistency = 1.0 - (
+                    np.std(v_variances) / (np.mean(v_variances) + 1e-6)
+                )
                 return float(max(0.0, min(1.0, (h_consistency + v_consistency) / 2)))
 
             return 1.0
@@ -419,7 +446,9 @@ class ImageQualityService:
         except Exception:
             return 1.0
 
-    def _estimate_text_area(self, gray: np.ndarray, focus_areas: list[dict] | None = None) -> float:
+    def _estimate_text_area(
+        self, gray: np.ndarray, focus_areas: list[dict] | None = None
+    ) -> float:
         """Estimate the ratio of image containing text"""
         try:
             cv2 = safe_cv2_import()
@@ -428,7 +457,9 @@ class ImageQualityService:
                 mser = cv2.MSER_create()
                 regions, _ = mser.detectRegions(gray)
             else:
-                logger.info("OpenCV not available for text area estimation, using edge-based fallback")
+                logger.info(
+                    "OpenCV not available for text area estimation, using edge-based fallback"
+                )
                 return self._estimate_text_area_fallback(gray, focus_areas)
 
             if not regions:
@@ -454,7 +485,9 @@ class ImageQualityService:
         except Exception:
             return 0.1  # Conservative estimate
 
-    def _estimate_text_area_fallback(self, gray: np.ndarray, focus_areas: list[dict] | None = None) -> float:
+    def _estimate_text_area_fallback(
+        self, gray: np.ndarray, focus_areas: list[dict] | None = None
+    ) -> float:
         """Fallback text area estimation using edge density analysis"""
         try:
             # Calculate edge density as proxy for text content
@@ -483,94 +516,116 @@ class ImageQualityService:
         except Exception:
             return 0.1  # Conservative fallback
 
-    def _identify_quality_issues(self, metrics: ImageQualityMetrics) -> list[QualityIssue]:
+    def _identify_quality_issues(
+        self, metrics: ImageQualityMetrics
+    ) -> list[QualityIssue]:
         """Identify specific quality issues based on metrics"""
         issues = []
 
         # Blur assessment
         if metrics.blur_score < self.thresholds["blur_minimum"]:
             severity = 1.0 - (metrics.blur_score / self.thresholds["blur_minimum"])
-            issues.append(QualityIssue(
-                issue_type=IssueType.BLUR,
-                severity=min(1.0, severity),
-                description=f"Image appears blurry (blur score: {metrics.blur_score:.1f})",
-                suggestion="Hold device steady and ensure proper focus"
-            ))
+            issues.append(
+                QualityIssue(
+                    issue_type=IssueType.BLUR,
+                    severity=min(1.0, severity),
+                    description=f"Image appears blurry (blur score: {metrics.blur_score:.1f})",
+                    suggestion="Hold device steady and ensure proper focus",
+                )
+            )
 
         # Resolution assessment
         if metrics.resolution_score < self.thresholds["resolution_minimum"]:
-            severity = 1.0 - (metrics.resolution_score / self.thresholds["resolution_minimum"])
-            issues.append(QualityIssue(
-                issue_type=IssueType.LOW_RESOLUTION,
-                severity=min(1.0, severity),
-                description=f"Low resolution may affect text clarity",
-                suggestion="Move closer to the text or use higher camera resolution"
-            ))
+            severity = 1.0 - (
+                metrics.resolution_score / self.thresholds["resolution_minimum"]
+            )
+            issues.append(
+                QualityIssue(
+                    issue_type=IssueType.LOW_RESOLUTION,
+                    severity=min(1.0, severity),
+                    description="Low resolution may affect text clarity",
+                    suggestion="Move closer to the text or use higher camera resolution",
+                )
+            )
 
         # Contrast assessment
         if metrics.contrast_score < self.thresholds["contrast_minimum"]:
-            severity = 1.0 - (metrics.contrast_score / self.thresholds["contrast_minimum"])
-            issues.append(QualityIssue(
-                issue_type=IssueType.POOR_CONTRAST,
-                severity=min(1.0, severity),
-                description=f"Low contrast may affect text detection",
-                suggestion="Improve lighting or adjust camera settings"
-            ))
+            severity = 1.0 - (
+                metrics.contrast_score / self.thresholds["contrast_minimum"]
+            )
+            issues.append(
+                QualityIssue(
+                    issue_type=IssueType.POOR_CONTRAST,
+                    severity=min(1.0, severity),
+                    description="Low contrast may affect text detection",
+                    suggestion="Improve lighting or adjust camera settings",
+                )
+            )
 
         # Brightness assessment
         if metrics.brightness_score > 200:
             severity = (metrics.brightness_score - 200) / 55
-            issues.append(QualityIssue(
-                issue_type=IssueType.OVEREXPOSURE,
-                severity=min(1.0, severity),
-                description="Image appears overexposed",
-                suggestion="Reduce exposure or avoid direct lighting"
-            ))
+            issues.append(
+                QualityIssue(
+                    issue_type=IssueType.OVEREXPOSURE,
+                    severity=min(1.0, severity),
+                    description="Image appears overexposed",
+                    suggestion="Reduce exposure or avoid direct lighting",
+                )
+            )
         elif metrics.brightness_score < 50:
             severity = (50 - metrics.brightness_score) / 50
-            issues.append(QualityIssue(
-                issue_type=IssueType.UNDEREXPOSURE,
-                severity=min(1.0, severity),
-                description="Image appears underexposed",
-                suggestion="Increase lighting or exposure"
-            ))
+            issues.append(
+                QualityIssue(
+                    issue_type=IssueType.UNDEREXPOSURE,
+                    severity=min(1.0, severity),
+                    description="Image appears underexposed",
+                    suggestion="Increase lighting or exposure",
+                )
+            )
 
         # Noise assessment
         if metrics.noise_score < self.thresholds["noise_acceptable"]:
             severity = 1.0 - (metrics.noise_score / self.thresholds["noise_acceptable"])
-            issues.append(QualityIssue(
-                issue_type=IssueType.NOISE,
-                severity=min(1.0, severity),
-                description="High noise levels detected",
-                suggestion="Improve lighting to reduce ISO noise"
-            ))
+            issues.append(
+                QualityIssue(
+                    issue_type=IssueType.NOISE,
+                    severity=min(1.0, severity),
+                    description="High noise levels detected",
+                    suggestion="Improve lighting to reduce ISO noise",
+                )
+            )
 
         # Rotation assessment
         if abs(metrics.rotation_angle) > self.thresholds["rotation_tolerance"]:
             severity = min(1.0, abs(metrics.rotation_angle) / 15.0)
-            issues.append(QualityIssue(
-                issue_type=IssueType.ROTATION,
-                severity=severity,
-                description=f"Image rotation detected ({metrics.rotation_angle:.1f}°)",
-                suggestion="Hold device parallel to text for best results"
-            ))
+            issues.append(
+                QualityIssue(
+                    issue_type=IssueType.ROTATION,
+                    severity=severity,
+                    description=f"Image rotation detected ({metrics.rotation_angle:.1f}°)",
+                    suggestion="Hold device parallel to text for best results",
+                )
+            )
 
         # Text area assessment
         if metrics.text_area_ratio < self.thresholds["text_area_minimum"]:
-            severity = 1.0 - (metrics.text_area_ratio / self.thresholds["text_area_minimum"])
-            issues.append(QualityIssue(
-                issue_type=IssueType.PERSPECTIVE_DISTORTION,
-                severity=min(1.0, severity),
-                description="Limited text area detected",
-                suggestion="Frame the text more directly and minimize angle"
-            ))
+            severity = 1.0 - (
+                metrics.text_area_ratio / self.thresholds["text_area_minimum"]
+            )
+            issues.append(
+                QualityIssue(
+                    issue_type=IssueType.PERSPECTIVE_DISTORTION,
+                    severity=min(1.0, severity),
+                    description="Limited text area detected",
+                    suggestion="Frame the text more directly and minimize angle",
+                )
+            )
 
         return issues
 
     def _generate_recommendations(
-        self,
-        metrics: ImageQualityMetrics,
-        issues: list[QualityIssue]
+        self, metrics: ImageQualityMetrics, issues: list[QualityIssue]
     ) -> list[str]:
         """Generate actionable recommendations for image improvement"""
         recommendations = []
@@ -579,7 +634,10 @@ class ImageQualityService:
         if any(issue.issue_type == IssueType.BLUR for issue in issues):
             recommendations.append("Hold device steady and ensure autofocus completes")
 
-        if any(issue.issue_type in [IssueType.OVEREXPOSURE, IssueType.UNDEREXPOSURE] for issue in issues):
+        if any(
+            issue.issue_type in [IssueType.OVEREXPOSURE, IssueType.UNDEREXPOSURE]
+            for issue in issues
+        ):
             recommendations.append("Adjust lighting conditions or camera exposure")
 
         if any(issue.issue_type == IssueType.ROTATION for issue in issues):
@@ -600,17 +658,17 @@ class ImageQualityService:
 
         # If no specific issues, provide general optimization tips
         if not recommendations:
-            recommendations.extend([
-                "Image quality is good for OCR processing",
-                "For best results, ensure even lighting and sharp focus"
-            ])
+            recommendations.extend(
+                [
+                    "Image quality is good for OCR processing",
+                    "For best results, ensure even lighting and sharp focus",
+                ]
+            )
 
         return recommendations
 
     def _calculate_overall_quality(
-        self,
-        metrics: ImageQualityMetrics,
-        issues: list[QualityIssue]
+        self, metrics: ImageQualityMetrics, issues: list[QualityIssue]
     ) -> tuple[QualityLevel, float]:
         """Calculate overall quality level and confidence"""
 
@@ -639,8 +697,11 @@ class ImageQualityService:
             quality_score += 0.1
 
         # Brightness contribution (15% weight)
-        if (self.thresholds["brightness_optimal_min"] <= metrics.brightness_score <=
-            self.thresholds["brightness_optimal_max"]):
+        if (
+            self.thresholds["brightness_optimal_min"]
+            <= metrics.brightness_score
+            <= self.thresholds["brightness_optimal_max"]
+        ):
             quality_score += 0.15
         elif 40 <= metrics.brightness_score <= 220:
             quality_score += 0.1
@@ -677,9 +738,7 @@ class ImageQualityService:
         return quality_level, confidence
 
     def _calculate_ocr_readiness(
-        self,
-        metrics: ImageQualityMetrics,
-        issues: list[QualityIssue]
+        self, metrics: ImageQualityMetrics, issues: list[QualityIssue]
     ) -> float:
         """Calculate OCR-specific readiness score"""
 
@@ -729,11 +788,13 @@ class ImageQualityService:
             noise_score=0.0,
             rotation_angle=0.0,
             perspective_score=0.0,
-            text_area_ratio=0.0
+            text_area_ratio=0.0,
         )
+
 
 # Global service instance
 _image_quality_service: ImageQualityService | None = None
+
 
 def get_image_quality_service() -> ImageQualityService:
     """Get global image quality service instance"""

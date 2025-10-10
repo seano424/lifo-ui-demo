@@ -41,6 +41,7 @@ def get_auth_users_fk() -> str:
 def get_uuid_type():
     """Get the correct UUID type based on environment (String for SQLite, UUID for PostgreSQL)"""
     from sqlalchemy.dialects.postgresql import UUID
+
     return (
         SQLString(36) if os.getenv("ENVIRONMENT") == "testing" else UUID(as_uuid=True)
     )
@@ -73,9 +74,13 @@ class Category(Base):
     )
     typical_shelf_life_days = Column(Integer)
     is_active = Column(Boolean, default=True)
-    created_at = Column(DateTime, default=lambda: datetime.now(UTC).replace(tzinfo=None))
+    created_at = Column(
+        DateTime, default=lambda: datetime.now(UTC).replace(tzinfo=None)
+    )
     updated_at = Column(
-        DateTime, default=lambda: datetime.now(UTC).replace(tzinfo=None), onupdate=lambda: datetime.now(UTC).replace(tzinfo=None)
+        DateTime,
+        default=lambda: datetime.now(UTC).replace(tzinfo=None),
+        onupdate=lambda: datetime.now(UTC).replace(tzinfo=None),
     )
 
     # Self-referential relationship for parent categories
@@ -142,9 +147,13 @@ class Product(Base):
     last_scanned_at = Column(DateTime)
 
     # Audit fields
-    created_at = Column(DateTime, default=lambda: datetime.now(UTC).replace(tzinfo=None))
+    created_at = Column(
+        DateTime, default=lambda: datetime.now(UTC).replace(tzinfo=None)
+    )
     updated_at = Column(
-        DateTime, default=lambda: datetime.now(UTC).replace(tzinfo=None), onupdate=lambda: datetime.now(UTC).replace(tzinfo=None)
+        DateTime,
+        default=lambda: datetime.now(UTC).replace(tzinfo=None),
+        onupdate=lambda: datetime.now(UTC).replace(tzinfo=None),
     )
     created_by = Column(
         get_uuid_type(),
@@ -208,9 +217,13 @@ class StoreProduct(Base):
         get_uuid_type(),
         ForeignKey(get_auth_users_fk()),
     )
-    created_at = Column(DateTime, default=lambda: datetime.now(UTC).replace(tzinfo=None))
+    created_at = Column(
+        DateTime, default=lambda: datetime.now(UTC).replace(tzinfo=None)
+    )
     updated_at = Column(
-        DateTime, default=lambda: datetime.now(UTC).replace(tzinfo=None), onupdate=lambda: datetime.now(UTC).replace(tzinfo=None)
+        DateTime,
+        default=lambda: datetime.now(UTC).replace(tzinfo=None),
+        onupdate=lambda: datetime.now(UTC).replace(tzinfo=None),
     )
 
     # Relationships
@@ -314,9 +327,13 @@ class Batch(Base):
         get_uuid_type(),
         ForeignKey(get_auth_users_fk()),
     )
-    created_at = Column(DateTime, default=lambda: datetime.now(UTC).replace(tzinfo=None))
+    created_at = Column(
+        DateTime, default=lambda: datetime.now(UTC).replace(tzinfo=None)
+    )
     updated_at = Column(
-        DateTime, default=lambda: datetime.now(UTC).replace(tzinfo=None), onupdate=lambda: datetime.now(UTC).replace(tzinfo=None)
+        DateTime,
+        default=lambda: datetime.now(UTC).replace(tzinfo=None),
+        onupdate=lambda: datetime.now(UTC).replace(tzinfo=None),
     )
 
     # Relationships
@@ -387,16 +404,24 @@ class BatchAction(Base):
     )
 
     # What was recommended vs what was done
-    action_type: Column[SQLEnum] = Column(SQLEnum(ActionType, name='action_type'), nullable=False)
-    recommended_action: Column[SQLEnum] = Column(SQLEnum(ActionType, name='action_type'), nullable=True)
+    action_type: Column[SQLEnum] = Column(
+        SQLEnum(ActionType, name="action_type"), nullable=False
+    )
+    recommended_action: Column[SQLEnum] = Column(
+        SQLEnum(ActionType, name="action_type"), nullable=True
+    )
     ai_score: Column[DECIMAL] = Column(
         DECIMAL(3, 2)
     )  # AI score that triggered recommendation (0.00-1.00)
 
     # Tracking details (from actual database schema)
     quantity_affected: Column[DECIMAL] = Column(DECIMAL(12, 4), nullable=False)
-    total_original_value: Column[DECIMAL] = Column(DECIMAL(10, 2), nullable=False)  # Value before action
-    total_recovered_value: Column[DECIMAL] = Column(DECIMAL(10, 2), nullable=False)  # Value after action
+    total_original_value: Column[DECIMAL] = Column(
+        DECIMAL(10, 2), nullable=False
+    )  # Value before action
+    total_recovered_value: Column[DECIMAL] = Column(
+        DECIMAL(10, 2), nullable=False
+    )  # Value after action
     batch_initial_quantity: Column[DECIMAL] = Column(DECIMAL(12, 4), nullable=False)
 
     # Optional tracking fields
@@ -425,7 +450,9 @@ class BatchAction(Base):
         ),
     )
 
-    created_at = Column(DateTime, nullable=False, default=lambda: datetime.now(UTC).replace(tzinfo=None))
+    created_at = Column(
+        DateTime, nullable=False, default=lambda: datetime.now(UTC).replace(tzinfo=None)
+    )
 
     # Relationships
     batch = relationship("Batch", back_populates="actions")
@@ -452,7 +479,7 @@ class DonationRecipient(Base):
     contact_email = Column(String(255))
     contact_phone = Column(String(50))
     recipient_type: Column[SQLEnum] = Column(
-        SQLEnum(DonationRecipientType, name='donation_recipient_type'), nullable=False
+        SQLEnum(DonationRecipientType, name="donation_recipient_type"), nullable=False
     )
 
     # Minimal compliance fields
@@ -475,7 +502,9 @@ class DonationRecipient(Base):
     )
 
     is_active = Column(Boolean, default=True)
-    created_at = Column(DateTime, default=lambda: datetime.now(UTC).replace(tzinfo=None))
+    created_at = Column(
+        DateTime, default=lambda: datetime.now(UTC).replace(tzinfo=None)
+    )
     created_by = Column(
         get_uuid_type(),
         ForeignKey(get_auth_users_fk()),

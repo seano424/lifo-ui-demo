@@ -5,7 +5,7 @@ Extracted from large mobile endpoint functions for better maintainability
 
 import time
 from functools import lru_cache
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
 import structlog
 
@@ -60,7 +60,9 @@ class MobileItemProcessor:
     def create_mobile_item(self, item: dict[str, Any]) -> dict[str, Any]:
         """Create mobile-optimized item representation"""
         days_to_expiry = item["days_to_expiry"]
-        urgency_score = self.urgency_calculator.calculate_quick_urgency_score(days_to_expiry)
+        urgency_score = self.urgency_calculator.calculate_quick_urgency_score(
+            days_to_expiry
+        )
 
         mobile_item = {
             "batch_id": item["batch_id"],
@@ -72,10 +74,12 @@ class MobileItemProcessor:
 
         # Only include essential details for mobile
         if self.include_details:
-            mobile_item.update({
-                "category": item["category"],
-                "estimated_value": item["current_quantity"] * item["selling_price"],
-            })
+            mobile_item.update(
+                {
+                    "category": item["category"],
+                    "estimated_value": item["current_quantity"] * item["selling_price"],
+                }
+            )
 
         return mobile_item
 
@@ -211,7 +215,10 @@ class MobileBatchSummaryProcessor:
 
         if not inventory_data:
             processing_time_ms = (time.time() - start_time) * 1000
-            return self.response_builder.build_empty_mobile_summary(), processing_time_ms
+            return (
+                self.response_builder.build_empty_mobile_summary(),
+                processing_time_ms,
+            )
 
         # Update categorizer limit
         self.categorizer.limit_urgent = limit_urgent
@@ -251,7 +258,9 @@ class MobileStoreHealthProcessor:
     """Processor for mobile store health"""
 
     @staticmethod
-    def process_store_health(analytics_data: dict[str, Any] | None) -> MobileStoreHealth:
+    def process_store_health(
+        analytics_data: dict[str, Any] | None,
+    ) -> MobileStoreHealth:
         """Process store health data for mobile"""
         if not analytics_data:
             return MobileStoreHealth(
@@ -297,7 +306,8 @@ class MobileStoreHealthProcessor:
             overall_score=round(overall_score, 2),
             critical_items=critical_items,
             expiring_soon=expiring_soon,
-            total_value_at_risk=analytics_data.get("total_value", 0) * 0.1,  # Estimated risk
+            total_value_at_risk=analytics_data.get("total_value", 0)
+            * 0.1,  # Estimated risk
             trends=trends,
             last_action_taken="Recent discount applied",  # Would come from action log
             next_recommended_action=next_action,
@@ -406,7 +416,9 @@ class MobileQuickScoreCalculator:
                     return 0.5
             return 0.2
 
-    def calculate_quick_margin_score(self, cost_price: float, selling_price: float) -> float:
+    def calculate_quick_margin_score(
+        self, cost_price: float, selling_price: float
+    ) -> float:
         """Quick margin score for mobile performance"""
         if not cost_price or not selling_price or selling_price <= cost_price:
             return 1.0

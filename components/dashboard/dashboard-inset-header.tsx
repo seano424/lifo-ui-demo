@@ -12,6 +12,7 @@ import {
   ScanSearch,
   SettingsIcon,
 } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { usePathname } from 'next/navigation'
 import { useMemo } from 'react'
 
@@ -34,13 +35,15 @@ function getPageIcon(pathname: string) {
 }
 
 export default function DashboardInsetHeader({
+  page,
   title,
   description,
   rightContent,
   isLoading,
   className,
 }: {
-  title: string
+  page?: string
+  title?: string
   description?: string
   rightContent?: React.ReactNode
   isLoading?: boolean
@@ -49,6 +52,13 @@ export default function DashboardInsetHeader({
   const pathname = usePathname()
   const PageIcon = useMemo(() => getPageIcon(pathname), [pathname])
 
+  // Always call hook unconditionally, use fallback page key if not provided
+  const t = useTranslations(page || 'dashboard')
+
+  // Use translations if page key is provided, otherwise use direct props
+  const displayTitle = page ? t('page.title') : title
+  const displayDescription = page ? t('page.description') : description
+
   return (
     <div className="relative animate-in fade-in-0 slide-in-from-top-4 duration-700">
       {/* Background gradient */}
@@ -56,34 +66,42 @@ export default function DashboardInsetHeader({
 
       <div
         className={cn(
-          'relative flex flex-col lg:flex-row gap-6 justify-between items-start lg:items-center p-8 rounded-3xl border border-border/50 bg-background/80 shadow-sm backdrop-blur-sm transition-all duration-300 hover:shadow-lg hover:shadow-primary/5',
+          'relative flex flex-col lg:flex-row gap-6 justify-between items-start lg:items-center p-8 rounded-3xl border border-border/50 bg-background/80 shadow-sm backdrop-blur-sm transition-all duration-300 ',
           className,
         )}
       >
         <div className="flex flex-col gap-4 flex-1">
           {isLoading ? (
-            <div className="space-y-3">
-              <Skeleton className="w-[400px] h-12 bg-gray-50 rounded-2xl" />
-              <Skeleton className="w-[300px] h-6 bg-gray-50 rounded-xl" />
+            <div className="space-y-4">
+              {/* Icon and title skeleton */}
+              <div className="flex items-center gap-3">
+                <Skeleton className="w-10 h-10 rounded-xl animate-pulse" />
+                <Skeleton className="w-[300px] h-8 rounded-xl animate-pulse" />
+              </div>
+              {/* Description skeleton */}
+              <div className="space-y-2">
+                <Skeleton className="w-[500px] h-4 rounded-lg animate-pulse" />
+                <Skeleton className="w-[400px] h-4 rounded-lg animate-pulse" />
+              </div>
             </div>
           ) : (
             <>
               {/* Main title with dynamic icon */}
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-xl bg-primary/10 text-primary">
+                <div className="p-2 rounded-xl bg-primary/10 text-primary items-center">
                   <PageIcon className="h-6 w-6" />
                 </div>
                 <Typography
                   variant="h1"
-                  className="font-black bg-gradient-to-r from-gray-900 to-gray-600 dark:from-gray-100 dark:to-gray-400 bg-clip-text text-transparent capitalize pb-2"
+                  className="font-black bg-gradient-to-r from-gray-900 to-gray-600 dark:from-gray-100 dark:to-gray-400 bg-clip-text text-transparent capitalize pb-1"
                 >
-                  {title}
+                  {displayTitle}
                 </Typography>
               </div>
 
-              {description && (
+              {displayDescription && (
                 <Typography className="max-w-5xl text-muted-foreground leading-relaxed" variant="p">
-                  {description}
+                  {displayDescription}
                 </Typography>
               )}
             </>
@@ -91,7 +109,14 @@ export default function DashboardInsetHeader({
         </div>
 
         {/* Right content with enhanced styling */}
-        {rightContent && <div className="flex items-center gap-3">{rightContent}</div>}
+        {isLoading ? (
+          <div className="flex items-center gap-3">
+            <Skeleton className="w-[120px] h-10 rounded-xl animate-pulse" />
+            <Skeleton className="w-[100px] h-10 rounded-xl animate-pulse" />
+          </div>
+        ) : (
+          rightContent && <div className="flex items-center gap-3">{rightContent}</div>
+        )}
       </div>
     </div>
   )

@@ -17,6 +17,7 @@ from typing import List, Dict, Optional
 # Add the parent directory to the path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+
 class QuickDatasetSampler:
     """Simple dataset sampler for Open Food Facts."""
 
@@ -32,7 +33,9 @@ class QuickDatasetSampler:
 
     async def download_sample_products(self, max_products: int = 50) -> List[Dict]:
         """Download sample products with good image data."""
-        print(f"🔍 Searching for {max_products} EU food products with clear labeling...")
+        print(
+            f"🔍 Searching for {max_products} EU food products with clear labeling..."
+        )
 
         products = []
 
@@ -42,13 +45,17 @@ class QuickDatasetSampler:
                     break
 
                 print(f"  Searching {country}...")
-                country_products = await self._get_products_from_country(session, country, max_products // len(self.countries))
+                country_products = await self._get_products_from_country(
+                    session, country, max_products // len(self.countries)
+                )
                 products.extend(country_products)
 
         print(f"📦 Found {len(products)} products with images")
         return products[:max_products]
 
-    async def _get_products_from_country(self, session: aiohttp.ClientSession, country: str, limit: int) -> List[Dict]:
+    async def _get_products_from_country(
+        self, session: aiohttp.ClientSession, country: str, limit: int
+    ) -> List[Dict]:
         """Get products from a specific country."""
         try:
             # Search for products with images and specific criteria
@@ -57,7 +64,7 @@ class QuickDatasetSampler:
                 "country": country,
                 "json": "1",
                 "page_size": limit,
-                "fields": "code,product_name,image_url,image_front_url,brands,categories,ingredients_text,expiration_date,packaging"
+                "fields": "code,product_name,image_url,image_front_url,brands,categories,ingredients_text,expiration_date,packaging",
             }
 
             url = f"{self.base_url}/cgi/search.pl"
@@ -88,11 +95,13 @@ class QuickDatasetSampler:
             return False
 
         # Must have some text content
-        if not any([
-            product.get("product_name"),
-            product.get("brands"),
-            product.get("ingredients_text")
-        ]):
+        if not any(
+            [
+                product.get("product_name"),
+                product.get("brands"),
+                product.get("ingredients_text"),
+            ]
+        ):
             return False
 
         return True
@@ -105,40 +114,48 @@ class QuickDatasetSampler:
 
         async with aiohttp.ClientSession() as session:
             for i, product in enumerate(products, 1):
-                print(f"  📸 Downloading {i}/{len(products)}: {product.get('product_name', 'Unknown')[:50]}...")
+                print(
+                    f"  📸 Downloading {i}/{len(products)}: {product.get('product_name', 'Unknown')[:50]}..."
+                )
 
                 image_url = product.get("image_front_url") or product.get("image_url")
                 if not image_url:
                     continue
 
                 # Download image
-                image_path = await self._download_image(session, image_url, product.get("code", f"product_{i}"))
+                image_path = await self._download_image(
+                    session, image_url, product.get("code", f"product_{i}")
+                )
 
                 if image_path:
                     # Create enhanced metadata for OCR testing
-                    enhanced_product = self._create_enhanced_metadata(product, image_path)
+                    enhanced_product = self._create_enhanced_metadata(
+                        product, image_path
+                    )
                     downloaded_products.append(enhanced_product)
 
         print(f"✅ Successfully downloaded {len(downloaded_products)} images")
         return downloaded_products
 
-    async def _download_image(self, session: aiohttp.ClientSession, image_url: str, product_code: str) -> Optional[Path]:
+    async def _download_image(
+        self, session: aiohttp.ClientSession, image_url: str, product_code: str
+    ) -> Optional[Path]:
         """Download a single image."""
         try:
             async with session.get(image_url) as response:
                 if response.status == 200:
                     # Determine file extension
-                    content_type = response.headers.get('content-type', '')
-                    if 'jpeg' in content_type or 'jpg' in content_type:
-                        ext = '.jpg'
-                    elif 'png' in content_type:
-                        ext = '.png'
+                    content_type = response.headers.get("content-type", "")
+                    if "jpeg" in content_type or "jpg" in content_type:
+                        ext = ".jpg"
+                    elif "png" in content_type:
+                        ext = ".png"
                     else:
-                        ext = '.jpg'  # Default
+                        ext = ".jpg"  # Default
 
                     image_path = self.images_dir / f"{product_code}{ext}"
 
-                    async with aiofiles.open(image_path, 'wb') as f:
+                    async with aiofiles.open(image_path, "wb") as f:
                         async for chunk in response.content.iter_chunked(8192):
                             await f.write(chunk)
 
@@ -158,26 +175,22 @@ class QuickDatasetSampler:
             "product_name": product.get("product_name"),
             "brands": product.get("brands"),
             "categories": product.get("categories"),
-
             # Image info
             "image_path": str(image_path),
             "image_filename": image_path.name,
-
             # OCR test targets
             "expected_text_elements": {
                 "product_name": product.get("product_name"),
                 "brands": product.get("brands"),
                 "ingredients": product.get("ingredients_text"),
-                "packaging": product.get("packaging")
+                "packaging": product.get("packaging"),
             },
-
             # Potential dates to extract
             "potential_dates": self._extract_potential_dates(product),
-
             # Test metadata
             "download_timestamp": datetime.now().isoformat(),
             "test_priority": self._calculate_test_priority(product),
-            "ocr_difficulty": self._estimate_ocr_difficulty(product)
+            "ocr_difficulty": self._estimate_ocr_difficulty(product),
         }
 
     def _extract_potential_dates(self, product: Dict) -> List[str]:
@@ -191,11 +204,14 @@ class QuickDatasetSampler:
         text_fields = [
             product.get("ingredients_text", ""),
             product.get("packaging", ""),
-            product.get("product_name", "")
+            product.get("product_name", ""),
         ]
 
         import re
-        date_pattern = r'\b\d{1,2}[/\-.]\d{1,2}[/\-.]\d{2,4}\b|\b\d{4}[/\-.]\d{1,2}[/\-.]\d{1,2}\b'
+
+        date_pattern = (
+            r"\b\d{1,2}[/\-.]\d{1,2}[/\-.]\d{2,4}\b|\b\d{4}[/\-.]\d{1,2}[/\-.]\d{1,2}\b"
+        )
 
         for text in text_fields:
             if text:
@@ -229,11 +245,13 @@ class QuickDatasetSampler:
     def _estimate_ocr_difficulty(self, product: Dict) -> str:
         """Estimate OCR difficulty based on text complexity."""
         # Simple heuristic based on text length and complexity
-        text_content = " ".join([
-            product.get("product_name", ""),
-            product.get("brands", ""),
-            product.get("ingredients_text", "")[:100]  # First 100 chars
-        ])
+        text_content = " ".join(
+            [
+                product.get("product_name", ""),
+                product.get("brands", ""),
+                product.get("ingredients_text", "")[:100],  # First 100 chars
+            ]
+        )
 
         if len(text_content) > 200:
             return "hard"
@@ -250,18 +268,18 @@ class QuickDatasetSampler:
                 "created": datetime.now().isoformat(),
                 "total_products": len(products),
                 "source": "Open Food Facts",
-                "countries": self.countries
+                "countries": self.countries,
             },
             "statistics": self._calculate_dataset_stats(products),
-            "products": products
+            "products": products,
         }
 
         metadata_path = self.output_dir / "dataset_metadata.json"
-        async with aiofiles.open(metadata_path, 'w') as f:
+        async with aiofiles.open(metadata_path, "w") as f:
             await f.write(json.dumps(dataset_metadata, indent=2, ensure_ascii=False))
 
         print(f"💾 Dataset saved to {self.output_dir}")
-        print(f"📊 Statistics:")
+        print("📊 Statistics:")
         for key, value in dataset_metadata["statistics"].items():
             print(f"   {key}: {value}")
 
@@ -273,7 +291,7 @@ class QuickDatasetSampler:
             "difficulty_distribution": {"easy": 0, "medium": 0, "hard": 0},
             "products_with_dates": 0,
             "products_with_brands": 0,
-            "products_with_ingredients": 0
+            "products_with_ingredients": 0,
         }
 
         for product in products:
@@ -294,6 +312,7 @@ class QuickDatasetSampler:
                 stats["products_with_ingredients"] += 1
 
         return stats
+
 
 async def main():
     """Main function to run the dataset sampler."""
@@ -325,9 +344,10 @@ async def main():
     await sampler.save_dataset(downloaded_products)
 
     print("\n🎉 Dataset ready for OCR testing!")
-    print(f"📁 Images: sample_dataset/images/")
-    print(f"📋 Metadata: sample_dataset/dataset_metadata.json")
+    print("📁 Images: sample_dataset/images/")
+    print("📋 Metadata: sample_dataset/dataset_metadata.json")
     print("\nNow you can test your OCR system with real food packaging images! 🍕📦")
+
 
 if __name__ == "__main__":
     asyncio.run(main())

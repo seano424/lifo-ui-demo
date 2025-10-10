@@ -6,14 +6,14 @@ Implements advanced database optimization techniques for 3x+ performance improve
 import asyncio
 import uuid
 from datetime import date, datetime, timedelta
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 import time
 
 import structlog
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.database.connection import async_session, direct_async_session
+from app.database.connection import async_session
 from app.services.batch_creation_service import BatchFromScanRequest
 
 logger = structlog.get_logger()
@@ -22,7 +22,7 @@ logger = structlog.get_logger()
 class OptimizedBatchCreationService:
     """
     High-performance batch creation service with advanced database optimizations
-    
+
     Key optimizations:
     1. Single-query bulk operations using PostgreSQL-specific features
     2. Minimized database roundtrips through batch processing
@@ -32,9 +32,9 @@ class OptimizedBatchCreationService:
     """
 
     # Optimal chunk sizes based on testing
-    OPTIMAL_CHUNK_SIZE = 50   # Smaller chunks for better concurrency
-    MAX_CHUNK_SIZE = 500      # Maximum safe chunk size for memory
-    MAX_CONCURRENT_CHUNKS = 5 # Concurrent chunk processing
+    OPTIMAL_CHUNK_SIZE = 50  # Smaller chunks for better concurrency
+    MAX_CHUNK_SIZE = 500  # Maximum safe chunk size for memory
+    MAX_CONCURRENT_CHUNKS = 5  # Concurrent chunk processing
 
     # Cache for category lookups
     _category_cache: dict[str, uuid.UUID] = {}
@@ -46,7 +46,9 @@ class OptimizedBatchCreationService:
         self.performance_metrics = {}
         # System UUID for service_role and system operations
         self.SYSTEM_USER_UUID = uuid.UUID("00000000-0000-0000-0000-000000000000")
-        logger.info("OptimizedBatchCreationService initialized with pooler connection (IPv4-compatible for WSL)")
+        logger.info(
+            "OptimizedBatchCreationService initialized with pooler connection (IPv4-compatible for WSL)"
+        )
 
     def _parse_user_id_to_uuid(self, user_id: str) -> uuid.UUID:
         """
@@ -69,11 +71,13 @@ class OptimizedBatchCreationService:
             logger.warning(
                 "Invalid user_id format, using system UUID",
                 user_id=user_id,
-                error=str(e)
+                error=str(e),
             )
             return self.SYSTEM_USER_UUID
 
-    async def _execute_raw_sql(self, session: AsyncSession, query: str, fetch: bool = True):
+    async def _execute_raw_sql(
+        self, session: AsyncSession, query: str, fetch: bool = True
+    ):
         """
         Execute raw SQL using direct database connection (supports prepared statements)
 
@@ -102,7 +106,7 @@ class OptimizedBatchCreationService:
     ) -> dict[str, Any]:
         """
         Ultra-optimized bulk batch creation with 3x+ performance improvement
-        
+
         Key optimizations:
         - Single transaction for entire chunk
         - Bulk UPSERT operations using PostgreSQL ON CONFLICT
@@ -111,24 +115,26 @@ class OptimizedBatchCreationService:
         """
         if not batch_requests:
             raise ValueError("No batch requests provided")
-        
+
         # Use optimal chunk size if not specified
         if chunk_size is None or chunk_size < 1:
             chunk_size = self.OPTIMAL_CHUNK_SIZE
         elif chunk_size > self.MAX_CHUNK_SIZE:
             chunk_size = self.MAX_CHUNK_SIZE
-            logger.warning(f"Chunk size reduced to maximum safe size: {self.MAX_CHUNK_SIZE}")
+            logger.warning(
+                f"Chunk size reduced to maximum safe size: {self.MAX_CHUNK_SIZE}"
+            )
 
         total_requests = len(batch_requests)
         successful_batches = []
         failed_batches = []
         created_products = set()
         updated_products = set()
-        
+
         # Track performance metrics
         start_time = time.perf_counter()
         db_time_total = 0
-        
+
         logger.info(
             "Starting optimized bulk CSV batch creation",
             total_requests=total_requests,
@@ -180,16 +186,26 @@ class OptimizedBatchCreationService:
                     # Return failed results for entire chunk
                     failed_results = []
                     for i, request in enumerate(chunk_requests):
-                        failed_results.append({
-                            "index": chunk_start + i,
-                            "barcode": request.barcode,
-                            "product_name": request.product_name,
-                            "error": f"Chunk processing failed: {str(e)}",
-                        })
-                    return {"successful": [], "failed": failed_results, "created_products": set(), "updated_products": set()}, 0
+                        failed_results.append(
+                            {
+                                "index": chunk_start + i,
+                                "barcode": request.barcode,
+                                "product_name": request.product_name,
+                                "error": f"Chunk processing failed: {str(e)}",
+                            }
+                        )
+                    return {
+                        "successful": [],
+                        "failed": failed_results,
+                        "created_products": set(),
+                        "updated_products": set(),
+                    }, 0
 
         # Execute all chunks concurrently
-        results_list = await asyncio.gather(*[process_chunk_with_semaphore(chunk) for chunk in chunks], return_exceptions=True)
+        results_list = await asyncio.gather(
+            *[process_chunk_with_semaphore(chunk) for chunk in chunks],
+            return_exceptions=True,
+        )
 
         # Aggregate results
         for result in results_list:
@@ -206,16 +222,24 @@ class OptimizedBatchCreationService:
 
         # Calculate performance metrics
         total_time = time.perf_counter() - start_time
-        success_rate = (len(successful_batches) / total_requests * 100) if total_requests > 0 else 0
-        
+        success_rate = (
+            (len(successful_batches) / total_requests * 100)
+            if total_requests > 0
+            else 0
+        )
+
         self.performance_metrics = {
             "total_processing_time_ms": total_time * 1000,
             "database_time_ms": db_time_total * 1000,
-            "database_percentage": (db_time_total / total_time * 100) if total_time > 0 else 0,
+            "database_percentage": (db_time_total / total_time * 100)
+            if total_time > 0
+            else 0,
             "items_per_second": total_requests / total_time if total_time > 0 else 0,
-            "avg_time_per_item_ms": (total_time / total_requests * 1000) if total_requests > 0 else 0,
+            "avg_time_per_item_ms": (total_time / total_requests * 1000)
+            if total_requests > 0
+            else 0,
         }
-        
+
         logger.info(
             "Optimized batch creation completed",
             **self.performance_metrics,
@@ -254,7 +278,7 @@ class OptimizedBatchCreationService:
     ) -> dict[str, list]:
         """
         Ultra-optimized chunk processing with minimal database operations
-        
+
         Key techniques:
         1. Single transaction for entire chunk
         2. Bulk UPSERT for products using ON CONFLICT
@@ -288,7 +312,12 @@ class OptimizedBatchCreationService:
 
                 # Step 4: Bulk INSERT all batches in single operation
                 successful_batches = await self._bulk_insert_batches_optimized(
-                    session, store_id, user_id, chunk_requests, product_mapping, chunk_start
+                    session,
+                    store_id,
+                    user_id,
+                    chunk_requests,
+                    product_mapping,
+                    chunk_start,
                 )
 
                 # Step 5: Single commit for entire chunk
@@ -317,17 +346,19 @@ class OptimizedBatchCreationService:
                     chunk_start=chunk_start,
                     error=str(e),
                 )
-                
+
                 # Return all as failed
                 failed_batches = []
                 for i, request in enumerate(chunk_requests):
-                    failed_batches.append({
-                        "index": chunk_start + i,
-                        "barcode": request.barcode,
-                        "product_name": request.product_name,
-                        "error": f"Bulk processing failed: {str(e)}",
-                    })
-                
+                    failed_batches.append(
+                        {
+                            "index": chunk_start + i,
+                            "barcode": request.barcode,
+                            "product_name": request.product_name,
+                            "error": f"Bulk processing failed: {str(e)}",
+                        }
+                    )
+
                 return {
                     "successful": [],
                     "failed": failed_batches,
@@ -353,9 +384,9 @@ class OptimizedBatchCreationService:
         for barcode in barcodes:
             escaped_barcode = barcode.replace("'", "''")  # SQL escape single quotes
             escaped_barcodes.append(f"'{escaped_barcode}'")
-        barcode_list = ', '.join(escaped_barcodes)
+        barcode_list = ", ".join(escaped_barcodes)
         store_uuid = str(uuid.UUID(store_id))  # Validate UUID format
-        
+
         query = f"""
             SELECT
                 p.barcode,
@@ -374,9 +405,13 @@ class OptimizedBatchCreationService:
 
         existing_products = {}
         for row in rows:
-            barcode, product_id, exists_in_store = row['barcode'], row['product_id'], row['exists_in_store']
+            barcode, product_id, exists_in_store = (
+                row["barcode"],
+                row["product_id"],
+                row["exists_in_store"],
+            )
             existing_products[barcode] = (product_id, exists_in_store)
-        
+
         return existing_products
 
     async def _bulk_upsert_products_optimized(
@@ -394,19 +429,65 @@ class OptimizedBatchCreationService:
         product_mapping = {}
         products_to_upsert = []
         store_products_to_upsert = []
-        
+
         # Prepare data for bulk operations
         for barcode, requests in barcode_to_requests.items():
             request = requests[0]  # Use first request for product data
-            
+
             if barcode in existing_products:
                 product_id, exists_in_store = existing_products[barcode]
                 product_mapping[barcode] = (product_id, False)
-                
+
                 # Add to store if not already there
                 if not exists_in_store:
                     user_uuid = self._parse_user_id_to_uuid(user_id)
-                    store_products_to_upsert.append({
+                    store_products_to_upsert.append(
+                        {
+                            "store_id": uuid.UUID(store_id),
+                            "product_id": product_id,
+                            "cost_price": request.cost_price or 0,
+                            "selling_price": request.selling_price or 0,
+                            "is_active": True,
+                            "added_by": user_uuid,
+                            "updated_by": user_uuid,
+                        }
+                    )
+            else:
+                # New product
+                product_id = uuid.uuid4()
+                product_mapping[barcode] = (product_id, True)
+
+                # Generate SKU
+                sku = (
+                    request.sku
+                    if hasattr(request, "sku") and request.sku
+                    else f"CSV_{barcode[:10]}_{uuid.uuid4().hex[:8].upper()}"
+                )
+
+                user_uuid = self._parse_user_id_to_uuid(user_id)
+                products_to_upsert.append(
+                    {
+                        "product_id": product_id,
+                        "sku": sku,
+                        "name": request.product_name,  # Database column is 'name'
+                        "brand": request.brand
+                        or "",  # Ensure non-None for SQL escaping
+                        "barcode": barcode,
+                        "barcode_type": "CSV_IMPORT",
+                        "unit_type": "unit",
+                        "typical_shelf_life_days": 30,
+                        "base_cost_price": request.cost_price or 0.01,
+                        "base_selling_price": request.selling_price or 0.01,
+                        "created_by": user_uuid,  # Database column is 'created_by'
+                        "is_verified": True,
+                        "category_id": await self._get_category_id_cached(
+                            request.category
+                        ),
+                    }
+                )
+
+                store_products_to_upsert.append(
+                    {
                         "store_id": uuid.UUID(store_id),
                         "product_id": product_id,
                         "cost_price": request.cost_price or 0,
@@ -414,78 +495,48 @@ class OptimizedBatchCreationService:
                         "is_active": True,
                         "added_by": user_uuid,
                         "updated_by": user_uuid,
-                    })
-            else:
-                # New product
-                product_id = uuid.uuid4()
-                product_mapping[barcode] = (product_id, True)
-
-                # Generate SKU
-                sku = request.sku if hasattr(request, 'sku') and request.sku else f"CSV_{barcode[:10]}_{uuid.uuid4().hex[:8].upper()}"
-
-                user_uuid = self._parse_user_id_to_uuid(user_id)
-                products_to_upsert.append({
-                    "product_id": product_id,
-                    "sku": sku,
-                    "name": request.product_name,  # Database column is 'name'
-                    "brand": request.brand or "",  # Ensure non-None for SQL escaping
-                    "barcode": barcode,
-                    "barcode_type": "CSV_IMPORT",
-                    "unit_type": "unit",
-                    "typical_shelf_life_days": 30,
-                    "base_cost_price": request.cost_price or 0.01,
-                    "base_selling_price": request.selling_price or 0.01,
-                    "created_by": user_uuid,  # Database column is 'created_by'
-                    "is_verified": True,
-                    "category_id": await self._get_category_id_cached(request.category),
-                })
-
-                store_products_to_upsert.append({
-                    "store_id": uuid.UUID(store_id),
-                    "product_id": product_id,
-                    "cost_price": request.cost_price or 0,
-                    "selling_price": request.selling_price or 0,
-                    "is_active": True,
-                    "added_by": user_uuid,
-                    "updated_by": user_uuid,
-                })
+                    }
+                )
 
         # Bulk insert products using PostgreSQL ON CONFLICT
-        created_products = []
-        updated_products = []
-        
         if products_to_upsert:
             try:
                 # Use raw SQL to avoid prepared statements for pgbouncer compatibility
                 values_list = []
                 for p in products_to_upsert:
                     # Escape string values properly for SQL
-                    escaped_barcode = p['barcode'].replace("'", "''")
-                    escaped_name = p['name'].replace("'", "''")  # Database column is 'name'
-                    escaped_brand = p['brand'].replace("'", "''")
-                    escaped_unit_type = p['unit_type'].replace("'", "''")
-                    escaped_barcode_type = p['barcode_type'].replace("'", "''")
-                    category_val = f"'{p['category_id']}'" if p['category_id'] is not None else 'NULL'
+                    escaped_barcode = p["barcode"].replace("'", "''")
+                    escaped_name = p["name"].replace(
+                        "'", "''"
+                    )  # Database column is 'name'
+                    escaped_brand = p["brand"].replace("'", "''")
+                    escaped_unit_type = p["unit_type"].replace("'", "''")
+                    escaped_barcode_type = p["barcode_type"].replace("'", "''")
+                    category_val = (
+                        f"'{p['category_id']}'"
+                        if p["category_id"] is not None
+                        else "NULL"
+                    )
 
                     values_list.append(f"""(
-                        '{str(p['product_id'])}',
-                        '{p['sku']}',
+                        '{str(p["product_id"])}',
+                        '{p["sku"]}',
                         '{escaped_name}',
                         {category_val},
                         '{escaped_brand}',
                         '{escaped_unit_type}',
-                        {p['typical_shelf_life_days']},
-                        {p['base_cost_price']},
-                        {p['base_selling_price']},
-                        '{str(p['created_by'])}',
+                        {p["typical_shelf_life_days"]},
+                        {p["base_cost_price"]},
+                        {p["base_selling_price"]},
+                        '{str(p["created_by"])}',
                         NOW(),
                         NOW(),
                         '{escaped_barcode}',
                         '{escaped_barcode_type}',
-                        {str(p['is_verified']).upper()}
+                        {str(p["is_verified"]).upper()}
                     )""")
 
-                values_clause = ',\n                    '.join(values_list)
+                values_clause = ",\n                    ".join(values_list)
 
                 query = f"""
                     INSERT INTO inventory.products (
@@ -499,31 +550,31 @@ class OptimizedBatchCreationService:
 
                 # Use raw asyncpg to avoid prepared statements
                 await self._execute_raw_sql(session, query, fetch=False)
-                
-                # Since ON CONFLICT doesn't return which were inserted, assume all were created
-                # This is an optimistic estimate for performance metrics
-                created_products = [p["barcode"] for p in products_to_upsert]
-                updated_products = []
-                
+
+                # Since ON CONFLICT doesn't return which were inserted, we don't track
+                # created vs updated products for performance metrics in this path
+
             except Exception as e:
                 if "no unique or exclusion constraint" in str(e).lower():
                     # Rollback the failed transaction and start fresh
                     await session.rollback()
-                    
+
                     # Fallback: Use traditional check-then-insert approach
                     logger.warning(
                         "Barcode constraint not found, using fallback approach",
-                        error=str(e)
+                        error=str(e),
                     )
-                    
+
                     # Get existing barcodes in this chunk using raw SQL for pgbouncer compatibility
                     existing_barcodes = {p["barcode"] for p in products_to_upsert}
                     escaped_barcodes = []
                     for barcode in existing_barcodes:
-                        escaped_barcode = barcode.replace("'", "''")  # SQL escape single quotes
+                        escaped_barcode = barcode.replace(
+                            "'", "''"
+                        )  # SQL escape single quotes
                         escaped_barcodes.append(f"'{escaped_barcode}'")
-                    barcode_list = ', '.join(escaped_barcodes)
-                    
+                    barcode_list = ", ".join(escaped_barcodes)
+
                     query = f"""
                         SELECT barcode
                         FROM inventory.products
@@ -531,46 +582,55 @@ class OptimizedBatchCreationService:
                     """
 
                     rows = await self._execute_raw_sql(session, query, fetch=True)
-                    existing_barcode_set = {row['barcode'] for row in rows}
-                    
+                    existing_barcode_set = {row["barcode"] for row in rows}
+
                     # Filter out products that already exist
                     new_products = [
-                        p for p in products_to_upsert 
+                        p
+                        for p in products_to_upsert
                         if p["barcode"] not in existing_barcode_set
                     ]
-                    
+
                     if new_products:
                         # Insert only new products using raw SQL for pgbouncer compatibility
                         values_list = []
                         for p in new_products:
                             # Escape string values properly for SQL
-                            escaped_sku = p['sku'].replace("'", "''")
-                            escaped_barcode = p['barcode'].replace("'", "''")
-                            escaped_name = p['name'].replace("'", "''")  # Dict key is 'name' not 'product_name'
-                            escaped_brand = p['brand'].replace("'", "''")
-                            escaped_unit_type = p['unit_type'].replace("'", "''")
-                            escaped_barcode_type = p['barcode_type'].replace("'", "''")
-                            category_val = f"'{str(p['category_id'])}'" if p['category_id'] is not None else 'NULL'
+                            escaped_sku = p["sku"].replace("'", "''")
+                            escaped_barcode = p["barcode"].replace("'", "''")
+                            escaped_name = p["name"].replace(
+                                "'", "''"
+                            )  # Dict key is 'name' not 'product_name'
+                            escaped_brand = p["brand"].replace("'", "''")
+                            escaped_unit_type = p["unit_type"].replace("'", "''")
+                            escaped_barcode_type = p["barcode_type"].replace("'", "''")
+                            category_val = (
+                                f"'{str(p['category_id'])}'"
+                                if p["category_id"] is not None
+                                else "NULL"
+                            )
 
                             values_list.append(f"""(
-                                '{str(p['product_id'])}',
+                                '{str(p["product_id"])}',
                                 '{escaped_sku}',
                                 '{escaped_name}',
                                 {category_val},
                                 '{escaped_brand}',
                                 '{escaped_unit_type}',
-                                {p['typical_shelf_life_days']},
-                                {p['base_cost_price']},
-                                {p['base_selling_price']},
-                                '{str(p['created_by'])}',
+                                {p["typical_shelf_life_days"]},
+                                {p["base_cost_price"]},
+                                {p["base_selling_price"]},
+                                '{str(p["created_by"])}',
                                 NOW(),
                                 NOW(),
                                 '{escaped_barcode}',
                                 '{escaped_barcode_type}',
-                                {str(p['is_verified']).upper()}
+                                {str(p["is_verified"]).upper()}
                             )""")
 
-                        values_clause = ',\n                            '.join(values_list)
+                        values_clause = ",\n                            ".join(
+                            values_list
+                        )
 
                         query = f"""
                             INSERT INTO inventory.products (
@@ -582,9 +642,14 @@ class OptimizedBatchCreationService:
                         """
 
                         await self._execute_raw_sql(session, query, fetch=False)
-                        
-                    created_products = [p["barcode"] for p in new_products]
-                    updated_products = [p["barcode"] for p in products_to_upsert if p["barcode"] in existing_barcode_set]
+
+                    # Track created and updated products for logging
+                    _ = [p["barcode"] for p in new_products]  # created_products
+                    _ = [
+                        p["barcode"]
+                        for p in products_to_upsert
+                        if p["barcode"] in existing_barcode_set
+                    ]  # updated_products
                 else:
                     raise e
 
@@ -593,19 +658,19 @@ class OptimizedBatchCreationService:
             values_list = []
             for sp in store_products_to_upsert:
                 values_list.append(f"""(
-                    '{str(sp['store_id'])}',
-                    '{str(sp['product_id'])}',
-                    {sp['cost_price']},
-                    {sp['selling_price']},
-                    {str(sp['is_active']).lower()},
-                    '{str(sp['added_by'])}',
+                    '{str(sp["store_id"])}',
+                    '{str(sp["product_id"])}',
+                    {sp["cost_price"]},
+                    {sp["selling_price"]},
+                    {str(sp["is_active"]).lower()},
+                    '{str(sp["added_by"])}',
                     NOW(),
-                    '{str(sp['updated_by'])}',
+                    '{str(sp["updated_by"])}',
                     NOW()
                 )""")
-            
-            values_clause = ',\n                '.join(values_list)
-            
+
+            values_clause = ",\n                ".join(values_list)
+
             query = f"""
                 INSERT INTO inventory.store_products (
                     store_id, product_id, cost_price, selling_price, is_active,
@@ -620,7 +685,7 @@ class OptimizedBatchCreationService:
 
         # Single flush for both operations
         await session.flush()
-        
+
         return product_mapping
 
     async def _bulk_insert_batches_optimized(
@@ -637,50 +702,57 @@ class OptimizedBatchCreationService:
         """
         batches_to_insert = []
         successful_batches = []
-        
+
         # Pre-generate all batch data
         for i, request in enumerate(batch_requests):
             if request.barcode not in product_mapping:
                 logger.error(f"Product not found for barcode: {request.barcode}")
                 continue
-            
+
             product_id, _ = product_mapping[request.barcode]
-            
+
             # Generate batch number
-            batch_number = request.batch_number or f"CSV-{date.today().strftime('%Y%m%d')}-{chunk_start + i + 1:05d}"
-            
+            batch_number = (
+                request.batch_number
+                or f"CSV-{date.today().strftime('%Y%m%d')}-{chunk_start + i + 1:05d}"
+            )
+
             # Pre-compute values
             manufacture_date = request.expiry_date - timedelta(days=30)
             batch_id = uuid.uuid4()
-            
-            batches_to_insert.append({
-                "batch_id": batch_id,
-                "product_id": product_id,
-                "batch_number": batch_number,
-                "initial_quantity": request.quantity,
-                "current_quantity": request.quantity,
-                "manufacture_date": manufacture_date,
-                "expiry_date": request.expiry_date,
-                "cost_price": request.cost_price or 0,
-                "selling_price": request.selling_price or 0,
-                "batch_source": "csv_import",
-                "scanned_barcode": request.barcode,
-                "scan_confidence": 1.0,
-                "verification_status": "verified",
-                "store_id": uuid.UUID(store_id),
-                "created_by": self._parse_user_id_to_uuid(user_id),
-                "status": "active",
-            })
-            
-            successful_batches.append({
-                "batch_id": str(batch_id),
-                "product_id": str(product_id),
-                "batch_number": batch_number,
-                "barcode": request.barcode,
-                "product_name": request.product_name,
-                "quantity": request.quantity,
-                "expiry_date": request.expiry_date.isoformat(),
-            })
+
+            batches_to_insert.append(
+                {
+                    "batch_id": batch_id,
+                    "product_id": product_id,
+                    "batch_number": batch_number,
+                    "initial_quantity": request.quantity,
+                    "current_quantity": request.quantity,
+                    "manufacture_date": manufacture_date,
+                    "expiry_date": request.expiry_date,
+                    "cost_price": request.cost_price or 0,
+                    "selling_price": request.selling_price or 0,
+                    "batch_source": "csv_import",
+                    "scanned_barcode": request.barcode,
+                    "scan_confidence": 1.0,
+                    "verification_status": "verified",
+                    "store_id": uuid.UUID(store_id),
+                    "created_by": self._parse_user_id_to_uuid(user_id),
+                    "status": "active",
+                }
+            )
+
+            successful_batches.append(
+                {
+                    "batch_id": str(batch_id),
+                    "product_id": str(product_id),
+                    "batch_number": batch_number,
+                    "barcode": request.barcode,
+                    "product_name": request.product_name,
+                    "quantity": request.quantity,
+                    "expiry_date": request.expiry_date.isoformat(),
+                }
+            )
 
         # Single bulk insert for all batches using raw SQL to avoid prepared statements
         if batches_to_insert:
@@ -691,9 +763,11 @@ class OptimizedBatchCreationService:
                 batch_number_escaped = batch["batch_number"].replace("'", "''")
                 batch_source_escaped = batch["batch_source"].replace("'", "''")
                 scanned_barcode_escaped = batch["scanned_barcode"].replace("'", "''")
-                verification_status_escaped = batch["verification_status"].replace("'", "''")
+                verification_status_escaped = batch["verification_status"].replace(
+                    "'", "''"
+                )
                 status_escaped = batch["status"].replace("'", "''")
-                
+
                 # Format row values
                 row_values = f"""(
                     '{batch["batch_id"]}',
@@ -716,9 +790,9 @@ class OptimizedBatchCreationService:
                     NOW()
                 )"""
                 value_rows.append(row_values)
-            
-            values_clause = ',\n                '.join(value_rows)
-            
+
+            values_clause = ",\n                ".join(value_rows)
+
             query = f"""
                 INSERT INTO inventory.batches (
                     batch_id, product_id, batch_number, initial_quantity, current_quantity,
@@ -731,27 +805,29 @@ class OptimizedBatchCreationService:
             # Use raw asyncpg to avoid prepared statements
             await self._execute_raw_sql(session, query, fetch=False)
             await session.flush()
-        
+
         return successful_batches
 
     async def _preload_category_cache(self, session: AsyncSession):
         """Pre-load category cache for faster lookups (disabled for pgbouncer compatibility)"""
         if self._cache_loaded:
             return
-        
+
         # Disabled for pgbouncer compatibility - prepared statements cause issues
         # Using hardcoded category mapping instead for now
         logger.info("Category pre-loading disabled for pgbouncer compatibility")
         self._cache_loaded = True
 
-    async def _get_category_id_cached(self, category_str: str | None) -> uuid.UUID | None:
+    async def _get_category_id_cached(
+        self, category_str: str | None
+    ) -> uuid.UUID | None:
         """Get category ID from cache"""
         if not category_str:
             # Return default category
             return self._category_cache.get("dry_goods")
-        
+
         category_str = category_str.lower().strip()
-        
+
         # Category mapping
         category_mapping = {
             "produce": "fresh_produce",
@@ -764,14 +840,14 @@ class OptimizedBatchCreationService:
             "frozen": "frozen_foods",
             "beverages": "beverages",
         }
-        
+
         category_code = category_mapping.get(category_str, category_str)
-        
+
         # Try to get from cache
         category_id = self._category_cache.get(category_code)
         if category_id:
             return category_id
-        
+
         # Fallback to default
         return self._category_cache.get("dry_goods")
 
@@ -779,21 +855,21 @@ class OptimizedBatchCreationService:
         """Fast validation without database access"""
         if not request.barcode or len(request.barcode.strip()) < 8:
             raise ValueError(f"Row {index}: Invalid barcode")
-        
+
         if not request.product_name or not request.product_name.strip():
             raise ValueError(f"Row {index}: Product name required")
-        
+
         if request.quantity <= 0:
             raise ValueError(f"Row {index}: Quantity must be positive")
-        
+
         # Date validation
         today = date.today()
         if request.expiry_date < today - timedelta(days=30):
             raise ValueError(f"Row {index}: Expiry date too far in past")
-        
+
         if request.expiry_date > today + timedelta(days=3650):
             raise ValueError(f"Row {index}: Expiry date too far in future")
 
 
 # Export the optimized service
-__all__ = ['OptimizedBatchCreationService']
+__all__ = ["OptimizedBatchCreationService"]

@@ -1,22 +1,6 @@
 'use client'
 
 import {
-  Crown,
-  Key,
-  Lock,
-  MoreHorizontal,
-  RefreshCw,
-  Unlock,
-  User,
-  UserCheck,
-  UserMinus,
-  UserPlus,
-  Users,
-} from 'lucide-react'
-import { useTranslations } from 'next-intl'
-import { useState } from 'react'
-import { toast } from 'sonner'
-import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -68,6 +52,22 @@ import type { StoreUser } from '@/lib/queries/store-users'
 import type { UserStorePermissions } from '@/lib/server/permissions'
 import { useActiveStoreId, useStoreState } from '@/lib/stores/store-context'
 import { cn } from '@/lib/utils'
+import {
+  Crown,
+  Key,
+  Lock,
+  MoreHorizontal,
+  RefreshCw,
+  Unlock,
+  User,
+  UserCheck,
+  UserMinus,
+  UserPlus,
+  Users,
+} from 'lucide-react'
+import { useTranslations } from 'next-intl'
+import { useState } from 'react'
+import { toast } from 'sonner'
 import { Card, CardContent, CardHeader } from '../ui/card'
 
 import { AddEmployeeDialog } from './add-employee-dialog'
@@ -114,15 +114,15 @@ export function StoreUsersList({ storeId: propStoreId, serverPermissions }: Stor
     }
   }
 
-  // Helper function to check if PIN is locked
-  const isPINLocked = (user: StoreUser): boolean => {
+  // Helper function to check if password is locked
+  const isPasswordLocked = (user: StoreUser): boolean => {
     const lockedUntil = user.pin_locked_until
     if (!lockedUntil) return false
     return new Date(lockedUntil) > new Date()
   }
 
-  // Helper function to check if user has PIN auth
-  const hasPINAuth = (user: StoreUser): boolean => {
+  // Helper function to check if user has password auth
+  const hasPasswordAuth = (user: StoreUser): boolean => {
     return user.can_use_pin_auth && !!user.requires_pin
   }
 
@@ -216,7 +216,7 @@ export function StoreUsersList({ storeId: propStoreId, serverPermissions }: Stor
                 <TableHead>{t('email')}</TableHead>
                 <TableHead>{t('role')}</TableHead>
                 <TableHead>{t('status')}</TableHead>
-                {/* {canManageUsers && <TableHead>{t('pinStatus')}</TableHead>} */}
+                {/* {canManageUsers && <TableHead>{t('passwordStatus')}</TableHead>} */}
                 {canManageUsers && <TableHead>{t('actions')}</TableHead>}
               </TableRow>
             </TableHeader>
@@ -241,8 +241,8 @@ export function StoreUsersList({ storeId: propStoreId, serverPermissions }: Stor
                     </TableCell>
                     {/* {canManageUsers && (
                       <TableCell>
-                        {hasPINAuth(storeUser) ? (
-                          isPINLocked(storeUser) ? (
+                        {hasPasswordAuth(storeUser) ? (
+                          isPasswordLocked(storeUser) ? (
                             <span className="text-sm flex items-center gap-1">
                               <Lock className="w-3 h-3" />
                               {t('locked')}
@@ -250,11 +250,11 @@ export function StoreUsersList({ storeId: propStoreId, serverPermissions }: Stor
                           ) : (
                             <span className="text-sm flex items-center gap-1">
                               <Key className="w-3 h-3" />
-                              {t('pinActive')}
+                              {t('passwordActive')}
                             </span>
                           )
                         ) : (
-                          <span className="text-sm">{t('noPin')}</span>
+                          <span className="text-sm">{t('noPassword')}</span>
                         )}
                       </TableCell>
                     )} */}
@@ -314,12 +314,12 @@ export function StoreUsersList({ storeId: propStoreId, serverPermissions }: Stor
                                 </DropdownMenuItem>
                               )}
 
-                              {/* PIN Management Actions */}
-                              {hasPINAuth(storeUser) && (
+                              {/* Password Management Actions */}
+                              {hasPasswordAuth(storeUser) && (
                                 <>
                                   <DropdownMenuSeparator />
 
-                                  {/* Reset PIN */}
+                                  {/* Reset Password */}
                                   <DropdownMenuItem
                                     onClick={() => {
                                       setSelectedUser(storeUser)
@@ -330,11 +330,11 @@ export function StoreUsersList({ storeId: propStoreId, serverPermissions }: Stor
                                     className="flex items-center gap-2"
                                   >
                                     <RefreshCw className="w-4 h-4" />
-                                    {t('dropdown.resetPin')}
+                                    {t('dropdown.resetPassword')}
                                   </DropdownMenuItem>
 
-                                  {/* Unlock PIN (only if locked) */}
-                                  {isPINLocked(storeUser) && (
+                                  {/* Unlock Password (only if locked) */}
+                                  {isPasswordLocked(storeUser) && (
                                     <DropdownMenuItem
                                       onClick={() => {
                                         setSelectedUser(storeUser)
@@ -345,7 +345,7 @@ export function StoreUsersList({ storeId: propStoreId, serverPermissions }: Stor
                                       className="flex items-center gap-2"
                                     >
                                       <Unlock className="w-4 h-4" />
-                                      {t('dropdown.unlockPin')}
+                                      {t('dropdown.unlockPassword')}
                                     </DropdownMenuItem>
                                   )}
                                 </>
@@ -544,46 +544,47 @@ export function StoreUsersList({ storeId: propStoreId, serverPermissions }: Stor
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* PIN Management Dialogs */}
+      {/* Password Management Dialogs */}
       {selectedUser && (
         <>
-          {/* Reset PIN Dialog */}
+          {/* Reset Password Dialog */}
           <Dialog open={isResetDialogOpen} onOpenChange={setIsResetDialogOpen}>
             <DialogContent>
               <DialogHeader>
                 <DialogTitle className="flex items-center gap-2">
                   <RefreshCw className="w-5 h-5" />
-                  {t('dialogs.resetPin.title', {
+                  {t('dialogs.resetPassword.title', {
                     name: selectedUser.full_name || '',
                   })}
                 </DialogTitle>
-                <DialogDescription>{t('dialogs.resetPin.description')}</DialogDescription>
+                <DialogDescription>{t('dialogs.resetPassword.description')}</DialogDescription>
               </DialogHeader>
 
               <div className="space-y-4">
                 <div className="p-4 bg-muted rounded-2xl">
                   <div className="space-y-2">
                     <div>
-                      <strong>{t('dialogs.resetPin.employee')}:</strong> {selectedUser.full_name}
+                      <strong>{t('dialogs.resetPassword.employee')}:</strong>{' '}
+                      {selectedUser.full_name}
                     </div>
                     <div>
-                      <strong>{t('dialogs.resetPin.username')}:</strong>{' '}
+                      <strong>{t('dialogs.resetPassword.username')}:</strong>{' '}
                       <span className="font-mono">{selectedUser.username}</span>
                     </div>
                     <div>
-                      <strong>{t('dialogs.resetPin.email')}:</strong> {selectedUser.email}
+                      <strong>{t('dialogs.resetPassword.email')}:</strong> {selectedUser.email}
                     </div>
                     <div>
-                      <strong>{t('dialogs.resetPin.currentStatus')}:</strong>
-                      {isPINLocked(selectedUser) ? (
+                      <strong>{t('dialogs.resetPassword.currentStatus')}:</strong>
+                      {isPasswordLocked(selectedUser) ? (
                         <span className="ml-2 text-red-600 flex items-center gap-1">
                           <Lock className="w-3 h-3" />
-                          {t('dialogs.resetPin.statusLocked')}
+                          {t('dialogs.resetPassword.statusLocked')}
                         </span>
                       ) : (
                         <span className="ml-2 text-primary-600 flex items-center gap-1">
                           <Key className="w-3 h-3" />
-                          {t('dialogs.resetPin.statusActive')}
+                          {t('dialogs.resetPassword.statusActive')}
                         </span>
                       )}
                     </div>
@@ -592,65 +593,66 @@ export function StoreUsersList({ storeId: propStoreId, serverPermissions }: Stor
 
                 <DialogFooter>
                   <Button variant="outline" onClick={() => setIsResetDialogOpen(false)}>
-                    {t('dialogs.resetPin.cancel')}
+                    {t('dialogs.resetPassword.cancel')}
                   </Button>
                   <Button
                     onClick={() => {
-                      // TODO: Implement PIN reset logic
+                      // TODO: Implement password reset logic
                       setIsResetDialogOpen(false)
                     }}
                     className="flex items-center gap-2"
                   >
                     <RefreshCw className="w-4 h-4" />
-                    {t('dialogs.resetPin.confirm')}
+                    {t('dialogs.resetPassword.confirm')}
                   </Button>
                 </DialogFooter>
               </div>
             </DialogContent>
           </Dialog>
 
-          {/* Unlock PIN Dialog */}
+          {/* Unlock Password Dialog */}
           <Dialog open={isUnlockDialogOpen} onOpenChange={setIsUnlockDialogOpen}>
             <DialogContent>
               <DialogHeader>
                 <DialogTitle className="flex items-center gap-2">
                   <Unlock className="w-5 h-5" />
-                  {t('dialogs.unlockPin.title', {
+                  {t('dialogs.unlockPassword.title', {
                     name: selectedUser.full_name || '',
                   })}
                 </DialogTitle>
-                <DialogDescription>{t('dialogs.unlockPin.description')}</DialogDescription>
+                <DialogDescription>{t('dialogs.unlockPassword.description')}</DialogDescription>
               </DialogHeader>
 
               <div className="space-y-4">
                 <div className="p-4 bg-muted rounded-2xl">
                   <div className="space-y-1">
                     <div>
-                      <strong>{t('dialogs.unlockPin.employee')}:</strong> {selectedUser.full_name}
+                      <strong>{t('dialogs.unlockPassword.employee')}:</strong>{' '}
+                      {selectedUser.full_name}
                     </div>
                     <div>
-                      <strong>{t('dialogs.unlockPin.username')}:</strong>{' '}
+                      <strong>{t('dialogs.unlockPassword.username')}:</strong>{' '}
                       <span className="font-mono">{selectedUser.username}</span>
                     </div>
                     <div>
-                      <strong>Status:</strong> {t('dialogs.unlockPin.lockedMessage')}
+                      <strong>Status:</strong> {t('dialogs.unlockPassword.lockedMessage')}
                     </div>
                   </div>
                 </div>
 
                 <DialogFooter>
                   <Button variant="outline" onClick={() => setIsUnlockDialogOpen(false)}>
-                    {t('dialogs.unlockPin.cancel')}
+                    {t('dialogs.unlockPassword.cancel')}
                   </Button>
                   <Button
                     onClick={() => {
-                      // TODO: Implement PIN unlock logic
+                      // TODO: Implement password unlock logic
                       setIsUnlockDialogOpen(false)
                     }}
                     className="flex items-center gap-2"
                   >
                     <Unlock className="w-4 h-4" />
-                    {t('dialogs.unlockPin.confirm')}
+                    {t('dialogs.unlockPassword.confirm')}
                   </Button>
                 </DialogFooter>
               </div>

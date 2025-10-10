@@ -130,8 +130,12 @@ export function TodoExpiryFilter({
         ? EXPIRED_PRESETS
         : GENERAL_PRESETS
 
-  // Find current selected preset
-  const currentPreset = presets.find(p => p.min === daysToExpiryMin && p.max === daysToExpiryMax)
+  // Find current selected preset (use loose equality to handle null/undefined differences)
+  const currentPreset = presets.find(
+    p =>
+      (p.min ?? null) === (daysToExpiryMin ?? null) &&
+      (p.max ?? null) === (daysToExpiryMax ?? null),
+  )
 
   // Determine if filter is active
   const isActive = daysToExpiryMin !== undefined || daysToExpiryMax !== undefined
@@ -162,11 +166,15 @@ export function TodoExpiryFilter({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant={isActive ? 'default' : 'outline'} disabled={isLoading}>
+        <Button
+          className="select-none"
+          variant={isActive ? 'default' : 'outline'}
+          disabled={isLoading}
+        >
           <Calendar className="h-4 w-4" />
           <span className="hidden sm:inline">{getFilterLabel()}</span>
           {currentPreset && (
-            <span className="text-white ml-1 border border-gray-500 rounded-2xl px-2 py-1">
+            <span className="ml-1 border border-gray-500 rounded-2xl px-2 text-current">
               {t(currentPreset.translationKey)}
             </span>
           )}

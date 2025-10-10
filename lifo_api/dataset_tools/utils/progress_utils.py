@@ -1,9 +1,10 @@
 """
 Progress tracking utilities for dataset operations.
 """
+
 import time
 from dataclasses import dataclass, field
-from typing import Optional, Dict, Any
+from typing import Optional, Dict
 from rich.progress import Progress, TaskID, BarColumn, TextColumn, TimeRemainingColumn
 from rich.console import Console
 
@@ -11,6 +12,7 @@ from rich.console import Console
 @dataclass
 class ProgressStats:
     """Statistics for progress tracking."""
+
     total: int = 0
     completed: int = 0
     failed: int = 0
@@ -51,7 +53,7 @@ class ProgressTracker:
             TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
             TextColumn("({task.completed}/{task.total})"),
             TimeRemainingColumn(),
-            console=self.console
+            console=self.console,
         )
         self.tasks: Dict[str, TaskID] = {}
         self.stats: Dict[str, ProgressStats] = {}
@@ -68,13 +70,7 @@ class ProgressTracker:
         self._active = False
         self.progress.__exit__(exc_type, exc_val, exc_tb)
 
-    def add_task(
-        self,
-        name: str,
-        description: str,
-        total: int,
-        **kwargs
-    ) -> str:
+    def add_task(self, name: str, description: str, total: int, **kwargs) -> str:
         """
         Add a new progress task.
 
@@ -102,7 +98,7 @@ class ProgressTracker:
         completed: bool = True,
         failed: bool = False,
         skipped: bool = False,
-        **kwargs
+        **kwargs,
     ) -> None:
         """
         Update progress for a task.

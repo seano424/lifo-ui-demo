@@ -1,10 +1,10 @@
 // app/api/email/send/route.ts
-import { type NextRequest, NextResponse } from 'next/server'
-import { type EmailCredentials, sendPinResetEmail, sendWelcomeEmail } from '@/lib/email/resend'
+import { type EmailCredentials, sendPasswordResetEmail, sendWelcomeEmail } from '@/lib/email/resend'
 import { createClient } from '@/lib/supabase/server'
+import { type NextRequest, NextResponse } from 'next/server'
 
 export interface EmailRequest {
-  type: 'welcome' | 'pin_reset'
+  type: 'welcome' | 'password_reset'
   credentials: EmailCredentials
   store_id?: string
   delivery_id?: string
@@ -31,7 +31,13 @@ export async function POST(request: NextRequest) {
     const { type, credentials, store_id, delivery_id } = body
 
     // Validate request
-    if (!type || !credentials || !credentials.email || !credentials.username || !credentials.pin) {
+    if (
+      !type ||
+      !credentials ||
+      !credentials.email ||
+      !credentials.username ||
+      !credentials.password
+    ) {
       return NextResponse.json(
         { success: false, error: 'Missing required fields' },
         { status: 400 },
@@ -80,8 +86,8 @@ export async function POST(request: NextRequest) {
     let emailResult: { data?: unknown; error?: unknown; success?: boolean; messageId?: string }
     if (type === 'welcome') {
       emailResult = await sendWelcomeEmail(enhancedCredentials)
-    } else if (type === 'pin_reset') {
-      emailResult = await sendPinResetEmail(enhancedCredentials)
+    } else if (type === 'password_reset') {
+      emailResult = await sendPasswordResetEmail(enhancedCredentials)
     } else {
       return NextResponse.json({ success: false, error: 'Invalid email type' }, { status: 400 })
     }

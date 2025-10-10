@@ -18,6 +18,12 @@ export async function setActiveStoreCookie(storeId: string) {
   return { success: true }
 }
 
+export async function clearActiveStoreCookie() {
+  const cookieStore = await cookies()
+  cookieStore.delete(ACTIVE_STORE_COOKIE_KEY)
+  return { success: true }
+}
+
 export async function getActiveStoreCookie(): Promise<string | null> {
   const cookieStore = await cookies()
   return cookieStore.get(ACTIVE_STORE_COOKIE_KEY)?.value || null

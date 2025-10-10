@@ -49,13 +49,13 @@ export function MarketingFooter() {
                 href="/"
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
-                Homepage
+                {t('links.homepage')}
               </Link>
               <Link
                 href="/features"
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
-                Features
+                {t('links.features')}
               </Link>
               <Link
                 href="/pricing"
@@ -67,7 +67,7 @@ export function MarketingFooter() {
                 href="/contact"
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
-                Contact
+                {t('links.contact')}
               </Link>
               {/* <Link
                 href="#"

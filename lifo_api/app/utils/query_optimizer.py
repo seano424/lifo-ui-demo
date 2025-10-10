@@ -3,7 +3,7 @@ Database Query Optimizer for Phase 2 API Consolidations
 Implements query optimization strategies for improved performance
 """
 
-from typing import Any, List
+from typing import Any
 
 import structlog
 from sqlalchemy import text
@@ -70,15 +70,11 @@ class QueryOptimizer:
             SELECT * FROM inventory_summary;
         """)
 
-        result = await self.db.execute(
-            query, {"store_id": store_id, "limit": limit}
-        )
-        
+        result = await self.db.execute(query, {"store_id": store_id, "limit": limit})
+
         return [dict(row._mapping) for row in result]
 
-    async def get_analytics_optimized(
-        self, store_id: str, days: int = 30
-    ) -> dict:
+    async def get_analytics_optimized(self, store_id: str, days: int = 30) -> dict:
         """
         Get analytics using materialized view for performance
         """
@@ -97,19 +93,19 @@ class QueryOptimizer:
                 AND date >= CURRENT_DATE - INTERVAL ':days days'
             ORDER BY date DESC;
         """)
-        
+
         try:
             result = await self.db.execute(
                 mv_query, {"store_id": store_id, "days": days}
             )
             mv_data = [dict(row._mapping) for row in result]
-            
+
             if mv_data:
                 return self._aggregate_analytics(mv_data)
         except Exception as e:
             logger.warning(
                 "Materialized view not available, falling back to direct query",
-                error=str(e)
+                error=str(e),
             )
 
         # Fallback to direct query if materialized view is not available
@@ -167,7 +163,7 @@ class QueryOptimizer:
         result = await self.db.execute(
             analytics_query, {"store_id": store_id, "days": days}
         )
-        
+
         data = [dict(row._mapping) for row in result]
         return self._aggregate_analytics(data)
 
@@ -179,9 +175,9 @@ class QueryOptimizer:
         total_batches = sum(d["batch_count"] for d in daily_data)
         total_urgent = sum(d["urgent_count"] for d in daily_data)
         avg_urgency = (
-            sum(d["avg_urgency"] * d["batch_count"] for d in daily_data) 
-            / total_batches
-            if total_batches > 0 else 0
+            sum(d["avg_urgency"] * d["batch_count"] for d in daily_data) / total_batches
+            if total_batches > 0
+            else 0
         )
 
         # Aggregate category breakdown
@@ -206,10 +202,7 @@ class QueryOptimizer:
         }
 
     async def bulk_insert_optimized(
-        self, 
-        table_name: str, 
-        records: list[dict], 
-        chunk_size: int = 100
+        self, table_name: str, records: list[dict], chunk_size: int = 100
     ) -> int:
         """
         Optimized bulk insertion using COPY command
@@ -219,39 +212,37 @@ class QueryOptimizer:
             return 0
 
         total_inserted = 0
-        
+
         # Process in chunks for better memory management
         for i in range(0, len(records), chunk_size):
-            chunk = records[i:i + chunk_size]
-            
+            chunk = records[i : i + chunk_size]
+
             # Build VALUES clause for bulk insert
             columns = list(chunk[0].keys())
             values_template = "({})".format(
-                ",".join([f":{col}_{idx}" for col in columns])
+                ",".join([f":{col}_{{idx}}" for col in columns])
             )
-            
+
             # Create parameter dict
             params = {}
             values_clauses = []
-            
+
             for idx, record in enumerate(chunk):
-                values_clauses.append(
-                    values_template.replace("{idx}", str(idx))
-                )
+                values_clauses.append(values_template.replace("{idx}", str(idx)))
                 for col, val in record.items():
                     params[f"{col}_{idx}"] = val
-            
+
             # Build and execute bulk insert query
             insert_query = text(f"""
-                INSERT INTO {table_name} ({','.join(columns)})
-                VALUES {','.join(values_clauses)}
+                INSERT INTO {table_name} ({",".join(columns)})
+                VALUES {",".join(values_clauses)}
                 ON CONFLICT DO NOTHING
                 RETURNING id;
             """)
-            
+
             result = await self.db.execute(insert_query, params)
             total_inserted += result.rowcount
-            
+
         await self.db.commit()
         return total_inserted
 
@@ -264,20 +255,17 @@ class QueryOptimizer:
             ON inventory_batches(store_id, expiry_date, is_active)
             WHERE is_active = true;
             """,
-            
             # Index for score lookups
             """
             CREATE INDEX IF NOT EXISTS idx_scores_batch_calculated
             ON product_scores(batch_id, calculated_at DESC);
             """,
-            
             # Index for category aggregations
             """
             CREATE INDEX IF NOT EXISTS idx_inventory_category_store
             ON inventory_batches(store_id, category)
             WHERE is_active = true AND current_quantity > 0;
             """,
-            
             # Partial index for urgent items
             """
             CREATE INDEX IF NOT EXISTS idx_urgent_items
@@ -319,17 +307,14 @@ class ConnectionPoolManager:
         """Get or create a connection pool for specific use case"""
         if pool_type not in self.pools:
             pool_config = self._get_pool_config(pool_type)
-            
+
             from sqlalchemy.ext.asyncio import create_async_engine
-            
-            engine = create_async_engine(
-                self.database_url,
-                **pool_config
-            )
-            
+
+            engine = create_async_engine(self.database_url, **pool_config)
+
             self.pools[pool_type] = engine
             logger.info(f"Created connection pool: {pool_type}", config=pool_config)
-        
+
         return self.pools[pool_type]
 
     def _get_pool_config(self, pool_type: str) -> dict:
@@ -364,7 +349,7 @@ class ConnectionPoolManager:
                 "pool_pre_ping": True,
             },
         }
-        
+
         return configs.get(pool_type, configs["default"])
 
     async def close_all_pools(self):
@@ -385,44 +370,43 @@ class QueryMonitor:
         self.slow_queries = []
 
     async def execute_with_monitoring(
-        self, 
-        db: AsyncSession, 
-        query: Any, 
-        params: dict = None
+        self, db: AsyncSession, query: Any, params: dict = None
     ):
         """Execute query with performance monitoring"""
         import time
-        
+
         start_time = time.time()
-        
+
         try:
             result = await db.execute(query, params or {})
             execution_time_ms = (time.time() - start_time) * 1000
-            
+
             # Log slow queries
             if execution_time_ms > self.slow_query_threshold_ms:
-                self.slow_queries.append({
-                    "query": str(query),
-                    "params": params,
-                    "execution_time_ms": execution_time_ms,
-                    "timestamp": time.time()
-                })
-                
+                self.slow_queries.append(
+                    {
+                        "query": str(query),
+                        "params": params,
+                        "execution_time_ms": execution_time_ms,
+                        "timestamp": time.time(),
+                    }
+                )
+
                 logger.warning(
                     "Slow query detected",
                     execution_time_ms=execution_time_ms,
-                    query=str(query)[:200]  # Log first 200 chars
+                    query=str(query)[:200],  # Log first 200 chars
                 )
-            
+
             return result
-            
+
         except Exception as e:
             execution_time_ms = (time.time() - start_time) * 1000
             logger.error(
                 "Query execution failed",
                 execution_time_ms=execution_time_ms,
                 error=str(e),
-                query=str(query)[:200]
+                query=str(query)[:200],
             )
             raise
 
@@ -430,19 +414,18 @@ class QueryMonitor:
         """Get report of slow queries"""
         if not self.slow_queries:
             return {"message": "No slow queries detected"}
-        
+
         # Sort by execution time
         sorted_queries = sorted(
-            self.slow_queries, 
-            key=lambda x: x["execution_time_ms"], 
-            reverse=True
+            self.slow_queries, key=lambda x: x["execution_time_ms"], reverse=True
         )
-        
+
         return {
             "total_slow_queries": len(self.slow_queries),
             "slowest_query_ms": sorted_queries[0]["execution_time_ms"],
             "average_slow_time_ms": sum(
                 q["execution_time_ms"] for q in self.slow_queries
-            ) / len(self.slow_queries),
-            "top_5_slowest": sorted_queries[:5]
+            )
+            / len(self.slow_queries),
+            "top_5_slowest": sorted_queries[:5],
         }

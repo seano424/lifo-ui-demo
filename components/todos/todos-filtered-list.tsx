@@ -255,7 +255,7 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
               size={isMobile ? 'default' : 'lg'}
               onClick={() => handleTabChange(tab.id)}
               className={cn(
-                'rounded-none relative flex flex-col-reverse sm:flex-row items-center pb-4 whitespace-nowrap gap-1 gap-2',
+                'rounded-none select-none relative flex flex-col-reverse sm:flex-row items-center pb-4 whitespace-nowrap gap-1',
                 'hover:bg-transparent group/tab',
                 activeTab === tab.id ? 'text-primary' : 'text-muted-foreground/90',
               )}

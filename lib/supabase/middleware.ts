@@ -3,6 +3,7 @@
 import { createServerClient } from '@supabase/ssr'
 import { type NextRequest, NextResponse } from 'next/server'
 import { hasEnvVars } from '../utils'
+import { logger } from '../utils/logger'
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
@@ -42,31 +43,61 @@ export async function updateSession(request: NextRequest) {
   // IMPORTANT: DO NOT REMOVE auth.getUser()
 
   let user = null
-  try {
-    const { data, error } = await supabase.auth.getUser()
+  let retryCount = 0
+  const maxRetries = 0 // No retries in middleware - fail fast, let client handle it
 
-    if (error) {
-      // Handle different error types appropriately
-      if (error.message?.includes('refresh_token_not_found')) {
-        // This is expected when tokens expire - not an error condition
-        console.log('[Middleware] Session expired, user needs to re-authenticate')
-      } else if (error.message?.includes('Auth session missing')) {
-        // Normal for logged-out users - don't log
-      } else if (error.message?.includes('JWT')) {
-        // Token format issues
-        console.log('[Middleware] Invalid token format, clearing session')
+  while (retryCount <= maxRetries) {
+    try {
+      const { data, error } = await supabase.auth.getUser()
+
+      if (error) {
+        // Handle different error types appropriately
+        if (error.message?.includes('refresh_token_not_found')) {
+          // This is expected when tokens expire - not an error condition
+          logger.queryWarn('middleware', 'Session expired, user needs to re-authenticate')
+        } else if (error.message?.includes('Auth session missing')) {
+          // Normal for logged-out users - don't log
+        } else if (error.message?.includes('JWT')) {
+          // Token format issues
+          logger.queryWarn('middleware', 'Invalid token format, clearing session')
+        } else if (error.message?.includes('fetch failed') && retryCount < maxRetries) {
+          // Retry on transient fetch failures
+          logger.queryWarn('middleware', 'Fetch failed, retrying', {
+            attempt: retryCount + 1,
+            maxRetries,
+          })
+          retryCount++
+          await new Promise(resolve => setTimeout(resolve, 50)) // Fixed 50ms instead of exponential
+          continue
+        } else {
+          // Only log unexpected errors
+          logger.error('middleware', 'Unexpected auth error', error.message)
+        }
+        user = null
+        break
       } else {
-        // Only log unexpected errors
-        console.error('[Middleware] Unexpected auth error:', error.message)
+        user = data?.user || null
+        break
       }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : String(err)
+
+      // Retry on connection errors
+      if (errorMessage.includes('fetch failed') && retryCount < maxRetries) {
+        logger.queryWarn('middleware', 'Connection error, retrying', {
+          attempt: retryCount + 1,
+          maxRetries,
+        })
+        retryCount++
+        await new Promise(resolve => setTimeout(resolve, 100 * 2 ** retryCount))
+        continue
+      }
+
+      // Handle any unexpected errors that aren't retryable
+      logger.error('middleware', 'Unexpected error getting user', errorMessage)
       user = null
-    } else {
-      user = data?.user || null
+      break
     }
-  } catch (err) {
-    // Handle any unexpected errors
-    console.error('[Middleware] Unexpected error getting user:', err)
-    user = null
   }
 
   // Allow requests with auth codes to pass through (for password reset, etc.)

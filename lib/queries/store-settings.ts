@@ -104,8 +104,8 @@ export async function fetchStoreSettings(
           throw new Error('User not authenticated')
         }
 
-        // Log all other errors normally and let React Query handle them
-        logger.error('lib/queries/store-settings', 'Store fetch error', {
+        // Log query errors with queryWarn to respect NEXT_PUBLIC_LOG_QUERIES setting
+        logger.queryWarn('lib/queries/store-settings', 'Store fetch error', {
           error: error.message,
           code: error.code,
           storeId,
@@ -156,7 +156,7 @@ export async function updateStoreBasicInfo(
       })
 
       if (error) {
-        logger.error('lib/queries/store-settings', 'Store update error via RPC', {
+        logger.queryWarn('lib/queries/store-settings', 'Store update error via RPC', {
           error: error.message,
           code: error.code,
           storeId,
@@ -199,7 +199,7 @@ export async function updateStoreAdvancedSettings(
       })
 
       if (error) {
-        logger.error('lib/queries/store-settings', 'Failed to update store advanced settings', {
+        logger.queryWarn('lib/queries/store-settings', 'Failed to update store advanced settings', {
           error: error.message,
           code: error.code,
           storeId,
@@ -208,7 +208,7 @@ export async function updateStoreAdvancedSettings(
       }
 
       if (!data || data.length === 0) {
-        logger.error('lib/queries/store-settings', 'No data returned from update operation', {
+        logger.queryWarn('lib/queries/store-settings', 'No data returned from update operation', {
           storeId,
         })
         throw new Error('No data returned from update operation')
@@ -242,7 +242,7 @@ export async function updateStoreThresholds(
       })
 
       if (error) {
-        logger.error('lib/queries/store-settings', 'Failed to update store thresholds', {
+        logger.queryWarn('lib/queries/store-settings', 'Failed to update store thresholds', {
           error: error.message,
           code: error.code,
           storeId,
@@ -251,7 +251,7 @@ export async function updateStoreThresholds(
       }
 
       if (!data || data.length === 0) {
-        logger.error('lib/queries/store-settings', 'No data returned from threshold update', {
+        logger.queryWarn('lib/queries/store-settings', 'No data returned from threshold update', {
           storeId,
         })
         throw new Error('No data returned from threshold update operation')
@@ -337,7 +337,7 @@ export async function validateStoreCode(
 
     return data.length === 0 // Returns true if code is available
   } catch (error) {
-    logger.error('lib/queries/store-settings', 'validateStoreCode error', {
+    logger.queryWarn('lib/queries/store-settings', 'validateStoreCode error', {
       error: error instanceof Error ? error.message : String(error),
       storeCode,
     })
@@ -368,7 +368,7 @@ export async function validateStoreEmail(
 
     return data.length === 0 // Returns true if email is available
   } catch (error) {
-    logger.error('lib/queries/store-settings', 'validateStoreEmail error', {
+    logger.queryWarn('lib/queries/store-settings', 'validateStoreEmail error', {
       error: error instanceof Error ? error.message : String(error),
       email,
     })
@@ -393,7 +393,7 @@ export async function testTableAccess(
       return { success: true, method: 'RPC function' }
     }
   } catch (error) {
-    logger.error('lib/queries/store-settings', 'testTableAccess error', {
+    logger.queryWarn('lib/queries/store-settings', 'testTableAccess error', {
       error: error instanceof Error ? error.message : String(error),
       storeId,
     })
@@ -412,7 +412,7 @@ export async function testTableAccess(
       return { success: true, method: 'business schema' }
     }
   } catch (error) {
-    logger.error('lib/queries/store-settings', 'Method 2 (business schema) exception', {
+    logger.queryWarn('lib/queries/store-settings', 'Method 2 (business schema) exception', {
       error: error instanceof Error ? error.message : String(error),
       storeId,
     })
@@ -423,4 +423,126 @@ export async function testTableAccess(
     method: 'none',
     error: 'All table access methods failed',
   }
+}
+
+// TypeScript interface for deactivate store RPC response
+export interface DeactivateStoreResponse {
+  success: boolean
+  store_id: string
+  store_name: string
+  deactivated_at: string
+  employees_anonymized: number
+  message: string
+}
+
+// Runtime validation for deactivate store response
+function validateDeactivateStoreResponse(data: unknown): DeactivateStoreResponse {
+  if (!data || typeof data !== 'object') {
+    throw new Error('Invalid deactivate store response: not an object')
+  }
+
+  const response = data as Record<string, unknown>
+
+  if (
+    typeof response.success !== 'boolean' ||
+    typeof response.store_id !== 'string' ||
+    typeof response.store_name !== 'string' ||
+    typeof response.deactivated_at !== 'string' ||
+    typeof response.employees_anonymized !== 'number' ||
+    typeof response.message !== 'string'
+  ) {
+    throw new Error('Invalid deactivate store response: missing or invalid fields')
+  }
+
+  return {
+    success: response.success,
+    store_id: response.store_id,
+    store_name: response.store_name,
+    deactivated_at: response.deactivated_at,
+    employees_anonymized: response.employees_anonymized,
+    message: response.message,
+  }
+}
+
+// Deactivate store (soft delete with GDPR compliance)
+export async function deactivateStore(
+  storeId: string,
+  serverClient?: ServerClient,
+): Promise<DeactivateStoreResponse> {
+  return withPerformanceTracking(
+    'lib/queries/store-settings',
+    'deactivateStore',
+    { storeId },
+    async () => {
+      const supabase = serverClient || createClient()
+
+      // Server-side permission check before calling RPC
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+
+      if (!user) {
+        logger.error('lib/queries/store-settings', 'Deactivation failed - user not authenticated', {
+          storeId,
+        })
+        throw new Error('User not authenticated')
+      }
+
+      // Verify user is store owner
+      const { data: storeUser, error: permissionError } = await supabase
+        .schema('business')
+        .from('store_users')
+        .select('role_in_store, is_active')
+        .eq('store_id', storeId)
+        .eq('user_id', user.id)
+        .single()
+
+      if (permissionError || !storeUser) {
+        logger.error('lib/queries/store-settings', 'Deactivation failed - permission check error', {
+          error: permissionError?.message,
+          storeId,
+          userId: user.id,
+        })
+        throw new Error('Permission check failed')
+      }
+
+      if (storeUser.role_in_store !== 'owner' || !storeUser.is_active) {
+        logger.error(
+          'lib/queries/store-settings',
+          'Deactivation failed - insufficient permissions',
+          {
+            role: storeUser.role_in_store,
+            isActive: storeUser.is_active,
+            storeId,
+            userId: user.id,
+          },
+        )
+        throw new Error('Only active store owners can deactivate stores')
+      }
+
+      // Proceed with RPC call after permission verification
+      const { data, error } = await supabase.schema('business').rpc('deactivate_store_safe', {
+        p_store_id: storeId,
+      })
+
+      if (error) {
+        logger.queryWarn('lib/queries/store-settings', 'Store deactivation error', {
+          error: error.message,
+          code: error.code,
+          storeId,
+        })
+        throw new Error(`Failed to deactivate store: ${error.message}`)
+      }
+
+      // Validate the response structure
+      const validatedData = validateDeactivateStoreResponse(data)
+
+      logger.log('lib/queries/store-settings', 'Store deactivated successfully', {
+        storeId,
+        employeesAnonymized: validatedData.employees_anonymized,
+      })
+
+      return validatedData
+    },
+  )
 }

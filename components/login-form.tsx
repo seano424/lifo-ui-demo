@@ -1,40 +1,33 @@
 'use client'
 
-import { Building2, Key, User } from 'lucide-react'
-import Link from 'next/link'
-import { useActionState, useEffect, useState } from 'react'
-import { useFormStatus } from 'react-dom'
-import { toast } from 'sonner'
 import { loginWithCredentials } from '@/app/(auth)/auth/login/actions'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Typography } from '@/components/ui/typography'
 import { cn } from '@/lib/utils'
-
-// Types for the authentication modes
-type AuthMode = 'admin' | 'employee'
+import { Building2 } from 'lucide-react'
+import { useTranslations } from 'next-intl'
+import Link from 'next/link'
+import { useActionState, useEffect } from 'react'
+import { useFormStatus } from 'react-dom'
+import { toast } from 'sonner'
 
 // Submit button component that uses form status
 function SubmitButton() {
   const { pending } = useFormStatus()
+  const t = useTranslations('auth.loginForm')
   return (
     <Button type="submit" className="w-full" disabled={pending}>
-      {pending ? 'Signing in...' : 'Sign In'}
+      {pending ? t('signingIn') : t('signIn')}
     </Button>
   )
 }
 
 export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
-  const [authMode, setAuthMode] = useState<AuthMode>('employee')
   const [state, formAction] = useActionState(loginWithCredentials, null)
-
-  // Reset form when switching modes
-  const handleModeChange = (mode: AuthMode) => {
-    setAuthMode(mode)
-  }
+  const t = useTranslations('auth.loginForm')
 
   // Show error toast when state changes
   useEffect(() => {
@@ -52,135 +45,68 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
           </div>
           <div className="space-y-1.5 flex flex-col">
             <CardTitle>
-              <Typography variant="h1">Welcome to LIFO</Typography>
+              <Typography variant="h1">{t('welcomeTitle')}</Typography>
             </CardTitle>
             <CardDescription>
               <Typography variant="p" color="muted">
-                Sign in to manage your store inventory
+                {t('description')}
               </Typography>
             </CardDescription>
           </div>
         </CardHeader>
 
         <CardContent>
-          <Tabs value={authMode} onValueChange={value => handleModeChange(value as AuthMode)}>
-            <TabsList className="grid w-full grid-cols-2 font-mono">
-              <TabsTrigger value="employee" className="flex items-center gap-2 uppercase">
-                <User className="w-4 h-4" />
-                Employee
-              </TabsTrigger>
-              <TabsTrigger value="admin" className="flex items-center gap-2 uppercase">
-                <Key className="w-4 h-4" />
-                Manager/Owner
-              </TabsTrigger>
-            </TabsList>
+          <form action={formAction} className="space-y-4 font-mono uppercase">
+            <div className="space-y-2">
+              <Label htmlFor="identifier">{t('usernameOrEmail')}</Label>
+              <Input
+                id="identifier"
+                name="identifier"
+                type="text"
+                placeholder={t('usernamePlaceholder')}
+                required
+                autoComplete="username"
+              />
+            </div>
 
-            {/* Employee PIN Login */}
-            <TabsContent value="employee" className="space-y-4">
-              <form action={formAction} className="space-y-4 font-mono uppercase">
-                <div className="space-y-2">
-                  <Label htmlFor="employee-identifier">Username or Email</Label>
-                  <Input
-                    id="employee-identifier"
-                    name="identifier"
-                    type="text"
-                    placeholder="johnd"
-                    required
-                    autoComplete="username"
-                  />
-                </div>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password">{t('password')}</Label>
+                <Link href="/auth/forgot-password" className="text-sm text-primary hover:underline">
+                  {t('forgotPassword')}
+                </Link>
+              </div>
+              <Input
+                id="password"
+                name="password"
+                type="password"
+                showPasswordToggle
+                placeholder={t('passwordPlaceholder')}
+                required
+                autoComplete="current-password"
+              />
+            </div>
 
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="employee-password">PIN</Label>
-                    <Link
-                      href="/auth/forgot-password"
-                      className="text-sm text-primary hover:underline"
-                    >
-                      Forgot PIN?
-                    </Link>
-                  </div>
-                  <Input
-                    id="employee-password"
-                    name="password"
-                    type="password"
-                    showPasswordToggle
-                    placeholder="••••••"
-                    required
-                    autoComplete="current-password"
-                  />
-                </div>
+            {state?.error && (
+              <div className="p-3 bg-red-50 border border-red-200 rounded-2xl">
+                <Typography variant="p" color="destructive" className="text-sm">
+                  {state.error}
+                </Typography>
+              </div>
+            )}
 
-                {state?.error && authMode === 'employee' && (
-                  <div className="p-3 bg-red-50 border border-red-200 rounded-2xl">
-                    <Typography variant="p" color="destructive" className="text-sm">
-                      {state.error}
-                    </Typography>
-                  </div>
-                )}
-
-                <SubmitButton />
-              </form>
-            </TabsContent>
-
-            {/* Admin Email/Password Login */}
-            <TabsContent value="admin" className="space-y-4">
-              <form action={formAction} className="space-y-4 font-mono uppercase">
-                <div className="space-y-2">
-                  <Label htmlFor="admin-identifier">Username or Email</Label>
-                  <Input
-                    id="admin-identifier"
-                    name="identifier"
-                    type="text"
-                    placeholder="manager@store.com or admin.user"
-                    required
-                    autoComplete="username"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="admin-password">Password</Label>
-                    <Link
-                      href="/auth/forgot-password"
-                      className="text-sm text-primary hover:underline"
-                    >
-                      Forgot password?
-                    </Link>
-                  </div>
-                  <Input
-                    id="admin-password"
-                    name="password"
-                    type="password"
-                    showPasswordToggle
-                    placeholder="••••••••"
-                    required
-                    autoComplete="current-password"
-                  />
-                </div>
-
-                {state?.error && authMode === 'admin' && (
-                  <div className="p-3 bg-red-50 border border-red-200 rounded-2xl">
-                    <Typography variant="p" color="destructive" className="text-sm">
-                      {state.error}
-                    </Typography>
-                  </div>
-                )}
-
-                <SubmitButton />
-              </form>
-            </TabsContent>
-          </Tabs>
+            <SubmitButton />
+          </form>
 
           {/* Footer for new accounts */}
           <div className="mt-6 text-center text-sm text-muted-foreground">
             <Typography variant="p" color="muted">
-              New store?{' '}
+              {t('newStore')}{' '}
               <Link
                 href="/onboarding/create-account"
                 className="text-primary hover:underline font-medium"
               >
-                Create an account
+                {t('createAccount')}
               </Link>
             </Typography>
           </div>

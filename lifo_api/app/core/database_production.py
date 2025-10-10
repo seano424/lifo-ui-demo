@@ -35,7 +35,9 @@ class DatabaseManager:
         database_url = settings.database_url
 
         if not database_url:
-            raise ValueError("DATABASE_URL environment variable is required for production")
+            raise ValueError(
+                "DATABASE_URL environment variable is required for production"
+            )
 
         # Convert postgres:// to postgresql:// if needed (for compatibility)
         if database_url.startswith("postgres://"):
@@ -44,7 +46,9 @@ class DatabaseManager:
         # Ensure async driver
         if not database_url.startswith("postgresql+asyncpg://"):
             if database_url.startswith("postgresql://"):
-                database_url = database_url.replace("postgresql://", "postgresql+asyncpg://", 1)
+                database_url = database_url.replace(
+                    "postgresql://", "postgresql+asyncpg://", 1
+                )
             else:
                 raise ValueError("Database URL must use PostgreSQL")
 
@@ -64,7 +68,7 @@ class DatabaseManager:
                 },
                 "command_timeout": 60,
                 "prepared_statement_cache_size": 0,  # Disable prepared statement cache
-            }
+            },
         }
 
         self.engine = create_async_engine(**engine_kwargs)
@@ -118,6 +122,7 @@ class DatabaseManager:
 
 # Global database manager instance
 db_manager = DatabaseManager()
+
 
 # Dependency for FastAPI
 async def get_db() -> AsyncGenerator[AsyncSession, None]:

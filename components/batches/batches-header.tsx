@@ -1,6 +1,6 @@
 'use client'
 
-import { Download, Plus } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 import DashboardInsetHeader from '@/components/dashboard/dashboard-inset-header'
@@ -20,10 +20,6 @@ export default function BatchesHeader() {
       description={pageDescription}
       rightContent={
         <div className="flex gap-2">
-          <Button onClick={() => alert('Todo: Export batches')} variant="outline">
-            <Download className="mr-2 h-4 w-4" />
-            {tButtons('export')}
-          </Button>
           <Link href="/dashboard/inbound">
             <Button>
               <Plus className="mr-2 h-4 w-4" />

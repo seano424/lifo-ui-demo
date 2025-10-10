@@ -752,9 +752,12 @@
     "description": "Aidons les entreprises à optimiser la gestion des stocks avec des solutions intelligentes pour réduire les déchets et maximiser les profits.",
     "quickLinks": "Liens Rapides",
     "links": {
+      "homepage": "Accueil",
+      "features": "Fonctionnalités",
       "aboutUs": "À Propos",
       "products": "Produits",
       "pricing": "Tarifs",
+      "contact": "Contact",
       "blog": "Blog"
     },
     "contactUs": "Contactez-Nous",

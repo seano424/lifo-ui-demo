@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/client'
 import type { createClient as createServerClient } from '@/lib/supabase/server'
 import { logger } from '@/lib/utils/logger'
 import { withPerformanceTracking } from '@/lib/utils/performance'
+import { withSupabaseRetry } from '@/lib/utils/retry'
 import type { UserPreferences } from './stores'
 
 type ServerClient = Awaited<ReturnType<typeof createServerClient>>
@@ -28,37 +29,41 @@ export async function fetchUserPreferencesRPC(
 
   return withPerformanceTracking(context, 'Fetch user preferences (RPC)', {}, async () => {
     try {
-      const { data, error } = await supabase.schema('user_mgmt').rpc('get_current_user_preferences')
+      return await withSupabaseRetry(async () => {
+        const { data, error } = await supabase
+          .schema('user_mgmt')
+          .rpc('get_current_user_preferences')
 
-      if (error) {
-        logger.error(context, 'RPC error', {
-          error: error.message,
-          code: error.code,
-        })
+        if (error) {
+          logger.queryWarn(context, 'RPC error', {
+            error: error.message,
+            code: error.code,
+          })
 
-        // Handle authentication errors gracefully
-        if (error.message.includes('Not authenticated')) {
-          logger.warn(context, 'User not authenticated, returning null')
-          return null
+          // Handle authentication errors gracefully
+          if (error.message.includes('Not authenticated')) {
+            logger.queryWarn(context, 'User not authenticated, returning null')
+            return null
+          }
+
+          throw new Error(`Failed to fetch user preferences: ${error.message}`)
         }
 
-        throw new Error(`Failed to fetch user preferences: ${error.message}`)
-      }
+        // RPC returns an array, take the first result
+        const preferences = (data && data.length > 0 ? data[0] : null) as UserPreferences | null
 
-      // RPC returns an array, take the first result
-      const preferences = (data && data.length > 0 ? data[0] : null) as UserPreferences | null
+        logger.log(context, 'User preferences fetched successfully (RPC)', {
+          hasPreferences: !!preferences,
+        })
 
-      logger.log(context, 'User preferences fetched successfully (RPC)', {
-        hasPreferences: !!preferences,
-      })
-
-      return preferences
+        return preferences
+      }, context)
     } catch (err) {
-      logger.error(context, 'Unexpected error', { error: err })
+      logger.queryWarn(context, 'Unexpected error', { error: err })
 
       // Return null for auth issues instead of throwing
       if (err instanceof Error && err.message.includes('Not authenticated')) {
-        logger.warn(context, 'Authentication issue, returning null preferences')
+        logger.queryWarn(context, 'Authentication issue, returning null preferences')
         return null
       }
 
@@ -99,7 +104,7 @@ export async function updateUserPrimaryStoreRPC(
         })
 
         if (error) {
-          logger.error(context, 'RPC error', {
+          logger.queryWarn(context, 'RPC error', {
             storeId,
             error: error.message,
             code: error.code,
@@ -117,9 +122,9 @@ export async function updateUserPrimaryStoreRPC(
           throw new Error(`Failed to update primary store: ${error.message}`)
         }
 
-        logger.log(context, 'Primary store updated successfully (RPC)', { storeId })
+        logger.query(context, 'Primary store updated successfully (RPC)', { storeId })
       } catch (err) {
-        logger.error(context, 'Unexpected error', { storeId, error: err })
+        logger.queryWarn(context, 'Unexpected error', { storeId, error: err })
         throw err
       }
     },
