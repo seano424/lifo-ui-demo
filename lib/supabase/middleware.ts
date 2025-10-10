@@ -4,6 +4,7 @@ import { createServerClient } from '@supabase/ssr'
 import { type NextRequest, NextResponse } from 'next/server'
 import { hasEnvVars } from '../utils'
 import { logger } from '../utils/logger'
+import { isRetryableError } from '../utils/retry'
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
@@ -42,73 +43,118 @@ export async function updateSession(request: NextRequest) {
 
   // IMPORTANT: DO NOT REMOVE auth.getUser()
 
-  let user = null
-  let retryCount = 0
-  const maxRetries = 0 // No retries in middleware - fail fast, let client handle it
+  /**
+   * Retry configuration aligned with rest of codebase (lib/utils/retry.ts)
+   * - 3 total attempts (initial + 2 retries)
+   * - Exponential backoff: 100ms, 200ms, 400ms
+   * - Jitter to prevent thundering herd
+   * - Max total time: ~700ms before failing
+   */
+  const MAX_RETRIES = 3
+  const INITIAL_DELAY_MS = 100
+  const BACKOFF_MULTIPLIER = 2
 
-  while (retryCount <= maxRetries) {
+  /**
+   * Calculate delay with exponential backoff and jitter
+   * Jitter prevents synchronized retry spikes from multiple requests
+   */
+  function calculateRetryDelay(attempt: number): number {
+    const baseDelay = INITIAL_DELAY_MS * BACKOFF_MULTIPLIER ** (attempt - 1)
+    const jitter = Math.random() * 0.3 * baseDelay // ±30% jitter
+    return Math.floor(baseDelay + jitter)
+  }
+
+  let user = null
+
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
     try {
       const { data, error } = await supabase.auth.getUser()
 
       if (error) {
-        // Handle different error types appropriately
-        if (error.message?.includes('refresh_token_not_found')) {
-          // This is expected when tokens expire - not an error condition
-          logger.queryWarn('middleware', 'Session expired, clearing invalid tokens')
-          // Clear ALL Supabase auth cookies to prevent repeated errors
-          // IMPORTANT: Clear cookies from the existing supabaseResponse to preserve any
-          // cookies that Supabase's createServerClient may have set
-          request.cookies.getAll().forEach(cookie => {
-            if (cookie.name.startsWith('sb-')) {
-              supabaseResponse.cookies.delete(cookie.name)
-            }
-          })
-        } else if (error.message?.includes('Auth session missing')) {
-          // Normal for logged-out users - don't log
-        } else if (error.message?.includes('JWT')) {
-          // Token format issues
-          logger.queryWarn('middleware', 'Invalid token format, clearing session')
-          // Clear ALL Supabase auth cookies from the existing response
-          request.cookies.getAll().forEach(cookie => {
-            if (cookie.name.startsWith('sb-')) {
-              supabaseResponse.cookies.delete(cookie.name)
-            }
-          })
-        } else if (error.message?.includes('fetch failed') && retryCount < maxRetries) {
-          // Retry on transient fetch failures
-          logger.queryWarn('middleware', 'Fetch failed, retrying', {
-            attempt: retryCount + 1,
-            maxRetries,
-          })
-          retryCount++
-          await new Promise(resolve => setTimeout(resolve, 50)) // Fixed 50ms instead of exponential
-          continue
-        } else {
-          // Only log unexpected errors
-          logger.error('middleware', 'Unexpected auth error', error.message)
+        // Classify error types for appropriate handling
+        const errorMsg = error.message || ''
+
+        if (errorMsg.includes('refresh_token_not_found')) {
+          // Expected: tokens expired - user needs to re-authenticate
+          // Cookie clearing happens at redirect point, not here
+          logger.queryWarn('middleware', 'Session expired, user needs to re-authenticate')
+          user = null
+          break
         }
+
+        if (errorMsg.includes('Auth session missing')) {
+          // Expected: logged-out users - silent failure
+          user = null
+          break
+        }
+
+        if (errorMsg.includes('JWT')) {
+          // Expected: invalid/malformed token - user needs to re-authenticate
+          logger.queryWarn('middleware', 'Invalid token format, user needs to re-authenticate')
+          user = null
+          break
+        }
+
+        // Check if error is retryable (network/transient issues)
+        if (isRetryableError(error) && attempt < MAX_RETRIES) {
+          const delay = calculateRetryDelay(attempt)
+          logger.queryWarn('middleware', 'Retryable auth error, waiting before retry', {
+            error: errorMsg,
+            attempt,
+            nextAttempt: attempt + 1,
+            maxRetries: MAX_RETRIES,
+            delayMs: delay,
+          })
+
+          await new Promise(resolve => setTimeout(resolve, delay))
+          continue // Retry
+        }
+
+        // Non-retryable error or exhausted retries
+        if (attempt >= MAX_RETRIES && isRetryableError(error)) {
+          logger.error('middleware', 'Auth check failed after all retries', {
+            error: errorMsg,
+            attempts: attempt,
+          })
+        } else {
+          logger.error('middleware', 'Non-retryable auth error', errorMsg)
+        }
+
         user = null
         break
-      } else {
-        user = data?.user || null
-        break
       }
+
+      // Success
+      user = data?.user || null
+      break
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : String(err)
 
-      // Retry on connection errors
-      if (errorMessage.includes('fetch failed') && retryCount < maxRetries) {
-        logger.queryWarn('middleware', 'Connection error, retrying', {
-          attempt: retryCount + 1,
-          maxRetries,
+      // Check if this is a retryable network error
+      if (isRetryableError(err) && attempt < MAX_RETRIES) {
+        const delay = calculateRetryDelay(attempt)
+        logger.queryWarn('middleware', 'Network error during auth check, retrying', {
+          error: errorMessage,
+          attempt,
+          nextAttempt: attempt + 1,
+          maxRetries: MAX_RETRIES,
+          delayMs: delay,
         })
-        retryCount++
-        await new Promise(resolve => setTimeout(resolve, 100 * 2 ** retryCount))
-        continue
+
+        await new Promise(resolve => setTimeout(resolve, delay))
+        continue // Retry
       }
 
-      // Handle any unexpected errors that aren't retryable
-      logger.error('middleware', 'Unexpected error getting user', errorMessage)
+      // Non-retryable error or exhausted retries
+      if (attempt >= MAX_RETRIES) {
+        logger.error('middleware', 'Auth check failed after all retries (exception)', {
+          error: errorMessage,
+          attempts: attempt,
+        })
+      } else {
+        logger.error('middleware', 'Non-retryable exception during auth check', errorMessage)
+      }
+
       user = null
       break
     }
@@ -130,7 +176,14 @@ export async function updateSession(request: NextRequest) {
     !request.nextUrl.pathname.startsWith('/pricing') &&
     !request.nextUrl.pathname.startsWith('/support')
   ) {
-    // no user, potentially respond by redirecting the user to the login page
+    // No user and not on a public page - redirect to login
+    // Clear all Supabase cookies to ensure clean state for re-authentication
+    request.cookies.getAll().forEach(cookie => {
+      if (cookie.name.startsWith('sb-')) {
+        supabaseResponse.cookies.delete(cookie.name)
+      }
+    })
+
     const url = request.nextUrl.clone()
     url.pathname = '/auth/login'
     return NextResponse.redirect(url)
