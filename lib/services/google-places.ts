@@ -1,3 +1,5 @@
+import { logger } from '@/lib/utils/logger'
+
 export interface PlaceAutocompleteResult {
   place_id: string
   structured_formatting: {
@@ -52,7 +54,7 @@ class GooglePlacesService {
     this.apiKey = process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY || ''
 
     if (!this.apiKey && process.env.NODE_ENV === 'development') {
-      console.warn('Google Places API key not found. Using mock data.')
+      logger.warn('GooglePlacesService', 'Google Places API key not found. Using mock data.')
     }
   }
 

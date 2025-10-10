@@ -9,6 +9,7 @@ import { queryKeys } from '@/lib/queries/query-keys'
 import { fetchUserPreferences, fetchUserStores } from '@/lib/queries/stores'
 import { createPrefetchedQuery } from '@/lib/react-query/prefetch'
 import { createClient as createServerClient } from '@/lib/supabase/server'
+import { logger } from '@/lib/utils/logger'
 
 interface InventoryProductsPageProps {
   searchParams: Promise<{
@@ -79,7 +80,7 @@ export default async function InventoryProductsPage({ searchParams }: InventoryP
       pages: 1, // Only prefetch first page
     })
   } catch (error) {
-    console.error('[InventoryProductsPage] Error prefetching data:', error)
+    logger.queryWarn('InventoryProductsPage', 'Error prefetching data', { error })
     // Continue without prefetch - client will handle loading
   }
 

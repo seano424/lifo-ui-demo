@@ -51,7 +51,7 @@ export class PerformanceTimer {
     }
 
     if (duration > this.thresholds.error) {
-      logger.error(
+      logger.queryWarn(
         this.context,
         `SLOW (>${this.thresholds.error}ms): ${this.operation}`,
         allMetadata,

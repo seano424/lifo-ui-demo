@@ -53,7 +53,7 @@ export async function fetchProductsPageRPC(
       })
 
       if (error) {
-        logger.error(context, 'RPC error', {
+        logger.queryWarn(context, 'RPC error', {
           error: error.message,
           code: error.code,
           storeId: filters.storeId,

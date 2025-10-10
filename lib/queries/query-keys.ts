@@ -148,6 +148,8 @@ export const queryKeys = {
       [...queryKeys.batches.byStore(storeId), 'byProduct', productId] as const,
     // Batch todo state queries (for accessing batch_todo_states view)
     todo: (batchId: string) => [...queryKeys.batches.all, 'todo', batchId] as const,
+    // Check if store has any batches (for welcome screen logic)
+    hasBatches: (storeId: string) => [...queryKeys.batches.byStore(storeId), 'hasBatches'] as const,
   },
 
   // Store users queries

@@ -125,7 +125,7 @@ export async function fetchTodosBySection(
       })
 
       if (error) {
-        logger.error('lib/queries/todos-rpc', 'Error in fetchTodosBySection', {
+        logger.queryWarn('lib/queries/todos-rpc', 'Error in fetchTodosBySection', {
           error: error.message,
           code: error.code,
           storeId,
@@ -167,7 +167,7 @@ export async function fetchDashboardSummary(
       })
 
       if (error) {
-        logger.error('lib/queries/todos-rpc', 'Error in fetchDashboardSummary', {
+        logger.queryWarn('lib/queries/todos-rpc', 'Error in fetchDashboardSummary', {
           error: error.message,
           code: error.code,
           storeId,
@@ -212,7 +212,7 @@ export async function fetchTodosDashboardOverview(
       })
 
       if (error) {
-        logger.error('lib/queries/todos-rpc', 'Error in fetchTodosDashboardOverview', {
+        logger.queryWarn('lib/queries/todos-rpc', 'Error in fetchTodosDashboardOverview', {
           error: error.message,
           code: error.code,
           storeId,
