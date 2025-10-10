@@ -44,7 +44,7 @@ export async function updateSession(request: NextRequest) {
 
   let user = null
   let retryCount = 0
-  const maxRetries = 2
+  const maxRetries = 0 // No retries in middleware - fail fast, let client handle it
 
   while (retryCount <= maxRetries) {
     try {
@@ -67,7 +67,7 @@ export async function updateSession(request: NextRequest) {
             maxRetries,
           })
           retryCount++
-          await new Promise(resolve => setTimeout(resolve, 100 * 2 ** retryCount))
+          await new Promise(resolve => setTimeout(resolve, 50)) // Fixed 50ms instead of exponential
           continue
         } else {
           // Only log unexpected errors

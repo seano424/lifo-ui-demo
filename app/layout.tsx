@@ -62,7 +62,8 @@ export default async function RootLayout({
     <html
       lang="fr"
       suppressHydrationWarning
-      className={`${raleway.variable} ${montserrat.variable} ${robotoMono.variable} scroll-smooth`}
+      data-scroll-behavior="smooth"
+      className={`${raleway.variable} ${montserrat.variable} ${robotoMono.variable}`}
     >
       <body className={`font-sans antialiased`}>
         <ThemeProvider
