@@ -1,21 +1,5 @@
 'use client'
 
-import { useQueryClient } from '@tanstack/react-query'
-import {
-  AlertTriangle,
-  Check,
-  Crown,
-  Key,
-  Mail,
-  RefreshCw,
-  RotateCcw,
-  UserCheck,
-  UserPlus,
-  Users,
-} from 'lucide-react'
-import { useTranslations } from 'next-intl'
-import { useCallback, useEffect, useState } from 'react'
-import { toast } from 'sonner'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -40,6 +24,22 @@ import { Separator } from '@/components/ui/separator'
 import { type EmailSendResult, getEmailErrorMessage, sendWelcomeEmail } from '@/lib/email/client'
 import { queryKeys } from '@/lib/queries/query-keys'
 import { createClient } from '@/lib/supabase/client'
+import { useQueryClient } from '@tanstack/react-query'
+import {
+  AlertTriangle,
+  Check,
+  Crown,
+  Key,
+  Mail,
+  RefreshCw,
+  RotateCcw,
+  UserCheck,
+  UserPlus,
+  Users,
+} from 'lucide-react'
+import { useTranslations } from 'next-intl'
+import { useCallback, useEffect, useState } from 'react'
+import { toast } from 'sonner'
 import { Typography } from '../ui/typography'
 
 interface AddEmployeeDialogProps {
@@ -69,7 +69,7 @@ interface ExistingUserInfo {
 
 interface CreatedCredentials {
   username: string
-  pin: string
+  password: string
   email: string
   full_name: string
   user_id: string
@@ -283,9 +283,9 @@ export function AddEmployeeDialog({
     return () => clearTimeout(timeoutId)
   }, [formData.username, checkUsernameAvailability, flowType])
 
-  // Generate secure PIN
-  const generateSecurePIN = (): string => {
-    const blockedPins = [
+  // Generate secure password
+  const generateSecurePassword = (): string => {
+    const blockedPasswords = [
       '000000',
       '111111',
       '222222',
@@ -310,11 +310,11 @@ export function AddEmployeeDialog({
       '456456',
       '789789',
     ]
-    let pin: string
+    let password: string
     do {
-      pin = Math.floor(100000 + Math.random() * 900000).toString()
-    } while (blockedPins.includes(pin))
-    return pin
+      password = Math.floor(100000 + Math.random() * 900000).toString()
+    } while (blockedPasswords.includes(password))
+    return password
   }
 
   // Send welcome email
@@ -325,7 +325,7 @@ export function AddEmployeeDialog({
       const result: EmailSendResult = await sendWelcomeEmail({
         credentials: {
           username: credentials.username,
-          pin: credentials.pin,
+          password: credentials.password,
           email: credentials.email,
           full_name: credentials.full_name,
         },
@@ -378,7 +378,7 @@ export function AddEmployeeDialog({
     setIsLoading(true)
 
     try {
-      const pin = generateSecurePIN()
+      const password = generateSecurePassword()
 
       const response = await fetch('/api/employees/create', {
         method: 'POST',
@@ -391,7 +391,7 @@ export function AddEmployeeDialog({
           role: formData.role,
           languagePreference: formData.languagePreference,
           storeId: storeId,
-          pin: pin,
+          password: password,
         }),
       })
 
@@ -403,7 +403,7 @@ export function AddEmployeeDialog({
 
       const credentials: CreatedCredentials = {
         username: result.username,
-        pin: result.pin,
+        password: result.password,
         email: result.email,
         full_name: `${formData.firstName} ${formData.lastName}`,
         user_id: result.user_id,
@@ -788,7 +788,7 @@ export function AddEmployeeDialog({
                         <code className="bg-muted px-1 rounded">{formData.username}</code>
                       </div>
                       <div>
-                        <strong>{t('preview.pin')}</strong> {t('preview.pinNote')}
+                        <strong>{t('preview.password')}</strong> {t('preview.passwordNote')}
                       </div>
                       <div className="text-xs text-muted-foreground mt-2">
                         {t('preview.loginNote')}

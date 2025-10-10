@@ -131,7 +131,9 @@ export function BatchTable({ data, currentSort, updateSort, isLoading }: BatchTa
           <CardDescription className="text-center max-w-md">
             {t('emptyState.description')}
           </CardDescription>
-          <Button className="mt-4">{t('emptyState.addFirstBatch')}</Button>
+          <Button asLink href="/dashboard/inbound" className="mt-4">
+            {t('emptyState.addFirstBatch')}
+          </Button>
         </CardContent>
       </Card>
     )

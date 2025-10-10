@@ -123,7 +123,9 @@ export function ProductsTable({ data, currentSort, updateSort, isLoading }: Prod
           <CardDescription className="text-center max-w-md">
             {t('empty.storeDescription')}
           </CardDescription>
-          <Button className="mt-4">{tButtons('addProduct')}</Button>
+          <Button asLink href="/dashboard/inbound" className="mt-4">
+            {tButtons('addProduct')}
+          </Button>
         </CardContent>
       </Card>
     )

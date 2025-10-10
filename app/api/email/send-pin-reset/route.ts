@@ -1,9 +1,9 @@
 // app/api/email/send-pin-reset/route.ts
 
-import { type NextRequest, NextResponse } from 'next/server'
 import type { EmailCredentials } from '@/lib/email/client'
-import { sendPinResetEmail } from '@/lib/email/resend'
+import { sendPasswordResetEmail } from '@/lib/email/resend'
 import { createClient } from '@/lib/supabase/server'
+import { type NextRequest, NextResponse } from 'next/server'
 
 export async function POST(request: NextRequest) {
   try {
@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Send the PIN reset email
-    const result = await sendPinResetEmail(emailCredentials)
+    const result = await sendPasswordResetEmail(emailCredentials)
 
     if (!result.success) {
       return NextResponse.json({ success: false, error: result.error }, { status: 500 })

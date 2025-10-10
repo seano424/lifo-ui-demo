@@ -66,26 +66,34 @@ export default function DashboardInsetHeader({
 
       <div
         className={cn(
-          'relative flex flex-col lg:flex-row gap-6 justify-between items-start lg:items-center p-8 rounded-3xl border border-border/50 bg-background/80 shadow-sm backdrop-blur-sm transition-all duration-300 hover:shadow-lg hover:shadow-primary/5',
+          'relative flex flex-col lg:flex-row gap-6 justify-between items-start lg:items-center p-8 rounded-3xl border border-border/50 bg-background/80 shadow-sm backdrop-blur-sm transition-all duration-300 ',
           className,
         )}
       >
         <div className="flex flex-col gap-4 flex-1">
           {isLoading ? (
-            <div className="space-y-3">
-              <Skeleton className="w-[400px] h-12 bg-gray-50 rounded-2xl" />
-              <Skeleton className="w-[300px] h-6 bg-gray-50 rounded-xl" />
+            <div className="space-y-4">
+              {/* Icon and title skeleton */}
+              <div className="flex items-center gap-3">
+                <Skeleton className="w-10 h-10 rounded-xl animate-pulse" />
+                <Skeleton className="w-[300px] h-8 rounded-xl animate-pulse" />
+              </div>
+              {/* Description skeleton */}
+              <div className="space-y-2">
+                <Skeleton className="w-[500px] h-4 rounded-lg animate-pulse" />
+                <Skeleton className="w-[400px] h-4 rounded-lg animate-pulse" />
+              </div>
             </div>
           ) : (
             <>
               {/* Main title with dynamic icon */}
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-xl bg-primary/10 text-primary">
+                <div className="p-2 rounded-xl bg-primary/10 text-primary items-center">
                   <PageIcon className="h-6 w-6" />
                 </div>
                 <Typography
                   variant="h1"
-                  className="font-black bg-gradient-to-r from-gray-900 to-gray-600 dark:from-gray-100 dark:to-gray-400 bg-clip-text text-transparent capitalize pb-2"
+                  className="font-black bg-gradient-to-r from-gray-900 to-gray-600 dark:from-gray-100 dark:to-gray-400 bg-clip-text text-transparent capitalize pb-1"
                 >
                   {displayTitle}
                 </Typography>
@@ -101,7 +109,14 @@ export default function DashboardInsetHeader({
         </div>
 
         {/* Right content with enhanced styling */}
-        {rightContent && <div className="flex items-center gap-3">{rightContent}</div>}
+        {isLoading ? (
+          <div className="flex items-center gap-3">
+            <Skeleton className="w-[120px] h-10 rounded-xl animate-pulse" />
+            <Skeleton className="w-[100px] h-10 rounded-xl animate-pulse" />
+          </div>
+        ) : (
+          rightContent && <div className="flex items-center gap-3">{rightContent}</div>
+        )}
       </div>
     </div>
   )
