@@ -3,6 +3,7 @@
 import { createServerClient } from '@supabase/ssr'
 import { type NextRequest, NextResponse } from 'next/server'
 import { hasEnvVars } from '../utils'
+import { logger } from '../utils/logger'
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
@@ -53,21 +54,24 @@ export async function updateSession(request: NextRequest) {
         // Handle different error types appropriately
         if (error.message?.includes('refresh_token_not_found')) {
           // This is expected when tokens expire - not an error condition
-          console.log('[Middleware] Session expired, user needs to re-authenticate')
+          logger.queryWarn('middleware', 'Session expired, user needs to re-authenticate')
         } else if (error.message?.includes('Auth session missing')) {
           // Normal for logged-out users - don't log
         } else if (error.message?.includes('JWT')) {
           // Token format issues
-          console.log('[Middleware] Invalid token format, clearing session')
+          logger.queryWarn('middleware', 'Invalid token format, clearing session')
         } else if (error.message?.includes('fetch failed') && retryCount < maxRetries) {
           // Retry on transient fetch failures
-          console.log(`[Middleware] Fetch failed, retrying (${retryCount + 1}/${maxRetries})...`)
+          logger.queryWarn('middleware', 'Fetch failed, retrying', {
+            attempt: retryCount + 1,
+            maxRetries,
+          })
           retryCount++
           await new Promise(resolve => setTimeout(resolve, 100 * 2 ** retryCount))
           continue
         } else {
           // Only log unexpected errors
-          console.error('[Middleware] Unexpected auth error:', error.message)
+          logger.error('middleware', 'Unexpected auth error', error.message)
         }
         user = null
         break
@@ -80,14 +84,17 @@ export async function updateSession(request: NextRequest) {
 
       // Retry on connection errors
       if (errorMessage.includes('fetch failed') && retryCount < maxRetries) {
-        console.log(`[Middleware] Connection error, retrying (${retryCount + 1}/${maxRetries})...`)
+        logger.queryWarn('middleware', 'Connection error, retrying', {
+          attempt: retryCount + 1,
+          maxRetries,
+        })
         retryCount++
         await new Promise(resolve => setTimeout(resolve, 100 * 2 ** retryCount))
         continue
       }
 
       // Handle any unexpected errors that aren't retryable
-      console.error('[Middleware] Unexpected error getting user:', errorMessage)
+      logger.error('middleware', 'Unexpected error getting user', errorMessage)
       user = null
       break
     }

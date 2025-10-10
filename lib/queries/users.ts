@@ -126,7 +126,7 @@ export async function fetchUsers(serverClient?: ServerClient): Promise<User[]> {
     const { data, error } = await supabase.rpc('get_users_with_metadata')
 
     if (error) {
-      logger.error('lib/queries/users', 'RPC error in fetchUsers', {
+      logger.queryWarn('lib/queries/users', 'RPC error in fetchUsers', {
         error: error.message,
         code: error.code,
       })
@@ -157,7 +157,7 @@ export async function fetchUsersPage(
       const { data: allUsers, error } = await supabase.rpc('get_users_with_metadata')
 
       if (error) {
-        logger.error('lib/queries/users', 'RPC error in fetchUsersPage', {
+        logger.queryWarn('lib/queries/users', 'RPC error in fetchUsersPage', {
           error: error.message,
           code: error.code,
         })
@@ -262,7 +262,7 @@ export async function updateUserPhone(
       })
 
       if (error) {
-        logger.error('lib/queries/users', 'RPC error in updateUserPhone', {
+        logger.queryWarn('lib/queries/users', 'RPC error in updateUserPhone', {
           error: error.message,
           code: error.code,
           userId,
@@ -304,7 +304,7 @@ export async function updateUserLanguagePreference(
       })
 
       if (error) {
-        logger.error('lib/queries/users', 'RPC error in updateUserLanguagePreference', {
+        logger.queryWarn('lib/queries/users', 'RPC error in updateUserLanguagePreference', {
           error: error.message,
           code: error.code,
           userId,
@@ -334,7 +334,7 @@ export async function getUserByUsername(
       })
 
       if (error) {
-        logger.error('lib/queries/users', 'RPC error in getUserByUsername', {
+        logger.queryWarn('lib/queries/users', 'RPC error in getUserByUsername', {
           error: error.message,
           code: error.code,
           username,
@@ -413,7 +413,7 @@ export async function updateUser(userId: string, updates: UserUpdate): Promise<U
         await supabase.rpc('get_users_with_metadata')
 
       if (fetchError) {
-        logger.error('lib/queries/users', 'Error fetching updated user', {
+        logger.queryWarn('lib/queries/users', 'Error fetching updated user', {
           error: fetchError.message,
           code: fetchError.code,
           userId,
@@ -547,7 +547,7 @@ export async function fetchUserById(userId: string, serverClient?: ServerClient)
     const { data, error } = await supabase.rpc('get_users_with_metadata')
 
     if (error) {
-      logger.error('lib/queries/users', 'RPC error in fetchUserById', {
+      logger.queryWarn('lib/queries/users', 'RPC error in fetchUserById', {
         error: error.message,
         code: error.code,
         userId,
@@ -583,7 +583,7 @@ export async function fetchUserRoles(userId: string): Promise<string[]> {
       .eq('user_id', userId)
 
     if (error) {
-      logger.error('lib/queries/users', 'Query error in fetchUserRoles', {
+      logger.queryWarn('lib/queries/users', 'Query error in fetchUserRoles', {
         error: error.message,
         code: error.code,
         userId,
@@ -617,7 +617,7 @@ export async function checkUserHasRole(userId: string, roleName: string): Promis
         .limit(1)
 
       if (error) {
-        logger.error('lib/queries/users', 'Query error in checkUserHasRole', {
+        logger.queryWarn('lib/queries/users', 'Query error in checkUserHasRole', {
           error: error.message,
           code: error.code,
           userId,

@@ -17,9 +17,23 @@ const DEFAULT_OPTIONS: Required<RetryOptions> = {
 }
 
 /**
- * Check if an error is retryable
+ * Check if an error is retryable based on error patterns
+ *
+ * @param error - The error to check
+ * @param retryableErrors - Array of error patterns to match against (defaults to common connection errors)
+ * @returns true if the error matches any retryable pattern
+ *
+ * @example
+ * ```typescript
+ * if (isRetryableError(error, ['ECONNRESET', 'fetch failed'])) {
+ *   // Retry the operation
+ * }
+ * ```
  */
-function isRetryableError(error: unknown, retryableErrors: string[]): boolean {
+export function isRetryableError(
+  error: unknown,
+  retryableErrors: string[] = DEFAULT_OPTIONS.retryableErrors,
+): boolean {
   if (!error) return false
 
   const errorMessage = error instanceof Error ? error.message : String(error)

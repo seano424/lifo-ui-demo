@@ -37,7 +37,7 @@ export async function fetchUrgentAlerts(storeId: string): Promise<UrgentAlertDat
         .eq('store_id', storeId)
 
       if (batchError) {
-        logger.error('lib/queries/urgent-alerts', 'Error fetching store batches', {
+        logger.queryWarn('lib/queries/urgent-alerts', 'Error fetching store batches', {
           error: batchError.message,
           code: batchError.code,
           storeId,
@@ -68,7 +68,7 @@ export async function fetchUrgentAlerts(storeId: string): Promise<UrgentAlertDat
         .order('days_to_expiry', { ascending: true })
 
       if (error) {
-        logger.error('lib/queries/urgent-alerts', 'Error fetching urgent alerts', {
+        logger.queryWarn('lib/queries/urgent-alerts', 'Error fetching urgent alerts', {
           error: error.message,
           code: error.code,
           storeId,
