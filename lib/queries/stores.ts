@@ -4,6 +4,7 @@ import type { createClient as createServerClient } from '@/lib/supabase/server'
 import type { Database } from '@/types/supabase'
 import { logger } from '@/lib/utils/logger'
 import { withPerformanceTracking } from '@/lib/utils/performance'
+import { withSupabaseRetry } from '@/lib/utils/retry'
 import { fetchUserPreferencesRPC, updateUserPrimaryStoreRPC } from './stores-rpc'
 
 // Use optimized RPC functions by default
@@ -38,11 +39,12 @@ export async function fetchUserStores(
 
   return withPerformanceTracking(context, 'Fetch user stores', { userId }, async () => {
     try {
-      const { data, error } = await supabase
-        .schema('business')
-        .from('store_users')
-        .select(
-          `
+      return await withSupabaseRetry(async () => {
+        const { data, error } = await supabase
+          .schema('business')
+          .from('store_users')
+          .select(
+            `
         role_in_store,
         permissions,
         stores:store_id (
@@ -66,37 +68,38 @@ export async function fetchUserStores(
           updated_at
         )
       `,
-        )
-        .eq('user_id', userId)
-        .eq('stores.is_active', true)
+          )
+          .eq('user_id', userId)
+          .eq('stores.is_active', true)
 
-      if (error) {
-        logger.error(context, 'Supabase error', {
+        if (error) {
+          logger.queryWarn(context, 'Supabase error', {
+            userId,
+            error: error.message,
+            code: error.code,
+          })
+          throw new Error(`Failed to fetch user stores: ${error.message}`)
+        }
+
+        const userStores = data
+          .filter(item => item.stores !== null) // Filter out null stores (deactivated)
+          .map(item => {
+            return {
+              store: item.stores as unknown as Store,
+              role: item.role_in_store as string,
+              permissions: item.permissions,
+            }
+          })
+
+        logger.log(context, 'User stores fetched successfully', {
           userId,
-          error: error.message,
-          code: error.code,
-        })
-        throw new Error(`Failed to fetch user stores: ${error.message}`)
-      }
-
-      const userStores = data
-        .filter(item => item.stores !== null) // Filter out null stores (deactivated)
-        .map(item => {
-          return {
-            store: item.stores as unknown as Store,
-            role: item.role_in_store as string,
-            permissions: item.permissions,
-          }
+          storeCount: userStores.length,
         })
 
-      logger.log(context, 'User stores fetched successfully', {
-        userId,
-        storeCount: userStores.length,
-      })
-
-      return userStores
+        return userStores
+      }, context)
     } catch (err) {
-      logger.error(context, 'Unexpected error', { userId, error: err })
+      logger.queryWarn(context, 'Unexpected error', { userId, error: err })
       throw err
     }
   })
@@ -134,7 +137,7 @@ export async function fetchUserStoresAlternative(
           .eq('stores.is_active', true)
 
         if (error) {
-          logger.error(context, 'Supabase error', {
+          logger.queryWarn(context, 'Supabase error', {
             userId,
             error: error.message,
             code: error.code,
@@ -174,7 +177,7 @@ export async function fetchUserStoresAlternative(
 
         return userStores
       } catch (err) {
-        logger.error(context, 'Unexpected error', { userId, error: err })
+        logger.queryWarn(context, 'Unexpected error', { userId, error: err })
         throw err
       }
     },
@@ -196,7 +199,7 @@ export async function fetchStoreById(storeId: string, serverClient?: ServerClien
         .single()
 
       if (error) {
-        logger.error(context, 'Supabase error', {
+        logger.queryWarn(context, 'Supabase error', {
           storeId,
           error: error.message,
           code: error.code,
@@ -208,7 +211,7 @@ export async function fetchStoreById(storeId: string, serverClient?: ServerClien
 
       return data as Store
     } catch (err) {
-      logger.error(context, 'Unexpected error', { storeId, error: err })
+      logger.queryWarn(context, 'Unexpected error', { storeId, error: err })
       throw err
     }
   })
@@ -237,13 +240,13 @@ export async function fetchUserPreferences(
         .maybeSingle()
 
       if (error) {
-        logger.error(context, 'Supabase error', {
+        logger.queryWarn(context, 'Supabase error', {
           error: error.message,
           code: error.code,
         })
         // Handle specific error types
         if (error.code === 'PGRST116') {
-          logger.log(context, 'No user preferences found')
+          logger.query(context, 'No user preferences found')
           return null // No row found - this is OK
         }
         throw error
@@ -255,10 +258,10 @@ export async function fetchUserPreferences(
 
       return data
     } catch (err) {
-      logger.error(context, 'Unexpected error', { error: err })
+      logger.queryWarn(context, 'Unexpected error', { error: err })
       // Return null instead of throwing for 406 errors
       if (err instanceof Error && err.message.includes('406')) {
-        logger.warn(context, 'Authentication issue, returning null preferences')
+        logger.queryWarn(context, 'Authentication issue, returning null preferences')
         return null
       }
       throw err
@@ -291,7 +294,7 @@ export async function updateUserPrimaryStore(userId: string, storeId: string): P
         })
 
         if (error) {
-          logger.error(context, 'Supabase error', {
+          logger.queryWarn(context, 'Supabase error', {
             userId,
             storeId,
             error: error.message,
@@ -300,9 +303,9 @@ export async function updateUserPrimaryStore(userId: string, storeId: string): P
           throw new Error(`Failed to update primary store: ${error.message}`)
         }
 
-        logger.log(context, 'Primary store updated successfully', { userId, storeId })
+        logger.query(context, 'Primary store updated successfully', { userId, storeId })
       } catch (err) {
-        logger.error(context, 'Unexpected error', { userId, storeId, error: err })
+        logger.queryWarn(context, 'Unexpected error', { userId, storeId, error: err })
         throw err
       }
     },
