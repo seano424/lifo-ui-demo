@@ -37,7 +37,8 @@
     "alerts": {
       "serviceUnavailable": "Service OCR temporairement indisponible. Veuillez utiliser la saisie manuelle.",
       "ocrError": "Erreur : {error}",
-      "backendUnavailable": "Le service backend ne répond pas"
+      "backendUnavailable": "Le service backend ne répond pas",
+      "scanInstructions": "Positionnez le code-barres dans le cadre de la caméra. Le scanner le détectera automatiquement."
     }
   }
 }

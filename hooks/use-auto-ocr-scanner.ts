@@ -27,10 +27,10 @@ export interface AutoOCRScannerOptions {
   ocrConfidenceThreshold?: number // Min confidence to accept OCR result (default: 0.5)
 
   // Frame analysis thresholds
-  minTextConfidence?: number // Min text detection confidence (default: 0.3)
+  minTextConfidence?: number // Min text detection confidence (default: 0.05 for low-light conditions)
   minDateConfidence?: number // Min date pattern confidence (default: 0.4)
   minOverallScore?: number // Min overall score to trigger OCR (default: 0.5)
-  minSharpness?: number // Min sharpness/focus (default: 0.15, lower for handwritten text)
+  minSharpness?: number // Min sharpness/focus (default: 0.02 for handwritten text on paper)
 
   // Debug mode
   debug?: boolean
@@ -63,10 +63,10 @@ export function useAutoOCRScanner(options: AutoOCRScannerOptions): AutoOCRScanne
     preCheckIntervalMs = 500,
     maxAttempts = 10,
     ocrConfidenceThreshold = 0.5,
-    minTextConfidence = 0.3,
-    minDateConfidence = 0.4,
-    minOverallScore = 0.5,
-    minSharpness = 0.15, // Lower default to support handwritten text
+    minTextConfidence = Number(process.env.NEXT_PUBLIC_AUTO_OCR_MIN_TEXT_CONFIDENCE) || 0.05,
+    minDateConfidence = Number(process.env.NEXT_PUBLIC_AUTO_OCR_MIN_DATE_CONFIDENCE) || 0.4,
+    minOverallScore = Number(process.env.NEXT_PUBLIC_AUTO_OCR_MIN_OVERALL_SCORE) || 0.5,
+    minSharpness = Number(process.env.NEXT_PUBLIC_AUTO_OCR_MIN_SHARPNESS) || 0.01,
     debug = false,
   } = options
 

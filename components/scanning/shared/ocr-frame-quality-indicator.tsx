@@ -25,7 +25,8 @@ export default function OCRFrameQualityIndicator({
   className,
   showDebugInfo = false,
 }: OCRFrameQualityIndicatorProps) {
-  const t = useTranslations('ocrFrameQuality')
+  const t = useTranslations('ocr')
+  const minSharpness = Number(process.env.NEXT_PUBLIC_AUTO_OCR_MIN_SHARPNESS) || 0.01
 
   if (!isAnalyzing || !analysis) {
     return null
@@ -50,35 +51,43 @@ export default function OCRFrameQualityIndicator({
       <div className="space-y-1.5">
         {/* Text Detection */}
         <QualityIndicator
-          label={t('textDetected', { defaultValue: 'Text detected' })}
+          label={t('ocrFrameQuality.textDetected', {
+            defaultValue: 'Text detected',
+          })}
           isGood={analysis.hasTextLikeContent}
           confidence={analysis.textConfidence}
         />
 
         {/* Date Pattern */}
         <QualityIndicator
-          label={t('datePattern', { defaultValue: 'Date pattern' })}
+          label={t('ocrFrameQuality.datePattern', {
+            defaultValue: 'Date pattern',
+          })}
           isGood={analysis.hasDatePattern}
           confidence={analysis.datePatternConfidence}
         />
 
         {/* Lighting */}
         <QualityIndicator
-          label={t('lighting', { defaultValue: 'Good lighting' })}
+          label={t('ocrFrameQuality.lighting', {
+            defaultValue: 'Good lighting',
+          })}
           isGood={analysis.brightness > 0.2 && analysis.brightness < 0.9}
           confidence={analysis.brightness > 0.5 ? analysis.brightness : 1 - analysis.brightness}
         />
 
         {/* Focus */}
         <QualityIndicator
-          label={t('focus', { defaultValue: 'In focus' })}
-          isGood={analysis.sharpness > 0.3}
+          label={t('ocrFrameQuality.focus', { defaultValue: 'In focus' })}
+          isGood={analysis.sharpness > minSharpness}
           confidence={analysis.sharpness}
         />
 
         {/* Contrast */}
         <QualityIndicator
-          label={t('contrast', { defaultValue: 'Good contrast' })}
+          label={t('ocrFrameQuality.contrast', {
+            defaultValue: 'Good contrast',
+          })}
           isGood={analysis.contrast > 0.3}
           confidence={analysis.contrast}
         />
@@ -87,7 +96,9 @@ export default function OCRFrameQualityIndicator({
       {/* Overall Status */}
       <div className="pt-2 border-t border-white/20">
         <div className="flex items-center justify-between">
-          <span className="text-xs opacity-75">{t('quality', { defaultValue: 'Quality' })}</span>
+          <span className="text-xs opacity-75">
+            {t('ocrFrameQuality.quality', { defaultValue: 'Quality' })}
+          </span>
           <span className="font-bold">{Math.round(analysis.overallScore * 100)}%</span>
         </div>
 
@@ -95,7 +106,11 @@ export default function OCRFrameQualityIndicator({
         {analysis.shouldTriggerOCR ? (
           <div className="mt-2 flex items-center gap-1.5 text-green-400 font-semibold animate-pulse">
             <Camera className="w-3.5 h-3.5" />
-            <span>{t('readyToScan', { defaultValue: '📸 Scanning...' })}</span>
+            <span>
+              {t('ocrFrameQuality.readyToScan', {
+                defaultValue: '📸 Scanning...',
+              })}
+            </span>
           </div>
         ) : (
           <div className="mt-2 text-yellow-400 text-xs">{getPositioningHint(analysis, t)}</div>
@@ -164,30 +179,46 @@ function getPositioningHint(
   analysis: FrameAnalysis,
   t: (key: string, options?: Record<string, string>) => string,
 ): string {
+  const minSharpness = Number(process.env.NEXT_PUBLIC_AUTO_OCR_MIN_SHARPNESS) || 0.01
+
   // Prioritize hints by importance
   if (!analysis.hasTextLikeContent) {
-    return t('hintMoveCloser', { defaultValue: 'Move closer to text' })
+    return t('ocrFrameQuality.hintMoveCloser', {
+      defaultValue: 'Move closer to text',
+    })
   }
 
   if (analysis.brightness < 0.2) {
-    return t('hintMoreLight', { defaultValue: 'Need more light' })
+    return t('ocrFrameQuality.hintMoreLight', {
+      defaultValue: 'Need more light',
+    })
   }
 
   if (analysis.brightness > 0.9) {
-    return t('hintTooLight', { defaultValue: 'Too bright, adjust angle' })
+    return t('ocrFrameQuality.hintTooLight', {
+      defaultValue: 'Too bright, adjust angle',
+    })
   }
 
-  if (analysis.sharpness < 0.3) {
-    return t('hintHoldSteady', { defaultValue: 'Hold steady to focus' })
+  if (analysis.sharpness < minSharpness) {
+    return t('ocrFrameQuality.hintHoldSteady', {
+      defaultValue: 'Hold steady to focus',
+    })
   }
 
   if (!analysis.hasDatePattern) {
-    return t('hintFindDate', { defaultValue: 'Point at expiry date' })
+    return t('ocrFrameQuality.hintFindDate', {
+      defaultValue: 'Point at expiry date',
+    })
   }
 
   if (analysis.contrast < 0.3) {
-    return t('hintImproveAngle', { defaultValue: 'Adjust angle for clarity' })
+    return t('ocrFrameQuality.hintImproveAngle', {
+      defaultValue: 'Adjust angle for clarity',
+    })
   }
 
-  return t('hintPositioning', { defaultValue: 'Keep positioning...' })
+  return t('ocrFrameQuality.hintPositioning', {
+    defaultValue: 'Keep positioning...',
+  })
 }

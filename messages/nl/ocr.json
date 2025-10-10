@@ -37,7 +37,8 @@
     "alerts": {
       "serviceUnavailable": "OCR-service tijdelijk niet beschikbaar. Gebruik handmatige invoer.",
       "ocrError": "Fout: {error}",
-      "backendUnavailable": "Backend-service reageert niet"
+      "backendUnavailable": "Backend-service reageert niet",
+      "scanInstructions": "Plaats de barcode binnen het cameraframe. De scanner detecteert deze automatisch."
     }
   }
 }

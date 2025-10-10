@@ -3,8 +3,7 @@
  * Controlled by NEXT_PUBLIC_DEBUG_OCR environment variable
  */
 
-const IS_OCR_DEBUG_ENABLED =
-  process.env.NEXT_PUBLIC_DEBUG_OCR === 'true' || process.env.NODE_ENV === 'development'
+const IS_OCR_DEBUG_ENABLED = process.env.NEXT_PUBLIC_DEBUG_OCR === 'true'
 
 export interface OCRDebugEvent {
   timestamp: string

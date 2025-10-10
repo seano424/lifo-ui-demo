@@ -37,7 +37,8 @@
     "alerts": {
       "serviceUnavailable": "OCR service temporarily unavailable. Please use manual entry.",
       "ocrError": "Error: {error}",
-      "backendUnavailable": "Backend service is not responding"
+      "backendUnavailable": "Backend service is not responding",
+      "scanInstructions": "Position the barcode within the camera frame. The scanner will detect it automatically."
     }
   }
 }

@@ -110,7 +110,6 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
     },
     maxAttempts: 10,
     preCheckIntervalMs: 500,
-    minSharpness: 0.05, // Very low threshold for handwritten text on textured surfaces (5%)
     debug: process.env.NODE_ENV === 'development',
   })
 

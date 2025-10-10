@@ -4,6 +4,7 @@
  * before making expensive OCR API calls
  */
 
+import { logger } from './logger'
 import { ocrDebugLogger } from './ocr-debug-logger'
 
 export interface FrameAnalysis {
@@ -64,10 +65,10 @@ export function analyzeFrame(
 ): FrameAnalysis {
   const {
     debug = false,
-    minTextConfidence = 0.3,
-    minDateConfidence = 0.4,
-    minOverallScore = 0.5,
-    minSharpness = 0.15,
+    minTextConfidence = Number(process.env.NEXT_PUBLIC_AUTO_OCR_MIN_TEXT_CONFIDENCE) || 0.05,
+    minDateConfidence = Number(process.env.NEXT_PUBLIC_AUTO_OCR_MIN_DATE_CONFIDENCE) || 0.4,
+    minOverallScore = Number(process.env.NEXT_PUBLIC_AUTO_OCR_MIN_OVERALL_SCORE) || 0.5,
+    minSharpness = Number(process.env.NEXT_PUBLIC_AUTO_OCR_MIN_SHARPNESS) || 0.01,
   } = options
 
   const ctx = canvas.getContext('2d')
@@ -103,7 +104,7 @@ export function analyzeFrame(
     overallScore >= minOverallScore &&
     quality.brightness > 0.2 && // Not too dark
     quality.brightness < 0.9 && // Not overexposed
-    quality.sharpness > minSharpness // Reasonably sharp (configurable)
+    quality.sharpness >= minSharpness // Reasonably sharp (configurable, >= not >)
 
   const analysis: FrameAnalysis = {
     hasTextLikeContent: textDetection.hasText,
@@ -176,17 +177,18 @@ function detectTextLikeContent(imageData: ImageData): {
   // Detect horizontal patterns (text typically appears in lines)
   const horizontalPatterns = detectHorizontalLines(edges, imageData.width, imageData.height)
 
-  // Text typically has 3-15% edge pixels
+  // Text typically has 2-15% edge pixels
   // Too few = no text, too many = noise/complex image
-  // For dates: Allow relaxed detection even without horizontal patterns (handwritten dates)
+  // For dates: Allow relaxed detection for handwritten text on paper (low contrast)
+  // Lowered threshold from 3% to 2% to support handwritten dates on white paper
   const hasText =
-    edgePercentage >= 3 && edgePercentage <= 25 && (horizontalPatterns || edgePercentage >= 8)
+    edgePercentage >= 2 && edgePercentage <= 25 && (horizontalPatterns || edgePercentage >= 2.5)
 
   // Normalize confidence to 0-1 range
   // Optimal range is around 5-10% edge pixels
   let confidence = 0
-  if (edgePercentage >= 3 && edgePercentage <= 15) {
-    confidence = Math.min((edgePercentage - 3) / 12, 1)
+  if (edgePercentage >= 2 && edgePercentage <= 15) {
+    confidence = Math.min((edgePercentage - 2) / 13, 1)
   } else if (edgePercentage > 15 && edgePercentage <= 25) {
     // Decay confidence for very high edge counts
     confidence = Math.max(0, 1 - (edgePercentage - 15) / 10)
@@ -259,36 +261,64 @@ function detectDatePattern(
   }
 } {
   // Convert to binary (black and white only)
-  const binary = toBinaryImage(imageData, 128)
+  // Use adaptive threshold: for handwritten text on white paper, use higher threshold (160)
+  // This helps capture light gray text that would be missed with threshold 128
+  const binary = toBinaryImage(imageData, 160)
 
   // Find connected components (groups of pixels that form shapes)
   const components = findConnectedComponents(binary, imageData.width, imageData.height)
 
   // Filter for number-like shapes
-  // Numbers are typically taller than wide (aspect ratio ~1.3-2.0)
-  // And not too small (min 5x8 pixels)
+  // Numbers are typically taller than wide (aspect ratio ~1.3-2.2)
+  // Relaxed for handwritten dates which may have varied proportions
+  // IMPORTANT: Balance between catching handwritten dates and avoiding logos
   const numberLikeShapes = components.filter(c => {
     const ratio = c.height / c.width
-    const isNumberSized = c.width >= 5 && c.height >= 8 && c.width <= 50 && c.height <= 80
-    const isNumberRatio = ratio >= 1.2 && ratio <= 2.2
-    return isNumberSized && isNumberRatio
+    // Relaxed size constraints for handwritten text (smaller minimum)
+    const isNumberSized = c.width >= 6 && c.height >= 10 && c.width <= 45 && c.height <= 70
+    // Relaxed aspect ratio: 1.3-2.2 to catch handwritten numbers
+    const isNumberRatio = ratio >= 1.3 && ratio <= 2.2
+    // Reject very small or very large components (likely noise or logos)
+    const isSaneSize = c.pixelCount >= 80 && c.pixelCount <= 2400
+    return isNumberSized && isNumberRatio && isSaneSize
   })
 
   // Look for separator patterns (slashes, dashes, dots)
   const hasSeparators = detectSeparatorPatterns(binary, imageData.width, imageData.height)
 
-  // Date needs at least 4 number-like characters (e.g., "12/25" = 4 digits)
-  // Ideally 6-8 for full dates (e.g., "12/25/2025" = 8 digits)
-  const hasDatePattern = numberLikeShapes.length >= 4 && hasSeparators
+  // Simplified approach: Don't require minimum shapes, just reject massive text blocks
+  // IMPORTANT: Reject if TOO MANY shapes detected (>15 = likely text/logo, not date)
+  // This allows handwritten dates (1-10 shapes) while still blocking HAWAII (20-30 shapes)
+  const hasDatePattern = numberLikeShapes.length <= 15
 
-  // Calculate confidence based on number of number-like shapes and separators
+  // Calculate confidence based on text presence and separators
+  // Let the OCR API do the heavy lifting of validating the actual date
+  // VERSION_MARKER: v2.4_simplified_no_min_shapes
   let confidence = 0
-  if (numberLikeShapes.length >= 4) {
-    // More number-like shapes = higher confidence (up to 8 for full date)
-    confidence = Math.min(numberLikeShapes.length / 8, 1) * 0.7
+
+  if (numberLikeShapes.length > 0 && numberLikeShapes.length <= 15) {
+    // Base confidence from having some text-like shapes
+    const shapeScore = Math.min(numberLikeShapes.length / 10, 1) * 0.5
+
+    if (hasSeparators) {
+      // WITH separators: Higher confidence (likely a date format)
+      confidence = Math.min(shapeScore + 0.5, 1.0)
+    } else {
+      // WITHOUT separators: Lower confidence but still allowed
+      confidence = shapeScore * 0.7
+    }
   }
-  if (hasSeparators) {
-    confidence += 0.3 // Boost for separators
+  // If > 15 shapes: confidence stays 0 (too many = text/logo, not a date)
+
+  // Debug logging via logger utility
+  if (numberLikeShapes.length > 0) {
+    logger.log('FrameAnalyzer', 'Date pattern detection', {
+      shapes: numberLikeShapes.length,
+      hasSeparators,
+      confidence: confidence.toFixed(3),
+      rejected: numberLikeShapes.length > 15 ? 'TOO_MANY_SHAPES' : null,
+      version: 'v2.4',
+    })
   }
 
   // IMPORTANT: If barcode detected, severely reduce date confidence
