@@ -46,22 +46,26 @@ export async function updateSession(request: NextRequest) {
   /**
    * Retry configuration aligned with rest of codebase (lib/utils/retry.ts)
    * - 3 total attempts (initial + 2 retries)
-   * - Exponential backoff: 100ms, 200ms, 400ms
+   * - Exponential backoff: 200ms, 400ms, 800ms (capped at 1000ms)
    * - Jitter to prevent thundering herd
-   * - Max total time: ~700ms before failing
+   * - Max total time: ~1600ms before failing
+   * - Increased delays to handle transient network issues (ECONNRESET)
    */
   const MAX_RETRIES = 3
-  const INITIAL_DELAY_MS = 100
+  const INITIAL_DELAY_MS = 200
   const BACKOFF_MULTIPLIER = 2
+  const MAX_DELAY_MS = 1000
 
   /**
    * Calculate delay with exponential backoff and jitter
    * Jitter prevents synchronized retry spikes from multiple requests
+   * Capped at MAX_DELAY_MS to prevent excessively long waits
    */
   function calculateRetryDelay(attempt: number): number {
     const baseDelay = INITIAL_DELAY_MS * BACKOFF_MULTIPLIER ** (attempt - 1)
-    const jitter = Math.random() * 0.3 * baseDelay // ±30% jitter
-    return Math.floor(baseDelay + jitter)
+    const cappedDelay = Math.min(baseDelay, MAX_DELAY_MS)
+    const jitter = Math.random() * 0.3 * cappedDelay // ±30% jitter
+    return Math.floor(cappedDelay + jitter)
   }
 
   let user = null
@@ -133,6 +137,7 @@ export async function updateSession(request: NextRequest) {
       // Check if this is a retryable network error
       if (isRetryableError(err) && attempt < MAX_RETRIES) {
         const delay = calculateRetryDelay(attempt)
+        // Only log retries when query logging is enabled to reduce console noise
         logger.queryWarn('middleware', 'Network error during auth check, retrying', {
           error: errorMessage,
           attempt,

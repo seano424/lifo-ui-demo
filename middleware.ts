@@ -1,5 +1,6 @@
 import { updateSession } from '@/lib/supabase/middleware'
-import { createClient } from '@/lib/supabase/server'
+import { createServerClient } from '@supabase/ssr'
+import { logger } from '@/lib/utils/logger'
 import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
 
@@ -9,32 +10,74 @@ export async function middleware(request: NextRequest) {
 
   // Handle auth code exchange for password resets and other auth flows
   if (code && pathname === '/') {
-    const supabase = await createClient()
+    // Create response object for proper cookie management
+    let response = NextResponse.next({ request })
+
+    // Create Supabase client with proper cookie handling for code exchange
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return request.cookies.getAll()
+          },
+          setAll(cookiesToSet) {
+            // Set cookies on request for downstream handlers
+            cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
+            // Create new response with updated cookies
+            response = NextResponse.next({ request })
+            // Set cookies on response to send back to client
+            cookiesToSet.forEach(({ name, value, options }) =>
+              response.cookies.set(name, value, options),
+            )
+          },
+        },
+      },
+    )
 
     try {
       const { error } = await supabase.auth.exchangeCodeForSession(code)
 
-      if (!error) {
-        // Code exchange successful - redirect to appropriate page
-        const type = searchParams.get('type')
-        const next = searchParams.get('next')
+      if (error) {
+        const errorMessage = error.message || ''
+        logger.error('middleware', 'Code exchange failed', {
+          error: errorMessage,
+          code: error.name,
+        })
 
-        if (type === 'recovery') {
-          // Password reset - redirect to update password page
-          const redirectUrl = new URL('/auth/update-password', request.url)
-          return NextResponse.redirect(redirectUrl)
-        } else if (next) {
-          // Use next parameter if provided
-          const redirectUrl = new URL(next, request.url)
-          return NextResponse.redirect(redirectUrl)
-        } else {
-          // Default redirect
-          const redirectUrl = new URL('/dashboard', request.url)
-          return NextResponse.redirect(redirectUrl)
+        // Provide specific error context
+        const errorUrl = new URL('/auth/error', request.url)
+        if (errorMessage.includes('expired') || errorMessage.includes('invalid')) {
+          errorUrl.searchParams.set('reason', 'invalid_code')
         }
+        return NextResponse.redirect(errorUrl)
       }
+
+      // Code exchange successful - determine redirect destination
+      const type = searchParams.get('type')
+      const next = searchParams.get('next')
+
+      let redirectUrl: URL
+      if (type === 'recovery') {
+        // Password reset - redirect to update password page
+        redirectUrl = new URL('/auth/update-password', request.url)
+      } else if (next) {
+        // Use next parameter if provided
+        redirectUrl = new URL(next, request.url)
+      } else {
+        // Default redirect
+        redirectUrl = new URL('/dashboard', request.url)
+      }
+
+      // Return redirect with session cookies set
+      return NextResponse.redirect(redirectUrl)
     } catch (error) {
-      console.error('Code exchange failed:', error)
+      const errorMessage = error instanceof Error ? error.message : String(error)
+      logger.error('middleware', 'Unexpected error during code exchange', {
+        error: errorMessage,
+      })
+
       // Redirect to error page
       const errorUrl = new URL('/auth/error', request.url)
       return NextResponse.redirect(errorUrl)

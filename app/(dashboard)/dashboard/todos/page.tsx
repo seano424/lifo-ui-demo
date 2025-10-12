@@ -5,6 +5,7 @@ import { TodosFilteredList } from '@/components/todos/todos-filtered-list'
 import { fetchUserPreferences, fetchUserStores } from '@/lib/queries/stores'
 import { createPrefetchedQuery } from '@/lib/react-query/prefetch'
 import { createClient as createServerClient } from '@/lib/supabase/server'
+import { logger } from '@/lib/utils/logger'
 import { dehydrate, HydrationBoundary } from '@tanstack/react-query'
 import { redirect } from 'next/navigation'
 
@@ -54,7 +55,7 @@ export default async function TodosPage({ searchParams }: TodosPageProps) {
       return <NoStoresError />
     }
   } catch (error) {
-    console.error('[TodosPage] Error prefetching data:', error)
+    logger.error('TodosPage', 'Error prefetching data', error)
   }
 
   return (

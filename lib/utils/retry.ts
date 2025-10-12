@@ -10,10 +10,10 @@ export interface RetryOptions {
 
 const DEFAULT_OPTIONS: Required<RetryOptions> = {
   maxAttempts: 3,
-  initialDelay: 100,
+  initialDelay: 200,
   maxDelay: 2000,
   backoffMultiplier: 2,
-  retryableErrors: ['ECONNRESET', 'ETIMEDOUT', 'ECONNREFUSED', 'fetch failed'],
+  retryableErrors: ['ECONNRESET', 'ETIMEDOUT', 'ECONNREFUSED', 'ENOTFOUND', 'fetch failed'],
 }
 
 /**
@@ -145,6 +145,8 @@ export async function withRetry<T>(
 
 /**
  * Retry specifically for Supabase queries with connection errors
+ * Uses longer delays than default to handle transient network issues (ECONNRESET)
+ * Aligned with middleware retry strategy for consistency
  *
  * @example
  * ```typescript
@@ -163,7 +165,7 @@ export async function withSupabaseRetry<T>(
     fn,
     {
       maxAttempts: 3,
-      initialDelay: 100,
+      initialDelay: 200,
       maxDelay: 1000,
       ...options,
     },
