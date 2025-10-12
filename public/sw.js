@@ -1,47 +1,39 @@
-const CACHE_NAME = 'lifo-ai-v4'
+const CACHE_NAME = 'lifo-ai-v6'
 
-// Critical pages to cache for offline access
-// Only cache public pages that don't require authentication (from middleware.ts line 76-86)
-const CRITICAL_PAGES = [
-  '/manifest.json',
-  '/offline',
-  // Auth pages (all public)
-  '/auth/login',
-  '/auth/sign-up',
-  '/auth/forgot-password',
-  '/auth/update-password',
-  '/auth/error',
-  '/auth/sign-up-success',
-  // Onboarding (public)
-  '/onboarding/create-account',
-  '/onboarding/success',
-  // Marketing pages (public)
-  '/',
-  '/contact',
-  '/features',
-  '/pricing',
-  '/support',
-]
+// Push notification handler (from Next.js docs)
+self.addEventListener('push', event => {
+  if (event.data) {
+    const data = event.data.json()
+    const options = {
+      body: data.body,
+      icon: data.icon || '/icon.png',
+      badge: '/badge.png',
+      vibrate: [100, 50, 100],
+      data: {
+        dateOfArrival: Date.now(),
+        primaryKey: '2',
+      },
+    }
+    event.waitUntil(self.registration.showNotification(data.title, options))
+  }
+})
 
-// Install event - cache critical pages with error handling
+// Notification click handler (from Next.js docs)
+self.addEventListener('notificationclick', event => {
+  console.log('Notification click received.')
+  event.notification.close()
+  event.waitUntil(clients.openWindow('http://localhost:3000'))
+})
+
+// Install event - skip precaching, use lazy caching instead
+// Precaching all pages on install causes ECONNRESET errors and floods the server
 self.addEventListener('install', event => {
   event.waitUntil(
-    caches
-      .open(CACHE_NAME)
-      .then(cache => {
-        // Add pages individually to prevent one failure from breaking all caching
-        return Promise.allSettled(
-          CRITICAL_PAGES.map(url =>
-            cache.add(url).catch(err => {
-              console.log(`Failed to cache ${url}:`, err.message)
-            }),
-          ),
-        )
-      })
-      .then(() => {
-        // Skip waiting to activate immediately
-        return self.skipWaiting()
-      }),
+    caches.open(CACHE_NAME).then(() => {
+      console.log('Service Worker: Cache opened, ready for lazy caching')
+      // Skip waiting to activate immediately
+      return self.skipWaiting()
+    }),
   )
 })
 
@@ -76,31 +68,87 @@ self.addEventListener('activate', event => {
   )
 })
 
-// Fetch event with offline fallback
+// Fetch event with intelligent caching strategy
 self.addEventListener('fetch', event => {
-  event.respondWith(
-    caches.match(event.request).then(response => {
-      // Return cached version if available
-      if (response) {
-        return response
-      }
+  const { request } = event
+  const url = new URL(request.url)
 
-      // Try to fetch from network
-      return fetch(event.request).catch(() => {
-        // If network fails and it's a page request, show offline page
-        if (event.request.destination === 'document') {
-          return (
-            caches.match('/offline') ||
-            new Response(
-              '<html><body><h1>You are offline</h1><p>Please check your connection and try again.</p></body></html>',
-              { headers: { 'Content-Type': 'text/html' } },
+  // Skip caching for:
+  // - Chrome extensions
+  // - Non-HTTP(S) requests
+  // - API calls
+  if (!url.protocol.startsWith('http') || url.pathname.startsWith('/api/')) {
+    return event.respondWith(fetch(request))
+  }
+
+  // Network-First strategy for HTML pages
+  // This prevents stale page caching and authentication issues
+  if (request.destination === 'document' || request.headers.get('accept')?.includes('text/html')) {
+    event.respondWith(
+      fetch(request)
+        .then(response => {
+          // Only cache successful responses (200-299)
+          if (response.ok && response.status >= 200 && response.status < 300) {
+            // Clone the response before caching
+            const responseToCache = response.clone()
+
+            caches.open(CACHE_NAME).then(cache => {
+              // Only cache public pages (not authenticated routes)
+              if (
+                url.pathname === '/' ||
+                url.pathname.startsWith('/auth/') ||
+                url.pathname.startsWith('/onboarding/') ||
+                url.pathname.startsWith('/contact') ||
+                url.pathname.startsWith('/features') ||
+                url.pathname.startsWith('/pricing') ||
+                url.pathname.startsWith('/support')
+              ) {
+                cache.put(request, responseToCache)
+              }
+            })
+          }
+
+          return response
+        })
+        .catch(() => {
+          // Network failed - try cache as fallback
+          return caches.match(request).then(cachedResponse => {
+            if (cachedResponse) {
+              return cachedResponse
+            }
+
+            // No cache available - show offline page
+            return (
+              caches.match('/offline') ||
+              new Response(
+                '<html><body><h1>You are offline</h1><p>Please check your connection and try again.</p></body></html>',
+                { headers: { 'Content-Type': 'text/html' } },
+              )
             )
-          )
+          })
+        }),
+    )
+  } else {
+    // Cache-First strategy for static assets (images, CSS, JS, fonts)
+    // This improves performance for resources that don't change often
+    event.respondWith(
+      caches.match(request).then(cachedResponse => {
+        if (cachedResponse) {
+          return cachedResponse
         }
 
-        // For other requests, return a basic offline response
-        return new Response('Offline', { status: 503 })
-      })
-    }),
-  )
+        return fetch(request).then(response => {
+          // Only cache successful responses
+          if (response.ok) {
+            const responseToCache = response.clone()
+            caches.open(CACHE_NAME).then(cache => {
+              cache.put(request, responseToCache)
+            })
+          }
+
+          return response
+        })
+      }),
+    )
+  }
 })

@@ -35,6 +35,8 @@ export default async function TodosPage({ searchParams }: TodosPageProps) {
     redirect('/auth/login')
   }
 
+  let stores: Awaited<ReturnType<typeof fetchUserStores>> = []
+
   try {
     await Promise.all([
       queryClient.prefetchQuery({
@@ -49,13 +51,15 @@ export default async function TodosPage({ searchParams }: TodosPageProps) {
       }),
     ])
 
-    const stores = await fetchUserStores(user.id, serverClient)
-
-    if (stores.length === 0) {
-      return <NoStoresError />
-    }
+    stores = await fetchUserStores(user.id, serverClient)
   } catch (error) {
     logger.error('TodosPage', 'Error prefetching data', error)
+    // If we can't fetch stores after retries, show an error page or redirect
+    throw new Error('Failed to load stores. Please refresh the page or try again later.')
+  }
+
+  if (stores.length === 0) {
+    return <NoStoresError />
   }
 
   return (

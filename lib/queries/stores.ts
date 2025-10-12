@@ -73,12 +73,14 @@ export async function fetchUserStores(
           .eq('stores.is_active', true)
 
         if (error) {
+          // Log the error for debugging
           logger.queryWarn(context, 'Supabase error', {
             userId,
             error: error.message,
             code: error.code,
           })
-          throw new Error(`Failed to fetch user stores: ${error.message}`)
+          // Throw the original error so retry logic can handle it properly
+          throw error
         }
 
         const userStores = data
@@ -137,12 +139,14 @@ export async function fetchUserStoresAlternative(
           .eq('stores.is_active', true)
 
         if (error) {
+          // Log the error for debugging
           logger.queryWarn(context, 'Supabase error', {
             userId,
             error: error.message,
             code: error.code,
           })
-          throw new Error(`Failed to fetch user stores: ${error.message}`)
+          // Throw the original error so retry logic can handle it properly
+          throw error
         }
 
         const userStores = data.map(storeData => ({
@@ -199,12 +203,14 @@ export async function fetchStoreById(storeId: string, serverClient?: ServerClien
         .single()
 
       if (error) {
+        // Log the error for debugging
         logger.queryWarn(context, 'Supabase error', {
           storeId,
           error: error.message,
           code: error.code,
         })
-        throw new Error(`Failed to fetch store: ${error.message}`)
+        // Throw the original error for proper error handling
+        throw error
       }
 
       logger.log(context, 'Store fetched successfully', { storeId })
@@ -294,13 +300,15 @@ export async function updateUserPrimaryStore(userId: string, storeId: string): P
         })
 
         if (error) {
+          // Log the error for debugging
           logger.queryWarn(context, 'Supabase error', {
             userId,
             storeId,
             error: error.message,
             code: error.code,
           })
-          throw new Error(`Failed to update primary store: ${error.message}`)
+          // Throw the original error for proper error handling
+          throw error
         }
 
         logger.query(context, 'Primary store updated successfully', { userId, storeId })
