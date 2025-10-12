@@ -7,32 +7,50 @@ import { DashboardKPICards } from '@/components/dashboard/dashboard-kpi-cards'
 import { ExpiredItemsSummary } from '@/components/dashboard/expired-items-summary'
 import { QuickActionCards } from '@/components/dashboard/quick-action-cards'
 import { StoreInsightsDashboard } from '@/components/dashboard/store-insights-dashboard'
+import { useTranslations } from 'next-intl'
 
-interface DashboardContentProps {
-  title: string
-}
+export function DashboardContent() {
+  const t = useTranslations('dashboardNav')
 
-export function DashboardContent({ title }: DashboardContentProps) {
   return (
-    <div className="flex flex-col gap-8">
-      <DashboardInsetHeader title={title} />
+    <div className="flex flex-col gap-10 pb-8 animate-in fade-in-0 duration-1000">
+      {/* Enhanced Header */}
+      <DashboardInsetHeader
+        title={t('titles.dashboard')}
+        description={t('descriptions.dashboard')}
+      />
 
-      <BatchStatusSummary />
-      <ExpiredItemsSummary />
+      {/* Status Overview Section */}
 
-      <div className="border p-5 rounded-2xl">
-        <DashboardKPICards />
+      <div className="space-y-6">
+        <BatchStatusSummary />
+
+        <ExpiredItemsSummary />
       </div>
 
-      <div className="bg-muted/50 rounded-2xl border-0 p-5 dark:bg-brand-dark">
+      {/* KPI Cards Section */}
+      <div className="relative animate-in fade-in-0 slide-in-from-bottom-4 duration-700 delay-300">
+        <div className="border border-border/50 p-8 rounded-3xl bg-background">
+          <DashboardKPICards />
+        </div>
+      </div>
+
+      {/* Store Insights */}
+      <div className="border border-border/50 p-8 rounded-3xl bg-background">
         <StoreInsightsDashboard />
       </div>
 
-      <div className="bg-muted/50 rounded-2xl border-0 p-5 dark:bg-brand-dark">
+      {/* Quick Actions */}
+      <div className="border border-border/50 p-8 rounded-3xl bg-background">
         <QuickActionCards />
       </div>
 
-      <AlertSensitivityControls />
+      {/* Alert Controls */}
+      <div className="animate-in fade-in-0 slide-in-from-bottom-4 duration-700 delay-600">
+        <div className="border border-border/50 p-8 rounded-3xl bg-background">
+          <AlertSensitivityControls />
+        </div>
+      </div>
     </div>
   )
 }

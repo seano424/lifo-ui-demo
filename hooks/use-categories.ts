@@ -14,7 +14,8 @@ export function useCategories() {
   const result = useQuery({
     queryKey: queryKeys.categories.list,
     queryFn: () => fetchCategories(),
-    staleTime: 5 * 60 * 1000, // 5 minutes - categories don't change often
+    staleTime: 10 * 60 * 1000, // 10 minutes - categories rarely change
+    gcTime: 30 * 60 * 1000, // 30 minutes
     retry: 2,
   })
 

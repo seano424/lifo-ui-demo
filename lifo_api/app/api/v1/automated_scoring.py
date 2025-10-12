@@ -3,8 +3,7 @@ API endpoints for managing automated scoring schedules
 Provides cron-like scheduling management for inventory scoring
 """
 
-
-from typing import Any, Dict, Optional
+from typing import Any
 
 import structlog
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
@@ -31,21 +30,20 @@ class CreateScheduleRequest(BaseModel):
     schedule_type: str = Field(
         default="cron",
         pattern="^(cron|interval)$",
-        description="Schedule type: 'cron' or 'interval'"
+        description="Schedule type: 'cron' or 'interval'",
     )
     cron_expression: str | None = Field(
         default="0 */4 * * *",
-        description="Cron expression (minute hour day month day_of_week)"
+        description="Cron expression (minute hour day month day_of_week)",
     )
     interval_hours: int | None = Field(
         default=4,
         ge=1,
         le=168,  # Max 1 week
-        description="Hours between scoring runs (for interval type)"
+        description="Hours between scoring runs (for interval type)",
     )
     force_recalculate: bool = Field(
-        default=False,
-        description="Force recalculation of all scores"
+        default=False, description="Force recalculation of all scores"
     )
     timezone: str = Field(default="UTC", description="Timezone for scheduling")
     enabled: bool = Field(default=True, description="Whether schedule is active")
@@ -57,21 +55,19 @@ class UpdateScheduleRequest(BaseModel):
     schedule_type: str | None = Field(
         default=None,
         pattern="^(cron|interval)$",
-        description="Schedule type: 'cron' or 'interval'"
+        description="Schedule type: 'cron' or 'interval'",
     )
     cron_expression: str | None = Field(
-        default=None,
-        description="Cron expression (minute hour day month day_of_week)"
+        default=None, description="Cron expression (minute hour day month day_of_week)"
     )
     interval_hours: int | None = Field(
         default=None,
         ge=1,
         le=168,  # Max 1 week
-        description="Hours between scoring runs (for interval type)"
+        description="Hours between scoring runs (for interval type)",
     )
     force_recalculate: bool | None = Field(
-        default=None,
-        description="Force recalculation of all scores"
+        default=None, description="Force recalculation of all scores"
     )
     timezone: str | None = Field(default=None, description="Timezone for scheduling")
     enabled: bool | None = Field(default=None, description="Whether schedule is active")
@@ -156,7 +152,7 @@ async def create_scoring_schedule(
             schedule_id=schedule_id,
             store_id=request_data.store_id,
             schedule_type=request_data.schedule_type,
-            user_id=current_user["sub"]
+            user_id=current_user["sub"],
         )
 
         # Get schedule status for response
@@ -165,7 +161,7 @@ async def create_scoring_schedule(
         return {
             "success": True,
             "message": f"Scoring schedule created for store {request_data.store_id}",
-            "schedule": status
+            "schedule": status,
         }
 
     except ValueError as ve:
@@ -173,7 +169,7 @@ async def create_scoring_schedule(
             "Invalid schedule configuration",
             store_id=request_data.store_id,
             error=str(ve),
-            user_id=current_user["sub"]
+            user_id=current_user["sub"],
         )
         raise HTTPException(status_code=400, detail=str(ve)) from ve
 
@@ -182,11 +178,10 @@ async def create_scoring_schedule(
             "Failed to create scoring schedule",
             store_id=request_data.store_id,
             error=str(e),
-            user_id=current_user["sub"]
+            user_id=current_user["sub"],
         )
         raise HTTPException(
-            status_code=500,
-            detail="Failed to create scoring schedule"
+            status_code=500, detail="Failed to create scoring schedule"
         ) from e
 
 
@@ -230,14 +225,14 @@ async def list_scoring_schedules(
             "Listed automated scoring schedules",
             total_schedules=len(schedules),
             store_filter=store_id,
-            user_id=current_user["sub"]
+            user_id=current_user["sub"],
         )
 
         return {
             "success": True,
             "total_count": len(schedules),
             "schedules": schedules,
-            "filters": {"store_id": store_id}
+            "filters": {"store_id": store_id},
         }
 
     except Exception as e:
@@ -245,11 +240,10 @@ async def list_scoring_schedules(
             "Failed to list scoring schedules",
             store_filter=store_id,
             error=str(e),
-            user_id=current_user["sub"]
+            user_id=current_user["sub"],
         )
         raise HTTPException(
-            status_code=500,
-            detail="Failed to list scoring schedules"
+            status_code=500, detail="Failed to list scoring schedules"
         ) from e
 
 
@@ -287,21 +281,17 @@ async def get_scoring_schedule(
 
         if not status:
             raise HTTPException(
-                status_code=404,
-                detail=f"Schedule {schedule_id} not found"
+                status_code=404, detail=f"Schedule {schedule_id} not found"
             )
 
         logger.info(
             "Retrieved scoring schedule details",
             schedule_id=schedule_id,
             store_id=status.get("store_id"),
-            user_id=current_user["sub"]
+            user_id=current_user["sub"],
         )
 
-        return {
-            "success": True,
-            "schedule": status
-        }
+        return {"success": True, "schedule": status}
 
     except HTTPException:
         raise
@@ -310,11 +300,10 @@ async def get_scoring_schedule(
             "Failed to get scoring schedule",
             schedule_id=schedule_id,
             error=str(e),
-            user_id=current_user["sub"]
+            user_id=current_user["sub"],
         )
         raise HTTPException(
-            status_code=500,
-            detail="Failed to get scoring schedule"
+            status_code=500, detail="Failed to get scoring schedule"
         ) from e
 
 
@@ -353,8 +342,7 @@ async def update_scoring_schedule(
         current_status = await scheduler.get_schedule_status(schedule_id)
         if not current_status:
             raise HTTPException(
-                status_code=404,
-                detail=f"Schedule {schedule_id} not found"
+                status_code=404, detail=f"Schedule {schedule_id} not found"
             )
 
         # Create updated configuration
@@ -362,21 +350,24 @@ async def update_scoring_schedule(
             schedule_id=schedule_id,
             store_id=current_status["store_id"],
             schedule_type=request_data.schedule_type or current_status["schedule_type"],
-            cron_expression=request_data.cron_expression or current_status["cron_expression"],
-            interval_hours=request_data.interval_hours or current_status["interval_hours"],
-            force_recalculate=request_data.force_recalculate if request_data.force_recalculate is not None else False,
+            cron_expression=request_data.cron_expression
+            or current_status["cron_expression"],
+            interval_hours=request_data.interval_hours
+            or current_status["interval_hours"],
+            force_recalculate=request_data.force_recalculate
+            if request_data.force_recalculate is not None
+            else False,
             timezone=request_data.timezone or current_status["timezone"],
-            enabled=request_data.enabled if request_data.enabled is not None else current_status["enabled"],
+            enabled=request_data.enabled
+            if request_data.enabled is not None
+            else current_status["enabled"],
         )
 
         # Update schedule
         success = await scheduler.update_scoring_schedule(schedule_id, config)
 
         if not success:
-            raise HTTPException(
-                status_code=500,
-                detail="Failed to update schedule"
-            )
+            raise HTTPException(status_code=500, detail="Failed to update schedule")
 
         # Get updated status
         updated_status = await scheduler.get_schedule_status(schedule_id)
@@ -385,13 +376,13 @@ async def update_scoring_schedule(
             "Automated scoring schedule updated",
             schedule_id=schedule_id,
             store_id=current_status["store_id"],
-            user_id=current_user["sub"]
+            user_id=current_user["sub"],
         )
 
         return {
             "success": True,
             "message": f"Schedule {schedule_id} updated successfully",
-            "schedule": updated_status
+            "schedule": updated_status,
         }
 
     except HTTPException:
@@ -401,7 +392,7 @@ async def update_scoring_schedule(
             "Invalid schedule update configuration",
             schedule_id=schedule_id,
             error=str(ve),
-            user_id=current_user["sub"]
+            user_id=current_user["sub"],
         )
         raise HTTPException(status_code=400, detail=str(ve)) from ve
 
@@ -410,11 +401,10 @@ async def update_scoring_schedule(
             "Failed to update scoring schedule",
             schedule_id=schedule_id,
             error=str(e),
-            user_id=current_user["sub"]
+            user_id=current_user["sub"],
         )
         raise HTTPException(
-            status_code=500,
-            detail="Failed to update scoring schedule"
+            status_code=500, detail="Failed to update scoring schedule"
         ) from e
 
 
@@ -451,29 +441,25 @@ async def delete_scoring_schedule(
         status = await scheduler.get_schedule_status(schedule_id)
         if not status:
             raise HTTPException(
-                status_code=404,
-                detail=f"Schedule {schedule_id} not found"
+                status_code=404, detail=f"Schedule {schedule_id} not found"
             )
 
         # Remove schedule
         success = await scheduler.remove_scoring_schedule(schedule_id)
 
         if not success:
-            raise HTTPException(
-                status_code=500,
-                detail="Failed to delete schedule"
-            )
+            raise HTTPException(status_code=500, detail="Failed to delete schedule")
 
         logger.info(
             "Automated scoring schedule deleted",
             schedule_id=schedule_id,
             store_id=status["store_id"],
-            user_id=current_user["sub"]
+            user_id=current_user["sub"],
         )
 
         return {
             "success": True,
-            "message": f"Schedule {schedule_id} deleted successfully"
+            "message": f"Schedule {schedule_id} deleted successfully",
         }
 
     except HTTPException:
@@ -483,11 +469,10 @@ async def delete_scoring_schedule(
             "Failed to delete scoring schedule",
             schedule_id=schedule_id,
             error=str(e),
-            user_id=current_user["sub"]
+            user_id=current_user["sub"],
         )
         raise HTTPException(
-            status_code=500,
-            detail="Failed to delete scoring schedule"
+            status_code=500, detail="Failed to delete scoring schedule"
         ) from e
 
 
@@ -525,16 +510,14 @@ async def trigger_immediate_scoring(
         scheduler = get_automated_scoring_scheduler()
 
         # Trigger immediate scoring
-        job_id = await scheduler.trigger_immediate_scoring(
-            store_id, force_recalculate
-        )
+        job_id = await scheduler.trigger_immediate_scoring(store_id, force_recalculate)
 
         logger.info(
             "Immediate scoring triggered",
             store_id=store_id,
             job_id=job_id,
             force_recalculate=force_recalculate,
-            user_id=current_user["sub"]
+            user_id=current_user["sub"],
         )
 
         return {
@@ -542,7 +525,7 @@ async def trigger_immediate_scoring(
             "message": f"Immediate scoring triggered for store {store_id}",
             "job_id": job_id,
             "store_id": store_id,
-            "force_recalculate": force_recalculate
+            "force_recalculate": force_recalculate,
         }
 
     except Exception as e:
@@ -550,11 +533,10 @@ async def trigger_immediate_scoring(
             "Failed to trigger immediate scoring",
             store_id=store_id,
             error=str(e),
-            user_id=current_user["sub"]
+            user_id=current_user["sub"],
         )
         raise HTTPException(
-            status_code=500,
-            detail="Failed to trigger immediate scoring"
+            status_code=500, detail="Failed to trigger immediate scoring"
         ) from e
 
 
@@ -591,10 +573,7 @@ async def get_job_status(
         result = await scheduler.get_job_result(job_id)
 
         if not result:
-            raise HTTPException(
-                status_code=404,
-                detail=f"Job {job_id} not found"
-            )
+            raise HTTPException(status_code=404, detail=f"Job {job_id} not found")
 
         # Convert to dict for JSON serialization
         job_status = {
@@ -603,7 +582,9 @@ async def get_job_status(
             "store_id": result.store_id,
             "status": result.status,
             "started_at": result.started_at.isoformat(),
-            "completed_at": result.completed_at.isoformat() if result.completed_at else None,
+            "completed_at": result.completed_at.isoformat()
+            if result.completed_at
+            else None,
             "total_items": result.total_items,
             "processed_items": result.processed_items,
             "high_priority_count": result.high_priority_count,
@@ -611,20 +592,17 @@ async def get_job_status(
             "items_per_second": result.items_per_second,
             "error_message": result.error_message,
             "retry_count": result.retry_count,
-            "database_operations": result.database_operations
+            "database_operations": result.database_operations,
         }
 
         logger.debug(
             "Retrieved job status",
             job_id=job_id,
             status=result.status,
-            user_id=current_user["sub"]
+            user_id=current_user["sub"],
         )
 
-        return {
-            "success": True,
-            "job": job_status
-        }
+        return {"success": True, "job": job_status}
 
     except HTTPException:
         raise
@@ -633,12 +611,9 @@ async def get_job_status(
             "Failed to get job status",
             job_id=job_id,
             error=str(e),
-            user_id=current_user["sub"]
+            user_id=current_user["sub"],
         )
-        raise HTTPException(
-            status_code=500,
-            detail="Failed to get job status"
-        ) from e
+        raise HTTPException(status_code=500, detail="Failed to get job status") from e
 
 
 @router.get("/system/status", response_model=dict[str, Any])
@@ -673,9 +648,7 @@ async def get_system_status(
 
         # Calculate statistics
         enabled_schedules = len([s for s in schedules if s.get("enabled", False)])
-        total_recent_jobs = sum(
-            len(s.get("recent_executions", [])) for s in schedules
-        )
+        total_recent_jobs = sum(len(s.get("recent_executions", [])) for s in schedules)
 
         # Calculate success rate from recent jobs
         successful_jobs = 0
@@ -702,13 +675,15 @@ async def get_system_status(
             "successful_jobs": successful_jobs,
             "failed_jobs": failed_jobs,
             "success_rate_percent": round(success_rate, 2),
-            "system_health": "healthy" if scheduler._is_running and success_rate >= 80 else "degraded"
+            "system_health": "healthy"
+            if scheduler._is_running and success_rate >= 80
+            else "degraded",
         }
 
         logger.info(
             "Retrieved automated scoring system status",
             **system_status,
-            user_id=current_user["sub"]
+            user_id=current_user["sub"],
         )
 
         return {
@@ -720,19 +695,16 @@ async def get_system_status(
                     "store_id": s["store_id"],
                     "enabled": s["enabled"],
                     "next_run_time": s["next_run_time"],
-                    "recent_execution_count": len(s.get("recent_executions", []))
+                    "recent_execution_count": len(s.get("recent_executions", [])),
                 }
                 for s in schedules
-            ]
+            ],
         }
 
     except Exception as e:
         logger.error(
-            "Failed to get system status",
-            error=str(e),
-            user_id=current_user["sub"]
+            "Failed to get system status", error=str(e), user_id=current_user["sub"]
         )
         raise HTTPException(
-            status_code=500,
-            detail="Failed to get system status"
+            status_code=500, detail="Failed to get system status"
         ) from e

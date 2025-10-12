@@ -114,6 +114,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       {...props}
     >
       <SidebarHeader className="flex gap-2 justify-center items-center h-16 border-b dark:bg-brand-dark">
+        {/* Desktop logo with text */}
         <Link
           href="/"
           className="group-data-[collapsible=icon]:hidden hidden sm:flex items-center gap-2 hover:opacity-80 transition-opacity duration-200 ease-in-out"
@@ -124,16 +125,22 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             Lifo
           </Typography>
         </Link>
-        <NavbarLogo
-          variant="vertical"
-          size="md"
-          className="group-data-[collapsible=icon]:hidden sm:hidden"
-        />
-        <NavbarLogo
-          variant="icon"
-          size="sm"
-          className="group-data-[collapsible=icon]:block hidden"
-        />
+
+        {/* Mobile vertical logo */}
+        <Link
+          href="/"
+          className="group-data-[collapsible=icon]:hidden sm:hidden hover:opacity-80 transition-opacity duration-200 ease-in-out"
+        >
+          <NavbarLogo variant="vertical" size="md" />
+        </Link>
+
+        {/* Collapsed icon logo */}
+        <Link
+          href="/"
+          className="group-data-[collapsible=icon]:block hidden hover:opacity-80 transition-opacity duration-200 ease-in-out"
+        >
+          <NavbarLogo variant="icon" size="sm" />
+        </Link>
       </SidebarHeader>
       <SidebarContent className="group-data-[collapsible=icon]:pt-4 pt-4">
         <NavMain sections={navigationData.navSections} />

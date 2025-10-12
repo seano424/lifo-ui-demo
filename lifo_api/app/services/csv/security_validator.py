@@ -4,7 +4,6 @@ Consolidates all security validation logic across CSV processing modules
 """
 
 import re
-from typing import List
 
 import chardet
 import magic
@@ -68,12 +67,12 @@ class CSVSecurityValidator:
     ) -> None:
         """
         Comprehensive file security validation
-        
+
         Args:
             file: FastAPI UploadFile object
             file_content: Raw file content bytes
             file_path: File path for validation
-            
+
         Raises:
             HTTPException: If security validation fails
         """
@@ -105,6 +104,7 @@ class CSVSecurityValidator:
                 self._validate_filename_security(file.filename)
             elif file_path:
                 import os
+
                 filename = os.path.basename(file_path)
                 self._validate_filename_security(filename)
 
@@ -123,8 +123,7 @@ class CSVSecurityValidator:
         except Exception as e:
             self.logger.error("CSV security validation failed", error=str(e))
             raise HTTPException(
-                status_code=500, 
-                detail=f"Security validation failed: {str(e)}"
+                status_code=500, detail=f"Security validation failed: {str(e)}"
             ) from e
 
     def _validate_filename_security(self, filename: str) -> None:
@@ -138,10 +137,7 @@ class CSVSecurityValidator:
 
         # Check file extension
         if not filename.lower().endswith(".csv"):
-            raise HTTPException(
-                status_code=400, 
-                detail="Only CSV files are allowed"
-            )
+            raise HTTPException(status_code=400, detail="Only CSV files are allowed")
 
     def _validate_content_security(self, content: bytes) -> None:
         """Validate file content security"""
@@ -165,12 +161,11 @@ class CSVSecurityValidator:
         # Try to decode as text for further validation
         try:
             text_content = content.decode("utf-8")
-            
+
             # Check for null bytes (binary indicator)
             if "\x00" in text_content:
                 raise HTTPException(
-                    status_code=400, 
-                    detail="File contains binary data, not CSV"
+                    status_code=400, detail="File contains binary data, not CSV"
                 )
 
             # Basic CSV structure validation
@@ -191,76 +186,71 @@ class CSVSecurityValidator:
 
         except UnicodeDecodeError as e:
             raise HTTPException(
-                status_code=400, 
-                detail="File is not valid UTF-8 text"
+                status_code=400, detail="File is not valid UTF-8 text"
             ) from e
 
     def _validate_encoding_security(self, content: bytes) -> None:
         """Validate file encoding security"""
         encoding_result = chardet.detect(content)
-        
+
         if encoding_result["confidence"] < 0.7:
             raise HTTPException(
                 status_code=400,
-                detail="File encoding is uncertain or potentially malicious"
+                detail="File encoding is uncertain or potentially malicious",
             )
 
         # Only allow safe encodings
         safe_encodings = ["utf-8", "ascii"]
         detected_encoding = encoding_result.get("encoding", "").lower()
-        
+
         if detected_encoding not in safe_encodings:
             self.logger.warning(
                 "Non-UTF-8 encoding detected",
                 detected_encoding=detected_encoding,
-                confidence=encoding_result["confidence"]
+                confidence=encoding_result["confidence"],
             )
 
     def validate_csv_content_patterns(self, csv_content: str) -> None:
         """
         Validate CSV content for dangerous patterns
-        
+
         Args:
             csv_content: Decoded CSV content string
-            
+
         Raises:
             HTTPException: If dangerous patterns detected
         """
         # Check content length
         if len(csv_content) > self.MAX_FILE_SIZE:
-            raise HTTPException(
-                status_code=413, 
-                detail="CSV content too large"
-            )
+            raise HTTPException(status_code=413, detail="CSV content too large")
 
         # Check for dangerous patterns in content
-        combined_pattern = '|'.join(self.DANGEROUS_PATTERNS)
-        
+        combined_pattern = "|".join(self.DANGEROUS_PATTERNS)
+
         if re.search(combined_pattern, csv_content, re.IGNORECASE | re.MULTILINE):
             raise HTTPException(
-                status_code=400, 
-                detail="CSV contains suspicious content patterns"
+                status_code=400, detail="CSV contains suspicious content patterns"
             )
 
         # Check for excessive special characters
         special_char_count = sum(
-            1 for char in csv_content 
+            1
+            for char in csv_content
             if not char.isalnum() and char not in ' ,.:-_\n\r\t"'
         )
-        
+
         if special_char_count > len(csv_content) * 0.1:  # More than 10% special chars
             raise HTTPException(
-                status_code=400,
-                detail="CSV contains excessive special characters"
+                status_code=400, detail="CSV contains excessive special characters"
             )
 
     def sanitize_csv_cell(self, value: str) -> str:
         """
         Sanitize CSV cell content to prevent injection
-        
+
         Args:
             value: Raw cell content
-            
+
         Returns:
             Sanitized cell content
         """
@@ -278,23 +268,22 @@ class CSVSecurityValidator:
 
         # Remove control characters
         sanitized = "".join(
-            char for char in sanitized 
-            if ord(char) >= 32 or char in "\t\n\r"
+            char for char in sanitized if ord(char) >= 32 or char in "\t\n\r"
         )
 
         # Limit length
         if len(sanitized) > self.MAX_CELL_LENGTH:
-            sanitized = sanitized[:self.MAX_CELL_LENGTH]
+            sanitized = sanitized[: self.MAX_CELL_LENGTH]
 
         return sanitized
 
     def validate_csv_structure_limits(self, rows: list[list[str]]) -> None:
         """
         Validate CSV structure against security limits
-        
+
         Args:
             rows: Parsed CSV rows
-            
+
         Raises:
             HTTPException: If limits exceeded
         """
@@ -307,8 +296,7 @@ class CSVSecurityValidator:
         for row_idx, row in enumerate(rows):
             if len(row) > self.MAX_COLUMNS:
                 raise HTTPException(
-                    status_code=400, 
-                    detail=f"Too many columns in row {row_idx + 1}"
+                    status_code=400, detail=f"Too many columns in row {row_idx + 1}"
                 )
 
             # Check cell content length

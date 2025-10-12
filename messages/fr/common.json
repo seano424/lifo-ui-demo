@@ -32,7 +32,11 @@
     "dateMustBeFuture": "La date doit être dans le futur"
   },
   "common": {
-    "more": "Plus"
+    "more": "Plus",
+    "aria": {
+      "toggleTheme": "Changer le thème",
+      "selectLanguage": "Sélectionner la langue"
+    }
   },
   "breadcrumbs": {
     "batches": "Lots",

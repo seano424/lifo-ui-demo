@@ -32,7 +32,11 @@
     "dateMustBeFuture": "Datum moet in de toekomst liggen"
   },
   "common": {
-    "more": "Meer"
+    "more": "Meer",
+    "aria": {
+      "toggleTheme": "Thema wisselen",
+      "selectLanguage": "Taal selecteren"
+    }
   },
   "breadcrumbs": {
     "batches": "Partijen",

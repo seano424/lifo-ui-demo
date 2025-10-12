@@ -6,13 +6,14 @@ import { setActiveStoreCookie } from '@/lib/actions/store-actions'
 import { queryKeys } from '@/lib/queries/query-keys'
 import {
   fetchStoreById,
-  fetchUserPreferences,
   fetchUserStores,
   type Store,
   selectDefaultStore,
   updateUserPrimaryStore,
 } from '@/lib/queries/stores'
+import { fetchUserPreferencesRPC } from '@/lib/queries/stores-rpc'
 import { useStoreState } from '@/lib/stores/store-context'
+import { logger } from '@/lib/utils/logger'
 import { useCurrentUser } from './use-users'
 
 const ACTIVE_STORE_KEY = 'activeStoreId'
@@ -37,38 +38,47 @@ export function useUserStores() {
 
   const userPreferencesResult = useQuery({
     queryKey: queryKeys.userPreferences.detail(currentUser?.id || ''),
-    queryFn: () => {
-      return fetchUserPreferences()
-    },
+    queryFn: () => fetchUserPreferencesRPC(),
     enabled: !!currentUser?.id,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 10 * 60 * 1000, // 10 minutes
+    staleTime: 10 * 60 * 1000, // 10 minutes - preferences rarely change
+    gcTime: 30 * 60 * 1000, // 30 minutes
     refetchOnMount: false, // Don't refetch if we have cached data
     refetchOnWindowFocus: false, // Don't refetch on window focus
+    refetchOnReconnect: false, // Don't refetch on network reconnect
   })
 
   // Auto-select store when data loads
   useEffect(() => {
-    if (userStoresResult.data && userStoresResult.data.length > 0 && !activeStore) {
+    if (userStoresResult.data && userStoresResult.data.length > 0) {
       setLoadingStores(userStoresResult.isLoading)
 
-      // Store the complete UserStore objects
+      // Always sync Zustand with React Query data
       setUserStores(userStoresResult.data)
 
-      // Get last active store from localStorage
-      const lastActiveStoreId =
-        typeof window !== 'undefined' ? localStorage.getItem(ACTIVE_STORE_KEY) : null
-      const primaryStoreId = userPreferencesResult.data?.primary_store_id
+      // Only auto-select if no active store yet
+      if (!activeStore) {
+        // Get last active store from localStorage
+        const lastActiveStoreId =
+          typeof window !== 'undefined' ? localStorage.getItem(ACTIVE_STORE_KEY) : null
+        const primaryStoreId = userPreferencesResult.data?.primary_store_id
 
-      // Use smart selection logic
-      const storeToSelect = selectDefaultStore(
-        userStoresResult.data,
-        primaryStoreId || null,
-        lastActiveStoreId,
-      )
+        // Use smart selection logic
+        const storeToSelect = selectDefaultStore(
+          userStoresResult.data,
+          primaryStoreId || null,
+          lastActiveStoreId,
+        )
 
-      if (storeToSelect) {
-        setActiveStore(storeToSelect)
+        if (storeToSelect) {
+          setActiveStore(storeToSelect)
+          // Also sync cookie for server-side consistency
+          setActiveStoreCookie(storeToSelect.store_id).catch(error => {
+            logger.error('hooks/use-stores', 'Failed to sync active store cookie', {
+              error: error instanceof Error ? error.message : String(error),
+              storeId: storeToSelect.store_id,
+            })
+          })
+        }
       }
     }
   }, [
@@ -154,7 +164,11 @@ export function useStoreActions() {
         toast.success(`Switched to ${newStore.store_name}`)
       }
     } catch (error) {
-      console.error('[useStoreActions.switchStore] Error:', error)
+      logger.error('hooks/use-stores', 'Failed to switch stores', {
+        error: error instanceof Error ? error.message : String(error),
+        newStoreId: newStore.store_id,
+        newStoreName: newStore.store_name,
+      })
       toast.error('Failed to switch stores')
     } finally {
       setChangingStore(false)

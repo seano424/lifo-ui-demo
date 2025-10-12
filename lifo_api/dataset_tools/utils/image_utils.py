@@ -1,9 +1,9 @@
 """
 Image processing and validation utilities.
 """
-import io
+
 from pathlib import Path
-from typing import Tuple, Optional, Dict, Any
+from typing import Dict, Any
 import numpy as np
 from PIL import Image, ExifTags
 import logging
@@ -13,13 +13,14 @@ try:
     from app.core.opencv_fallback import (
         safe_cv2_import,
         safe_laplacian_variance,
-        safe_rgb_to_grayscale
+        safe_rgb_to_grayscale,
     )
 except ImportError:
     # Fallback for when running outside main app context
     def safe_cv2_import():
         try:
             import cv2
+
             return cv2
         except ImportError:
             return None
@@ -31,18 +32,22 @@ except ImportError:
         # Basic fallback
         kernel = np.array([[0, 1, 0], [1, -4, 1], [0, 1, 0]], dtype=np.float64)
         from scipy import ndimage
+
         laplacian = ndimage.convolve(gray_image.astype(np.float64), kernel)
         return float(np.var(laplacian))
 
     def safe_rgb_to_grayscale(rgb_image):
         if len(rgb_image.shape) == 2:
             return rgb_image
-        return np.dot(rgb_image[...,:3], [0.299, 0.587, 0.114]).astype(np.uint8)
+        return np.dot(rgb_image[..., :3], [0.299, 0.587, 0.114]).astype(np.uint8)
+
 
 logger = logging.getLogger(__name__)
 
 
-def validate_image(image_path: Path, min_width: int = 300, min_height: int = 300) -> bool:
+def validate_image(
+    image_path: Path, min_width: int = 300, min_height: int = 300
+) -> bool:
     """
     Validate image file for basic quality requirements.
 
@@ -90,7 +95,7 @@ def get_image_metadata(image_path: Path) -> Dict[str, Any]:
         "format": None,
         "mode": None,
         "has_exif": False,
-        "exif_data": {}
+        "exif_data": {},
     }
 
     try:
@@ -103,7 +108,7 @@ def get_image_metadata(image_path: Path) -> Dict[str, Any]:
             metadata["mode"] = img.mode
 
             # Extract EXIF data
-            if hasattr(img, '_getexif'):
+            if hasattr(img, "_getexif"):
                 exif_data = img._getexif()
                 if exif_data:
                     metadata["has_exif"] = True
@@ -123,7 +128,7 @@ def resize_image(
     output_path: Path,
     max_width: int = 1024,
     max_height: int = 1024,
-    quality: int = 85
+    quality: int = 85,
 ) -> bool:
     """
     Resize image while maintaining aspect ratio.
@@ -141,8 +146,8 @@ def resize_image(
     try:
         with Image.open(image_path) as img:
             # Convert to RGB if necessary (for JPEG output)
-            if img.mode in ('RGBA', 'LA', 'P'):
-                img = img.convert('RGB')
+            if img.mode in ("RGBA", "LA", "P"):
+                img = img.convert("RGB")
 
             # Calculate new dimensions
             img.thumbnail((max_width, max_height), Image.Resampling.LANCZOS)
@@ -181,20 +186,20 @@ def detect_text_regions(image_path: Path, confidence_threshold: float = 0.5) -> 
             return []
 
         # Get image dimensions
-        (H, W) = image.shape[:2]
+        # (H, W) = image.shape[:2]
 
         # Resize image for EAST detector (multiple of 32)
-        new_W, new_H = 320, 320
-        ratio_W = W / float(new_W)
-        ratio_H = H / float(new_H)
+        # new_W, new_H = 320, 320
+        # ratio_W = W / float(new_W)
+        # ratio_H = H / float(new_H)
 
-        image_resized = cv2.resize(image, (new_W, new_H))
+        # image_resized = cv2.resize(image, (new_W, new_H))
 
         # Create blob for text detection
-        blob = cv2.dnn.blobFromImage(
-            image_resized, 1.0, (new_W, new_H),
-            (123.68, 116.78, 103.94), swapRB=True, crop=False
-        )
+        # blob = cv2.dnn.blobFromImage(
+        #     image_resized, 1.0, (new_W, new_H),
+        #     (123.68, 116.78, 103.94), swapRB=True, crop=False
+        # )
 
         # Note: EAST text detector would need to be loaded here
         # For now, return empty list as EAST model is not included
@@ -233,8 +238,8 @@ def calculate_image_quality_score(image_path: Path) -> float:
         else:
             # Fallback using PIL
             with Image.open(image_path) as pil_image:
-                if pil_image.mode != 'L':
-                    pil_image = pil_image.convert('RGB')
+                if pil_image.mode != "L":
+                    pil_image = pil_image.convert("RGB")
                     image_array = np.array(pil_image)
                     gray = safe_rgb_to_grayscale(image_array)
                 else:
@@ -255,7 +260,9 @@ def calculate_image_quality_score(image_path: Path) -> float:
         contrast_score = min(contrast / 64.0, 1.0)
 
         # Combined quality score
-        quality_score = (sharpness_score * 0.5 + brightness_score * 0.25 + contrast_score * 0.25)
+        quality_score = (
+            sharpness_score * 0.5 + brightness_score * 0.25 + contrast_score * 0.25
+        )
 
         return max(0.0, min(1.0, quality_score))
 

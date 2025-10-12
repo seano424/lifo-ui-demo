@@ -6,9 +6,9 @@ Provides background task scheduling for automatic inventory scoring updates
 import asyncio
 import uuid
 
-from datetime import datetime, timedelta
+from datetime import datetime
 
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import structlog
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
@@ -16,14 +16,10 @@ from apscheduler.triggers.cron import CronTrigger
 from apscheduler.triggers.interval import IntervalTrigger
 from pydantic import BaseModel, Field
 
-from sqlalchemy.ext.asyncio import AsyncSession
-
 
 from app.core.config import settings
 from app.core.scoring import create_scoring_service
 from app.database.connection import get_async_session
-
-from app.database.read_only_operations import get_read_only_operations
 
 
 logger = structlog.get_logger()
@@ -39,23 +35,21 @@ class ScoringScheduleConfig(BaseModel):
     # Cron configuration (for cron schedule_type)
     cron_expression: str | None = Field(
         default="0 */4 * * *",  # Every 4 hours by default
-        description="Cron expression (minute hour day month day_of_week)"
+        description="Cron expression (minute hour day month day_of_week)",
     )
 
     # Interval configuration (for interval schedule_type)
     interval_hours: int | None = Field(
-        default=4,
-        description="Hours between scoring runs (for interval type)"
+        default=4, description="Hours between scoring runs (for interval type)"
     )
 
     # Scoring options
     force_recalculate: bool = Field(
-        default=False,
-        description="Force recalculation of all scores"
+        default=False, description="Force recalculation of all scores"
     )
     full_rescore: bool = Field(
         default=False,
-        description="Score ALL batches (not limited to 1000). Use for nightly comprehensive rescoring."
+        description="Score ALL batches (not limited to 1000). Use for nightly comprehensive rescoring.",
     )
     enabled: bool = Field(default=True, description="Whether schedule is active")
 
@@ -66,7 +60,9 @@ class ScoringScheduleConfig(BaseModel):
 
     # Performance settings
     batch_size: int = Field(default=500, description="Batch size for scoring")
-    timeout_minutes: int = Field(default=15, description="Timeout for scoring operation")
+    timeout_minutes: int = Field(
+        default=15, description="Timeout for scoring operation"
+    )
 
 
 class ScoringJobResult(BaseModel):
@@ -104,7 +100,9 @@ class AutomatedScoringScheduler:
         self.scheduler = AsyncIOScheduler()
         self.active_schedules: dict[str, ScoringScheduleConfig] = {}
         self.job_results: dict[str, ScoringJobResult] = {}
-        self.logger = structlog.get_logger().bind(component="automated_scoring_scheduler")
+        self.logger = structlog.get_logger().bind(
+            component="automated_scoring_scheduler"
+        )
         self._is_running = False
 
     async def start_scheduler(self):
@@ -160,11 +158,12 @@ class AutomatedScoringScheduler:
 
             # Create trigger based on schedule type
             if config.schedule_type == "cron":
-                trigger = self._create_cron_trigger(config.cron_expression, config.timezone)
+                trigger = self._create_cron_trigger(
+                    config.cron_expression, config.timezone
+                )
             elif config.schedule_type == "interval":
                 trigger = IntervalTrigger(
-                    hours=config.interval_hours,
-                    timezone=config.timezone
+                    hours=config.interval_hours, timezone=config.timezone
                 )
             else:
                 raise ValueError(f"Invalid schedule_type: {config.schedule_type}")
@@ -179,7 +178,7 @@ class AutomatedScoringScheduler:
                 name=f"Automated scoring for store {config.store_id}",
                 misfire_grace_time=300,  # 5 minutes grace time
                 coalesce=True,  # Combine missed executions
-                replace_existing=True
+                replace_existing=True,
             )
 
             # Store configuration
@@ -190,8 +189,12 @@ class AutomatedScoringScheduler:
                 schedule_id=schedule_id,
                 store_id=config.store_id,
                 schedule_type=config.schedule_type,
-                cron_expression=config.cron_expression if config.schedule_type == "cron" else None,
-                interval_hours=config.interval_hours if config.schedule_type == "interval" else None
+                cron_expression=config.cron_expression
+                if config.schedule_type == "cron"
+                else None,
+                interval_hours=config.interval_hours
+                if config.schedule_type == "interval"
+                else None,
             )
 
             return schedule_id
@@ -201,7 +204,7 @@ class AutomatedScoringScheduler:
                 "Failed to add scoring schedule",
                 schedule_id=config.schedule_id,
                 store_id=config.store_id,
-                error=str(e)
+                error=str(e),
             )
             raise
 
@@ -229,7 +232,7 @@ class AutomatedScoringScheduler:
                 self.logger.info(
                     "Scoring schedule removed successfully",
                     schedule_id=schedule_id,
-                    store_id=config.store_id
+                    store_id=config.store_id,
                 )
                 return True
 
@@ -239,11 +242,13 @@ class AutomatedScoringScheduler:
             self.logger.error(
                 "Failed to remove scoring schedule",
                 schedule_id=schedule_id,
-                error=str(e)
+                error=str(e),
             )
             return False
 
-    async def update_scoring_schedule(self, schedule_id: str, config: ScoringScheduleConfig) -> bool:
+    async def update_scoring_schedule(
+        self, schedule_id: str, config: ScoringScheduleConfig
+    ) -> bool:
         """
         Update an existing scoring schedule
 
@@ -265,7 +270,7 @@ class AutomatedScoringScheduler:
             self.logger.info(
                 "Scoring schedule updated successfully",
                 schedule_id=schedule_id,
-                store_id=config.store_id
+                store_id=config.store_id,
             )
 
             return True
@@ -274,7 +279,7 @@ class AutomatedScoringScheduler:
             self.logger.error(
                 "Failed to update scoring schedule",
                 schedule_id=schedule_id,
-                error=str(e)
+                error=str(e),
             )
             return False
 
@@ -298,7 +303,8 @@ class AutomatedScoringScheduler:
 
             # Get recent job results
             recent_results = [
-                result for result in self.job_results.values()
+                result
+                for result in self.job_results.values()
                 if result.schedule_id == schedule_id
             ]
             recent_results.sort(key=lambda x: x.started_at, reverse=True)
@@ -312,29 +318,31 @@ class AutomatedScoringScheduler:
                 "cron_expression": config.cron_expression,
                 "interval_hours": config.interval_hours,
                 "timezone": config.timezone,
-                "next_run_time": job.next_run_time.isoformat() if job and job.next_run_time else None,
+                "next_run_time": job.next_run_time.isoformat()
+                if job and job.next_run_time
+                else None,
                 "recent_executions": [
                     {
                         "job_id": result.job_id,
                         "started_at": result.started_at.isoformat(),
-                        "completed_at": result.completed_at.isoformat() if result.completed_at else None,
+                        "completed_at": result.completed_at.isoformat()
+                        if result.completed_at
+                        else None,
                         "status": result.status,
                         "processed_items": result.processed_items,
                         "processing_time_ms": result.processing_time_ms,
                         "items_per_second": result.items_per_second,
-                        "error_message": result.error_message
+                        "error_message": result.error_message,
                     }
                     for result in recent_results
-                ]
+                ],
             }
 
             return status
 
         except Exception as e:
             self.logger.error(
-                "Failed to get schedule status",
-                schedule_id=schedule_id,
-                error=str(e)
+                "Failed to get schedule status", schedule_id=schedule_id, error=str(e)
             )
             return None
 
@@ -354,7 +362,9 @@ class AutomatedScoringScheduler:
 
         return schedules
 
-    async def trigger_immediate_scoring(self, store_id: str, force_recalculate: bool = False) -> str:
+    async def trigger_immediate_scoring(
+        self, store_id: str, force_recalculate: bool = False
+    ) -> str:
         """
         Trigger immediate scoring for a store (outside of schedule)
 
@@ -370,7 +380,7 @@ class AutomatedScoringScheduler:
             config = ScoringScheduleConfig(
                 store_id=store_id,
                 force_recalculate=force_recalculate,
-                schedule_type="immediate"
+                schedule_type="immediate",
             )
 
             # Execute immediately
@@ -383,16 +393,14 @@ class AutomatedScoringScheduler:
                 "Immediate scoring triggered",
                 store_id=store_id,
                 job_id=job_id,
-                force_recalculate=force_recalculate
+                force_recalculate=force_recalculate,
             )
 
             return job_id
 
         except Exception as e:
             self.logger.error(
-                "Failed to trigger immediate scoring",
-                store_id=store_id,
-                error=str(e)
+                "Failed to trigger immediate scoring", store_id=store_id, error=str(e)
             )
             raise
 
@@ -408,12 +416,16 @@ class AutomatedScoringScheduler:
         """
         return self.job_results.get(job_id)
 
-    def _create_cron_trigger(self, cron_expression: str, timezone: str = "UTC") -> CronTrigger:
+    def _create_cron_trigger(
+        self, cron_expression: str, timezone: str = "UTC"
+    ) -> CronTrigger:
         """Create cron trigger from expression"""
         try:
             parts = cron_expression.strip().split()
             if len(parts) != 5:
-                raise ValueError("Cron expression must have 5 parts: minute hour day month day_of_week")
+                raise ValueError(
+                    "Cron expression must have 5 parts: minute hour day month day_of_week"
+                )
 
             minute, hour, day, month, day_of_week = parts
 
@@ -423,14 +435,14 @@ class AutomatedScoringScheduler:
                 day=day,
                 month=month,
                 day_of_week=day_of_week,
-                timezone=timezone
+                timezone=timezone,
             )
 
         except Exception as e:
             self.logger.error(
                 "Failed to create cron trigger",
                 cron_expression=cron_expression,
-                error=str(e)
+                error=str(e),
             )
             raise ValueError(f"Invalid cron expression: {cron_expression}")
 
@@ -439,13 +451,15 @@ class AutomatedScoringScheduler:
         job_id = f"job_{uuid.uuid4()}"
         await self._execute_scoring_job_with_id(config, job_id)
 
-    async def _execute_scoring_job_with_id(self, config: ScoringScheduleConfig, job_id: str):
+    async def _execute_scoring_job_with_id(
+        self, config: ScoringScheduleConfig, job_id: str
+    ):
         """Execute a scoring job with specific ID"""
         result = ScoringJobResult(
             job_id=job_id,
             schedule_id=config.schedule_id,
             store_id=config.store_id,
-            started_at=datetime.utcnow()
+            started_at=datetime.utcnow(),
         )
 
         # Store initial result
@@ -455,7 +469,7 @@ class AutomatedScoringScheduler:
             "Starting automated scoring job",
             job_id=job_id,
             schedule_id=config.schedule_id,
-            store_id=config.store_id
+            store_id=config.store_id,
         )
 
         try:
@@ -470,28 +484,26 @@ class AutomatedScoringScheduler:
                     self.logger.info(
                         "Executing FULL rescore (all batches)",
                         job_id=job_id,
-                        store_id=config.store_id
+                        store_id=config.store_id,
                     )
                     scoring_result = await asyncio.wait_for(
                         scoring_service.score_store_inventory(
-                            config.store_id,
-                            recalculate_all=config.force_recalculate
+                            config.store_id, recalculate_all=config.force_recalculate
                         ),
-                        timeout=config.timeout_minutes * 60
+                        timeout=config.timeout_minutes * 60,
                     )
                 else:
                     # Standard bulk: Score top 1000 most urgent batches
                     self.logger.info(
                         "Executing standard bulk rescore (1000 most urgent batches)",
                         job_id=job_id,
-                        store_id=config.store_id
+                        store_id=config.store_id,
                     )
                     scoring_result = await asyncio.wait_for(
                         scoring_service.score_store_inventory_bulk(
-                            config.store_id,
-                            recalculate_all=config.force_recalculate
+                            config.store_id, recalculate_all=config.force_recalculate
                         ),
-                        timeout=config.timeout_minutes * 60
+                        timeout=config.timeout_minutes * 60,
                     )
 
                 # Update result with success data
@@ -499,13 +511,19 @@ class AutomatedScoringScheduler:
                 result.status = "completed"
                 result.total_items = scoring_result.get("total_items", 0)
                 result.processed_items = scoring_result.get("processed", 0)
-                result.high_priority_count = scoring_result.get("high_priority_count", 0)
+                result.high_priority_count = scoring_result.get(
+                    "high_priority_count", 0
+                )
                 result.processing_time_ms = scoring_result.get("processing_time_ms", 0)
-                result.database_operations = scoring_result.get("database_operations", {})
+                result.database_operations = scoring_result.get(
+                    "database_operations", {}
+                )
 
                 # Calculate performance metrics
                 if result.processing_time_ms > 0:
-                    result.items_per_second = (result.processed_items * 1000) / result.processing_time_ms
+                    result.items_per_second = (
+                        result.processed_items * 1000
+                    ) / result.processing_time_ms
 
                 self.logger.info(
                     "Automated scoring job completed successfully",
@@ -515,20 +533,22 @@ class AutomatedScoringScheduler:
                     processed_items=result.processed_items,
                     processing_time_ms=result.processing_time_ms,
                     items_per_second=result.items_per_second,
-                    high_priority_count=result.high_priority_count
+                    high_priority_count=result.high_priority_count,
                 )
 
         except TimeoutError:
             result.completed_at = datetime.utcnow()
             result.status = "timeout"
-            result.error_message = f"Scoring timed out after {config.timeout_minutes} minutes"
+            result.error_message = (
+                f"Scoring timed out after {config.timeout_minutes} minutes"
+            )
 
             self.logger.error(
                 "Automated scoring job timed out",
                 job_id=job_id,
                 schedule_id=config.schedule_id,
                 store_id=config.store_id,
-                timeout_minutes=config.timeout_minutes
+                timeout_minutes=config.timeout_minutes,
             )
 
         except Exception as e:
@@ -541,7 +561,7 @@ class AutomatedScoringScheduler:
                 job_id=job_id,
                 schedule_id=config.schedule_id,
                 store_id=config.store_id,
-                error=str(e)
+                error=str(e),
             )
 
             # Implement retry logic if configured
@@ -550,7 +570,7 @@ class AutomatedScoringScheduler:
                     "Scheduling retry for failed scoring job",
                     job_id=job_id,
                     retry_count=result.retry_count + 1,
-                    max_retries=config.max_retries
+                    max_retries=config.max_retries,
                 )
 
                 # Schedule retry after delay
@@ -565,7 +585,9 @@ class AutomatedScoringScheduler:
             # Clean up old results (keep last 100 per schedule)
             await self._cleanup_old_results(config.schedule_id)
 
-    async def _schedule_retry(self, config: ScoringScheduleConfig, original_job_id: str, retry_count: int):
+    async def _schedule_retry(
+        self, config: ScoringScheduleConfig, original_job_id: str, retry_count: int
+    ):
         """Schedule a retry for a failed job"""
         try:
             # Wait for retry delay
@@ -586,7 +608,7 @@ class AutomatedScoringScheduler:
                 "Failed to execute retry",
                 original_job_id=original_job_id,
                 retry_count=retry_count,
-                error=str(e)
+                error=str(e),
             )
 
     async def _cleanup_old_results(self, schedule_id: str):
@@ -594,7 +616,8 @@ class AutomatedScoringScheduler:
         try:
             # Get results for this schedule
             schedule_results = [
-                (job_id, result) for job_id, result in self.job_results.items()
+                (job_id, result)
+                for job_id, result in self.job_results.items()
                 if result.schedule_id == schedule_id
             ]
 
@@ -611,14 +634,12 @@ class AutomatedScoringScheduler:
                     "Cleaned up old job results",
                     schedule_id=schedule_id,
                     removed_count=len(to_remove),
-                    remaining_count=100
+                    remaining_count=100,
                 )
 
         except Exception as e:
             self.logger.warning(
-                "Failed to cleanup old results",
-                schedule_id=schedule_id,
-                error=str(e)
+                "Failed to cleanup old results", schedule_id=schedule_id, error=str(e)
             )
 
     async def _load_default_schedules(self):
@@ -638,7 +659,7 @@ class AutomatedScoringScheduler:
                 "Default schedules loaded (implement store discovery as needed)",
                 default_cron=default_cron,
                 default_full_rescore_cron=default_full_rescore_cron,
-                default_timezone=default_timezone
+                default_timezone=default_timezone,
             )
 
             # TODO: Implement automatic discovery of active stores and creation of default schedules

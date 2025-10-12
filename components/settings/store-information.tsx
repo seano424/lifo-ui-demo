@@ -36,6 +36,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { AddStoreFlow } from './add-store-flow'
+import { DeactivateStoreDialog } from './deactivate-store-dialog'
 
 interface StoreInformationProps {
   serverPermissions?: UserStorePermissions // Server-computed permissions
@@ -241,13 +242,13 @@ export default function StoreInformation({
     return () => subscription.unsubscribe()
   }, [isEditing, form.watch]) // Removed form from dependencies as it's stable
 
-  const handleSave = async (data: StoreInfoFormData) => {
+  const handleSave = (data: StoreInfoFormData) => {
     try {
       const cleanedData = Object.fromEntries(
         Object.entries(data).map(([key, value]) => [key, value === '' ? null : value]),
       )
 
-      await updateBasicInfo(cleanedData)
+      updateBasicInfo(cleanedData)
       setIsEditing(false)
       setHasUnsavedChanges(false)
     } catch (error) {
@@ -354,7 +355,7 @@ export default function StoreInformation({
       {/* Manage Multiple Stores Section */}
       <Card className="mb-4">
         <CardHeader className="py-4">
-          <div className="flex items-center justify-between gap-2">
+          <div className="flex flex-col gap-4 sm:flex-row items-center justify-between">
             <div className="flex flex-col gap-2">
               <Typography variant="h3" className="flex font-black items-center gap-2">
                 {t('storeInformation.manageMultipleStores')}
@@ -378,9 +379,9 @@ export default function StoreInformation({
       {/* Store Information Section */}
       <Card className="shadow-primary-300 border-t-0">
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <Typography variant="h3" className="flex font-black items-center gap-2">
+          <div className="flex flex-col gap-4 sm:flex-row items-center justify-between">
+            <div className="flex flex-col gap-2 pb-2">
+              <Typography variant="h3" className="flex font-black items-center">
                 {t('storeInformation.title')}
               </Typography>
               <Typography variant="p" color="muted">
@@ -805,31 +806,31 @@ export default function StoreInformation({
               </div>
             )}
           </form>
-
-          {process.env.NODE_ENV === 'development' && (
-            <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-2xl">
-              <Typography variant="p" className="font-medium text-yellow-800 mb-2">
-                Debug: Store Information: Only visible in development mode
-              </Typography>
-              <pre className="text-xs bg-white p-2 rounded-2xl border overflow-auto max-h-32">
-                {JSON.stringify(
-                  {
-                    propStoreId,
-                    contextStoreId,
-                    effectiveStoreId,
-                    hasStoreData: !!storeData,
-                    isLoading,
-                    serverPermissions: !!serverPermissions,
-                    permissionsLoading: permissions.isLoading,
-                  },
-                  null,
-                  2,
-                )}
-              </pre>
-            </div>
-          )}
         </CardContent>
       </Card>
+
+      {/* Danger Zone - Store Deactivation */}
+      {permissions.isOwner && storeData && (
+        <Card className="border-destructive">
+          <CardHeader>
+            <Typography variant="h3" className="font-black text-destructive">
+              Danger Zone
+            </Typography>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-2">
+              <Typography variant="p" color="muted">
+                Deactivate your store and anonymize employee data.
+              </Typography>
+
+              <DeactivateStoreDialog
+                store={storeData}
+                canDeactivate={permissions.isOwner ?? false}
+              />
+            </div>
+          </CardContent>
+        </Card>
+      )}
       <BottomSheet
         isOpen={isAddStoreOpen}
         variant="fullHeight"

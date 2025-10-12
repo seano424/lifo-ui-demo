@@ -1,9 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
+import { clearActiveStoreCookie } from '@/lib/actions/store-actions'
 import { usePermissionsNew } from '@/hooks/use-complete-user-profile'
 import { useCurrentUser } from '@/hooks/use-users'
 import { queryKeys } from '@/lib/queries/query-keys'
 import {
+  deactivateStore,
   debugStoreAccess,
   fetchStoreSettings,
   type StoreAdvancedSettings,
@@ -458,5 +461,67 @@ export function useStoreImageUpload() {
   return {
     uploadImage: uploadImage.mutate,
     isUploading: uploadImage.isPending,
+  }
+}
+
+// Hook for store deactivation
+export function useDeactivateStore() {
+  const queryClient = useQueryClient()
+  const activeStoreId = useActiveStoreId()
+  const router = useRouter()
+  const { data: currentUser } = useCurrentUser()
+  const { clearActiveStore } = useStoreState()
+
+  const deactivateMutation = useMutation({
+    mutationFn: async () => {
+      if (!activeStoreId) {
+        throw new Error('No active store selected')
+      }
+      return deactivateStore(activeStoreId)
+    },
+    onSuccess: async data => {
+      // CRITICAL: Clear server-side cookie FIRST to prevent race condition
+      await clearActiveStoreCookie()
+
+      // Then clear the active store from Zustand state and localStorage
+      clearActiveStore()
+
+      toast.success(data.message || 'Store deactivated successfully', {
+        description: `${data.employees_anonymized} employee records anonymized for GDPR compliance.`,
+      })
+
+      // Redirect to dashboard root FIRST (will trigger store selection)
+      router.push('/dashboard')
+
+      // Delay query invalidation until after navigation starts
+      // This prevents race conditions with auth state during navigation
+      setTimeout(() => {
+        // Invalidate all store-related queries including store details
+        queryClient.invalidateQueries({ queryKey: queryKeys.stores.all })
+        if (currentUser?.id) {
+          queryClient.invalidateQueries({
+            queryKey: queryKeys.stores.userStores(currentUser.id),
+          })
+        }
+        if (activeStoreId) {
+          queryClient.invalidateQueries({
+            queryKey: queryKeys.stores.detail(activeStoreId),
+          })
+        }
+
+        // Force server component refresh after queries are invalidated
+        router.refresh()
+      }, 100)
+    },
+    onError: error => {
+      toast.error(`Failed to deactivate store: ${error.message}`, {
+        description: 'Please try again or contact support if the problem persists.',
+      })
+    },
+  })
+
+  return {
+    deactivateStore: deactivateMutation.mutate,
+    isDeactivating: deactivateMutation.isPending,
   }
 }

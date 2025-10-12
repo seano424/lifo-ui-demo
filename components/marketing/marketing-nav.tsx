@@ -149,7 +149,7 @@ const MarketingNav = ({ menu }: MarketingNavProps) => {
           <NavbarLogo variant="text" href="/" />
           <Sheet>
             <SheetTrigger asChild>
-              <Button variant="outline" size="icon">
+              <Button variant="outline" size="icon" aria-label={t('menuButton')}>
                 <Menu className="size-4" />
               </Button>
             </SheetTrigger>

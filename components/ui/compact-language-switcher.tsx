@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -18,6 +19,7 @@ const LIFO_LANGUAGES = {
 
 export function CompactLanguageSwitcher() {
   const { currentLanguage, setLanguage, isLoading } = useLanguageStore()
+  const t = useTranslations('common.aria')
 
   const handleLanguageChange = async (language: string) => {
     await setLanguage(language as Language)
@@ -26,7 +28,13 @@ export function CompactLanguageSwitcher() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="icon" disabled={isLoading} className="rounded-full border">
+        <Button
+          variant="outline"
+          size="icon"
+          disabled={isLoading}
+          className="rounded-full border"
+          aria-label={t('selectLanguage')}
+        >
           <Globe className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>

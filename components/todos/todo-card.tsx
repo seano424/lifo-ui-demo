@@ -5,7 +5,7 @@ import { Typography } from '@/components/ui/typography'
 import type { TodoItem } from '@/lib/queries/todos-rpc'
 
 import { cn } from '@/lib/utils'
-import { formatRecommendation } from '@/lib/utils/todo-transformers'
+import { migrateRecommendation } from '@/lib/utils/recommendation-migration'
 import { Calendar, Package, PenLine, CheckIcon } from 'lucide-react'
 import { startOfDay, isToday, differenceInDays, addDays, isBefore } from 'date-fns'
 import { useTranslations } from 'next-intl'
@@ -18,46 +18,52 @@ interface TodoCardProps {
 // Move urgency config outside component for better performance
 const URGENCY_CONFIG = {
   critical: {
-    color: 'bg-primary-500',
-    textColor: 'text-primary-700',
-    bgColor: 'group-hover:bg-primary-500 border-primary-600',
-    badge: 'bg-primary-200 text-primary-800 border-primary-500',
+    color: 'bg-red-500',
+    textColor: 'text-red-700',
+    bgColor: 'group-hover:bg-red-500 bg-red-100',
+    badge: 'bg-red-200 text-red-800 border-red-500',
     badgeVariant: 'default' as const,
+    borderColor: 'border-red-500',
   },
   high: {
-    color: 'bg-primary-500',
-    textColor: 'text-primary-700',
-    bgColor: 'group-hover:bg-primary-50 border-primary-500',
-    badge: 'bg-primary-100 text-primary-800 border-primary-500',
+    color: 'bg-red-500',
+    textColor: 'text-red-700',
+    bgColor: 'group-hover:bg-red-50 bg-red-500',
+    badge: 'bg-red-100 text-red-800 border-red-500',
     badgeVariant: 'default' as const,
+    borderColor: 'border-red-500',
   },
   medium: {
     color: 'bg-primary-500',
     textColor: 'text-primary-700',
-    bgColor: 'group-hover:bg-primary-50 border-primary-500',
+    bgColor: 'group-hover:bg-primary-50 bg-primary-500',
     badge: 'bg-primary-100 text-primary-800 border-primary-500',
     badgeVariant: 'primary' as const,
+    borderColor: 'border-primary-500',
   },
   low: {
     color: 'bg-secondary-500',
     textColor: 'text-secondary-700',
-    bgColor: 'group-hover:bg-secondary-50 border-secondary-500',
+    bgColor: 'group-hover:bg-secondary-50 bg-secondary-500',
     badge: 'bg-secondary-100 text-secondary-800 border-secondary-500',
     badgeVariant: 'secondary' as const,
+    borderColor: 'border-secondary-500',
   },
   none: {
     color: 'bg-gray-500',
     textColor: 'text-gray-700',
-    bgColor: 'group-hover:bg-gray-50 border-gray-200',
+    bgColor: 'group-hover:bg-gray-50 bg-gray-500',
     badge: 'bg-gray-100 text-gray-800 border-gray-200',
     badgeVariant: 'secondary' as const,
+    borderColor: 'border-gray-500',
   },
   default: {
     color: 'bg-gray-500',
     textColor: 'text-gray-700',
-    bgColor: 'group-hover:bg-gray-50 border-gray-200',
+    bgColor: 'group-hover:bg-gray-50 bg-gray-500',
     badge: 'bg-gray-100 text-gray-800 border-gray-200',
     badgeVariant: 'secondary' as const,
+    borderColor: 'border-gray-500',
   },
 } as const
 
@@ -66,6 +72,22 @@ export function TodoCard({ todo, onClick }: TodoCardProps) {
 
   const handleCardClick = () => {
     onClick?.()
+  }
+
+  // Get standardized recommendation and translate it
+  const getRecommendationText = (recommendation: string | null | undefined): string => {
+    if (!recommendation) return t('card.noRecommendation')
+
+    // Migrate legacy recommendations to standard format
+    const standardRec = migrateRecommendation(recommendation)
+
+    // Try to get translation, fallback to formatted text if translation doesn't exist
+    try {
+      return t(`recommendations.${standardRec}`)
+    } catch {
+      // Fallback: capitalize and format if translation missing
+      return standardRec.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+    }
   }
 
   // Format expiry date with reliable timezone handling using date-fns
@@ -119,16 +141,20 @@ export function TodoCard({ todo, onClick }: TodoCardProps) {
   return (
     <button
       type="button"
-      className={cn('cursor-pointer transition-all duration-1000', 'border-b flex flex-col')}
+      className={cn(
+        'cursor-pointer transition-all duration-1000',
+        'border rounded-2xl p-4 flex flex-col',
+        urgencyConfig.borderColor,
+      )}
       onClick={handleCardClick}
     >
-      <div className="flex gap-3 px-4 pb-6 items-start relative group">
+      <div className="flex gap-3 items-start relative group">
         <Badge
           variant="outline"
           className={cn(
             'border-2 rounded-full cursor-pointer',
             'sm:h-6 sm:w-6 h-5 w-5 p-0 bg-brand-white dark:bg-brand-dark transition-all duration-200 items-center justify-center',
-            urgencyConfig.bgColor,
+            urgencyConfig.badge,
           )}
         >
           {isCompleted && (
@@ -146,7 +172,7 @@ export function TodoCard({ todo, onClick }: TodoCardProps) {
               <Typography className="flex gap-1 sm:w-8/12">
                 <span className="flex-shrink-0">{t('card.suggestion')}</span>
                 <span className="truncate lowercase">
-                  {formatRecommendation(todo.ai_recommendation || t('card.noRecommendation'))}
+                  {getRecommendationText(todo.ai_recommendation)}
                 </span>
               </Typography>
             </div>
@@ -163,7 +189,9 @@ export function TodoCard({ todo, onClick }: TodoCardProps) {
               {!isCompleted && (
                 <Typography variant="muted" className="flex items-center gap-1 px-2">
                   <Package className="h-3 w-3" />
-                  {t('card.unitsLeft', { quantity: todo.current_quantity ?? 0 })}
+                  {t('card.unitsLeft', {
+                    quantity: todo.current_quantity ?? 0,
+                  })}
                 </Typography>
               )}
 
@@ -198,13 +226,17 @@ export function TodoCard({ todo, onClick }: TodoCardProps) {
                 !wasDiscounted &&
                 !isCompleted && (
                   <Badge variant={urgencyConfig.badgeVariant}>
-                    {t('card.suggestedDiscount', { percent: todo.last_discount_percent })}
+                    {t('card.suggestedDiscount', {
+                      percent: todo.last_discount_percent,
+                    })}
                   </Badge>
                 )}
 
               {wasDiscounted && (
                 <Badge variant={urgencyConfig.badgeVariant}>
-                  {t('card.currentlyDiscounted', { percent: todo.last_discount_percent ?? 0 })}
+                  {t('card.currentlyDiscounted', {
+                    percent: todo.last_discount_percent ?? 0,
+                  })}
                 </Badge>
               )}
 

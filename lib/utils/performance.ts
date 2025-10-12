@@ -13,8 +13,8 @@ export type PerformanceThreshold = {
 }
 
 export const DEFAULT_THRESHOLDS: PerformanceThreshold = {
-  warn: 200,
-  error: 500,
+  warn: 500,
+  error: 2000,
 }
 
 export class PerformanceTimer {
@@ -36,7 +36,7 @@ export class PerformanceTimer {
     this.thresholds = thresholds
     this.startTime = performance.now()
 
-    logger.log(context, `Starting: ${operation}`, metadata)
+    logger.query(context, `Starting: ${operation}`, metadata)
   }
 
   /**
@@ -57,9 +57,13 @@ export class PerformanceTimer {
         allMetadata,
       )
     } else if (duration > this.thresholds.warn) {
-      logger.warn(this.context, `Slow (>${this.thresholds.warn}ms): ${this.operation}`, allMetadata)
+      logger.queryWarn(
+        this.context,
+        `Slow (>${this.thresholds.warn}ms): ${this.operation}`,
+        allMetadata,
+      )
     } else {
-      logger.log(this.context, `Completed: ${this.operation}`, allMetadata)
+      logger.query(this.context, `Completed: ${this.operation}`, allMetadata)
     }
 
     return duration

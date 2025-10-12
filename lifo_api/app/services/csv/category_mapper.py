@@ -3,7 +3,7 @@ Centralized Category Mapping Service
 Consolidates all category mapping logic across CSV processing modules
 """
 
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import structlog
 from sqlalchemy import text
@@ -33,11 +33,9 @@ class CategoryMappingService:
         "légumes": "fresh_produce",
         "fruits et légumes": "fresh_produce",
         "fresh": "fresh_produce",
-        "organic": "fresh_produce",
-        
         # Meat and fish
         "meat": "fresh_meat_fish",
-        "fish": "fresh_meat_fish", 
+        "fish": "fresh_meat_fish",
         "seafood": "fresh_meat_fish",
         "poultry": "fresh_meat_fish",
         "viande": "fresh_meat_fish",
@@ -45,7 +43,6 @@ class CategoryMappingService:
         "chicken": "fresh_meat_fish",
         "beef": "fresh_meat_fish",
         "pork": "fresh_meat_fish",
-        
         # Dairy and eggs
         "dairy": "dairy_eggs",
         "milk": "dairy_eggs",
@@ -57,7 +54,6 @@ class CategoryMappingService:
         "lait": "dairy_eggs",
         "butter": "dairy_eggs",
         "cream": "dairy_eggs",
-        
         # Bakery
         "bakery": "bakery_fresh",
         "bread": "bakery_fresh",
@@ -67,7 +63,6 @@ class CategoryMappingService:
         "cake": "bakery_fresh",
         "muffin": "bakery_fresh",
         "croissant": "bakery_fresh",
-        
         # Frozen foods
         "frozen": "frozen_foods",
         "frozen foods": "frozen_foods",
@@ -76,7 +71,6 @@ class CategoryMappingService:
         "ice cream": "frozen_foods",
         "frozen vegetables": "frozen_foods",
         "frozen meals": "frozen_foods",
-        
         # Deli and prepared
         "deli": "deli_prepared",
         "prepared": "deli_prepared",
@@ -84,13 +78,11 @@ class CategoryMappingService:
         "sandwiches": "deli_prepared",
         "salads": "deli_prepared",
         "cooked": "deli_prepared",
-        
         # Chilled packaged
         "chilled": "chilled_packaged",
         "packaged": "chilled_packaged",
         "refrigerated": "chilled_packaged",
         "cold": "chilled_packaged",
-        
         # Canned and jarred
         "canned": "canned_jarred",
         "jarred": "canned_jarred",
@@ -99,7 +91,6 @@ class CategoryMappingService:
         "jars": "canned_jarred",
         "cans": "canned_jarred",
         "conserve": "canned_jarred",
-        
         # Dry goods
         "dry": "dry_goods",
         "dry goods": "dry_goods",
@@ -110,7 +101,6 @@ class CategoryMappingService:
         "flour": "dry_goods",
         "beans": "dry_goods",
         "lentils": "dry_goods",
-        
         # Beverages
         "beverages": "beverages",
         "drinks": "beverages",
@@ -122,7 +112,6 @@ class CategoryMappingService:
         "tea": "beverages",
         "wine": "beverages",
         "beer": "beverages",
-        
         # Spices and condiments
         "spices": "spices_condiments",
         "condiments": "spices_condiments",
@@ -134,7 +123,6 @@ class CategoryMappingService:
         "pepper": "spices_condiments",
         "oil": "spices_condiments",
         "vinegar": "spices_condiments",
-        
         # Pantry staples
         "pantry": "pantry_staples",
         "staples": "pantry_staples",
@@ -142,13 +130,11 @@ class CategoryMappingService:
         "essentials": "pantry_staples",
         "baking": "pantry_staples",
         "sugar": "pantry_staples",
-        
         # Bulk items
         "bulk": "bulk_items",
         "wholesale": "bulk_items",
         "large": "bulk_items",
         "family size": "bulk_items",
-        
         # Specialty items
         "specialty": "specialty_items",
         "gourmet": "specialty_items",
@@ -156,7 +142,6 @@ class CategoryMappingService:
         "artisan": "specialty_items",
         "premium": "specialty_items",
         "imported": "specialty_items",
-        
         # Household and other
         "general": "household_other",
         "other": "household_other",
@@ -167,18 +152,6 @@ class CategoryMappingService:
         "office": "household_other",
         "miscellaneous": "household_other",
         "misc": "household_other",
-        
-        # Legacy mappings for backward compatibility
-        "dairy": "dairy_eggs",
-        "frozen": "frozen_foods",
-        "bakery": "bakery_fresh",
-        "produce": "fresh_produce",
-        "meat": "fresh_meat_fish",
-        "general": "household_other",
-        "pantry": "pantry_staples",
-        "canned": "canned_jarred",
-        "spices": "spices_condiments",
-        "bulk": "bulk_items",
     }
 
     # Shelf life mapping (days) for categories
@@ -204,7 +177,7 @@ class CategoryMappingService:
     RISK_LEVELS = {
         "fresh_produce": "high",
         "fresh_meat_fish": "very_high",
-        "bakery_fresh": "very_high", 
+        "bakery_fresh": "very_high",
         "dairy_eggs": "high",
         "deli_prepared": "very_high",
         "frozen_foods": "low",
@@ -221,67 +194,69 @@ class CategoryMappingService:
 
     def __init__(self):
         self.logger = logger.bind(component="category_mapper")
-        self._category_cache: dict[str, str] = {}  # category_code -> category_uuid cache
-        self._reverse_cache: dict[str, str] = {}   # category_uuid -> category_code cache
+        self._category_cache: dict[
+            str, str
+        ] = {}  # category_code -> category_uuid cache
+        self._reverse_cache: dict[str, str] = {}  # category_uuid -> category_code cache
 
     def map_category(self, raw_category: str) -> str:
         """
         Map raw category string to standardized category code
-        
+
         Args:
             raw_category: Raw category from CSV
-            
+
         Returns:
             Standardized category code
         """
         if not raw_category:
             return "dry_goods"  # Default fallback
-        
+
         category_str = str(raw_category).lower().strip()
-        
+
         # Direct mapping check
         if category_str in self.CATEGORY_MAPPING:
             return self.CATEGORY_MAPPING[category_str]
-        
+
         # Partial matching for flexibility
         for key, value in self.CATEGORY_MAPPING.items():
             if key in category_str or category_str in key:
                 return value
-        
+
         # Advanced fuzzy matching
         mapped_category = self._fuzzy_match_category(category_str)
         if mapped_category:
             return mapped_category
-        
+
         # Default fallback
         self.logger.warning(
             "Category mapping not found, using default",
             raw_category=raw_category,
-            fallback="dry_goods"
+            fallback="dry_goods",
         )
         return "dry_goods"
 
     def _fuzzy_match_category(self, category_str: str) -> str | None:
         """
         Perform fuzzy matching for category strings
-        
+
         Args:
             category_str: Category string to match
-            
+
         Returns:
             Matched category code or None
         """
         # Split into words for better matching
         words = category_str.split()
-        
+
         for word in words:
             if word in self.CATEGORY_MAPPING:
                 return self.CATEGORY_MAPPING[word]
-        
+
         # Check for common patterns
         patterns = {
             r".*meat.*": "fresh_meat_fish",
-            r".*fish.*": "fresh_meat_fish", 
+            r".*fish.*": "fresh_meat_fish",
             r".*dairy.*": "dairy_eggs",
             r".*milk.*": "dairy_eggs",
             r".*bread.*": "bakery_fresh",
@@ -294,37 +269,38 @@ class CategoryMappingService:
             r".*sauce.*": "spices_condiments",
             r".*clean.*": "household_other",
         }
-        
+
         import re
+
         for pattern, category in patterns.items():
             if re.search(pattern, category_str):
                 return category
-        
+
         return None
 
     async def resolve_category_uuid(self, category_code: str) -> str:
         """
         Resolve category code to UUID from database
-        
+
         Args:
             category_code: Standard category code
-            
+
         Returns:
             Category UUID or category_code as fallback
         """
         # Check cache first
         if category_code in self._category_cache:
             return self._category_cache[category_code]
-        
+
         try:
             if get_db_sync is None:
                 # Fallback: return category_code if no database access
                 self.logger.warning(
                     "No database access available, using category_code",
-                    category_code=category_code
+                    category_code=category_code,
                 )
                 return category_code
-            
+
             # Query database for category UUID
             with get_db_sync() as db:
                 result = db.execute(
@@ -333,7 +309,7 @@ class CategoryMappingService:
                     ),
                     {"code": category_code},
                 ).fetchone()
-                
+
                 if result:
                     category_uuid = str(result[0])
                     self._category_cache[category_code] = category_uuid
@@ -346,30 +322,30 @@ class CategoryMappingService:
                             "SELECT category_id FROM inventory.categories WHERE category_code = 'dry_goods' LIMIT 1"
                         )
                     ).fetchone()
-                    
+
                     if fallback_result:
                         fallback_uuid = str(fallback_result[0])
                         self._category_cache["dry_goods"] = fallback_uuid
                         self._reverse_cache[fallback_uuid] = "dry_goods"
-                        
+
                         self.logger.warning(
                             "Category not found in database, using dry_goods fallback",
-                            requested_category=category_code
+                            requested_category=category_code,
                         )
                         return fallback_uuid
                     else:
                         # Ultimate fallback: return the category_code
                         self.logger.error(
                             "No categories found in database, using category_code as fallback",
-                            category_code=category_code
+                            category_code=category_code,
                         )
                         return category_code
-        
+
         except Exception as e:
             self.logger.error(
                 "Error resolving category UUID",
                 category_code=category_code,
-                error=str(e)
+                error=str(e),
             )
             # Fallback: return category_code if database query fails
             return category_code
@@ -377,10 +353,10 @@ class CategoryMappingService:
     def get_shelf_life_days(self, category_code: str) -> int:
         """
         Get typical shelf life for category
-        
+
         Args:
             category_code: Standard category code
-            
+
         Returns:
             Shelf life in days
         """
@@ -389,10 +365,10 @@ class CategoryMappingService:
     def get_risk_level(self, category_code: str) -> str:
         """
         Get risk level for category (for LIFO scoring)
-        
+
         Args:
             category_code: Standard category code
-            
+
         Returns:
             Risk level string
         """
@@ -401,66 +377,71 @@ class CategoryMappingService:
     def get_all_categories(self) -> dict[str, dict[str, Any]]:
         """
         Get all category information
-        
+
         Returns:
             Dictionary of all categories with metadata
         """
         categories = {}
-        
+
         # Get unique category codes
         unique_codes = set(self.CATEGORY_MAPPING.values())
-        
+
         for code in unique_codes:
             categories[code] = {
                 "category_code": code,
                 "shelf_life_days": self.get_shelf_life_days(code),
                 "risk_level": self.get_risk_level(code),
-                "display_name": code.replace("_", " ").title()
+                "display_name": code.replace("_", " ").title(),
             }
-        
+
         return categories
 
-    def get_category_suggestions(self, partial_category: str, limit: int = 5) -> list[str]:
+    def get_category_suggestions(
+        self, partial_category: str, limit: int = 5
+    ) -> list[str]:
         """
         Get category suggestions for partial matches
-        
+
         Args:
             partial_category: Partial category string
             limit: Maximum number of suggestions
-            
+
         Returns:
             List of suggested category codes
         """
         if not partial_category:
             return []
-        
+
         search_term = partial_category.lower().strip()
         suggestions = []
-        
+
         # Direct matches first
         for key, value in self.CATEGORY_MAPPING.items():
             if search_term in key and value not in suggestions:
                 suggestions.append(value)
                 if len(suggestions) >= limit:
                     break
-        
+
         # If not enough suggestions, add fuzzy matches
         if len(suggestions) < limit:
             for key, value in self.CATEGORY_MAPPING.items():
-                if (key in search_term or any(word in key for word in search_term.split())) and value not in suggestions:
+                if (
+                    key in search_term
+                    or any(word in key for word in search_term.split())
+                ) and value not in suggestions:
                     suggestions.append(value)
                     if len(suggestions) >= limit:
                         break
-        
+
         return suggestions
 
     def validate_category_code(self, category_code: str) -> bool:
         """
         Validate if category code is valid
-        
+
         Args:
             category_code: Category code to validate
-            
+
         Returns:
             True if valid category code
         """

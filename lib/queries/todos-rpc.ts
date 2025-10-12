@@ -149,7 +149,7 @@ export async function fetchTodosBySection(
 }
 
 /**
- * Fetch dashboard summary - calls get_dashboard_summary
+ * Fetch dashboard summary - calls get_dashboard_summary_json (optimized JSON version)
  */
 export async function fetchDashboardSummary(
   storeId: string,
@@ -162,7 +162,7 @@ export async function fetchDashboardSummary(
     async () => {
       const supabase = serverClient || createClient()
 
-      const { data, error } = await supabase.rpc('get_dashboard_summary', {
+      const { data, error } = await supabase.rpc('get_dashboard_summary_json', {
         p_store_id: storeId,
       })
 
@@ -176,7 +176,7 @@ export async function fetchDashboardSummary(
       }
 
       return (
-        data?.[0] || {
+        data || {
           total_active_batches: 0,
           needs_attention_count: 0,
           critical_count: 0,

@@ -472,25 +472,27 @@ class BulkDataRetriever:
     async def get_store_inventory_data(self, store_id: str) -> list[dict[str, Any]]:
         """Get all inventory data for a store in a single optimized query"""
         try:
-            inventory_data = await self.read_ops.get_store_inventory_for_scoring(store_id)
+            inventory_data = await self.read_ops.get_store_inventory_for_scoring(
+                store_id
+            )
 
             if not inventory_data:
-                self.logger.warning("No inventory data found for store", store_id=store_id)
+                self.logger.warning(
+                    "No inventory data found for store", store_id=store_id
+                )
                 return []
 
             self.logger.info(
                 "Retrieved inventory data for bulk scoring",
                 store_id=store_id,
-                item_count=len(inventory_data)
+                item_count=len(inventory_data),
             )
 
             return inventory_data
 
         except Exception as e:
             self.logger.error(
-                "Failed to retrieve inventory data",
-                store_id=store_id,
-                error=str(e)
+                "Failed to retrieve inventory data", store_id=store_id, error=str(e)
             )
             return []
 
@@ -500,11 +502,9 @@ class BulkDataRetriever:
 
     def extract_categories(self, inventory_data: list[dict[str, Any]]) -> list[str]:
         """Extract unique categories from inventory data"""
-        return list({
-            item.get("category")
-            for item in inventory_data
-            if item.get("category")
-        })
+        return list(
+            {item.get("category") for item in inventory_data if item.get("category")}
+        )
 
 
 class VelocityCalculationService:
@@ -515,7 +515,9 @@ class VelocityCalculationService:
 
     def __init__(self, read_ops):
         self.read_ops = read_ops
-        self.logger = structlog.get_logger().bind(component="velocity_calculation_service")
+        self.logger = structlog.get_logger().bind(
+            component="velocity_calculation_service"
+        )
 
     async def get_bulk_velocity_data(
         self, store_id: str, product_ids: list[str], days: int = 30
@@ -531,16 +533,14 @@ class VelocityCalculationService:
                 store_id=store_id,
                 product_count=len(product_ids),
                 days=days,
-                results_count=len(velocity_data)
+                results_count=len(velocity_data),
             )
 
             return velocity_data
 
         except Exception as e:
             self.logger.error(
-                "Failed to retrieve bulk velocity data",
-                store_id=store_id,
-                error=str(e)
+                "Failed to retrieve bulk velocity data", store_id=store_id, error=str(e)
             )
             return {}
 
@@ -571,16 +571,13 @@ class CategoryWeightService:
             self.logger.debug(
                 "Retrieved bulk category weights",
                 category_count=len(categories),
-                results_count=len(category_weights)
+                results_count=len(category_weights),
             )
 
             return category_weights
 
         except Exception as e:
-            self.logger.error(
-                "Failed to retrieve bulk category weights",
-                error=str(e)
-            )
+            self.logger.error("Failed to retrieve bulk category weights", error=str(e))
             return {}
 
     def get_weights_for_category(
@@ -604,7 +601,7 @@ class InMemoryScoringEngine:
         batch_data: dict[str, Any],
         daily_sales: float,
         category_weights: dict[str, float],
-        store_id: str
+        store_id: str,
     ) -> ScoringResult | None:
         """Score a single batch using in-memory calculations only"""
         try:
@@ -700,7 +697,7 @@ class InMemoryScoringEngine:
         inventory_data: list[dict[str, Any]],
         velocity_data_bulk: dict[str, dict[str, float]],
         category_weights_bulk: dict[str, dict[str, float]],
-        store_id: str
+        store_id: str,
     ) -> tuple[list[ScoringResult], list[str], int]:
         """Score all batches using in-memory calculations"""
         results = []
@@ -710,15 +707,15 @@ class InMemoryScoringEngine:
         self.logger.info(
             "Starting bulk in-memory scoring",
             total_batches=len(inventory_data),
-            store_id=store_id
+            store_id=store_id,
         )
 
         for batch_data in inventory_data:
             try:
                 # Get pre-fetched data
-                daily_sales = velocity_data_bulk.get(
-                    batch_data["product_id"], {}
-                ).get("avg_daily_sales", 1.0)
+                daily_sales = velocity_data_bulk.get(batch_data["product_id"], {}).get(
+                    "avg_daily_sales", 1.0
+                )
                 category_weights = category_weights_bulk.get(
                     batch_data.get("category"), {}
                 )
@@ -750,7 +747,7 @@ class InMemoryScoringEngine:
             total_batches=len(inventory_data),
             successful=len(results),
             high_priority=high_priority_count,
-            errors=len(errors)
+            errors=len(errors),
         )
 
         return results, errors, high_priority_count
@@ -799,7 +796,7 @@ class BulkResultPersister:
             self.logger.info(
                 "Using chunked direct database persistence for large batch",
                 total_results=len(results),
-                approach="direct_connection_chunked"
+                approach="direct_connection_chunked",
             )
             return await self._persist_via_chunked_direct(results, store_id)
 
@@ -828,12 +825,12 @@ class BulkResultPersister:
                 total_results=total_items,
                 chunk_size=CHUNK_SIZE,
                 total_chunks=(total_items + CHUNK_SIZE - 1) // CHUNK_SIZE,
-                operation_type="supabase_rest_api_chunked"
+                operation_type="supabase_rest_api_chunked",
             )
 
             # Process in chunks to avoid statement timeout
             for i in range(0, total_items, CHUNK_SIZE):
-                chunk = scores_data[i:i + CHUNK_SIZE]
+                chunk = scores_data[i : i + CHUNK_SIZE]
                 chunk_num = (i // CHUNK_SIZE) + 1
                 total_chunks = (total_items + CHUNK_SIZE - 1) // CHUNK_SIZE
 
@@ -845,13 +842,13 @@ class BulkResultPersister:
                         self.logger.debug(
                             f"Chunk {chunk_num}/{total_chunks} succeeded",
                             chunk_size=len(chunk),
-                            successful_so_far=successful_count
+                            successful_so_far=successful_count,
                         )
                     else:
                         failed_count += len(chunk)
                         self.logger.warning(
                             f"Chunk {chunk_num}/{total_chunks} returned False",
-                            chunk_size=len(chunk)
+                            chunk_size=len(chunk),
                         )
 
                 except Exception as chunk_error:
@@ -859,18 +856,21 @@ class BulkResultPersister:
                     self.logger.error(
                         f"Chunk {chunk_num}/{total_chunks} failed",
                         error=str(chunk_error),
-                        chunk_size=len(chunk)
+                        chunk_size=len(chunk),
                     )
 
-            bulk_db_time = int((datetime.utcnow() - bulk_db_start).total_seconds() * 1000)
+            bulk_db_time = int(
+                (datetime.utcnow() - bulk_db_start).total_seconds() * 1000
+            )
 
             # Track performance metrics
             from app.monitoring.metrics import metrics_collector
+
             metrics_collector.record_api_request(
                 endpoint="bulk_scoring_database",
                 method="POST",
                 status_code=200 if failed_count == 0 else 207,  # 207 = Multi-Status
-                response_time_ms=bulk_db_time
+                response_time_ms=bulk_db_time,
             )
 
             self.logger.info(
@@ -878,7 +878,7 @@ class BulkResultPersister:
                 successful=successful_count,
                 failed=failed_count,
                 total=total_items,
-                database_time_ms=bulk_db_time
+                database_time_ms=bulk_db_time,
             )
 
             # If all chunks failed, fallback to individual transactions
@@ -892,10 +892,12 @@ class BulkResultPersister:
             self.logger.warning(
                 "Supabase REST operation failed completely, falling back to individual transactions",
                 error=str(bulk_error),
-                fallback_method="isolated_transactions"
+                fallback_method="isolated_transactions",
             )
 
-            return await self._fallback_to_individual_saves(results, store_id, bulk_db_start)
+            return await self._fallback_to_individual_saves(
+                results, store_id, bulk_db_start
+            )
 
     async def _persist_via_chunked_direct(
         self, results: list[ScoringResult], store_id: str
@@ -927,7 +929,9 @@ class BulkResultPersister:
 
         # Validate DATABASE_DIRECT_URL configuration
         if not db_url:
-            self.logger.error("DATABASE_DIRECT_URL not configured - falling back to Supabase REST")
+            self.logger.error(
+                "DATABASE_DIRECT_URL not configured - falling back to Supabase REST"
+            )
             # Fallback to Supabase REST API
             return await self._persist_via_supabase_rest(results, store_id)
 
@@ -937,13 +941,18 @@ class BulkResultPersister:
         # Create connection for COPY operation with error handling
         try:
             conn = await asyncpg.connect(db_url, timeout=10)
-            self.logger.info("Direct database connection established", db_host=db_url.split("@")[1].split("/")[0] if "@" in db_url else "unknown")
+            self.logger.info(
+                "Direct database connection established",
+                db_host=db_url.split("@")[1].split("/")[0]
+                if "@" in db_url
+                else "unknown",
+            )
         except (OSError, ConnectionRefusedError, asyncpg.exceptions.PostgresError) as e:
             self.logger.error(
                 "Direct database connection failed - falling back to Supabase REST",
                 error=str(e),
                 error_type=type(e).__name__,
-                db_url_prefix=db_url[:50] if db_url else "NOT_SET"
+                db_url_prefix=db_url[:50] if db_url else "NOT_SET",
             )
             # Fallback to Supabase REST API
             return await self._persist_via_supabase_rest(results, store_id)
@@ -973,7 +982,7 @@ class BulkResultPersister:
                 self.logger.info(
                     "Created temporary staging table",
                     staging_table=staging_table,
-                    total_records=len(scores_data)
+                    total_records=len(scores_data),
                 )
 
                 # Step 2: Prepare CSV data in memory for COPY command
@@ -991,11 +1000,17 @@ class BulkResultPersister:
                         str(score["composite_score"]),
                         score["recommendation"],
                         score["urgency_level"],
-                        str(score["discount_percent"]) if score["discount_percent"] is not None else "\\N",
-                        score["reason"].replace("\t", " ").replace("\n", " ") if score["reason"] else "\\N",
+                        str(score["discount_percent"])
+                        if score["discount_percent"] is not None
+                        else "\\N",
+                        score["reason"].replace("\t", " ").replace("\n", " ")
+                        if score["reason"]
+                        else "\\N",
                         "t" if score["ml_enhanced"] else "f",
-                        str(score["confidence_level"]) if score["confidence_level"] is not None else "\\N",
-                        score["calculated_at"].isoformat()
+                        str(score["confidence_level"])
+                        if score["confidence_level"] is not None
+                        else "\\N",
+                        score["calculated_at"].isoformat(),
                     ]
                     csv_buffer.write("\t".join(row_values) + "\n")
 
@@ -1008,21 +1023,34 @@ class BulkResultPersister:
                     staging_table,
                     source=csv_buffer,
                     columns=[
-                        "batch_id", "store_id", "expiry_score", "velocity_score",
-                        "margin_score", "composite_score", "recommendation", "urgency_level",
-                        "discount_percent", "reason", "ml_enhanced", "confidence_level",
-                        "calculated_at"
+                        "batch_id",
+                        "store_id",
+                        "expiry_score",
+                        "velocity_score",
+                        "margin_score",
+                        "composite_score",
+                        "recommendation",
+                        "urgency_level",
+                        "discount_percent",
+                        "reason",
+                        "ml_enhanced",
+                        "confidence_level",
+                        "calculated_at",
                     ],
                     format="text",  # Tab-delimited text format
-                    delimiter="\t"
+                    delimiter="\t",
                 )
-                copy_time_ms = int((datetime.utcnow() - copy_start).total_seconds() * 1000)
+                copy_time_ms = int(
+                    (datetime.utcnow() - copy_start).total_seconds() * 1000
+                )
 
                 self.logger.info(
                     "COPY command completed",
                     records_loaded=len(scores_data),
                     copy_time_ms=copy_time_ms,
-                    records_per_second=int(len(scores_data) / (copy_time_ms / 1000)) if copy_time_ms > 0 else 0
+                    records_per_second=int(len(scores_data) / (copy_time_ms / 1000))
+                    if copy_time_ms > 0
+                    else 0,
                 )
 
                 # Step 4: Single INSERT...SELECT with ON CONFLICT (handles duplicates efficiently)
@@ -1051,7 +1079,9 @@ class BulkResultPersister:
                         confidence_level = EXCLUDED.confidence_level,
                         calculated_at = EXCLUDED.calculated_at
                 """)
-                insert_time_ms = int((datetime.utcnow() - insert_start).total_seconds() * 1000)
+                insert_time_ms = int(
+                    (datetime.utcnow() - insert_start).total_seconds() * 1000
+                )
 
                 # Parse affected rows from result (format: "INSERT 0 N" or "INSERT N")
                 rows_affected = len(scores_data)  # Default assumption
@@ -1061,7 +1091,9 @@ class BulkResultPersister:
                     if len(parts) >= 2:
                         rows_affected = int(parts[-1])
 
-                total_time_ms = int((datetime.utcnow() - start_time).total_seconds() * 1000)
+                total_time_ms = int(
+                    (datetime.utcnow() - start_time).total_seconds() * 1000
+                )
 
                 self.logger.info(
                     "Bulk persistence completed successfully",
@@ -1070,8 +1102,10 @@ class BulkResultPersister:
                     copy_time_ms=copy_time_ms,
                     insert_time_ms=insert_time_ms,
                     total_time_ms=total_time_ms,
-                    records_per_second=int(len(scores_data) / (total_time_ms / 1000)) if total_time_ms > 0 else 0,
-                    performance_improvement="60x faster vs previous implementation"
+                    records_per_second=int(len(scores_data) / (total_time_ms / 1000))
+                    if total_time_ms > 0
+                    else 0,
+                    performance_improvement="60x faster vs previous implementation",
                 )
 
                 return len(scores_data), 0
@@ -1082,12 +1116,12 @@ class BulkResultPersister:
                 error=str(e),
                 error_type=type(e).__name__,
                 total_records=len(scores_data),
-                suggestion="Check DATABASE_DIRECT_URL configuration and network connectivity"
+                suggestion="Check DATABASE_DIRECT_URL configuration and network connectivity",
             )
             # Close connection before fallback
             try:
                 await conn.close()
-            except:
+            except Exception:
                 pass
 
             # Fallback to Supabase REST API for resilience
@@ -1099,7 +1133,7 @@ class BulkResultPersister:
                 "COPY-based persistence failed - unexpected error",
                 error=str(e),
                 error_type=type(e).__name__,
-                total_records=len(scores_data)
+                total_records=len(scores_data),
             )
             # Return failure count
             return 0, len(scores_data)
@@ -1108,25 +1142,31 @@ class BulkResultPersister:
             # Close connection
             await conn.close()
 
-    def _prepare_scores_data(self, results: list[ScoringResult], store_id: str) -> list[dict]:
+    def _prepare_scores_data(
+        self, results: list[ScoringResult], store_id: str
+    ) -> list[dict]:
         """Prepare scoring results data for bulk database operation"""
         scores_data = []
         for result in results:
-            scores_data.append({
-                "batch_id": str(result.batch_id),
-                "store_id": str(store_id),
-                "expiry_score": float(result.expiry_score),
-                "velocity_score": float(result.velocity_score),
-                "margin_score": float(result.margin_score),
-                "composite_score": float(result.composite_score),
-                "recommendation": str(result.recommendation),
-                "urgency_level": str(result.urgency_level),
-                "discount_percent": int(result.discount_percent),
-                "reason": str(result.reason),
-                "ml_enhanced": bool(result.ml_enhanced),
-                "confidence_level": float(result.confidence_level),
-                "calculated_at": result.calculated_at.isoformat() if hasattr(result.calculated_at, 'isoformat') else str(result.calculated_at),
-            })
+            scores_data.append(
+                {
+                    "batch_id": str(result.batch_id),
+                    "store_id": str(store_id),
+                    "expiry_score": float(result.expiry_score),
+                    "velocity_score": float(result.velocity_score),
+                    "margin_score": float(result.margin_score),
+                    "composite_score": float(result.composite_score),
+                    "recommendation": str(result.recommendation),
+                    "urgency_level": str(result.urgency_level),
+                    "discount_percent": int(result.discount_percent),
+                    "reason": str(result.reason),
+                    "ml_enhanced": bool(result.ml_enhanced),
+                    "confidence_level": float(result.confidence_level),
+                    "calculated_at": result.calculated_at.isoformat()
+                    if hasattr(result.calculated_at, "isoformat")
+                    else str(result.calculated_at),
+                }
+            )
         return scores_data
 
     async def _fallback_to_individual_saves(
@@ -1148,11 +1188,12 @@ class BulkResultPersister:
 
         # Track fallback performance
         from app.monitoring.metrics import metrics_collector
+
         metrics_collector.record_api_request(
             endpoint="bulk_scoring_database_fallback",
             method="POST",
             status_code=500 if database_successful == 0 else 200,
-            response_time_ms=fallback_db_time
+            response_time_ms=fallback_db_time,
         )
 
         self.logger.info(
@@ -1160,12 +1201,14 @@ class BulkResultPersister:
             successful=database_successful,
             failed=database_failed,
             total=len(results),
-            fallback_time_ms=fallback_db_time
+            fallback_time_ms=fallback_db_time,
         )
 
         return database_successful, database_failed
 
-    async def _save_individual_score_result(self, result: ScoringResult, store_id: str) -> bool:
+    async def _save_individual_score_result(
+        self, result: ScoringResult, store_id: str
+    ) -> bool:
         """Save individual scoring result using isolated transaction"""
         from app.utils.database_health import create_fresh_session, execute_with_retry
 
@@ -1180,12 +1223,16 @@ class BulkResultPersister:
 
                 from sqlalchemy import text
 
-                schema_prefix = "scoring." if os.getenv("ENVIRONMENT") != "testing" else ""
+                schema_prefix = (
+                    "scoring." if os.getenv("ENVIRONMENT") != "testing" else ""
+                )
                 table_name = f"{schema_prefix}product_scores"
 
                 # Delete existing score for this batch using raw SQL
                 delete_sql = f"DELETE FROM {table_name} WHERE batch_id = :batch_id"
-                await isolated_session.execute(text(delete_sql), {"batch_id": result.batch_id})
+                await isolated_session.execute(
+                    text(delete_sql), {"batch_id": result.batch_id}
+                )
 
                 # Insert new score using raw SQL to avoid ORM prepared statements
                 insert_sql = f"""
@@ -1229,7 +1276,7 @@ class BulkResultPersister:
                 self.logger.warning(
                     "Failed to save score result in isolated transaction",
                     batch_id=result.batch_id,
-                    error=str(e)
+                    error=str(e),
                 )
                 raise
             finally:
@@ -1237,16 +1284,14 @@ class BulkResultPersister:
 
         # Execute with automatic retry logic and health monitoring
         success, result_data, error = await execute_with_retry(
-            f"save_score_result_{result.batch_id}",
-            save_operation,
-            max_retries=3
+            f"save_score_result_{result.batch_id}", save_operation, max_retries=3
         )
 
         if not success:
             self.logger.error(
                 "Final failure to save score result after all retries",
                 batch_id=result.batch_id,
-                error=str(error) if error else "Unknown error"
+                error=str(error) if error else "Unknown error",
             )
             return False
 
@@ -1267,19 +1312,16 @@ class PerformanceMonitor:
         """Start monitoring an operation"""
         self.start_time = datetime.utcnow()
         self.operation_name = operation_name
-        self.logger.info(
-            f"Starting {operation_name}",
-            **context
-        )
+        self.logger.info(f"Starting {operation_name}", **context)
 
     def log_milestone(self, milestone: str, **context):
         """Log a milestone during the operation"""
         if self.start_time:
-            elapsed_ms = int((datetime.utcnow() - self.start_time).total_seconds() * 1000)
+            elapsed_ms = int(
+                (datetime.utcnow() - self.start_time).total_seconds() * 1000
+            )
             self.logger.info(
-                f"Milestone: {milestone}",
-                elapsed_ms=elapsed_ms,
-                **context
+                f"Milestone: {milestone}", elapsed_ms=elapsed_ms, **context
             )
 
     def complete_operation(self, **context) -> int:
@@ -1287,25 +1329,30 @@ class PerformanceMonitor:
         if not self.start_time:
             return 0
 
-        processing_time_ms = int((datetime.utcnow() - self.start_time).total_seconds() * 1000)
+        processing_time_ms = int(
+            (datetime.utcnow() - self.start_time).total_seconds() * 1000
+        )
 
         self.logger.info(
             f"Completed {getattr(self, 'operation_name', 'operation')}",
             processing_time_ms=processing_time_ms,
-            **context
+            **context,
         )
 
         return processing_time_ms
 
-    def track_performance_metrics(self, endpoint: str, processing_time_ms: int, status_code: int = 200):
+    def track_performance_metrics(
+        self, endpoint: str, processing_time_ms: int, status_code: int = 200
+    ):
         """Track performance metrics using the monitoring system"""
         try:
             from app.monitoring.metrics import metrics_collector
+
             metrics_collector.record_api_request(
                 endpoint=endpoint,
                 method="POST",
                 status_code=status_code,
-                response_time_ms=processing_time_ms
+                response_time_ms=processing_time_ms,
             )
         except Exception as e:
             self.logger.warning("Failed to track performance metrics", error=str(e))
@@ -1319,25 +1366,28 @@ class ScoringService:
     """
 
     def __init__(
-        self, 
+        self,
         db: AsyncSession,
         bulk_data_retriever: BulkDataRetriever | None = None,
         velocity_service: VelocityCalculationService | None = None,
         category_weight_service: CategoryWeightService | None = None,
         scoring_engine: InMemoryScoringEngine | None = None,
         result_persister: BulkResultPersister | None = None,
-        performance_monitor: PerformanceMonitor | None = None
+        performance_monitor: PerformanceMonitor | None = None,
     ):
         self.db = db
         self.logger = structlog.get_logger().bind(component="scoring_service")
 
         # Initialize services with dependency injection
         from app.database.read_only_operations import get_read_only_operations
+
         read_ops = get_read_only_operations(db)
 
         self.bulk_data_retriever = bulk_data_retriever or BulkDataRetriever(read_ops)
         self.velocity_service = velocity_service or VelocityCalculationService(read_ops)
-        self.category_weight_service = category_weight_service or CategoryWeightService(read_ops)
+        self.category_weight_service = category_weight_service or CategoryWeightService(
+            read_ops
+        )
         self.scoring_engine = scoring_engine or InMemoryScoringEngine()
         self.result_persister = result_persister or BulkResultPersister(read_ops)
         self.performance_monitor = performance_monitor or PerformanceMonitor()
@@ -1589,7 +1639,9 @@ class ScoringService:
             # Track AI recommendation in database for analytics
             if track_recommendation:
                 try:
-                    await self._track_recommendation_isolated(result, batch_data.get("store_id"))
+                    await self._track_recommendation_isolated(
+                        result, batch_data.get("store_id")
+                    )
                 except Exception as e:
                     self.logger.warning("Failed to track recommendation", error=str(e))
 
@@ -1621,20 +1673,19 @@ class ScoringService:
         """
         # Start performance monitoring
         self.performance_monitor.start_operation(
-            "bulk_scoring",
-            store_id=store_id,
-            recalculate_all=recalculate_all
+            "bulk_scoring", store_id=store_id, recalculate_all=recalculate_all
         )
 
         try:
             # STEP 1: Bulk data retrieval
             self.performance_monitor.log_milestone("data_retrieval_start")
-            inventory_data = await self.bulk_data_retriever.get_store_inventory_data(store_id)
+            inventory_data = await self.bulk_data_retriever.get_store_inventory_data(
+                store_id
+            )
 
             if not inventory_data:
                 processing_time_ms = self.performance_monitor.complete_operation(
-                    store_id=store_id,
-                    total_items=0
+                    store_id=store_id, total_items=0
                 )
                 return {
                     "store_id": store_id,
@@ -1651,10 +1702,10 @@ class ScoringService:
             categories = self.bulk_data_retriever.extract_categories(inventory_data)
 
             self.performance_monitor.log_milestone(
-                "data_preparation_complete", 
+                "data_preparation_complete",
                 inventory_count=len(inventory_data),
                 unique_products=len(product_ids),
-                unique_categories=len(categories)
+                unique_categories=len(categories),
             )
 
             # STEP 3: Bulk velocity data collection
@@ -1663,30 +1714,30 @@ class ScoringService:
             )
 
             self.performance_monitor.log_milestone(
-                "velocity_data_retrieved",
-                velocity_results=len(velocity_data_bulk)
+                "velocity_data_retrieved", velocity_results=len(velocity_data_bulk)
             )
 
             # STEP 4: Bulk category weights retrieval
-            category_weights_bulk = await self.category_weight_service.get_bulk_category_weights(
-                categories
+            category_weights_bulk = (
+                await self.category_weight_service.get_bulk_category_weights(categories)
             )
 
             self.performance_monitor.log_milestone(
-                "category_weights_retrieved",
-                weight_results=len(category_weights_bulk)
+                "category_weights_retrieved", weight_results=len(category_weights_bulk)
             )
 
             # STEP 5: In-memory scoring for all batches
-            results, errors, high_priority_count = self.scoring_engine.score_all_batches(
-                inventory_data, velocity_data_bulk, category_weights_bulk, store_id
+            results, errors, high_priority_count = (
+                self.scoring_engine.score_all_batches(
+                    inventory_data, velocity_data_bulk, category_weights_bulk, store_id
+                )
             )
 
             self.performance_monitor.log_milestone(
                 "scoring_complete",
                 results_count=len(results),
                 high_priority_count=high_priority_count,
-                errors_count=len(errors)
+                errors_count=len(errors),
             )
 
             # STEP 6: Bulk result persistence using COPY (60x faster than REST API)
@@ -1694,14 +1745,15 @@ class ScoringService:
             if results:
                 # Use BulkResultPersister with DATABASE_DIRECT_URL for COPY commands
                 # This is 60x faster than REST API chunking (1-3s vs 3+ minutes)
-                database_successful, database_failed = await self.result_persister.persist_results(
-                    results, store_id
-                )
+                (
+                    database_successful,
+                    database_failed,
+                ) = await self.result_persister.persist_results(results, store_id)
 
                 self.performance_monitor.log_milestone(
                     "persistence_complete",
                     database_successful=database_successful,
-                    database_failed=database_failed
+                    database_failed=database_failed,
                 )
 
             # STEP 7: Complete monitoring and prepare response
@@ -1711,7 +1763,7 @@ class ScoringService:
                 processed=len(results),
                 high_priority_count=high_priority_count,
                 database_successful=database_successful,
-                database_failed=database_failed
+                database_failed=database_failed,
             )
 
             # Track overall performance metrics
@@ -1733,16 +1785,15 @@ class ScoringService:
                 "database_operations": {
                     "successful": database_successful,
                     "failed": database_failed,
-                    "total": len(results)
-                }
+                    "total": len(results),
+                },
             }
 
         except Exception as e:
             import traceback
 
             processing_time_ms = self.performance_monitor.complete_operation(
-                store_id=store_id,
-                error=str(e)
+                store_id=store_id, error=str(e)
             )
 
             self.logger.error(
@@ -1793,7 +1844,7 @@ class ScoringService:
         store_id: str,
         recalculate_all: bool = False,
         store_donation_config: dict | None = None,
-        include_donation_rationale: bool = False
+        include_donation_rationale: bool = False,
     ) -> dict[str, Any]:
         """Score all active batches for a store and save results to database with proper transaction isolation"""
         start_time = datetime.utcnow()
@@ -1815,7 +1866,9 @@ class ScoringService:
 
             # Get inventory data for scoring using secure read-only view
             # fetch_all=True ensures we score ALL batches, not just 1000
-            inventory_data = await read_ops.get_store_inventory_for_scoring(store_id, fetch_all=True)
+            inventory_data = await read_ops.get_store_inventory_for_scoring(
+                store_id, fetch_all=True
+            )
 
             if not inventory_data:
                 self.logger.warning(
@@ -1838,7 +1891,7 @@ class ScoringService:
                 "Starting batch scoring with transaction isolation",
                 store_id=store_id,
                 total_batches=len(batch_ids),
-                recalculate_all=recalculate_all
+                recalculate_all=recalculate_all,
             )
 
             # Score each batch - computation doesn't require database session
@@ -1855,7 +1908,7 @@ class ScoringService:
                     self.logger.error(
                         "Scoring computation failed for batch",
                         batch_id=batch_id,
-                        error=str(e)
+                        error=str(e),
                     )
                     errors.append(f"Failed to score batch {batch_id}: {str(e)}")
 
@@ -1863,7 +1916,7 @@ class ScoringService:
             if results:
                 self.logger.info(
                     "Saving score results with individual transaction isolation",
-                    results_count=len(results)
+                    results_count=len(results),
                 )
 
                 # Process each result in its own isolated transaction
@@ -1873,13 +1926,15 @@ class ScoringService:
                         database_operations_successful += 1
                     else:
                         database_operations_failed += 1
-                        errors.append(f"Failed to save score for batch {result.batch_id}")
+                        errors.append(
+                            f"Failed to save score for batch {result.batch_id}"
+                        )
 
                 self.logger.info(
                     "Database operations completed",
                     successful=database_operations_successful,
                     failed=database_operations_failed,
-                    total_results=len(results)
+                    total_results=len(results),
                 )
 
             processing_time = (datetime.utcnow() - start_time).total_seconds() * 1000
@@ -1906,8 +1961,8 @@ class ScoringService:
                 "database_operations": {
                     "successful": database_operations_successful,
                     "failed": database_operations_failed,
-                    "total": len(results)
-                }
+                    "total": len(results),
+                },
             }
 
         except Exception as e:
@@ -1918,7 +1973,7 @@ class ScoringService:
                 error=str(e),
                 results_computed=len(results),
                 database_successful=database_operations_successful,
-                database_failed=database_operations_failed
+                database_failed=database_operations_failed,
             )
 
             processing_time = (datetime.utcnow() - start_time).total_seconds() * 1000
@@ -1934,8 +1989,8 @@ class ScoringService:
                 "database_operations": {
                     "successful": database_operations_successful,
                     "failed": database_operations_failed,
-                    "total": len(results)
-                }
+                    "total": len(results),
+                },
             }
 
     async def _save_score_result(self, result: ScoringResult):
@@ -1975,7 +2030,9 @@ class ScoringService:
             )
             raise
 
-    async def _save_score_result_isolated(self, result: ScoringResult, store_id: str) -> bool:
+    async def _save_score_result_isolated(
+        self, result: ScoringResult, store_id: str
+    ) -> bool:
         """
         Save scoring result using isolated transaction with advanced retry logic and health monitoring
         Returns True if successful, False if failed (but doesn't raise exception)
@@ -1993,12 +2050,17 @@ class ScoringService:
                 from decimal import Decimal
 
                 from sqlalchemy import text
-                schema_prefix = "scoring." if os.getenv("ENVIRONMENT") != "testing" else ""
+
+                schema_prefix = (
+                    "scoring." if os.getenv("ENVIRONMENT") != "testing" else ""
+                )
                 table_name = f"{schema_prefix}product_scores"
 
                 # Delete existing score for this batch using raw SQL
                 delete_sql = f"DELETE FROM {table_name} WHERE batch_id = :batch_id"
-                await isolated_session.execute(text(delete_sql), {"batch_id": result.batch_id})
+                await isolated_session.execute(
+                    text(delete_sql), {"batch_id": result.batch_id}
+                )
 
                 # Insert new score using raw SQL to avoid ORM prepared statements
                 insert_sql = f"""
@@ -2037,7 +2099,7 @@ class ScoringService:
 
                 self.logger.debug(
                     "Successfully saved score result in isolated transaction",
-                    batch_id=result.batch_id
+                    batch_id=result.batch_id,
                 )
 
                 return True
@@ -2048,7 +2110,7 @@ class ScoringService:
                 self.logger.warning(
                     "Failed to save score result in isolated transaction",
                     batch_id=result.batch_id,
-                    error=str(e)
+                    error=str(e),
                 )
                 raise
             finally:
@@ -2056,9 +2118,7 @@ class ScoringService:
 
         # Execute with automatic retry logic and health monitoring
         success, result_data, error = await execute_with_retry(
-            f"save_score_result_{result.batch_id}",
-            save_operation,
-            max_retries=3
+            f"save_score_result_{result.batch_id}", save_operation, max_retries=3
         )
 
         if success:
@@ -2069,11 +2129,13 @@ class ScoringService:
             self.logger.error(
                 "Final failure to save score result after all retries with health monitoring",
                 batch_id=result.batch_id,
-                error=str(error) if error else "Unknown error"
+                error=str(error) if error else "Unknown error",
             )
             return False
 
-    async def _track_recommendation_isolated(self, result: ScoringResult, store_id: str | None = None) -> bool:
+    async def _track_recommendation_isolated(
+        self, result: ScoringResult, store_id: str | None = None
+    ) -> bool:
         """Track AI recommendation using isolated transaction with health monitoring and error handling"""
         from app.utils.database_health import create_fresh_session, execute_with_retry
 
@@ -2098,7 +2160,7 @@ class ScoringService:
                     ai_score=result.composite_score,
                     user_id=None,  # System-generated recommendation
                     discount_percent=result.discount_percent,
-                    reasoning=result.reason
+                    reasoning=result.reason,
                 )
 
                 # Commit the tracking transaction
@@ -2110,7 +2172,7 @@ class ScoringService:
                 self.logger.warning(
                     "Failed to track AI recommendation in isolated transaction",
                     batch_id=result.batch_id,
-                    error=str(e)
+                    error=str(e),
                 )
                 raise
             finally:
@@ -2121,14 +2183,14 @@ class ScoringService:
             success, _, error = await execute_with_retry(
                 f"track_recommendation_{result.batch_id}",
                 track_operation,
-                max_retries=2  # Lower retries for tracking since it's non-critical
+                max_retries=2,  # Lower retries for tracking since it's non-critical
             )
 
             if not success:
                 self.logger.warning(
                     "Failed to track AI recommendation after retries",
                     batch_id=result.batch_id,
-                    error=str(error) if error else "Unknown error"
+                    error=str(error) if error else "Unknown error",
                 )
 
             return success
@@ -2138,7 +2200,7 @@ class ScoringService:
             self.logger.warning(
                 "Tracking operation failed completely",
                 batch_id=result.batch_id,
-                error=str(e)
+                error=str(e),
             )
             return False
 

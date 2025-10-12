@@ -274,6 +274,7 @@ export default function UserAccountInformation() {
             {!isEditingPhone && (
               <Button
                 variant="subtleSecondary"
+                size="sm" // Ajout de size="sm"
                 onClick={() => setIsEditingPhone(true)}
                 className="flex items-center gap-2"
               >

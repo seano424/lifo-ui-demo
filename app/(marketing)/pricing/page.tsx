@@ -2,8 +2,10 @@
 
 import { Button } from '@/components/ui/button'
 import { Typography } from '@/components/ui/typography'
-import { ArrowRight, Building2, Check, Sparkles, Users } from 'lucide-react'
+import { ArrowRight, Check, Sparkles } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+
+// import {Building2, Users} from 'lucide-react' --- IGNORE (It's when we're putting back the others pricing cards) ---
 
 interface PricingCardProps {
   title: string
@@ -175,16 +177,16 @@ export default function PricingPage() {
           </Typography>
         </div>
         {/* Contact Message */}
-        <div className="text-center mb-8">
+        {/* <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-primary-600/90 via-primary-700/90 to-secondary-700/90 shadow-lg hover:shadow-xl transition-all duration-300 border border-primary-400/20 backdrop-blur-sm">
             <Typography variant="p" className="text-sm text-white font-medium">
-              📧 {t('contactUs')}: <strong> contact@lifo-app.com </strong>
+              📧 {t("contactUs")}: <strong> contact@lifo-app.com </strong>
             </Typography>
           </div>
-        </div>
+        </div> */}
 
         {/* Pricing Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16 mt-20">
+        <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-8 mb-16 mt-20 max-w-lg mx-auto">
           {/* Free Trial */}
           <PricingCard
             title={t('plans.freeTrial.title')}
@@ -205,89 +207,89 @@ export default function PricingPage() {
           />
 
           {/* Light */}
-          <PricingCard
-            title={t('plans.light.title')}
-            subtitle={t('plans.light.subtitle')}
-            price={t('plans.light.price')}
-            period={t('plans.light.period')}
-            description={t('plans.light.description')}
+          {/* <PricingCard
+            title={t("plans.light.title")}
+            subtitle={t("plans.light.subtitle")}
+            price={t("plans.light.price")}
+            period={t("plans.light.period")}
+            description={t("plans.light.description")}
             features={[
-              t('plans.light.features.0'),
-              t('plans.light.features.1'),
-              t('plans.light.features.2'),
-              t('plans.light.features.3'),
+              t("plans.light.features.0"),
+              t("plans.light.features.1"),
+              t("plans.light.features.2"),
+              t("plans.light.features.3"),
             ]}
             fees={[
               {
-                type: t('plans.light.fees.0.type'),
-                percentage: t('plans.light.fees.0.percentage'),
+                type: t("plans.light.fees.0.type"),
+                percentage: t("plans.light.fees.0.percentage"),
               },
               {
-                type: t('plans.light.fees.1.type'),
-                percentage: t('plans.light.fees.1.percentage'),
+                type: t("plans.light.fees.1.type"),
+                percentage: t("plans.light.fees.1.percentage"),
               },
             ]}
             isComingSoon={true}
-            sellingPoint={t('plans.light.sellingPoint')}
+            sellingPoint={t("plans.light.sellingPoint")}
             icon={<Users size={24} />}
-          />
+          /> */}
 
           {/* Pro */}
-          <PricingCard
-            title={t('plans.pro.title')}
-            subtitle={t('plans.pro.subtitle')}
-            price={t('plans.pro.price')}
-            period={t('plans.pro.period')}
-            description={t('plans.pro.description')}
+          {/* <PricingCard
+            title={t("plans.pro.title")}
+            subtitle={t("plans.pro.subtitle")}
+            price={t("plans.pro.price")}
+            period={t("plans.pro.period")}
+            description={t("plans.pro.description")}
             features={[
-              t('plans.pro.features.0'),
-              t('plans.pro.features.1'),
-              t('plans.pro.features.2'),
-              t('plans.pro.features.3'),
-              t('plans.pro.features.4'),
+              t("plans.pro.features.0"),
+              t("plans.pro.features.1"),
+              t("plans.pro.features.2"),
+              t("plans.pro.features.3"),
+              t("plans.pro.features.4"),
             ]}
             fees={[
               {
-                type: t('plans.pro.fees.0.type'),
-                percentage: t('plans.pro.fees.0.percentage'),
+                type: t("plans.pro.fees.0.type"),
+                percentage: t("plans.pro.fees.0.percentage"),
               },
               {
-                type: t('plans.pro.fees.1.type'),
-                percentage: t('plans.pro.fees.1.percentage'),
+                type: t("plans.pro.fees.1.type"),
+                percentage: t("plans.pro.fees.1.percentage"),
               },
             ]}
-            sellingPoint={t('plans.pro.sellingPoint')}
+            sellingPoint={t("plans.pro.sellingPoint")}
             isComingSoon={true}
             icon={<Building2 size={24} />}
-          />
+          /> */}
 
           {/* Enterprise */}
-          <PricingCard
-            title={t('plans.enterprise.title')}
-            subtitle={t('plans.enterprise.subtitle')}
-            price={t('plans.enterprise.price')}
-            description={t('plans.enterprise.description')}
+          {/* <PricingCard
+            title={t("plans.enterprise.title")}
+            subtitle={t("plans.enterprise.subtitle")}
+            price={t("plans.enterprise.price")}
+            description={t("plans.enterprise.description")}
             features={[
-              t('plans.enterprise.features.0'),
-              t('plans.enterprise.features.1'),
-              t('plans.enterprise.features.2'),
-              t('plans.enterprise.features.3'),
-              t('plans.enterprise.features.4'),
+              t("plans.enterprise.features.0"),
+              t("plans.enterprise.features.1"),
+              t("plans.enterprise.features.2"),
+              t("plans.enterprise.features.3"),
+              t("plans.enterprise.features.4"),
             ]}
             fees={[
               {
-                type: t('plans.enterprise.fees.0.type'),
-                percentage: t('plans.enterprise.fees.0.percentage'),
+                type: t("plans.enterprise.fees.0.type"),
+                percentage: t("plans.enterprise.fees.0.percentage"),
               },
               {
-                type: t('plans.enterprise.fees.1.type'),
-                percentage: t('plans.enterprise.fees.1.percentage'),
+                type: t("plans.enterprise.fees.1.type"),
+                percentage: t("plans.enterprise.fees.1.percentage"),
               },
             ]}
-            sellingPoint={t('plans.enterprise.sellingPoint')}
+            sellingPoint={t("plans.enterprise.sellingPoint")}
             isComingSoon={true}
             icon={<Building2 size={24} />}
-          />
+          /> */}
         </div>
 
         {/* Bottom Note */}

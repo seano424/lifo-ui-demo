@@ -28,7 +28,7 @@ export function HeroHeading() {
       </div>
       <Typography as="h2" className="text-4xl md:text-6xl text-foreground/80">
         {t('hero.title', {
-          fallback: 'The Future of Inventory Management is Here.',
+          fallback: 'Smarter Inventory Decisions — Batch by Batch',
         })}{' '}
       </Typography>
     </header>
