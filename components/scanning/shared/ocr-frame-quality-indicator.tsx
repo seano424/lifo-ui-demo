@@ -6,6 +6,7 @@
 import { Camera, Check, X } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import type { FrameAnalysis } from '@/lib/utils/frame-analyzer'
+import { parseEnvFloat } from '@/lib/utils/ocr-config'
 import { cn } from '@/lib/utils'
 
 export interface OCRFrameQualityIndicatorProps {
@@ -26,9 +27,19 @@ export default function OCRFrameQualityIndicator({
   showDebugInfo = false,
 }: OCRFrameQualityIndicatorProps) {
   const t = useTranslations('ocr')
-  const minSharpness = Number(process.env.NEXT_PUBLIC_AUTO_OCR_MIN_SHARPNESS) || 0.01
+  const minSharpness = parseEnvFloat(process.env.NEXT_PUBLIC_AUTO_OCR_MIN_SHARPNESS, 0.01)
 
+  // Null safety: ensure we have valid analysis data
   if (!isAnalyzing || !analysis) {
+    return null
+  }
+
+  // Additional safety: validate analysis has required numeric properties
+  if (
+    typeof analysis.overallScore !== 'number' ||
+    typeof analysis.textConfidence !== 'number' ||
+    typeof analysis.datePatternConfidence !== 'number'
+  ) {
     return null
   }
 
@@ -38,6 +49,9 @@ export default function OCRFrameQualityIndicator({
         'absolute top-4 right-4 bg-black/80 text-white p-3 rounded-lg text-xs space-y-2 min-w-[180px] backdrop-blur-sm',
         className,
       )}
+      role="status"
+      aria-live="polite"
+      aria-label="OCR scan quality indicator"
     >
       {/* Header */}
       <div className="flex items-center gap-2 border-b border-white/20 pb-2">
@@ -179,7 +193,7 @@ function getPositioningHint(
   analysis: FrameAnalysis,
   t: (key: string, options?: Record<string, string>) => string,
 ): string {
-  const minSharpness = Number(process.env.NEXT_PUBLIC_AUTO_OCR_MIN_SHARPNESS) || 0.01
+  const minSharpness = parseEnvFloat(process.env.NEXT_PUBLIC_AUTO_OCR_MIN_SHARPNESS, 0.01)
 
   // Prioritize hints by importance
   if (!analysis.hasTextLikeContent) {

@@ -4,11 +4,13 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { captureImageFromVideo, type OCRError } from '@/lib/api/ocr-client'
+import { captureImageFromVideo } from '@/lib/api/ocr-client'
 import type { ExpiryDateInfo } from '@/lib/stores/scanning-workflow-store'
 import { analyzeFrame, type FrameAnalysis } from '@/lib/utils/frame-analyzer'
 import { logger } from '@/lib/utils/logger'
+import { parseEnvFloat } from '@/lib/utils/ocr-config'
 import { ocrDebugLogger } from '@/lib/utils/ocr-debug-logger'
+import { isRateLimitError } from '@/lib/utils/ocr-type-guards'
 import { useOCRWithFallback } from './use-ocr-processing'
 
 export interface AutoOCRScannerOptions {
@@ -63,10 +65,10 @@ export function useAutoOCRScanner(options: AutoOCRScannerOptions): AutoOCRScanne
     preCheckIntervalMs = 500,
     maxAttempts = 10,
     ocrConfidenceThreshold = 0.5,
-    minTextConfidence = Number(process.env.NEXT_PUBLIC_AUTO_OCR_MIN_TEXT_CONFIDENCE) || 0.05,
-    minDateConfidence = Number(process.env.NEXT_PUBLIC_AUTO_OCR_MIN_DATE_CONFIDENCE) || 0.4,
-    minOverallScore = Number(process.env.NEXT_PUBLIC_AUTO_OCR_MIN_OVERALL_SCORE) || 0.5,
-    minSharpness = Number(process.env.NEXT_PUBLIC_AUTO_OCR_MIN_SHARPNESS) || 0.01,
+    minTextConfidence = parseEnvFloat(process.env.NEXT_PUBLIC_AUTO_OCR_MIN_TEXT_CONFIDENCE, 0.05),
+    minDateConfidence = parseEnvFloat(process.env.NEXT_PUBLIC_AUTO_OCR_MIN_DATE_CONFIDENCE, 0.4),
+    minOverallScore = parseEnvFloat(process.env.NEXT_PUBLIC_AUTO_OCR_MIN_OVERALL_SCORE, 0.5),
+    minSharpness = parseEnvFloat(process.env.NEXT_PUBLIC_AUTO_OCR_MIN_SHARPNESS, 0.01),
     debug = false,
   } = options
 
@@ -98,6 +100,7 @@ export function useAutoOCRScanner(options: AutoOCRScannerOptions): AutoOCRScanne
    */
   const analyzeCurrentFrame = useCallback(async (): Promise<FrameAnalysis | null> => {
     const startTime = performance.now()
+    let canvas: HTMLCanvasElement | null = null
 
     try {
       const videoElement = document.querySelector('video') as HTMLVideoElement | null
@@ -106,7 +109,7 @@ export function useAutoOCRScanner(options: AutoOCRScannerOptions): AutoOCRScanne
       }
 
       // Create canvas and capture frame
-      const canvas = document.createElement('canvas')
+      canvas = document.createElement('canvas')
       canvas.width = videoElement.videoWidth
       canvas.height = videoElement.videoHeight
 
@@ -172,6 +175,12 @@ export function useAutoOCRScanner(options: AutoOCRScannerOptions): AutoOCRScanne
         error: error instanceof Error ? error.message : String(error),
       })
       return null
+    } finally {
+      // Clean up canvas to prevent memory leaks
+      if (canvas) {
+        canvas.width = 0
+        canvas.height = 0
+      }
     }
   }, [debug, minTextConfidence, minDateConfidence, minOverallScore, minSharpness])
 
@@ -326,16 +335,15 @@ export function useAutoOCRScanner(options: AutoOCRScannerOptions): AutoOCRScanne
 
       ocrDebugLogger.logAPIFailure('/api/v1/ocr/scan/ocr-expiry', error, apiDuration)
 
-      const ocrError = error as OCRError
-
+      // Log error details
+      const errorMessage = error instanceof Error ? error.message : String(error)
       logger.error('AutoOCRScanner', 'OCR processing failed', {
-        error: ocrError.message || String(error),
-        errorType: ocrError.type,
+        error: errorMessage,
         attemptCount: attemptCount + 1,
       })
 
-      // Special handling for rate limit errors
-      if (ocrError.type === 'rate_limit') {
+      // Special handling for rate limit errors using type guard
+      if (isRateLimitError(error)) {
         consecutiveRateLimitsRef.current += 1
 
         // Calculate backoff time (exponential: 5s, 10s, 20s, 30s max)

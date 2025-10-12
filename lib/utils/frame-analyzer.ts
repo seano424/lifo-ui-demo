@@ -5,6 +5,7 @@
  */
 
 import { logger } from './logger'
+import { OCR_DEFAULTS, parseEnvFloat } from './ocr-config'
 import { ocrDebugLogger } from './ocr-debug-logger'
 
 export interface FrameAnalysis {
@@ -65,10 +66,22 @@ export function analyzeFrame(
 ): FrameAnalysis {
   const {
     debug = false,
-    minTextConfidence = Number(process.env.NEXT_PUBLIC_AUTO_OCR_MIN_TEXT_CONFIDENCE) || 0.05,
-    minDateConfidence = Number(process.env.NEXT_PUBLIC_AUTO_OCR_MIN_DATE_CONFIDENCE) || 0.4,
-    minOverallScore = Number(process.env.NEXT_PUBLIC_AUTO_OCR_MIN_OVERALL_SCORE) || 0.5,
-    minSharpness = Number(process.env.NEXT_PUBLIC_AUTO_OCR_MIN_SHARPNESS) || 0.01,
+    minTextConfidence = parseEnvFloat(
+      process.env.NEXT_PUBLIC_AUTO_OCR_MIN_TEXT_CONFIDENCE,
+      OCR_DEFAULTS.SCANNING.MIN_TEXT_CONFIDENCE,
+    ),
+    minDateConfidence = parseEnvFloat(
+      process.env.NEXT_PUBLIC_AUTO_OCR_MIN_DATE_CONFIDENCE,
+      OCR_DEFAULTS.SCANNING.MIN_DATE_CONFIDENCE,
+    ),
+    minOverallScore = parseEnvFloat(
+      process.env.NEXT_PUBLIC_AUTO_OCR_MIN_OVERALL_SCORE,
+      OCR_DEFAULTS.SCANNING.MIN_OVERALL_SCORE,
+    ),
+    minSharpness = parseEnvFloat(
+      process.env.NEXT_PUBLIC_AUTO_OCR_MIN_SHARPNESS,
+      OCR_DEFAULTS.SCANNING.MIN_SHARPNESS,
+    ),
   } = options
 
   const ctx = canvas.getContext('2d')
@@ -163,7 +176,8 @@ function detectTextLikeContent(imageData: ImageData): {
   const edges = sobelEdgeDetection(grayscale, imageData.width, imageData.height)
 
   // Count edge pixels
-  const threshold = 50
+  // Edge threshold empirically determined for text detection
+  const threshold = OCR_DEFAULTS.FRAME_ANALYSIS.EDGE_THRESHOLD
   let edgePixelCount = 0
   for (let i = 0; i < edges.length; i++) {
     if (edges[i] > threshold) {
@@ -177,12 +191,14 @@ function detectTextLikeContent(imageData: ImageData): {
   // Detect horizontal patterns (text typically appears in lines)
   const horizontalPatterns = detectHorizontalLines(edges, imageData.width, imageData.height)
 
-  // Text typically has 2-15% edge pixels
+  // Text typically has 2-25% edge pixels
   // Too few = no text, too many = noise/complex image
   // For dates: Allow relaxed detection for handwritten text on paper (low contrast)
   // Lowered threshold from 3% to 2% to support handwritten dates on white paper
   const hasText =
-    edgePercentage >= 2 && edgePercentage <= 25 && (horizontalPatterns || edgePercentage >= 2.5)
+    edgePercentage >= OCR_DEFAULTS.FRAME_ANALYSIS.MIN_EDGE_PERCENT &&
+    edgePercentage <= OCR_DEFAULTS.FRAME_ANALYSIS.MAX_EDGE_PERCENT &&
+    (horizontalPatterns || edgePercentage >= 2.5)
 
   // Normalize confidence to 0-1 range
   // Optimal range is around 5-10% edge pixels
@@ -229,7 +245,8 @@ function detectBarcode(imageData: ImageData): {
   const verticalLines = detectVerticalLines(grayscale, imageData.width, imageData.height)
 
   // Barcodes typically have many vertical lines (at least 15-20 bars)
-  const isBarcode = verticalLines >= 15
+  // Based on typical 1D barcode structure
+  const isBarcode = verticalLines >= OCR_DEFAULTS.FRAME_ANALYSIS.MIN_BARCODE_LINES
 
   // Calculate confidence based on vertical line count
   // More vertical lines = higher barcode confidence
@@ -263,7 +280,7 @@ function detectDatePattern(
   // Convert to binary (black and white only)
   // Use adaptive threshold: for handwritten text on white paper, use higher threshold (160)
   // This helps capture light gray text that would be missed with threshold 128
-  const binary = toBinaryImage(imageData, 160)
+  const binary = toBinaryImage(imageData, OCR_DEFAULTS.FRAME_ANALYSIS.BINARY_THRESHOLD)
 
   // Find connected components (groups of pixels that form shapes)
   const components = findConnectedComponents(binary, imageData.width, imageData.height)
@@ -275,11 +292,19 @@ function detectDatePattern(
   const numberLikeShapes = components.filter(c => {
     const ratio = c.height / c.width
     // Relaxed size constraints for handwritten text (smaller minimum)
-    const isNumberSized = c.width >= 6 && c.height >= 10 && c.width <= 45 && c.height <= 70
+    const isNumberSized =
+      c.width >= OCR_DEFAULTS.FRAME_ANALYSIS.MIN_NUMBER_WIDTH &&
+      c.height >= OCR_DEFAULTS.FRAME_ANALYSIS.MIN_NUMBER_HEIGHT &&
+      c.width <= OCR_DEFAULTS.FRAME_ANALYSIS.MAX_NUMBER_WIDTH &&
+      c.height <= OCR_DEFAULTS.FRAME_ANALYSIS.MAX_NUMBER_HEIGHT
     // Relaxed aspect ratio: 1.3-2.2 to catch handwritten numbers
-    const isNumberRatio = ratio >= 1.3 && ratio <= 2.2
+    const isNumberRatio =
+      ratio >= OCR_DEFAULTS.FRAME_ANALYSIS.MIN_NUMBER_ASPECT_RATIO &&
+      ratio <= OCR_DEFAULTS.FRAME_ANALYSIS.MAX_NUMBER_ASPECT_RATIO
     // Reject very small or very large components (likely noise or logos)
-    const isSaneSize = c.pixelCount >= 80 && c.pixelCount <= 2400
+    const isSaneSize =
+      c.pixelCount >= OCR_DEFAULTS.FRAME_ANALYSIS.MIN_SHAPE_PIXEL_COUNT &&
+      c.pixelCount <= OCR_DEFAULTS.FRAME_ANALYSIS.MAX_SHAPE_PIXEL_COUNT
     return isNumberSized && isNumberRatio && isSaneSize
   })
 
@@ -289,7 +314,7 @@ function detectDatePattern(
   // Simplified approach: Don't require minimum shapes, just reject massive text blocks
   // IMPORTANT: Reject if TOO MANY shapes detected (>15 = likely text/logo, not date)
   // This allows handwritten dates (1-10 shapes) while still blocking HAWAII (20-30 shapes)
-  const hasDatePattern = numberLikeShapes.length <= 15
+  const hasDatePattern = numberLikeShapes.length <= OCR_DEFAULTS.FRAME_ANALYSIS.MAX_NUMBER_SHAPES
 
   // Calculate confidence based on text presence and separators
   // Let the OCR API do the heavy lifting of validating the actual date
@@ -564,6 +589,7 @@ function findConnectedComponents(
 
 /**
  * Flood fill algorithm to trace connected region
+ * Uses iterative approach with safety limits to prevent memory issues
  */
 function floodFill(
   binary: Uint8ClampedArray,
@@ -579,11 +605,22 @@ function floodFill(
   let minY = startY
   let maxY = startY
   let pixelCount = 0
+  let iterations = 0
 
-  while (stack.length > 0) {
-    const [x, y] = stack.pop()!
+  // Safety limit to prevent infinite loops on large connected regions
+  const MAX_ITERATIONS = OCR_DEFAULTS.FLOOD_FILL.MAX_ITERATIONS
+
+  while (stack.length > 0 && iterations < MAX_ITERATIONS) {
+    iterations++
+
+    // Safe pop with null check
+    const coords = stack.pop()
+    if (!coords) break
+
+    const [x, y] = coords
     const idx = y * width + x
 
+    // Boundary and validity checks
     if (x < 0 || x >= width || y < 0 || y >= height) continue
     if (visited[idx] === 1 || binary[idx] === 0) continue
 
@@ -595,11 +632,20 @@ function floodFill(
     minY = Math.min(minY, y)
     maxY = Math.max(maxY, y)
 
-    // Add neighbors
+    // Add neighbors (4-connectivity)
     stack.push([x + 1, y])
     stack.push([x - 1, y])
     stack.push([x, y + 1])
     stack.push([x, y - 1])
+  }
+
+  // Log warning if we hit iteration limit
+  if (iterations >= MAX_ITERATIONS) {
+    logger.warn('FrameAnalyzer', 'Flood fill hit max iterations', {
+      iterations,
+      pixelCount,
+      maxIterations: MAX_ITERATIONS,
+    })
   }
 
   return {
