@@ -2,19 +2,19 @@
 
 import { createServerClient } from '@supabase/ssr'
 import { type NextRequest, NextResponse } from 'next/server'
-import { hasEnvVars } from '../utils'
 import { logger } from '../utils/logger'
-import { isRetryableError } from '../utils/retry'
+import type { User } from '@supabase/supabase-js'
+
+const AUTH_CACHE = new Map<string, { user: User | null; expiresAt: number }>()
+const AUTH_CACHE_TTL = 60000 // 1 minute
+const MAX_CACHE_SIZE = 1000
+
+const SUPABASE_PROJECT_ID =
+  process.env.NEXT_PUBLIC_SUPABASE_URL?.match(/https:\/\/([^.]+)\.supabase\.co/)?.[1] ||
+  'jrgmetdsohowtxickqij'
 
 export async function updateSession(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({
-    request,
-  })
-
-  // If the env vars are not set, skip middleware check. You can remove this once you setup the project.
-  if (!hasEnvVars) {
-    return supabaseResponse
-  }
+  let supabaseResponse = NextResponse.next({ request })
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -26,9 +26,7 @@ export async function updateSession(request: NextRequest) {
         },
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
-          supabaseResponse = NextResponse.next({
-            request,
-          })
+          supabaseResponse = NextResponse.next({ request })
           cookiesToSet.forEach(({ name, value, options }) =>
             supabaseResponse.cookies.set(name, value, options),
           )
@@ -37,175 +35,116 @@ export async function updateSession(request: NextRequest) {
     },
   )
 
-  // Do not run code between createServerClient and
-  // supabase.auth.getUser(). A simple mistake could make it very hard to debug
-  // issues with users being randomly logged out.
+  const sessionToken = request.cookies.get(`sb-${SUPABASE_PROJECT_ID}-auth-token`)?.value
+  const cacheKey = sessionToken ? `auth_${sessionToken.slice(-16)}` : null
 
-  // IMPORTANT: DO NOT REMOVE auth.getUser()
-
-  /**
-   * Retry configuration aligned with rest of codebase (lib/utils/retry.ts)
-   * - 3 total attempts (initial + 2 retries)
-   * - Exponential backoff: 200ms, 400ms, 800ms (capped at 1000ms)
-   * - Jitter to prevent thundering herd
-   * - Max total time: ~1600ms before failing
-   * - Increased delays to handle transient network issues (ECONNRESET)
-   */
-  const MAX_RETRIES = 3
-  const INITIAL_DELAY_MS = 200
-  const BACKOFF_MULTIPLIER = 2
-  const MAX_DELAY_MS = 1000
-
-  /**
-   * Calculate delay with exponential backoff and jitter
-   * Jitter prevents synchronized retry spikes from multiple requests
-   * Capped at MAX_DELAY_MS to prevent excessively long waits
-   */
-  function calculateRetryDelay(attempt: number): number {
-    const baseDelay = INITIAL_DELAY_MS * BACKOFF_MULTIPLIER ** (attempt - 1)
-    const cappedDelay = Math.min(baseDelay, MAX_DELAY_MS)
-    const jitter = Math.random() * 0.3 * cappedDelay // ±30% jitter
-    return Math.floor(cappedDelay + jitter)
+  // Check cache
+  if (cacheKey) {
+    const cached = AUTH_CACHE.get(cacheKey)
+    if (cached && cached.expiresAt > Date.now()) {
+      logger.query('middleware', 'Auth cache hit')
+      const user = cached.user
+      if (!user && !isPublicRoute(request)) {
+        return redirectToLogin(request, supabaseResponse)
+      }
+      return supabaseResponse
+    }
   }
 
-  let user = null
+  logger.query('middleware', 'Auth cache miss')
 
-  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+  let user = null
+  let networkError = false
+
+  // Try twice with 300ms delay
+  for (let attempt = 1; attempt <= 2; attempt++) {
     try {
       const { data, error } = await supabase.auth.getUser()
 
       if (error) {
-        // Classify error types for appropriate handling
         const errorMsg = error.message || ''
 
-        if (errorMsg.includes('refresh_token_not_found')) {
-          // Expected: tokens expired - user needs to re-authenticate
-          // Cookie clearing happens at redirect point, not here
-          logger.queryWarn('middleware', 'Session expired, user needs to re-authenticate')
+        // Auth errors - don't retry
+        if (
+          errorMsg.includes('refresh_token_not_found') ||
+          errorMsg.includes('Auth session missing') ||
+          errorMsg.includes('JWT')
+        ) {
+          if (cacheKey) AUTH_CACHE.delete(cacheKey)
           user = null
+          networkError = false
           break
         }
 
-        if (errorMsg.includes('Auth session missing')) {
-          // Expected: logged-out users - silent failure
-          user = null
-          break
+        // Network error - retry once
+        networkError = true
+        if (attempt < 2) {
+          await new Promise(resolve => setTimeout(resolve, 300))
         }
+      } else {
+        user = data?.user || null
+        networkError = false
 
-        if (errorMsg.includes('JWT')) {
-          // Expected: invalid/malformed token - user needs to re-authenticate
-          logger.queryWarn('middleware', 'Invalid token format, user needs to re-authenticate')
-          user = null
-          break
-        }
-
-        // Check if error is retryable (network/transient issues)
-        if (isRetryableError(error) && attempt < MAX_RETRIES) {
-          const delay = calculateRetryDelay(attempt)
-          logger.queryWarn('middleware', 'Retryable auth error, waiting before retry', {
-            error: errorMsg,
-            attempt,
-            nextAttempt: attempt + 1,
-            maxRetries: MAX_RETRIES,
-            delayMs: delay,
+        if (cacheKey && user) {
+          AUTH_CACHE.set(cacheKey, {
+            user,
+            expiresAt: Date.now() + AUTH_CACHE_TTL,
           })
 
-          await new Promise(resolve => setTimeout(resolve, delay))
-          continue // Retry
+          if (AUTH_CACHE.size > MAX_CACHE_SIZE) {
+            const now = Date.now()
+            for (const [key, value] of AUTH_CACHE.entries()) {
+              if (value.expiresAt < now) AUTH_CACHE.delete(key)
+            }
+          }
         }
-
-        // Non-retryable error or exhausted retries
-        if (attempt >= MAX_RETRIES && isRetryableError(error)) {
-          logger.error('middleware', 'Auth check failed after all retries', {
-            error: errorMsg,
-            attempts: attempt,
-          })
-        } else {
-          logger.error('middleware', 'Non-retryable auth error', errorMsg)
-        }
-
-        user = null
         break
       }
-
-      // Success
-      user = data?.user || null
-      break
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : String(err)
-
-      // Check if this is a retryable network error
-      if (isRetryableError(err) && attempt < MAX_RETRIES) {
-        const delay = calculateRetryDelay(attempt)
-        // Only log retries when query logging is enabled to reduce console noise
-        logger.queryWarn('middleware', 'Network error during auth check, retrying', {
-          error: errorMessage,
-          attempt,
-          nextAttempt: attempt + 1,
-          maxRetries: MAX_RETRIES,
-          delayMs: delay,
-        })
-
-        await new Promise(resolve => setTimeout(resolve, delay))
-        continue // Retry
+    } catch {
+      networkError = true
+      if (attempt < 2) {
+        await new Promise(resolve => setTimeout(resolve, 300))
       }
-
-      // Non-retryable error or exhausted retries
-      if (attempt >= MAX_RETRIES) {
-        logger.error('middleware', 'Auth check failed after all retries (exception)', {
-          error: errorMessage,
-          attempts: attempt,
-        })
-      } else {
-        logger.error('middleware', 'Non-retryable exception during auth check', errorMessage)
-      }
-
-      user = null
-      break
     }
   }
 
-  // Allow requests with auth codes to pass through (for password reset, etc.)
-  const hasAuthCode = request.nextUrl.searchParams.get('code')
-
-  if (
-    request.nextUrl.pathname !== '/' &&
-    !user &&
-    !hasAuthCode &&
-    !request.nextUrl.pathname.startsWith('/login') &&
-    !request.nextUrl.pathname.startsWith('/auth') &&
-    !request.nextUrl.pathname.startsWith('/onboarding/create-account') &&
-    !request.nextUrl.pathname.startsWith('/onboarding/success') &&
-    !request.nextUrl.pathname.startsWith('/contact') &&
-    !request.nextUrl.pathname.startsWith('/features') &&
-    !request.nextUrl.pathname.startsWith('/pricing') &&
-    !request.nextUrl.pathname.startsWith('/support')
-  ) {
-    // No user and not on a public page - redirect to login
-    // Clear all Supabase cookies to ensure clean state for re-authentication
-    request.cookies.getAll().forEach(cookie => {
-      if (cookie.name.startsWith('sb-')) {
-        supabaseResponse.cookies.delete(cookie.name)
-      }
-    })
-
-    const url = request.nextUrl.clone()
-    url.pathname = '/auth/login'
-    return NextResponse.redirect(url)
+  // Handle result
+  if (!user && !isPublicRoute(request)) {
+    // If network error, let request through (don't redirect)
+    if (networkError) {
+      logger.queryWarn('middleware', 'Network error - letting request through')
+      return supabaseResponse
+    }
+    // Real auth failure - redirect
+    return redirectToLogin(request, supabaseResponse)
   }
 
-  // IMPORTANT: You *must* return the supabaseResponse object as it is.
-  // If you're creating a new response object with NextResponse.next() make sure to:
-  // 1. Pass the request in it, like so:
-  //    const myNewResponse = NextResponse.next({ request })
-  // 2. Copy over the cookies, like so:
-  //    myNewResponse.cookies.setAll(supabaseResponse.cookies.getAll())
-  // 3. Change the myNewResponse object to fit your needs, but avoid changing
-  //    the cookies!
-  // 4. Finally:
-  //    return myNewResponse
-  // If this is not done, you may be causing the browser and server to go out
-  // of sync and terminate the user's session prematurely!
-
   return supabaseResponse
+}
+
+function isPublicRoute(request: NextRequest): boolean {
+  const pathname = request.nextUrl.pathname
+  return (
+    pathname === '/' ||
+    pathname.startsWith('/login') ||
+    pathname.startsWith('/auth') ||
+    pathname.startsWith('/onboarding/create-account') ||
+    pathname.startsWith('/onboarding/success') ||
+    pathname.startsWith('/contact') ||
+    pathname.startsWith('/features') ||
+    pathname.startsWith('/pricing') ||
+    pathname.startsWith('/support') ||
+    request.nextUrl.searchParams.has('code')
+  )
+}
+
+function redirectToLogin(request: NextRequest, response: NextResponse): NextResponse {
+  request.cookies.getAll().forEach(cookie => {
+    if (cookie.name.startsWith('sb-')) {
+      response.cookies.delete(cookie.name)
+    }
+  })
+  const url = request.nextUrl.clone()
+  url.pathname = '/auth/login'
+  return NextResponse.redirect(url)
 }

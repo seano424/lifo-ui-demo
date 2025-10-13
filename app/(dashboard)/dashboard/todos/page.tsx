@@ -53,9 +53,10 @@ export default async function TodosPage({ searchParams }: TodosPageProps) {
 
     stores = await fetchUserStores(user.id, serverClient)
   } catch (error) {
-    logger.error('TodosPage', 'Error prefetching data', error)
-    // If we can't fetch stores after retries, show an error page or redirect
-    throw new Error('Failed to load stores. Please refresh the page or try again later.')
+    // Silently handle - retry logic already attempted recovery
+    // If all retries failed, stores will be empty array
+    logger.queryWarn('TodosPage', 'Error prefetching data after retries', error)
+    stores = []
   }
 
   if (stores.length === 0) {
