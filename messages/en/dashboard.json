@@ -66,6 +66,8 @@
       "title": "Product Removal",
       "description": "Scan items to remove them from your inventory. Each scan will automatically remove the oldest batch of the scanned product, following the LIFO principle.",
       "recentlyRemoved": "{count, plural, =0 {No items removed} =1 {1 item removed} other {# items removed}}",
+      "removedQuantityExpires": "Removed {quantity}x • Expires: {date}",
+      "andMoreItems": "... and {count} more items",
       "success": "Product successfully removed"
     },
     "errors": {
