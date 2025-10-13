@@ -5,7 +5,6 @@ Implements NLP-based classification and hierarchical text analysis
 
 import re
 import time
-from typing import Any, Optional
 from dataclasses import dataclass
 
 import structlog
@@ -16,6 +15,7 @@ logger = structlog.get_logger()
 @dataclass
 class ProductNameResult:
     """Result of product name extraction"""
+
     product_name: str
     brand_name: str | None
     product_description: str | None
@@ -31,6 +31,7 @@ class ProductNameResult:
 @dataclass
 class TextBlock:
     """Enhanced text block with analysis metadata"""
+
     text: str
     original_text: str
     bounding_box: dict | None
@@ -62,147 +63,235 @@ class ProductNameExtractionService:
         self.product_indicators = self._initialize_product_indicators()
         self.exclusion_patterns = self._initialize_exclusion_patterns()
         self.food_categories = self._initialize_food_categories()
-        self.confidence_thresholds = {
-            'high': 0.80,
-            'medium': 0.65,
-            'low': 0.45
-        }
+        self.confidence_thresholds = {"high": 0.80, "medium": 0.65, "low": 0.45}
 
         logger.info(
             "ProductNameExtractionService initialized",
             brand_indicators_count=len(self.brand_indicators),
             product_indicators_count=len(self.product_indicators),
-            food_categories_count=len(self.food_categories)
+            food_categories_count=len(self.food_categories),
         )
 
     def _initialize_brand_indicators(self) -> dict[str, float]:
         """Initialize brand name indicators with confidence weights"""
         return {
             # Common brand suffixes/prefixes
-            'ltd': 0.8, 'limited': 0.8, 'inc': 0.8, 'incorporated': 0.8,
-            'co': 0.7, 'company': 0.7, 'corp': 0.7, 'corporation': 0.7,
-            'gmbh': 0.8, 'sa': 0.7, 'sas': 0.7, 'spa': 0.7,
-
+            "ltd": 0.8,
+            "limited": 0.8,
+            "inc": 0.8,
+            "incorporated": 0.8,
+            "co": 0.7,
+            "company": 0.7,
+            "corp": 0.7,
+            "corporation": 0.7,
+            "gmbh": 0.8,
+            "sa": 0.7,
+            "sas": 0.7,
+            "spa": 0.7,
             # Brand quality indicators
-            'premium': 0.6, 'select': 0.6, 'choice': 0.6, 'signature': 0.7,
-            'finest': 0.6, 'quality': 0.5, 'special': 0.5, 'deluxe': 0.6,
-
+            "premium": 0.6,
+            "select": 0.6,
+            "choice": 0.6,
+            "signature": 0.7,
+            "finest": 0.6,
+            "quality": 0.5,
+            "special": 0.5,
+            "deluxe": 0.6,
             # European brand indicators
-            'bio': 0.6, 'organic': 0.6, 'naturel': 0.6, 'natural': 0.6,
-            'fresh': 0.5, 'farm': 0.6, 'artisan': 0.7, 'traditional': 0.6,
-
+            "bio": 0.6,
+            "organic": 0.6,
+            "naturel": 0.6,
+            "natural": 0.6,
+            "fresh": 0.5,
+            "farm": 0.6,
+            "artisan": 0.7,
+            "traditional": 0.6,
             # Multilingual brand terms
-            'marque': 0.7,  # French: brand
-            'marke': 0.7,   # German: brand
-            'marca': 0.7,   # Spanish/Italian: brand
+            "marque": 0.7,  # French: brand
+            "marke": 0.7,  # German: brand
+            "marca": 0.7,  # Spanish/Italian: brand
         }
 
     def _initialize_product_indicators(self) -> dict[str, float]:
         """Initialize product name/description indicators"""
         return {
             # Product descriptors
-            'flavour': 0.7, 'flavor': 0.7, 'taste': 0.6, 'style': 0.6,
-            'variety': 0.6, 'type': 0.5, 'recipe': 0.6, 'blend': 0.6,
-
+            "flavour": 0.7,
+            "flavor": 0.7,
+            "taste": 0.6,
+            "style": 0.6,
+            "variety": 0.6,
+            "type": 0.5,
+            "recipe": 0.6,
+            "blend": 0.6,
             # Food preparation indicators
-            'fresh': 0.6, 'frozen': 0.7, 'dried': 0.6, 'smoked': 0.7,
-            'grilled': 0.6, 'roasted': 0.6, 'baked': 0.6, 'steamed': 0.6,
-
+            "fresh": 0.6,
+            "frozen": 0.7,
+            "dried": 0.6,
+            "smoked": 0.7,
+            "grilled": 0.6,
+            "roasted": 0.6,
+            "baked": 0.6,
+            "steamed": 0.6,
             # Size/quantity indicators
-            'large': 0.5, 'small': 0.5, 'medium': 0.5, 'extra': 0.5,
-            'family': 0.6, 'portion': 0.5, 'serving': 0.5,
-
+            "large": 0.5,
+            "small": 0.5,
+            "medium": 0.5,
+            "extra": 0.5,
+            "family": 0.6,
+            "portion": 0.5,
+            "serving": 0.5,
             # Multilingual product terms
-            'produit': 0.7,  # French: product
-            'produkt': 0.7,  # German: product
-            'producto': 0.7, # Spanish: product
-            'prodotto': 0.7, # Italian: product
+            "produit": 0.7,  # French: product
+            "produkt": 0.7,  # German: product
+            "producto": 0.7,  # Spanish: product
+            "prodotto": 0.7,  # Italian: product
         }
 
     def _initialize_exclusion_patterns(self) -> list[str]:
         """Initialize patterns to exclude from product names"""
         return [
             # Nutritional information
-            r'\b\d+\s*(kcal|cal|calories|kj|protein|fat|sugar|salt|sodium)\b',
-            r'\b\d+\s*(g|kg|ml|l|oz|lb)\b',  # Weight/volume
-            r'\b\d+%\b',  # Percentages
-
+            r"\b\d+\s*(kcal|cal|calories|kj|protein|fat|sugar|salt|sodium)\b",
+            r"\b\d+\s*(g|kg|ml|l|oz|lb)\b",  # Weight/volume
+            r"\b\d+%\b",  # Percentages
             # Ingredient lists
-            r'\bingredients?\s*:',
-            r'\bingrédients?\s*:',  # French
-            r'\bzutaten\s*:',       # German
-            r'\bingredientes\s*:',  # Spanish
-            r'\bingredienti\s*:',   # Italian
-
+            r"\bingredients?\s*:",
+            r"\bingrédients?\s*:",  # French
+            r"\bzutaten\s*:",  # German
+            r"\bingredientes\s*:",  # Spanish
+            r"\bingredienti\s*:",  # Italian
             # Allergen information
-            r'\bcontains?\s*:',
-            r'\bcontient\s*:',      # French
-            r'\benthält\s*:',       # German
-            r'\bcontiene\s*:',      # Spanish/Italian
-
+            r"\bcontains?\s*:",
+            r"\bcontient\s*:",  # French
+            r"\benthält\s*:",  # German
+            r"\bcontiene\s*:",  # Spanish/Italian
             # Storage instructions
-            r'\bstore\s+in',
-            r'\bconserver\s+au',    # French
-            r'\blagern\s+bei',      # German
-            r'\bconservar\s+en',    # Spanish
-
+            r"\bstore\s+in",
+            r"\bconserver\s+au",  # French
+            r"\blagern\s+bei",  # German
+            r"\bconservar\s+en",  # Spanish
             # Regulatory text
-            r'\b[A-Z]{2,}\s+\d+',   # Regulation codes
-            r'\bec\s+\d+',          # EC numbers
-            r'\be\d+',              # E-numbers
-
+            r"\b[A-Z]{2,}\s+\d+",  # Regulation codes
+            r"\bec\s+\d+",  # EC numbers
+            r"\be\d+",  # E-numbers
             # Dates and codes
-            r'\b\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4}\b',  # Dates
-            r'\bbatch\s*:?\s*\w+',
-            r'\blot\s*:?\s*\w+',
-
+            r"\b\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4}\b",  # Dates
+            r"\bbatch\s*:?\s*\w+",
+            r"\blot\s*:?\s*\w+",
             # Barcodes
-            r'\b\d{8,13}\b',        # Barcode numbers
-
+            r"\b\d{8,13}\b",  # Barcode numbers
             # Website/contact info
-            r'\bwww\.',
-            r'\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\b',  # Email
-            r'\b\+?\d{1,3}[-.\s]?\d{3,}\b',  # Phone numbers
+            r"\bwww\.",
+            r"\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\b",  # Email
+            r"\b\+?\d{1,3}[-.\s]?\d{3,}\b",  # Phone numbers
         ]
 
     def _initialize_food_categories(self) -> dict[str, list[str]]:
         """Initialize food category keywords for context"""
         return {
-            'dairy': [
-                'milk', 'cheese', 'yogurt', 'yoghurt', 'butter', 'cream',
-                'lait', 'fromage', 'yaourt',  # French
-                'milch', 'käse', 'joghurt',   # German
-                'leche', 'queso', 'yogur',    # Spanish
-                'latte', 'formaggio', 'yogurt' # Italian
+            "dairy": [
+                "milk",
+                "cheese",
+                "yogurt",
+                "yoghurt",
+                "butter",
+                "cream",
+                "lait",
+                "fromage",
+                "yaourt",  # French
+                "milch",
+                "käse",
+                "joghurt",  # German
+                "leche",
+                "queso",
+                "yogur",  # Spanish
+                "latte",
+                "formaggio",
+                "yogurt",  # Italian
             ],
-            'meat': [
-                'chicken', 'beef', 'pork', 'lamb', 'turkey', 'ham', 'bacon',
-                'poulet', 'bœuf', 'porc', 'agneau',  # French
-                'huhn', 'rindfleisch', 'schwein',    # German
-                'pollo', 'carne', 'cerdo', 'cordero', # Spanish
-                'pollo', 'manzo', 'maiale', 'agnello' # Italian
+            "meat": [
+                "chicken",
+                "beef",
+                "pork",
+                "lamb",
+                "turkey",
+                "ham",
+                "bacon",
+                "poulet",
+                "bœuf",
+                "porc",
+                "agneau",  # French
+                "huhn",
+                "rindfleisch",
+                "schwein",  # German
+                "pollo",
+                "carne",
+                "cerdo",
+                "cordero",  # Spanish
+                "pollo",
+                "manzo",
+                "maiale",
+                "agnello",  # Italian
             ],
-            'beverages': [
-                'water', 'juice', 'coffee', 'tea', 'soda', 'beer', 'wine',
-                'eau', 'jus', 'café', 'thé', 'vin',   # French
-                'wasser', 'saft', 'kaffee', 'tee',    # German
-                'agua', 'zumo', 'café', 'té', 'vino', # Spanish
-                'acqua', 'succo', 'caffè', 'tè', 'vino' # Italian
+            "beverages": [
+                "water",
+                "juice",
+                "coffee",
+                "tea",
+                "soda",
+                "beer",
+                "wine",
+                "eau",
+                "jus",
+                "café",
+                "thé",
+                "vin",  # French
+                "wasser",
+                "saft",
+                "kaffee",
+                "tee",  # German
+                "agua",
+                "zumo",
+                "café",
+                "té",
+                "vino",  # Spanish
+                "acqua",
+                "succo",
+                "caffè",
+                "tè",
+                "vino",  # Italian
             ],
-            'bakery': [
-                'bread', 'cake', 'cookies', 'biscuits', 'pastry',
-                'pain', 'gâteau', 'biscuits', 'pâtisserie',  # French
-                'brot', 'kuchen', 'kekse', 'gebäck',         # German
-                'pan', 'pastel', 'galletas', 'pastelería',   # Spanish
-                'pane', 'torta', 'biscotti', 'pasticceria'   # Italian
-            ]
+            "bakery": [
+                "bread",
+                "cake",
+                "cookies",
+                "biscuits",
+                "pastry",
+                "pain",
+                "gâteau",
+                "biscuits",
+                "pâtisserie",  # French
+                "brot",
+                "kuchen",
+                "kekse",
+                "gebäck",  # German
+                "pan",
+                "pastel",
+                "galletas",
+                "pastelería",  # Spanish
+                "pane",
+                "torta",
+                "biscotti",
+                "pasticceria",  # Italian
+            ],
         }
 
     async def extract_product_names_from_text_blocks(
         self,
         text_blocks: list[str],
         bounding_boxes: list[dict] | None = None,
-        language_preference: str = 'auto'
+        language_preference: str = "auto",
     ) -> list[ProductNameResult]:
         """
         Extract product names from OCR text blocks with advanced analysis
@@ -220,7 +309,7 @@ class ProductNameExtractionService:
         logger.debug(
             "Starting product name extraction",
             text_blocks_count=len(text_blocks),
-            language_preference=language_preference
+            language_preference=language_preference,
         )
 
         # Create enhanced text blocks with metadata
@@ -252,35 +341,42 @@ class ProductNameExtractionService:
 
         # Remove duplicates and validate
         unique_candidates = self._remove_duplicate_names(candidates)
-        validated_candidates = [c for c in unique_candidates if self._validate_product_name(c)]
+        validated_candidates = [
+            c for c in unique_candidates if self._validate_product_name(c)
+        ]
 
         # Sort by confidence and hierarchy
-        validated_candidates.sort(key=lambda x: (
-            x.hierarchy_level,  # Primary hierarchy first
-            x.confidence,       # Then by confidence
-            x.font_size_score + x.position_score  # Then by visual importance
-        ), reverse=True)
+        validated_candidates.sort(
+            key=lambda x: (
+                x.hierarchy_level,  # Primary hierarchy first
+                x.confidence,  # Then by confidence
+                x.font_size_score + x.position_score,  # Then by visual importance
+            ),
+            reverse=True,
+        )
 
         processing_time = (time.time() - start_time) * 1000
 
         logger.info(
             "Product name extraction completed",
             total_results=len(validated_candidates),
-            processing_time_ms=processing_time
+            processing_time_ms=processing_time,
         )
 
         return validated_candidates[:5]  # Return top 5 results
 
     def _create_enhanced_blocks(
-        self,
-        text_blocks: list[str],
-        bounding_boxes: list[dict] | None
+        self, text_blocks: list[str], bounding_boxes: list[dict] | None
     ) -> list[TextBlock]:
         """Create enhanced text blocks with analysis metadata"""
         enhanced_blocks = []
 
         for i, text in enumerate(text_blocks):
-            bounding_box = bounding_boxes[i] if bounding_boxes and i < len(bounding_boxes) else None
+            bounding_box = (
+                bounding_boxes[i]
+                if bounding_boxes and i < len(bounding_boxes)
+                else None
+            )
 
             # Calculate scores
             font_size_score = self._calculate_font_size_score(bounding_box)
@@ -304,7 +400,7 @@ class ProductNameExtractionService:
                 contains_brand_indicators=contains_brand_indicators,
                 contains_product_indicators=contains_product_indicators,
                 contains_nutritional_info=contains_nutritional_info,
-                contains_ingredients=contains_ingredients
+                contains_ingredients=contains_ingredients,
             )
 
             enhanced_blocks.append(enhanced_block)
@@ -317,8 +413,8 @@ class ProductNameExtractionService:
             return 0.5  # Neutral score
 
         try:
-            height = bounding_box.get('height', 0)
-            width = bounding_box.get('width', 0)
+            height = bounding_box.get("height", 0)
+            width = bounding_box.get("width", 0)
 
             # Larger text typically indicates more important content
             # Normalize based on typical font sizes on packaging
@@ -353,8 +449,8 @@ class ProductNameExtractionService:
             return 0.5  # Neutral score
 
         try:
-            x = bounding_box.get('x', 0)
-            y = bounding_box.get('y', 0)
+            x = bounding_box.get("x", 0)
+            y = bounding_box.get("y", 0)
 
             # Typical product name positions on food packaging
             position_score = 0.5  # Base score
@@ -379,21 +475,25 @@ class ProductNameExtractionService:
     def _contains_brand_indicators(self, text: str) -> bool:
         """Check if text contains brand indicators"""
         text_lower = text.lower()
-        return any(indicator in text_lower for indicator in self.brand_indicators.keys())
+        return any(
+            indicator in text_lower for indicator in self.brand_indicators.keys()
+        )
 
     def _contains_product_indicators(self, text: str) -> bool:
         """Check if text contains product indicators"""
         text_lower = text.lower()
-        return any(indicator in text_lower for indicator in self.product_indicators.keys())
+        return any(
+            indicator in text_lower for indicator in self.product_indicators.keys()
+        )
 
     def _contains_nutritional_info(self, text: str) -> bool:
         """Check if text contains nutritional information"""
         nutritional_patterns = [
-            r'\b\d+\s*(kcal|cal|calories|kj)\b',
-            r'\b\d+\s*g\s*(protein|fat|sugar|salt)\b',
-            r'\bper\s+100\s*g\b',
-            r'\benergy\b',
-            r'\bnutrition\b',
+            r"\b\d+\s*(kcal|cal|calories|kj)\b",
+            r"\b\d+\s*g\s*(protein|fat|sugar|salt)\b",
+            r"\bper\s+100\s*g\b",
+            r"\benergy\b",
+            r"\bnutrition\b",
         ]
 
         text_lower = text.lower()
@@ -402,11 +502,11 @@ class ProductNameExtractionService:
     def _contains_ingredients(self, text: str) -> bool:
         """Check if text contains ingredient information"""
         ingredient_patterns = [
-            r'\bingredients?\s*:',
-            r'\bingrédients?\s*:',
-            r'\bzutaten\s*:',
-            r'\bingredientes\s*:',
-            r'\bingredienti\s*:',
+            r"\bingredients?\s*:",
+            r"\bingrédients?\s*:",
+            r"\bzutaten\s*:",
+            r"\bingredientes\s*:",
+            r"\bingredienti\s*:",
         ]
 
         text_lower = text.lower()
@@ -438,7 +538,7 @@ class ProductNameExtractionService:
                 continue
 
             # Skip blocks that are mostly numbers
-            if len(re.sub(r'[^\d]', '', block.text)) / len(block.text) > 0.7:
+            if len(re.sub(r"[^\d]", "", block.text)) / len(block.text) > 0.7:
                 continue
 
             filtered_blocks.append(block)
@@ -446,9 +546,7 @@ class ProductNameExtractionService:
         return filtered_blocks
 
     async def _extract_single_block_candidates(
-        self,
-        blocks: list[TextBlock],
-        language_preference: str
+        self, blocks: list[TextBlock], language_preference: str
     ) -> list[ProductNameResult]:
         """Extract product name candidates from single blocks"""
         candidates = []
@@ -469,7 +567,9 @@ class ProductNameExtractionService:
             hierarchy_level = self._determine_hierarchy_level(block, name_type)
 
             # Extract brand and product components
-            brand_name, product_description = self._separate_brand_and_product(cleaned_text)
+            brand_name, product_description = self._separate_brand_and_product(
+                cleaned_text
+            )
 
             candidate = ProductNameResult(
                 product_name=cleaned_text,
@@ -481,7 +581,7 @@ class ProductNameExtractionService:
                 raw_text=block.text,
                 font_size_score=block.font_size_score,
                 position_score=block.position_score,
-                bounding_box=block.bounding_box
+                bounding_box=block.bounding_box,
             )
 
             candidates.append(candidate)
@@ -489,9 +589,7 @@ class ProductNameExtractionService:
         return candidates
 
     async def _extract_multiline_candidates(
-        self,
-        blocks: list[TextBlock],
-        language_preference: str
+        self, blocks: list[TextBlock], language_preference: str
     ) -> list[ProductNameResult]:
         """Extract product names that span multiple lines"""
         candidates = []
@@ -509,31 +607,41 @@ class ProductNameExtractionService:
                     if cleaned_text and len(cleaned_text) > len(block1.text.strip()):
                         # Create combined result
                         combined_confidence = (
-                            self._calculate_single_block_confidence(block1, 'combined') +
-                            self._calculate_single_block_confidence(block2, 'combined')
+                            self._calculate_single_block_confidence(block1, "combined")
+                            + self._calculate_single_block_confidence(
+                                block2, "combined"
+                            )
                         ) / 2
 
                         # Bonus for successful combination
                         combined_confidence = min(combined_confidence + 0.1, 1.0)
 
                         hierarchy_level = min(
-                            self._determine_hierarchy_level(block1, 'combined'),
-                            self._determine_hierarchy_level(block2, 'combined')
+                            self._determine_hierarchy_level(block1, "combined"),
+                            self._determine_hierarchy_level(block2, "combined"),
                         )
 
-                        brand_name, product_description = self._separate_brand_and_product(cleaned_text)
+                        brand_name, product_description = (
+                            self._separate_brand_and_product(cleaned_text)
+                        )
 
                         candidate = ProductNameResult(
                             product_name=cleaned_text,
                             brand_name=brand_name,
                             product_description=product_description,
                             confidence=combined_confidence,
-                            name_type='combined',
+                            name_type="combined",
                             hierarchy_level=hierarchy_level,
                             raw_text=f"{block1.text} {block2.text}",
-                            font_size_score=(block1.font_size_score + block2.font_size_score) / 2,
-                            position_score=(block1.position_score + block2.position_score) / 2,
-                            bounding_box=block1.bounding_box
+                            font_size_score=(
+                                block1.font_size_score + block2.font_size_score
+                            )
+                            / 2,
+                            position_score=(
+                                block1.position_score + block2.position_score
+                            )
+                            / 2,
+                            bounding_box=block1.bounding_box,
                         )
 
                         candidates.append(candidate)
@@ -541,9 +649,7 @@ class ProductNameExtractionService:
         return candidates
 
     async def _extract_combined_candidates(
-        self,
-        blocks: list[TextBlock],
-        language_preference: str
+        self, blocks: list[TextBlock], language_preference: str
     ) -> list[ProductNameResult]:
         """Extract brand + product combinations"""
         candidates = []
@@ -563,8 +669,12 @@ class ProductNameExtractionService:
                         combined_name = f"{brand_text} {product_text}"
 
                         confidence = (
-                            self._calculate_single_block_confidence(brand_block, 'brand') +
-                            self._calculate_single_block_confidence(product_block, 'product')
+                            self._calculate_single_block_confidence(
+                                brand_block, "brand"
+                            )
+                            + self._calculate_single_block_confidence(
+                                product_block, "product"
+                            )
                         ) / 2
 
                         # Bonus for brand+product combination
@@ -575,12 +685,19 @@ class ProductNameExtractionService:
                             brand_name=brand_text,
                             product_description=product_text,
                             confidence=confidence,
-                            name_type='combined',
+                            name_type="combined",
                             hierarchy_level=1,  # High priority for brand+product
                             raw_text=f"{brand_block.text} {product_block.text}",
-                            font_size_score=max(brand_block.font_size_score, product_block.font_size_score),
-                            position_score=(brand_block.position_score + product_block.position_score) / 2,
-                            bounding_box=brand_block.bounding_box
+                            font_size_score=max(
+                                brand_block.font_size_score,
+                                product_block.font_size_score,
+                            ),
+                            position_score=(
+                                brand_block.position_score
+                                + product_block.position_score
+                            )
+                            / 2,
+                            bounding_box=brand_block.bounding_box,
                         )
 
                         candidates.append(candidate)
@@ -593,14 +710,16 @@ class ProductNameExtractionService:
             return ""
 
         # Remove extra whitespace
-        cleaned = re.sub(r'\s+', ' ', text.strip())
+        cleaned = re.sub(r"\s+", " ", text.strip())
 
         # Remove common non-product elements
-        cleaned = re.sub(r'\b\d+\s*(g|kg|ml|l|oz|lb)\b', '', cleaned, flags=re.IGNORECASE)
-        cleaned = re.sub(r'\b\d+%\b', '', cleaned)
+        cleaned = re.sub(
+            r"\b\d+\s*(g|kg|ml|l|oz|lb)\b", "", cleaned, flags=re.IGNORECASE
+        )
+        cleaned = re.sub(r"\b\d+%\b", "", cleaned)
 
         # Remove special characters at start/end
-        cleaned = re.sub(r'^[^\w\s]+|[^\w\s]+$', '', cleaned)
+        cleaned = re.sub(r"^[^\w\s]+|[^\w\s]+$", "", cleaned)
 
         # Title case normalization (optional)
         if cleaned.isupper() and len(cleaned) > 10:
@@ -614,13 +733,15 @@ class ProductNameExtractionService:
 
         # Brand indicators
         brand_score = sum(
-            weight for keyword, weight in self.brand_indicators.items()
+            weight
+            for keyword, weight in self.brand_indicators.items()
             if keyword in text_lower
         )
 
         # Product indicators
         product_score = sum(
-            weight for keyword, weight in self.product_indicators.items()
+            weight
+            for keyword, weight in self.product_indicators.items()
             if keyword in text_lower
         )
 
@@ -640,15 +761,17 @@ class ProductNameExtractionService:
 
         # Determine type
         if brand_score > product_score and brand_score > 0.5:
-            return 'brand'
+            return "brand"
         elif product_score > 0.5:
-            return 'product'
+            return "product"
         elif len(text.split()) == 1 and text.isupper():
-            return 'brand'  # Single uppercase word likely brand
+            return "brand"  # Single uppercase word likely brand
         else:
-            return 'description'
+            return "description"
 
-    def _calculate_single_block_confidence(self, block: TextBlock, name_type: str) -> float:
+    def _calculate_single_block_confidence(
+        self, block: TextBlock, name_type: str
+    ) -> float:
         """Calculate confidence for single block extraction"""
         base_confidence = 0.4
 
@@ -658,10 +781,10 @@ class ProductNameExtractionService:
 
         # Name type bonus
         type_bonus = {
-            'brand': 0.2,
-            'product': 0.2,
-            'combined': 0.25,
-            'description': 0.1
+            "brand": 0.2,
+            "product": 0.2,
+            "combined": 0.25,
+            "description": 0.1,
         }
         base_confidence += type_bonus.get(name_type, 0.1)
 
@@ -694,7 +817,7 @@ class ProductNameExtractionService:
             hierarchy_level = 3  # Tertiary
 
         # Name type can influence hierarchy
-        if name_type == 'brand' and block.font_size_score >= 0.5:
+        if name_type == "brand" and block.font_size_score >= 0.5:
             hierarchy_level = min(hierarchy_level - 1, 1)  # Promote brands
 
         return hierarchy_level
@@ -710,9 +833,11 @@ class ProductNameExtractionService:
         if len(words) >= 3:
             # Check if first word looks like a brand
             first_word = words[0].lower()
-            if (first_word in self.brand_indicators or
-                first_word.isupper() or
-                first_word.istitle()):
+            if (
+                first_word in self.brand_indicators
+                or first_word.isupper()
+                or first_word.istitle()
+            ):
                 return words[0], " ".join(words[1:])
 
         # If no clear separation, return as product only
@@ -725,9 +850,9 @@ class ProductNameExtractionService:
 
         try:
             # Simple adjacency check based on position
-            y1 = block1.bounding_box.get('y', 0)
-            y2 = block2.bounding_box.get('y', 0)
-            h1 = block1.bounding_box.get('height', 0)
+            y1 = block1.bounding_box.get("y", 0)
+            y2 = block2.bounding_box.get("y", 0)
+            h1 = block1.bounding_box.get("height", 0)
 
             # Check if blocks are vertically close
             vertical_distance = abs(y2 - (y1 + h1))
@@ -742,7 +867,9 @@ class ProductNameExtractionService:
         combined = f"{text1.strip()} {text2.strip()}"
         return combined
 
-    def _remove_duplicate_names(self, candidates: list[ProductNameResult]) -> list[ProductNameResult]:
+    def _remove_duplicate_names(
+        self, candidates: list[ProductNameResult]
+    ) -> list[ProductNameResult]:
         """Remove duplicate product name extractions"""
         if not candidates:
             return []
@@ -769,7 +896,7 @@ class ProductNameExtractionService:
             return False
 
         # Minimum confidence threshold
-        if result.confidence < self.confidence_thresholds['low']:
+        if result.confidence < self.confidence_thresholds["low"]:
             return False
 
         # Length validation
@@ -778,7 +905,7 @@ class ProductNameExtractionService:
             return False
 
         # Must contain some alphabetic characters
-        if not re.search(r'[a-zA-Z]', result.product_name):
+        if not re.search(r"[a-zA-Z]", result.product_name):
             return False
 
         return True
@@ -786,6 +913,7 @@ class ProductNameExtractionService:
 
 # Global service instance
 _product_name_extraction_service: ProductNameExtractionService | None = None
+
 
 def get_product_name_extraction_service() -> ProductNameExtractionService:
     """Get singleton instance of product name extraction service"""

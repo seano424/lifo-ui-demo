@@ -6,7 +6,7 @@ Prevents cascading failures when external services (like Google Vision API) are 
 import asyncio
 import time
 from enum import Enum
-from typing import Any, Optional
+from typing import Any
 from collections.abc import Callable
 
 import structlog
@@ -16,13 +16,15 @@ logger = structlog.get_logger()
 
 class CircuitState(Enum):
     """Circuit breaker states"""
-    CLOSED = "closed"      # Normal operation
-    OPEN = "open"          # Blocking calls due to failures
+
+    CLOSED = "closed"  # Normal operation
+    OPEN = "open"  # Blocking calls due to failures
     HALF_OPEN = "half_open"  # Testing if service has recovered
 
 
 class CircuitBreakerError(Exception):
     """Raised when circuit breaker is open"""
+
     pass
 
 
@@ -41,7 +43,7 @@ class CircuitBreaker:
         failure_threshold: int = 5,
         recovery_timeout_seconds: int = 60,
         expected_exception: type[BaseException] = Exception,
-        success_threshold: int = 2
+        success_threshold: int = 2,
     ):
         self.failure_threshold = failure_threshold
         self.recovery_timeout = recovery_timeout_seconds
@@ -58,14 +60,14 @@ class CircuitBreaker:
             "Circuit breaker initialized",
             failure_threshold=failure_threshold,
             recovery_timeout_seconds=recovery_timeout_seconds,
-            success_threshold=success_threshold
+            success_threshold=success_threshold,
         )
 
     def _should_attempt_reset(self) -> bool:
         """Check if we should attempt to reset from OPEN to HALF_OPEN"""
         return (
-            self.state == CircuitState.OPEN and
-            time.time() - self.last_failure_time >= self.recovery_timeout
+            self.state == CircuitState.OPEN
+            and time.time() - self.last_failure_time >= self.recovery_timeout
         )
 
     def _record_success(self):
@@ -97,7 +99,7 @@ class CircuitBreaker:
         logger.warning(
             "Circuit breaker tripped to OPEN",
             failure_count=self.failure_count,
-            failure_threshold=self.failure_threshold
+            failure_threshold=self.failure_threshold,
         )
 
     def _reset(self):
@@ -137,7 +139,7 @@ class CircuitBreaker:
             self._record_success()
             return result
 
-        except self.expected_exception as e:
+        except self.expected_exception:
             self._record_failure()
             raise
         except Exception as e:
@@ -145,21 +147,24 @@ class CircuitBreaker:
             logger.warning(
                 "Unexpected exception in circuit breaker",
                 error=str(e),
-                error_type=type(e).__name__
+                error_type=type(e).__name__,
             )
             raise e
 
     def get_stats(self) -> dict[str, Any]:
         """Get circuit breaker statistics"""
         return {
-            'state': self.state.value,
-            'failure_count': self.failure_count,
-            'success_count': self.success_count,
-            'failure_threshold': self.failure_threshold,
-            'recovery_timeout_seconds': self.recovery_timeout,
-            'last_failure_time': self.last_failure_time,
-            'time_until_retry': max(0, self.recovery_timeout - (time.time() - self.last_failure_time))
-            if self.state == CircuitState.OPEN else 0
+            "state": self.state.value,
+            "failure_count": self.failure_count,
+            "success_count": self.success_count,
+            "failure_threshold": self.failure_threshold,
+            "recovery_timeout_seconds": self.recovery_timeout,
+            "last_failure_time": self.last_failure_time,
+            "time_until_retry": max(
+                0, self.recovery_timeout - (time.time() - self.last_failure_time)
+            )
+            if self.state == CircuitState.OPEN
+            else 0,
         }
 
 
@@ -172,10 +177,10 @@ def get_vision_api_breaker() -> CircuitBreaker:
     global _vision_api_breaker
     if _vision_api_breaker is None:
         _vision_api_breaker = CircuitBreaker(
-            failure_threshold=5,     # Allow 5 failures before opening
+            failure_threshold=5,  # Allow 5 failures before opening
             recovery_timeout_seconds=60,  # Wait 1 minute before testing
             expected_exception=Exception,  # Count all exceptions as failures
-            success_threshold=2      # Need 2 successes to close circuit
+            success_threshold=2,  # Need 2 successes to close circuit
         )
     return _vision_api_breaker
 
@@ -185,6 +190,6 @@ def get_circuit_breaker_stats() -> dict[str, Any]:
     stats = {}
 
     if _vision_api_breaker is not None:
-        stats['vision_api'] = _vision_api_breaker.get_stats()
+        stats["vision_api"] = _vision_api_breaker.get_stats()
 
     return stats

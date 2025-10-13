@@ -107,9 +107,10 @@ async def upload_csv(
     try:
         # ⏱️ START COMPREHENSIVE TIMING
         import time
+
         total_start_time = time.perf_counter()
         timing_details = {}
-        
+
         # ⏱️ File Upload Timing
         file_start = time.perf_counter()
         file_content = await file.read()
@@ -132,7 +133,9 @@ async def upload_csv(
         # Use sanitized content for processing
         sanitized_content = security_result["sanitized_content"].encode("utf-8")
         security_end = time.perf_counter()
-        timing_details["security_validation_ms"] = (security_end - security_start) * 1000
+        timing_details["security_validation_ms"] = (
+            security_end - security_start
+        ) * 1000
 
         # Log security actions if any
         if security_result["sanitization_changes"]:
@@ -153,7 +156,9 @@ async def upload_csv(
             sanitized_content, store_id, current_user["sub"]
         )
         csv_processing_end = time.perf_counter()
-        timing_details["csv_processing_ms"] = (csv_processing_end - csv_processing_start) * 1000
+        timing_details["csv_processing_ms"] = (
+            csv_processing_end - csv_processing_start
+        ) * 1000
 
         # Check processing result status
         if result["status"] == "error":
@@ -173,15 +178,17 @@ async def upload_csv(
         # Prepare response to match frontend CSVUploadResponse interface
         processed_count = result["processed_count"]
         total_items = len(result["data"]) if result.get("data") else 0
-        
+
         # ⏱️ Calculate Total Processing Time
         total_end_time = time.perf_counter()
-        timing_details["total_processing_ms"] = (total_end_time - total_start_time) * 1000
-        
+        timing_details["total_processing_ms"] = (
+            total_end_time - total_start_time
+        ) * 1000
+
         # Extract timing metrics from metadata if available
         metadata = result.get("metadata", {})
         csv_internal_processing_time_ms = metadata.get("processing_time_ms", 0)
-        
+
         # Get detailed timing information if available
         csv_internal_timing = metadata.get("timing_details", {})
         # Merge internal CSV timing with our external timing
@@ -195,23 +202,48 @@ async def upload_csv(
             "skipped": skipped_count,  # Now populated from metadata
             "errors": result.get("errors", []),
             "total_items": total_items,
-            "processing_time_ms": round(timing_details.get("total_processing_ms", 0), 2),
-            "duplicates_skipped": duplicates[:10] if duplicates else [],  # Limit to first 10
+            "processing_time_ms": round(
+                timing_details.get("total_processing_ms", 0), 2
+            ),
+            "duplicates_skipped": duplicates[:10]
+            if duplicates
+            else [],  # Limit to first 10
             "performance_metrics": {
                 # ⏱️ Comprehensive Timing Metrics
-                "total_processing_ms": round(timing_details.get("total_processing_ms", 0), 2),
+                "total_processing_ms": round(
+                    timing_details.get("total_processing_ms", 0), 2
+                ),
                 "file_upload_ms": round(timing_details.get("file_upload_ms", 0), 2),
-                "security_validation_ms": round(timing_details.get("security_validation_ms", 0), 2),
-                "csv_processing_ms": round(timing_details.get("csv_processing_ms", 0), 2),
+                "security_validation_ms": round(
+                    timing_details.get("security_validation_ms", 0), 2
+                ),
+                "csv_processing_ms": round(
+                    timing_details.get("csv_processing_ms", 0), 2
+                ),
                 "csv_internal_processing_ms": round(csv_internal_processing_time_ms, 2),
                 "items_per_second": round(
-                    processed_count / (timing_details.get("total_processing_ms", 1) / 1000), 2
-                ) if timing_details.get("total_processing_ms", 0) > 0 else 0,
+                    processed_count
+                    / (timing_details.get("total_processing_ms", 1) / 1000),
+                    2,
+                )
+                if timing_details.get("total_processing_ms", 0) > 0
+                else 0,
                 # Internal CSV processor metrics
-                "duplicate_detection_ms": round(timing_details.get("duplicate_detection_ms", 0), 2),
-                "product_resolution_ms": round(timing_details.get("product_resolution_ms", 0), 2),
-                "batch_insertion_ms": round(timing_details.get("batch_insertion_ms", 0), 2),
-                "database_operations_ms": round(timing_details.get("database_operations_ms", csv_internal_processing_time_ms), 2),
+                "duplicate_detection_ms": round(
+                    timing_details.get("duplicate_detection_ms", 0), 2
+                ),
+                "product_resolution_ms": round(
+                    timing_details.get("product_resolution_ms", 0), 2
+                ),
+                "batch_insertion_ms": round(
+                    timing_details.get("batch_insertion_ms", 0), 2
+                ),
+                "database_operations_ms": round(
+                    timing_details.get(
+                        "database_operations_ms", csv_internal_processing_time_ms
+                    ),
+                    2,
+                ),
                 "csv_parsing_ms": round(timing_details.get("csv_parsing_ms", 0), 2),
                 "validation_ms": round(timing_details.get("validation_ms", 0), 2),
                 # Performance indicators
@@ -254,14 +286,19 @@ async def upload_csv(
             filename=file.filename,
             total_processing_ms=round(timing_details.get("total_processing_ms", 0), 2),
             file_upload_ms=round(timing_details.get("file_upload_ms", 0), 2),
-            security_validation_ms=round(timing_details.get("security_validation_ms", 0), 2),
+            security_validation_ms=round(
+                timing_details.get("security_validation_ms", 0), 2
+            ),
             csv_processing_ms=round(timing_details.get("csv_processing_ms", 0), 2),
             items_processed=processed_count,
             items_per_second=round(
-                processed_count / (timing_details.get("total_processing_ms", 1) / 1000), 2
-            ) if timing_details.get("total_processing_ms", 0) > 0 else 0,
+                processed_count / (timing_details.get("total_processing_ms", 1) / 1000),
+                2,
+            )
+            if timing_details.get("total_processing_ms", 0) > 0
+            else 0,
             success=True,
-            timing_precision="microsecond"
+            timing_precision="microsecond",
         )
 
         return response_data
@@ -484,7 +521,7 @@ async def upload_csv_and_create_batches(
     try:
         # ⏱️ START COMPREHENSIVE TIMING FOR BATCH CREATION WORKFLOW
         total_workflow_start = time.perf_counter()
-        
+
         # Track file upload time
         upload_start = time.perf_counter()
         file_content = await file.read()
@@ -504,15 +541,21 @@ async def upload_csv_and_create_batches(
             chunk_size=chunk_size,
         )
         orchestrator_time_ms = (time.perf_counter() - orchestrator_start) * 1000
-        
+
         # ⏱️ Calculate total workflow time
         total_workflow_time_ms = (time.perf_counter() - total_workflow_start) * 1000
-        
+
         # Add comprehensive timing to metrics
         if "performance_metrics" in response_data:
-            response_data["performance_metrics"]["file_upload_ms"] = round(upload_time_ms, 2)
-            response_data["performance_metrics"]["orchestrator_processing_ms"] = round(orchestrator_time_ms, 2)
-            response_data["performance_metrics"]["total_workflow_ms"] = round(total_workflow_time_ms, 2)
+            response_data["performance_metrics"]["file_upload_ms"] = round(
+                upload_time_ms, 2
+            )
+            response_data["performance_metrics"]["orchestrator_processing_ms"] = round(
+                orchestrator_time_ms, 2
+            )
+            response_data["performance_metrics"]["total_workflow_ms"] = round(
+                total_workflow_time_ms, 2
+            )
             response_data["performance_metrics"]["timing_precision"] = "microsecond"
             response_data["performance_metrics"]["workflow_optimized"] = True
 
@@ -541,8 +584,77 @@ async def upload_csv_and_create_batches(
             database_operations_ms=performance_metrics.get("database_operations_ms", 0),
             items_per_second=performance_metrics.get("items_per_second", 0),
             timing_precision="microsecond",
-            workflow_optimized=True
+            workflow_optimized=True,
         )
+
+        # 🎯 AUTO-TRIGGER SCORING FOR SMALL-TO-MEDIUM UPLOADS
+        # After successful batch creation, automatically trigger scoring for uploads ≤1,000 items
+        # This provides immediate urgency scores without manual intervention
+        successful_batches = response_data["batch_creation"]["successful_batches"]
+        total_items = response_data["batch_creation"]["total_requests"]
+
+        if successful_batches > 0:
+            # Hybrid approach: auto-trigger for ≤1,000 items, manual for larger
+            AUTO_SCORE_THRESHOLD = 1000
+
+            if total_items <= AUTO_SCORE_THRESHOLD:
+                try:
+                    # Import the automated scoring scheduler
+                    from app.core.automated_scoring import get_automated_scoring_scheduler
+
+                    scheduler = get_automated_scoring_scheduler()
+
+                    # Trigger immediate scoring (force_recalculate=False to be efficient)
+                    job_id = await scheduler.trigger_immediate_scoring(
+                        store_id, force_recalculate=False
+                    )
+
+                    # Add job_id to response so user can track progress
+                    response_data["auto_scoring"] = {
+                        "triggered": True,
+                        "job_id": job_id,
+                        "message": f"Automatic scoring triggered for {successful_batches} new batches",
+                        "note": "Track scoring progress using the job_id",
+                    }
+
+                    logger.info(
+                        "Auto-triggered scoring after CSV upload",
+                        store_id=store_id,
+                        job_id=job_id,
+                        total_items=total_items,
+                        successful_batches=successful_batches,
+                        user_id=current_user["sub"],
+                    )
+
+                except Exception as scoring_error:
+                    # Don't fail the entire request if auto-scoring fails
+                    logger.warning(
+                        "Failed to auto-trigger scoring after CSV upload",
+                        store_id=store_id,
+                        total_items=total_items,
+                        error=str(scoring_error),
+                        user_id=current_user["sub"],
+                    )
+                    response_data["auto_scoring"] = {
+                        "triggered": False,
+                        "error": str(scoring_error),
+                        "message": "Automatic scoring failed. Trigger manually if needed.",
+                    }
+            else:
+                # For large uploads, suggest manual trigger
+                response_data["auto_scoring"] = {
+                    "triggered": False,
+                    "message": f"Large upload detected ({total_items} items). Trigger scoring manually when ready.",
+                    "note": f"Uploads with >{AUTO_SCORE_THRESHOLD} items require manual scoring trigger to avoid system overload.",
+                }
+
+                logger.info(
+                    "Large CSV upload - scoring not auto-triggered",
+                    store_id=store_id,
+                    total_items=total_items,
+                    threshold=AUTO_SCORE_THRESHOLD,
+                    user_id=current_user["sub"],
+                )
 
         return response_data
 

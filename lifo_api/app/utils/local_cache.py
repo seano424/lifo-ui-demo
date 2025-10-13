@@ -9,7 +9,7 @@ import json
 import time
 from datetime import datetime
 from threading import Lock
-from typing import Any, Optional
+from typing import Any
 
 import structlog
 
@@ -32,7 +32,7 @@ class LocalMemoryCache:
         self,
         max_size: int = 1000,
         default_ttl_seconds: int = 3600,
-        cleanup_interval_seconds: int = 300
+        cleanup_interval_seconds: int = 300,
     ):
         self._cache: dict[str, dict[str, Any]] = {}
         self._max_size = max_size
@@ -45,7 +45,7 @@ class LocalMemoryCache:
             "Local memory cache initialized",
             max_size=max_size,
             default_ttl_seconds=default_ttl_seconds,
-            cleanup_interval_seconds=cleanup_interval_seconds
+            cleanup_interval_seconds=cleanup_interval_seconds,
         )
 
     def _generate_key(self, key_data: Any) -> str:
@@ -65,7 +65,7 @@ class LocalMemoryCache:
         expired_keys = []
 
         for key, entry in self._cache.items():
-            if current_time > entry['expires_at']:
+            if current_time > entry["expires_at"]:
                 expired_keys.append(key)
 
         for key in expired_keys:
@@ -77,7 +77,7 @@ class LocalMemoryCache:
             logger.debug(
                 "Cleaned up expired cache entries",
                 expired_count=len(expired_keys),
-                remaining_count=len(self._cache)
+                remaining_count=len(self._cache),
             )
 
         return len(expired_keys)
@@ -95,8 +95,7 @@ class LocalMemoryCache:
 
         # Sort by access time and remove oldest entries
         sorted_entries = sorted(
-            self._cache.items(),
-            key=lambda x: x[1]['last_accessed']
+            self._cache.items(), key=lambda x: x[1]["last_accessed"]
         )
 
         entries_to_remove = len(self._cache) - self._max_size + 1
@@ -108,7 +107,7 @@ class LocalMemoryCache:
             "Enforced cache size limit",
             removed_count=entries_to_remove,
             current_size=len(self._cache),
-            max_size=self._max_size
+            max_size=self._max_size,
         )
 
     def get(self, key_data: Any) -> Any | None:
@@ -125,22 +124,17 @@ class LocalMemoryCache:
             current_time = time.time()
 
             # Check if expired
-            if current_time > entry['expires_at']:
+            if current_time > entry["expires_at"]:
                 del self._cache[cache_key]
                 return None
 
             # Update access time
-            entry['last_accessed'] = current_time
+            entry["last_accessed"] = current_time
 
             logger.debug("Cache hit", cache_key=cache_key[:16])
-            return entry['value']
+            return entry["value"]
 
-    def set(
-        self,
-        key_data: Any,
-        value: Any,
-        ttl_seconds: int | None = None
-    ) -> None:
+    def set(self, key_data: Any, value: Any, ttl_seconds: int | None = None) -> None:
         """Set value in cache with TTL"""
         cache_key = self._generate_key(key_data)
         ttl = ttl_seconds if ttl_seconds is not None else self._default_ttl
@@ -151,17 +145,17 @@ class LocalMemoryCache:
             self._enforce_size_limit()
 
             self._cache[cache_key] = {
-                'value': value,
-                'expires_at': current_time + ttl,
-                'last_accessed': current_time,
-                'created_at': current_time
+                "value": value,
+                "expires_at": current_time + ttl,
+                "last_accessed": current_time,
+                "created_at": current_time,
             }
 
             logger.debug(
                 "Cache set",
                 cache_key=cache_key[:16],
                 ttl_seconds=ttl,
-                cache_size=len(self._cache)
+                cache_size=len(self._cache),
             )
 
     def delete(self, key_data: Any) -> bool:
@@ -187,17 +181,18 @@ class LocalMemoryCache:
         with self._lock:
             current_time = time.time()
             expired_count = sum(
-                1 for entry in self._cache.values()
-                if current_time > entry['expires_at']
+                1
+                for entry in self._cache.values()
+                if current_time > entry["expires_at"]
             )
 
             return {
-                'total_entries': len(self._cache),
-                'expired_entries': expired_count,
-                'active_entries': len(self._cache) - expired_count,
-                'max_size': self._max_size,
-                'utilization_percent': (len(self._cache) / self._max_size) * 100,
-                'last_cleanup': datetime.fromtimestamp(self._last_cleanup).isoformat(),
+                "total_entries": len(self._cache),
+                "expired_entries": expired_count,
+                "active_entries": len(self._cache) - expired_count,
+                "max_size": self._max_size,
+                "utilization_percent": (len(self._cache) / self._max_size) * 100,
+                "last_cleanup": datetime.fromtimestamp(self._last_cleanup).isoformat(),
             }
 
 
@@ -210,10 +205,11 @@ def get_ocr_cache() -> LocalMemoryCache:
     global _ocr_cache
     if _ocr_cache is None:
         from app.core.config import settings
+
         _ocr_cache = LocalMemoryCache(
             max_size=1000,  # Store up to 1000 OCR results
             default_ttl_seconds=settings.ocr_cache_ttl_seconds,
-            cleanup_interval_seconds=300  # Cleanup every 5 minutes
+            cleanup_interval_seconds=300,  # Cleanup every 5 minutes
         )
     return _ocr_cache
 
@@ -221,6 +217,7 @@ def get_ocr_cache() -> LocalMemoryCache:
 def cache_ocr_result(image_data: bytes, result: Any) -> None:
     """Cache an OCR result using image data as key"""
     from app.core.config import settings
+
     if not settings.ocr_enable_caching:
         return
 
@@ -231,6 +228,7 @@ def cache_ocr_result(image_data: bytes, result: Any) -> None:
 def get_cached_ocr_result(image_data: bytes) -> Any | None:
     """Get cached OCR result for image data"""
     from app.core.config import settings
+
     if not settings.ocr_enable_caching:
         return None
 

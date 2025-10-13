@@ -113,13 +113,33 @@ export function useUrgentTodos(pageSize: number = 20) {
   )
 }
 
-// Items expiring soon (within X days)
-export function useExpiringTodos(daysMax: number = 3, pageSize: number = 20) {
+// Items expiring soon (with configurable date range)
+// Shows items based purely on expiry timeline, regardless of action status
+export function useExpiringTodos(
+  additionalFilters?: Omit<TodoFilters, 'batch_status'>,
+  pageSize: number = 20,
+) {
   return useTodosWithFilters(
     {
-      days_to_expiry_max: daysMax,
       batch_status: ['active'],
-      completion_status: 'pending',
+      // Default to showing all expiring items (min: 0) if no filters provided
+      days_to_expiry_min: additionalFilters?.days_to_expiry_min ?? 0,
+      // DO NOT filter by completion_status - expiring items should show regardless of action status
+      ...additionalFilters,
+    },
+    pageSize,
+  )
+}
+
+// Expired items (already past expiry date)
+export function useExpiredTodos(
+  additionalFilters?: Omit<TodoFilters, 'batch_status'>,
+  pageSize: number = 20,
+) {
+  return useTodosWithFilters(
+    {
+      batch_status: ['expired'],
+      ...additionalFilters,
     },
     pageSize,
   )

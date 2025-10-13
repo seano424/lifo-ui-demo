@@ -1,6 +1,7 @@
 """
 Open Food Facts API downloader with concurrent processing and error handling.
 """
+
 import asyncio
 import json
 from pathlib import Path
@@ -8,15 +9,20 @@ from typing import Dict, List, Any, Optional, Set
 import aiohttp
 import aiofiles
 from dataclasses import dataclass, asdict
-import logging
 
-from ..config import OpenFoodFactsConfig, DatasetConfig
-from ..utils import ProgressTracker, validate_product_data, validate_image_quality, get_logger
+from ..config import DatasetConfig
+from ..utils import (
+    ProgressTracker,
+    validate_product_data,
+    validate_image_quality,
+    get_logger,
+)
 
 
 @dataclass
 class ProductData:
     """Structured product data from Open Food Facts."""
+
     code: str
     product_name: str
     brands: str
@@ -54,7 +60,7 @@ class OpenFoodFactsDownloader:
         """Async context manager entry."""
         self.session = aiohttp.ClientSession(
             headers={"User-Agent": self.off_config.user_agent},
-            timeout=aiohttp.ClientTimeout(total=30)
+            timeout=aiohttp.ClientTimeout(total=30),
         )
         return self
 
@@ -63,7 +69,9 @@ class OpenFoodFactsDownloader:
         if self.session:
             await self.session.close()
 
-    async def download_products(self, progress_tracker: Optional[ProgressTracker] = None) -> List[ProductData]:
+    async def download_products(
+        self, progress_tracker: Optional[ProgressTracker] = None
+    ) -> List[ProductData]:
         """
         Download product data from Open Food Facts API.
 
@@ -83,7 +91,7 @@ class OpenFoodFactsDownloader:
             task_name = progress_tracker.add_task(
                 "api_requests",
                 "Downloading product metadata",
-                total=len(self.off_config.countries)
+                total=len(self.off_config.countries),
             )
 
         for country in self.off_config.countries:
@@ -121,23 +129,41 @@ class OpenFoodFactsDownloader:
         page = 1
         products_downloaded = 0
 
-        while products_downloaded < self.off_config.max_total_products // len(self.off_config.countries):
+        while products_downloaded < self.off_config.max_total_products // len(
+            self.off_config.countries
+        ):
             params = {
                 "countries": country,
                 "page_size": self.off_config.max_products_per_request,
                 "page": page,
-                "fields": ",".join([
-                    "code", "product_name", "brands", "categories", "countries",
-                    "expiration_date", "image_url", "image_front_url",
-                    "image_ingredients_url", "image_nutrition_url",
-                    "ingredients_text", "nutriments", "packaging",
-                    "manufacturing_places", "origins", "labels",
-                    "created_datetime", "last_modified_datetime"
-                ])
+                "fields": ",".join(
+                    [
+                        "code",
+                        "product_name",
+                        "brands",
+                        "categories",
+                        "countries",
+                        "expiration_date",
+                        "image_url",
+                        "image_front_url",
+                        "image_ingredients_url",
+                        "image_nutrition_url",
+                        "ingredients_text",
+                        "nutriments",
+                        "packaging",
+                        "manufacturing_places",
+                        "origins",
+                        "labels",
+                        "created_datetime",
+                        "last_modified_datetime",
+                    ]
+                ),
             }
 
             try:
-                async with self.session.get(self.off_config.base_url, params=params) as response:
+                async with self.session.get(
+                    self.off_config.base_url, params=params
+                ) as response:
                     if response.status != 200:
                         self.logger.warning(f"API request failed: {response.status}")
                         break
@@ -188,7 +214,7 @@ class OpenFoodFactsDownloader:
                 origins=raw_data.get("origins"),
                 labels=raw_data.get("labels"),
                 created_datetime=raw_data.get("created_datetime"),
-                last_modified_datetime=raw_data.get("last_modified_datetime")
+                last_modified_datetime=raw_data.get("last_modified_datetime"),
             )
         except Exception as e:
             self.logger.debug(f"Error creating ProductData: {e}")
@@ -197,8 +223,7 @@ class OpenFoodFactsDownloader:
     def _is_valid_product(self, product: ProductData) -> bool:
         """Check if product meets quality requirements."""
         is_valid, issues = validate_product_data(
-            asdict(product),
-            ["code", "product_name"]
+            asdict(product), ["code", "product_name"]
         )
 
         if not is_valid:
@@ -206,7 +231,11 @@ class OpenFoodFactsDownloader:
             return False
 
         # Check for at least one image URL
-        image_urls = [product.image_url, product.image_front_url, product.image_ingredients_url]
+        image_urls = [
+            product.image_url,
+            product.image_front_url,
+            product.image_ingredients_url,
+        ]
         if not any(url for url in image_urls):
             return False
 
@@ -215,7 +244,7 @@ class OpenFoodFactsDownloader:
     async def download_images(
         self,
         products: List[ProductData],
-        progress_tracker: Optional[ProgressTracker] = None
+        progress_tracker: Optional[ProgressTracker] = None,
     ) -> Dict[str, List[str]]:
         """
         Download images for products concurrently.
@@ -232,7 +261,13 @@ class OpenFoodFactsDownloader:
 
         # Count total images to download
         total_images = sum(
-            len([url for url in [p.image_url, p.image_front_url, p.image_ingredients_url] if url])
+            len(
+                [
+                    url
+                    for url in [p.image_url, p.image_front_url, p.image_ingredients_url]
+                    if url
+                ]
+            )
             for p in products
         )
 
@@ -240,9 +275,7 @@ class OpenFoodFactsDownloader:
         task_name = None
         if progress_tracker:
             task_name = progress_tracker.add_task(
-                "image_downloads",
-                "Downloading product images",
-                total=total_images
+                "image_downloads", "Downloading product images", total=total_images
             )
 
         # Create download tasks
@@ -251,7 +284,7 @@ class OpenFoodFactsDownloader:
             image_urls = [
                 (product.image_url, "main"),
                 (product.image_front_url, "front"),
-                (product.image_ingredients_url, "ingredients")
+                (product.image_ingredients_url, "ingredients"),
             ]
 
             for url, img_type in image_urls:
@@ -281,7 +314,7 @@ class OpenFoodFactsDownloader:
         url: str,
         image_type: str,
         progress_tracker: Optional[ProgressTracker],
-        task_name: Optional[str]
+        task_name: Optional[str],
     ) -> Optional[tuple]:
         """Download a single image with error handling."""
         async with self.semaphore:
@@ -302,7 +335,7 @@ class OpenFoodFactsDownloader:
                     if response.status == 200:
                         content = await response.read()
 
-                        async with aiofiles.open(image_path, 'wb') as f:
+                        async with aiofiles.open(image_path, "wb") as f:
                             await f.write(content)
 
                         # Validate downloaded image
@@ -310,7 +343,7 @@ class OpenFoodFactsDownloader:
                             image_path,
                             self.config.min_image_width,
                             self.config.min_image_height,
-                            self.config.max_image_size_mb
+                            self.config.max_image_size_mb,
                         )
 
                         if is_valid:
@@ -320,7 +353,9 @@ class OpenFoodFactsDownloader:
                         else:
                             # Remove invalid image
                             image_path.unlink(missing_ok=True)
-                            self.logger.debug(f"Removed invalid image {filename}: {issues}")
+                            self.logger.debug(
+                                f"Removed invalid image {filename}: {issues}"
+                            )
 
                 if progress_tracker and task_name:
                     progress_tracker.update(task_name, failed=True)
@@ -332,13 +367,15 @@ class OpenFoodFactsDownloader:
 
         return None
 
-    async def save_metadata(self, products: List[ProductData], filename: str = "products.json") -> Path:
+    async def save_metadata(
+        self, products: List[ProductData], filename: str = "products.json"
+    ) -> Path:
         """Save product metadata to JSON file."""
         output_path = self.config.openfoodfacts_dir / filename
 
         products_dict = [asdict(product) for product in products]
 
-        async with aiofiles.open(output_path, 'w', encoding='utf-8') as f:
+        async with aiofiles.open(output_path, "w", encoding="utf-8") as f:
             await f.write(json.dumps(products_dict, indent=2, ensure_ascii=False))
 
         self.logger.info(f"Saved {len(products)} products to {output_path}")
@@ -372,5 +409,5 @@ class OpenFoodFactsDownloader:
                 "products_with_images": len(product_images),
                 "total_images": sum(len(imgs) for imgs in product_images.values()),
                 "metadata_file": str(metadata_path),
-                "image_directory": str(self.config.openfoodfacts_dir / "images")
+                "image_directory": str(self.config.openfoodfacts_dir / "images"),
             }

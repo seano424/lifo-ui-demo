@@ -17,7 +17,7 @@ from decimal import Decimal
 from app.core.config import get_scoring_weights
 from app.core.scoring.engine import InventoryScorer
 from app.utils.recommendation_migration import migrate_recommendation
-from .models import ScoringInput, ScoringResult
+from .models import ScoringResult
 from .services import (
     BulkDataRetriever,
     CategoryWeightService,
@@ -28,6 +28,7 @@ from .monitoring import PerformanceMonitor
 
 logger = structlog.get_logger()
 
+
 class ScoringService:
     """
     Async service for batch scoring operations with database integration
@@ -36,28 +37,32 @@ class ScoringService:
     """
 
     def __init__(
-        self, 
+        self,
         db: AsyncSession,
         bulk_data_retriever: BulkDataRetriever | None = None,
         velocity_service: VelocityCalculationService | None = None,
         category_weight_service: CategoryWeightService | None = None,
         scoring_engine: InMemoryScoringEngine | None = None,
         result_persister: Any | None = None,
-        performance_monitor: PerformanceMonitor | None = None
+        performance_monitor: PerformanceMonitor | None = None,
     ):
         self.db = db
         self.logger = structlog.get_logger().bind(component="scoring_service")
 
         # Initialize services with dependency injection
         from app.database.read_only_operations import get_read_only_operations
+
         read_ops = get_read_only_operations(db)
 
         self.bulk_data_retriever = bulk_data_retriever or BulkDataRetriever(read_ops)
         self.velocity_service = velocity_service or VelocityCalculationService(read_ops)
-        self.category_weight_service = category_weight_service or CategoryWeightService(read_ops)
+        self.category_weight_service = category_weight_service or CategoryWeightService(
+            read_ops
+        )
         self.scoring_engine = scoring_engine or InMemoryScoringEngine()
         # REFACTORED: Use UnifiedScoringPersistence (60x performance improvement)
         from app.core.persistence import get_unified_scoring_persistence
+
         self.result_persister = result_persister or get_unified_scoring_persistence(db)
         self.performance_monitor = performance_monitor or PerformanceMonitor()
 
@@ -308,7 +313,9 @@ class ScoringService:
             # Track AI recommendation in database for analytics
             if track_recommendation:
                 try:
-                    await self._track_recommendation_isolated(result, batch_data.get("store_id"))
+                    await self._track_recommendation_isolated(
+                        result, batch_data.get("store_id")
+                    )
                 except Exception as e:
                     self.logger.warning("Failed to track recommendation", error=str(e))
 
@@ -340,20 +347,19 @@ class ScoringService:
         """
         # Start performance monitoring
         self.performance_monitor.start_operation(
-            "bulk_scoring",
-            store_id=store_id,
-            recalculate_all=recalculate_all
+            "bulk_scoring", store_id=store_id, recalculate_all=recalculate_all
         )
 
         try:
             # STEP 1: Bulk data retrieval
             self.performance_monitor.log_milestone("data_retrieval_start")
-            inventory_data = await self.bulk_data_retriever.get_store_inventory_data(store_id)
+            inventory_data = await self.bulk_data_retriever.get_store_inventory_data(
+                store_id
+            )
 
             if not inventory_data:
                 processing_time_ms = self.performance_monitor.complete_operation(
-                    store_id=store_id,
-                    total_items=0
+                    store_id=store_id, total_items=0
                 )
                 return {
                     "store_id": store_id,
@@ -370,10 +376,10 @@ class ScoringService:
             categories = self.bulk_data_retriever.extract_categories(inventory_data)
 
             self.performance_monitor.log_milestone(
-                "data_preparation_complete", 
+                "data_preparation_complete",
                 inventory_count=len(inventory_data),
                 unique_products=len(product_ids),
-                unique_categories=len(categories)
+                unique_categories=len(categories),
             )
 
             # STEP 3: Bulk velocity data collection
@@ -382,30 +388,30 @@ class ScoringService:
             )
 
             self.performance_monitor.log_milestone(
-                "velocity_data_retrieved",
-                velocity_results=len(velocity_data_bulk)
+                "velocity_data_retrieved", velocity_results=len(velocity_data_bulk)
             )
 
             # STEP 4: Bulk category weights retrieval
-            category_weights_bulk = await self.category_weight_service.get_bulk_category_weights(
-                categories
+            category_weights_bulk = (
+                await self.category_weight_service.get_bulk_category_weights(categories)
             )
 
             self.performance_monitor.log_milestone(
-                "category_weights_retrieved",
-                weight_results=len(category_weights_bulk)
+                "category_weights_retrieved", weight_results=len(category_weights_bulk)
             )
 
             # STEP 5: In-memory scoring for all batches
-            results, errors, high_priority_count = self.scoring_engine.score_all_batches(
-                inventory_data, velocity_data_bulk, category_weights_bulk, store_id
+            results, errors, high_priority_count = (
+                self.scoring_engine.score_all_batches(
+                    inventory_data, velocity_data_bulk, category_weights_bulk, store_id
+                )
             )
 
             self.performance_monitor.log_milestone(
                 "scoring_complete",
                 results_count=len(results),
                 high_priority_count=high_priority_count,
-                errors_count=len(errors)
+                errors_count=len(errors),
             )
 
             # STEP 6: Bulk result persistence using COPY (60x faster than REST API)
@@ -424,7 +430,7 @@ class ScoringService:
                 self.performance_monitor.log_milestone(
                     "persistence_complete",
                     database_successful=database_successful,
-                    database_failed=database_failed
+                    database_failed=database_failed,
                 )
 
             # STEP 7: Complete monitoring and prepare response
@@ -434,7 +440,7 @@ class ScoringService:
                 processed=len(results),
                 high_priority_count=high_priority_count,
                 database_successful=database_successful,
-                database_failed=database_failed
+                database_failed=database_failed,
             )
 
             # Track overall performance metrics
@@ -456,16 +462,15 @@ class ScoringService:
                 "database_operations": {
                     "successful": database_successful,
                     "failed": database_failed,
-                    "total": len(results)
-                }
+                    "total": len(results),
+                },
             }
 
         except Exception as e:
             import traceback
 
             processing_time_ms = self.performance_monitor.complete_operation(
-                store_id=store_id,
-                error=str(e)
+                store_id=store_id, error=str(e)
             )
 
             self.logger.error(
@@ -516,7 +521,7 @@ class ScoringService:
         store_id: str,
         recalculate_all: bool = False,
         store_donation_config: dict | None = None,
-        include_donation_rationale: bool = False
+        include_donation_rationale: bool = False,
     ) -> dict[str, Any]:
         """Score all active batches for a store and save results to database with proper transaction isolation"""
         start_time = datetime.utcnow()
@@ -538,7 +543,9 @@ class ScoringService:
 
             # Get inventory data for scoring using secure read-only view
             # fetch_all=True ensures we score ALL batches, not just 1000
-            inventory_data = await read_ops.get_store_inventory_for_scoring(store_id, fetch_all=True)
+            inventory_data = await read_ops.get_store_inventory_for_scoring(
+                store_id, fetch_all=True
+            )
 
             if not inventory_data:
                 self.logger.warning(
@@ -561,7 +568,7 @@ class ScoringService:
                 "Starting batch scoring with transaction isolation",
                 store_id=store_id,
                 total_batches=len(batch_ids),
-                recalculate_all=recalculate_all
+                recalculate_all=recalculate_all,
             )
 
             # Score each batch - computation doesn't require database session
@@ -578,7 +585,7 @@ class ScoringService:
                     self.logger.error(
                         "Scoring computation failed for batch",
                         batch_id=batch_id,
-                        error=str(e)
+                        error=str(e),
                     )
                     errors.append(f"Failed to score batch {batch_id}: {str(e)}")
 
@@ -586,7 +593,7 @@ class ScoringService:
             if results:
                 self.logger.info(
                     "Saving score results with individual transaction isolation",
-                    results_count=len(results)
+                    results_count=len(results),
                 )
 
                 # Process each result in its own isolated transaction
@@ -596,13 +603,15 @@ class ScoringService:
                         database_operations_successful += 1
                     else:
                         database_operations_failed += 1
-                        errors.append(f"Failed to save score for batch {result.batch_id}")
+                        errors.append(
+                            f"Failed to save score for batch {result.batch_id}"
+                        )
 
                 self.logger.info(
                     "Database operations completed",
                     successful=database_operations_successful,
                     failed=database_operations_failed,
-                    total_results=len(results)
+                    total_results=len(results),
                 )
 
             processing_time = (datetime.utcnow() - start_time).total_seconds() * 1000
@@ -629,8 +638,8 @@ class ScoringService:
                 "database_operations": {
                     "successful": database_operations_successful,
                     "failed": database_operations_failed,
-                    "total": len(results)
-                }
+                    "total": len(results),
+                },
             }
 
         except Exception as e:
@@ -641,7 +650,7 @@ class ScoringService:
                 error=str(e),
                 results_computed=len(results),
                 database_successful=database_operations_successful,
-                database_failed=database_operations_failed
+                database_failed=database_operations_failed,
             )
 
             processing_time = (datetime.utcnow() - start_time).total_seconds() * 1000
@@ -657,8 +666,8 @@ class ScoringService:
                 "database_operations": {
                     "successful": database_operations_successful,
                     "failed": database_operations_failed,
-                    "total": len(results)
-                }
+                    "total": len(results),
+                },
             }
 
     async def _save_score_result(self, result: ScoringResult):
@@ -698,7 +707,9 @@ class ScoringService:
             )
             raise
 
-    async def _save_score_result_isolated(self, result: ScoringResult, store_id: str) -> bool:
+    async def _save_score_result_isolated(
+        self, result: ScoringResult, store_id: str
+    ) -> bool:
         """
         Save scoring result using isolated transaction with advanced retry logic and health monitoring
         Returns True if successful, False if failed (but doesn't raise exception)
@@ -716,12 +727,17 @@ class ScoringService:
                 from decimal import Decimal
 
                 from sqlalchemy import text
-                schema_prefix = "scoring." if os.getenv("ENVIRONMENT") != "testing" else ""
+
+                schema_prefix = (
+                    "scoring." if os.getenv("ENVIRONMENT") != "testing" else ""
+                )
                 table_name = f"{schema_prefix}product_scores"
 
                 # Delete existing score for this batch using raw SQL
                 delete_sql = f"DELETE FROM {table_name} WHERE batch_id = :batch_id"
-                await isolated_session.execute(text(delete_sql), {"batch_id": result.batch_id})
+                await isolated_session.execute(
+                    text(delete_sql), {"batch_id": result.batch_id}
+                )
 
                 # Insert new score using raw SQL to avoid ORM prepared statements
                 insert_sql = f"""
@@ -760,7 +776,7 @@ class ScoringService:
 
                 self.logger.debug(
                     "Successfully saved score result in isolated transaction",
-                    batch_id=result.batch_id
+                    batch_id=result.batch_id,
                 )
 
                 return True
@@ -771,7 +787,7 @@ class ScoringService:
                 self.logger.warning(
                     "Failed to save score result in isolated transaction",
                     batch_id=result.batch_id,
-                    error=str(e)
+                    error=str(e),
                 )
                 raise
             finally:
@@ -779,9 +795,7 @@ class ScoringService:
 
         # Execute with automatic retry logic and health monitoring
         success, result_data, error = await execute_with_retry(
-            f"save_score_result_{result.batch_id}",
-            save_operation,
-            max_retries=3
+            f"save_score_result_{result.batch_id}", save_operation, max_retries=3
         )
 
         if success:
@@ -792,11 +806,13 @@ class ScoringService:
             self.logger.error(
                 "Final failure to save score result after all retries with health monitoring",
                 batch_id=result.batch_id,
-                error=str(error) if error else "Unknown error"
+                error=str(error) if error else "Unknown error",
             )
             return False
 
-    async def _track_recommendation_isolated(self, result: ScoringResult, store_id: str | None = None) -> bool:
+    async def _track_recommendation_isolated(
+        self, result: ScoringResult, store_id: str | None = None
+    ) -> bool:
         """Track AI recommendation using isolated transaction with health monitoring and error handling"""
         from app.utils.database_health import create_fresh_session, execute_with_retry
 
@@ -833,7 +849,7 @@ class ScoringService:
                 self.logger.warning(
                     "Failed to track AI recommendation in isolated transaction",
                     batch_id=result.batch_id,
-                    error=str(e)
+                    error=str(e),
                 )
                 raise
             finally:
@@ -844,14 +860,14 @@ class ScoringService:
             success, _, error = await execute_with_retry(
                 f"track_recommendation_{result.batch_id}",
                 track_operation,
-                max_retries=2  # Lower retries for tracking since it's non-critical
+                max_retries=2,  # Lower retries for tracking since it's non-critical
             )
 
             if not success:
                 self.logger.warning(
                     "Failed to track AI recommendation after retries",
                     batch_id=result.batch_id,
-                    error=str(error) if error else "Unknown error"
+                    error=str(error) if error else "Unknown error",
                 )
 
             return success
@@ -861,7 +877,7 @@ class ScoringService:
             self.logger.warning(
                 "Tracking operation failed completely",
                 batch_id=result.batch_id,
-                error=str(e)
+                error=str(e),
             )
             return False
 
@@ -895,4 +911,3 @@ class ScoringService:
 def create_scoring_service(db: AsyncSession) -> ScoringService:
     """Create a scoring service instance"""
     return ScoringService(db)
-

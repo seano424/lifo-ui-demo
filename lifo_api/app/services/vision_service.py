@@ -80,7 +80,9 @@ class GoogleVisionService:
         self.project_id = project_id
         self.client = None
         self.circuit_breaker = get_vision_api_breaker()
-        self.thread_pool = ThreadPoolExecutor(max_workers=2, thread_name_prefix="vision")
+        self.thread_pool = ThreadPoolExecutor(
+            max_workers=2, thread_name_prefix="vision"
+        )
         self._initialize_client()
 
     def _initialize_client(self):
@@ -99,15 +101,14 @@ class GoogleVisionService:
             # Initialize client with explicit credentials (Google's official method)
             if credentials:
                 self.client = vision.ImageAnnotatorClient(
-                    credentials=credentials,
-                    client_options=client_options
+                    credentials=credentials, client_options=client_options
                 )
                 logger.info(
                     "Google Vision API client initialized successfully with explicit credentials",
                     region="EU",
                     endpoint="eu-vision.googleapis.com",
                     project_id=self.project_id,
-                    credential_method="service_account_info"
+                    credential_method="service_account_info",
                 )
             else:
                 # Fallback to default credential chain (for local development with gcloud auth)
@@ -117,7 +118,7 @@ class GoogleVisionService:
                     region="EU",
                     endpoint="eu-vision.googleapis.com",
                     project_id=self.project_id,
-                    credential_method="default_chain"
+                    credential_method="default_chain",
                 )
 
         except Exception as e:
@@ -141,31 +142,48 @@ class GoogleVisionService:
         """
         try:
             # Check for JSON credentials in environment (DigitalOcean App Platform pattern)
-            credentials_json = os.getenv('GOOGLE_APPLICATION_CREDENTIALS_JSON')
+            credentials_json = os.getenv("GOOGLE_APPLICATION_CREDENTIALS_JSON")
 
             if credentials_json:
                 try:
                     # Try parsing as direct JSON first
-                    if credentials_json.strip().startswith('{'):
+                    if credentials_json.strip().startswith("{"):
                         service_account_info = json.loads(credentials_json)
-                        logger.debug("Loaded Google credentials from JSON environment variable")
+                        logger.debug(
+                            "Loaded Google credentials from JSON environment variable"
+                        )
                     else:
                         # Try base64 decoding if it's encoded
                         try:
-                            decoded_credentials = base64.b64decode(credentials_json).decode('utf-8')
+                            decoded_credentials = base64.b64decode(
+                                credentials_json
+                            ).decode("utf-8")
                             service_account_info = json.loads(decoded_credentials)
-                            logger.debug("Loaded Google credentials from base64-encoded environment variable")
+                            logger.debug(
+                                "Loaded Google credentials from base64-encoded environment variable"
+                            )
                         except Exception:
-                            logger.error("Failed to decode base64 credentials, trying as direct JSON")
+                            logger.error(
+                                "Failed to decode base64 credentials, trying as direct JSON"
+                            )
                             service_account_info = json.loads(credentials_json)
 
                     # Validate required fields
-                    required_fields = ['type', 'project_id', 'private_key', 'client_email']
-                    missing_fields = [field for field in required_fields if field not in service_account_info]
+                    required_fields = [
+                        "type",
+                        "project_id",
+                        "private_key",
+                        "client_email",
+                    ]
+                    missing_fields = [
+                        field
+                        for field in required_fields
+                        if field not in service_account_info
+                    ]
                     if missing_fields:
                         logger.error(
                             "Missing required fields in service account JSON",
-                            missing_fields=missing_fields
+                            missing_fields=missing_fields,
                         )
                         return None
 
@@ -177,8 +195,9 @@ class GoogleVisionService:
                     logger.info(
                         "Google Cloud credentials loaded successfully",
                         method="service_account_info",
-                        project_id=service_account_info.get('project_id'),
-                        client_email=service_account_info.get('client_email', '')[:20] + "..."  # Log partial email for debugging
+                        project_id=service_account_info.get("project_id"),
+                        client_email=service_account_info.get("client_email", "")[:20]
+                        + "...",  # Log partial email for debugging
                     )
                     return credentials
 
@@ -187,75 +206,95 @@ class GoogleVisionService:
                         "Failed to parse Google credentials JSON",
                         error=str(e),
                         json_length=len(credentials_json),
-                        json_preview=credentials_json[:50] + "..." if len(credentials_json) > 50 else credentials_json
+                        json_preview=credentials_json[:50] + "..."
+                        if len(credentials_json) > 50
+                        else credentials_json,
                     )
                     return None
                 except Exception as e:
                     logger.error(
                         "Failed to create Google credentials from JSON",
                         error=str(e),
-                        error_type=type(e).__name__
+                        error_type=type(e).__name__,
                     )
                     return None
 
             # Check for GOOGLE_APPLICATION_CREDENTIALS - could be file path or JSON content
-            credentials_env = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
+            credentials_env = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
             if credentials_env:
                 logger.info(
                     "Found GOOGLE_APPLICATION_CREDENTIALS environment variable",
                     length=len(credentials_env),
                     starts_with=credentials_env[:10],
-                    is_file=os.path.isfile(credentials_env)
+                    is_file=os.path.isfile(credentials_env),
                 )
 
                 # First, check if it's a file path (traditional approach)
                 if os.path.isfile(credentials_env):
                     try:
-                        credentials = service_account.Credentials.from_service_account_file(
-                            credentials_env
+                        credentials = (
+                            service_account.Credentials.from_service_account_file(
+                                credentials_env
+                            )
                         )
                         logger.info(
                             "Google Cloud credentials loaded from file",
                             method="service_account_file",
-                            file_path=credentials_env
+                            file_path=credentials_env,
                         )
                         return credentials
                     except Exception as e:
                         logger.error(
                             "Failed to load Google credentials from file",
                             error=str(e),
-                            file_path=credentials_env
+                            file_path=credentials_env,
                         )
                         return None
 
                 # If not a file, try parsing as JSON content (DigitalOcean direct setup)
                 # More robust JSON detection
                 stripped_env = credentials_env.strip()
-                if stripped_env.startswith('{') and stripped_env.endswith('}'):
+                if stripped_env.startswith("{") and stripped_env.endswith("}"):
                     try:
-                        logger.info("Detected JSON content in GOOGLE_APPLICATION_CREDENTIALS, parsing directly")
+                        logger.info(
+                            "Detected JSON content in GOOGLE_APPLICATION_CREDENTIALS, parsing directly"
+                        )
                         service_account_info = json.loads(stripped_env)
 
                         # Validate required fields
-                        required_fields = ['type', 'project_id', 'private_key', 'client_email']
-                        missing_fields = [field for field in required_fields if field not in service_account_info]
+                        required_fields = [
+                            "type",
+                            "project_id",
+                            "private_key",
+                            "client_email",
+                        ]
+                        missing_fields = [
+                            field
+                            for field in required_fields
+                            if field not in service_account_info
+                        ]
                         if missing_fields:
                             logger.error(
                                 "Missing required fields in GOOGLE_APPLICATION_CREDENTIALS JSON",
-                                missing_fields=missing_fields
+                                missing_fields=missing_fields,
                             )
                             return None
 
                         # Create credentials using Google's official method
-                        credentials = service_account.Credentials.from_service_account_info(
-                            service_account_info
+                        credentials = (
+                            service_account.Credentials.from_service_account_info(
+                                service_account_info
+                            )
                         )
 
                         logger.info(
                             "Google Cloud credentials loaded from GOOGLE_APPLICATION_CREDENTIALS JSON",
                             method="service_account_info_from_env",
-                            project_id=service_account_info.get('project_id'),
-                            client_email=service_account_info.get('client_email', '')[:20] + "..."
+                            project_id=service_account_info.get("project_id"),
+                            client_email=service_account_info.get("client_email", "")[
+                                :20
+                            ]
+                            + "...",
                         )
                         return credentials
 
@@ -264,39 +303,45 @@ class GoogleVisionService:
                             "Failed to parse GOOGLE_APPLICATION_CREDENTIALS as JSON",
                             error=str(e),
                             env_length=len(credentials_env),
-                            env_preview=stripped_env[:100] + "..." if len(stripped_env) > 100 else stripped_env
+                            env_preview=stripped_env[:100] + "..."
+                            if len(stripped_env) > 100
+                            else stripped_env,
                         )
                         return None
                     except Exception as e:
                         logger.error(
                             "Failed to create credentials from GOOGLE_APPLICATION_CREDENTIALS JSON",
                             error=str(e),
-                            error_type=type(e).__name__
+                            error_type=type(e).__name__,
                         )
                         return None
                 else:
                     logger.warning(
                         "GOOGLE_APPLICATION_CREDENTIALS found but not recognized as file path or JSON",
                         starts_with=stripped_env[:20],
-                        ends_with=stripped_env[-10:] if len(stripped_env) > 10 else stripped_env,
-                        length=len(stripped_env)
+                        ends_with=stripped_env[-10:]
+                        if len(stripped_env) > 10
+                        else stripped_env,
+                        length=len(stripped_env),
                     )
 
             # No explicit credentials found - will use default credential chain
-            logger.info("No explicit Google credentials found, will use default credential chain (gcloud auth)")
+            logger.info(
+                "No explicit Google credentials found, will use default credential chain (gcloud auth)"
+            )
             return None
 
         except Exception as e:
             logger.error(
                 "Unexpected error loading Google credentials",
                 error=str(e),
-                error_type=type(e).__name__
+                error_type=type(e).__name__,
             )
             return None
 
     def __del__(self):
         """Clean up thread pool on service destruction"""
-        if hasattr(self, 'thread_pool') and self.thread_pool:
+        if hasattr(self, "thread_pool") and self.thread_pool:
             self.thread_pool.shutdown(wait=False)
 
     async def process_image(self, image_data: bytes) -> VisionScanResult:
@@ -365,7 +410,7 @@ class GoogleVisionService:
         # Single optimized API call with timeout
         barcodes, raw_text = await asyncio.wait_for(
             self._detect_text_and_barcodes_combined(image),
-            timeout=settings.ocr_timeout_seconds
+            timeout=settings.ocr_timeout_seconds,
         )
 
         # Parse expiry dates from OCR text
@@ -376,9 +421,7 @@ class GoogleVisionService:
 
         # Calculate average confidence scores
         text_confidence_avg = (
-            sum(ocr.confidence for ocr in raw_text) / len(raw_text)
-            if raw_text
-            else 0.0
+            sum(ocr.confidence for ocr in raw_text) / len(raw_text) if raw_text else 0.0
         )
         barcode_confidence_avg = (
             sum(barcode.confidence for barcode in barcodes) / len(barcodes)
@@ -436,10 +479,7 @@ class GoogleVisionService:
             # Save optimized image as JPEG with configurable quality
             output = io.BytesIO()
             image.save(
-                output,
-                format="JPEG",
-                quality=settings.ocr_jpeg_quality,
-                optimize=True
+                output, format="JPEG", quality=settings.ocr_jpeg_quality, optimize=True
             )
             optimized_data = output.getvalue()
 
@@ -521,6 +561,28 @@ class GoogleVisionService:
         ocr_results = []
 
         if response.text_annotations:
+            # Get the full text (first annotation is always the complete detected text)
+            full_text = (
+                response.text_annotations[0].description
+                if response.text_annotations
+                else ""
+            )
+
+            # IMPORTANT: Add the full text as the first OCR result for date parsing
+            # The full text often contains dates that are split across individual annotations
+            if full_text:
+                ocr_results.append(
+                    OCRResult(
+                        text=full_text,
+                        confidence=0.8,
+                        bounding_box=self._extract_bounding_box(
+                            response.text_annotations[0].bounding_poly
+                        )
+                        if response.text_annotations
+                        else None,
+                    )
+                )
+
             # Process individual text annotations (skip full text at index 0)
             for annotation in response.text_annotations[1:]:
                 text = annotation.description.strip()
@@ -749,9 +811,12 @@ class GoogleVisionService:
                 "DD/MM/YYYY",
             ),
             (r"(?:exp|EXP|BEST\s*BY|BB)[\s:]*(\d{1,2})(\w{3})(\d{2,4})", "DD Mon YYYY"),
-            # Special format like '22NOV2017'
+            # Special format like '22NOV2017' or '03NOV26'
             (r"\b(\d{1,2})([A-Z]{3})(\d{4})\b", "DD Mon YYYY"),
             (r"\b(\d{1,2})([A-Z]{3})(\d{2})\b", "DD Mon YY"),
+            # Date with slashes and month names like '03/JUL/26'
+            (r"\b(\d{1,2})[/\-.]([A-Z]{3})[/\-.](\d{2,4})\b", "DD/Mon/YYYY"),
+            (r"\b(\d{1,2})[/\-.]([A-Za-z]{3,9})[/\-.](\d{2,4})\b", "DD/Mon/YYYY"),
         ]
 
         # Enhanced multilingual month mapping
@@ -890,6 +955,24 @@ class GoogleVisionService:
                             if year < 100:
                                 year += 2000 if year < 50 else 1900
                             parsed_date = datetime(year, int(month), int(day))
+
+                        elif format_name == "DD/Mon/YYYY":
+                            # Handle formats like '03/JUL/26' or '03-Jul-2026'
+                            day, month_str, year = groups
+                            # Try different cases for multilingual support
+                            month = (
+                                month_map.get(month_str.lower())
+                                or month_map.get(month_str.capitalize())
+                                or month_map.get(month_str.upper().lower())
+                            )
+                            if month:
+                                year = int(year)
+                                if year < 100:
+                                    year += 2000 if year < 50 else 1900
+                                parsed_date = datetime(year, month, int(day))
+                                confidence = (
+                                    0.85  # High confidence for this explicit format
+                                )
 
                         # Enhanced date validation - allow wide range for debugging
                         # In production, should be more restrictive (e.g., 6 months past, 3 years future)

@@ -5,7 +5,7 @@ DEPRECATED: This module has been superseded by the new unified CSV services arch
 Legacy module - replaced by: app.services.csv.unified_csv_service
 The new architecture eliminates duplicate code and provides:
 - Better security validation
-- Consolidated parsing engine  
+- Consolidated parsing engine
 - Centralized category mapping
 - Unified error handling
 - Template generation
@@ -402,11 +402,11 @@ class UnifiedCSVProcessor:
         Replaces individual cell checking with bulk pattern matching
         """
         # Combine all security patterns into single regex for efficiency
-        combined_pattern = '|'.join(self.FORMULA_PATTERNS)
+        combined_pattern = "|".join(self.FORMULA_PATTERNS)
 
         # Check for oversized content efficiently
         for col in df.columns:
-            if df[col].dtype == 'object':  # String columns only
+            if df[col].dtype == "object":  # String columns only
                 # Check cell length limits using vectorized operations
                 too_long = df[col].str.len() > self.MAX_CELL_LENGTH
                 if too_long.any():
@@ -417,7 +417,9 @@ class UnifiedCSVProcessor:
                     )
 
                 # Vectorized security pattern check
-                dangerous_content = df[col].str.contains(combined_pattern, case=False, na=False, regex=True)
+                dangerous_content = df[col].str.contains(
+                    combined_pattern, case=False, na=False, regex=True
+                )
                 if dangerous_content.any():
                     dangerous_indices = df[dangerous_content].index
                     first_dangerous_row = int(dangerous_indices[0]) + 1
@@ -855,7 +857,9 @@ class UnifiedCSVProcessor:
             existing_batch_number = item.get("batch_number", "").strip()
 
             # Debug logging
-            logger.info(f"UnifiedCSVProcessor batch number check: idx={idx}, sku={item.get('sku', 'unknown')}, existing_batch_number='{existing_batch_number}'")
+            logger.info(
+                f"UnifiedCSVProcessor batch number check: idx={idx}, sku={item.get('sku', 'unknown')}, existing_batch_number='{existing_batch_number}'"
+            )
 
             if not existing_batch_number:
                 # Generate batch number: STORE_SKU_YYYYMMDD_SEQUENCE
@@ -868,7 +872,9 @@ class UnifiedCSVProcessor:
                 item["batch_number"] = batch_number
                 logger.info(f"Generated batch number: {batch_number}")
             else:
-                logger.info(f"Keeping CSV-provided batch number: {existing_batch_number}")
+                logger.info(
+                    f"Keeping CSV-provided batch number: {existing_batch_number}"
+                )
                 # If batch_number exists, keep the CSV-provided value
 
         return processed_data

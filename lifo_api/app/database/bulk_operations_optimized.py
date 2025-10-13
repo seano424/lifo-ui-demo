@@ -6,7 +6,6 @@ This module provides optimized bulk operations that use asyncpg directly
 instead of Supabase PostgREST API, eliminating HTTP/JSON overhead.
 """
 
-import asyncio
 from datetime import datetime
 from typing import Any
 
@@ -46,10 +45,14 @@ class BulkOperationsOptimizer:
             urls_to_try = []
             if direct_url:
                 # Remove postgresql+asyncpg:// prefix for asyncpg
-                direct_url_cleaned = direct_url.replace("postgresql+asyncpg://", "postgresql://")
+                direct_url_cleaned = direct_url.replace(
+                    "postgresql+asyncpg://", "postgresql://"
+                )
                 urls_to_try.append(("direct", direct_url_cleaned))
 
-            pooler_url_cleaned = pooler_url.replace("postgresql+asyncpg://", "postgresql://")
+            pooler_url_cleaned = pooler_url.replace(
+                "postgresql+asyncpg://", "postgresql://"
+            )
             urls_to_try.append(("pooler", pooler_url_cleaned))
 
             # Try each URL until one works
@@ -58,7 +61,7 @@ class BulkOperationsOptimizer:
                 try:
                     self.logger.info(
                         f"Attempting {connection_type} connection for bulk operations",
-                        url_prefix=db_url[:50]
+                        url_prefix=db_url[:50],
                     )
 
                     self.pool = await asyncpg.create_pool(
@@ -76,7 +79,7 @@ class BulkOperationsOptimizer:
 
                     self.logger.info(
                         f"✅ Connected via {connection_type} connection",
-                        connection_type=connection_type
+                        connection_type=connection_type,
                     )
                     break
 
@@ -85,7 +88,7 @@ class BulkOperationsOptimizer:
                     self.logger.warning(
                         f"❌ {connection_type.title()} connection failed, trying next",
                         error=str(e),
-                        connection_type=connection_type
+                        connection_type=connection_type,
                     )
                     if self.pool:
                         await self.pool.close()
@@ -93,14 +96,14 @@ class BulkOperationsOptimizer:
                     continue
 
             if self.pool is None:
-                raise Exception(f"All database connections failed. Last error: {last_error}")
+                raise Exception(
+                    f"All database connections failed. Last error: {last_error}"
+                )
 
         return self.pool
 
     async def bulk_upsert_product_scores(
-        self,
-        scores: list[dict[str, Any]],
-        on_conflict_column: str = "batch_id"
+        self, scores: list[dict[str, Any]], on_conflict_column: str = "batch_id"
     ) -> int:
         """
         High-performance bulk upsert of product scores
@@ -131,7 +134,7 @@ class BulkOperationsOptimizer:
         self.logger.info(
             "🚀 Starting direct PostgreSQL bulk upsert",
             scores_count=len(scores),
-            method="bulk_operations_optimized"
+            method="bulk_operations_optimized",
         )
 
         try:
@@ -141,25 +144,28 @@ class BulkOperationsOptimizer:
             # Prepare data tuples for bulk insert
             data = []
             for score in scores:
-                data.append((
-                    score.get("batch_id"),
-                    score.get("store_id"),
-                    score.get("expiry_score"),
-                    score.get("velocity_score"),
-                    score.get("margin_score"),
-                    score.get("composite_score"),
-                    score.get("recommendation"),
-                    score.get("urgency_level"),
-                    score.get("discount_percent"),
-                    score.get("reason"),
-                    score.get("ml_enhanced", False),
-                    score.get("confidence_level"),
-                    score.get("calculated_at") or datetime.utcnow(),
-                ))
+                data.append(
+                    (
+                        score.get("batch_id"),
+                        score.get("store_id"),
+                        score.get("expiry_score"),
+                        score.get("velocity_score"),
+                        score.get("margin_score"),
+                        score.get("composite_score"),
+                        score.get("recommendation"),
+                        score.get("urgency_level"),
+                        score.get("discount_percent"),
+                        score.get("reason"),
+                        score.get("ml_enhanced", False),
+                        score.get("confidence_level"),
+                        score.get("calculated_at") or datetime.utcnow(),
+                    )
+                )
 
             # Execute bulk upsert using native PostgreSQL
             async with pool.acquire() as conn:
-                result = await conn.executemany("""
+                await conn.executemany(
+                    """
                     INSERT INTO scoring.product_scores (
                         batch_id,
                         store_id,
@@ -188,7 +194,9 @@ class BulkOperationsOptimizer:
                         ml_enhanced = EXCLUDED.ml_enhanced,
                         confidence_level = EXCLUDED.confidence_level,
                         calculated_at = EXCLUDED.calculated_at
-                """, data)
+                """,
+                    data,
+                )
 
             duration_ms = int((datetime.utcnow() - start_time).total_seconds() * 1000)
 
@@ -197,7 +205,7 @@ class BulkOperationsOptimizer:
                 scores_count=len(scores),
                 duration_ms=duration_ms,
                 per_item_ms=duration_ms / len(scores),
-                method="direct_postgresql"
+                method="direct_postgresql",
             )
 
             return len(scores)
@@ -208,14 +216,11 @@ class BulkOperationsOptimizer:
                 "Direct PostgreSQL bulk upsert failed",
                 error=str(e),
                 scores_count=len(scores),
-                duration_ms=duration_ms
+                duration_ms=duration_ms,
             )
             raise
 
-    async def bulk_insert_batches(
-        self,
-        batches: list[dict[str, Any]]
-    ) -> int:
+    async def bulk_insert_batches(self, batches: list[dict[str, Any]]) -> int:
         """
         High-performance bulk insert of inventory batches
 
@@ -236,23 +241,26 @@ class BulkOperationsOptimizer:
             # Prepare data tuples
             data = []
             for batch in batches:
-                data.append((
-                    batch.get("batch_id"),
-                    batch.get("store_id"),
-                    batch.get("product_id"),
-                    batch.get("initial_quantity"),
-                    batch.get("current_quantity"),
-                    batch.get("unit_cost"),
-                    batch.get("selling_price"),
-                    batch.get("expiry_date"),
-                    batch.get("manufacture_date"),
-                    batch.get("location_code"),
-                    batch.get("status", "active"),
-                    batch.get("created_at") or datetime.utcnow(),
-                ))
+                data.append(
+                    (
+                        batch.get("batch_id"),
+                        batch.get("store_id"),
+                        batch.get("product_id"),
+                        batch.get("initial_quantity"),
+                        batch.get("current_quantity"),
+                        batch.get("unit_cost"),
+                        batch.get("selling_price"),
+                        batch.get("expiry_date"),
+                        batch.get("manufacture_date"),
+                        batch.get("location_code"),
+                        batch.get("status", "active"),
+                        batch.get("created_at") or datetime.utcnow(),
+                    )
+                )
 
             async with pool.acquire() as conn:
-                await conn.executemany("""
+                await conn.executemany(
+                    """
                     INSERT INTO inventory.batches (
                         batch_id,
                         store_id,
@@ -268,7 +276,9 @@ class BulkOperationsOptimizer:
                         created_at
                     ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
                     ON CONFLICT (batch_id) DO NOTHING
-                """, data)
+                """,
+                    data,
+                )
 
             duration_ms = int((datetime.utcnow() - start_time).total_seconds() * 1000)
 
@@ -276,7 +286,7 @@ class BulkOperationsOptimizer:
                 "Direct PostgreSQL bulk insert completed",
                 batches_count=len(batches),
                 duration_ms=duration_ms,
-                method="direct_postgresql"
+                method="direct_postgresql",
             )
 
             return len(batches)
@@ -287,7 +297,7 @@ class BulkOperationsOptimizer:
                 "Direct PostgreSQL bulk insert failed",
                 error=str(e),
                 batches_count=len(batches),
-                duration_ms=duration_ms
+                duration_ms=duration_ms,
             )
             raise
 

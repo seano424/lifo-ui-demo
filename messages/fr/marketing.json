@@ -1,6 +1,7 @@
 {
   "marketing": {
     "nav": {
+      "menuButton": "Ouvrir le menu",
       "about": "À propos",
       "features": "Services",
       "resources": "Ressources",
@@ -160,14 +161,16 @@
   },
   "landingpage": {
     "hero": {
-      "title": "L'avenir de la gestion des stocks est là.",
-      "subtitle": "La solution intelligente pour réduire le gaspillage et augmenter vos bénéfices",
+      "title": "La gestion de stocks plus intelligente Lot par lot",
+      "subtitle": "Réduisez le gaspillage, optimisez vos commandes et augmentez vos marges grâce aux aperçus IA pour la gestion de stocks",
       "buttons": {
         "freeTrial": "Démarrer mon essai gratuit",
-        "explore": "Explorer la plateforme"
+        "explore": "Explorer la plateforme",
+        "dashboard": "Accéder à mon tableau de bord"
       },
       "badge": {
-        "text": "Profitez d'un essai gratuit de 14 jours"
+        "text": "Profitez d'un mois d'essai gratuit",
+        "welcomeBack": "Votre tableau de bord est prêt"
       }
     },
     "features": {
@@ -264,8 +267,8 @@
         "title": "Essai gratuit",
         "subtitle": "Magasins pilotes",
         "price": "Gratuit",
-        "period": "2 mois",
-        "description": "Toutes les fonctionnalités, sans limitation, pour un essai gratuit de 2 mois.",
+        "period": "1 mois",
+        "description": "Toutes les fonctionnalités, sans limitation, pour un essai gratuit de 1 mois.",
         "features": {
           "0": "1 jour d'intégration et de formation",
           "1": "Support complet inclus",
@@ -749,9 +752,12 @@
     "description": "Aidons les entreprises à optimiser la gestion des stocks avec des solutions intelligentes pour réduire les déchets et maximiser les profits.",
     "quickLinks": "Liens Rapides",
     "links": {
+      "homepage": "Accueil",
+      "features": "Fonctionnalités",
       "aboutUs": "À Propos",
       "products": "Produits",
       "pricing": "Tarifs",
+      "contact": "Contact",
       "blog": "Blog"
     },
     "contactUs": "Contactez-Nous",

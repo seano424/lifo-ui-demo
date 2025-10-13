@@ -73,7 +73,7 @@ export interface StoreSettingsData extends StoreBasicInfo {
   settings?: StoreAdvancedSettings
 }
 
-// Fetch store settings using RPC function
+// Fetch store settings using optimized combined RPC function
 export async function fetchStoreSettings(
   storeId: string,
   serverClient?: ServerClient,
@@ -85,18 +85,18 @@ export async function fetchStoreSettings(
     async () => {
       const supabase = serverClient || createClient()
 
-      // Use the RPC function to get store data
-      const { data: storeData, error: storeError } = await supabase.rpc('get_store_settings', {
+      // Use the optimized RPC that returns BOTH store and settings in one call
+      const { data, error } = await supabase.rpc('get_store_settings_complete', {
         store_id_param: storeId,
       })
 
-      if (storeError) {
+      if (error) {
         // Only suppress auth errors during logout - let other errors through normally
         if (
-          storeError.message?.includes('JWT') ||
-          storeError.message?.includes('invalid') ||
-          storeError.code === 'PGRST301' ||
-          storeError.message?.includes('Auth session missing')
+          error.message?.includes('JWT') ||
+          error.message?.includes('invalid') ||
+          error.code === 'PGRST301' ||
+          error.message?.includes('Auth session missing')
         ) {
           logger.log('lib/queries/store-settings', 'Store fetch skipped - user not authenticated', {
             storeId,
@@ -106,32 +106,17 @@ export async function fetchStoreSettings(
 
         // Log all other errors normally and let React Query handle them
         logger.error('lib/queries/store-settings', 'Store fetch error', {
-          error: storeError.message,
-          code: storeError.code,
+          error: error.message,
+          code: error.code,
           storeId,
         })
-        throw new Error(`Failed to fetch store: ${storeError.message}`)
+        throw new Error(`Failed to fetch store: ${error.message}`)
       }
 
-      // Still fetch store settings from business.store_settings if needed
-      const { data: settingsData, error: settingsError } = await supabase
-        .schema('business')
-        .from('store_settings')
-        .select('*')
-        .eq('store_id', storeId)
-        .single()
-
-      // Settings might not exist yet, that's OK
-      if (settingsError && settingsError.code !== 'PGRST116') {
-        logger.warn('lib/queries/store-settings', 'Failed to fetch store settings', {
-          error: settingsError.message,
-          storeId,
-        })
-      }
-
+      // Data comes as { store: {...}, settings: {...} }
       return {
-        ...storeData,
-        settings: settingsData || undefined,
+        ...data.store,
+        settings: data.settings || undefined,
       }
     },
   )
@@ -438,4 +423,126 @@ export async function testTableAccess(
     method: 'none',
     error: 'All table access methods failed',
   }
+}
+
+// TypeScript interface for deactivate store RPC response
+export interface DeactivateStoreResponse {
+  success: boolean
+  store_id: string
+  store_name: string
+  deactivated_at: string
+  employees_anonymized: number
+  message: string
+}
+
+// Runtime validation for deactivate store response
+function validateDeactivateStoreResponse(data: unknown): DeactivateStoreResponse {
+  if (!data || typeof data !== 'object') {
+    throw new Error('Invalid deactivate store response: not an object')
+  }
+
+  const response = data as Record<string, unknown>
+
+  if (
+    typeof response.success !== 'boolean' ||
+    typeof response.store_id !== 'string' ||
+    typeof response.store_name !== 'string' ||
+    typeof response.deactivated_at !== 'string' ||
+    typeof response.employees_anonymized !== 'number' ||
+    typeof response.message !== 'string'
+  ) {
+    throw new Error('Invalid deactivate store response: missing or invalid fields')
+  }
+
+  return {
+    success: response.success,
+    store_id: response.store_id,
+    store_name: response.store_name,
+    deactivated_at: response.deactivated_at,
+    employees_anonymized: response.employees_anonymized,
+    message: response.message,
+  }
+}
+
+// Deactivate store (soft delete with GDPR compliance)
+export async function deactivateStore(
+  storeId: string,
+  serverClient?: ServerClient,
+): Promise<DeactivateStoreResponse> {
+  return withPerformanceTracking(
+    'lib/queries/store-settings',
+    'deactivateStore',
+    { storeId },
+    async () => {
+      const supabase = serverClient || createClient()
+
+      // Server-side permission check before calling RPC
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+
+      if (!user) {
+        logger.error('lib/queries/store-settings', 'Deactivation failed - user not authenticated', {
+          storeId,
+        })
+        throw new Error('User not authenticated')
+      }
+
+      // Verify user is store owner
+      const { data: storeUser, error: permissionError } = await supabase
+        .schema('business')
+        .from('store_users')
+        .select('role_in_store, is_active')
+        .eq('store_id', storeId)
+        .eq('user_id', user.id)
+        .single()
+
+      if (permissionError || !storeUser) {
+        logger.error('lib/queries/store-settings', 'Deactivation failed - permission check error', {
+          error: permissionError?.message,
+          storeId,
+          userId: user.id,
+        })
+        throw new Error('Permission check failed')
+      }
+
+      if (storeUser.role_in_store !== 'owner' || !storeUser.is_active) {
+        logger.error(
+          'lib/queries/store-settings',
+          'Deactivation failed - insufficient permissions',
+          {
+            role: storeUser.role_in_store,
+            isActive: storeUser.is_active,
+            storeId,
+            userId: user.id,
+          },
+        )
+        throw new Error('Only active store owners can deactivate stores')
+      }
+
+      // Proceed with RPC call after permission verification
+      const { data, error } = await supabase.schema('business').rpc('deactivate_store_safe', {
+        p_store_id: storeId,
+      })
+
+      if (error) {
+        logger.error('lib/queries/store-settings', 'Store deactivation error', {
+          error: error.message,
+          code: error.code,
+          storeId,
+        })
+        throw new Error(`Failed to deactivate store: ${error.message}`)
+      }
+
+      // Validate the response structure
+      const validatedData = validateDeactivateStoreResponse(data)
+
+      logger.log('lib/queries/store-settings', 'Store deactivated successfully', {
+        storeId,
+        employeesAnonymized: validatedData.employees_anonymized,
+      })
+
+      return validatedData
+    },
+  )
 }

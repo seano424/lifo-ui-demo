@@ -179,6 +179,8 @@ dmypy.json
 .do/*_app_id.txt
 .do/ENVIRONMENT_VARIABLES_CHECKLIST.md
 
+certificates
+
 !dataset_tools/
 !test_data/
 CLAUDE.md

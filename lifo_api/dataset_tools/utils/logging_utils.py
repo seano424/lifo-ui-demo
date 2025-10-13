@@ -1,8 +1,8 @@
 """
 Logging utilities for dataset tools.
 """
+
 import logging
-import sys
 from pathlib import Path
 from typing import Optional
 from rich.logging import RichHandler
@@ -13,7 +13,7 @@ def setup_logger(
     name: str,
     level: str = "INFO",
     log_file: Optional[Path] = None,
-    console_output: bool = True
+    console_output: bool = True,
 ) -> logging.Logger:
     """
     Set up a logger with both console and file handlers.
@@ -39,13 +39,10 @@ def setup_logger(
             console=Console(stderr=True),
             show_time=True,
             show_path=False,
-            rich_tracebacks=True
+            rich_tracebacks=True,
         )
         console_handler.setLevel(getattr(logging, level.upper()))
-        console_formatter = logging.Formatter(
-            "%(message)s",
-            datefmt="[%X]"
-        )
+        console_formatter = logging.Formatter("%(message)s", datefmt="[%X]")
         console_handler.setFormatter(console_formatter)
         logger.addHandler(console_handler)
 

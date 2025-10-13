@@ -97,7 +97,7 @@ async def get_authentication_health(
             "Authentication health requested",
             user_id=current_user.get("sub"),
             status=health_status.get("status"),
-            health_score=health_status.get("health_score")
+            health_score=health_status.get("health_score"),
         )
 
         return health_status
@@ -129,7 +129,7 @@ async def get_authentication_metrics(
             "Authentication metrics requested",
             user_id=current_user.get("sub"),
             hours=hours,
-            total_requests=metrics.total_requests
+            total_requests=metrics.total_requests,
         )
 
         return {
@@ -140,15 +140,16 @@ async def get_authentication_metrics(
                 "failed_auths": metrics.failed_auths,
                 "success_rate_percent": (
                     (metrics.successful_auths / metrics.total_requests * 100)
-                    if metrics.total_requests > 0 else 0
+                    if metrics.total_requests > 0
+                    else 0
                 ),
                 "avg_response_time_ms": metrics.avg_response_time_ms,
                 "rate_limit_hits": metrics.rate_limit_hits,
                 "unique_users": metrics.unique_users,
                 "security_incidents": metrics.security_incidents,
-                "uptime_percentage": metrics.uptime_percentage
+                "uptime_percentage": metrics.uptime_percentage,
             },
-            "timestamp": datetime.utcnow()
+            "timestamp": datetime.utcnow(),
         }
 
     except Exception as e:
@@ -164,7 +165,9 @@ async def get_authentication_metrics(
 
 @router.get("/auth/security-report")
 async def get_auth_security_report(
-    hours: int = Query(24, ge=1, le=168, description="Hours of security data to analyze"),
+    hours: int = Query(
+        24, ge=1, le=168, description="Hours of security data to analyze"
+    ),
     current_user: dict[str, Any] = Depends(get_current_user),
 ) -> dict[str, Any]:
     """
@@ -178,7 +181,7 @@ async def get_auth_security_report(
             "Authentication security report requested",
             user_id=current_user.get("sub"),
             hours=hours,
-            total_incidents=security_report.get("total_incidents", 0)
+            total_incidents=security_report.get("total_incidents", 0),
         )
 
         return security_report

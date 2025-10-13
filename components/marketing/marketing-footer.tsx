@@ -19,16 +19,14 @@ export function MarketingFooter() {
           {/* Logo and Description */}
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <div className="relative w-8 h-8">
-                <Image
-                  src="/logos/lifo-logo-icon.svg"
-                  alt="LIFO.AI Logo"
-                  fill
-                  className="object-contain"
-                  priority
-                  sizes="32px"
-                />
-              </div>
+              <Image
+                src="/logos/lifo-logo-icon.svg"
+                alt="LIFO.AI Logo"
+                width={600}
+                height={280}
+                className="w-10 h-auto"
+                priority
+              />
               <Typography
                 variant="h4"
                 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-violet-700 via-indigo-400 to-blue-600"
@@ -51,13 +49,13 @@ export function MarketingFooter() {
                 href="/"
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
-                Homepage
+                {t('links.homepage')}
               </Link>
               <Link
                 href="/features"
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
-                Features
+                {t('links.features')}
               </Link>
               <Link
                 href="/pricing"
@@ -69,7 +67,7 @@ export function MarketingFooter() {
                 href="/contact"
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
-                Contact
+                {t('links.contact')}
               </Link>
               {/* <Link
                 href="#"
@@ -96,10 +94,11 @@ export function MarketingFooter() {
               </a>
               <div className="flex items-center gap-2 mt-8">
                 <a
-                  href="https://linkedin.com/company/lifo-ai"
+                  href="https://www.linkedin.com/company/lifo-app/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-muted-foreground hover:text-blue-600 transition-colors"
+                  aria-label="Visit LIFO.AI on LinkedIn"
                 >
                   <Linkedin size={16} />
                 </a>

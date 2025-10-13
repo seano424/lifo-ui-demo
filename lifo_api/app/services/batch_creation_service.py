@@ -31,9 +31,11 @@ class BatchFromScanRequest(BaseModel):
     )
     brand: str | None = Field(None, max_length=100, description="Product brand")
     category: str | None = Field(None, max_length=100, description="Product category")
-    
+
     # CSV imports provide SKU - add this field for proper handling
-    sku: str | None = Field(None, max_length=100, description="Product SKU from CSV import")
+    sku: str | None = Field(
+        None, max_length=100, description="Product SKU from CSV import"
+    )
 
     # Batch details
     quantity: float = Field(..., gt=0, description="Initial quantity")
@@ -112,7 +114,7 @@ class BatchCreationService:
             logger.warning(
                 "Invalid user_id format, using system UUID",
                 user_id=user_id,
-                error=str(e)
+                error=str(e),
             )
             return self.SYSTEM_USER_UUID
 
@@ -222,9 +224,7 @@ class BatchCreationService:
 
         # Find or create category if provided
         if batch_data.category:
-            await self._find_or_create_category(
-                session, batch_data.category, user_uuid
-            )
+            await self._find_or_create_category(session, batch_data.category, user_uuid)
 
         # Create new product - use provided SKU or generate one
         product_sku = batch_data.sku if batch_data.sku else f"SCAN-{batch_data.barcode}"
@@ -286,8 +286,7 @@ class BatchCreationService:
             category_name.lower()
             .replace(" ", "_")
             .replace("-", "_")
-            .replace("&", "and")
-            [:50]  # Limit to 50 characters
+            .replace("&", "and")[:50]  # Limit to 50 characters
         )
 
         # Ensure category code is unique
@@ -391,17 +390,20 @@ class BatchCreationService:
         # Bulk query for existing products
         result = await session.execute(
             select(Product.barcode, Product.product_id, StoreProduct.store_id)
-            .join(StoreProduct, Product.product_id == StoreProduct.product_id, isouter=True)
+            .join(
+                StoreProduct,
+                Product.product_id == StoreProduct.product_id,
+                isouter=True,
+            )
             .where(
                 and_(
                     Product.barcode.in_(unique_barcodes),
                     or_(
-                        StoreProduct.store_id.is_(None),  # Product exists but not in this store
-                        and_(
-                            StoreProduct.store_id == store_id,
-                            StoreProduct.is_active
-                        )
-                    )
+                        StoreProduct.store_id.is_(
+                            None
+                        ),  # Product exists but not in this store
+                        and_(StoreProduct.store_id == store_id, StoreProduct.is_active),
+                    ),
                 )
             )
         )
@@ -477,13 +479,14 @@ class BatchCreationService:
             shelf_life = category_shelf_life.get(request.category or "other", 30)
 
             # Use provided SKU from CSV or generate unique one
-            if hasattr(request, 'sku') and request.sku:
+            if hasattr(request, "sku") and request.sku:
                 product_sku = request.sku
             else:
                 # Generate unique SKU for products without SKU
                 import uuid as uuid_lib
+
                 product_sku = f"CSV_{barcode[:10]}_{uuid_lib.uuid4().hex[:8].upper()}"
-            
+
             product = Product(
                 product_id=product_id,
                 sku=product_sku,  # Use provided SKU or generated unique one
@@ -519,7 +522,9 @@ class BatchCreationService:
         # Bulk insert store products
         if store_products_to_create:
             session.add_all(store_products_to_create)
-            logger.info("Bulk created store products", count=len(store_products_to_create))
+            logger.info(
+                "Bulk created store products", count=len(store_products_to_create)
+            )
 
         await session.flush()
         return new_products
@@ -591,15 +596,17 @@ class BatchCreationService:
                 batches_to_create.append(batch)
 
                 # Prepare success record
-                successful_batches.append({
-                    "batch_id": str(batch.batch_id),
-                    "product_id": str(product_id),
-                    "batch_number": batch_number,
-                    "barcode": request.barcode,
-                    "product_name": request.product_name,
-                    "quantity": request.quantity,
-                    "expiry_date": request.expiry_date.isoformat(),
-                })
+                successful_batches.append(
+                    {
+                        "batch_id": str(batch.batch_id),
+                        "product_id": str(product_id),
+                        "batch_number": batch_number,
+                        "barcode": request.barcode,
+                        "product_name": request.product_name,
+                        "quantity": request.quantity,
+                        "expiry_date": request.expiry_date.isoformat(),
+                    }
+                )
 
             except Exception as e:
                 logger.error(
@@ -638,7 +645,9 @@ class BatchCreationService:
 
                 # Step 1: Bulk lookup existing products
                 barcodes = [req.barcode for req in chunk_requests]
-                existing_products = await self._bulk_lookup_products(session, store_id, barcodes)
+                existing_products = await self._bulk_lookup_products(
+                    session, store_id, barcodes
+                )
 
                 # Step 2: Bulk create missing products
                 new_products = await self._bulk_create_missing_products(
@@ -647,7 +656,13 @@ class BatchCreationService:
 
                 # Step 3: Bulk create all batches
                 successful_batches = await self._bulk_create_batches(
-                    session, chunk_requests, existing_products, new_products, store_id, user_id, chunk_start
+                    session,
+                    chunk_requests,
+                    existing_products,
+                    new_products,
+                    store_id,
+                    user_id,
+                    chunk_start,
                 )
 
                 # Commit all changes
@@ -678,12 +693,14 @@ class BatchCreationService:
                 # Return all as failed
                 failed_batches = []
                 for i, request in enumerate(chunk_requests):
-                    failed_batches.append({
-                        "index": chunk_start + i,
-                        "barcode": request.barcode,
-                        "product_name": request.product_name,
-                        "error": f"Bulk processing failed: {str(e)}",
-                    })
+                    failed_batches.append(
+                        {
+                            "index": chunk_start + i,
+                            "barcode": request.barcode,
+                            "product_name": request.product_name,
+                            "error": f"Bulk processing failed: {str(e)}",
+                        }
+                    )
 
                 return {
                     "successful": [],
@@ -755,8 +772,8 @@ class BatchCreationService:
         if not batch_requests:
             raise ValueError("No batch requests provided")
 
-        if chunk_size < 1 or chunk_size > 100:
-            raise ValueError("Chunk size must be between 1 and 100")
+        if chunk_size < 1 or chunk_size > 500:
+            raise ValueError("Chunk size must be between 1 and 500")
 
         total_requests = len(batch_requests)
         successful_batches = []
@@ -1051,17 +1068,20 @@ class BatchCreationService:
         # Bulk query for existing products
         result = await session.execute(
             select(Product.barcode, Product.product_id, StoreProduct.store_id)
-            .join(StoreProduct, Product.product_id == StoreProduct.product_id, isouter=True)
+            .join(
+                StoreProduct,
+                Product.product_id == StoreProduct.product_id,
+                isouter=True,
+            )
             .where(
                 and_(
                     Product.barcode.in_(unique_barcodes),
                     or_(
-                        StoreProduct.store_id.is_(None),  # Product exists but not in this store
-                        and_(
-                            StoreProduct.store_id == store_id,
-                            StoreProduct.is_active
-                        )
-                    )
+                        StoreProduct.store_id.is_(
+                            None
+                        ),  # Product exists but not in this store
+                        and_(StoreProduct.store_id == store_id, StoreProduct.is_active),
+                    ),
                 )
             )
         )
@@ -1137,13 +1157,14 @@ class BatchCreationService:
             shelf_life = category_shelf_life.get(request.category or "other", 30)
 
             # Use provided SKU from CSV or generate unique one
-            if hasattr(request, 'sku') and request.sku:
+            if hasattr(request, "sku") and request.sku:
                 product_sku = request.sku
             else:
                 # Generate unique SKU for products without SKU
                 import uuid as uuid_lib
+
                 product_sku = f"CSV_{barcode[:10]}_{uuid_lib.uuid4().hex[:8].upper()}"
-            
+
             product = Product(
                 product_id=product_id,
                 sku=product_sku,  # Use provided SKU or generated unique one
@@ -1179,7 +1200,9 @@ class BatchCreationService:
         # Bulk insert store products
         if store_products_to_create:
             session.add_all(store_products_to_create)
-            logger.info("Bulk created store products", count=len(store_products_to_create))
+            logger.info(
+                "Bulk created store products", count=len(store_products_to_create)
+            )
 
         await session.flush()
         return new_products
@@ -1251,15 +1274,17 @@ class BatchCreationService:
                 batches_to_create.append(batch)
 
                 # Prepare success record
-                successful_batches.append({
-                    "batch_id": str(batch.batch_id),
-                    "product_id": str(product_id),
-                    "batch_number": batch_number,
-                    "barcode": request.barcode,
-                    "product_name": request.product_name,
-                    "quantity": request.quantity,
-                    "expiry_date": request.expiry_date.isoformat(),
-                })
+                successful_batches.append(
+                    {
+                        "batch_id": str(batch.batch_id),
+                        "product_id": str(product_id),
+                        "batch_number": batch_number,
+                        "barcode": request.barcode,
+                        "product_name": request.product_name,
+                        "quantity": request.quantity,
+                        "expiry_date": request.expiry_date.isoformat(),
+                    }
+                )
 
             except Exception as e:
                 logger.error(
@@ -1298,7 +1323,9 @@ class BatchCreationService:
 
                 # Step 1: Bulk lookup existing products
                 barcodes = [req.barcode for req in chunk_requests]
-                existing_products = await self._bulk_lookup_products(session, store_id, barcodes)
+                existing_products = await self._bulk_lookup_products(
+                    session, store_id, barcodes
+                )
 
                 # Step 2: Bulk create missing products
                 new_products = await self._bulk_create_missing_products(
@@ -1307,7 +1334,13 @@ class BatchCreationService:
 
                 # Step 3: Bulk create all batches
                 successful_batches = await self._bulk_create_batches(
-                    session, chunk_requests, existing_products, new_products, store_id, user_id, chunk_start
+                    session,
+                    chunk_requests,
+                    existing_products,
+                    new_products,
+                    store_id,
+                    user_id,
+                    chunk_start,
                 )
 
                 # Commit all changes
@@ -1338,12 +1371,14 @@ class BatchCreationService:
                 # Return all as failed
                 failed_batches = []
                 for i, request in enumerate(chunk_requests):
-                    failed_batches.append({
-                        "index": chunk_start + i,
-                        "barcode": request.barcode,
-                        "product_name": request.product_name,
-                        "error": f"Bulk processing failed: {str(e)}",
-                    })
+                    failed_batches.append(
+                        {
+                            "index": chunk_start + i,
+                            "barcode": request.barcode,
+                            "product_name": request.product_name,
+                            "error": f"Bulk processing failed: {str(e)}",
+                        }
+                    )
 
                 return {
                     "successful": [],

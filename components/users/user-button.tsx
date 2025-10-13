@@ -30,6 +30,7 @@ export default function UserButton() {
       href="/dashboard/settings?tab=account"
       variant="outline"
       className="rounded-full border"
+      aria-label="Account settings"
     >
       <UserIcon className="w-4 h-4" />
     </Button>

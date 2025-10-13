@@ -3,7 +3,8 @@ import { redirect } from 'next/navigation'
 import { NoStoresError } from '@/components/dashboard/no-stores-error'
 import { ProductsFilteredList } from '@/components/products/products-filtered-list'
 import ProductsHeader from '@/components/products/products-header'
-import { fetchProductsPage, type ProductFilters, type SortField } from '@/lib/queries/products'
+import type { ProductFilters, SortField } from '@/lib/queries/products'
+import { fetchProductsPageRPC } from '@/lib/queries/products-rpc'
 import { queryKeys } from '@/lib/queries/query-keys'
 import { fetchUserPreferences, fetchUserStores } from '@/lib/queries/stores'
 import { createPrefetchedQuery } from '@/lib/react-query/prefetch'
@@ -34,23 +35,11 @@ export default async function InventoryProductsPage({ searchParams }: InventoryP
   }
 
   try {
-    // Prefetch user stores and preferences
-    await Promise.all([
-      queryClient.prefetchQuery({
-        queryKey: queryKeys.stores.userStores(user.id),
-        queryFn: () => fetchUserStores(user.id, serverClient),
-        staleTime: 5 * 60 * 1000,
-      }),
-      queryClient.prefetchQuery({
-        queryKey: queryKeys.userPreferences.detail(user.id),
-        queryFn: () => fetchUserPreferences(serverClient),
-        staleTime: 5 * 60 * 1000,
-      }),
+    // Fetch stores and preferences (layout has them cached in client but we need them server-side)
+    const [stores, preferences] = await Promise.all([
+      fetchUserStores(user.id, serverClient),
+      fetchUserPreferences(serverClient),
     ])
-
-    // Get user's stores to determine which store to prefetch products for
-    const stores = await fetchUserStores(user.id, serverClient)
-    const preferences = await fetchUserPreferences(serverClient)
 
     if (stores.length === 0) {
       // User has no stores - show error instead of redirecting
@@ -69,19 +58,22 @@ export default async function InventoryProductsPage({ searchParams }: InventoryP
       filters.category = params.category
     }
 
-    // Handle sorting
+    // Handle sorting - match client default
     if (params.sort) {
       filters.sort = {
         field: params.sort as SortField,
         direction: (params.direction || 'asc') as 'asc' | 'desc',
       }
+    } else {
+      // Default sort matches client-side default in ProductsFilteredList
+      filters.sort = { field: 'created_at', direction: 'desc' }
     }
 
-    // Prefetch the first page of products with filters
+    // Prefetch the first page of products with filters (using optimized RPC)
     await queryClient.prefetchInfiniteQuery({
       queryKey: queryKeys.products.infinite(storeToUse.store_id, filters),
       queryFn: ({ pageParam = 0 }) =>
-        fetchProductsPage({ page: pageParam, pageSize: 20 }, filters, serverClient),
+        fetchProductsPageRPC({ page: pageParam, pageSize: 20 }, filters, serverClient),
       initialPageParam: 0,
       getNextPageParam: lastPage => lastPage.nextPage,
       pages: 1, // Only prefetch first page

@@ -242,7 +242,9 @@ async def process_scanned_batch(
         read_ops = get_read_only_operations(db)
 
         # Look up product by barcode
-        product_info = await _lookup_product_by_barcode(
+        from app.utils.scan_workflow_helpers import BarcodeProductLookup
+
+        product_info = await BarcodeProductLookup.lookup_product_by_barcode(
             scan_data.barcode, store_id, read_ops
         )
 

@@ -50,7 +50,9 @@ class ActionTrackingService:
             performed_at=datetime.now(UTC).replace(tzinfo=None),
             performed_by=uuid.UUID(user_id) if user_id else None,
             # Required fields with defaults
-            quantity_affected=Decimal("0"),  # Zero is valid for 'ignored' action_type per DB constraint
+            quantity_affected=Decimal(
+                "0"
+            ),  # Zero is valid for 'ignored' action_type per DB constraint
             total_original_value=Decimal("0"),
             total_recovered_value=Decimal("0"),
             batch_initial_quantity=batch.initial_quantity,
@@ -141,9 +143,15 @@ class ActionTrackingService:
             ai_score=Decimal(str(ai_score)),
             performed_at=datetime.now(UTC).replace(tzinfo=None),
             performed_by=uuid.UUID(user_id),
-            quantity_affected=Decimal(str(quantity_affected)) if quantity_affected else Decimal("0"),
-            total_original_value=Decimal(str(total_original_value)) if total_original_value else Decimal("0"),
-            total_recovered_value=Decimal(str(total_recovered_value)) if total_recovered_value else Decimal("0"),
+            quantity_affected=Decimal(str(quantity_affected))
+            if quantity_affected
+            else Decimal("0"),
+            total_original_value=Decimal(str(total_original_value))
+            if total_original_value
+            else Decimal("0"),
+            total_recovered_value=Decimal(str(total_recovered_value))
+            if total_recovered_value
+            else Decimal("0"),
             batch_initial_quantity=batch.initial_quantity,
             notes=notes,
             donation_recipient_id=uuid.UUID(donation_recipient_id)
@@ -171,8 +179,12 @@ class ActionTrackingService:
                 BatchAction.action_type,
                 func.count().label("count"),
                 func.avg(BatchAction.ai_score).label("avg_ai_score"),
-                func.sum(BatchAction.total_original_value).label("total_original_value"),
-                func.sum(BatchAction.total_recovered_value).label("total_recovered_value"),
+                func.sum(BatchAction.total_original_value).label(
+                    "total_original_value"
+                ),
+                func.sum(BatchAction.total_recovered_value).label(
+                    "total_recovered_value"
+                ),
             )
             .where(
                 and_(

@@ -81,7 +81,8 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
     useScanOutActions()
 
   // OCR processing hook for expiry date capture
-  const { processExpiryDate, isLoading: isOCRProcessing, isBackendHealthy } = useOCRWithFallback()
+  // const { processExpiryDate, isLoading: isOCRProcessing, isBackendHealthy } = useOCRWithFallback()
+  const { processExpiryDate, isLoading: isOCRProcessing } = useOCRWithFallback() // debug
 
   // Dialog states
   const [showSubmissionDialog, setShowSubmissionDialog] = useState(false)
@@ -397,7 +398,7 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
             isOCRProcessing={isOCRProcessing}
             ocrError={ocrError}
             onClearOCRError={clearOCRError}
-            isBackendHealthy={isBackendHealthy}
+            // isBackendHealthy={isBackendHealthy}
             title={t('captureExpiryDate')}
             subtitle={t('pointCameraAtExpiry')}
             autoStart={true}

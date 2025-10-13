@@ -71,19 +71,21 @@ jobs:
 
       - name: Lint with Ruff
         run: |
-          uv run ruff check lifo_api --output-format=github
-          uv run ruff format --check lifo_api
+          cd lifo_api
+          uv run ruff check . --output-format=github
+          uv run ruff format --check .
 
       - name: Type checking with MyPy
         run: |
+          cd lifo_api
           echo "::group::MyPy Type Checking"
-          uv run mypy lifo_api --show-error-codes --pretty 2>&1 | tee mypy-report.txt || echo "MyPy found type errors - see output above"
+          uv run mypy . --show-error-codes --pretty 2>&1 | tee mypy-report.txt || echo "MyPy found type errors - see output above"
           echo "::endgroup::"
-          
+
           # Count errors for tracking progress
           error_count=$(grep -c "error:" mypy-report.txt || echo "0")
           echo "Total MyPy errors: $error_count"
-          
+
           # Set as warning instead of failure
           if [ "$error_count" -gt 0 ]; then
             echo "::warning::Found $error_count MyPy type errors. See full output above."
@@ -92,25 +94,26 @@ jobs:
 
       - name: Security scan with Ruff
         run: |
-          uv run ruff check --select=S lifo_api --ignore=S603,S607,S110,S105,S608,S324,S104 --exclude=tests/,scripts/
+          cd lifo_api
+          uv run ruff check --select=S . --ignore=S603,S607,S110,S105,S608,S324,S104 --exclude=tests/,scripts/
 
       - name: Run tests with coverage
         run: |
+          cd lifo_api
           echo "::group::Running Test Suite"
-          uv run python -m pytest lifo_api/tests/ -v \
-            --cov=lifo_ai_core \
-            --cov=lifo_api \
+          uv run python -m pytest tests/ -v \
+            --cov=app \
             --cov-report=xml \
             --cov-report=term \
             --junit-xml=test-results.xml 2>&1 | tee test-report.txt || echo "Tests completed with some failures - see output above"
           echo "::endgroup::"
-          
+
           # Count test results for tracking
           if [ -f test-results.xml ]; then
             failures=$(grep -o 'failures="[0-9]*"' test-results.xml | grep -o '[0-9]*' || echo "0")
             errors=$(grep -o 'errors="[0-9]*"' test-results.xml | grep -o '[0-9]*' || echo "0")
             echo "Test failures: $failures, Test errors: $errors"
-            
+
             if [ "$failures" -gt 0 ] || [ "$errors" -gt 0 ]; then
               echo "::warning::Found $failures test failures and $errors test errors. See full output above."
             fi

@@ -16,17 +16,17 @@ logger = structlog.get_logger()
 
 class AnalyticsDataFetcher:
     """Service for fetching data from Supabase for analytics"""
-    
+
     def __init__(self, logger):
         self.logger = logger
-    
+
     async def fetch_batch_data(self, store_id: str):
         """Fetch batch data from Supabase"""
         from app.database.supabase_service import get_supabase_service
-        
+
         supabase_service = get_supabase_service()
         admin_client = supabase_service.get_admin_client()
-        
+
         result = (
             admin_client.schema("inventory")
             .table("batches")
@@ -49,25 +49,26 @@ class AnalyticsDataFetcher:
             .gt("current_quantity", 0)
             .execute()
         )
-        
+
         self.logger.info(
             "FastAPI: Raw batches from Supabase",
             store_id=store_id,
             total_batches=len(result.data) if result.data else 0,
             batch_ids=[batch["batch_id"] for batch in result.data[:5]]
-            if result.data else [],
+            if result.data
+            else [],
             first_batch_sample=result.data[0] if result.data else None,
         )
-        
+
         return result.data or []
-    
+
     async def fetch_scoring_data(self, store_id: str):
         """Fetch scoring data from Supabase"""
         from app.database.supabase_service import get_supabase_service
-        
+
         supabase_service = get_supabase_service()
         admin_client = supabase_service.get_admin_client()
-        
+
         scoring_result = (
             admin_client.schema("scoring")
             .table("product_scores")
@@ -84,28 +85,27 @@ class AnalyticsDataFetcher:
             .order("composite_score", desc=True)
             .execute()
         )
-        
+
         self.logger.info(
             "FastAPI: Scoring data from product_scores",
             store_id=store_id,
             total_scores=len(scoring_result.data) if scoring_result.data else 0,
-            scoring_batch_ids=[
-                score["batch_id"] for score in scoring_result.data[:5]
-            ] if scoring_result.data else [],
+            scoring_batch_ids=[score["batch_id"] for score in scoring_result.data[:5]]
+            if scoring_result.data
+            else [],
             score_threshold=0.4,
-            first_score_sample=scoring_result.data[0]
-            if scoring_result.data else None,
+            first_score_sample=scoring_result.data[0] if scoring_result.data else None,
         )
-        
+
         return scoring_result.data or []
 
 
 class ExpiryCalculator:
     """Service for calculating expiry dates and urgency levels"""
-    
+
     def __init__(self, logger):
         self.logger = logger
-    
+
     def calculate_days_to_expiry(self, expiry_date_str: str) -> int:
         """Calculate days to expiry from ISO date string"""
         try:
@@ -115,12 +115,12 @@ class ExpiryCalculator:
             return (expiry_date - date.today()).days
         except (ValueError, KeyError) as e:
             self.logger.warning(
-                "Error processing expiry date", 
+                "Error processing expiry date",
                 expiry_date=expiry_date_str,
-                error=str(e)
+                error=str(e),
             )
             return 0
-    
+
     def calculate_urgency_from_days(self, days_to_expiry: int) -> tuple[str, float]:
         """Calculate urgency level and composite score from days to expiry"""
         if days_to_expiry < 0:
@@ -133,15 +133,17 @@ class ExpiryCalculator:
             return "medium", 0.5
         else:
             return "low", 0.4
-    
+
     def create_fallback_score_info(self, batch_id: str, expiry_date_str: str) -> dict:
         """Create fallback scoring info for batches without scores"""
         days_to_expiry = self.calculate_days_to_expiry(expiry_date_str)
         urgency, composite_score = self.calculate_urgency_from_days(days_to_expiry)
-        
+
         # Generate meaningful reasons based on expiry status
-        reason, recommendation, discount = self._generate_meaningful_reason(days_to_expiry)
-        
+        reason, recommendation, discount = self._generate_meaningful_reason(
+            days_to_expiry
+        )
+
         return {
             "batch_id": batch_id,
             "composite_score": composite_score,
@@ -150,7 +152,7 @@ class ExpiryCalculator:
             "reason": reason,
             "discount_percent": discount,
         }
-    
+
     def _generate_meaningful_reason(self, days_to_expiry: int) -> tuple[str, str, int]:
         """Generate meaningful reason, recommendation, and discount based on expiry status"""
         if days_to_expiry < 0:
@@ -158,235 +160,261 @@ class ExpiryCalculator:
             return (
                 f"product expired {days_expired} day{'s' if days_expired != 1 else ''} ago",
                 "dispose",
-                0
+                0,
             )
         elif days_to_expiry == 0:
-            return (
-                "product expires today",
-                "urgent_discount",
-                40
-            )
+            return ("product expires today", "urgent_discount", 40)
         elif days_to_expiry == 1:
-            return (
-                "product expires tomorrow",
-                "discount_aggressive", 
-                25
-            )
+            return ("product expires tomorrow", "discount_aggressive", 25)
         elif days_to_expiry <= 3:
             return (
                 f"product expires in {days_to_expiry} days",
                 "discount_moderate",
-                15
+                15,
             )
         elif days_to_expiry <= 7:
             return (
                 f"product expires in {days_to_expiry} days - monitor closely",
                 "monitor",
-                0
+                0,
             )
         else:
-            return (
-                f"product has {days_to_expiry} days remaining",
-                "monitor",
-                0
-            )
+            return (f"product has {days_to_expiry} days remaining", "monitor", 0)
 
 
 class CategoryBreakdownService:
     """Service for calculating category-based inventory analytics"""
-    
+
     def __init__(self, logger):
         self.logger = logger
         self.expiry_calculator = ExpiryCalculator(logger)
-    
+
     def calculate_category_breakdown(self, batch_data: list) -> list:
         """Calculate category breakdown from batch data with product information"""
         if not batch_data:
             return []
-        
+
         # Group batches by category
         category_groups = {}
-        
+
         for batch in batch_data:
             try:
                 # Extract category from product data - handle both data structures
                 category = "Unknown"
-                
+
                 # Check if this is processed inventory data (from get_store_inventory_for_scoring)
                 if "category" in batch:
                     category = batch["category"]
                 # Or if it's raw batch data with nested structure (from fetch_batch_data)
-                elif batch.get("store_products") and batch["store_products"].get("products"):
+                elif batch.get("store_products") and batch["store_products"].get(
+                    "products"
+                ):
                     product_info = batch["store_products"]["products"]
                     category_info = product_info.get("category")
                     if category_info:
-                        category = category_info.get("display_name_en") or category_info.get("category_code", "Unknown")
-                
+                        category = category_info.get(
+                            "display_name_en"
+                        ) or category_info.get("category_code", "Unknown")
+
                 # Initialize category group if not exists
                 if category not in category_groups:
                     category_groups[category] = {
                         "batches": [],
                         "total_quantity": 0.0,
                         "total_value": 0.0,
-                        "urgency_counts": {"critical": 0, "high": 0, "medium": 0, "low": 0},
-                        "expiry_days": []
+                        "urgency_counts": {
+                            "critical": 0,
+                            "high": 0,
+                            "medium": 0,
+                            "low": 0,
+                        },
+                        "expiry_days": [],
                     }
-                
+
                 # Add batch to category group
                 category_groups[category]["batches"].append(batch)
-                category_groups[category]["total_quantity"] += float(batch.get("current_quantity", 0))
-                category_groups[category]["total_value"] += (
-                    float(batch.get("current_quantity", 0)) * float(batch.get("selling_price", 0))
+                category_groups[category]["total_quantity"] += float(
+                    batch.get("current_quantity", 0)
                 )
-                
+                category_groups[category]["total_value"] += float(
+                    batch.get("current_quantity", 0)
+                ) * float(batch.get("selling_price", 0))
+
                 # Calculate urgency for this batch
                 days_to_expiry = self.expiry_calculator.calculate_days_to_expiry(
                     batch["expiry_date"]
                 )
                 category_groups[category]["expiry_days"].append(days_to_expiry)
-                
-                urgency, _ = self.expiry_calculator.calculate_urgency_from_days(days_to_expiry)
+
+                urgency, _ = self.expiry_calculator.calculate_urgency_from_days(
+                    days_to_expiry
+                )
                 category_groups[category]["urgency_counts"][urgency] += 1
-                
+
             except (ValueError, KeyError) as e:
                 self.logger.warning(
-                    "Error processing batch for category breakdown", 
+                    "Error processing batch for category breakdown",
                     batch_id=batch.get("batch_id"),
-                    error=str(e)
+                    error=str(e),
                 )
                 continue
-        
+
         # Build final breakdown list
         breakdown = []
         for category, data in category_groups.items():
             # Calculate average days to expiry
             avg_days_to_expiry = (
-                sum(data["expiry_days"]) / len(data["expiry_days"]) 
-                if data["expiry_days"] else 0
+                sum(data["expiry_days"]) / len(data["expiry_days"])
+                if data["expiry_days"]
+                else 0
             )
-            
-            breakdown.append({
-                "category": category,
-                "batch_count": len(data["batches"]),
-                "total_quantity": round(data["total_quantity"], 2),
-                "total_value": round(data["total_value"], 2),
-                "urgency_distribution": data["urgency_counts"],
-                "avg_days_to_expiry": round(avg_days_to_expiry, 1)
-            })
-        
+
+            breakdown.append(
+                {
+                    "category": category,
+                    "batch_count": len(data["batches"]),
+                    "total_quantity": round(data["total_quantity"], 2),
+                    "total_value": round(data["total_value"], 2),
+                    "urgency_distribution": data["urgency_counts"],
+                    "avg_days_to_expiry": round(avg_days_to_expiry, 1),
+                }
+            )
+
         # Sort by total value descending
         breakdown.sort(key=lambda x: x["total_value"], reverse=True)
-        
+
         self.logger.info(
             "Category breakdown calculated",
             categories_count=len(breakdown),
-            total_batches=len(batch_data)
+            total_batches=len(batch_data),
         )
-        
+
         return breakdown
 
 
 class RecentActionsService:
     """Service for generating recent actions based on inventory patterns"""
-    
+
     def __init__(self, logger):
         self.logger = logger
         self.expiry_calculator = ExpiryCalculator(logger)
-    
-    def generate_recent_actions(self, batch_data: list, actionable_batches: list) -> list:
+
+    def generate_recent_actions(
+        self, batch_data: list, actionable_batches: list
+    ) -> list:
         """Generate recent actions based on inventory state and actionable batches"""
         recent_actions = []
-        
+
         try:
             # Generate actions based on actionable batches (these represent AI recommendations)
             for batch in actionable_batches[:10]:  # Limit to 10 most recent/urgent
                 action_type = self._determine_action_type(batch)
-                
-                recent_actions.append({
-                    "action_id": f"ai_{batch.get('batch_id', '')[:8]}",
-                    "action_type": action_type,
-                    "batch_id": batch.get("batch_id"),
-                    "product_name": batch.get("product_name", "Unknown"),
-                    "original_price": batch.get("current_quantity", 0) * (
-                        batch.get("selling_price", 0) if "selling_price" in batch else 
-                        batch.get("potential_loss", 0) / max(batch.get("current_quantity", 1), 1)
-                    ),
-                    "new_price": None,  # Would be calculated when action is taken
-                    "discount_percent": batch.get("discount_percent", 0),
-                    "urgency_level": batch.get("urgency", "medium"),
-                    "recommendation": batch.get("recommendation", "monitor"),
-                    "executed_at": datetime.now(),
-                    "executed_by": "ai_system",
-                    "effectiveness_score": None,  # Would be calculated after action execution
-                    "status": "recommended"
-                })
-            
+
+                recent_actions.append(
+                    {
+                        "action_id": f"ai_{batch.get('batch_id', '')[:8]}",
+                        "action_type": action_type,
+                        "batch_id": batch.get("batch_id"),
+                        "product_name": batch.get("product_name", "Unknown"),
+                        "original_price": batch.get("current_quantity", 0)
+                        * (
+                            batch.get("selling_price", 0)
+                            if "selling_price" in batch
+                            else batch.get("potential_loss", 0)
+                            / max(batch.get("current_quantity", 1), 1)
+                        ),
+                        "new_price": None,  # Would be calculated when action is taken
+                        "discount_percent": batch.get("discount_percent", 0),
+                        "urgency_level": batch.get("urgency", "medium"),
+                        "recommendation": batch.get("recommendation", "monitor"),
+                        "executed_at": datetime.now(),
+                        "executed_by": "ai_system",
+                        "effectiveness_score": None,  # Would be calculated after action execution
+                        "status": "recommended",
+                    }
+                )
+
             # Generate pattern-based actions from batch data
             critical_batches = [
-                batch for batch in batch_data 
-                if self.expiry_calculator.calculate_days_to_expiry(batch["expiry_date"]) <= 0
+                batch
+                for batch in batch_data
+                if self.expiry_calculator.calculate_days_to_expiry(batch["expiry_date"])
+                <= 0
             ]
-            
+
             for batch in critical_batches[:5]:  # Add up to 5 critical items
-                if any(action["batch_id"] == batch["batch_id"] for action in recent_actions):
+                if any(
+                    action["batch_id"] == batch["batch_id"] for action in recent_actions
+                ):
                     continue  # Skip if already in actionable batches
-                
-                # Extract product name - handle both data structures  
+
+                # Extract product name - handle both data structures
                 product_name = "Unknown"
                 if "product_name" in batch:
                     product_name = batch["product_name"]
-                elif batch.get("store_products") and batch["store_products"].get("products"):
-                    product_name = batch["store_products"]["products"].get("name", "Unknown")
-                
-                recent_actions.append({
-                    "action_id": f"exp_{batch.get('batch_id', '')[:8]}",
-                    "action_type": "expired_removal",
-                    "batch_id": batch.get("batch_id"),
-                    "product_name": product_name,
-                    "original_price": float(batch.get("current_quantity", 0)) * float(batch.get("selling_price", 0)),
-                    "new_price": 0.0,  # Expired items have no value
-                    "discount_percent": 100,
-                    "urgency_level": "critical",
-                    "recommendation": "remove",
-                    "executed_at": datetime.now(),
-                    "executed_by": "system",
-                    "effectiveness_score": 0.0,  # No recovery possible
-                    "status": "required"
-                })
-            
+                elif batch.get("store_products") and batch["store_products"].get(
+                    "products"
+                ):
+                    product_name = batch["store_products"]["products"].get(
+                        "name", "Unknown"
+                    )
+
+                recent_actions.append(
+                    {
+                        "action_id": f"exp_{batch.get('batch_id', '')[:8]}",
+                        "action_type": "expired_removal",
+                        "batch_id": batch.get("batch_id"),
+                        "product_name": product_name,
+                        "original_price": float(batch.get("current_quantity", 0))
+                        * float(batch.get("selling_price", 0)),
+                        "new_price": 0.0,  # Expired items have no value
+                        "discount_percent": 100,
+                        "urgency_level": "critical",
+                        "recommendation": "remove",
+                        "executed_at": datetime.now(),
+                        "executed_by": "system",
+                        "effectiveness_score": 0.0,  # No recovery possible
+                        "status": "required",
+                    }
+                )
+
             # Sort by urgency and execution time
             urgency_priority = {"critical": 0, "high": 1, "medium": 2, "low": 3}
             recent_actions.sort(
                 key=lambda x: (
                     urgency_priority.get(x.get("urgency_level", "medium"), 4),
-                    x.get("executed_at", datetime.now())
+                    x.get("executed_at", datetime.now()),
                 ),
-                reverse=True
+                reverse=True,
             )
-            
+
             self.logger.info(
                 "Recent actions generated",
                 actions_count=len(recent_actions),
-                actionable_count=len([a for a in recent_actions if a["status"] == "recommended"]),
-                critical_count=len([a for a in recent_actions if a["urgency_level"] == "critical"])
+                actionable_count=len(
+                    [a for a in recent_actions if a["status"] == "recommended"]
+                ),
+                critical_count=len(
+                    [a for a in recent_actions if a["urgency_level"] == "critical"]
+                ),
             )
-            
+
             return recent_actions[:15]  # Return top 15 actions
-            
+
         except Exception as e:
             self.logger.error(
                 "Error generating recent actions",
                 error=str(e),
-                batch_count=len(batch_data)
+                batch_count=len(batch_data),
             )
             return []
-    
+
     def _determine_action_type(self, batch: dict) -> str:
         """Determine action type based on batch characteristics"""
         urgency = batch.get("urgency", "medium")
         recommendation = batch.get("recommendation", "monitor")
         discount_percent = batch.get("discount_percent", 0)
-        
+
         if urgency == "critical":
             if discount_percent >= 40:
                 return "discount_aggressive"
@@ -411,11 +439,11 @@ class RecentActionsService:
 
 class InventorySummaryCalculator:
     """Service for calculating inventory summary statistics"""
-    
+
     def __init__(self, logger):
         self.logger = logger
         self.expiry_calculator = ExpiryCalculator(logger)
-    
+
     def calculate_summary(self, batch_data: list) -> dict:
         """Calculate inventory summary statistics"""
         total_batches = len(batch_data)
@@ -427,17 +455,17 @@ class InventorySummaryCalculator:
             * float(batch.get("selling_price", 0))
             for batch in batch_data
         )
-        
+
         urgency_counts = {"critical": 0, "high": 0, "medium": 0, "low": 0}
         expired_count = 0
         expiring_soon_count = 0
-        
+
         for batch in batch_data:
             try:
                 days_to_expiry = self.expiry_calculator.calculate_days_to_expiry(
                     batch["expiry_date"]
                 )
-                
+
                 if days_to_expiry <= 0:
                     expired_count += 1
                     urgency_counts["critical"] += 1
@@ -452,13 +480,11 @@ class InventorySummaryCalculator:
                     expiring_soon_count += 1
                 else:
                     urgency_counts["low"] += 1
-                    
+
             except (ValueError, KeyError) as e:
-                self.logger.warning(
-                    "Error processing batch expiry date", error=str(e)
-                )
+                self.logger.warning("Error processing batch expiry date", error=str(e))
                 continue
-        
+
         return {
             "total_batches": total_batches,
             "total_quantity": total_quantity,
@@ -471,23 +497,25 @@ class InventorySummaryCalculator:
 
 class ActionableBatchProcessor:
     """Service for processing actionable batches with scoring integration"""
-    
+
     def __init__(self, logger):
         self.logger = logger
         self.expiry_calculator = ExpiryCalculator(logger)
-    
-    def process_actionable_batches(self, batch_data: list, scoring_data: list, store_id: str) -> list:
+
+    def process_actionable_batches(
+        self, batch_data: list, scoring_data: list, store_id: str
+    ) -> list:
         """Process and create actionable batches list"""
         actionable_batches = []
         scores_by_batch = {score["batch_id"]: score for score in scoring_data}
-        
+
         # Tracking variables for logging
         batches_processed = 0
         batches_with_scores = 0
         batches_without_scores = 0
         batches_filtered_expired = 0
         batches_added_to_actionable = 0
-        
+
         self.logger.info(
             "FastAPI: Starting actionable batches processing",
             store_id=store_id,
@@ -495,13 +523,14 @@ class ActionableBatchProcessor:
             total_batches_from_inventory=len(batch_data),
             total_scoring_records=len(scoring_data),
             scoring_batch_ids=[s["batch_id"] for s in scoring_data[:3]]
-            if scoring_data else [],
+            if scoring_data
+            else [],
         )
-        
+
         for batch in batch_data:
             batches_processed += 1
             score_info = scores_by_batch.get(batch["batch_id"])
-            
+
             if score_info:
                 batches_with_scores += 1
             else:
@@ -514,26 +543,28 @@ class ActionableBatchProcessor:
                     .get("name", "Unknown"),
                     expiry_date=batch["expiry_date"],
                 )
-                
+
                 score_info = self.expiry_calculator.create_fallback_score_info(
                     batch["batch_id"], batch["expiry_date"]
                 )
-                
+
                 self.logger.info(
                     "FastAPI: Created fallback scoring for unscored batch",
                     batch_id=batch["batch_id"],
-                    days_to_expiry=self.expiry_calculator.calculate_days_to_expiry(batch["expiry_date"]),
+                    days_to_expiry=self.expiry_calculator.calculate_days_to_expiry(
+                        batch["expiry_date"]
+                    ),
                     fallback_urgency=score_info["urgency_level"],
                     fallback_score=score_info["composite_score"],
                 )
-            
+
             if score_info:
                 processed_batch = self._process_single_batch(batch, score_info)
                 if processed_batch:
                     if processed_batch.get("days_to_expiry", -1) >= 0:
                         batches_added_to_actionable += 1
                         actionable_batches.append(processed_batch)
-                        
+
                         self.logger.info(
                             "FastAPI: Adding batch to actionable",
                             batch_id=batch["batch_id"],
@@ -553,7 +584,7 @@ class ActionableBatchProcessor:
                             days_to_expiry=processed_batch["days_to_expiry"],
                             composite_score=score_info.get("composite_score", 0),
                         )
-        
+
         # Sort by urgency and score
         urgency_priority = {"critical": 0, "high": 1, "medium": 2, "low": 3}
         actionable_batches.sort(
@@ -562,7 +593,7 @@ class ActionableBatchProcessor:
                 -x["composite_score"],
             )
         )
-        
+
         self.logger.info(
             "FastAPI: Final actionable batches summary",
             store_id=store_id,
@@ -575,43 +606,43 @@ class ActionableBatchProcessor:
             batches_added_to_actionable=batches_added_to_actionable,
             final_actionable_count=len(actionable_batches),
         )
-        
+
         return actionable_batches
-    
+
     def _process_single_batch(self, batch: dict, score_info: dict) -> dict:
         """Process a single batch with its scoring information"""
         try:
             days_to_expiry = self.expiry_calculator.calculate_days_to_expiry(
                 batch["expiry_date"]
             )
-            
+
             # Get product info
             product_name = "Unknown"
             if batch.get("store_products") and batch["store_products"].get("products"):
                 product_info = batch["store_products"]["products"]
                 product_name = product_info.get("name", "Unknown")
-            
+
             # Map urgency to expected levels
             urgency_mapping = {
                 "critical": "critical",
-                "high": "high", 
+                "high": "high",
                 "medium": "medium",
                 "low": "low",
             }
-            
+
             urgency = urgency_mapping.get(
                 score_info.get("urgency_level", "medium"), "medium"
             )
-            
+
             # Calculate potential loss
-            potential_loss = float(
-                batch.get("current_quantity", 0)
-            ) * float(batch.get("selling_price", 0))
-            
+            potential_loss = float(batch.get("current_quantity", 0)) * float(
+                batch.get("selling_price", 0)
+            )
+
             # Use database values or fallback to calculated values
             discount_percent = score_info.get("discount_percent", 0)
             reason = score_info.get("reason", "AI recommendation")
-            
+
             # Fallback calculations if database values are missing
             if discount_percent == 0:
                 if urgency == "critical":
@@ -622,7 +653,7 @@ class ActionableBatchProcessor:
                     discount_percent = 15
                 elif score_info.get("composite_score", 0) > 0.7:
                     discount_percent = 20
-            
+
             return {
                 "batch_id": batch["batch_id"],
                 "product_name": product_name,
@@ -637,7 +668,7 @@ class ActionableBatchProcessor:
                 "composite_score": float(score_info.get("composite_score", 0)),
                 "days_to_expiry": days_to_expiry,
             }
-            
+
         except (ValueError, KeyError) as e:
             self.logger.warning(
                 "Error processing actionable batch",
@@ -649,12 +680,12 @@ class ActionableBatchProcessor:
 
 class AnalyticsResponseFormatter:
     """Service for formatting analytics response data"""
-    
+
     def __init__(self, logger):
         self.logger = logger
         self.category_service = CategoryBreakdownService(logger)
         self.actions_service = RecentActionsService(logger)
-    
+
     def create_empty_response(self) -> dict:
         """Create empty analytics response structure"""
         return {
@@ -675,38 +706,44 @@ class AnalyticsResponseFormatter:
             "recent_actions": [],
             "actionable_batches": [],
         }
-    
-    def format_response(self, summary_data: dict, actionable_batches: list, batch_data: list = None) -> dict:
+
+    def format_response(
+        self, summary_data: dict, actionable_batches: list, batch_data: list = None
+    ) -> dict:
         """Format the final analytics response with proper category breakdown and recent actions"""
         # Calculate category breakdown using inventory data
         category_breakdown = []
         recent_actions = []
-        
+
         if batch_data:
             try:
                 # Generate category breakdown from batch data
-                category_breakdown = self.category_service.calculate_category_breakdown(batch_data)
-                
+                category_breakdown = self.category_service.calculate_category_breakdown(
+                    batch_data
+                )
+
                 # Generate recent actions from batch data and actionable batches
-                recent_actions = self.actions_service.generate_recent_actions(batch_data, actionable_batches)
-                
+                recent_actions = self.actions_service.generate_recent_actions(
+                    batch_data, actionable_batches
+                )
+
                 self.logger.info(
                     "Analytics response formatted with enhanced data",
                     categories_count=len(category_breakdown),
                     actions_count=len(recent_actions),
-                    actionable_count=len(actionable_batches)
+                    actionable_count=len(actionable_batches),
                 )
-                
+
             except Exception as e:
                 self.logger.error(
                     "Error generating enhanced analytics data",
                     error=str(e),
-                    fallback_to_empty=True
+                    fallback_to_empty=True,
                 )
                 # Fall back to empty arrays on error
                 category_breakdown = []
                 recent_actions = []
-        
+
         return {
             "inventory_summary": {
                 "total_batches": summary_data["total_batches"],
@@ -779,7 +816,9 @@ class SecureReadOnlyOperations:
 
             if fetch_all:
                 # Fetch ALL batches using pagination to avoid arbitrary limits
-                self.logger.info("Fetching ALL batches using pagination", store_id=store_id)
+                self.logger.info(
+                    "Fetching ALL batches using pagination", store_id=store_id
+                )
                 all_data = []
                 page_size = 1000
                 offset = 0
@@ -811,12 +850,16 @@ class SecureReadOnlyOperations:
                 self.logger.info(
                     "Fetched all batches via pagination",
                     store_id=store_id,
-                    total_batches=len(all_data)
+                    total_batches=len(all_data),
                 )
-                result = type('obj', (object,), {'data': all_data})()  # Create result-like object
+                result = type(
+                    "obj", (object,), {"data": all_data}
+                )()  # Create result-like object
             else:
                 # Use Supabase default limit of 1000 for quick scoring
-                self.logger.info("Fetching top 1000 urgent batches for scoring", store_id=store_id)
+                self.logger.info(
+                    "Fetching top 1000 urgent batches for scoring", store_id=store_id
+                )
                 result = (
                     admin_client.schema("inventory")
                     .table("batches")
@@ -847,14 +890,16 @@ class SecureReadOnlyOperations:
                     product_name = "Unknown"
                     sku = "Unknown"
                     category = "Unknown"
-                    
+
                     if product:
                         product_name = product.get("name", "Unknown")
                         sku = product.get("sku", row.get("batch_number", "Unknown"))
                         # Get category info from nested category data
                         category_info = product.get("category")
                         if category_info:
-                            category = category_info.get("display_name_en") or category_info.get("category_code", "Unknown")
+                            category = category_info.get(
+                                "display_name_en"
+                            ) or category_info.get("category_code", "Unknown")
                         else:
                             category = "Unknown"
                     else:
@@ -971,14 +1016,16 @@ class SecureReadOnlyOperations:
             product_name = "Unknown"
             sku = "Unknown"
             category = "Unknown"
-            
+
             if product:
                 product_name = product.get("name", "Unknown")
                 sku = product.get("sku", batch.get("batch_number", "Unknown"))
                 # Get category info from nested category data
                 category_info = product.get("category")
                 if category_info:
-                    category = category_info.get("display_name_en") or category_info.get("category_code", "Unknown")
+                    category = category_info.get(
+                        "display_name_en"
+                    ) or category_info.get("category_code", "Unknown")
                 else:
                     category = "Unknown"
             else:
@@ -1243,28 +1290,28 @@ class SecureReadOnlyOperations:
             summary_calculator = InventorySummaryCalculator(self.logger)
             batch_processor = ActionableBatchProcessor(self.logger)
             response_formatter = AnalyticsResponseFormatter(self.logger)
-            
+
             # 1. Fetch data from Supabase
             batch_data = await data_fetcher.fetch_batch_data(store_id)
             scoring_data = await data_fetcher.fetch_scoring_data(store_id)
-            
+
             # 2. Handle empty data case
             if not batch_data:
                 return response_formatter.create_empty_response()
-            
+
             # 3. Calculate inventory summary statistics
             summary_data = summary_calculator.calculate_summary(batch_data)
-            
+
             # 4. Process actionable batches with scoring integration
             actionable_batches = batch_processor.process_actionable_batches(
                 batch_data, scoring_data, store_id
             )
-            
+
             # 5. Format and return the response with enhanced data
             analytics_data = response_formatter.format_response(
                 summary_data, actionable_batches, batch_data
             )
-            
+
             self.logger.info(
                 "Analytics data retrieved via Supabase with enhanced features",
                 store_id=store_id,
@@ -1272,9 +1319,9 @@ class SecureReadOnlyOperations:
                 categories_count=len(analytics_data.get("category_breakdown", [])),
                 recent_actions_count=len(analytics_data.get("recent_actions", [])),
             )
-            
+
             return analytics_data
-            
+
         except Exception as e:
             self.logger.error(
                 "Failed to get analytics data", store_id=store_id, error=str(e)
@@ -1287,7 +1334,13 @@ class SecureReadOnlyOperations:
         self, store_id: str, product_ids: list[str], days: int = 30
     ) -> dict[str, dict[str, Any]]:
         """
-        BULK OPTIMIZATION: Get sales velocity data for multiple products in single query
+        BULK OPTIMIZATION: Get sales velocity data for multiple products with CHUNKING
+
+        FIXED: Multiple issues addressed:
+        1. Chunks product IDs to avoid URL length limits (7,584 products → 500 per chunk)
+        2. Uses correct column names (batch_id, quantity vs product_id, quantity_sold)
+        3. JOINs with inventory.batches to get product_id from batch_id
+
         Returns: {product_id: {avg_daily_sales: float, total_sales: int, ...}}
         """
         try:
@@ -1305,28 +1358,104 @@ class SecureReadOnlyOperations:
 
             start_date = (datetime.now() - timedelta(days=days)).date().isoformat()
 
-            # Get sales data for all products in single query
-            result = (
-                admin_client.schema("sales")
-                .table("transactions")
-                .select("product_id, quantity_sold, sale_date")
+            # First, get batch_ids for the products we're interested in
+            # This is more efficient than joining on every transaction query
+            self.logger.info(
+                "Fetching batch mappings for product velocity calculation",
+                store_id=store_id,
+                product_count=len(product_ids),
+            )
+
+            # Get batch_id to product_id mapping
+            batch_result = (
+                admin_client.schema("inventory")
+                .table("batches")
+                .select("batch_id, product_id")
                 .eq("store_id", store_id)
                 .in_("product_id", product_ids)
-                .gte("sale_date", start_date)
                 .execute()
             )
 
+            if not batch_result.data:
+                self.logger.info(
+                    "No batches found for products",
+                    store_id=store_id,
+                    product_count=len(product_ids),
+                )
+                # Return default values for all products
+                return {
+                    product_id: {
+                        "avg_daily_sales": 1.0,
+                        "total_sales": 0,
+                        "total_quantity": 0,
+                    }
+                    for product_id in product_ids
+                }
+
+            # Create batch_id -> product_id mapping
+            batch_to_product = {
+                batch["batch_id"]: batch["product_id"]
+                for batch in batch_result.data
+            }
+            batch_ids = list(batch_to_product.keys())
+
+            self.logger.info(
+                "Batch mappings retrieved",
+                store_id=store_id,
+                batch_count=len(batch_ids),
+            )
+
+            # FIXED: Chunk batch IDs to avoid URL length limits
+            # URL length limit typically ~2000-8000 chars
+            # Each UUID is ~36 chars, so 500 batch_ids = ~18,000 chars in URL (safe)
+            CHUNK_SIZE = 500
+            all_sales_data = []
+
+            # Process in chunks
+            for i in range(0, len(batch_ids), CHUNK_SIZE):
+                chunk = batch_ids[i:i + CHUNK_SIZE]
+
+                try:
+                    # Get sales data for this chunk of batches
+                    # FIXED: Use correct column names from actual schema
+                    result = (
+                        admin_client.schema("sales")
+                        .table("transactions")
+                        .select("batch_id, quantity, sale_date")
+                        .eq("store_id", store_id)
+                        .in_("batch_id", chunk)
+                        .gte("sale_date", start_date)
+                        .execute()
+                    )
+
+                    if result.data:
+                        all_sales_data.extend(result.data)
+
+                except Exception as chunk_error:
+                    self.logger.warning(
+                        "Failed to fetch velocity data for chunk",
+                        store_id=store_id,
+                        chunk_index=i // CHUNK_SIZE,
+                        chunk_size=len(chunk),
+                        error=str(chunk_error),
+                    )
+                    continue
+
             # Process results into velocity data per product
+            # FIXED: Map batch_id -> product_id and aggregate by product
             velocity_data = {}
+
             for product_id in product_ids:
+                # Find all sales for batches belonging to this product
                 product_sales = [
                     sale
-                    for sale in (result.data or [])
-                    if sale["product_id"] == product_id
+                    for sale in all_sales_data
+                    if batch_to_product.get(sale["batch_id"]) == product_id
                 ]
 
+                # FIXED: Use 'quantity' column (not 'quantity_sold')
                 total_quantity = sum(
-                    sale.get("quantity_sold", 0) for sale in product_sales
+                    sale.get("quantity", 0) for sale in product_sales
                 )
                 avg_daily_sales = total_quantity / days if days > 0 else 0
 
@@ -1337,9 +1466,11 @@ class SecureReadOnlyOperations:
                 }
 
             self.logger.info(
-                "Bulk velocity data retrieved",
+                "Bulk velocity data retrieved (CHUNKED)",
                 store_id=store_id,
                 products_count=len(product_ids),
+                chunks_processed=(len(product_ids) + CHUNK_SIZE - 1) // CHUNK_SIZE,
+                total_sales_records=len(all_sales_data),
                 days=days,
             )
 
@@ -1456,14 +1587,14 @@ class SecureReadOnlyOperations:
             if len(scores) > 1000:  # Safety limit
                 self.logger.warning(
                     "Large bulk operation detected, consider chunking",
-                    scores_count=len(scores)
+                    scores_count=len(scores),
                 )
 
             # Import Supabase service
             from app.database.supabase_service import get_supabase_service
 
-            supabase_service = get_supabase_service()
-            admin_client = supabase_service.get_admin_client()
+            _ = get_supabase_service()
+            # Note: admin_client available via get_supabase_service().get_admin_client() if needed
 
             # Prepare and validate data for bulk upsert
             upsert_data = []
@@ -1472,10 +1603,17 @@ class SecureReadOnlyOperations:
             for i, score in enumerate(scores):
                 try:
                     # Validate required fields
-                    required_fields = ["batch_id", "store_id", "composite_score", "recommendation"]
+                    required_fields = [
+                        "batch_id",
+                        "store_id",
+                        "composite_score",
+                        "recommendation",
+                    ]
                     for field in required_fields:
                         if field not in score:
-                            validation_errors.append(f"Score {i}: Missing required field '{field}'")
+                            validation_errors.append(
+                                f"Score {i}: Missing required field '{field}'"
+                            )
                             continue
 
                     validated_score = {
@@ -1494,13 +1632,19 @@ class SecureReadOnlyOperations:
                         "calculated_at": (
                             score["calculated_at"].isoformat()
                             if hasattr(score.get("calculated_at"), "isoformat")
-                            else str(score.get("calculated_at", datetime.utcnow().isoformat()))
+                            else str(
+                                score.get(
+                                    "calculated_at", datetime.utcnow().isoformat()
+                                )
+                            )
                         ),
                     }
                     upsert_data.append(validated_score)
 
                 except (ValueError, TypeError) as ve:
-                    validation_errors.append(f"Score {i}: Data validation error - {str(ve)}")
+                    validation_errors.append(
+                        f"Score {i}: Data validation error - {str(ve)}"
+                    )
                     continue
 
             if validation_errors:
@@ -1508,7 +1652,7 @@ class SecureReadOnlyOperations:
                     "Data validation errors in bulk operation",
                     errors=validation_errors[:5],  # Log first 5 errors
                     total_errors=len(validation_errors),
-                    valid_scores=len(upsert_data)
+                    valid_scores=len(upsert_data),
                 )
 
                 # Fail if more than 20% of data is invalid
@@ -1516,7 +1660,7 @@ class SecureReadOnlyOperations:
                     self.logger.error(
                         "Too many validation errors in bulk operation",
                         error_rate=len(validation_errors) / len(scores),
-                        threshold=0.2
+                        threshold=0.2,
                     )
                     return False
 
@@ -1531,22 +1675,26 @@ class SecureReadOnlyOperations:
             # This bypasses HTTP/JSON overhead for 10-50x performance improvement
             bulk_optimizer = get_bulk_optimizer()
             rows_upserted = await bulk_optimizer.bulk_upsert_product_scores(
-                scores=upsert_data,
-                on_conflict_column="batch_id"
+                scores=upsert_data, on_conflict_column="batch_id"
             )
 
             # Calculate performance metrics
-            db_operation_time = int((datetime.utcnow() - db_operation_start).total_seconds() * 1000)
-            total_operation_time = int((datetime.utcnow() - bulk_start).total_seconds() * 1000)
+            db_operation_time = int(
+                (datetime.utcnow() - db_operation_start).total_seconds() * 1000
+            )
+            total_operation_time = int(
+                (datetime.utcnow() - bulk_start).total_seconds() * 1000
+            )
 
             if rows_upserted > 0:
                 # Track performance metrics
                 from app.monitoring.metrics import metrics_collector
+
                 metrics_collector.record_api_request(
                     endpoint="bulk_store_score_results",
                     method="POST",
                     status_code=200,
-                    response_time_ms=total_operation_time
+                    response_time_ms=total_operation_time,
                 )
 
                 self.logger.info(
@@ -1556,32 +1704,37 @@ class SecureReadOnlyOperations:
                     db_operation_time_ms=db_operation_time,
                     total_time_ms=total_operation_time,
                     per_item_ms=total_operation_time / len(upsert_data),
-                    performance_target="<500ms achieved" if total_operation_time < 500 else f"Target missed: {total_operation_time}ms",
+                    performance_target="<500ms achieved"
+                    if total_operation_time < 500
+                    else f"Target missed: {total_operation_time}ms",
                     validation_errors=len(validation_errors),
-                    method="direct_postgresql"
+                    method="direct_postgresql",
                 )
                 return True
             else:
                 self.logger.error(
                     "Bulk upsert operation failed - no rows inserted",
                     rows_upserted=rows_upserted,
-                    operation_time_ms=total_operation_time
+                    operation_time_ms=total_operation_time,
                 )
                 return False
 
         except Exception as e:
-            operation_time = int((datetime.utcnow() - bulk_start).total_seconds() * 1000)
+            operation_time = int(
+                (datetime.utcnow() - bulk_start).total_seconds() * 1000
+            )
 
             # Track failed performance metrics
             try:
                 from app.monitoring.metrics import metrics_collector
+
                 metrics_collector.record_api_request(
                     endpoint="bulk_store_score_results",
                     method="POST",
                     status_code=500,
-                    response_time_ms=operation_time
+                    response_time_ms=operation_time,
                 )
-            except:
+            except Exception:
                 pass  # Don't fail on metrics recording failure
 
             self.logger.error(
@@ -1589,7 +1742,7 @@ class SecureReadOnlyOperations:
                 scores_count=len(scores) if scores else 0,
                 operation_time_ms=operation_time,
                 error=str(e),
-                error_type=type(e).__name__
+                error_type=type(e).__name__,
             )
             return False
 

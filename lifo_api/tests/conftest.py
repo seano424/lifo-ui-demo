@@ -422,7 +422,9 @@ def security_test_payloads():
 @pytest_asyncio.fixture
 async def async_client(test_settings):
     """Async HTTP client for testing async endpoints."""
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://test"
+    ) as client:
         yield client
 
 
