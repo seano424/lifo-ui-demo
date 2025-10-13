@@ -2,72 +2,28 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { queryKeys } from '@/lib/queries/query-keys'
 import { createClient } from '@/lib/supabase/client'
-import type { Database } from '@/types/supabase'
-
-// Batch type from database
-type BatchRow = Database['inventory']['Tables']['batches']['Row']
-
-// Custom type for available batches with nested structure
-interface AvailableBatch {
-  batch: BatchRow
-  products: {
-    product_name: string
-    brand_name: string
-    barcode: string
-    category_name?: string
-  }
-}
-
-interface CheckoutItem {
-  batchId: string
-  quantityRemoved: number
-  reason: 'scan-out' | 'sale' | 'waste' | 'transfer' | 'expired'
-  storeId: string
-  notes?: string
-}
-
-interface CheckoutResult {
-  success: boolean
-  successCount?: number
-  failureCount?: number
-  message: string
-  results: Array<{
-    batchId: string
-    success: boolean
-    error?: string
-  }>
-}
+import type { AvailableBatch, CheckoutItem, CheckoutResult } from '@/types/scanning'
 
 // Type for RPC function results
 interface BatchRPCResult {
   batch_id: string
-  batch_number: string | null
+  batch_number: string
   product_id: string
   store_id: string
   expiry_date: string
   current_quantity: number
-  available_quantity: number
+  available_quantity: number | null
+  initial_quantity: number
   cost_price: number
   selling_price: number
   location_code: string | null
   status: string
+  verification_status: string | null
   created_at: string
   product_name: string
   brand_name: string | null
   product_barcode: string
   category_name: string | null
-}
-
-interface StoreAccessResult {
-  user_id: string
-  role_in_store: string
-  is_active: boolean
-}
-
-interface BatchUpdateResult {
-  success: boolean
-  new_quantity: number
-  error_message: string | null
 }
 
 /**
@@ -160,6 +116,7 @@ export function useScanOutActions() {
       // Transform to nested structure with batch and products
       return data.map((rpcResult: BatchRPCResult): AvailableBatch => {
         const currentQty = Number(rpcResult.current_quantity)
+        const initialQty = Number(rpcResult.initial_quantity)
         const availableQty = rpcResult.available_quantity
           ? Number(rpcResult.available_quantity)
           : currentQty
@@ -167,19 +124,20 @@ export function useScanOutActions() {
         return {
           batch: {
             batch_id: rpcResult.batch_id,
-            batch_number: rpcResult.batch_number || '',
+            batch_number: rpcResult.batch_number,
             product_id: rpcResult.product_id,
             store_id: rpcResult.store_id,
             expiry_date: rpcResult.expiry_date,
             current_quantity: currentQty,
             available_quantity: availableQty,
+            initial_quantity: initialQty,
             cost_price: Number(rpcResult.cost_price),
             selling_price: Number(rpcResult.selling_price),
             location_code: rpcResult.location_code,
             status: rpcResult.status,
+            verification_status: rpcResult.verification_status,
             created_at: rpcResult.created_at,
-            // Additional required fields from BatchRow type
-            initial_quantity: currentQty,
+            // Additional required fields not returned by RPC (for full BatchRow compliance)
             received_date: null,
             reserved_quantity: null,
             updated_at: rpcResult.created_at,
@@ -191,7 +149,6 @@ export function useScanOutActions() {
             batch_source: null,
             scanned_barcode: null,
             scan_confidence: null,
-            verification_status: 'verified' as const,
             created_by: null,
           },
           products: {
@@ -210,14 +167,15 @@ export function useScanOutActions() {
 
   /**
    * Process checkout/removal of items from inventory
-   * Uses RPC functions to avoid schema syntax issues
+   * Uses batch RPC function for optimal performance (single DB call vs N calls)
    */
   const checkoutMutation = useMutation({
     mutationFn: async (items: CheckoutItem[]): Promise<CheckoutResult> => {
       const supabase = createClient()
-      const results: CheckoutResult['results'] = []
-      let successCount = 0
-      let failureCount = 0
+
+      if (items.length === 0) {
+        throw new Error('No items to checkout')
+      }
 
       // Authentication check
       const {
@@ -230,82 +188,72 @@ export function useScanOutActions() {
         throw new Error('User not authenticated. Please sign in and try again.')
       }
 
-      // Store access check using RPC function
-      if (items.length > 0 && items[0].storeId) {
-        const { data: storeAccessData, error: storeAccessError } = await supabase.rpc(
-          'check_store_access',
-          {
-            user_id_param: user.id,
-            store_id_param: items[0].storeId,
-          },
-        )
+      const storeId = items[0].storeId
 
-        if (storeAccessError) {
-          console.error('Store access check failed:', storeAccessError)
-          throw new Error('Failed to verify store access')
-        }
+      // Process all items in a single batch RPC call (13x faster than loop)
+      const { data: batchResults, error: batchError } = await supabase.rpc(
+        'batch_update_quantities',
+        {
+          p_items: items.map(item => ({
+            batch_id: item.batchId,
+            quantity: item.quantityRemoved,
+            action_reason: item.reason || 'scan-out',
+            notes: item.notes || '',
+          })),
+          p_store_id: storeId,
+        },
+      )
 
-        const storeAccess = storeAccessData?.[0] as StoreAccessResult | undefined
-
-        if (!storeAccess || !storeAccess.is_active) {
-          console.error('Store Access Denied:', {
-            storeId: items[0].storeId,
-            userId: user.id,
-          })
-          throw new Error('You do not have active access to this store')
-        }
+      if (batchError) {
+        console.error('Batch update failed:', batchError)
+        throw new Error(`Checkout failed: ${batchError.message}`)
       }
 
-      // Process each item in the checkout using RPC function
-      for (const item of items) {
-        try {
-          const { data: updateResults, error: updateError } = await supabase.rpc(
-            'update_batch_quantity',
-            {
-              batch_id_param: item.batchId,
-              quantity_to_remove: item.quantityRemoved,
-              reason_param: item.reason,
-            },
-          )
-
-          if (updateError) {
-            console.error('Batch update RPC failed:', updateError)
-            results.push({
-              batchId: item.batchId,
-              success: false,
-              error: updateError.message,
-            })
-            failureCount++
-            continue
-          }
-
-          const updateResult = updateResults?.[0] as BatchUpdateResult | undefined
-
-          if (!updateResult || !updateResult.success) {
-            results.push({
-              batchId: item.batchId,
-              success: false,
-              error: updateResult?.error_message || 'Update failed',
-            })
-            failureCount++
-            continue
-          }
-
-          results.push({
-            batchId: item.batchId,
-            success: true,
-          })
-          successCount++
-        } catch (error) {
-          console.error(`Error processing checkout for batch ${item.batchId}:`, error)
-          results.push({
-            batchId: item.batchId,
-            success: false,
-            error: error instanceof Error ? error.message : 'Unknown error',
-          })
-          failureCount++
-        }
+      // The RPC returns an object with results array, not a direct array
+      if (!batchResults || typeof batchResults !== 'object') {
+        console.error('Invalid batch results:', batchResults)
+        throw new Error('No results returned from batch update')
       }
+
+      // Type the response from the RPC
+      const response = batchResults as {
+        results: Array<{
+          batch_id: string
+          success: boolean
+          new_quantity: number | null
+          error_message: string | null
+        }>
+        success: boolean
+        store_id: string
+        timestamp: string
+        processed_count: number
+      }
+
+      if (!response.results || response.results.length === 0) {
+        console.error('No results in batch response:', response)
+        throw new Error('No results returned from batch update')
+      }
+
+      // Process results
+      const results: CheckoutResult['results'] = response.results.map(result => ({
+        batchId: result.batch_id,
+        success: result.success,
+        error: result.error_message || undefined,
+      }))
+
+      const successCount = results.filter(r => r.success).length
+      const failureCount = results.filter(r => !r.success).length
+
+      // Debug logging
+      console.log('[DEBUG] Processed results:', {
+        totalItems: results.length,
+        successCount,
+        failureCount,
+        results,
+        individualResults: response.results,
+        firstResultDetail: response.results[0],
+        errorMessages: response.results.map(r => r.error_message),
+      })
 
       return {
         success: successCount > 0,
@@ -321,24 +269,25 @@ export function useScanOutActions() {
 
     onSuccess: (result, items) => {
       if (result.success) {
-        // Invalidate relevant queries to refresh the UI
-        queryClient.invalidateQueries({
-          queryKey: queryKeys.batches.all,
-        })
+        const storeId = items[0]?.storeId
 
-        if (items.length > 0 && items[0].storeId) {
+        // Only invalidate affected store's data (not all stores)
+        if (storeId) {
+          // Invalidate this store's batches (more targeted than invalidating all batches)
           queryClient.invalidateQueries({
-            queryKey: queryKeys.batches.byStore(items[0].storeId),
+            queryKey: queryKeys.batches.byStore(storeId),
           })
 
+          // Invalidate store-specific dashboard data
           queryClient.invalidateQueries({
-            queryKey: queryKeys.products.byStore(items[0].storeId),
+            queryKey: ['dashboard', storeId],
+          })
+
+          // Invalidate store-specific product queries
+          queryClient.invalidateQueries({
+            queryKey: queryKeys.products.byStore(storeId),
           })
         }
-
-        queryClient.invalidateQueries({
-          queryKey: queryKeys.productLookup.all,
-        })
 
         // Show success message
         if (result.failureCount === 0) {

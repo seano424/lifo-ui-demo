@@ -25,17 +25,9 @@ import BatchSelectionList from '../shared/batch-selection-list'
 import ScanningCamera from '../shared/scanning-camera'
 import { useScanOutActions } from './use-scan-out-actions'
 import type { Database } from '@/types/supabase'
+import type { AvailableBatch } from '@/types/scanning'
 
 type batch = Database['inventory']['Tables']['batches']['Row']
-
-interface AvailableBatch {
-  batch: batch
-  products: {
-    product_name: string
-    brand_name: string
-    barcode: string
-  }
-}
 
 interface CurrentProduct {
   barcode: string
@@ -97,22 +89,29 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
       currentStep === 'batch-selection' &&
       availableBatches.length > 0,
     storeId: activeStore?.store_id || '',
-    onExpiryDetected: expiryInfo => {
-      if (expiryInfo.extractedDate && availableBatches.length > 0) {
-        // Try to match the captured date to an available batch
-        const matchedBatch = matchBatchByExpiry(availableBatches, expiryInfo.extractedDate)
+    onExpiryDetected: async expiryInfo => {
+      try {
+        if (expiryInfo.extractedDate && availableBatches.length > 0) {
+          // Try to match the captured date to an available batch
+          const matchedBatch = matchBatchByExpiry(availableBatches, expiryInfo.extractedDate)
 
-        if (matchedBatch) {
-          handleBatchSelected(matchedBatch)
-          setOcrError(null)
-        } else {
-          // No matching batch found
-          setOcrError(
-            t('noBatchFoundWithExpiry', {
-              date: expiryInfo.extractedDate,
-            }),
-          )
+          if (matchedBatch) {
+            handleBatchSelected(matchedBatch)
+            setOcrError(null)
+          } else {
+            // No matching batch found
+            setOcrError(
+              t('noBatchFoundWithExpiry', {
+                date: expiryInfo.extractedDate,
+              }),
+            )
+          }
+        } else if (!expiryInfo.extractedDate) {
+          setOcrError(t('couldNotDetectExpiry'))
         }
+      } catch (error) {
+        console.error('Auto-OCR expiry processing failed:', error)
+        setOcrError(error instanceof Error ? error.message : t('errorProcessingExpiry'))
       }
     },
     maxAttempts: 10,
@@ -152,16 +151,18 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
           batchesData?.map(
             (rpcBatch: {
               batch_id: string
-              batch_number: string | null
+              batch_number: string
               product_id: string
               store_id: string
               expiry_date: string
               current_quantity: number
-              available_quantity: number
+              available_quantity: number | null
+              initial_quantity: number
               cost_price: number
               selling_price: number
               location_code: string | null
               status: string
+              verification_status: string | null
               created_at: string
               product_name: string
               brand_name: string
@@ -175,13 +176,14 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
                 expiry_date: rpcBatch.expiry_date,
                 current_quantity: rpcBatch.current_quantity,
                 available_quantity: rpcBatch.available_quantity ?? rpcBatch.current_quantity,
+                initial_quantity: rpcBatch.initial_quantity,
                 cost_price: rpcBatch.cost_price,
                 selling_price: rpcBatch.selling_price,
                 location_code: rpcBatch.location_code,
                 status: rpcBatch.status,
+                verification_status: rpcBatch.verification_status,
                 created_at: rpcBatch.created_at,
-                // Add any other batch fields required by the Database type
-                initial_quantity: rpcBatch.current_quantity, // fallback if not in RPC
+                // Additional required fields not returned by RPC (for full BatchRow compliance)
                 received_date: null,
                 reserved_quantity: null,
                 updated_at: rpcBatch.created_at,
@@ -193,7 +195,6 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
                 batch_source: null,
                 scanned_barcode: null,
                 scan_confidence: null,
-                verification_status: 'verified',
                 created_by: null,
               } as batch,
               products: {

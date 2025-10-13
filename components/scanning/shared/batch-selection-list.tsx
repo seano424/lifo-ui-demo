@@ -3,18 +3,7 @@
 import { Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Typography } from '@/components/ui/typography'
-import type { Database } from '@/types/supabase'
-
-type BatchRow = Database['inventory']['Tables']['batches']['Row']
-
-interface AvailableBatch {
-  batch: BatchRow
-  products: {
-    product_name: string
-    brand_name: string
-    barcode: string
-  }
-}
+import type { AvailableBatch } from '@/types/scanning'
 
 interface BatchSelectionListProps {
   batches: AvailableBatch[] // ← Changed from InventoryBatch[]
