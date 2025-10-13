@@ -136,11 +136,33 @@ class UnifiedScoringPersistenceOptimized:
                 result = await self._persist_via_multi_value_insert(
                     results, store_id, start_time
                 )
+
+                # If multi-value INSERT also failed, fallback to REST API
+                if not result["success"] and "failed" in result.get("method", ""):
+                    self.logger.warning(
+                        "Multi-value INSERT failed, falling back to REST API",
+                        total_items=total_items,
+                        insert_error=result.get("errors", ["Unknown error"])[0] if result.get("errors") else "Unknown",
+                    )
+                    result = await self._persist_via_rest_chunked_legacy(
+                        results, store_id, start_time
+                    )
         else:
             # Small batch: Use multi-value INSERT directly (20-30x faster than REST chunking)
             result = await self._persist_via_multi_value_insert(
                 results, store_id, start_time
             )
+
+            # If multi-value INSERT failed, fallback to REST API
+            if not result["success"] and "failed" in result.get("method", ""):
+                self.logger.warning(
+                    "Multi-value INSERT failed, falling back to REST API",
+                    total_items=total_items,
+                    insert_error=result.get("errors", ["Unknown error"])[0] if result.get("errors") else "Unknown",
+                )
+                result = await self._persist_via_rest_chunked_legacy(
+                    results, store_id, start_time
+                )
 
         processing_time_ms = (time.perf_counter() - start_time) * 1000
         result["processing_time_ms"] = round(processing_time_ms, 2)
