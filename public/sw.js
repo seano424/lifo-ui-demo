@@ -1,51 +1,41 @@
-const CACHE_NAME = 'lifo-ai-v4'
+const CACHE_NAME = 'lifo-ai-v7'
 
-// Critical pages to cache for offline access
-// Only cache public pages that don't require authentication (from middleware.ts line 76-86)
-const CRITICAL_PAGES = [
-  '/manifest.json',
-  '/offline',
-  // Auth pages (all public)
-  '/auth/login',
-  '/auth/sign-up',
-  '/auth/forgot-password',
-  '/auth/update-password',
-  '/auth/error',
-  '/auth/sign-up-success',
-  // Onboarding (public)
-  '/onboarding/create-account',
-  '/onboarding/success',
-  // Marketing pages (public)
-  '/',
-  '/contact',
-  '/features',
-  '/pricing',
-  '/support',
-]
+// Push notification handler
+self.addEventListener('push', event => {
+  if (event.data) {
+    const data = event.data.json()
+    const options = {
+      body: data.body,
+      icon: data.icon || '/icon.png',
+      badge: '/badge.png',
+      vibrate: [100, 50, 100],
+      data: {
+        dateOfArrival: Date.now(),
+        primaryKey: '2',
+      },
+    }
+    event.waitUntil(self.registration.showNotification(data.title, options))
+  }
+})
 
-// Install event - cache critical pages with error handling
+// Notification click handler
+self.addEventListener('notificationclick', event => {
+  console.log('Notification click received.')
+  event.notification.close()
+  event.waitUntil(clients.openWindow('http://localhost:3000'))
+})
+
+// Install event
 self.addEventListener('install', event => {
   event.waitUntil(
-    caches
-      .open(CACHE_NAME)
-      .then(cache => {
-        // Add pages individually to prevent one failure from breaking all caching
-        return Promise.allSettled(
-          CRITICAL_PAGES.map(url =>
-            cache.add(url).catch(err => {
-              console.log(`Failed to cache ${url}:`, err.message)
-            }),
-          ),
-        )
-      })
-      .then(() => {
-        // Skip waiting to activate immediately
-        return self.skipWaiting()
-      }),
+    caches.open(CACHE_NAME).then(() => {
+      console.log('Service Worker: Cache opened')
+      return self.skipWaiting()
+    }),
   )
 })
 
-// Activate event - clean up old caches and force reload on update
+// Activate event
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches
@@ -54,53 +44,57 @@ self.addEventListener('activate', event => {
         return Promise.all(
           cacheNames.map(cacheName => {
             if (cacheName !== CACHE_NAME) {
-              console.log('Deleting old cache:', cacheName)
               return caches.delete(cacheName)
             }
           }),
         )
       })
-      .then(() => {
-        // Take control of all clients immediately
-        return self.clients.claim()
-      })
-      .then(() => {
-        // Force reload all clients when service worker updates
-        // This prevents stale server action errors after deployments
-        return self.clients.matchAll({ type: 'window' }).then(clients => {
-          clients.forEach(client => {
-            client.postMessage({ type: 'SW_UPDATED' })
-          })
-        })
-      }),
+      .then(() => self.clients.claim()),
   )
 })
 
-// Fetch event with offline fallback
+// Fetch event - DON'T INTERCEPT SAME-ORIGIN NAVIGATION
 self.addEventListener('fetch', event => {
-  event.respondWith(
-    caches.match(event.request).then(response => {
-      // Return cached version if available
-      if (response) {
-        return response
-      }
+  const { request } = event
+  const url = new URL(request.url)
 
-      // Try to fetch from network
-      return fetch(event.request).catch(() => {
-        // If network fails and it's a page request, show offline page
-        if (event.request.destination === 'document') {
-          return (
-            caches.match('/offline') ||
-            new Response(
-              '<html><body><h1>You are offline</h1><p>Please check your connection and try again.</p></body></html>',
-              { headers: { 'Content-Type': 'text/html' } },
-            )
-          )
+  // CRITICAL: Don't intercept same-origin HTML requests
+  // Let Next.js middleware handle auth and routing
+  if (
+    url.origin === self.location.origin &&
+    (request.mode === 'navigate' || request.destination === 'document')
+  ) {
+    return // Pass through to Next.js
+  }
+
+  // Skip API calls and Next.js internals
+  if (url.pathname.startsWith('/api/') || url.pathname.startsWith('/_next/')) {
+    return
+  }
+
+  // Only cache external static assets
+  if (
+    request.destination === 'image' ||
+    request.destination === 'style' ||
+    request.destination === 'script' ||
+    request.destination === 'font'
+  ) {
+    event.respondWith(
+      caches.match(request).then(cachedResponse => {
+        if (cachedResponse) {
+          return cachedResponse
         }
 
-        // For other requests, return a basic offline response
-        return new Response('Offline', { status: 503 })
-      })
-    }),
-  )
+        return fetch(request).then(response => {
+          if (response.ok) {
+            const responseToCache = response.clone()
+            caches.open(CACHE_NAME).then(cache => {
+              cache.put(request, responseToCache)
+            })
+          }
+          return response
+        })
+      }),
+    )
+  }
 })

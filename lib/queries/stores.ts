@@ -4,7 +4,6 @@ import type { createClient as createServerClient } from '@/lib/supabase/server'
 import type { Database } from '@/types/supabase'
 import { logger } from '@/lib/utils/logger'
 import { withPerformanceTracking } from '@/lib/utils/performance'
-import { withSupabaseRetry } from '@/lib/utils/retry'
 import { fetchUserPreferencesRPC, updateUserPrimaryStoreRPC } from './stores-rpc'
 
 // Use optimized RPC functions by default
@@ -39,12 +38,11 @@ export async function fetchUserStores(
 
   return withPerformanceTracking(context, 'Fetch user stores', { userId }, async () => {
     try {
-      return await withSupabaseRetry(async () => {
-        const { data, error } = await supabase
-          .schema('business')
-          .from('store_users')
-          .select(
-            `
+      const { data, error } = await supabase
+        .schema('business')
+        .from('store_users')
+        .select(
+          `
         role_in_store,
         permissions,
         stores:store_id (
@@ -68,36 +66,37 @@ export async function fetchUserStores(
           updated_at
         )
       `,
-          )
-          .eq('user_id', userId)
-          .eq('stores.is_active', true)
+        )
+        .eq('user_id', userId)
+        .eq('stores.is_active', true)
 
-        if (error) {
-          logger.queryWarn(context, 'Supabase error', {
-            userId,
-            error: error.message,
-            code: error.code,
-          })
-          throw new Error(`Failed to fetch user stores: ${error.message}`)
-        }
-
-        const userStores = data
-          .filter(item => item.stores !== null) // Filter out null stores (deactivated)
-          .map(item => {
-            return {
-              store: item.stores as unknown as Store,
-              role: item.role_in_store as string,
-              permissions: item.permissions,
-            }
-          })
-
-        logger.log(context, 'User stores fetched successfully', {
+      if (error) {
+        // Log the error for debugging
+        logger.queryWarn(context, 'Supabase error', {
           userId,
-          storeCount: userStores.length,
+          error: error.message,
+          code: error.code,
+        })
+        // Throw the original error for proper error handling
+        throw error
+      }
+
+      const userStores = data
+        .filter(item => item.stores !== null) // Filter out null stores (deactivated)
+        .map(item => {
+          return {
+            store: item.stores as unknown as Store,
+            role: item.role_in_store as string,
+            permissions: item.permissions,
+          }
         })
 
-        return userStores
-      }, context)
+      logger.log(context, 'User stores fetched successfully', {
+        userId,
+        storeCount: userStores.length,
+      })
+
+      return userStores
     } catch (err) {
       logger.queryWarn(context, 'Unexpected error', { userId, error: err })
       throw err
@@ -137,12 +136,14 @@ export async function fetchUserStoresAlternative(
           .eq('stores.is_active', true)
 
         if (error) {
+          // Log the error for debugging
           logger.queryWarn(context, 'Supabase error', {
             userId,
             error: error.message,
             code: error.code,
           })
-          throw new Error(`Failed to fetch user stores: ${error.message}`)
+          // Throw the original error so retry logic can handle it properly
+          throw error
         }
 
         const userStores = data.map(storeData => ({
@@ -199,12 +200,14 @@ export async function fetchStoreById(storeId: string, serverClient?: ServerClien
         .single()
 
       if (error) {
+        // Log the error for debugging
         logger.queryWarn(context, 'Supabase error', {
           storeId,
           error: error.message,
           code: error.code,
         })
-        throw new Error(`Failed to fetch store: ${error.message}`)
+        // Throw the original error for proper error handling
+        throw error
       }
 
       logger.log(context, 'Store fetched successfully', { storeId })
@@ -294,13 +297,15 @@ export async function updateUserPrimaryStore(userId: string, storeId: string): P
         })
 
         if (error) {
+          // Log the error for debugging
           logger.queryWarn(context, 'Supabase error', {
             userId,
             storeId,
             error: error.message,
             code: error.code,
           })
-          throw new Error(`Failed to update primary store: ${error.message}`)
+          // Throw the original error for proper error handling
+          throw error
         }
 
         logger.query(context, 'Primary store updated successfully', { userId, storeId })

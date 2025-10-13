@@ -3,7 +3,6 @@ import { createClient } from '@/lib/supabase/client'
 import type { createClient as createServerClient } from '@/lib/supabase/server'
 import { logger } from '@/lib/utils/logger'
 import { withPerformanceTracking } from '@/lib/utils/performance'
-import { withSupabaseRetry } from '@/lib/utils/retry'
 import type { UserPreferences } from './stores'
 
 type ServerClient = Awaited<ReturnType<typeof createServerClient>>
@@ -29,35 +28,31 @@ export async function fetchUserPreferencesRPC(
 
   return withPerformanceTracking(context, 'Fetch user preferences (RPC)', {}, async () => {
     try {
-      return await withSupabaseRetry(async () => {
-        const { data, error } = await supabase
-          .schema('user_mgmt')
-          .rpc('get_current_user_preferences')
+      const { data, error } = await supabase.schema('user_mgmt').rpc('get_current_user_preferences')
 
-        if (error) {
-          logger.queryWarn(context, 'RPC error', {
-            error: error.message,
-            code: error.code,
-          })
-
-          // Handle authentication errors gracefully
-          if (error.message.includes('Not authenticated')) {
-            logger.queryWarn(context, 'User not authenticated, returning null')
-            return null
-          }
-
-          throw new Error(`Failed to fetch user preferences: ${error.message}`)
-        }
-
-        // RPC returns an array, take the first result
-        const preferences = (data && data.length > 0 ? data[0] : null) as UserPreferences | null
-
-        logger.log(context, 'User preferences fetched successfully (RPC)', {
-          hasPreferences: !!preferences,
+      if (error) {
+        logger.queryWarn(context, 'RPC error', {
+          error: error.message,
+          code: error.code,
         })
 
-        return preferences
-      }, context)
+        // Handle authentication errors gracefully
+        if (error.message.includes('Not authenticated')) {
+          logger.queryWarn(context, 'User not authenticated, returning null')
+          return null
+        }
+
+        throw new Error(`Failed to fetch user preferences: ${error.message}`)
+      }
+
+      // RPC returns an array, take the first result
+      const preferences = (data && data.length > 0 ? data[0] : null) as UserPreferences | null
+
+      logger.log(context, 'User preferences fetched successfully (RPC)', {
+        hasPreferences: !!preferences,
+      })
+
+      return preferences
     } catch (err) {
       logger.queryWarn(context, 'Unexpected error', { error: err })
 

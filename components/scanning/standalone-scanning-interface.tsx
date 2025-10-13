@@ -15,6 +15,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { useAutoOCRScanner } from '@/hooks/use-auto-ocr-scanner'
 import { useInventoryActions, useScannedItemConverter } from '@/hooks/use-inventory-submission'
 import { useOCRWithFallback } from '@/hooks/use-ocr-processing'
 import { useProductLookup } from '@/hooks/use-product-lookup'
@@ -61,15 +62,7 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
   // Store actions
   const workflowActions = useScanningActions()
 
-  // OCR processing
-  // const { processExpiryDate, isLoading: isOCRProcessing, isBackendHealthy } = useOCRWithFallback()  //commented for debugging
-  const { processExpiryDate, isLoading: isOCRProcessing } = useOCRWithFallback()
-
-  // Inventory submission
-  const { submitBatch, isSubmittingBatch } = useInventoryActions()
-  const { convertMultipleScannedItems } = useScannedItemConverter()
-
-  // Local UI state
+  // Local UI state (declared early so auto-OCR hook can reference them)
   const [uiStep, setUIStep] = useState<UIStep>('camera-barcode')
   const [showManualBarcode, setShowManualBarcode] = useState(false)
   const [scannedItems, setScannedItems] = useState<ScannedItem[]>([])
@@ -83,6 +76,45 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
     quantity: 1,
     price: 0,
   })
+
+  // OCR processing
+  const { processExpiryDate, isLoading: isOCRProcessing } = useOCRWithFallback()
+
+  // Check if auto-OCR is enabled via environment variable
+  const isAutoOCREnabled = process.env.NEXT_PUBLIC_AUTO_OCR_ENABLED === 'true'
+
+  // Auto-OCR scanner with intelligent pre-checks
+  const autoOCRScanner = useAutoOCRScanner({
+    isEnabled:
+      isAutoOCREnabled && // Feature flag check
+      currentStep === 'ocr' &&
+      uiStep === 'camera-expiry' &&
+      !inventoryData.expiryDate,
+    storeId: activeStore?.store_id || '',
+    onExpiryDetected: expiryInfo => {
+      logger.log('StandaloneScanningInterface', 'Auto-OCR detected expiry date', {
+        extractedDate: expiryInfo.extractedDate,
+        confidence: expiryInfo.confidence,
+        totalAttempts: autoOCRScanner.attemptCount,
+      })
+
+      // Set the expiry date result in the workflow
+      workflowActions.setExpiryDateResult(expiryInfo)
+
+      if (expiryInfo.extractedDate) {
+        const formattedDate = expiryInfo.extractedDate.split('T')[0]
+        setInventoryData(prev => ({ ...prev, expiryDate: formattedDate }))
+        setOcrError(null)
+      }
+    },
+    maxAttempts: 10,
+    preCheckIntervalMs: 500,
+    debug: process.env.NODE_ENV === 'development',
+  })
+
+  // Inventory submission
+  const { submitBatch, isSubmittingBatch } = useInventoryActions()
+  const { convertMultipleScannedItems } = useScannedItemConverter()
 
   // Dialog states
   const [showSubmissionDialog, setShowSubmissionDialog] = useState(false)
@@ -504,13 +536,14 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
                 <ScanningCamera
                   mode="ocr"
                   onOCRCapture={handleOCRCapture}
-                  isOCRProcessing={isOCRProcessing}
+                  isOCRProcessing={isOCRProcessing || autoOCRScanner.isAnalyzing}
                   ocrError={ocrError}
                   onClearOCRError={() => {
                     setOcrError(null)
                     workflowActions.setError(null)
                   }}
-                  // isBackendHealthy={isBackendHealthy}
+                  // Auto-OCR props - auto-scan starts automatically when enabled
+                  autoOCRState={isAutoOCREnabled ? autoOCRScanner : undefined}
                 />
               )}
 
@@ -532,11 +565,7 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
                   data={inventoryData}
                   onChange={setInventoryData}
                   onSubmit={handleInventoryFormSubmit}
-                  title={
-                    ocrError //|| isBackendHealthy === false
-                      ? t('expiry.manualEntryFallback')
-                      : t('expiry.orEnterManually')
-                  }
+                  title={ocrError ? t('expiry.manualEntryFallback') : t('expiry.orEnterManually')}
                   submitButtonText={t('expiry.confirmDate')}
                 />
               )}

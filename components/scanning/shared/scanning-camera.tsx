@@ -7,8 +7,10 @@ import BarcodeScanner, { type BarcodeDetection } from '@/components/barcode/barc
 import ManualBarcodeEntry from '@/components/barcode/manual-barcode-entry'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
+import type { AutoOCRScannerState } from '@/hooks/use-auto-ocr-scanner'
 import { cn } from '@/lib/utils'
 import { logger } from '@/lib/utils/logger'
+import OCRFrameQualityIndicator from './ocr-frame-quality-indicator'
 
 export interface ScanningCameraProps {
   // Camera mode
@@ -26,6 +28,9 @@ export interface ScanningCameraProps {
   isOCRProcessing?: boolean
   ocrError?: string | null
   onClearOCRError?: () => void
+
+  // Auto-OCR props
+  autoOCRState?: AutoOCRScannerState
 
   // Manual entry props
   showManualEntry?: boolean
@@ -53,6 +58,7 @@ export default function ScanningCamera({
   isOCRProcessing = false,
   ocrError,
   onClearOCRError,
+  autoOCRState,
   showManualEntry = false,
   manualEntryMode = 'inbound',
   storeId,
@@ -130,7 +136,7 @@ export default function ScanningCamera({
   return (
     <div className={cn(className, 'space-y-4')}>
       {/* Camera Scanner */}
-      <div className="space-y-2">
+      <div className="space-y-2 relative">
         <BarcodeScanner
           onScan={mode === 'barcode' && onBarcodeScanned ? onBarcodeScanned : () => {}}
           onError={onScanError || (() => {})}
@@ -139,6 +145,17 @@ export default function ScanningCamera({
           subtitle={cameraSubtitle}
           permissionMessage={permissionMessage}
         />
+
+        {/* Frame Quality Indicator for Auto-OCR */}
+        {mode === 'ocr' && autoOCRState && process.env.NEXT_PUBLIC_DEBUG_OCR === 'true' && (
+          <OCRFrameQualityIndicator
+            analysis={autoOCRState.lastAnalysis}
+            isAnalyzing={autoOCRState.isAnalyzing}
+            attemptCount={autoOCRState.attemptCount}
+            maxAttempts={10}
+            reason={autoOCRState.lastReason ?? undefined}
+          />
+        )}
       </div>
 
       {/* OCR Mode - Capture Button and Error Display */}
@@ -167,15 +184,44 @@ export default function ScanningCamera({
 
           {/* OCR Action Buttons */}
           {isBackendHealthy !== false && (
-            <div className="flex gap-2">
-              <Button onClick={handleOCRCapture} className="flex-1 " disabled={isOCRProcessing}>
-                <Camera className="w-4 h-4 mr-2" />
-                {isOCRProcessing ? t('buttons.processingOCR') : t('buttons.captureExpiryDate')}
-              </Button>
-              {ocrError && onClearOCRError && (
-                <Button onClick={onClearOCRError} variant="outline" size="sm">
-                  {t('buttons.clearError')}
+            <div className="space-y-2">
+              {/* Manual Capture Button (always available as fallback) */}
+              <div className="flex gap-2">
+                <Button onClick={handleOCRCapture} className="flex-1" disabled={isOCRProcessing}>
+                  <Camera className="w-4 h-4 mr-2" />
+                  {isOCRProcessing
+                    ? t('buttons.processingOCR')
+                    : autoOCRState
+                      ? t('buttons.captureExpiryDate') // Auto-OCR enabled - button is fallback
+                      : t('buttons.captureExpiryDate')}{' '}
+                  {/* Manual mode only */}
                 </Button>
+                {ocrError && onClearOCRError && (
+                  <Button onClick={onClearOCRError} variant="outline" size="sm">
+                    {t('buttons.clearError', { defaultValue: 'Clear' })}
+                  </Button>
+                )}
+              </div>
+
+              {/* Mode Indicator */}
+              {!autoOCRState && (
+                <div className="text-xs text-gray-600 text-center bg-gray-50 p-2 rounded">
+                  📸 Manual mode: Click button to capture expiry date
+                </div>
+              )}
+
+              {/* Auto-Scan Stats (Debug) */}
+              {autoOCRState?.isAnalyzing && process.env.NEXT_PUBLIC_DEBUG_OCR === 'true' && (
+                <div className="text-xs text-gray-500 text-center">
+                  Auto-scanning... Frames: {autoOCRState.totalFramesAnalyzed} | OCR:{' '}
+                  {autoOCRState.ocrTriggeredCount}
+                </div>
+              )}
+
+              {autoOCRState?.isAnalyzing && process.env.NEXT_PUBLIC_DEBUG_OCR !== 'true' && (
+                <div className="text-xs text-primary-600 text-center bg-primary-50 p-2 rounded animate-pulse">
+                  🤖 Auto-scanning active... Hold camera steady on expiry date
+                </div>
               )}
             </div>
           )}

@@ -38,7 +38,6 @@ export default function BarcodeScanner({
   const [error, setError] = useState<string | null>(null)
   const [hasPermission, setHasPermission] = useState<boolean | null>(null)
   const [detectedBarcode, setDetectedBarcode] = useState<string | null>(null)
-  const [scanningHistory, setScanningHistory] = useState<string[]>([])
   const [isMounted, setIsMounted] = useState(false)
   const [userStoppedCamera, setUserStoppedCamera] = useState(false)
 
@@ -177,11 +176,8 @@ export default function BarcodeScanner({
         // Auto-confirm after brief display
         setTimeout(() => {
           if (isMounted) {
-            // Call handleBarcodeDetected directly with current values
-            const barcode = detection.rawValue
-            setScanningHistory(prev => [barcode, ...prev.slice(0, 4)])
             setDetectedBarcode(null)
-            onScan(barcode, detection)
+            onScan(detection.rawValue, detection)
 
             // Continue scanning after brief pause
             setTimeout(() => {
@@ -199,25 +195,6 @@ export default function BarcodeScanner({
       // Don't spam errors, just continue scanning
     }
   }, [isScanning, isInitialized, detectBarcodes, isMounted, onScan])
-
-  // Handle successful barcode detection
-  const handleBarcodeDetected = useCallback(
-    (barcode: string, detection?: BarcodeDetection) => {
-      if (!isMounted) return
-
-      setScanningHistory(prev => [barcode, ...prev.slice(0, 4)])
-      setDetectedBarcode(null)
-      onScan(barcode, detection)
-
-      // Continue scanning after brief pause
-      setTimeout(() => {
-        if (isMounted) {
-          setDetectedBarcode(null)
-        }
-      }, 500)
-    },
-    [onScan, isMounted],
-  )
 
   // Set up scanning interval
   useEffect(() => {
@@ -390,31 +367,6 @@ export default function BarcodeScanner({
                 Stop Scanning
               </Button>
             )}
-          </div>
-        )}
-
-        {/* Scanning History */}
-        {scanningHistory.length > 0 && (
-          <div className="space-y-2">
-            <h4 className="text-sm font-medium text-gray-600">Recent Scans</h4>
-            <div className="space-y-1">
-              {scanningHistory.map((barcode, index) => (
-                <div
-                  key={`scan-${barcode}-${Date.now()}-${index}`}
-                  className="flex items-center justify-between p-2 bg-gray-50 rounded-2xl text-sm"
-                >
-                  <span className="font-mono">{barcode}</span>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => handleBarcodeDetected(barcode)}
-                    className="h-6 px-2 text-xs"
-                  >
-                    Re-scan
-                  </Button>
-                </div>
-              ))}
-            </div>
           </div>
         )}
       </div>

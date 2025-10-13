@@ -76,10 +76,29 @@ export interface OCRFullAnalysisResponse {
   date_extraction_metadata: Record<string, unknown>
 }
 
-export interface OCRError {
-  message: string
-  type: 'network' | 'api' | 'timeout' | 'validation'
-  details?: unknown
+/**
+ * Custom Error class for OCR operations
+ * Extends Error to be properly serializable by React error boundaries
+ */
+export class OCRError extends Error {
+  public readonly type: 'network' | 'api' | 'timeout' | 'validation' | 'rate_limit'
+  public readonly details?: unknown
+
+  constructor(
+    message: string,
+    type: 'network' | 'api' | 'timeout' | 'validation' | 'rate_limit',
+    details?: unknown,
+  ) {
+    super(message)
+    this.name = 'OCRError'
+    this.type = type
+    this.details = details
+
+    // Maintains proper stack trace for where our error was thrown (only available on V8)
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, OCRError)
+    }
+  }
 }
 
 /**
@@ -180,6 +199,15 @@ export async function extractExpiryDate(
         statusText: response.statusText,
         errorText,
       })
+
+      // Check for rate limit error (429)
+      if (response.status === 429) {
+        throw new OCRError(`Rate limit exceeded: ${errorText}`, 'rate_limit', {
+          status: response.status,
+          errorText,
+        })
+      }
+
       throw new Error(`API error ${response.status}: ${errorText}`)
     }
 
@@ -216,6 +244,17 @@ export async function extractExpiryDate(
 
     return result
   } catch (error) {
+    // If error is already an OCRError, log and re-throw it
+    if (error instanceof OCRError) {
+      logger.error('OCRClient', 'OCR extraction failed', {
+        error: error.message,
+        errorType: error.type,
+        details: error.details,
+      })
+      throw error
+    }
+
+    // Log standard errors
     logger.error('OCRClient', 'OCR extraction failed', {
       error: error instanceof Error ? error.message : String(error),
       errorType: error instanceof Error ? error.constructor.name : typeof error,
@@ -223,25 +262,26 @@ export async function extractExpiryDate(
     })
 
     // Create OCR error with type classification
-    const ocrError: OCRError = {
-      message: error instanceof Error ? error.message : 'Unknown OCR error',
-      type: 'api',
-      details: error,
-    }
+    const errorMessage = error instanceof Error ? error.message : 'Unknown OCR error'
+    const errorDetails =
+      error instanceof Error
+        ? { message: error.message, name: error.name }
+        : { error: String(error) }
 
     // Classify error type
+    let errorType: OCRError['type'] = 'api'
     if (error instanceof TypeError && error.message.includes('fetch')) {
-      ocrError.type = 'network'
+      errorType = 'network'
       logger.error('OCRClient', 'Classified as network error')
     } else if (error instanceof Error && error.message.includes('timeout')) {
-      ocrError.type = 'timeout'
+      errorType = 'timeout'
       logger.error('OCRClient', 'Classified as timeout error')
     } else if (error instanceof Error && error.message.includes('validation')) {
-      ocrError.type = 'validation'
+      errorType = 'validation'
       logger.error('OCRClient', 'Classified as validation error')
     }
 
-    throw ocrError
+    throw new OCRError(errorMessage, errorType, errorDetails)
   }
 }
 
@@ -331,22 +371,24 @@ export async function performFullOCRAnalysis(
   } catch (error) {
     console.error('Full OCR analysis failed:', error)
 
-    const ocrError: OCRError = {
-      message: error instanceof Error ? error.message : 'Unknown OCR error',
-      type: 'api',
-      details: error,
-    }
+    // Create OCR error with type classification
+    const errorMessage = error instanceof Error ? error.message : 'Unknown OCR error'
+    const errorDetails =
+      error instanceof Error
+        ? { message: error.message, name: error.name }
+        : { error: String(error) }
 
     // Classify error type
+    let errorType: OCRError['type'] = 'api'
     if (error instanceof TypeError && error.message.includes('fetch')) {
-      ocrError.type = 'network'
+      errorType = 'network'
     } else if (error instanceof Error && error.message.includes('timeout')) {
-      ocrError.type = 'timeout'
+      errorType = 'timeout'
     } else if (error instanceof Error && error.message.includes('validation')) {
-      ocrError.type = 'validation'
+      errorType = 'validation'
     }
 
-    throw ocrError
+    throw new OCRError(errorMessage, errorType, errorDetails)
   }
 }
 

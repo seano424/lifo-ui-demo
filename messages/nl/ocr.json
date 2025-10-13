@@ -1,0 +1,44 @@
+{
+  "ocrFrameQuality": {
+    "textDetected": "Tekst gedetecteerd",
+    "datePattern": "Datumpatroon",
+    "lighting": "Goede belichting",
+    "focus": "Scherp gesteld",
+    "contrast": "Goed contrast",
+    "quality": "Kwaliteit",
+    "readyToScan": "📸 Scannen...",
+    "hintMoveCloser": "Ga dichter bij de tekst",
+    "hintMoreLight": "Meer licht nodig",
+    "hintTooLight": "Te helder, pas de hoek aan",
+    "hintHoldSteady": "Houd stil voor scherpstelling",
+    "hintFindDate": "Richt op de houdbaarheidsdatum",
+    "hintImproveAngle": "Pas de hoek aan voor duidelijkheid",
+    "hintPositioning": "Positioneren..."
+  },
+  "scanningCamera": {
+    "titles": {
+      "scanProduct": "Product scannen",
+      "scanExpiryDate": "Houdbaarheidsdatum scannen"
+    },
+    "subtitles": {
+      "pointAtBarcode": "Richt de camera op de barcode",
+      "pointAtExpiryDate": "Richt de camera op de houdbaarheidsdatum"
+    },
+    "permissions": {
+      "barcodeRequired": "Cameratoegang vereist voor barcode scannen",
+      "expiryRequired": "Cameratoegang vereist voor houdbaarheidsdatum scannen"
+    },
+    "buttons": {
+      "processingOCR": "Verwerken...",
+      "captureExpiryDate": "Houdbaarheidsdatum vastleggen",
+      "clearError": "Wissen",
+      "manualEntry": "Handmatige invoer"
+    },
+    "alerts": {
+      "serviceUnavailable": "OCR-service tijdelijk niet beschikbaar. Gebruik handmatige invoer.",
+      "ocrError": "Fout: {error}",
+      "backendUnavailable": "Backend-service reageert niet",
+      "scanInstructions": "Plaats de barcode binnen het cameraframe. De scanner detecteert deze automatisch."
+    }
+  }
+}

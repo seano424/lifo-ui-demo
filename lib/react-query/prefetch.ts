@@ -199,8 +199,9 @@ export async function prefetchDashboardData() {
     }
 
     const totalDuration = performance.now() - perfStart
-    console.log(
-      `[Performance] Dashboard prefetch completed in ${totalDuration.toFixed(0)}ms (prefetch: ${prefetchDuration.toFixed(0)}ms)`,
+    logger.query(
+      'prefetchDashboardData',
+      `Dashboard prefetch completed in ${totalDuration.toFixed(0)}ms (prefetch: ${prefetchDuration.toFixed(0)}ms)`,
     )
 
     return {

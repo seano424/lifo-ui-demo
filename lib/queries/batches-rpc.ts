@@ -6,7 +6,6 @@ import { createClient } from '@/lib/supabase/client'
 import type { createClient as createServerClient } from '@/lib/supabase/server'
 import { logger } from '@/lib/utils/logger'
 import { withPerformanceTracking } from '@/lib/utils/performance'
-import { withSupabaseRetry } from '@/lib/utils/retry'
 import type { BatchFilters, BatchWithProduct, BatchesPageParam } from './batches'
 
 type ServerClient = Awaited<ReturnType<typeof createServerClient>>
@@ -24,27 +23,25 @@ export async function hasBatchesRPC(
   const context = 'hasBatchesRPC'
 
   return withPerformanceTracking(context, 'Check if store has batches', { storeId }, async () => {
-    return withSupabaseRetry(async () => {
-      const { data, error } = await supabase.schema('inventory').rpc('has_batches', {
-        p_store_id: storeId,
-      })
+    const { data, error } = await supabase.schema('inventory').rpc('has_batches', {
+      p_store_id: storeId,
+    })
 
-      if (error) {
-        logger.queryWarn(context, 'RPC error', {
-          error: error.message,
-          code: error.code,
-          storeId,
-        })
-        throw new Error(`Failed to check batches: ${error.message}`)
-      }
-
-      logger.log(context, 'Batch check completed', {
+    if (error) {
+      logger.queryWarn(context, 'RPC error', {
+        error: error.message,
+        code: error.code,
         storeId,
-        hasBatches: data,
       })
+      throw new Error(`Failed to check batches: ${error.message}`)
+    }
 
-      return data as boolean
-    }, context)
+    logger.log(context, 'Batch check completed', {
+      storeId,
+      hasBatches: data,
+    })
+
+    return data as boolean
   })
 }
 

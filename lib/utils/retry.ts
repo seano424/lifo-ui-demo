@@ -10,10 +10,18 @@ export interface RetryOptions {
 
 const DEFAULT_OPTIONS: Required<RetryOptions> = {
   maxAttempts: 3,
-  initialDelay: 100,
+  initialDelay: 200,
   maxDelay: 2000,
   backoffMultiplier: 2,
-  retryableErrors: ['ECONNRESET', 'ETIMEDOUT', 'ECONNREFUSED', 'fetch failed'],
+  retryableErrors: [
+    'ECONNRESET',
+    'ETIMEDOUT',
+    'ECONNREFUSED',
+    'ENOTFOUND',
+    'EPIPE', // Broken pipe - connection closed during write
+    'ECONNABORTED', // Connection aborted
+    'fetch failed',
+  ],
 }
 
 /**
@@ -39,14 +47,21 @@ export function isRetryableError(
   const errorMessage = error instanceof Error ? error.message : String(error)
   const errorCode = error && typeof error === 'object' && 'code' in error ? String(error.code) : ''
 
+  // Check error cause chain for nested error codes (e.g., EPIPE in error.cause.code)
+  const errorCause = error && typeof error === 'object' && 'cause' in error ? error.cause : null
+  const causeCode =
+    errorCause && typeof errorCause === 'object' && 'code' in errorCause
+      ? String(errorCause.code)
+      : ''
+  const causeMessage = errorCause instanceof Error ? errorCause.message : String(errorCause || '')
+
   return retryableErrors.some(
     retryable =>
       errorMessage.includes(retryable) ||
       errorCode.includes(retryable) ||
-      (error &&
-        typeof error === 'object' &&
-        'cause' in error &&
-        isRetryableError(error.cause, retryableErrors)),
+      causeCode.includes(retryable) || // Check cause.code (e.g., EPIPE)
+      causeMessage.includes(retryable) || // Check cause.message
+      (errorCause && isRetryableError(errorCause, retryableErrors)), // Recursive check
   )
 }
 
@@ -145,6 +160,8 @@ export async function withRetry<T>(
 
 /**
  * Retry specifically for Supabase queries with connection errors
+ * Uses longer delays than default to handle transient network issues (ECONNRESET)
+ * Aligned with middleware retry strategy for consistency
  *
  * @example
  * ```typescript
@@ -163,7 +180,7 @@ export async function withSupabaseRetry<T>(
     fn,
     {
       maxAttempts: 3,
-      initialDelay: 100,
+      initialDelay: 200,
       maxDelay: 1000,
       ...options,
     },

@@ -1,0 +1,44 @@
+{
+  "ocrFrameQuality": {
+    "textDetected": "Texte détecté",
+    "datePattern": "Format de date",
+    "lighting": "Bon éclairage",
+    "focus": "Mise au point",
+    "contrast": "Bon contraste",
+    "quality": "Qualité",
+    "readyToScan": "📸 Numérisation...",
+    "hintMoveCloser": "Approchez-vous du texte",
+    "hintMoreLight": "Plus de lumière nécessaire",
+    "hintTooLight": "Trop lumineux, ajustez l'angle",
+    "hintHoldSteady": "Tenez fermement pour la mise au point",
+    "hintFindDate": "Pointez sur la date de péremption",
+    "hintImproveAngle": "Ajustez l'angle pour plus de clarté",
+    "hintPositioning": "Positionnement en cours..."
+  },
+  "scanningCamera": {
+    "titles": {
+      "scanProduct": "Scanner le produit",
+      "scanExpiryDate": "Scanner la date de péremption"
+    },
+    "subtitles": {
+      "pointAtBarcode": "Pointez l'appareil photo sur le code-barres",
+      "pointAtExpiryDate": "Pointez l'appareil photo sur la date de péremption"
+    },
+    "permissions": {
+      "barcodeRequired": "Accès à l'appareil photo requis pour scanner le code-barres",
+      "expiryRequired": "Accès à l'appareil photo requis pour scanner la date de péremption"
+    },
+    "buttons": {
+      "processingOCR": "Traitement en cours...",
+      "captureExpiryDate": "Capturer la date de péremption",
+      "clearError": "Effacer",
+      "manualEntry": "Saisie manuelle"
+    },
+    "alerts": {
+      "serviceUnavailable": "Service OCR temporairement indisponible. Veuillez utiliser la saisie manuelle.",
+      "ocrError": "Erreur : {error}",
+      "backendUnavailable": "Le service backend ne répond pas",
+      "scanInstructions": "Positionnez le code-barres dans le cadre de la caméra. Le scanner le détectera automatiquement."
+    }
+  }
+}
