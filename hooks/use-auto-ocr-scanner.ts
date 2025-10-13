@@ -43,6 +43,7 @@ export interface AutoOCRScannerState {
   isAnalyzing: boolean
   attemptCount: number
   lastAnalysis: FrameAnalysis | null
+  lastReason: string | null // Human-readable reason for OCR trigger decision
 
   // Controls
   startAutoScan: () => void
@@ -55,9 +56,52 @@ export interface AutoOCRScannerState {
 }
 
 /**
+ * Validates user-provided options
+ */
+function validateOptions(options: AutoOCRScannerOptions): void {
+  const {
+    preCheckIntervalMs = 500,
+    maxAttempts = 10,
+    ocrConfidenceThreshold = 0.5,
+    minTextConfidence,
+    minDateConfidence,
+    minOverallScore,
+    minSharpness,
+  } = options
+
+  // Validate preCheckIntervalMs (100-5000ms)
+  if (preCheckIntervalMs < 100 || preCheckIntervalMs > 5000) {
+    throw new Error('preCheckIntervalMs must be between 100 and 5000 milliseconds')
+  }
+
+  // Validate maxAttempts (1-50)
+  if (maxAttempts < 1 || maxAttempts > 50) {
+    throw new Error('maxAttempts must be between 1 and 50')
+  }
+
+  // Validate threshold values (0-1)
+  const thresholds = [
+    { name: 'ocrConfidenceThreshold', value: ocrConfidenceThreshold },
+    { name: 'minTextConfidence', value: minTextConfidence },
+    { name: 'minDateConfidence', value: minDateConfidence },
+    { name: 'minOverallScore', value: minOverallScore },
+    { name: 'minSharpness', value: minSharpness },
+  ]
+
+  for (const { name, value } of thresholds) {
+    if (value !== undefined && (value < 0 || value > 1)) {
+      throw new Error(`${name} must be between 0 and 1`)
+    }
+  }
+}
+
+/**
  * Hook for auto-OCR scanning with intelligent pre-checks
  */
 export function useAutoOCRScanner(options: AutoOCRScannerOptions): AutoOCRScannerState {
+  // Validate options
+  validateOptions(options)
+
   const {
     isEnabled,
     onExpiryDetected,
@@ -76,6 +120,7 @@ export function useAutoOCRScanner(options: AutoOCRScannerOptions): AutoOCRScanne
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [attemptCount, setAttemptCount] = useState(0)
   const [lastAnalysis, setLastAnalysis] = useState<FrameAnalysis | null>(null)
+  const [lastReason, setLastReason] = useState<string | null>(null)
   const [totalFramesAnalyzed, setTotalFramesAnalyzed] = useState(0)
   const [ocrTriggeredCount, setOcrTriggeredCount] = useState(0)
 
@@ -132,29 +177,35 @@ export function useAutoOCRScanner(options: AutoOCRScannerOptions): AutoOCRScanne
 
       const duration = performance.now() - startTime
 
+      // Calculate reason for OCR trigger decision
+      const reason = analysis.shouldTriggerOCR
+        ? 'All thresholds met'
+        : !analysis.hasTextLikeContent
+          ? `No text detected (edges: ${analysis.debugInfo?.edgePercentage.toFixed(1)}%)`
+          : analysis.textConfidence < minTextConfidence
+            ? `Text confidence too low (${(analysis.textConfidence * 100).toFixed(0)}% < ${(minTextConfidence * 100).toFixed(0)}%)`
+            : !analysis.hasDatePattern
+              ? 'No date pattern detected'
+              : analysis.datePatternConfidence < minDateConfidence
+                ? `Date pattern confidence too low (${(analysis.datePatternConfidence * 100).toFixed(0)}% < ${(minDateConfidence * 100).toFixed(0)}%)`
+                : analysis.brightness <= 0.2
+                  ? `Too dark (brightness: ${(analysis.brightness * 100).toFixed(0)}%)`
+                  : analysis.brightness >= 0.9
+                    ? `Overexposed (brightness: ${(analysis.brightness * 100).toFixed(0)}%)`
+                    : analysis.sharpness <= minSharpness
+                      ? `Too blurry (sharpness: ${(analysis.sharpness * 100).toFixed(0)}% < ${(minSharpness * 100).toFixed(0)}%)`
+                      : `Overall score too low (${(analysis.overallScore * 100).toFixed(0)}% < ${(minOverallScore * 100).toFixed(0)}%)`
+
+      // Store the reason in state
+      setLastReason(reason)
+
       // Debug logging
       ocrDebugLogger.logFrameAnalysis({
         shouldTriggerOCR: analysis.shouldTriggerOCR,
         textConfidence: analysis.textConfidence,
         datePatternConfidence: analysis.datePatternConfidence,
         overallScore: analysis.overallScore,
-        reason: analysis.shouldTriggerOCR
-          ? 'All thresholds met'
-          : !analysis.hasTextLikeContent
-            ? `No text detected (edges: ${analysis.debugInfo?.edgePercentage.toFixed(1)}%)`
-            : analysis.textConfidence < minTextConfidence
-              ? `Text confidence too low (${(analysis.textConfidence * 100).toFixed(0)}% < ${(minTextConfidence * 100).toFixed(0)}%)`
-              : !analysis.hasDatePattern
-                ? 'No date pattern detected'
-                : analysis.datePatternConfidence < minDateConfidence
-                  ? `Date pattern confidence too low (${(analysis.datePatternConfidence * 100).toFixed(0)}% < ${(minDateConfidence * 100).toFixed(0)}%)`
-                  : analysis.brightness <= 0.2
-                    ? `Too dark (brightness: ${(analysis.brightness * 100).toFixed(0)}%)`
-                    : analysis.brightness >= 0.9
-                      ? `Overexposed (brightness: ${(analysis.brightness * 100).toFixed(0)}%)`
-                      : analysis.sharpness <= minSharpness
-                        ? `Too blurry (sharpness: ${(analysis.sharpness * 100).toFixed(0)}% < ${(minSharpness * 100).toFixed(0)}%)`
-                        : `Overall score too low (${(analysis.overallScore * 100).toFixed(0)}% < ${(minOverallScore * 100).toFixed(0)}%)`,
+        reason,
       })
 
       if (debug) {
@@ -422,6 +473,9 @@ export function useAutoOCRScanner(options: AutoOCRScannerOptions): AutoOCRScanne
       return
     }
 
+    // Create AbortController for cleanup
+    const abortController = new AbortController()
+
     logger.log('AutoOCRScanner', 'Starting pre-check loop', {
       preCheckIntervalMs,
       maxAttempts,
@@ -429,6 +483,11 @@ export function useAutoOCRScanner(options: AutoOCRScannerOptions): AutoOCRScanne
     })
 
     const interval = setInterval(async () => {
+      // Check if aborted
+      if (abortController.signal.aborted) {
+        return
+      }
+
       // Skip if OCR is currently processing
       if (isProcessingOCRRef.current) {
         if (debug) {
@@ -439,6 +498,11 @@ export function useAutoOCRScanner(options: AutoOCRScannerOptions): AutoOCRScanne
 
       // Analyze current frame
       const analysis = await analyzeCurrentFrame()
+
+      // Check if aborted after async operation
+      if (abortController.signal.aborted) {
+        return
+      }
 
       // Double-check OCR isn't processing (might have started during frame analysis)
       if (isProcessingOCRRef.current) {
@@ -472,6 +536,9 @@ export function useAutoOCRScanner(options: AutoOCRScannerOptions): AutoOCRScanne
     preCheckIntervalRef.current = interval
 
     return () => {
+      // Abort any pending async operations
+      abortController.abort()
+
       if (preCheckIntervalRef.current) {
         clearInterval(preCheckIntervalRef.current)
         preCheckIntervalRef.current = null
@@ -545,6 +612,7 @@ export function useAutoOCRScanner(options: AutoOCRScannerOptions): AutoOCRScanne
     setIsAnalyzing(false)
     setAttemptCount(0)
     setLastAnalysis(null)
+    setLastReason(null)
     setTotalFramesAnalyzed(0)
     setOcrTriggeredCount(0)
 
@@ -557,12 +625,10 @@ export function useAutoOCRScanner(options: AutoOCRScannerOptions): AutoOCRScanne
   // Auto-start when enabled
   useEffect(() => {
     if (isEnabled && !isAnalyzing) {
-      logger.log('AutoOCRScanner', 'Auto-starting scan (enabled)', {
-        attemptCount,
-      })
+      logger.log('AutoOCRScanner', 'Auto-starting scan (enabled)')
       startAutoScan()
     }
-  }, [isEnabled, isAnalyzing, attemptCount, startAutoScan])
+  }, [isEnabled, isAnalyzing, startAutoScan])
 
   // Auto-stop when max attempts reached
   useEffect(() => {
@@ -596,6 +662,7 @@ export function useAutoOCRScanner(options: AutoOCRScannerOptions): AutoOCRScanne
     isAnalyzing,
     attemptCount,
     lastAnalysis,
+    lastReason,
     totalFramesAnalyzed,
     ocrTriggeredCount,
     startAutoScan,

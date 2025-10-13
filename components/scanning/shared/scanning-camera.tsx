@@ -147,13 +147,13 @@ export default function ScanningCamera({
         />
 
         {/* Frame Quality Indicator for Auto-OCR */}
-        {mode === 'ocr' && autoOCRState && (
+        {mode === 'ocr' && autoOCRState && process.env.NEXT_PUBLIC_DEBUG_OCR === 'true' && (
           <OCRFrameQualityIndicator
             analysis={autoOCRState.lastAnalysis}
             isAnalyzing={autoOCRState.isAnalyzing}
             attemptCount={autoOCRState.attemptCount}
             maxAttempts={10}
-            showDebugInfo={process.env.NEXT_PUBLIC_DEBUG_OCR === 'true'}
+            reason={autoOCRState.lastReason ?? undefined}
           />
         )}
       </div>

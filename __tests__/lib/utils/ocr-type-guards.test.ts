@@ -10,17 +10,17 @@ import {
   isTimeoutError,
   getErrorMessage,
 } from '@/lib/utils/ocr-type-guards'
-import type { OCRError } from '@/lib/api/ocr-client'
+import { OCRError } from '@/lib/api/ocr-client'
 
 describe('ocr-type-guards', () => {
   describe('isOCRError', () => {
     it('should return true for valid OCRError objects', () => {
       const validErrors: OCRError[] = [
-        { message: 'Network error', type: 'network' },
-        { message: 'API error', type: 'api' },
-        { message: 'Timeout', type: 'timeout' },
-        { message: 'Validation failed', type: 'validation' },
-        { message: 'Rate limited', type: 'rate_limit' },
+        new OCRError('Network error', 'network'),
+        new OCRError('API error', 'api'),
+        new OCRError('Timeout', 'timeout'),
+        new OCRError('Validation failed', 'validation'),
+        new OCRError('Rate limited', 'rate_limit'),
       ]
 
       validErrors.forEach(error => {
@@ -29,11 +29,10 @@ describe('ocr-type-guards', () => {
     })
 
     it('should return true for OCRError with details', () => {
-      const errorWithDetails: OCRError = {
-        message: 'API error',
-        type: 'api',
-        details: { status: 500, body: 'Internal Server Error' },
-      }
+      const errorWithDetails = new OCRError('API error', 'api', {
+        status: 500,
+        body: 'Internal Server Error',
+      })
 
       expect(isOCRError(errorWithDetails)).toBe(true)
     })
@@ -71,17 +70,14 @@ describe('ocr-type-guards', () => {
 
   describe('isRateLimitError', () => {
     it('should return true for rate limit OCRErrors', () => {
-      const rateLimitError: OCRError = {
-        message: 'Rate limit exceeded',
-        type: 'rate_limit',
-      }
+      const rateLimitError = new OCRError('Rate limit exceeded', 'rate_limit')
 
       expect(isRateLimitError(rateLimitError)).toBe(true)
     })
 
     it('should return false for other OCRError types', () => {
-      const networkError: OCRError = { message: 'Network error', type: 'network' }
-      const apiError: OCRError = { message: 'API error', type: 'api' }
+      const networkError = new OCRError('Network error', 'network')
+      const apiError = new OCRError('API error', 'api')
 
       expect(isRateLimitError(networkError)).toBe(false)
       expect(isRateLimitError(apiError)).toBe(false)
@@ -96,17 +92,14 @@ describe('ocr-type-guards', () => {
 
   describe('isNetworkError', () => {
     it('should return true for network OCRErrors', () => {
-      const networkError: OCRError = {
-        message: 'Failed to fetch',
-        type: 'network',
-      }
+      const networkError = new OCRError('Failed to fetch', 'network')
 
       expect(isNetworkError(networkError)).toBe(true)
     })
 
     it('should return false for other OCRError types', () => {
-      const rateLimitError: OCRError = { message: 'Rate limited', type: 'rate_limit' }
-      const timeoutError: OCRError = { message: 'Timeout', type: 'timeout' }
+      const rateLimitError = new OCRError('Rate limited', 'rate_limit')
+      const timeoutError = new OCRError('Timeout', 'timeout')
 
       expect(isNetworkError(rateLimitError)).toBe(false)
       expect(isNetworkError(timeoutError)).toBe(false)
@@ -120,17 +113,14 @@ describe('ocr-type-guards', () => {
 
   describe('isTimeoutError', () => {
     it('should return true for timeout OCRErrors', () => {
-      const timeoutError: OCRError = {
-        message: 'Request timeout',
-        type: 'timeout',
-      }
+      const timeoutError = new OCRError('Request timeout', 'timeout')
 
       expect(isTimeoutError(timeoutError)).toBe(true)
     })
 
     it('should return false for other OCRError types', () => {
-      const networkError: OCRError = { message: 'Network error', type: 'network' }
-      const validationError: OCRError = { message: 'Validation failed', type: 'validation' }
+      const networkError = new OCRError('Network error', 'network')
+      const validationError = new OCRError('Validation failed', 'validation')
 
       expect(isTimeoutError(networkError)).toBe(false)
       expect(isTimeoutError(validationError)).toBe(false)
@@ -144,10 +134,7 @@ describe('ocr-type-guards', () => {
 
   describe('getErrorMessage', () => {
     it('should extract message from OCRError', () => {
-      const ocrError: OCRError = {
-        message: 'API request failed',
-        type: 'api',
-      }
+      const ocrError = new OCRError('API request failed', 'api')
 
       expect(getErrorMessage(ocrError)).toBe('API request failed')
     })
@@ -185,7 +172,7 @@ describe('ocr-type-guards', () => {
         return 'unknown'
       }
 
-      const ocrError: OCRError = { message: 'test', type: 'api' }
+      const ocrError = new OCRError('test', 'api')
       expect(handleError(ocrError)).toBe('api')
       expect(handleError(new Error('test'))).toBe('unknown')
     })
@@ -199,8 +186,8 @@ describe('ocr-type-guards', () => {
         return false
       }
 
-      const rateLimitError: OCRError = { message: 'test', type: 'rate_limit' }
-      const networkError: OCRError = { message: 'test', type: 'network' }
+      const rateLimitError = new OCRError('test', 'rate_limit')
+      const networkError = new OCRError('test', 'network')
 
       expect(handleRateLimit(rateLimitError)).toBe(true)
       expect(handleRateLimit(networkError)).toBe(false)

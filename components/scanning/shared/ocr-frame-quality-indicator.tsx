@@ -15,7 +15,7 @@ export interface OCRFrameQualityIndicatorProps {
   attemptCount: number
   maxAttempts: number
   className?: string
-  showDebugInfo?: boolean
+  reason?: string // Optional reason text explaining why OCR is/isn't triggered
 }
 
 export default function OCRFrameQualityIndicator({
@@ -24,7 +24,7 @@ export default function OCRFrameQualityIndicator({
   attemptCount,
   maxAttempts,
   className,
-  showDebugInfo = false,
+  reason,
 }: OCRFrameQualityIndicatorProps) {
   const t = useTranslations('ocr')
   const minSharpness = parseEnvFloat(process.env.NEXT_PUBLIC_AUTO_OCR_MIN_SHARPNESS, 0.01)
@@ -107,6 +107,25 @@ export default function OCRFrameQualityIndicator({
         />
       </div>
 
+      {/* Raw Frame Analysis Data */}
+      <div className="pt-2 border-t border-white/20 text-[10px] opacity-60 space-y-0.5">
+        <div className="font-semibold opacity-80 mb-1">Frame Analysis:</div>
+        <div>textConfidence: {analysis.textConfidence.toFixed(4)}</div>
+        <div>datePatternConfidence: {analysis.datePatternConfidence.toFixed(4)}</div>
+        <div>overallScore: {analysis.overallScore.toFixed(4)}</div>
+        <div>shouldTriggerOCR: {analysis.shouldTriggerOCR ? 'true' : 'false'}</div>
+      </div>
+
+      {/* Analysis Reason */}
+      {reason && (
+        <div className="pt-2 border-t border-white/20">
+          <div className="flex items-start gap-2">
+            <span className="text-[10px] opacity-60 uppercase tracking-wider">Status:</span>
+            <span className="text-xs flex-1">{reason}</span>
+          </div>
+        </div>
+      )}
+
       {/* Overall Status */}
       <div className="pt-2 border-t border-white/20">
         <div className="flex items-center justify-between">
@@ -130,16 +149,6 @@ export default function OCRFrameQualityIndicator({
           <div className="mt-2 text-yellow-400 text-xs">{getPositioningHint(analysis, t)}</div>
         )}
       </div>
-
-      {/* Debug Info */}
-      {showDebugInfo && analysis.debugInfo && (
-        <div className="pt-2 border-t border-white/20 text-[10px] opacity-60 space-y-0.5">
-          <div>Edges: {analysis.debugInfo.edgePercentage.toFixed(1)}%</div>
-          <div>Shapes: {analysis.debugInfo.numberLikeShapes}</div>
-          <div>Sep: {analysis.debugInfo.hasSeparators ? 'Yes' : 'No'}</div>
-          <div>H-Lines: {analysis.debugInfo.horizontalPatterns ? 'Yes' : 'No'}</div>
-        </div>
-      )}
     </div>
   )
 }

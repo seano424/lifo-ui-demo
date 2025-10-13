@@ -78,7 +78,6 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
   })
 
   // OCR processing
-  // const { processExpiryDate, isLoading: isOCRProcessing, isBackendHealthy } = useOCRWithFallback()  //commented for debugging
   const { processExpiryDate, isLoading: isOCRProcessing } = useOCRWithFallback()
 
   // Check if auto-OCR is enabled via environment variable
@@ -545,7 +544,6 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
                   }}
                   // Auto-OCR props - auto-scan starts automatically when enabled
                   autoOCRState={isAutoOCREnabled ? autoOCRScanner : undefined}
-                  // isBackendHealthy={isBackendHealthy}
                 />
               )}
 
@@ -567,11 +565,7 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
                   data={inventoryData}
                   onChange={setInventoryData}
                   onSubmit={handleInventoryFormSubmit}
-                  title={
-                    ocrError //|| isBackendHealthy === false
-                      ? t('expiry.manualEntryFallback')
-                      : t('expiry.orEnterManually')
-                  }
+                  title={ocrError ? t('expiry.manualEntryFallback') : t('expiry.orEnterManually')}
                   submitButtonText={t('expiry.confirmDate')}
                 />
               )}

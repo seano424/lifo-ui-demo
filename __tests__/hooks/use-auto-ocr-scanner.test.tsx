@@ -14,7 +14,7 @@ import { renderHook, waitFor, act } from '@testing-library/react'
 import { useAutoOCRScanner } from '@/hooks/use-auto-ocr-scanner'
 import * as frameAnalyzer from '@/lib/utils/frame-analyzer'
 import * as ocrClient from '@/lib/api/ocr-client'
-import type { OCRError } from '@/lib/api/ocr-client'
+import { OCRError } from '@/lib/api/ocr-client'
 
 // Mock dependencies
 jest.mock('@/lib/utils/frame-analyzer')
@@ -248,6 +248,52 @@ describe('useAutoOCRScanner', () => {
 
       await waitFor(() => {
         expect(result.current.lastAnalysis).toEqual(mockAnalysis)
+        // With these values, all thresholds should be met (or would trigger if shouldTriggerOCR was true)
+        // Since shouldTriggerOCR is false in mock, but other values pass, the reason depends on the actual calculation
+        expect(result.current.lastReason).toBeTruthy()
+      })
+    })
+
+    it('should update lastReason based on frame analysis', async () => {
+      const onExpiryDetected = jest.fn()
+
+      const mockAnalysis = {
+        shouldTriggerOCR: false,
+        hasTextLikeContent: false,
+        textConfidence: 0.01,
+        hasDatePattern: false,
+        datePatternConfidence: 0,
+        overallScore: 0.1,
+        brightness: 0.5,
+        sharpness: 0.5,
+        contrast: 0.5,
+        isBarcodeDetected: false,
+        barcodeConfidence: 0,
+        debugInfo: {
+          edgePercentage: 1.5,
+        },
+      }
+
+      ;(frameAnalyzer.analyzeFrame as jest.Mock).mockReturnValue(mockAnalysis)
+
+      const { result } = renderHook(() =>
+        useAutoOCRScanner({
+          isEnabled: true,
+          onExpiryDetected,
+          storeId: 'test-store',
+          preCheckIntervalMs: 100,
+        }),
+      )
+
+      await waitFor(() => expect(result.current.isAnalyzing).toBe(true))
+
+      act(() => {
+        jest.advanceTimersByTime(100)
+      })
+
+      await waitFor(() => {
+        expect(result.current.lastReason).toContain('No text detected')
+        expect(result.current.lastReason).toContain('1.5%')
       })
     })
 
@@ -342,10 +388,7 @@ describe('useAutoOCRScanner', () => {
     it('should handle rate limit errors with exponential backoff', async () => {
       const onExpiryDetected = jest.fn()
 
-      const rateLimitError: OCRError = {
-        message: 'Rate limit exceeded',
-        type: 'rate_limit',
-      }
+      const rateLimitError = new OCRError('Rate limit exceeded', 'rate_limit')
 
       // Mock frame analysis to trigger OCR
       ;(frameAnalyzer.analyzeFrame as jest.Mock).mockReturnValue({
@@ -396,10 +439,7 @@ describe('useAutoOCRScanner', () => {
     it('should handle rate limit errors', async () => {
       const onExpiryDetected = jest.fn()
 
-      const rateLimitError: OCRError = {
-        message: 'Rate limit exceeded',
-        type: 'rate_limit',
-      }
+      const rateLimitError = new OCRError('Rate limit exceeded', 'rate_limit')
 
       ;(frameAnalyzer.analyzeFrame as jest.Mock).mockReturnValue({
         shouldTriggerOCR: true,
