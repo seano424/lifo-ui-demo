@@ -2,21 +2,14 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { queryKeys } from '@/lib/queries/query-keys'
 import { createClient } from '@/lib/supabase/client'
+import type { Database } from '@/types/supabase'
 
-// Custom type for available batches with product info
+// Batch type from database
+type BatchRow = Database['inventory']['Tables']['batches']['Row']
+
+// Custom type for available batches with nested structure
 interface AvailableBatch {
-  batch_id: string
-  batch_number: string | null
-  product_id: string
-  store_id: string
-  expiry_date: string
-  current_quantity: number
-  available_quantity: number
-  cost_price: number
-  selling_price: number
-  location_code: string | null
-  status: string
-  created_at: string
+  batch: BatchRow
   products: {
     product_name: string
     brand_name: string
@@ -108,8 +101,8 @@ export function useScanOutActions() {
     }
 
     // Find exact match first
-    const exactMatch = batches.find(batch => {
-      const batchDate = new Date(batch.expiry_date)
+    const exactMatch = batches.find(availableBatch => {
+      const batchDate = new Date(availableBatch.batch.expiry_date)
       return (
         batchDate.getFullYear() === targetDate.getFullYear() &&
         batchDate.getMonth() === targetDate.getMonth() &&
@@ -126,13 +119,13 @@ export function useScanOutActions() {
     let closestBatch: AvailableBatch | null = null
     let smallestDifference = Infinity
 
-    for (const batch of batches) {
-      const batchDate = new Date(batch.expiry_date)
+    for (const availableBatch of batches) {
+      const batchDate = new Date(availableBatch.batch.expiry_date)
       const difference = Math.abs(batchDate.getTime() - targetDate.getTime())
 
       if (difference <= toleranceMs && difference < smallestDifference) {
         smallestDifference = difference
-        closestBatch = batch
+        closestBatch = availableBatch
       }
     }
 
@@ -164,29 +157,51 @@ export function useScanOutActions() {
         return []
       }
 
-      // Transform with proper typing
-      return data.map(
-        (batch: BatchRPCResult): AvailableBatch => ({
-          batch_id: batch.batch_id,
-          batch_number: batch.batch_number,
-          product_id: batch.product_id,
-          store_id: batch.store_id,
-          expiry_date: batch.expiry_date,
-          current_quantity: Number(batch.current_quantity),
-          available_quantity: Number(batch.available_quantity || batch.current_quantity),
-          cost_price: Number(batch.cost_price),
-          selling_price: Number(batch.selling_price),
-          location_code: batch.location_code,
-          status: batch.status,
-          created_at: batch.created_at,
-          products: {
-            product_name: batch.product_name || 'Unknown Product',
-            brand_name: batch.brand_name || 'Unknown Brand',
-            barcode: batch.product_barcode || barcode,
-            category_name: batch.category_name || undefined,
+      // Transform to nested structure with batch and products
+      return data.map((rpcResult: BatchRPCResult): AvailableBatch => {
+        const currentQty = Number(rpcResult.current_quantity)
+        const availableQty = rpcResult.available_quantity
+          ? Number(rpcResult.available_quantity)
+          : currentQty
+
+        return {
+          batch: {
+            batch_id: rpcResult.batch_id,
+            batch_number: rpcResult.batch_number || '',
+            product_id: rpcResult.product_id,
+            store_id: rpcResult.store_id,
+            expiry_date: rpcResult.expiry_date,
+            current_quantity: currentQty,
+            available_quantity: availableQty,
+            cost_price: Number(rpcResult.cost_price),
+            selling_price: Number(rpcResult.selling_price),
+            location_code: rpcResult.location_code,
+            status: rpcResult.status,
+            created_at: rpcResult.created_at,
+            // Additional required fields from BatchRow type
+            initial_quantity: currentQty,
+            received_date: null,
+            reserved_quantity: null,
+            updated_at: rpcResult.created_at,
+            manufacture_date: null,
+            supplier: null,
+            ocr_extracted_date: null,
+            ocr_confidence: null,
+            processing_batch_id: null,
+            batch_source: null,
+            scanned_barcode: null,
+            scan_confidence: null,
+            verification_status: 'verified' as const,
+            created_by: null,
           },
-        }),
-      )
+          products: {
+            product_name: rpcResult.product_name || 'Unknown Product',
+            brand_name: rpcResult.brand_name || 'Unknown Brand',
+            barcode: rpcResult.product_barcode || barcode,
+            category_name: rpcResult.category_name || undefined,
+          },
+        }
+      })
     } catch (error) {
       console.error('Error in findAvailableBatches:', error)
       throw error

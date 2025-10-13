@@ -3,20 +3,12 @@
 import { Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Typography } from '@/components/ui/typography'
+import type { Database } from '@/types/supabase'
 
-interface InventoryBatch {
-  batch_id: string
-  batch_number: string | null
-  product_id: string
-  store_id: string
-  expiry_date: string
-  current_quantity: number
-  available_quantity: number
-  cost_price: number
-  selling_price: number
-  location_code: string | null
-  status: string
-  created_at: string
+type BatchRow = Database['inventory']['Tables']['batches']['Row']
+
+interface AvailableBatch {
+  batch: BatchRow
   products: {
     product_name: string
     brand_name: string
@@ -25,8 +17,8 @@ interface InventoryBatch {
 }
 
 interface BatchSelectionListProps {
-  batches: InventoryBatch[]
-  onBatchSelected: (batch: InventoryBatch) => void
+  batches: AvailableBatch[] // ← Changed from InventoryBatch[]
+  onBatchSelected: (batch: AvailableBatch) => void // ← Changed parameter type
   selectedBatchId?: string
   className?: string
 }
@@ -63,7 +55,8 @@ export default function BatchSelectionList({
       </Typography>
 
       <div className="flex flex-col gap-4 max-h-80 bg-secondary-50/10 rounded-2xl px-4 overflow-y-auto">
-        {batches.map((batch, index) => {
+        {batches.map((availableBatch, index) => {
+          const { batch, products } = availableBatch // ← Destructure the nested structure
           const isSelected = selectedBatchId === batch.batch_id
           const isRecommended = index === 0
 
@@ -79,7 +72,7 @@ export default function BatchSelectionList({
                 }
                 ${isRecommended && !isSelected ? 'border-blue-300 bg-blue-25' : ''}
               `}
-              onClick={() => onBatchSelected(batch)}
+              onClick={() => onBatchSelected(availableBatch)} // ← Pass the whole AvailableBatch
             >
               {/* Selection Indicator */}
               {isSelected && (
@@ -104,18 +97,18 @@ export default function BatchSelectionList({
 
               <div className="flex justify-between items-start">
                 <div className="flex-1 flex flex-col gap-1 pb-2">
-                  <Typography variant="p">{batch.products.product_name}</Typography>
-
-                  <Typography variant="p">Expires: {formatDate(batch.expiry_date)}</Typography>
-
+                  <Typography variant="p">{products.product_name}</Typography>{' '}
+                  {/* ← Use products */}
+                  <Typography variant="p">Expires: {formatDate(batch.expiry_date)}</Typography>{' '}
+                  {/* ← Use batch */}
                   <Typography variant="small" className="text-gray-600">
-                    Available: {batch.available_quantity || batch.current_quantity} units
+                    Available: {batch.available_quantity || batch.current_quantity} units{' '}
+                    {/* ← Use batch */}
                   </Typography>
-
                   <Typography variant="small" className="text-gray-600">
-                    Cost: {formatPrice(batch.cost_price)}
+                    Cost: {formatPrice(Number(batch.cost_price))}{' '}
+                    {/* ← Use batch and cast to number */}
                   </Typography>
-
                   {isRecommended && !isSelected && (
                     <Typography variant="small" className="text-xs text-blue-600 font-light">
                       ↑ Recommended (First to expire)
@@ -129,7 +122,7 @@ export default function BatchSelectionList({
                   className={isSelected ? 'bg-primary-600 hover:bg-primary-700' : ''}
                   onClick={e => {
                     e.stopPropagation()
-                    onBatchSelected(batch)
+                    onBatchSelected(availableBatch) // ← Pass the whole AvailableBatch
                   }}
                 >
                   {isSelected ? 'Selected' : 'Select'}

@@ -18,36 +18,17 @@ import { useOCRWithFallback } from '@/hooks/use-ocr-processing'
 import { captureImageFromVideo } from '@/lib/api/ocr-client'
 import { useStoreState } from '@/lib/stores/store-context'
 import { createClient } from '@/lib/supabase/client'
-// Note: We're not using BaseScanningInterface in this implementation
-// Instead we have a custom workflow with manual state management
+
 import type { ScannedItem } from '../shared'
 import BatchSelectionList from '../shared/batch-selection-list'
 import ScanningCamera from '../shared/scanning-camera'
 import { useScanOutActions } from './use-scan-out-actions'
+import type { Database } from '@/types/supabase'
 
-interface ProductData {
-  product_id: string
-  name: string
-  brand: string | null
-  category: string | null
-  barcode: string | null
-  image_url: string | null
-  unit_type: string | null
-}
+type batch = Database['inventory']['Tables']['batches']['Row']
 
 interface AvailableBatch {
-  batch_id: string
-  batch_number: string | null
-  product_id: string
-  store_id: string
-  expiry_date: string
-  current_quantity: number
-  available_quantity: number
-  cost_price: number
-  selling_price: number
-  location_code: string | null
-  status: string
-  created_at: string
+  batch: batch
   products: {
     product_name: string
     brand_name: string
@@ -105,7 +86,6 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
   const [ocrError, setOcrError] = useState<string | null>(null)
   const [_quantity, setQuantity] = useState<number>(1)
 
-  // Custom barcode scan handler for scan-out
   const handleCustomBarcodeScanned = async (barcode: string, _productData?: unknown) => {
     if (!activeStore) {
       console.error(t('noActiveStore'))
@@ -119,58 +99,78 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
       if (barcode.startsWith('INTERNAL-')) {
         const productId = barcode.replace('INTERNAL-', '')
 
-        // Get batches directly by product_id instead of barcode
+        // Use RPC function to get batches (handles complex join properly)
         const supabase = createClient()
         const { data: batchesData, error } = await supabase
-          .schema('inventory')
-          .from('batches')
-          .select(
-            `
-            batch_id,
-            batch_number,
-            product_id,
-            store_id,
-            expiry_date,
-            current_quantity,
-            available_quantity,
-            cost_price,
-            selling_price,
-            location_code,
-            status,
-            created_at,
-            products (
-              product_id,
-              name,
-              brand,
-              category,
-              barcode,
-              image_url,
-              unit_type
-            )
-          `,
-          )
-          .eq('product_id', productId)
-          .eq('store_id', activeStore.store_id)
-          .eq('status', 'active')
-          .gt('current_quantity', 0)
-          .order('expiry_date', { ascending: true })
+          .schema('inventory') // ← Add this to specify the schema
+          .rpc('get_available_batches_by_product', {
+            p_product_id: productId,
+            p_store_id: activeStore.store_id,
+          })
 
         if (error) {
           console.error('Error fetching batches by product_id:', error)
           return
         }
 
+        // Transform the flat RPC result to match AvailableBatch type with nested batch
         batches =
-          batchesData?.map(batch => ({
-            ...batch,
-            products: {
-              product_name: (batch.products as unknown as ProductData)?.name || t('unknownProduct'),
-              brand_name: (batch.products as unknown as ProductData)?.brand || t('unknownBrand'),
-              barcode: (batch.products as unknown as ProductData)?.barcode || '',
-            },
-          })) || []
+          batchesData?.map(
+            (rpcBatch: {
+              batch_id: string
+              batch_number: string | null
+              product_id: string
+              store_id: string
+              expiry_date: string
+              current_quantity: number
+              available_quantity: number
+              cost_price: number
+              selling_price: number
+              location_code: string | null
+              status: string
+              created_at: string
+              product_name: string
+              brand_name: string
+              barcode: string
+            }) => ({
+              batch: {
+                batch_id: rpcBatch.batch_id,
+                batch_number: rpcBatch.batch_number,
+                product_id: rpcBatch.product_id,
+                store_id: rpcBatch.store_id,
+                expiry_date: rpcBatch.expiry_date,
+                current_quantity: rpcBatch.current_quantity,
+                available_quantity: rpcBatch.available_quantity ?? rpcBatch.current_quantity,
+                cost_price: rpcBatch.cost_price,
+                selling_price: rpcBatch.selling_price,
+                location_code: rpcBatch.location_code,
+                status: rpcBatch.status,
+                created_at: rpcBatch.created_at,
+                // Add any other batch fields required by the Database type
+                initial_quantity: rpcBatch.current_quantity, // fallback if not in RPC
+                received_date: null,
+                reserved_quantity: null,
+                updated_at: rpcBatch.created_at,
+                manufacture_date: null,
+                supplier: null,
+                ocr_extracted_date: null,
+                ocr_confidence: null,
+                processing_batch_id: null,
+                batch_source: null,
+                scanned_barcode: null,
+                scan_confidence: null,
+                verification_status: 'verified',
+                created_by: null,
+              } as batch,
+              products: {
+                product_name: rpcBatch.product_name,
+                brand_name: rpcBatch.brand_name || '',
+                barcode: rpcBatch.barcode || '',
+              },
+            }),
+          ) || []
       } else {
-        // Regular barcode lookup
+        // Regular barcode lookup - already returns nested structure
         batches = await findAvailableBatches(barcode, activeStore.store_id)
       }
 
@@ -195,21 +195,23 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
       if (currentProduct) {
         // Add to pending list with default quantity of 1
         const newItem: PendingItem = {
-          id: batch.batch_id,
-          batchId: batch.batch_id,
+          id: batch.batch.batch_id, // ← Access via batch.batch
+          batchId: batch.batch.batch_id, // ← Access via batch.batch
           barcode: currentProduct.barcode,
           productName: batch.products.product_name,
           brand: batch.products.brand_name,
           quantity: 1,
-          maxQuantity: batch.current_quantity,
-          expiryDate: batch.expiry_date,
-          price: batch.cost_price,
+          maxQuantity: Number(batch.batch.current_quantity), // ← Access via batch.batch
+          expiryDate: batch.batch.expiry_date, // ← Access via batch.batch
+          price: Number(batch.batch.cost_price), // ← Access via batch.batch
           timestamp: new Date(),
         }
 
         setPendingItems(prev => {
           // Check if this batch is already in the list
-          const existingIndex = prev.findIndex(item => item.batchId === batch.batch_id)
+          const existingIndex = prev.findIndex(
+            item => item.batchId === batch.batch.batch_id, // ← Access via batch.batch
+          )
           if (existingIndex >= 0) {
             // Increment quantity if already exists
             const updated = [...prev]
@@ -398,7 +400,6 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
             isOCRProcessing={isOCRProcessing}
             ocrError={ocrError}
             onClearOCRError={clearOCRError}
-            // isBackendHealthy={isBackendHealthy}
             title={t('captureExpiryDate')}
             subtitle={t('pointCameraAtExpiry')}
             autoStart={true}
