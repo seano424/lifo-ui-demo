@@ -14,6 +14,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { useAutoOCRScanner } from '@/hooks/use-auto-ocr-scanner'
 import { useOCRWithFallback } from '@/hooks/use-ocr-processing'
 import { captureImageFromVideo } from '@/lib/api/ocr-client'
 import { useStoreState } from '@/lib/stores/store-context'
@@ -85,6 +86,39 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
   const [_selectedBatch, setSelectedBatch] = useState<AvailableBatch | null>(null)
   const [ocrError, setOcrError] = useState<string | null>(null)
   const [_quantity, setQuantity] = useState<number>(1)
+
+  // Check if auto-OCR is enabled via environment variable
+  const isAutoOCREnabled = process.env.NEXT_PUBLIC_AUTO_OCR_ENABLED === 'true'
+
+  // Auto-OCR scanner with intelligent pre-checks for batch selection
+  const autoOCRScanner = useAutoOCRScanner({
+    isEnabled:
+      isAutoOCREnabled && // Feature flag check
+      currentStep === 'batch-selection' &&
+      availableBatches.length > 0,
+    storeId: activeStore?.store_id || '',
+    onExpiryDetected: expiryInfo => {
+      if (expiryInfo.extractedDate && availableBatches.length > 0) {
+        // Try to match the captured date to an available batch
+        const matchedBatch = matchBatchByExpiry(availableBatches, expiryInfo.extractedDate)
+
+        if (matchedBatch) {
+          handleBatchSelected(matchedBatch)
+          setOcrError(null)
+        } else {
+          // No matching batch found
+          setOcrError(
+            t('noBatchFoundWithExpiry', {
+              date: expiryInfo.extractedDate,
+            }),
+          )
+        }
+      }
+    },
+    maxAttempts: 10,
+    preCheckIntervalMs: 500,
+    debug: process.env.NODE_ENV === 'development',
+  })
 
   const handleCustomBarcodeScanned = async (barcode: string, _productData?: unknown) => {
     if (!activeStore) {
@@ -397,12 +431,13 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
           <ScanningCamera
             mode="ocr"
             onOCRCapture={handleOCRExpiryCapture}
-            isOCRProcessing={isOCRProcessing}
+            isOCRProcessing={isOCRProcessing || autoOCRScanner.isAnalyzing}
             ocrError={ocrError}
             onClearOCRError={clearOCRError}
             title={t('captureExpiryDate')}
             subtitle={t('pointCameraAtExpiry')}
             autoStart={true}
+            autoOCRState={isAutoOCREnabled ? autoOCRScanner : undefined}
           />
 
           <BatchSelectionList
