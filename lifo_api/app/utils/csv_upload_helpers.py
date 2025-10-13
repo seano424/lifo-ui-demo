@@ -52,10 +52,10 @@ class CSVUploadValidator:
 
     @staticmethod
     def validate_chunk_size(chunk_size: int) -> None:
-        """Validate chunk size parameter"""
-        if chunk_size < 1 or chunk_size > 100:
+        """Validate chunk size parameter (optimized for performance)"""
+        if chunk_size < 1 or chunk_size > 500:
             raise HTTPException(
-                status_code=400, detail="Chunk size must be between 1 and 100"
+                status_code=400, detail="Chunk size must be between 1 and 500"
             )
 
 
