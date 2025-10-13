@@ -389,17 +389,17 @@ describe('useScanOutActions', () => {
         error: null,
       })
 
-      mockSupabase.rpc
-        .mockResolvedValueOnce({
-          // check_store_access
-          data: [{ user_id: 'user-1', role_in_store: 'owner', is_active: true }],
-          error: null,
-        })
-        .mockResolvedValueOnce({
-          // update_batch_quantity
-          data: [{ success: true, new_quantity: 5, error_message: null }],
-          error: null,
-        })
+      mockSupabase.rpc.mockResolvedValueOnce({
+        // batch_update_quantities
+        data: {
+          results: [{ batch_id: 'batch-1', success: true, new_quantity: 5, error_message: null }],
+          success: true,
+          store_id: 'store-1',
+          timestamp: new Date().toISOString(),
+          processed_count: 1,
+        },
+        error: null,
+      })
 
       const { result } = renderHook(() => useScanOutActions(), {
         wrapper: createWrapper(),
