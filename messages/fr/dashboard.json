@@ -66,6 +66,8 @@
       "title": "Sortie des produits",
       "description": "Scannez les articles à retirer de votre inventaire. Chaque scan retire automatiquement le lot le plus récent du produit scanné, selon le principe LIFO.",
       "recentlyRemoved": "{count, plural, =0 {Aucun article retiré} =1 {1 article retiré} other {# articles retirés}}",
+      "removedQuantityExpires": "Retiré {quantity}x • Expire le : {date}",
+      "andMoreItems": "... et {count} autres articles",
       "success": "Produit retiré avec succès"
     },
     "errors": {
@@ -556,6 +558,9 @@
     "noInventoryAvailable": "Aucun inventaire disponible pour ce produit dans le magasin actuel.",
     "ocrProcessingFailed": "Le traitement OCR a échoué",
     "batchRemovalNote": "Retrait de lot : {productName} x{quantity}",
+    "recentlyRemoved": "Récemment retiré ({count} articles)",
+    "removedQuantityExpires": "Retiré {quantity}x • Expire le : {date}",
+    "andMoreItems": "... et {count} autres articles",
     "cancel": "Annuler"
   },
   "buttons": {

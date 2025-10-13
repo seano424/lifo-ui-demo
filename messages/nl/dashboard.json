@@ -66,6 +66,8 @@
       "title": "Producten Uitslag",
       "description": "Scan artikelen om ze uit uw voorraad te verwijderen. Elke scan verwijdert automatisch de meest recente batch van het gescande product, volgens het LIFO-principe.",
       "recentlyRemoved": "{count, plural, =0 {Geen artikelen verwijderd} =1 {1 artikel verwijderd} other {# artikelen verwijderd}}",
+      "removedQuantityExpires": "Verwijderd {quantity}x • Verloopt op: {date}",
+      "andMoreItems": "... en {count} meer items",
       "success": "Product succesvol verwijderd"
     },
     "errors": {
@@ -556,6 +558,9 @@
     "noInventoryAvailable": "Geen voorraad beschikbaar voor dit product in de huidige winkel.",
     "ocrProcessingFailed": "OCR-verwerking mislukt",
     "batchRemovalNote": "Batch verwijdering: {productName} x{quantity}",
+    "recentlyRemoved": "Recent verwijderd ({count} items)",
+    "removedQuantityExpires": "Verwijderd {quantity}x • Verloopt op: {date}",
+    "andMoreItems": "... en {count} meer items",
     "cancel": "Annuleren"
   },
   "buttons": {
