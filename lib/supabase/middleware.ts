@@ -100,7 +100,24 @@ export async function updateSession(request: NextRequest) {
         }
         break
       }
-    } catch {
+    } catch (err) {
+      // Handle connection errors (EPIPE, ECONNRESET, etc.)
+      const errorMessage = err instanceof Error ? err.message : String(err)
+
+      // Connection aborted/closed - don't log as error, don't retry
+      if (
+        errorMessage.includes('EPIPE') ||
+        errorMessage.includes('ECONNRESET') ||
+        errorMessage.includes('ECONNABORTED') ||
+        errorMessage.includes('connection closed')
+      ) {
+        logger.query('middleware', 'Connection closed during auth check')
+        networkError = false // Don't treat as network error
+        user = null
+        break // Exit retry loop
+      }
+
+      // Other network errors - retry once
       networkError = true
       if (attempt < 2) {
         await new Promise(resolve => setTimeout(resolve, 300))
