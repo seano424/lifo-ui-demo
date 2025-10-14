@@ -224,6 +224,8 @@
     "searchPlaceholder": "Zoek producten...",
     "activeFilters": "Actieve filters toegepast",
     "clearAll": "Alles wissen",
+    "showFilters": "Filters tonen",
+    "hideFilters": "Filters verbergen",
     "urgency": {
       "all": "Alle urgentieniveaus",
       "critical": "Kritiek",
