@@ -587,6 +587,75 @@ async def upload_csv_and_create_batches(
             workflow_optimized=True,
         )
 
+        # 🎯 AUTO-TRIGGER SCORING FOR SMALL-TO-MEDIUM UPLOADS
+        # After successful batch creation, automatically trigger scoring for uploads ≤1,000 items
+        # This provides immediate urgency scores without manual intervention
+        successful_batches = response_data["batch_creation"]["successful_batches"]
+        total_items = response_data["batch_creation"]["total_requests"]
+
+        if successful_batches > 0:
+            # Hybrid approach: auto-trigger for ≤1,000 items, manual for larger
+            AUTO_SCORE_THRESHOLD = 1000
+
+            if total_items <= AUTO_SCORE_THRESHOLD:
+                try:
+                    # Import the automated scoring scheduler
+                    from app.core.automated_scoring import get_automated_scoring_scheduler
+
+                    scheduler = get_automated_scoring_scheduler()
+
+                    # Trigger immediate scoring (force_recalculate=False to be efficient)
+                    job_id = await scheduler.trigger_immediate_scoring(
+                        store_id, force_recalculate=False
+                    )
+
+                    # Add job_id to response so user can track progress
+                    response_data["auto_scoring"] = {
+                        "triggered": True,
+                        "job_id": job_id,
+                        "message": f"Automatic scoring triggered for {successful_batches} new batches",
+                        "note": "Track scoring progress using the job_id",
+                    }
+
+                    logger.info(
+                        "Auto-triggered scoring after CSV upload",
+                        store_id=store_id,
+                        job_id=job_id,
+                        total_items=total_items,
+                        successful_batches=successful_batches,
+                        user_id=current_user["sub"],
+                    )
+
+                except Exception as scoring_error:
+                    # Don't fail the entire request if auto-scoring fails
+                    logger.warning(
+                        "Failed to auto-trigger scoring after CSV upload",
+                        store_id=store_id,
+                        total_items=total_items,
+                        error=str(scoring_error),
+                        user_id=current_user["sub"],
+                    )
+                    response_data["auto_scoring"] = {
+                        "triggered": False,
+                        "error": str(scoring_error),
+                        "message": "Automatic scoring failed. Trigger manually if needed.",
+                    }
+            else:
+                # For large uploads, suggest manual trigger
+                response_data["auto_scoring"] = {
+                    "triggered": False,
+                    "message": f"Large upload detected ({total_items} items). Trigger scoring manually when ready.",
+                    "note": f"Uploads with >{AUTO_SCORE_THRESHOLD} items require manual scoring trigger to avoid system overload.",
+                }
+
+                logger.info(
+                    "Large CSV upload - scoring not auto-triggered",
+                    store_id=store_id,
+                    total_items=total_items,
+                    threshold=AUTO_SCORE_THRESHOLD,
+                    user_id=current_user["sub"],
+                )
+
         return response_data
 
     except HTTPException:

@@ -1334,7 +1334,13 @@ class SecureReadOnlyOperations:
         self, store_id: str, product_ids: list[str], days: int = 30
     ) -> dict[str, dict[str, Any]]:
         """
-        BULK OPTIMIZATION: Get sales velocity data for multiple products in single query
+        BULK OPTIMIZATION: Get sales velocity data for multiple products with CHUNKING
+
+        FIXED: Multiple issues addressed:
+        1. Chunks product IDs to avoid URL length limits (7,584 products → 500 per chunk)
+        2. Uses correct column names (batch_id, quantity vs product_id, quantity_sold)
+        3. JOINs with inventory.batches to get product_id from batch_id
+
         Returns: {product_id: {avg_daily_sales: float, total_sales: int, ...}}
         """
         try:
@@ -1352,28 +1358,127 @@ class SecureReadOnlyOperations:
 
             start_date = (datetime.now() - timedelta(days=days)).date().isoformat()
 
-            # Get sales data for all products in single query
-            result = (
-                admin_client.schema("sales")
-                .table("transactions")
-                .select("product_id, quantity_sold, sale_date")
-                .eq("store_id", store_id)
-                .in_("product_id", product_ids)
-                .gte("sale_date", start_date)
-                .execute()
+            # First, get batch_ids for the products we're interested in
+            # CRITICAL: Must chunk product_ids to avoid URL length limits
+            self.logger.info(
+                "Fetching batch mappings for product velocity calculation",
+                store_id=store_id,
+                product_count=len(product_ids),
             )
 
+            # FIXED: Chunk product_ids for batch mapping query (same 500 limit)
+            PRODUCT_CHUNK_SIZE = 500
+            all_batch_mappings = []
+
+            for i in range(0, len(product_ids), PRODUCT_CHUNK_SIZE):
+                product_chunk = product_ids[i:i + PRODUCT_CHUNK_SIZE]
+
+                try:
+                    # Get batch_id to product_id mapping for this chunk
+                    batch_result = (
+                        admin_client.schema("inventory")
+                        .table("batches")
+                        .select("batch_id, product_id")
+                        .eq("store_id", store_id)
+                        .in_("product_id", product_chunk)
+                        .execute()
+                    )
+
+                    if batch_result.data:
+                        all_batch_mappings.extend(batch_result.data)
+
+                except Exception as mapping_error:
+                    self.logger.warning(
+                        "Failed to fetch batch mappings for product chunk",
+                        store_id=store_id,
+                        chunk_index=i // PRODUCT_CHUNK_SIZE,
+                        chunk_size=len(product_chunk),
+                        error=str(mapping_error),
+                    )
+                    continue
+
+            if not all_batch_mappings:
+                self.logger.info(
+                    "No batches found for products",
+                    store_id=store_id,
+                    product_count=len(product_ids),
+                )
+                # Return default values for all products
+                return {
+                    product_id: {
+                        "avg_daily_sales": 1.0,
+                        "total_sales": 0,
+                        "total_quantity": 0,
+                    }
+                    for product_id in product_ids
+                }
+
+            # Create batch_id -> product_id mapping
+            batch_to_product = {
+                batch["batch_id"]: batch["product_id"]
+                for batch in all_batch_mappings
+            }
+            batch_ids = list(batch_to_product.keys())
+
+            self.logger.info(
+                "Batch mappings retrieved (CHUNKED)",
+                store_id=store_id,
+                product_count=len(product_ids),
+                batch_count=len(batch_ids),
+                chunks_processed=(len(product_ids) + PRODUCT_CHUNK_SIZE - 1) // PRODUCT_CHUNK_SIZE,
+            )
+
+            # FIXED: Chunk batch IDs to avoid URL length limits
+            # URL length limit typically ~2000-8000 chars
+            # Each UUID is ~36 chars, so 500 batch_ids = ~18,000 chars in URL (safe)
+            CHUNK_SIZE = 500
+            all_sales_data = []
+
+            # Process in chunks
+            for i in range(0, len(batch_ids), CHUNK_SIZE):
+                chunk = batch_ids[i:i + CHUNK_SIZE]
+
+                try:
+                    # Get sales data for this chunk of batches
+                    # FIXED: Use correct column names from actual schema
+                    result = (
+                        admin_client.schema("sales")
+                        .table("transactions")
+                        .select("batch_id, quantity, sale_date")
+                        .eq("store_id", store_id)
+                        .in_("batch_id", chunk)
+                        .gte("sale_date", start_date)
+                        .execute()
+                    )
+
+                    if result.data:
+                        all_sales_data.extend(result.data)
+
+                except Exception as chunk_error:
+                    self.logger.warning(
+                        "Failed to fetch velocity data for chunk",
+                        store_id=store_id,
+                        chunk_index=i // CHUNK_SIZE,
+                        chunk_size=len(chunk),
+                        error=str(chunk_error),
+                    )
+                    continue
+
             # Process results into velocity data per product
+            # FIXED: Map batch_id -> product_id and aggregate by product
             velocity_data = {}
+
             for product_id in product_ids:
+                # Find all sales for batches belonging to this product
                 product_sales = [
                     sale
-                    for sale in (result.data or [])
-                    if sale["product_id"] == product_id
+                    for sale in all_sales_data
+                    if batch_to_product.get(sale["batch_id"]) == product_id
                 ]
 
+                # FIXED: Use 'quantity' column (not 'quantity_sold')
                 total_quantity = sum(
-                    sale.get("quantity_sold", 0) for sale in product_sales
+                    sale.get("quantity", 0) for sale in product_sales
                 )
                 avg_daily_sales = total_quantity / days if days > 0 else 0
 
@@ -1384,9 +1489,11 @@ class SecureReadOnlyOperations:
                 }
 
             self.logger.info(
-                "Bulk velocity data retrieved",
+                "Bulk velocity data retrieved (CHUNKED)",
                 store_id=store_id,
                 products_count=len(product_ids),
+                chunks_processed=(len(product_ids) + CHUNK_SIZE - 1) // CHUNK_SIZE,
+                total_sales_records=len(all_sales_data),
                 days=days,
             )
 

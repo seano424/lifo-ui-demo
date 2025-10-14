@@ -417,6 +417,23 @@ class HealthCheckBypassMiddleware(BaseHTTPMiddleware):
 
 app.add_middleware(HealthCheckBypassMiddleware)
 
+# CORS middleware MUST be early (before security middleware) to handle preflight OPTIONS requests
+# This allows the browser to check CORS headers before other security checks
+cors_origins = settings.get_cors_origins()
+logger.info(
+    "CORS middleware configured",
+    origins=cors_origins,
+    environment=settings.environment,
+)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=cors_origins,
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["*"],
+    expose_headers=["*"],
+)
+
 # Security middleware (order matters - most restrictive first)
 app.add_middleware(TrustedHostMiddleware, allowed_hosts=settings.get_allowed_hosts())
 
@@ -447,17 +464,6 @@ if settings.rate_limit_enabled:
 
 # Security blocking middleware
 app.middleware("http")(check_blocked_ip)
-
-# CORS middleware for frontend integration
-app.add_middleware(
-    CORSMiddleware,
-    # allow_origins=settings.get_cors_origins(),
-    allow_origins=["http://localhost:3000", "http://localhost:3001", "https://lifo-app.com", "https://www.lifo-app.com", "https://clownfish-app-y2uru.ondigitalocean.app"],
-    allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allow_headers=["*"],
-    expose_headers=["*"],
-)
 
 # Health check debugging middleware (for production troubleshooting)
 @app.middleware("http")

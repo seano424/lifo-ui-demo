@@ -772,8 +772,8 @@ class BatchCreationService:
         if not batch_requests:
             raise ValueError("No batch requests provided")
 
-        if chunk_size < 1 or chunk_size > 100:
-            raise ValueError("Chunk size must be between 1 and 100")
+        if chunk_size < 1 or chunk_size > 500:
+            raise ValueError("Chunk size must be between 1 and 500")
 
         total_requests = len(batch_requests)
         successful_batches = []
