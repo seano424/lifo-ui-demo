@@ -1359,24 +1359,45 @@ class SecureReadOnlyOperations:
             start_date = (datetime.now() - timedelta(days=days)).date().isoformat()
 
             # First, get batch_ids for the products we're interested in
-            # This is more efficient than joining on every transaction query
+            # CRITICAL: Must chunk product_ids to avoid URL length limits
             self.logger.info(
                 "Fetching batch mappings for product velocity calculation",
                 store_id=store_id,
                 product_count=len(product_ids),
             )
 
-            # Get batch_id to product_id mapping
-            batch_result = (
-                admin_client.schema("inventory")
-                .table("batches")
-                .select("batch_id, product_id")
-                .eq("store_id", store_id)
-                .in_("product_id", product_ids)
-                .execute()
-            )
+            # FIXED: Chunk product_ids for batch mapping query (same 500 limit)
+            PRODUCT_CHUNK_SIZE = 500
+            all_batch_mappings = []
 
-            if not batch_result.data:
+            for i in range(0, len(product_ids), PRODUCT_CHUNK_SIZE):
+                product_chunk = product_ids[i:i + PRODUCT_CHUNK_SIZE]
+
+                try:
+                    # Get batch_id to product_id mapping for this chunk
+                    batch_result = (
+                        admin_client.schema("inventory")
+                        .table("batches")
+                        .select("batch_id, product_id")
+                        .eq("store_id", store_id)
+                        .in_("product_id", product_chunk)
+                        .execute()
+                    )
+
+                    if batch_result.data:
+                        all_batch_mappings.extend(batch_result.data)
+
+                except Exception as mapping_error:
+                    self.logger.warning(
+                        "Failed to fetch batch mappings for product chunk",
+                        store_id=store_id,
+                        chunk_index=i // PRODUCT_CHUNK_SIZE,
+                        chunk_size=len(product_chunk),
+                        error=str(mapping_error),
+                    )
+                    continue
+
+            if not all_batch_mappings:
                 self.logger.info(
                     "No batches found for products",
                     store_id=store_id,
@@ -1395,14 +1416,16 @@ class SecureReadOnlyOperations:
             # Create batch_id -> product_id mapping
             batch_to_product = {
                 batch["batch_id"]: batch["product_id"]
-                for batch in batch_result.data
+                for batch in all_batch_mappings
             }
             batch_ids = list(batch_to_product.keys())
 
             self.logger.info(
-                "Batch mappings retrieved",
+                "Batch mappings retrieved (CHUNKED)",
                 store_id=store_id,
+                product_count=len(product_ids),
                 batch_count=len(batch_ids),
+                chunks_processed=(len(product_ids) + PRODUCT_CHUNK_SIZE - 1) // PRODUCT_CHUNK_SIZE,
             )
 
             # FIXED: Chunk batch IDs to avoid URL length limits

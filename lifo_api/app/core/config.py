@@ -28,10 +28,11 @@ class Settings(BaseSettings):
         description="Allowed hosts for the server (comma-separated string or list)",
     )
 
-    # CORS Configuration
-    cors_origins: str | list[str] = Field(
+    # CORS Configuration (FastAPI standard naming)
+    backend_cors_origins: str | list[str] = Field(
         default="http://localhost:3000,http://localhost:3001,http://127.0.0.1:3000",
-        description="CORS allowed origins (comma-separated string or list)",
+        description="Backend CORS allowed origins (comma-separated string or list)",
+        alias="cors_origins",  # Accept both BACKEND_CORS_ORIGINS and CORS_ORIGINS
     )
 
     # Production URLs (set via environment variables)
@@ -254,7 +255,7 @@ class Settings(BaseSettings):
         default=80, description="CPU usage warning threshold (%)"
     )
 
-    @field_validator("cors_origins", "allowed_hosts", "api_keys", mode="before")
+    @field_validator("backend_cors_origins", "allowed_hosts", "api_keys", mode="before")
     @classmethod
     def parse_list_fields(cls, v) -> list[str]:
         """Parse comma-separated strings or lists into lists of strings"""
@@ -274,11 +275,11 @@ class Settings(BaseSettings):
         return self.allowed_hosts or ["*"]
 
     @property
-    def cors_origins_list(self) -> list[str]:
-        """Get cors_origins as a list"""
-        if isinstance(self.cors_origins, str):
-            return self.parse_list_fields(self.cors_origins)
-        return self.cors_origins or []
+    def backend_cors_origins_list(self) -> list[str]:
+        """Get backend_cors_origins as a list"""
+        if isinstance(self.backend_cors_origins, str):
+            return self.parse_list_fields(self.backend_cors_origins)
+        return self.backend_cors_origins or []
 
     @property
     def api_keys_list(self) -> list[str]:
@@ -292,22 +293,28 @@ class Settings(BaseSettings):
         if self.environment == "production":
             origins = []
 
-            # Add ONLY explicitly configured frontend URL in production
+            # 1. Use BACKEND_CORS_ORIGINS environment variable if explicitly set
+            if self.backend_cors_origins_list:
+                # Filter to only HTTPS origins in production
+                origins.extend([
+                    origin for origin in self.backend_cors_origins_list
+                    if origin.startswith("https://")
+                ])
+
+            # 2. Add frontend URL if configured
             if self.frontend_url:
                 # Validate URL format
                 if self.frontend_url.startswith("https://"):
-                    origins.append(self.frontend_url)
+                    if self.frontend_url not in origins:
+                        origins.append(self.frontend_url)
 
                     # Add www subdomain only if original doesn't have it
                     if not self.frontend_url.startswith("https://www."):
                         www_url = self.frontend_url.replace("https://", "https://www.")
-                        origins.append(www_url)
-                else:
-                    # In production, only HTTPS is allowed
-                    pass
+                        if www_url not in origins:
+                            origins.append(www_url)
 
-            # For DigitalOcean App Platform health checks - add null origin for internal requests
-            # Health checks come from internal networks without proper origins
+            # 3. Fallback: if no origins configured, allow localhost for initial setup
             if not origins:
                 # Allow requests with no origin (internal health checks) and localhost for testing
                 origins.extend(
@@ -317,21 +324,29 @@ class Settings(BaseSettings):
             return origins
 
         elif self.environment == "staging":
-            # Staging environment - limited CORS
+            # Staging environment - use BACKEND_CORS_ORIGINS or frontend_url
             origins = []
-            if self.frontend_url:
+
+            # 1. Use BACKEND_CORS_ORIGINS environment variable if set
+            if self.backend_cors_origins_list:
+                origins.extend(self.backend_cors_origins_list)
+
+            # 2. Add frontend URL if configured
+            if self.frontend_url and self.frontend_url not in origins:
                 origins.append(self.frontend_url)
 
-            # Limited development origins for staging
-            origins.extend(
-                [
-                    "http://localhost:3000",  # Local development
-                ]
-            )
+            # 3. Always allow localhost for development
+            if "http://localhost:3000" not in origins:
+                origins.append("http://localhost:3000")
+
             return origins
 
-        # Development only - use default origins
-        return self.cors_origins_list
+        # Development - use BACKEND_CORS_ORIGINS environment variable
+        return self.backend_cors_origins_list if self.backend_cors_origins_list else [
+            "http://localhost:3000",
+            "http://localhost:3001",
+            "http://127.0.0.1:3000"
+        ]
 
     def get_allowed_hosts(self) -> list[str]:
         """Get allowed hosts based on environment - SECURE VERSION"""
