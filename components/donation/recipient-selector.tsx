@@ -1,17 +1,26 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Plus, Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Typography } from '@/components/ui/typography'
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import {
   useDonationRecipients,
   ADHOC_PRESETS,
   type DonationRecipient,
+  type CreateRecipientData,
 } from '@/hooks/use-donation-recipients'
 import { useTranslations } from 'next-intl'
+import { logger } from '@/lib/utils/logger'
 
 interface RecipientSelectorProps {
   storeId: string | undefined
@@ -25,9 +34,9 @@ interface RecipientSelectorProps {
  * Shared component for selecting donation recipients
  *
  * Supports:
- * - Database recipients (permanent records)
- * - Quick presets (Employee, Family & Friends, etc.)
- * - Custom ad-hoc recipients (temporary entries)
+ * - Database recipients (permanent records) - shown at top
+ * - Quick presets (Employee, Family & Friends, etc.) - ad-hoc, temporary
+ * - Custom recipients form - creates permanent DB records with full details
  *
  * Used in:
  * - DonateTab (todos dialog)
@@ -56,11 +65,35 @@ export function RecipientSelector({
   const t = useTranslations('donation')
   const tCommon = useTranslations()
 
-  const { recipients, isLoading, addAdhocRecipient, ADHOC_RECIPIENT_UUID } =
-    useDonationRecipients(storeId)
+  const {
+    recipients,
+    isLoading,
+    addAdhocRecipient,
+    createRecipient,
+    isCreating,
+    ADHOC_RECIPIENT_UUID,
+  } = useDonationRecipients(storeId)
 
   const [showCustomInput, setShowCustomInput] = useState(false)
   const [customName, setCustomName] = useState('')
+  const [customType, setCustomType] = useState<DonationRecipient['type']>('charity')
+  const [customEmail, setCustomEmail] = useState('')
+  const [customPhone, setCustomPhone] = useState('')
+
+  // Log recipients whenever they change
+  useEffect(() => {
+    const dbRecipients = recipients.filter(r => !r.isAdhoc)
+    const adhocRecipients = recipients.filter(r => r.isAdhoc)
+
+    logger.log('RecipientSelector', 'Recipients updated', {
+      storeId,
+      totalCount: recipients.length,
+      dbCount: dbRecipients.length,
+      adhocCount: adhocRecipients.length,
+      dbRecipientNames: dbRecipients.map(r => r.name),
+      adhocRecipientNames: adhocRecipients.map(r => r.name),
+    })
+  }, [recipients, storeId])
 
   // Handle preset selection
   const handlePresetSelect = (presetName: string) => {
@@ -69,14 +102,53 @@ export function RecipientSelector({
     setShowCustomInput(false)
   }
 
-  // Handle custom name submission
-  const handleCustomSubmit = () => {
-    if (!customName.trim()) return
-
-    addAdhocRecipient(customName)
-    onRecipientSelect(ADHOC_RECIPIENT_UUID, customName)
+  // Reset custom form
+  const resetCustomForm = () => {
     setCustomName('')
+    setCustomType('charity')
+    setCustomEmail('')
+    setCustomPhone('')
     setShowCustomInput(false)
+  }
+
+  // Handle custom recipient creation (saves to DB)
+  const handleCustomSubmit = () => {
+    if (!customName.trim()) {
+      logger.warn('RecipientSelector', 'Submit blocked - name is empty')
+      return
+    }
+
+    const recipientData: CreateRecipientData = {
+      name: customName.trim(),
+      type: customType,
+      contactEmail: customEmail.trim() || undefined,
+      contactPhone: customPhone.trim() || undefined,
+    }
+
+    logger.log('RecipientSelector', 'Submitting new recipient', {
+      recipientData,
+      storeId,
+    })
+
+    // Create permanent DB recipient
+    // Note: The mutation's onSuccess in the hook handles query invalidation
+    // We need to include BOTH the mutation's onSuccess AND our custom logic
+    createRecipient(recipientData, {
+      onSuccess: createdRecipient => {
+        logger.log('RecipientSelector', 'Recipient created successfully (component callback)', {
+          createdRecipient,
+        })
+        // Select the newly created recipient
+        onRecipientSelect(createdRecipient.id, createdRecipient.name)
+        resetCustomForm()
+      },
+      onError: error => {
+        logger.error('RecipientSelector', 'Failed to create recipient (component callback)', {
+          error,
+          recipientData,
+        })
+      },
+    })
   }
 
   // Handle DB recipient selection
@@ -154,7 +226,7 @@ export function RecipientSelector({
         </div>
       </div>
 
-      {/* Custom Entry */}
+      {/* Custom Entry - Creates Permanent DB Recipient */}
       <div className="mt-4 space-y-2">
         {!showCustomInput ? (
           <Button
@@ -164,38 +236,116 @@ export function RecipientSelector({
             className="w-full justify-start"
           >
             <Plus className="h-4 w-4 mr-2" />
-            {t('addCustomRecipient') || 'Add Custom Recipient'}
+            {t('addCustomRecipient') || 'Add New Recipient'}
           </Button>
         ) : (
-          <div className="space-y-2">
-            <Label htmlFor="custom-recipient">
-              {t('customRecipientName') || 'Custom Recipient Name'}
-            </Label>
-            <div className="flex gap-2">
+          <div className="space-y-3 p-4 border rounded-lg bg-gray-50 dark:bg-gray-900">
+            <Typography variant="muted" className="text-sm font-medium">
+              {t('newRecipientDetails') || 'New Recipient Details'}
+            </Typography>
+
+            {/* Name Field */}
+            <div className="space-y-1">
+              <Label htmlFor="custom-recipient" className="text-xs">
+                {t('recipientName') || 'Recipient Name'} *
+              </Label>
               <Input
                 id="custom-recipient"
                 value={customName}
                 onChange={e => setCustomName(e.target.value)}
-                placeholder={t('customRecipientPlaceholder') || 'e.g., Local School, Church...'}
+                placeholder={t('customRecipientPlaceholder') || 'e.g., Local Food Bank'}
                 onKeyDown={e => {
-                  if (e.key === 'Enter') handleCustomSubmit()
-                  if (e.key === 'Escape') {
-                    setShowCustomInput(false)
-                    setCustomName('')
-                  }
+                  if (e.key === 'Enter' && customName.trim()) handleCustomSubmit()
+                  if (e.key === 'Escape') resetCustomForm()
                 }}
                 autoFocus
               />
-              <Button onClick={handleCustomSubmit} disabled={!customName.trim()}>
-                {tCommon('add') || 'Add'}
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setShowCustomInput(false)
-                  setCustomName('')
-                }}
+            </div>
+
+            {/* Type Selector */}
+            <div className="space-y-1">
+              <Label htmlFor="custom-type" className="text-xs">
+                {t('recipientType') || 'Type'} *
+              </Label>
+              <Select
+                value={customType}
+                onValueChange={value => setCustomType(value as DonationRecipient['type'])}
               >
+                <SelectTrigger id="custom-type">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="charity">{t('type.charity') || 'Charity'}</SelectItem>
+                  <SelectItem value="food_bank">{t('type.foodBank') || 'Food Bank'}</SelectItem>
+                  <SelectItem value="soup_kitchen">
+                    {t('type.soupKitchen') || 'Soup Kitchen'}
+                  </SelectItem>
+                  <SelectItem value="religious_org">
+                    {t('type.religiousOrg') || 'Religious Organization'}
+                  </SelectItem>
+                  <SelectItem value="community_group">
+                    {t('type.communityGroup') || 'Community Group'}
+                  </SelectItem>
+                  <SelectItem value="animal_shelter">
+                    {t('type.animalShelter') || 'Animal Shelter'}
+                  </SelectItem>
+                  <SelectItem value="school">{t('type.school') || 'School'}</SelectItem>
+                  <SelectItem value="elderly_care">
+                    {t('type.elderlyCare') || 'Elderly Care'}
+                  </SelectItem>
+                  <SelectItem value="homeless_shelter">
+                    {t('type.homelessShelter') || 'Homeless Shelter'}
+                  </SelectItem>
+                  <SelectItem value="other">{t('type.other') || 'Other'}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Contact Email (Optional) */}
+            <div className="space-y-1">
+              <Label htmlFor="custom-email" className="text-xs">
+                {t('contactEmail') || 'Contact Email'} ({tCommon('optional') || 'optional'})
+              </Label>
+              <Input
+                id="custom-email"
+                type="email"
+                value={customEmail}
+                onChange={e => setCustomEmail(e.target.value)}
+                placeholder="contact@example.org"
+              />
+            </div>
+
+            {/* Contact Phone (Optional) */}
+            <div className="space-y-1">
+              <Label htmlFor="custom-phone" className="text-xs">
+                {t('contactPhone') || 'Contact Phone'} ({tCommon('optional') || 'optional'})
+              </Label>
+              <Input
+                id="custom-phone"
+                type="tel"
+                value={customPhone}
+                onChange={e => setCustomPhone(e.target.value)}
+                placeholder="+1 (555) 123-4567"
+              />
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex gap-2 pt-2">
+              <Button
+                onClick={handleCustomSubmit}
+                disabled={!customName.trim() || isCreating}
+                className="flex-1"
+              >
+                {isCreating ? (
+                  <>
+                    <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full mr-2" />
+                    {tCommon('saving') || 'Saving...'}
+                  </>
+                ) : (
+                  tCommon('save') || 'Save'
+                )}
+              </Button>
+              <Button variant="outline" onClick={resetCustomForm} disabled={isCreating}>
                 {tCommon('cancel') || 'Cancel'}
               </Button>
             </div>

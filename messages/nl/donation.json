@@ -5,5 +5,22 @@
   "addCustomRecipient": "Aangepaste ontvanger toevoegen",
   "customRecipientName": "Aangepaste ontvangersnaam",
   "customRecipientPlaceholder": "bijv., Lokale school, Kerk...",
-  "recentQuickOptions": "Recente snelle opties"
+  "recentQuickOptions": "Recente snelle opties",
+  "newRecipientDetails": "Nieuwe ontvanger details",
+  "recipientName": "Ontvanger naam",
+  "recipientType": "Type",
+  "contactEmail": "Contact e-mail",
+  "contactPhone": "Contact telefoon",
+  "type": {
+    "charity": "Goed doel",
+    "foodBank": "Voedselbank",
+    "soupKitchen": "Gaarkeuken",
+    "religiousOrg": "Religieuze organisatie",
+    "communityGroup": "Gemeenschapsgroep",
+    "animalShelter": "Dierenopvang",
+    "school": "School",
+    "elderlyCare": "Ouderenzorg",
+    "homelessShelter": "Daklozenopvang",
+    "other": "Overig"
+  }
 }

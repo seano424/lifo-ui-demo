@@ -137,5 +137,6 @@
   "close": "Close",
   "save": "Save",
   "edit": "Edit",
-  "saving": "Saving..."
+  "saving": "Saving...",
+  "optional": "optional"
 }

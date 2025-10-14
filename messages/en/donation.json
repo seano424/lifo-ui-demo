@@ -5,5 +5,22 @@
   "addCustomRecipient": "Add Custom Recipient",
   "customRecipientName": "Custom Recipient Name",
   "customRecipientPlaceholder": "e.g., Local School, Church...",
-  "recentQuickOptions": "Recent Quick Options"
+  "recentQuickOptions": "Recent Quick Options",
+  "newRecipientDetails": "New Recipient Details",
+  "recipientName": "Recipient Name",
+  "recipientType": "Type",
+  "contactEmail": "Contact Email",
+  "contactPhone": "Contact Phone",
+  "type": {
+    "charity": "Charity",
+    "foodBank": "Food Bank",
+    "soupKitchen": "Soup Kitchen",
+    "religiousOrg": "Religious Organization",
+    "communityGroup": "Community Group",
+    "animalShelter": "Animal Shelter",
+    "school": "School",
+    "elderlyCare": "Elderly Care",
+    "homelessShelter": "Homeless Shelter",
+    "other": "Other"
+  }
 }
