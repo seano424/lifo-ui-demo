@@ -571,6 +571,9 @@
     "recentlyRemoved": "Récemment retiré ({count} articles)",
     "removedQuantityExpires": "Retiré {quantity}x • Expire le : {date}",
     "andMoreItems": "... et {count} autres articles",
+    "donationRecipientRequired": "Veuillez sélectionner un destinataire de don pour : {itemNames}",
+    "disposalReasonRequired": "Veuillez fournir une raison d'élimination pour : {itemNames}",
+    "selectRecipientRequired": "Veuillez sélectionner un destinataire",
     "cancel": "Annuler"
   },
   "buttons": {

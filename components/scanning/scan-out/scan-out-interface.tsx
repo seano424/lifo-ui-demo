@@ -19,6 +19,8 @@ import { useOCRWithFallback } from '@/hooks/use-ocr-processing'
 import { captureImageFromVideo } from '@/lib/api/ocr-client'
 import { useStoreState } from '@/lib/stores/store-context'
 import { createClient } from '@/lib/supabase/client'
+import { RecipientSelector } from '@/components/donation/recipient-selector'
+import { toast } from 'sonner'
 
 import type { ScannedItem } from '../shared'
 import ActionTypeSelector from './action-type-selector'
@@ -44,6 +46,7 @@ interface PendingItem extends ScannedItem {
   maxQuantity: number
   actionType: ActionType
   donationRecipientId?: string
+  donationRecipientName?: string // For ad-hoc or display purposes
   disposalReason?: string
 }
 
@@ -313,9 +316,15 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
   }
 
   // Update donation recipient for an item
-  const updateItemDonationRecipient = (batchId: string, donationRecipientId: string) => {
+  const updateItemDonationRecipient = (
+    batchId: string,
+    donationRecipientId: string,
+    donationRecipientName: string,
+  ) => {
     setPendingItems(prev =>
-      prev.map(item => (item.batchId === batchId ? { ...item, donationRecipientId } : item)),
+      prev.map(item =>
+        item.batchId === batchId ? { ...item, donationRecipientId, donationRecipientName } : item,
+      ),
     )
   }
 
@@ -395,6 +404,48 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
   }
 
   const handleConfirmSubmission = () => {
+    // Validate donation items have recipients selected
+    const donationItemsWithoutRecipient = pendingItems.filter(
+      item => item.actionType === 'donate' && !item.donationRecipientId,
+    )
+
+    if (donationItemsWithoutRecipient.length > 0) {
+      const itemNames = donationItemsWithoutRecipient.map(item => item.productName).join(', ')
+      toast.error(
+        t('donationRecipientRequired') || `Please select a donation recipient for: ${itemNames}`,
+      )
+      console.error('[SCAN-OUT-UI] Validation failed: Donation items missing recipients', {
+        count: donationItemsWithoutRecipient.length,
+        items: donationItemsWithoutRecipient.map(item => ({
+          batchId: item.batchId,
+          productName: item.productName,
+          actionType: item.actionType,
+        })),
+      })
+      return // Prevent submission
+    }
+
+    // Validate disposal items have reasons
+    const disposalItemsWithoutReason = pendingItems.filter(
+      item => item.actionType === 'dispose' && !item.disposalReason?.trim(),
+    )
+
+    if (disposalItemsWithoutReason.length > 0) {
+      const itemNames = disposalItemsWithoutReason.map(item => item.productName).join(', ')
+      toast.error(
+        t('disposalReasonRequired') || `Please provide a disposal reason for: ${itemNames}`,
+      )
+      console.error('[SCAN-OUT-UI] Validation failed: Disposal items missing reasons', {
+        count: disposalItemsWithoutReason.length,
+        items: disposalItemsWithoutReason.map(item => ({
+          batchId: item.batchId,
+          productName: item.productName,
+          actionType: item.actionType,
+        })),
+      })
+      return // Prevent submission
+    }
+
     const checkoutItems = pendingItems.map(item => ({
       batchId: item.batchId,
       quantityRemoved: item.quantity,
@@ -405,9 +456,22 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
         productName: item.productName,
         quantity: item.quantity,
       }),
-      donationRecipientId: item.donationRecipientId, // Pass donation recipient if provided
+      donationRecipientId: item.donationRecipientId, // Pass donation recipient UUID if provided
+      donationRecipientName: item.donationRecipientName, // Pass donation recipient name (for ad-hoc or display)
       disposalReason: item.disposalReason, // Pass disposal reason if provided
     }))
+
+    // Debug log to verify donation recipient data
+    checkoutItems.forEach((item, index) => {
+      if (item.actionType === 'donate') {
+        console.log(`[SCAN-OUT-UI] Donation item #${index + 1}:`, {
+          donationRecipientId: item.donationRecipientId,
+          donationRecipientName: item.donationRecipientName,
+          hasRecipientId: !!item.donationRecipientId,
+          hasRecipientName: !!item.donationRecipientName,
+        })
+      }
+    })
 
     console.log('[SCAN-OUT-UI] Submitting checkout:', {
       itemCount: checkoutItems.length,
@@ -612,14 +676,23 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
                   {/* Action-specific inputs */}
                   {item.actionType === 'donate' && (
                     <div className="mt-2">
-                      <input
-                        type="text"
-                        placeholder={
-                          t('donationRecipientPlaceholder') || 'Donation recipient (optional)'
-                        }
-                        value={item.donationRecipientId || ''}
-                        onChange={e => updateItemDonationRecipient(item.batchId, e.target.value)}
-                        className="w-full px-2 py-1 text-xs border rounded-lg focus:ring-2 focus:ring-blue-500"
+                      {!item.donationRecipientId && (
+                        <div className="mb-2 text-sm text-red-600 font-medium">
+                          ⚠️ {t('selectRecipientRequired') || 'Please select a recipient'}
+                        </div>
+                      )}
+                      <RecipientSelector
+                        storeId={activeStore?.store_id}
+                        selectedRecipientId={item.donationRecipientId}
+                        selectedRecipientName={item.donationRecipientName}
+                        onRecipientSelect={(recipientId, recipientName) => {
+                          updateItemDonationRecipient(item.batchId, recipientId, recipientName)
+                        }}
+                        className={`p-2 bg-white dark:bg-gray-800 rounded-lg border ${
+                          !item.donationRecipientId
+                            ? 'border-red-500 border-2'
+                            : 'border-gray-200 dark:border-gray-700'
+                        }`}
                       />
                     </div>
                   )}

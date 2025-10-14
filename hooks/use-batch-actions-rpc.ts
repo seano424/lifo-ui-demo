@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import { ADHOC_RECIPIENT_UUID } from '@/hooks/use-donation-recipients'
 
 export interface ActionableBatch {
   batch_id: string
@@ -388,7 +389,13 @@ export function useBatchActionRPC(providedStoreId?: string) {
       const rpcParams = {
         p_batch_id: params.batchId,
         p_quantity_affected: params.quantity,
-        p_donation_recipient_id: params.donationRecipientId,
+        // Only pass donation_recipient_id if it's a real DB recipient (not ad-hoc)
+        // Ad-hoc recipients use the placeholder UUID, which doesn't exist in DB
+        // Pass null for ad-hoc recipients - the name is already in notes field
+        p_donation_recipient_id:
+          params.donationRecipientId && params.donationRecipientId !== ADHOC_RECIPIENT_UUID
+            ? params.donationRecipientId
+            : null,
         p_user_id: userId,
         p_notes: params.notes || null,
       } as DonateActionParams

@@ -571,6 +571,9 @@
     "recentlyRemoved": "Recent verwijderd ({count} items)",
     "removedQuantityExpires": "Verwijderd {quantity}x • Verloopt op: {date}",
     "andMoreItems": "... en {count} meer items",
+    "donationRecipientRequired": "Selecteer een donatieontvanger voor: {itemNames}",
+    "disposalReasonRequired": "Geef een verwijderingsreden op voor: {itemNames}",
+    "selectRecipientRequired": "Selecteer een ontvanger",
     "cancel": "Annuleren"
   },
   "buttons": {

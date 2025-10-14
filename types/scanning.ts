@@ -41,6 +41,9 @@ export interface ScanOutItem {
   price: number
   timestamp: Date
   actionType: ActionType // Action to perform when removing this batch
+  donationRecipientId?: string // Donation recipient UUID (if actionType === 'donate')
+  donationRecipientName?: string // Donation recipient name (for ad-hoc or display)
+  disposalReason?: string // Disposal reason (if actionType === 'dispose')
 }
 
 /**
@@ -53,8 +56,9 @@ export interface CheckoutItem {
   reason?: string // Optional additional reason/context
   storeId: string
   notes?: string
-  donationRecipientId?: string // Required when actionType === 'donate'
-  disposalReason?: string // Required when actionType === 'dispose'
+  donationRecipientId?: string // Donation recipient UUID (required when actionType === 'donate')
+  donationRecipientName?: string // Donation recipient name (for ad-hoc recipients or display)
+  disposalReason?: string // Disposal reason (required when actionType === 'dispose')
 }
 
 /**

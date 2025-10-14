@@ -569,6 +569,9 @@
     "recentlyRemoved": "Recently Removed ({count} items)",
     "removedQuantityExpires": "Removed {quantity}x • Expires: {date}",
     "andMoreItems": "... and {count} more items",
+    "donationRecipientRequired": "Please select a donation recipient for: {itemNames}",
+    "disposalReasonRequired": "Please provide a disposal reason for: {itemNames}",
+    "selectRecipientRequired": "Please select a recipient",
     "cancel": "Cancel"
   },
   "buttons": {

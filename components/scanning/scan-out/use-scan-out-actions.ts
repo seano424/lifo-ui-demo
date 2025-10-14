@@ -3,6 +3,7 @@ import { toast } from 'sonner'
 import { queryKeys } from '@/lib/queries/query-keys'
 import { createClient } from '@/lib/supabase/client'
 import type { AvailableBatch, CheckoutItem, CheckoutResult } from '@/types/scanning'
+import { ADHOC_RECIPIENT_UUID } from '@/hooks/use-donation-recipients'
 
 // Type for RPC function results
 interface BatchRPCResult {
@@ -192,15 +193,53 @@ export function useScanOutActions() {
 
       // Log the request payload for debugging
       const rpcPayload = {
-        p_items: items.map(item => ({
-          batch_id: item.batchId,
-          quantity: item.quantityRemoved,
-          action_type: item.actionType, // Use the new action_type field (sold/donate/dispose)
-          action_reason: item.reason || 'scan-out', // Keep for backward compatibility
-          notes: item.notes || '',
-          donation_recipient_id: item.donationRecipientId, // Required for 'donate' action
-          disposal_reason: item.disposalReason, // Required for 'dispose' action
-        })),
+        p_items: items.map(item => {
+          // Build notes field: include recipient name for ad-hoc donations
+          let notesField = item.notes || ''
+
+          // If this is a donation action and we have a recipient name, include it in notes
+          if (item.actionType === 'donate' && item.donationRecipientName) {
+            // Check if this is an ad-hoc recipient (UUID is special placeholder)
+            const isAdhoc = item.donationRecipientId === ADHOC_RECIPIENT_UUID
+
+            if (isAdhoc) {
+              // For ad-hoc recipients, prepend the recipient name to notes
+              const recipientNote = `Recipient: ${item.donationRecipientName}`
+              notesField = notesField ? `${recipientNote} | ${notesField}` : recipientNote
+            }
+          }
+
+          const recipientId =
+            item.actionType === 'donate' &&
+            item.donationRecipientId &&
+            item.donationRecipientId !== ADHOC_RECIPIENT_UUID
+              ? item.donationRecipientId
+              : null
+
+          // Debug log to verify the fix is working
+          if (item.actionType === 'donate') {
+            console.log('[SCAN-OUT] Donation recipient handling:', {
+              originalId: item.donationRecipientId,
+              isAdhoc: item.donationRecipientId === ADHOC_RECIPIENT_UUID,
+              finalIdToSend: recipientId,
+              recipientName: item.donationRecipientName,
+              ADHOC_UUID: ADHOC_RECIPIENT_UUID,
+            })
+          }
+
+          return {
+            batch_id: item.batchId,
+            quantity: item.quantityRemoved,
+            action_type: item.actionType, // Use the new action_type field (sold/donate/dispose)
+            action_reason: item.reason || 'scan-out', // Keep for backward compatibility
+            notes: notesField,
+            // Only pass donation_recipient_id if it's a real DB recipient (not ad-hoc)
+            // Ad-hoc recipients use the placeholder UUID, which doesn't exist in DB
+            // Pass null for ad-hoc recipients - the name is already in notes field
+            donation_recipient_id: recipientId,
+            disposal_reason: item.disposalReason, // Required for 'dispose' action
+          }
+        }),
         p_store_id: storeId,
       }
 
