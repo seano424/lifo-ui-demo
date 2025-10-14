@@ -21,11 +21,12 @@ import { useStoreState } from '@/lib/stores/store-context'
 import { createClient } from '@/lib/supabase/client'
 
 import type { ScannedItem } from '../shared'
+import ActionTypeSelector from './action-type-selector'
 import BatchSelectionList from '../shared/batch-selection-list'
 import ScanningCamera from '../shared/scanning-camera'
 import { useScanOutActions } from './use-scan-out-actions'
 import type { Database } from '@/types/supabase'
-import type { AvailableBatch } from '@/types/scanning'
+import type { ActionType, AvailableBatch } from '@/types/scanning'
 
 type batch = Database['inventory']['Tables']['batches']['Row']
 
@@ -41,6 +42,7 @@ interface CurrentProduct {
 interface PendingItem extends ScannedItem {
   batchId: string
   maxQuantity: number
+  actionType: ActionType
 }
 
 interface ScanOutInterfaceProps {
@@ -71,6 +73,9 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
   type ScanOutStep = 'scanning' | 'batch-selection'
   const [currentStep, setCurrentStep] = useState<ScanOutStep>('scanning')
   const [showManualEntry, setShowManualEntry] = useState(false)
+
+  // Global action type (default to 'sold')
+  const [globalActionType, setGlobalActionType] = useState<ActionType>('sold')
 
   // Available batches for the current product
   const [availableBatches, setAvailableBatches] = useState<AvailableBatch[]>([])
@@ -228,7 +233,7 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
   const handleBatchSelected = useCallback(
     (batch: AvailableBatch) => {
       if (currentProduct) {
-        // Add to pending list with default quantity of 1
+        // Add to pending list with default quantity of 1 and current global action type
         const newItem: PendingItem = {
           id: batch.batch.batch_id, // ← Access via batch.batch
           batchId: batch.batch.batch_id, // ← Access via batch.batch
@@ -240,6 +245,7 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
           expiryDate: batch.batch.expiry_date, // ← Access via batch.batch
           price: Number(batch.batch.cost_price), // ← Access via batch.batch
           timestamp: new Date(),
+          actionType: globalActionType, // Use the global action type
         }
 
         setPendingItems(prev => {
@@ -270,7 +276,7 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
         setSelectedBatch(null)
       }
     },
-    [currentProduct],
+    [currentProduct, globalActionType],
   )
 
   // Update item quantity in the pending list
@@ -284,6 +290,13 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
             }
           : item,
       ),
+    )
+  }
+
+  // Update item action type in the pending list
+  const updateItemActionType = (batchId: string, actionType: ActionType) => {
+    setPendingItems(prev =>
+      prev.map(item => (item.batchId === batchId ? { ...item, actionType } : item)),
     )
   }
 
@@ -361,6 +374,7 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
       pendingItems.map(item => ({
         batchId: item.batchId,
         quantityRemoved: item.quantity,
+        actionType: item.actionType, // Pass the action type (sold/donate/dispose)
         reason: 'scan-out',
         storeId: activeStore?.store_id || '',
         notes: t('batchRemovalNote', {
@@ -401,8 +415,42 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
   const totalItems = pendingItems.reduce((sum, item) => sum + item.quantity, 0)
   const totalValue = pendingItems.reduce((sum, item) => sum + item.quantity * item.price, 0)
 
+  // Calculate breakdown by action type
+  const actionBreakdown = pendingItems.reduce(
+    (acc, item) => {
+      const existingAction = acc.find(a => a.actionType === item.actionType)
+      if (existingAction) {
+        existingAction.count += item.quantity
+        existingAction.value += item.quantity * item.price
+        existingAction.items.push(item)
+      } else {
+        acc.push({
+          actionType: item.actionType,
+          count: item.quantity,
+          value: item.quantity * item.price,
+          items: [item],
+        })
+      }
+      return acc
+    },
+    [] as Array<{
+      actionType: ActionType
+      count: number
+      value: number
+      items: PendingItem[]
+    }>,
+  )
+
   return (
     <div className="space-y-4">
+      {/* Global Action Type Selector */}
+      <div className="px-4">
+        <ActionTypeSelector
+          selectedAction={globalActionType}
+          onActionChange={setGlobalActionType}
+        />
+      </div>
+
       {/* Step 1: Barcode Scanning */}
       {currentStep === 'scanning' && (
         <div className="space-y-4">
@@ -473,11 +521,18 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
             {pendingItems.map(item => (
               <div
                 key={item.batchId}
-                className="flex items-center justify-between p-3 bg-gray-50 rounded-2xl border"
+                className="flex items-start justify-between p-3 bg-gray-50 rounded-2xl border"
               >
                 <div className="flex-1">
-                  <div className="font-medium">
-                    {item.maxQuantity} {t('available')}
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="font-medium">
+                      {item.maxQuantity} {t('available')}
+                    </div>
+                    <ActionTypeSelector
+                      selectedAction={item.actionType}
+                      onActionChange={actionType => updateItemActionType(item.batchId, actionType)}
+                      variant="compact"
+                    />
                   </div>
                   <div className="font-medium">{item.productName}</div>
                   <div className="text-sm text-gray-500">
@@ -488,7 +543,7 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
                     {formatPrice(item.price * item.quantity)}
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 ml-2">
                   <Button
                     size="sm"
                     variant="outline"
@@ -546,7 +601,15 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
         <Dialog open={showSubmissionDialog} onOpenChange={setShowSubmissionDialog}>
           <DialogContent className="sm:max-w-lg">
             <DialogHeader>
-              <DialogTitle>{t('confirmCheckout')}</DialogTitle>
+              <DialogTitle>
+                {actionBreakdown.length === 1
+                  ? actionBreakdown[0].actionType === 'sold'
+                    ? t('confirmSale')
+                    : actionBreakdown[0].actionType === 'donate'
+                      ? t('confirmDonation')
+                      : t('confirmDisposal')
+                  : t('confirmCheckout')}
+              </DialogTitle>
               <DialogDescription>{t('reviewItemsBeforeRemoval')}</DialogDescription>
             </DialogHeader>
 
@@ -555,27 +618,70 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
                 {t('aboutToRemoveItems', { count: pendingItems.length })}
               </div>
 
+              {/* Action Breakdown Summary */}
+              {actionBreakdown.length > 1 && (
+                <div className="grid grid-cols-3 gap-2 p-3 bg-gray-50 rounded-2xl border">
+                  {actionBreakdown.map(action => {
+                    const colorClass =
+                      action.actionType === 'sold'
+                        ? 'bg-primary-100 text-primary-700 border-primary-200'
+                        : action.actionType === 'donate'
+                          ? 'bg-blue-100 text-blue-700 border-blue-200'
+                          : 'bg-red-100 text-red-700 border-red-200'
+                    return (
+                      <div
+                        key={action.actionType}
+                        className={`p-2 rounded-xl border ${colorClass}`}
+                      >
+                        <div className="text-xs font-medium capitalize">
+                          {t(`actions.${action.actionType}`)}
+                        </div>
+                        <div className="text-lg font-bold">{action.count}</div>
+                        <div className="text-xs">{formatPrice(action.value)}</div>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+
               {/* Summary List */}
               <div className="max-h-60 overflow-y-auto space-y-2 border rounded-2xl p-3 bg-gray-50">
                 {pendingItems.map(item => {
                   const itemTotal = item.quantity * item.price
+                  const actionColor =
+                    item.actionType === 'sold'
+                      ? 'text-primary-700'
+                      : item.actionType === 'donate'
+                        ? 'text-blue-700'
+                        : 'text-red-700'
+                  const actionBg =
+                    item.actionType === 'sold'
+                      ? 'bg-primary-50'
+                      : item.actionType === 'donate'
+                        ? 'bg-blue-50'
+                        : 'bg-red-50'
                   return (
                     <div
                       key={item.batchId}
-                      className="flex justify-between items-start p-2 bg-white rounded-2xl border text-sm"
+                      className={`flex justify-between items-start p-2 rounded-2xl border ${actionBg}`}
                     >
                       <div className="flex-1">
-                        <div className="font-medium">{item.productName}</div>
+                        <div className="flex items-center gap-2">
+                          <div className="font-medium">{item.productName}</div>
+                          <span className={`text-xs font-medium capitalize ${actionColor}`}>
+                            ({t(`actions.${item.actionType}`)})
+                          </span>
+                        </div>
                         {item.brand && <div className="text-xs text-gray-600">{item.brand}</div>}
                         <div className="text-xs text-gray-500">
                           {t('expires')}: {new Date(item.expiryDate).toLocaleDateString()}
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="font-medium text-red-600">
+                        <div className={`font-medium ${actionColor}`}>
                           -{item.quantity}x {formatPrice(item.price)}
                         </div>
-                        <div className="text-xs text-red-500">
+                        <div className="text-xs text-gray-600">
                           {t('remove')}: {formatPrice(itemTotal)}
                         </div>
                       </div>

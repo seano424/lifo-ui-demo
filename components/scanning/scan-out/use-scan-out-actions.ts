@@ -197,7 +197,8 @@ export function useScanOutActions() {
           p_items: items.map(item => ({
             batch_id: item.batchId,
             quantity: item.quantityRemoved,
-            action_reason: item.reason || 'scan-out',
+            action_type: item.actionType, // Use the new action_type field (sold/donate/dispose)
+            action_reason: item.reason || 'scan-out', // Keep for backward compatibility
             notes: item.notes || '',
           })),
           p_store_id: storeId,

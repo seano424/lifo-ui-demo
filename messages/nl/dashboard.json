@@ -432,6 +432,11 @@
     "pointCameraAtBarcode": "Richt camera op product barcode",
     "title": "Scannen voor uitgang",
     "description": "Scan artikelen wanneer ze de voorraad verlaten",
+    "actions": {
+      "sold": "Verkocht",
+      "donate": "Doneren",
+      "dispose": "Weggooien"
+    },
     "scanning": {
       "scanNextProduct": "Volgend product scannen",
       "scanProductBarcode": "Product barcode scannen",
@@ -541,6 +546,9 @@
     "clearAll": "Alles wissen",
     "submitAll": "Alles indienen ({count} items)",
     "confirmCheckout": "Uitgang bevestigen",
+    "confirmSale": "Verkoop bevestigen",
+    "confirmDonation": "Donatie bevestigen",
+    "confirmDisposal": "Verwijdering bevestigen",
     "reviewItemsBeforeRemoval": "Controleer onderstaande items voordat u ze uit de voorraad verwijdert.",
     "aboutToRemoveItems": "U staat op het punt {count} items uit de voorraad te verwijderen:",
     "totalItemsRemoved": "Totaal verwijderde items",

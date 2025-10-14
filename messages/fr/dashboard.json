@@ -432,6 +432,11 @@
     "pointCameraAtBarcode": "Pointez la caméra vers le code-barres du produit",
     "title": "Scanner pour sortir",
     "description": "Scanner les articles lors de leur sortie d'inventaire",
+    "actions": {
+      "sold": "Vendu",
+      "donate": "Don",
+      "dispose": "Jeter"
+    },
     "scanning": {
       "scanNextProduct": "Scanner le produit suivant",
       "scanProductBarcode": "Scanner le code-barres du produit",
@@ -541,6 +546,9 @@
     "clearAll": "Tout effacer",
     "submitAll": "Soumettre tout ({count} articles)",
     "confirmCheckout": "Confirmer la sortie",
+    "confirmSale": "Confirmer la vente",
+    "confirmDonation": "Confirmer le don",
+    "confirmDisposal": "Confirmer l'élimination",
     "reviewItemsBeforeRemoval": "Vérifiez les articles ci-dessous avant de les retirer de l'inventaire.",
     "aboutToRemoveItems": "Vous êtes sur le point de retirer {count} articles de l'inventaire :",
     "totalItemsRemoved": "Total des articles retirés",

@@ -433,6 +433,11 @@
     "pointCameraAtBarcode": "Point camera at product barcode",
     "title": "Scan Out",
     "description": "Scan items when they leave inventory",
+    "actions": {
+      "sold": "Sold",
+      "donate": "Donate",
+      "dispose": "Dispose"
+    },
     "scanning": {
       "scanNextProduct": "Scan next product",
       "scanProductBarcode": "Scan product barcode",
@@ -539,6 +544,9 @@
     "clearAll": "Clear All",
     "submitAll": "Submit All ({count} items)",
     "confirmCheckout": "Confirm Checkout",
+    "confirmSale": "Confirm Sale",
+    "confirmDonation": "Confirm Donation",
+    "confirmDisposal": "Confirm Disposal",
     "reviewItemsBeforeRemoval": "Review the items below before removing them from inventory.",
     "aboutToRemoveItems": "You are about to remove {count} items from inventory:",
     "totalItemsRemoved": "Total Items Removed",
