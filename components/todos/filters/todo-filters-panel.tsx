@@ -2,6 +2,7 @@
 
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
+import { ArrowUpDown, Filter } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useCallback } from 'react'
 import type { TodoTabType } from '../todos-filtered-list'
@@ -87,45 +88,59 @@ export function TodoFiltersPanel({
     filters.days_to_expiry_max !== undefined
 
   return (
-    <Card className={`p-4 space-y-4 ${className}`}>
-      {/* Search Bar */}
-      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+    <Card className={`p-6 space-y-6 ${className}`}>
+      {/* Filters Section */}
+      <div className="space-y-4">
         <div className="flex items-center gap-2">
-          {hasActiveFilters && (
-            <>
-              <span className="hidden sm:inline text-sm text-muted-foreground">
-                {t('filters.activeFilters')}
-              </span>
-              <Button size="sm" variant="secondary" onClick={clearAllFilters} className="h-8">
-                {t('filters.clearAll')}
-              </Button>
-            </>
-          )}
+          <div className="h-px bg-border flex-1" />
+          <div className="flex items-center gap-2 text-primary font-bold px-2">
+            <Filter className="w-4 h-4" />
+            <h4 className="text-sm font-medium">{t('filters.filtersTitle')}</h4>
+          </div>
+          <div className="h-px bg-border flex-1" />
         </div>
+
+        <div className="space-y-3">
+          <TodoFiltersBar
+            filters={{
+              urgency_level: filters.urgency_level,
+              action_type: filters.action_type,
+              batch_status: filters.batch_status,
+            }}
+            onFiltersChange={handleFilterChange}
+            isLoading={isLoading}
+          />
+          <TodoExpiryFilter
+            activeTab={activeTab}
+            daysToExpiryMin={filters.days_to_expiry_min}
+            daysToExpiryMax={filters.days_to_expiry_max}
+            onExpiryChange={handleExpiryChange}
+            isLoading={isLoading}
+          />
+        </div>
+
+        {/* Clear All Filters Button */}
+        {hasActiveFilters && (
+          <div className="flex justify-center pt-2">
+            <Button size="sm" variant="outline" onClick={clearAllFilters} className="h-8">
+              {t('filters.clearAll')}
+            </Button>
+          </div>
+        )}
       </div>
 
-      {/* Filter Controls */}
+      {/* Sort Section */}
       <div className="space-y-4">
-        <div className="flex flex-col lg:flex-row gap-2 items-start justify-between">
-          <div className="flex-1 flex flex-wrap gap-2">
-            <TodoFiltersBar
-              filters={{
-                urgency_level: filters.urgency_level,
-                action_type: filters.action_type,
-                batch_status: filters.batch_status,
-              }}
-              onFiltersChange={handleFilterChange}
-              isLoading={isLoading}
-            />
-            <TodoExpiryFilter
-              activeTab={activeTab}
-              daysToExpiryMin={filters.days_to_expiry_min}
-              daysToExpiryMax={filters.days_to_expiry_max}
-              onExpiryChange={handleExpiryChange}
-              isLoading={isLoading}
-            />
+        <div className="flex items-center gap-2">
+          <div className="h-px bg-border flex-1" />
+          <div className="flex items-center gap-2 text-primary font-bold px-2">
+            <ArrowUpDown className="w-4 h-4" />
+            <h4 className="text-sm font-medium">{t('filters.sortTitle')}</h4>
           </div>
+          <div className="h-px bg-border flex-1" />
+        </div>
 
+        <div className="flex ">
           <TodoSortControls
             sortConfig={filters.sortConfig}
             onSortChange={handleSortChange}

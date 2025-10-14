@@ -229,23 +229,23 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
   )
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-2">
       {/* Mobile Filter & Sort Buttons */}
-      <div className="flex sm:hidden justify-center gap-2 py-2 ">
+      <div className="flex sm:hidden justify-center gap-6 pt-4 border-t border-border">
         <Button
           variant="subtleTertiary"
           onClick={() => setShowMobileFilters(true)}
-          className="flex items-center gap-2"
+          className="flex items-center gap-2 h-12 px-6 text-base font-medium"
         >
-          <Filter className="w-4 h-4" />
+          <Filter className="w-5 h-5" />
           {t('filters.filtersTitle')}
         </Button>
         <Button
           variant="subtleTertiary"
           onClick={() => setShowMobileSort(true)}
-          className="flex items-center gap-2"
+          className="flex items-center gap-2 h-12 px-6 text-base font-medium"
         >
-          <ArrowUpDown className="w-4 h-4" />
+          <ArrowUpDown className="w-5 h-5" />
           {t('filters.sortTitle')}
         </Button>
       </div>
@@ -259,7 +259,7 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
         />
       </div>
       {/* Mobile Search Bar */}
-      <div className="sm:hidden px-4 flex justify-center">
+      <div className="sm:hidden px-4 flex justify-center py-4">
         <TodoSearchBar
           searchTerm={filters.product_name}
           onSearchChange={handleSearchChange}
@@ -268,14 +268,18 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
         />
       </div>
 
+      {/* Mobile Separator after search */}
+      <div className="sm:hidden border-t border-border mx-4" />
+
       {/* Desktop Search Bar */}
-      <div className="hidden sm:block mb-4">
-        <div className="w-full max-w-4xl mx-auto">
+      <div className="hidden sm:block my-8">
+        <div className="w-1/2 mx-auto">
           <TodoSearchBar
             searchTerm={filters.product_name}
             onSearchChange={handleSearchChange}
             isLoading={false}
             placeholder={t('filters.searchPlaceholder')}
+            size="large"
           />
         </div>
       </div>
