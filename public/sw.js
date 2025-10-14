@@ -1,4 +1,4 @@
-const CACHE_NAME = 'lifo-ai-v8'
+const CACHE_NAME = 'lifo-ai-v9'
 
 // Push notification handler
 self.addEventListener('push', event => {
