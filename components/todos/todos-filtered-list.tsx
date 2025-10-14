@@ -19,6 +19,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { MobileFiltersOnlyModal } from './filters/mobile-filters-only-modal'
 import { MobileSortOnlyModal } from './filters/mobile-sort-only-modal'
 import { TodoFiltersPanel, type TodoFiltersState } from './filters/todo-filters-panel'
+import { TodoSearchBar } from './filters/todo-search-bar'
 import type { SortDirection, SortField } from './filters/todo-sort-controls'
 import { CompletedTab } from './todos-main-tabs/completed-tab'
 import { ExpiredTab } from './todos-main-tabs/expired-tab'
@@ -217,10 +218,20 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
     [],
   )
 
+  const handleSearchChange = useCallback(
+    (searchTerm: string | undefined) => {
+      handleFiltersChange(prev => ({
+        ...prev,
+        product_name: searchTerm,
+      }))
+    },
+    [handleFiltersChange],
+  )
+
   return (
     <div className="space-y-6">
       {/* Mobile Filter & Sort Buttons */}
-      <div className="flex sm:hidden justify-center gap-2 py-2 border-y border-muted">
+      <div className="flex sm:hidden justify-center gap-2 py-2 ">
         <Button
           variant="subtleTertiary"
           onClick={() => setShowMobileFilters(true)}
@@ -238,7 +249,6 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
           {t('filters.sortTitle')}
         </Button>
       </div>
-
       {/* Desktop Filters */}
       <div className="hidden sm:block">
         <TodoFiltersPanel
@@ -247,6 +257,27 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
           isLoading={false}
           activeTab={activeTab}
         />
+      </div>
+      {/* Mobile Search Bar */}
+      <div className="sm:hidden px-4 flex justify-center">
+        <TodoSearchBar
+          searchTerm={filters.product_name}
+          onSearchChange={handleSearchChange}
+          isLoading={false}
+          placeholder={t('filters.searchPlaceholder')}
+        />
+      </div>
+
+      {/* Desktop Search Bar */}
+      <div className="hidden sm:block mb-4">
+        <div className="w-full max-w-4xl mx-auto">
+          <TodoSearchBar
+            searchTerm={filters.product_name}
+            onSearchChange={handleSearchChange}
+            isLoading={false}
+            placeholder={t('filters.searchPlaceholder')}
+          />
+        </div>
       </div>
 
       {/* Mobile Filters Modal */}
