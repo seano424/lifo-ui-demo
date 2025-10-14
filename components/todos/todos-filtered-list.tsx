@@ -42,7 +42,7 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
   const t = useTranslations('todos')
   const router = useRouter()
   const { isMobile } = useMediaQuery()
-  const [showFilters, setShowFilters] = useState(false)
+  const [showFilters, setShowFilters] = useState(true)
 
   const [activeTab, setActiveTab] = useState<TodoTabType>(
     (initialFilters?.tab as TodoTabType) || 'pending',
@@ -215,13 +215,14 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
 
   return (
     <div className="space-y-6">
-      {/* Filter Panel */}
-      <div className="flex sm:hidden justify-center py-4 border-y border-muted">
+      {/* Mobile Filter Toggle */}
+      <div className="flex sm:hidden justify-center py-2 border-y border-muted">
         <Button variant="subtleTertiary" onClick={() => setShowFilters(!showFilters)}>
-          {t('filters.clearAll').replace(' all', 's')}
+          {showFilters ? t('filters.hideFilters') : t('filters.showFilters')}
         </Button>
       </div>
 
+      {/* Mobile Filters */}
       {showFilters && (
         <div className="sm:hidden">
           <TodoFiltersPanel
@@ -233,6 +234,7 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
         </div>
       )}
 
+      {/* Desktop Filters */}
       <div className="hidden sm:block">
         <TodoFiltersPanel
           filters={filters}

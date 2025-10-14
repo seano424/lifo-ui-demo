@@ -224,6 +224,8 @@
     "searchPlaceholder": "Rechercher des produits...",
     "activeFilters": "Filtres actifs appliqués",
     "clearAll": "Tout effacer",
+    "showFilters": "Afficher les filtres",
+    "hideFilters": "Masquer les filtres",
     "urgency": {
       "all": "Tous les niveaux d'urgence",
       "critical": "Critique",

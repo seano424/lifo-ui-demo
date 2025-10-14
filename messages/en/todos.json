@@ -224,6 +224,8 @@
     "searchPlaceholder": "Search products...",
     "activeFilters": "Active filters applied",
     "clearAll": "Clear all",
+    "showFilters": "Show Filters",
+    "hideFilters": "Hide Filters",
     "urgency": {
       "all": "All Urgency Levels",
       "critical": "Critical",
