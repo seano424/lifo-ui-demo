@@ -31,6 +31,20 @@
     "notFound": "Aucune tâche terminée trouvée.",
     "noMatch": "Aucune tâche terminée ne correspond à vos filtres"
   },
+  "expiring": {
+    "errorLoading": "Erreur lors du chargement des tâches expirantes",
+    "loading": "Chargement des tâches expirantes...",
+    "noExpiringHeading": "Aucun article expirant !",
+    "allGood": "Tous les articles sont frais. Aucun article n'expire bientôt.",
+    "noMatch": "Aucune tâche expirante ne correspond à vos filtres"
+  },
+  "expired": {
+    "errorLoading": "Erreur lors du chargement des tâches expirées",
+    "loading": "Chargement des tâches expirées...",
+    "noExpiredHeading": "Aucun article expiré !",
+    "allCleared": "Excellent travail ! Tous les articles expirés ont été traités.",
+    "noMatch": "Aucune tâche expirée ne correspond à vos filtres"
+  },
   "emptyStateWithFilters": "Essayez d'ajuster vos filtres pour voir plus d'articles.",
   "card": {
     "suggestion": "Suggestion",

@@ -6,7 +6,7 @@
   "tabs": {
     "pending": "In afwachting",
     "inProgress": "Bezig",
-    "expiring": "Verlopen",
+    "expiring": "Verlopen binnenkort",
     "expired": "Verlopen",
     "completed": "Voltooid"
   },
@@ -30,6 +30,20 @@
     "noCompletedHeading": "Geen voltooide taken",
     "notFound": "Geen voltooide taken gevonden.",
     "noMatch": "Geen voltooide taken komen overeen met uw filters"
+  },
+  "expiring": {
+    "errorLoading": "Fout bij het laden van verlopen taken",
+    "loading": "Verlopen taken laden...",
+    "noExpiringHeading": "Geen items die verlopen!",
+    "allGood": "Alle items zijn vers. Geen items verlopen binnenkort.",
+    "noMatch": "Geen verlopen taken komen overeen met uw filters"
+  },
+  "expired": {
+    "errorLoading": "Fout bij het laden van verlopen taken",
+    "loading": "Verlopen taken laden...",
+    "noExpiredHeading": "Geen verlopen items!",
+    "allCleared": "Goed gedaan! Alle verlopen items zijn opgeruimd.",
+    "noMatch": "Geen verlopen taken komen overeen met uw filters"
   },
   "emptyStateWithFilters": "Probeer uw filters aan te passen om meer items te zien.",
   "card": {
