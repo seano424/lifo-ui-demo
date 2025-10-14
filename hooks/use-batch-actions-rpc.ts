@@ -332,7 +332,7 @@ export function useBatchActionRPC(providedStoreId?: string) {
         // Invalidate donation-specific queries
         actionSpecificInvalidations.push(
           queryClient.invalidateQueries({
-            queryKey: ['donation-recipients', storeId],
+            queryKey: queryKeys.donations.recipients(storeId),
           }),
         )
       }
