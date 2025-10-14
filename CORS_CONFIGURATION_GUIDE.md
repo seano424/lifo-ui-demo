@@ -17,17 +17,19 @@ This guide explains how to configure CORS (Cross-Origin Resource Sharing) for th
 
 The API now uses the `get_cors_origins()` function which returns different CORS origins based on the `ENVIRONMENT` variable:
 
-1. **Production**: Only HTTPS origins from `CORS_ORIGINS` env var
-2. **Staging**: Any origins from `CORS_ORIGINS` + localhost for testing
-3. **Development**: Uses `CORS_ORIGINS` or defaults to localhost:3000/3001
+1. **Production**: Only HTTPS origins from `BACKEND_CORS_ORIGINS` env var
+2. **Staging**: Any origins from `BACKEND_CORS_ORIGINS` + localhost for testing
+3. **Development**: Uses `BACKEND_CORS_ORIGINS` or defaults to localhost:3000/3001
 
 ### Configuration Priority
 
 The function checks in this order:
 
-1. `CORS_ORIGINS` environment variable (comma-separated list)
+1. `BACKEND_CORS_ORIGINS` environment variable (comma-separated list) ← **FastAPI standard**
 2. `FRONTEND_URL` environment variable (single URL)
 3. Fallback defaults (localhost for development)
+
+**Note**: For backward compatibility, the field also accepts `CORS_ORIGINS` as an alias.
 
 ---
 
@@ -42,7 +44,7 @@ For local development, use:
 ENVIRONMENT=development
 
 # CORS Configuration (comma-separated, no spaces after commas)
-CORS_ORIGINS=http://localhost:3000,http://localhost:3001,http://127.0.0.1:3000
+BACKEND_CORS_ORIGINS=http://localhost:3000,http://localhost:3001,http://127.0.0.1:3000
 
 # Optional: Single frontend URL
 FRONTEND_URL=http://localhost:3000
@@ -59,7 +61,7 @@ For staging environment on DigitalOcean:
 ENVIRONMENT=staging
 
 # CORS Configuration - Include staging frontend URL
-CORS_ORIGINS=https://staging.lifo-app.com,https://clownfish-app-y2uru.ondigitalocean.app,http://localhost:3000
+BACKEND_CORS_ORIGINS=https://staging.lifo-app.com,https://clownfish-app-y2uru.ondigitalocean.app,http://localhost:3000
 
 # Optional: Primary frontend URL
 FRONTEND_URL=https://clownfish-app-y2uru.ondigitalocean.app
@@ -76,7 +78,7 @@ For production environment on DigitalOcean:
 ENVIRONMENT=production
 
 # CORS Configuration - ONLY HTTPS origins (production security)
-CORS_ORIGINS=https://lifo-app.com,https://www.lifo-app.com,https://clownfish-app-y2uru.ondigitalocean.app
+BACKEND_CORS_ORIGINS=https://lifo-app.com,https://www.lifo-app.com,https://clownfish-app-y2uru.ondigitalocean.app
 
 # Optional: Primary frontend URL
 FRONTEND_URL=https://lifo-app.com
@@ -92,10 +94,10 @@ FRONTEND_URL=https://lifo-app.com
 
 ```python
 if self.environment == "production":
-    # 1. Use CORS_ORIGINS if set (filters to HTTPS only)
-    if self.cors_origins_list:
+    # 1. Use BACKEND_CORS_ORIGINS if set (filters to HTTPS only)
+    if self.backend_cors_origins_list:
         origins.extend([
-            origin for origin in self.cors_origins_list
+            origin for origin in self.backend_cors_origins_list
             if origin.startswith("https://")  # ← Security: HTTPS only
         ])
 
@@ -128,7 +130,7 @@ Your `.env.local` already has:
 FRONTEND_URL=http://localhost:3000
 ```
 
-This works for development. The `CORS_ORIGINS` is commented out, so it uses the default.
+This works for development. The `BACKEND_CORS_ORIGINS` is commented out, so it uses the default.
 
 ### Step 2: Configure Staging Environment
 
@@ -138,7 +140,7 @@ Update DigitalOcean staging app environment variables:
 2. Add/Update environment variables:
    ```
    ENVIRONMENT=staging
-   CORS_ORIGINS=https://clownfish-app-y2uru.ondigitalocean.app,http://localhost:3000
+   BACKEND_CORS_ORIGINS=https://clownfish-app-y2uru.ondigitalocean.app,http://localhost:3000
    FRONTEND_URL=https://clownfish-app-y2uru.ondigitalocean.app
    ```
 3. Save and redeploy
@@ -151,7 +153,7 @@ Update DigitalOcean production app environment variables:
 2. Add/Update environment variables:
    ```
    ENVIRONMENT=production
-   CORS_ORIGINS=https://lifo-app.com,https://www.lifo-app.com,https://clownfish-app-y2uru.ondigitalocean.app
+   BACKEND_CORS_ORIGINS=https://lifo-app.com,https://www.lifo-app.com,https://clownfish-app-y2uru.ondigitalocean.app
    FRONTEND_URL=https://lifo-app.com
    ```
 3. Save and redeploy
@@ -216,8 +218,8 @@ No CORS errors - requests succeed
 ### 1. Updated `app/core/config.py`
 
 **Improved `get_cors_origins()` function**:
-- Now uses `CORS_ORIGINS` environment variable as primary source
-- Falls back to `FRONTEND_URL` if `CORS_ORIGINS` not set
+- Now uses `BACKEND_CORS_ORIGINS` environment variable as primary source
+- Falls back to `FRONTEND_URL` if `BACKEND_CORS_ORIGINS` not set
 - Filters to HTTPS-only in production
 - Adds www variant automatically
 - Has sensible defaults for development
@@ -255,7 +257,7 @@ In production, the function **filters out any HTTP origins**:
 
 ```python
 # This configuration:
-CORS_ORIGINS=http://localhost:3000,https://lifo-app.com
+BACKEND_CORS_ORIGINS=http://localhost:3000,https://lifo-app.com
 
 # Results in (production):
 origins=['https://lifo-app.com']  # HTTP origin filtered out
@@ -267,10 +269,10 @@ Wildcards (`*`) are not allowed in production for security:
 
 ```python
 # ❌ This is rejected:
-CORS_ORIGINS=*
+BACKEND_CORS_ORIGINS=*
 
 # ✅ Use explicit origins:
-CORS_ORIGINS=https://lifo-app.com,https://www.lifo-app.com
+BACKEND_CORS_ORIGINS=https://lifo-app.com,https://www.lifo-app.com
 ```
 
 ### Development vs Production
@@ -280,7 +282,7 @@ CORS_ORIGINS=https://lifo-app.com,https://www.lifo-app.com
 | HTTP Origins | ✅ Allowed | ❌ Filtered out |
 | HTTPS Origins | ✅ Allowed | ✅ Allowed |
 | Wildcards | ✅ Allowed | ❌ Not allowed |
-| Localhost | ✅ Always | ❌ Only if in CORS_ORIGINS |
+| Localhost | ✅ Always | ❌ Only if in BACKEND_CORS_ORIGINS |
 | Credentials | ✅ Enabled | ✅ Enabled |
 
 ---
@@ -299,7 +301,7 @@ Access to XMLHttpRequest ... has been blocked by CORS policy
    ```bash
    doctl apps logs <app-id> --type run --tail | grep "CORS middleware configured"
    ```
-2. Verify `CORS_ORIGINS` environment variable is set correctly
+2. Verify `BACKEND_CORS_ORIGINS` environment variable is set correctly
 3. Ensure frontend URL is in the list (case-sensitive, exact match)
 4. Check for trailing slashes (origins should NOT have trailing slashes)
 
@@ -324,7 +326,7 @@ Preflight request failed
 
 **Solution**:
 1. Check `ENVIRONMENT` variable is set to "production"
-2. Verify `CORS_ORIGINS` has HTTPS URLs (not HTTP)
+2. Verify `BACKEND_CORS_ORIGINS` has HTTPS URLs (not HTTP)
 3. Check logs show correct origins:
    ```
    INFO: CORS middleware configured
@@ -340,9 +342,9 @@ Preflight request failed
 
 **Solution**:
 - If `FRONTEND_URL=https://lifo-app.com`, the www variant is auto-added
-- If using `CORS_ORIGINS`, add both explicitly:
+- If using `BACKEND_CORS_ORIGINS`, add both explicitly:
   ```bash
-  CORS_ORIGINS=https://lifo-app.com,https://www.lifo-app.com
+  BACKEND_CORS_ORIGINS=https://lifo-app.com,https://www.lifo-app.com
   ```
 
 ---
@@ -383,12 +385,12 @@ Preflight request failed
 ## 🙏 Summary
 
 The CORS issue was caused by:
-1. `get_cors_origins()` function not using `CORS_ORIGINS` environment variable
+1. `get_cors_origins()` function not using `BACKEND_CORS_ORIGINS` environment variable
 2. Function commented out → hardcoded origins used instead
 3. CORS middleware too late in chain (after security middleware)
 
 The fix:
-1. ✅ Improved `get_cors_origins()` to use `CORS_ORIGINS` env var
+1. ✅ Improved `get_cors_origins()` to use `BACKEND_CORS_ORIGINS` env var (FastAPI standard)
 2. ✅ Uncommented function call in `main.py`
 3. ✅ Moved CORS middleware early (before security middleware)
 4. ✅ Added logging for visibility
