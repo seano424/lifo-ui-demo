@@ -1,8 +1,12 @@
 'use client'
 
-import { HandHeart, ShoppingCart, Trash2 } from 'lucide-react'
+import { HandHeart, ShoppingCart, ClipboardXIcon } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import type { ActionType } from '@/types/scanning'
+import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip'
+import { Typography } from '@/components/ui/typography'
+import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 
 interface ActionTypeSelectorProps {
   selectedAction: ActionType
@@ -32,7 +36,7 @@ export default function ActionTypeSelector({
   }> = [
     {
       type: 'sold',
-      label: t('sold'),
+      label: t('sell'),
       icon: ShoppingCart,
       color: 'text-gray-600',
       activeColor: 'text-primary-700 bg-primary-100 border-primary-700',
@@ -47,7 +51,7 @@ export default function ActionTypeSelector({
     {
       type: 'dispose',
       label: t('dispose'),
-      icon: Trash2,
+      icon: ClipboardXIcon,
       color: 'text-gray-600',
       activeColor: 'text-red-700 bg-red-100 border-red-700',
     },
@@ -55,24 +59,30 @@ export default function ActionTypeSelector({
 
   if (variant === 'compact') {
     return (
-      <div className={`flex gap-1 ${className}`}>
+      <div className={`flex gap-2 ${className}`}>
         {actions.map(action => {
           const Icon = action.icon
           const isActive = selectedAction === action.type
           return (
-            <button
-              key={action.type}
-              type="button"
-              onClick={() => onActionChange(action.type)}
-              className={`flex items-center justify-center px-2 py-1 rounded-lg border-2 transition-all ${
-                isActive
-                  ? action.activeColor
-                  : 'text-gray-400 bg-white border-gray-200 hover:border-gray-300'
-              }`}
-              aria-label={action.label}
-            >
-              <Icon className="h-3.5 w-3.5" />
-            </button>
+            <Tooltip key={action.type}>
+              <TooltipTrigger asChild>
+                <button
+                  type="button"
+                  onClick={() => onActionChange(action.type)}
+                  className={`flex items-center justify-center px-2 py-1 rounded-lg border-2 transition-all ${
+                    isActive
+                      ? action.activeColor
+                      : 'text-gray-400 bg-white border-gray-200 hover:border-gray-300'
+                  }`}
+                  aria-label={action.label}
+                >
+                  <Icon className="h-4 w-4" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <Typography className="text-white">{action.label}</Typography>
+              </TooltipContent>
+            </Tooltip>
           )
         })}
       </div>
@@ -85,19 +95,31 @@ export default function ActionTypeSelector({
         const Icon = action.icon
         const isActive = selectedAction === action.type
         return (
-          <button
-            key={action.type}
-            type="button"
-            onClick={() => onActionChange(action.type)}
-            className={`flex-1 flex flex-col items-center justify-center gap-2 px-4 py-3 rounded-2xl border-2 transition-all ${
-              isActive
-                ? action.activeColor
-                : 'text-gray-600 bg-white border-gray-200 hover:border-gray-300'
-            }`}
-          >
-            <Icon className="h-5 w-5" />
-            <span className="text-sm font-medium">{action.label}</span>
-          </button>
+          <Tooltip key={action.type}>
+            <TooltipTrigger asChild>
+              <Button
+                variant={isActive ? 'default' : 'outline'}
+                onClick={() => onActionChange(action.type)}
+                className={cn(
+                  'flex flex-col items-center gap-2 border w-full',
+                  isActive && 'text-white',
+                )}
+              >
+                <Icon className="h-5 w-5" />
+                <Typography
+                  className={cn(
+                    isActive ? 'text-white' : 'text-gray-600',
+                    'transition-all ease-in-out',
+                  )}
+                >
+                  {action.label}
+                </Typography>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <Typography className="text-white">{action.label}</Typography>
+            </TooltipContent>
+          </Tooltip>
         )
       })}
     </div>

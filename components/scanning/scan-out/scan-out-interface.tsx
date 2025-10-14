@@ -21,6 +21,7 @@ import { useStoreState } from '@/lib/stores/store-context'
 import { createClient } from '@/lib/supabase/client'
 import { RecipientSelector } from '@/components/donation/recipient-selector'
 import { toast } from 'sonner'
+import { Typography } from '@/components/ui/typography'
 
 import type { ScannedItem } from '../shared'
 import ActionTypeSelector from './action-type-selector'
@@ -29,6 +30,7 @@ import ScanningCamera from '../shared/scanning-camera'
 import { useScanOutActions } from './use-scan-out-actions'
 import type { Database } from '@/types/supabase'
 import type { ActionType, AvailableBatch } from '@/types/scanning'
+import { Input } from '@/components/ui/input'
 
 type batch = Database['inventory']['Tables']['batches']['Row']
 
@@ -653,33 +655,33 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
                 key={item.batchId}
                 className="flex items-start justify-between p-3 bg-gray-50 rounded-2xl border"
               >
-                <div className="flex-1">
+                <div className="flex-1 flex flex-col gap-2">
                   <div className="flex items-center justify-between mb-2">
-                    <div className="font-medium">
+                    <Typography>
                       {item.maxQuantity} {t('available')}
-                    </div>
+                    </Typography>
                     <ActionTypeSelector
                       selectedAction={item.actionType}
                       onActionChange={actionType => updateItemActionType(item.batchId, actionType)}
                       variant="compact"
                     />
                   </div>
-                  <div className="font-medium">{item.productName}</div>
-                  <div className="text-sm text-gray-500">
+                  <Typography>{item.productName}</Typography>
+                  <Typography>
                     {item.brand} • {t('expires')}: {new Date(item.expiryDate).toLocaleDateString()}
-                  </div>
-                  <div className="text-sm text-gray-600">
+                  </Typography>
+                  <Typography>
                     {formatPrice(item.price)} × {item.quantity} ={' '}
                     {formatPrice(item.price * item.quantity)}
-                  </div>
+                  </Typography>
 
                   {/* Action-specific inputs */}
                   {item.actionType === 'donate' && (
                     <div className="mt-2">
                       {!item.donationRecipientId && (
-                        <div className="mb-2 text-sm text-red-600 font-medium">
-                          ⚠️ {t('selectRecipientRequired') || 'Please select a recipient'}
-                        </div>
+                        <Typography color="destructive">
+                          {t('selectRecipientRequired') || 'Please select a recipient'}
+                        </Typography>
                       )}
                       <RecipientSelector
                         storeId={activeStore?.store_id}
@@ -688,63 +690,59 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
                         onRecipientSelect={(recipientId, recipientName) => {
                           updateItemDonationRecipient(item.batchId, recipientId, recipientName)
                         }}
-                        className={`p-2 bg-white dark:bg-gray-800 rounded-lg border ${
-                          !item.donationRecipientId
-                            ? 'border-red-500 border-2'
-                            : 'border-gray-200 dark:border-gray-700'
-                        }`}
+                        className={`p-2 bg-white dark:bg-gray-800 rounded-lg border`}
                       />
                     </div>
                   )}
                   {item.actionType === 'dispose' && (
                     <div className="mt-2">
-                      <input
+                      <Input
                         type="text"
                         placeholder={
                           t('disposalReasonPlaceholder') || 'Reason (e.g., Expired, Moldy)'
                         }
                         value={item.disposalReason || ''}
                         onChange={e => updateItemDisposalReason(item.batchId, e.target.value)}
-                        className="w-full px-2 py-1 text-xs border rounded-lg focus:ring-2 focus:ring-red-500"
                       />
                     </div>
                   )}
-                </div>
-                <div className="flex items-center gap-2 ml-2">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => updateItemQuantity(item.batchId, item.quantity - 1)}
-                    disabled={item.quantity <= 1}
-                  >
-                    <Minus className="h-3 w-3" />
-                  </Button>
-                  <input
-                    type="number"
-                    value={item.quantity}
-                    onChange={e =>
-                      updateItemQuantity(item.batchId, parseInt(e.target.value, 10) || 1)
-                    }
-                    className="w-12 text-center border rounded-2xl px-1 py-1 text-sm"
-                    min="1"
-                    max={item.maxQuantity}
-                  />
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => updateItemQuantity(item.batchId, item.quantity + 1)}
-                    disabled={item.quantity >= item.maxQuantity}
-                  >
-                    <Plus className="h-3 w-3" />
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => removeItemFromList(item.batchId)}
-                    className="text-red-600 hover:text-red-700"
-                  >
-                    <Trash2 className="h-3 w-3" />
-                  </Button>
+
+                  <div className="flex items-center gap-2 justify-center">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => updateItemQuantity(item.batchId, item.quantity - 1)}
+                      disabled={item.quantity <= 1}
+                    >
+                      <Minus className="h-3 w-3" />
+                    </Button>
+                    <input
+                      type="number"
+                      value={item.quantity}
+                      onChange={e =>
+                        updateItemQuantity(item.batchId, parseInt(e.target.value, 10) || 1)
+                      }
+                      className="w-12 text-center border rounded-2xl px-1 py-1 text-sm"
+                      min="1"
+                      max={item.maxQuantity}
+                    />
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => updateItemQuantity(item.batchId, item.quantity + 1)}
+                      disabled={item.quantity >= item.maxQuantity}
+                    >
+                      <Plus className="h-3 w-3" />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => removeItemFromList(item.batchId)}
+                      className="text-red-600 hover:text-red-700"
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </Button>
+                  </div>
                 </div>
               </div>
             ))}
@@ -777,14 +775,13 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
                       : t('confirmDisposal')
                   : t('confirmCheckout')}
               </DialogTitle>
-              <DialogDescription>{t('reviewItemsBeforeRemoval')}</DialogDescription>
+              <DialogDescription className="text-sm text-gray-600">
+                {t('reviewItemsBeforeRemoval')}{' '}
+                {t('aboutToRemoveItems', { count: pendingItems.length })}
+              </DialogDescription>
             </DialogHeader>
 
             <div className="space-y-4">
-              <div className="text-sm text-gray-600">
-                {t('aboutToRemoveItems', { count: pendingItems.length })}
-              </div>
-
               {/* Action Breakdown Summary */}
               {actionBreakdown.length > 1 && (
                 <div className="grid grid-cols-3 gap-2 p-3 bg-gray-50 rounded-2xl border">
@@ -800,11 +797,9 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
                         key={action.actionType}
                         className={`p-2 rounded-xl border ${colorClass}`}
                       >
-                        <div className="text-xs font-medium capitalize">
-                          {t(`actions.${action.actionType}`)}
-                        </div>
-                        <div className="text-lg font-bold">{action.count}</div>
-                        <div className="text-xs">{formatPrice(action.value)}</div>
+                        <Typography>{t(`actions.${action.actionType}`)}</Typography>
+                        <Typography>{action.count}</Typography>
+                        <Typography variant="extraSmall">{formatPrice(action.value)}</Typography>
                       </div>
                     )
                   })}
@@ -832,25 +827,25 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
                       key={item.batchId}
                       className={`flex justify-between items-start p-2 rounded-2xl border ${actionBg}`}
                     >
-                      <div className="flex-1">
+                      <div className="flex-1 flex flex-col gap-1">
                         <div className="flex items-center gap-2">
-                          <div className="font-medium">{item.productName}</div>
-                          <span className={`text-xs font-medium capitalize ${actionColor}`}>
+                          <Typography>{item.productName}</Typography>
+                          <Typography variant="extraSmall" className={`${actionColor}`}>
                             ({t(`actions.${item.actionType}`)})
-                          </span>
+                          </Typography>
                         </div>
-                        {item.brand && <div className="text-xs text-gray-600">{item.brand}</div>}
-                        <div className="text-xs text-gray-500">
+                        {item.brand && <Typography variant="extraSmall">{item.brand}</Typography>}
+                        <Typography variant="extraSmall">
                           {t('expires')}: {new Date(item.expiryDate).toLocaleDateString()}
-                        </div>
+                        </Typography>
                       </div>
-                      <div className="text-right">
-                        <div className={`font-medium ${actionColor}`}>
+                      <div className="text-right flex flex-col gap-1">
+                        <Typography variant="extraSmall" className={`${actionColor}`}>
                           -{item.quantity}x {formatPrice(item.price)}
-                        </div>
-                        <div className="text-xs text-gray-600">
+                        </Typography>
+                        <Typography variant="extraSmall">
                           {t('remove')}: {formatPrice(itemTotal)}
-                        </div>
+                        </Typography>
                       </div>
                     </div>
                   )
@@ -859,20 +854,20 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
 
               {/* Total Summary */}
               <div className="border-t pt-3">
-                <div className="flex justify-between items-center font-medium">
-                  <span>{t('totalItemsRemoved')}:</span>
-                  <span className="text-red-600">
+                <div className="flex justify-between items-center">
+                  <Typography>{t('totalItemsRemoved')}:</Typography>
+                  <Typography color="destructive">
                     -{pendingItems.reduce((sum, item) => sum + item.quantity, 0)}
-                  </span>
+                  </Typography>
                 </div>
-                <div className="flex justify-between items-center font-medium">
-                  <span>{t('totalValueRemoved')}:</span>
-                  <span className="text-red-600">
+                <div className="flex justify-between items-center">
+                  <Typography>{t('totalValueRemoved')}:</Typography>
+                  <Typography color="destructive">
                     -
                     {formatPrice(
                       pendingItems.reduce((sum, item) => sum + item.quantity * item.price, 0),
                     )}
-                  </span>
+                  </Typography>
                 </div>
               </div>
             </div>

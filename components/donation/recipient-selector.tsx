@@ -168,16 +168,14 @@ export function RecipientSelector({
   }
 
   const dbRecipients = recipients.filter(r => !r.isAdhoc)
-  const adhocRecipientsList = recipients.filter(r => r.isAdhoc)
+  // const adhocRecipientsList = recipients.filter((r) => r.isAdhoc)
 
   return (
     <div className={className}>
       {/* DB Recipients */}
       {dbRecipients.length > 0 && (
-        <div className="space-y-2">
-          <Typography variant="muted" className="text-sm">
-            {t('savedRecipients') || 'Saved Recipients'}
-          </Typography>
+        <div className="flex flex-col gap-2">
+          <Typography variant="muted">{t('savedRecipients') || 'Saved Recipients'}</Typography>
           <div className="grid grid-cols-1 gap-2">
             {dbRecipients.map(recipient => (
               <Button
@@ -187,11 +185,11 @@ export function RecipientSelector({
                 onClick={() => handleRecipientSelect(recipient)}
                 className="border-none shadow justify-start"
               >
-                <div className="text-left flex-1">
-                  <div className="font-medium">{recipient.name}</div>
-                  <div className="text-xs text-muted-foreground capitalize">
+                <div className="text-left flex-1 flex flex-col gap-1">
+                  <Typography>{recipient.name}</Typography>
+                  <Typography variant="extraSmall" className="text-muted-foreground capitalize">
                     {recipient.type.replace('_', ' ')}
-                  </div>
+                  </Typography>
                 </div>
                 {selectedRecipientId === recipient.id && <Check className="h-4 w-4 ml-2" />}
               </Button>
@@ -201,10 +199,8 @@ export function RecipientSelector({
       )}
 
       {/* Quick Presets */}
-      <div className={`space-y-2 ${dbRecipients.length > 0 ? 'mt-4' : ''}`}>
-        <Typography variant="muted" className="text-sm">
-          {t('quickOptions') || 'Quick Options'}
-        </Typography>
+      <div className={`flex flex-col gap-2 ${dbRecipients.length > 0 ? 'mt-4' : ''}`}>
+        <Typography variant="muted">{t('quickOptions') || 'Quick Options'}</Typography>
         <div className="grid grid-cols-2 gap-2">
           {ADHOC_PRESETS.map(preset => {
             const isSelected =
@@ -263,7 +259,7 @@ export function RecipientSelector({
             </div>
 
             {/* Type Selector */}
-            <div className="space-y-1">
+            <div className="flex flex-col gap-1">
               <Label htmlFor="custom-type" className="text-xs">
                 {t('recipientType') || 'Type'} *
               </Label>
@@ -302,7 +298,7 @@ export function RecipientSelector({
             </div>
 
             {/* Contact Email (Optional) */}
-            <div className="space-y-1">
+            <div className="flex flex-col gap-1">
               <Label htmlFor="custom-email" className="text-xs">
                 {t('contactEmail') || 'Contact Email'} ({tCommon('optional') || 'optional'})
               </Label>
@@ -316,7 +312,7 @@ export function RecipientSelector({
             </div>
 
             {/* Contact Phone (Optional) */}
-            <div className="space-y-1">
+            <div className="flex flex-col gap-1">
               <Label htmlFor="custom-phone" className="text-xs">
                 {t('contactPhone') || 'Contact Phone'} ({tCommon('optional') || 'optional'})
               </Label>
@@ -354,13 +350,16 @@ export function RecipientSelector({
       </div>
 
       {/* Ad-hoc Recipients Already Added */}
-      {adhocRecipientsList.length > 0 && (
-        <div className="space-y-2 mt-4">
-          <Typography variant="muted" className="text-sm">
+      {/* {adhocRecipientsList.length > 0 && (
+        <div className="flex flex-col gap-2 mt-4">
+          <Typography
+            variant="muted"
+            className="text-sm"
+          >
             {t('recentQuickOptions') || 'Recent Quick Options'}
           </Typography>
           <div className="grid grid-cols-1 gap-2">
-            {adhocRecipientsList.map(recipient => {
+            {adhocRecipientsList.map((recipient) => {
               const isSelected =
                 selectedRecipientId === ADHOC_RECIPIENT_UUID &&
                 selectedRecipientName === recipient.name
@@ -379,7 +378,7 @@ export function RecipientSelector({
             })}
           </div>
         </div>
-      )}
+      )} */}
     </div>
   )
 }

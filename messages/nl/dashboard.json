@@ -434,6 +434,7 @@
     "description": "Scan artikelen wanneer ze de voorraad verlaten",
     "actions": {
       "sold": "Verkocht",
+      "sell": "Verkopen",
       "donate": "Doneren",
       "dispose": "Weggooien"
     },

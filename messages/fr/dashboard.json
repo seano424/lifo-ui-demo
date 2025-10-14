@@ -434,6 +434,7 @@
     "description": "Scanner les articles lors de leur sortie d'inventaire",
     "actions": {
       "sold": "Vendu",
+      "sell": "Vendre",
       "donate": "Don",
       "dispose": "Jeter"
     },
