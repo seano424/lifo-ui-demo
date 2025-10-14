@@ -12,9 +12,12 @@ import {
 } from '@/hooks/use-todos-with-filters'
 import type { BatchStatus, TodoActionType, TodoUrgencyLevel } from '@/lib/queries/todos-rpc'
 import { cn } from '@/lib/utils'
+import { ArrowUpDown, Filter } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { MobileFiltersOnlyModal } from './filters/mobile-filters-only-modal'
+import { MobileSortOnlyModal } from './filters/mobile-sort-only-modal'
 import { TodoFiltersPanel, type TodoFiltersState } from './filters/todo-filters-panel'
 import type { SortDirection, SortField } from './filters/todo-sort-controls'
 import { CompletedTab } from './todos-main-tabs/completed-tab'
@@ -42,7 +45,8 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
   const t = useTranslations('todos')
   const router = useRouter()
   const { isMobile } = useMediaQuery()
-  const [showFilters, setShowFilters] = useState(true)
+  const [showMobileFilters, setShowMobileFilters] = useState(false)
+  const [showMobileSort, setShowMobileSort] = useState(false)
 
   const [activeTab, setActiveTab] = useState<TodoTabType>(
     (initialFilters?.tab as TodoTabType) || 'pending',
@@ -215,24 +219,25 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
 
   return (
     <div className="space-y-6">
-      {/* Mobile Filter Toggle */}
-      <div className="flex sm:hidden justify-center py-2 border-y border-muted">
-        <Button variant="subtleTertiary" onClick={() => setShowFilters(!showFilters)}>
-          {showFilters ? t('filters.hideFilters') : t('filters.showFilters')}
+      {/* Mobile Filter & Sort Buttons */}
+      <div className="flex sm:hidden justify-center gap-2 py-2 border-y border-muted">
+        <Button
+          variant="subtleTertiary"
+          onClick={() => setShowMobileFilters(true)}
+          className="flex items-center gap-2"
+        >
+          <Filter className="w-4 h-4" />
+          {t('filters.filtersTitle')}
+        </Button>
+        <Button
+          variant="subtleTertiary"
+          onClick={() => setShowMobileSort(true)}
+          className="flex items-center gap-2"
+        >
+          <ArrowUpDown className="w-4 h-4" />
+          {t('filters.sortTitle')}
         </Button>
       </div>
-
-      {/* Mobile Filters */}
-      {showFilters && (
-        <div className="sm:hidden">
-          <TodoFiltersPanel
-            filters={filters}
-            onFiltersChange={handleFiltersChange}
-            isLoading={false}
-            activeTab={activeTab}
-          />
-        </div>
-      )}
 
       {/* Desktop Filters */}
       <div className="hidden sm:block">
@@ -243,6 +248,52 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
           activeTab={activeTab}
         />
       </div>
+
+      {/* Mobile Filters Modal */}
+      <MobileFiltersOnlyModal
+        isOpen={showMobileFilters}
+        onClose={() => setShowMobileFilters(false)}
+        filters={{
+          urgency_level: filters.urgency_level,
+          action_type: filters.action_type,
+          batch_status: filters.batch_status,
+        }}
+        onFiltersChange={newFilters => {
+          handleFiltersChange(prev => ({
+            ...prev,
+            ...newFilters,
+          }))
+        }}
+        onClearAll={() => {
+          handleFiltersChange(prev => ({
+            ...prev,
+            urgency_level: undefined,
+            action_type: undefined,
+            batch_status: undefined,
+          }))
+        }}
+        isLoading={false}
+      />
+
+      {/* Mobile Sort Modal */}
+      <MobileSortOnlyModal
+        isOpen={showMobileSort}
+        onClose={() => setShowMobileSort(false)}
+        sortConfig={filters.sortConfig || { field: 'urgency', direction: 'desc' }}
+        onSortChange={sortConfig => {
+          handleFiltersChange(prev => ({
+            ...prev,
+            sortConfig,
+          }))
+        }}
+        onReset={() => {
+          handleFiltersChange(prev => ({
+            ...prev,
+            sortConfig: defaultSortConfig,
+          }))
+        }}
+        isLoading={false}
+      />
 
       {/* Tab Navigation */}
       <div className="relative mb-10">

@@ -221,12 +221,19 @@
     "urgency": "Urgency"
   },
   "filters": {
+    "title": "Filter",
+    "filtersTitle": "Filters",
+    "sortTitle": "Sort",
     "searchPlaceholder": "Search products...",
     "activeFilters": "Active filters applied",
-    "clearAll": "Clear all",
+    "clearAll": "Clear all filters",
+    "apply": "Apply",
     "showFilters": "Show Filters",
     "hideFilters": "Hide Filters",
+    "currentSort": "Current Sort",
+    "resetSort": "Reset Sort",
     "urgency": {
+      "title": "Urgency Level",
       "all": "All Urgency Levels",
       "critical": "Critical",
       "high": "High",
@@ -235,6 +242,7 @@
       "none": "None"
     },
     "action": {
+      "title": "Action Type",
       "all": "All Actions",
       "discount": "Discount",
       "donate": "Donate",
@@ -247,7 +255,21 @@
     "status": {
       "all": "All Status",
       "active": "Active",
-      "expired": "Expired"
+      "expired": "Expired",
+      "title": "Batch Status"
+    },
+    "sort": {
+      "sortBy": "Sort by",
+      "direction": "Direction",
+      "urgency": "Urgency",
+      "expiryDate": "Expiry Date",
+      "currentQuantity": "Current Quantity",
+      "potentialLoss": "Potential Loss",
+      "alphabetical": "Alphabetical",
+      "actionDate": "Action Date",
+      "effectiveness": "Effectiveness",
+      "ascending": "Ascending",
+      "descending": "Descending"
     },
     "expiry": {
       "expiringWithin": "Expiring within",

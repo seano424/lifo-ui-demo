@@ -221,12 +221,19 @@
     "urgency": "Urgence"
   },
   "filters": {
+    "title": "Filtrer",
+    "filtersTitle": "Filtres",
+    "sortTitle": "Trier",
     "searchPlaceholder": "Rechercher des produits...",
     "activeFilters": "Filtres actifs appliqués",
-    "clearAll": "Tout effacer",
+    "clearAll": "Effacer tous les filtres",
+    "apply": "Appliquer",
     "showFilters": "Afficher les filtres",
     "hideFilters": "Masquer les filtres",
+    "currentSort": "Tri actuel",
+    "resetSort": "Réinitialiser le tri",
     "urgency": {
+      "title": "Niveau d'urgence",
       "all": "Tous les niveaux d'urgence",
       "critical": "Critique",
       "high": "Élevé",
@@ -235,6 +242,7 @@
       "none": "Aucun"
     },
     "action": {
+      "title": "Type d'action",
       "all": "Toutes les actions",
       "discount": "Remise",
       "donate": "Don",
@@ -247,7 +255,21 @@
     "status": {
       "all": "Tous les statuts",
       "active": "Actif",
-      "expired": "Expiré"
+      "expired": "Expiré",
+      "title": "Statut du lot"
+    },
+    "sort": {
+      "sortBy": "Trier par",
+      "direction": "Direction",
+      "urgency": "Urgence",
+      "expiryDate": "Date d'expiration",
+      "currentQuantity": "Quantité actuelle",
+      "potentialLoss": "Perte potentielle",
+      "alphabetical": "Alphabétique",
+      "actionDate": "Date d'action",
+      "effectiveness": "Efficacité",
+      "ascending": "Croissant",
+      "descending": "Décroissant"
     },
     "expiry": {
       "expiringWithin": "Expirant dans",
