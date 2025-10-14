@@ -137,5 +137,6 @@
   "close": "Fermer",
   "save": "Sauvegarder",
   "edit": "Modifier",
-  "saving": "Enregistrement..."
+  "saving": "Enregistrement...",
+  "optional": "facultatif"
 }

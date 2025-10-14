@@ -432,6 +432,14 @@
     "pointCameraAtBarcode": "Richt camera op product barcode",
     "title": "Scannen voor uitgang",
     "description": "Scan artikelen wanneer ze de voorraad verlaten",
+    "actions": {
+      "sold": "Verkocht",
+      "sell": "Verkopen",
+      "donate": "Doneren",
+      "dispose": "Weggooien"
+    },
+    "donationRecipientPlaceholder": "Donatieontvanger (optioneel)",
+    "disposalReasonPlaceholder": "Reden (bijv. Verlopen, Beschimmeld, Beschadigd)",
     "scanning": {
       "scanNextProduct": "Volgend product scannen",
       "scanProductBarcode": "Product barcode scannen",
@@ -541,6 +549,9 @@
     "clearAll": "Alles wissen",
     "submitAll": "Alles indienen ({count} items)",
     "confirmCheckout": "Uitgang bevestigen",
+    "confirmSale": "Verkoop bevestigen",
+    "confirmDonation": "Donatie bevestigen",
+    "confirmDisposal": "Verwijdering bevestigen",
     "reviewItemsBeforeRemoval": "Controleer onderstaande items voordat u ze uit de voorraad verwijdert.",
     "aboutToRemoveItems": "U staat op het punt {count} items uit de voorraad te verwijderen:",
     "totalItemsRemoved": "Totaal verwijderde items",
@@ -561,6 +572,9 @@
     "recentlyRemoved": "Recent verwijderd ({count} items)",
     "removedQuantityExpires": "Verwijderd {quantity}x • Verloopt op: {date}",
     "andMoreItems": "... en {count} meer items",
+    "donationRecipientRequired": "Selecteer een donatieontvanger voor: {itemNames}",
+    "disposalReasonRequired": "Geef een verwijderingsreden op voor: {itemNames}",
+    "selectRecipientRequired": "Selecteer een ontvanger",
     "cancel": "Annuleren"
   },
   "buttons": {

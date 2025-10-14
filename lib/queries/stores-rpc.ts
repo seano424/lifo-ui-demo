@@ -23,6 +23,13 @@ type ServerClient = Awaited<ReturnType<typeof createServerClient>>
 export async function fetchUserPreferencesRPC(
   serverClient?: ServerClient,
 ): Promise<UserPreferences | null> {
+  // IMPORTANT: serverClient must be provided in SSR context
+  // createClient() uses createBrowserClient which fails in Node.js
+  if (!serverClient && typeof window === 'undefined') {
+    logger.queryWarn('fetchUserPreferencesRPC', 'serverClient required in SSR context')
+    return null
+  }
+
   const supabase = serverClient || createClient()
   const context = 'fetchUserPreferencesRPC'
 
@@ -85,6 +92,13 @@ export async function updateUserPrimaryStoreRPC(
   storeId: string,
   serverClient?: ServerClient,
 ): Promise<void> {
+  // IMPORTANT: serverClient must be provided in SSR context
+  // createClient() uses createBrowserClient which fails in Node.js
+  if (!serverClient && typeof window === 'undefined') {
+    logger.queryWarn('updateUserPrimaryStoreRPC', 'serverClient required in SSR context')
+    throw new Error('Server client required for SSR context')
+  }
+
   const supabase = serverClient || createClient()
   const context = 'updateUserPrimaryStoreRPC'
 

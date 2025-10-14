@@ -2,7 +2,9 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { queryKeys } from '@/lib/queries/query-keys'
 import { createClient } from '@/lib/supabase/client'
+import { logger } from '@/lib/utils/logger'
 import type { AvailableBatch, CheckoutItem, CheckoutResult } from '@/types/scanning'
+import { ADHOC_RECIPIENT_UUID } from '@/hooks/use-donation-recipients'
 
 // Type for RPC function results
 interface BatchRPCResult {
@@ -99,13 +101,15 @@ export function useScanOutActions() {
     const supabase = createClient()
 
     try {
-      const { data, error } = await supabase.rpc('find_available_batches_by_barcode', {
-        barcode_param: barcode,
-        store_id_param: storeId,
-      })
+      const { data, error } = await supabase
+        .schema('inventory')
+        .rpc('find_available_batches_by_barcode', {
+          barcode_param: barcode,
+          store_id_param: storeId,
+        })
 
       if (error) {
-        console.error('RPC batch lookup failed:', error)
+        logger.error('ScanOut', 'RPC batch lookup failed', { error })
         throw new Error(`Failed to fetch available inventory: ${error.message}`)
       }
 
@@ -160,7 +164,7 @@ export function useScanOutActions() {
         }
       })
     } catch (error) {
-      console.error('Error in findAvailableBatches:', error)
+      logger.error('ScanOut', 'Error in findAvailableBatches', { error })
       throw error
     }
   }
@@ -184,34 +188,97 @@ export function useScanOutActions() {
       } = await supabase.auth.getUser()
 
       if (authError || !user) {
-        console.error('Authentication Error:', authError)
+        logger.error('ScanOut', 'Authentication error', { error: authError })
         throw new Error('User not authenticated. Please sign in and try again.')
       }
 
       const storeId = items[0].storeId
 
+      // Log the request payload for debugging
+      const rpcPayload = {
+        p_items: items.map(item => {
+          // Build notes field: include recipient name for ad-hoc donations
+          let notesField = item.notes || ''
+
+          // If this is a donation action and we have a recipient name, include it in notes
+          if (item.actionType === 'donate' && item.donationRecipientName) {
+            // Check if this is an ad-hoc recipient (UUID is special placeholder)
+            const isAdhoc = item.donationRecipientId === ADHOC_RECIPIENT_UUID
+
+            if (isAdhoc) {
+              // For ad-hoc recipients, prepend the recipient name to notes
+              const recipientNote = `Recipient: ${item.donationRecipientName}`
+              notesField = notesField ? `${recipientNote} | ${notesField}` : recipientNote
+            }
+          }
+
+          const recipientId =
+            item.actionType === 'donate' &&
+            item.donationRecipientId &&
+            item.donationRecipientId !== ADHOC_RECIPIENT_UUID
+              ? item.donationRecipientId
+              : null
+
+          // Debug log to verify the fix is working
+          if (item.actionType === 'donate') {
+            logger.log('ScanOut', 'Donation recipient handling', {
+              originalId: item.donationRecipientId,
+              isAdhoc: item.donationRecipientId === ADHOC_RECIPIENT_UUID,
+              finalIdToSend: recipientId,
+              recipientName: item.donationRecipientName,
+              ADHOC_UUID: ADHOC_RECIPIENT_UUID,
+            })
+          }
+
+          return {
+            batch_id: item.batchId,
+            quantity: item.quantityRemoved,
+            action_type: item.actionType, // Use the new action_type field (sold/donate/dispose)
+            action_reason: item.reason || 'scan-out', // Keep for backward compatibility
+            notes: notesField,
+            // Only pass donation_recipient_id if it's a real DB recipient (not ad-hoc)
+            // Ad-hoc recipients use the placeholder UUID, which doesn't exist in DB
+            // Pass null for ad-hoc recipients - the name is already in notes field
+            donation_recipient_id: recipientId,
+            disposal_reason: item.disposalReason, // Required for 'dispose' action
+          }
+        }),
+        p_store_id: storeId,
+      }
+
+      logger.log('ScanOut', 'RPC Request', {
+        function: 'batch_update_quantities',
+        storeId,
+        itemCount: items.length,
+        payload: rpcPayload,
+        itemDetails: items.map(item => ({
+          batchId: item.batchId,
+          actionType: item.actionType,
+          quantity: item.quantityRemoved,
+        })),
+      })
+
       // Process all items in a single batch RPC call (13x faster than loop)
       const { data: batchResults, error: batchError } = await supabase.rpc(
         'batch_update_quantities',
-        {
-          p_items: items.map(item => ({
-            batch_id: item.batchId,
-            quantity: item.quantityRemoved,
-            action_reason: item.reason || 'scan-out',
-            notes: item.notes || '',
-          })),
-          p_store_id: storeId,
-        },
+        rpcPayload,
       )
 
       if (batchError) {
-        console.error('Batch update failed:', batchError)
+        logger.error('ScanOut', 'RPC Error', {
+          error: batchError,
+          message: batchError.message,
+          details: batchError.details,
+          hint: batchError.hint,
+          code: batchError.code,
+          payload: rpcPayload,
+        })
         throw new Error(`Checkout failed: ${batchError.message}`)
       }
 
       // The RPC returns an object with results array, not a direct array
       if (!batchResults || typeof batchResults !== 'object') {
-        console.error('Invalid batch results:', batchResults)
+        logger.error('ScanOut', 'Invalid batch results', { batchResults })
         throw new Error('No results returned from batch update')
       }
 
@@ -230,7 +297,7 @@ export function useScanOutActions() {
       }
 
       if (!response.results || response.results.length === 0) {
-        console.error('No results in batch response:', response)
+        logger.error('ScanOut', 'No results in batch response', { response })
         throw new Error('No results returned from batch update')
       }
 
@@ -244,16 +311,52 @@ export function useScanOutActions() {
       const successCount = results.filter(r => r.success).length
       const failureCount = results.filter(r => !r.success).length
 
-      // Debug logging
-      console.log('[DEBUG] Processed results:', {
+      // Enhanced logging with success/failure breakdown
+      logger.log('ScanOut', 'RPC Response', {
         totalItems: results.length,
         successCount,
         failureCount,
-        results,
-        individualResults: response.results,
-        firstResultDetail: response.results[0],
-        errorMessages: response.results.map(r => r.error_message),
+        rawResponse: response,
       })
+
+      // Log successful items
+      const successfulItems = response.results.filter(r => r.success)
+      if (successfulItems.length > 0) {
+        logger.log('ScanOut', 'Successful items', {
+          count: successfulItems.length,
+          items: successfulItems.map(r => ({
+            batchId: r.batch_id,
+            newQuantity: r.new_quantity,
+          })),
+        })
+      }
+
+      // Log failed items with detailed error info
+      const failedItems = response.results.filter(r => !r.success)
+      if (failedItems.length > 0) {
+        logger.error('ScanOut', 'Failed items', {
+          count: failedItems.length,
+          items: failedItems.map(r => ({
+            batchId: r.batch_id,
+            error: r.error_message,
+            // Try to match with original item for more context
+            originalItem: items.find(item => item.batchId === r.batch_id),
+          })),
+        })
+
+        // Log each failure individually for visibility
+        failedItems.forEach((failedItem, index) => {
+          const originalItem = items.find(item => item.batchId === failedItem.batch_id)
+          logger.error('ScanOut', `Failure #${index + 1}`, {
+            batchId: failedItem.batch_id,
+            errorMessage: failedItem.error_message,
+            requestedQuantity: originalItem?.quantityRemoved,
+            actionType: originalItem?.actionType,
+            reason: originalItem?.reason,
+            notes: originalItem?.notes,
+          })
+        })
+      }
 
       return {
         success: successCount > 0,
@@ -301,7 +404,7 @@ export function useScanOutActions() {
     },
 
     onError: (error: Error) => {
-      console.error('Checkout failed:', error)
+      logger.error('ScanOut', 'Checkout failed', { error })
       toast.error(`Checkout failed: ${error.message}`)
     },
   })

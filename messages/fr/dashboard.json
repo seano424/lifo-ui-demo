@@ -432,6 +432,14 @@
     "pointCameraAtBarcode": "Pointez la caméra vers le code-barres du produit",
     "title": "Scanner pour sortir",
     "description": "Scanner les articles lors de leur sortie d'inventaire",
+    "actions": {
+      "sold": "Vendu",
+      "sell": "Vendre",
+      "donate": "Don",
+      "dispose": "Jeter"
+    },
+    "donationRecipientPlaceholder": "Destinataire du don (optionnel)",
+    "disposalReasonPlaceholder": "Raison (ex: Expiré, Moisi, Endommagé)",
     "scanning": {
       "scanNextProduct": "Scanner le produit suivant",
       "scanProductBarcode": "Scanner le code-barres du produit",
@@ -541,6 +549,9 @@
     "clearAll": "Tout effacer",
     "submitAll": "Soumettre tout ({count} articles)",
     "confirmCheckout": "Confirmer la sortie",
+    "confirmSale": "Confirmer la vente",
+    "confirmDonation": "Confirmer le don",
+    "confirmDisposal": "Confirmer l'élimination",
     "reviewItemsBeforeRemoval": "Vérifiez les articles ci-dessous avant de les retirer de l'inventaire.",
     "aboutToRemoveItems": "Vous êtes sur le point de retirer {count} articles de l'inventaire :",
     "totalItemsRemoved": "Total des articles retirés",
@@ -561,6 +572,9 @@
     "recentlyRemoved": "Récemment retiré ({count} articles)",
     "removedQuantityExpires": "Retiré {quantity}x • Expire le : {date}",
     "andMoreItems": "... et {count} autres articles",
+    "donationRecipientRequired": "Veuillez sélectionner un destinataire de don pour : {itemNames}",
+    "disposalReasonRequired": "Veuillez fournir une raison d'élimination pour : {itemNames}",
+    "selectRecipientRequired": "Veuillez sélectionner un destinataire",
     "cancel": "Annuler"
   },
   "buttons": {

@@ -409,6 +409,7 @@ describe('useScanOutActions', () => {
         {
           batchId: 'batch-1',
           quantityRemoved: 5,
+          actionType: 'sold',
           reason: 'sale',
           storeId: 'store-1',
         },
@@ -435,6 +436,7 @@ describe('useScanOutActions', () => {
         {
           batchId: 'batch-1',
           quantityRemoved: 5,
+          actionType: 'sold',
           reason: 'sale',
           storeId: 'store-1',
         },

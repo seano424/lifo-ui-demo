@@ -9,6 +9,11 @@ import type { Database } from './supabase'
 export type BatchRow = Database['inventory']['Tables']['batches']['Row']
 
 /**
+ * Action types for batch removal in scan-out workflow
+ */
+export type ActionType = 'sold' | 'donate' | 'dispose'
+
+/**
  * Available batch with nested structure for scan-out workflow
  * Includes full batch data and associated product information
  */
@@ -35,6 +40,10 @@ export interface ScanOutItem {
   expiryDate: string
   price: number
   timestamp: Date
+  actionType: ActionType // Action to perform when removing this batch
+  donationRecipientId?: string // Donation recipient UUID (if actionType === 'donate')
+  donationRecipientName?: string // Donation recipient name (for ad-hoc or display)
+  disposalReason?: string // Disposal reason (if actionType === 'dispose')
 }
 
 /**
@@ -43,9 +52,13 @@ export interface ScanOutItem {
 export interface CheckoutItem {
   batchId: string
   quantityRemoved: number
-  reason: 'scan-out' | 'sale' | 'waste' | 'transfer' | 'expired'
+  actionType: ActionType // Type of action being performed
+  reason?: string // Optional additional reason/context
   storeId: string
   notes?: string
+  donationRecipientId?: string // Donation recipient UUID (required when actionType === 'donate')
+  donationRecipientName?: string // Donation recipient name (for ad-hoc recipients or display)
+  disposalReason?: string // Disposal reason (required when actionType === 'dispose')
 }
 
 /**

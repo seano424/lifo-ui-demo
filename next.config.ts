@@ -50,10 +50,10 @@ const nextConfig: NextConfig = {
           },
           {
             // Implements strict Content Security Policy for service worker
-            // Allows connections to Supabase for API requests
+            // Allows connections to Supabase for API requests and Google Fonts
             key: 'Content-Security-Policy',
             value:
-              "default-src 'self'; script-src 'self'; connect-src 'self' https://jrgmetdsohowtxickqij.supabase.co",
+              "default-src 'self'; script-src 'self'; connect-src 'self' https://jrgmetdsohowtxickqij.supabase.co https://fonts.googleapis.com https://fonts.gstatic.com; font-src 'self' https://fonts.gstatic.com data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
           },
         ],
       },

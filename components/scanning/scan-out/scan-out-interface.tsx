@@ -19,13 +19,18 @@ import { useOCRWithFallback } from '@/hooks/use-ocr-processing'
 import { captureImageFromVideo } from '@/lib/api/ocr-client'
 import { useStoreState } from '@/lib/stores/store-context'
 import { createClient } from '@/lib/supabase/client'
+import { RecipientSelector } from '@/components/donation/recipient-selector'
+import { toast } from 'sonner'
+import { Typography } from '@/components/ui/typography'
 
 import type { ScannedItem } from '../shared'
+import ActionTypeSelector from './action-type-selector'
 import BatchSelectionList from '../shared/batch-selection-list'
 import ScanningCamera from '../shared/scanning-camera'
 import { useScanOutActions } from './use-scan-out-actions'
 import type { Database } from '@/types/supabase'
-import type { AvailableBatch } from '@/types/scanning'
+import type { ActionType, AvailableBatch } from '@/types/scanning'
+import { Input } from '@/components/ui/input'
 
 type batch = Database['inventory']['Tables']['batches']['Row']
 
@@ -41,6 +46,10 @@ interface CurrentProduct {
 interface PendingItem extends ScannedItem {
   batchId: string
   maxQuantity: number
+  actionType: ActionType
+  donationRecipientId?: string
+  donationRecipientName?: string // For ad-hoc or display purposes
+  disposalReason?: string
 }
 
 interface ScanOutInterfaceProps {
@@ -71,6 +80,9 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
   type ScanOutStep = 'scanning' | 'batch-selection'
   const [currentStep, setCurrentStep] = useState<ScanOutStep>('scanning')
   const [showManualEntry, setShowManualEntry] = useState(false)
+
+  // Global action type (default to 'sold')
+  const [globalActionType, setGlobalActionType] = useState<ActionType>('sold')
 
   // Available batches for the current product
   const [availableBatches, setAvailableBatches] = useState<AvailableBatch[]>([])
@@ -228,7 +240,7 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
   const handleBatchSelected = useCallback(
     (batch: AvailableBatch) => {
       if (currentProduct) {
-        // Add to pending list with default quantity of 1
+        // Add to pending list with default quantity of 1 and current global action type
         const newItem: PendingItem = {
           id: batch.batch.batch_id, // ← Access via batch.batch
           batchId: batch.batch.batch_id, // ← Access via batch.batch
@@ -240,6 +252,7 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
           expiryDate: batch.batch.expiry_date, // ← Access via batch.batch
           price: Number(batch.batch.cost_price), // ← Access via batch.batch
           timestamp: new Date(),
+          actionType: globalActionType, // Use the global action type
         }
 
         setPendingItems(prev => {
@@ -270,7 +283,7 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
         setSelectedBatch(null)
       }
     },
-    [currentProduct],
+    [currentProduct, globalActionType],
   )
 
   // Update item quantity in the pending list
@@ -284,6 +297,43 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
             }
           : item,
       ),
+    )
+  }
+
+  // Update item action type in the pending list
+  const updateItemActionType = (batchId: string, actionType: ActionType) => {
+    setPendingItems(prev =>
+      prev.map(item =>
+        item.batchId === batchId
+          ? {
+              ...item,
+              actionType,
+              // Clear action-specific fields when changing action type
+              donationRecipientId: actionType === 'donate' ? item.donationRecipientId : undefined,
+              disposalReason: actionType === 'dispose' ? item.disposalReason : undefined,
+            }
+          : item,
+      ),
+    )
+  }
+
+  // Update donation recipient for an item
+  const updateItemDonationRecipient = (
+    batchId: string,
+    donationRecipientId: string,
+    donationRecipientName: string,
+  ) => {
+    setPendingItems(prev =>
+      prev.map(item =>
+        item.batchId === batchId ? { ...item, donationRecipientId, donationRecipientName } : item,
+      ),
+    )
+  }
+
+  // Update disposal reason for an item
+  const updateItemDisposalReason = (batchId: string, disposalReason: string) => {
+    setPendingItems(prev =>
+      prev.map(item => (item.batchId === batchId ? { ...item, disposalReason } : item)),
     )
   }
 
@@ -356,26 +406,112 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
   }
 
   const handleConfirmSubmission = () => {
-    // Submit the checkout/removal to inventory
-    submitCheckout(
-      pendingItems.map(item => ({
-        batchId: item.batchId,
-        quantityRemoved: item.quantity,
-        reason: 'scan-out',
-        storeId: activeStore?.store_id || '',
-        notes: t('batchRemovalNote', {
-          productName: item.productName,
-          quantity: item.quantity,
-        }),
-      })),
-      {
-        onSuccess: result => {
-          // Store the result for the success dialog
-          setSubmissionResult({
-            successCount: result.successCount || pendingItems.length,
-            totalCount: pendingItems.length,
-          })
+    // Validate donation items have recipients selected
+    const donationItemsWithoutRecipient = pendingItems.filter(
+      item => item.actionType === 'donate' && !item.donationRecipientId,
+    )
 
+    if (donationItemsWithoutRecipient.length > 0) {
+      const itemNames = donationItemsWithoutRecipient.map(item => item.productName).join(', ')
+      toast.error(
+        t('donationRecipientRequired') || `Please select a donation recipient for: ${itemNames}`,
+      )
+      console.error('[SCAN-OUT-UI] Validation failed: Donation items missing recipients', {
+        count: donationItemsWithoutRecipient.length,
+        items: donationItemsWithoutRecipient.map(item => ({
+          batchId: item.batchId,
+          productName: item.productName,
+          actionType: item.actionType,
+        })),
+      })
+      return // Prevent submission
+    }
+
+    // Validate disposal items have reasons
+    const disposalItemsWithoutReason = pendingItems.filter(
+      item => item.actionType === 'dispose' && !item.disposalReason?.trim(),
+    )
+
+    if (disposalItemsWithoutReason.length > 0) {
+      const itemNames = disposalItemsWithoutReason.map(item => item.productName).join(', ')
+      toast.error(
+        t('disposalReasonRequired') || `Please provide a disposal reason for: ${itemNames}`,
+      )
+      console.error('[SCAN-OUT-UI] Validation failed: Disposal items missing reasons', {
+        count: disposalItemsWithoutReason.length,
+        items: disposalItemsWithoutReason.map(item => ({
+          batchId: item.batchId,
+          productName: item.productName,
+          actionType: item.actionType,
+        })),
+      })
+      return // Prevent submission
+    }
+
+    const checkoutItems = pendingItems.map(item => ({
+      batchId: item.batchId,
+      quantityRemoved: item.quantity,
+      actionType: item.actionType, // Pass the action type (sold/donate/dispose)
+      reason: 'scan-out',
+      storeId: activeStore?.store_id || '',
+      notes: t('batchRemovalNote', {
+        productName: item.productName,
+        quantity: item.quantity,
+      }),
+      donationRecipientId: item.donationRecipientId, // Pass donation recipient UUID if provided
+      donationRecipientName: item.donationRecipientName, // Pass donation recipient name (for ad-hoc or display)
+      disposalReason: item.disposalReason, // Pass disposal reason if provided
+    }))
+
+    // Debug log to verify donation recipient data
+    checkoutItems.forEach((item, index) => {
+      if (item.actionType === 'donate') {
+        console.log(`[SCAN-OUT-UI] Donation item #${index + 1}:`, {
+          donationRecipientId: item.donationRecipientId,
+          donationRecipientName: item.donationRecipientName,
+          hasRecipientId: !!item.donationRecipientId,
+          hasRecipientName: !!item.donationRecipientName,
+        })
+      }
+    })
+
+    console.log('[SCAN-OUT-UI] Submitting checkout:', {
+      itemCount: checkoutItems.length,
+      storeId: activeStore?.store_id,
+      actionBreakdown: actionBreakdown.map(a => ({
+        action: a.actionType,
+        count: a.count,
+        value: a.value,
+      })),
+      items: checkoutItems,
+      pendingItems: pendingItems.map(item => ({
+        batchId: item.batchId,
+        productName: item.productName,
+        quantity: item.quantity,
+        actionType: item.actionType,
+        maxQuantity: item.maxQuantity,
+      })),
+    })
+
+    // Submit the checkout/removal to inventory
+    submitCheckout(checkoutItems, {
+      onSuccess: result => {
+        console.log('[SCAN-OUT-UI] Submission successful:', {
+          result,
+          successCount: result.successCount,
+          failureCount: result.failureCount,
+          totalAttempted: pendingItems.length,
+          results: result.results,
+        })
+
+        // Store the result for the success dialog
+        setSubmissionResult({
+          successCount: result.successCount || 0,
+          totalCount: pendingItems.length,
+        })
+
+        // Only clear items and show success if at least one item succeeded
+        if (result.successCount && result.successCount > 0) {
           // Notify parent with all items
           pendingItems.forEach(item => {
             onItemRemoved?.(item)
@@ -387,12 +523,22 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
 
           // Show success dialog
           setShowSuccessDialog(true)
-        },
-        onError: _error => {
-          // Dialog stays open so user can retry or cancel
-        },
+        } else {
+          // All items failed - keep dialog open and show error
+          console.error('[SCAN-OUT-UI] All items failed to process')
+          // Dialog stays open so user can see what happened and retry
+        }
       },
-    )
+      onError: error => {
+        console.error('[SCAN-OUT-UI] Submission failed:', {
+          error,
+          message: error instanceof Error ? error.message : String(error),
+          stack: error instanceof Error ? error.stack : undefined,
+          attemptedItems: checkoutItems,
+        })
+        // Dialog stays open so user can retry or cancel
+      },
+    })
   }
 
   const formatPrice = (price: number) => `€${price.toFixed(2)}`
@@ -401,8 +547,42 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
   const totalItems = pendingItems.reduce((sum, item) => sum + item.quantity, 0)
   const totalValue = pendingItems.reduce((sum, item) => sum + item.quantity * item.price, 0)
 
+  // Calculate breakdown by action type
+  const actionBreakdown = pendingItems.reduce(
+    (acc, item) => {
+      const existingAction = acc.find(a => a.actionType === item.actionType)
+      if (existingAction) {
+        existingAction.count += item.quantity
+        existingAction.value += item.quantity * item.price
+        existingAction.items.push(item)
+      } else {
+        acc.push({
+          actionType: item.actionType,
+          count: item.quantity,
+          value: item.quantity * item.price,
+          items: [item],
+        })
+      }
+      return acc
+    },
+    [] as Array<{
+      actionType: ActionType
+      count: number
+      value: number
+      items: PendingItem[]
+    }>,
+  )
+
   return (
     <div className="space-y-4">
+      {/* Global Action Type Selector */}
+      <div className="px-4">
+        <ActionTypeSelector
+          selectedAction={globalActionType}
+          onActionChange={setGlobalActionType}
+        />
+      </div>
+
       {/* Step 1: Barcode Scanning */}
       {currentStep === 'scanning' && (
         <div className="space-y-4">
@@ -473,56 +653,96 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
             {pendingItems.map(item => (
               <div
                 key={item.batchId}
-                className="flex items-center justify-between p-3 bg-gray-50 rounded-2xl border"
+                className="flex items-start justify-between p-3 bg-gray-50 rounded-2xl border"
               >
-                <div className="flex-1">
-                  <div className="font-medium">
-                    {item.maxQuantity} {t('available')}
+                <div className="flex-1 flex flex-col gap-2">
+                  <div className="flex items-center justify-between mb-2">
+                    <Typography>
+                      {item.maxQuantity} {t('available')}
+                    </Typography>
+                    <ActionTypeSelector
+                      selectedAction={item.actionType}
+                      onActionChange={actionType => updateItemActionType(item.batchId, actionType)}
+                      variant="compact"
+                    />
                   </div>
-                  <div className="font-medium">{item.productName}</div>
-                  <div className="text-sm text-gray-500">
+                  <Typography>{item.productName}</Typography>
+                  <Typography>
                     {item.brand} • {t('expires')}: {new Date(item.expiryDate).toLocaleDateString()}
-                  </div>
-                  <div className="text-sm text-gray-600">
+                  </Typography>
+                  <Typography>
                     {formatPrice(item.price)} × {item.quantity} ={' '}
                     {formatPrice(item.price * item.quantity)}
+                  </Typography>
+
+                  {/* Action-specific inputs */}
+                  {item.actionType === 'donate' && (
+                    <div className="mt-2">
+                      {!item.donationRecipientId && (
+                        <Typography color="destructive">
+                          {t('selectRecipientRequired') || 'Please select a recipient'}
+                        </Typography>
+                      )}
+                      <RecipientSelector
+                        storeId={activeStore?.store_id}
+                        selectedRecipientId={item.donationRecipientId}
+                        selectedRecipientName={item.donationRecipientName}
+                        onRecipientSelect={(recipientId, recipientName) => {
+                          updateItemDonationRecipient(item.batchId, recipientId, recipientName)
+                        }}
+                        className={`p-2 bg-white dark:bg-gray-800 rounded-lg border`}
+                      />
+                    </div>
+                  )}
+                  {item.actionType === 'dispose' && (
+                    <div className="mt-2">
+                      <Input
+                        type="text"
+                        placeholder={
+                          t('disposalReasonPlaceholder') || 'Reason (e.g., Expired, Moldy)'
+                        }
+                        value={item.disposalReason || ''}
+                        onChange={e => updateItemDisposalReason(item.batchId, e.target.value)}
+                      />
+                    </div>
+                  )}
+
+                  <div className="flex items-center gap-2 justify-center">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => updateItemQuantity(item.batchId, item.quantity - 1)}
+                      disabled={item.quantity <= 1}
+                    >
+                      <Minus className="h-3 w-3" />
+                    </Button>
+                    <input
+                      type="number"
+                      value={item.quantity}
+                      onChange={e =>
+                        updateItemQuantity(item.batchId, parseInt(e.target.value, 10) || 1)
+                      }
+                      className="w-12 text-center border rounded-2xl px-1 py-1 text-sm"
+                      min="1"
+                      max={item.maxQuantity}
+                    />
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => updateItemQuantity(item.batchId, item.quantity + 1)}
+                      disabled={item.quantity >= item.maxQuantity}
+                    >
+                      <Plus className="h-3 w-3" />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => removeItemFromList(item.batchId)}
+                      className="text-red-600 hover:text-red-700"
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </Button>
                   </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => updateItemQuantity(item.batchId, item.quantity - 1)}
-                    disabled={item.quantity <= 1}
-                  >
-                    <Minus className="h-3 w-3" />
-                  </Button>
-                  <input
-                    type="number"
-                    value={item.quantity}
-                    onChange={e =>
-                      updateItemQuantity(item.batchId, parseInt(e.target.value, 10) || 1)
-                    }
-                    className="w-12 text-center border rounded-2xl px-1 py-1 text-sm"
-                    min="1"
-                    max={item.maxQuantity}
-                  />
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => updateItemQuantity(item.batchId, item.quantity + 1)}
-                    disabled={item.quantity >= item.maxQuantity}
-                  >
-                    <Plus className="h-3 w-3" />
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => removeItemFromList(item.batchId)}
-                    className="text-red-600 hover:text-red-700"
-                  >
-                    <Trash2 className="h-3 w-3" />
-                  </Button>
                 </div>
               </div>
             ))}
@@ -546,38 +766,86 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
         <Dialog open={showSubmissionDialog} onOpenChange={setShowSubmissionDialog}>
           <DialogContent className="sm:max-w-lg">
             <DialogHeader>
-              <DialogTitle>{t('confirmCheckout')}</DialogTitle>
-              <DialogDescription>{t('reviewItemsBeforeRemoval')}</DialogDescription>
+              <DialogTitle>
+                {actionBreakdown.length === 1
+                  ? actionBreakdown[0].actionType === 'sold'
+                    ? t('confirmSale')
+                    : actionBreakdown[0].actionType === 'donate'
+                      ? t('confirmDonation')
+                      : t('confirmDisposal')
+                  : t('confirmCheckout')}
+              </DialogTitle>
+              <DialogDescription className="text-sm text-gray-600">
+                {t('reviewItemsBeforeRemoval')}{' '}
+                {t('aboutToRemoveItems', { count: pendingItems.length })}
+              </DialogDescription>
             </DialogHeader>
 
             <div className="space-y-4">
-              <div className="text-sm text-gray-600">
-                {t('aboutToRemoveItems', { count: pendingItems.length })}
-              </div>
+              {/* Action Breakdown Summary */}
+              {actionBreakdown.length > 1 && (
+                <div className="grid grid-cols-3 gap-2 p-3 bg-gray-50 rounded-2xl border">
+                  {actionBreakdown.map(action => {
+                    const colorClass =
+                      action.actionType === 'sold'
+                        ? 'bg-primary-100 text-primary-700 border-primary-200'
+                        : action.actionType === 'donate'
+                          ? 'bg-blue-100 text-blue-700 border-blue-200'
+                          : 'bg-red-100 text-red-700 border-red-200'
+                    return (
+                      <div
+                        key={action.actionType}
+                        className={`p-2 rounded-xl border ${colorClass}`}
+                      >
+                        <Typography>{t(`actions.${action.actionType}`)}</Typography>
+                        <Typography>{action.count}</Typography>
+                        <Typography variant="extraSmall">{formatPrice(action.value)}</Typography>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
 
               {/* Summary List */}
               <div className="max-h-60 overflow-y-auto space-y-2 border rounded-2xl p-3 bg-gray-50">
                 {pendingItems.map(item => {
                   const itemTotal = item.quantity * item.price
+                  const actionColor =
+                    item.actionType === 'sold'
+                      ? 'text-primary-700'
+                      : item.actionType === 'donate'
+                        ? 'text-blue-700'
+                        : 'text-red-700'
+                  const actionBg =
+                    item.actionType === 'sold'
+                      ? 'bg-primary-50'
+                      : item.actionType === 'donate'
+                        ? 'bg-blue-50'
+                        : 'bg-red-50'
                   return (
                     <div
                       key={item.batchId}
-                      className="flex justify-between items-start p-2 bg-white rounded-2xl border text-sm"
+                      className={`flex justify-between items-start p-2 rounded-2xl border ${actionBg}`}
                     >
-                      <div className="flex-1">
-                        <div className="font-medium">{item.productName}</div>
-                        {item.brand && <div className="text-xs text-gray-600">{item.brand}</div>}
-                        <div className="text-xs text-gray-500">
+                      <div className="flex-1 flex flex-col gap-1">
+                        <div className="flex items-center gap-2">
+                          <Typography>{item.productName}</Typography>
+                          <Typography variant="extraSmall" className={`${actionColor}`}>
+                            ({t(`actions.${item.actionType}`)})
+                          </Typography>
+                        </div>
+                        {item.brand && <Typography variant="extraSmall">{item.brand}</Typography>}
+                        <Typography variant="extraSmall">
                           {t('expires')}: {new Date(item.expiryDate).toLocaleDateString()}
-                        </div>
+                        </Typography>
                       </div>
-                      <div className="text-right">
-                        <div className="font-medium text-red-600">
+                      <div className="text-right flex flex-col gap-1">
+                        <Typography variant="extraSmall" className={`${actionColor}`}>
                           -{item.quantity}x {formatPrice(item.price)}
-                        </div>
-                        <div className="text-xs text-red-500">
+                        </Typography>
+                        <Typography variant="extraSmall">
                           {t('remove')}: {formatPrice(itemTotal)}
-                        </div>
+                        </Typography>
                       </div>
                     </div>
                   )
@@ -586,20 +854,20 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
 
               {/* Total Summary */}
               <div className="border-t pt-3">
-                <div className="flex justify-between items-center font-medium">
-                  <span>{t('totalItemsRemoved')}:</span>
-                  <span className="text-red-600">
+                <div className="flex justify-between items-center">
+                  <Typography>{t('totalItemsRemoved')}:</Typography>
+                  <Typography color="destructive">
                     -{pendingItems.reduce((sum, item) => sum + item.quantity, 0)}
-                  </span>
+                  </Typography>
                 </div>
-                <div className="flex justify-between items-center font-medium">
-                  <span>{t('totalValueRemoved')}:</span>
-                  <span className="text-red-600">
+                <div className="flex justify-between items-center">
+                  <Typography>{t('totalValueRemoved')}:</Typography>
+                  <Typography color="destructive">
                     -
                     {formatPrice(
                       pendingItems.reduce((sum, item) => sum + item.quantity * item.price, 0),
                     )}
-                  </span>
+                  </Typography>
                 </div>
               </div>
             </div>

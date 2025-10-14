@@ -1,0 +1,26 @@
+{
+  "loadingRecipients": "Chargement des destinataires...",
+  "savedRecipients": "Destinataires enregistrés",
+  "quickOptions": "Options rapides",
+  "addCustomRecipient": "Ajouter un destinataire personnalisé",
+  "customRecipientName": "Nom du destinataire personnalisé",
+  "customRecipientPlaceholder": "par ex., École locale, Église...",
+  "recentQuickOptions": "Options rapides récentes",
+  "newRecipientDetails": "Détails du nouveau destinataire",
+  "recipientName": "Nom du destinataire",
+  "recipientType": "Type",
+  "contactEmail": "Courriel de contact",
+  "contactPhone": "Téléphone de contact",
+  "type": {
+    "charity": "Charité",
+    "foodBank": "Banque alimentaire",
+    "soupKitchen": "Soupe populaire",
+    "religiousOrg": "Organisation religieuse",
+    "communityGroup": "Groupe communautaire",
+    "animalShelter": "Refuge pour animaux",
+    "school": "École",
+    "elderlyCare": "Soins aux personnes âgées",
+    "homelessShelter": "Refuge pour sans-abri",
+    "other": "Autre"
+  }
+}

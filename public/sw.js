@@ -1,4 +1,4 @@
-const CACHE_NAME = 'lifo-ai-v7'
+const CACHE_NAME = 'lifo-ai-v9'
 
 // Push notification handler
 self.addEventListener('push', event => {
@@ -70,6 +70,12 @@ self.addEventListener('fetch', event => {
   // Skip API calls and Next.js internals
   if (url.pathname.startsWith('/api/') || url.pathname.startsWith('/_next/')) {
     return
+  }
+
+  // CRITICAL: Never intercept Supabase requests
+  // This prevents ECONNRESET errors and auth issues
+  if (url.hostname.includes('supabase.co')) {
+    return // Pass through to Supabase
   }
 
   // Only cache external static assets
