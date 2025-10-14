@@ -437,6 +437,8 @@
       "donate": "Don",
       "dispose": "Jeter"
     },
+    "donationRecipientPlaceholder": "Destinataire du don (optionnel)",
+    "disposalReasonPlaceholder": "Raison (ex: Expiré, Moisi, Endommagé)",
     "scanning": {
       "scanNextProduct": "Scanner le produit suivant",
       "scanProductBarcode": "Scanner le code-barres du produit",

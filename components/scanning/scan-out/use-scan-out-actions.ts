@@ -190,23 +190,47 @@ export function useScanOutActions() {
 
       const storeId = items[0].storeId
 
+      // Log the request payload for debugging
+      const rpcPayload = {
+        p_items: items.map(item => ({
+          batch_id: item.batchId,
+          quantity: item.quantityRemoved,
+          action_type: item.actionType, // Use the new action_type field (sold/donate/dispose)
+          action_reason: item.reason || 'scan-out', // Keep for backward compatibility
+          notes: item.notes || '',
+          donation_recipient_id: item.donationRecipientId, // Required for 'donate' action
+          disposal_reason: item.disposalReason, // Required for 'dispose' action
+        })),
+        p_store_id: storeId,
+      }
+
+      console.log('[SCAN-OUT] RPC Request:', {
+        function: 'batch_update_quantities',
+        storeId,
+        itemCount: items.length,
+        payload: rpcPayload,
+        itemDetails: items.map(item => ({
+          batchId: item.batchId,
+          actionType: item.actionType,
+          quantity: item.quantityRemoved,
+        })),
+      })
+
       // Process all items in a single batch RPC call (13x faster than loop)
       const { data: batchResults, error: batchError } = await supabase.rpc(
         'batch_update_quantities',
-        {
-          p_items: items.map(item => ({
-            batch_id: item.batchId,
-            quantity: item.quantityRemoved,
-            action_type: item.actionType, // Use the new action_type field (sold/donate/dispose)
-            action_reason: item.reason || 'scan-out', // Keep for backward compatibility
-            notes: item.notes || '',
-          })),
-          p_store_id: storeId,
-        },
+        rpcPayload,
       )
 
       if (batchError) {
-        console.error('Batch update failed:', batchError)
+        console.error('[SCAN-OUT] RPC Error:', {
+          error: batchError,
+          message: batchError.message,
+          details: batchError.details,
+          hint: batchError.hint,
+          code: batchError.code,
+          payload: rpcPayload,
+        })
         throw new Error(`Checkout failed: ${batchError.message}`)
       }
 
@@ -245,16 +269,52 @@ export function useScanOutActions() {
       const successCount = results.filter(r => r.success).length
       const failureCount = results.filter(r => !r.success).length
 
-      // Debug logging
-      console.log('[DEBUG] Processed results:', {
+      // Enhanced logging with success/failure breakdown
+      console.log('[SCAN-OUT] RPC Response:', {
         totalItems: results.length,
         successCount,
         failureCount,
-        results,
-        individualResults: response.results,
-        firstResultDetail: response.results[0],
-        errorMessages: response.results.map(r => r.error_message),
+        rawResponse: response,
       })
+
+      // Log successful items
+      const successfulItems = response.results.filter(r => r.success)
+      if (successfulItems.length > 0) {
+        console.log('[SCAN-OUT] ✅ Successful items:', {
+          count: successfulItems.length,
+          items: successfulItems.map(r => ({
+            batchId: r.batch_id,
+            newQuantity: r.new_quantity,
+          })),
+        })
+      }
+
+      // Log failed items with detailed error info
+      const failedItems = response.results.filter(r => !r.success)
+      if (failedItems.length > 0) {
+        console.error('[SCAN-OUT] ❌ Failed items:', {
+          count: failedItems.length,
+          items: failedItems.map(r => ({
+            batchId: r.batch_id,
+            error: r.error_message,
+            // Try to match with original item for more context
+            originalItem: items.find(item => item.batchId === r.batch_id),
+          })),
+        })
+
+        // Log each failure individually for visibility
+        failedItems.forEach((failedItem, index) => {
+          const originalItem = items.find(item => item.batchId === failedItem.batch_id)
+          console.error(`[SCAN-OUT] Failure #${index + 1}:`, {
+            batchId: failedItem.batch_id,
+            errorMessage: failedItem.error_message,
+            requestedQuantity: originalItem?.quantityRemoved,
+            actionType: originalItem?.actionType,
+            reason: originalItem?.reason,
+            notes: originalItem?.notes,
+          })
+        })
+      }
 
       return {
         success: successCount > 0,

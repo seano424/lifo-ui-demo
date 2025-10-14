@@ -43,6 +43,8 @@ interface PendingItem extends ScannedItem {
   batchId: string
   maxQuantity: number
   actionType: ActionType
+  donationRecipientId?: string
+  disposalReason?: string
 }
 
 interface ScanOutInterfaceProps {
@@ -296,7 +298,31 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
   // Update item action type in the pending list
   const updateItemActionType = (batchId: string, actionType: ActionType) => {
     setPendingItems(prev =>
-      prev.map(item => (item.batchId === batchId ? { ...item, actionType } : item)),
+      prev.map(item =>
+        item.batchId === batchId
+          ? {
+              ...item,
+              actionType,
+              // Clear action-specific fields when changing action type
+              donationRecipientId: actionType === 'donate' ? item.donationRecipientId : undefined,
+              disposalReason: actionType === 'dispose' ? item.disposalReason : undefined,
+            }
+          : item,
+      ),
+    )
+  }
+
+  // Update donation recipient for an item
+  const updateItemDonationRecipient = (batchId: string, donationRecipientId: string) => {
+    setPendingItems(prev =>
+      prev.map(item => (item.batchId === batchId ? { ...item, donationRecipientId } : item)),
+    )
+  }
+
+  // Update disposal reason for an item
+  const updateItemDisposalReason = (batchId: string, disposalReason: string) => {
+    setPendingItems(prev =>
+      prev.map(item => (item.batchId === batchId ? { ...item, disposalReason } : item)),
     )
   }
 
@@ -369,27 +395,57 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
   }
 
   const handleConfirmSubmission = () => {
-    // Submit the checkout/removal to inventory
-    submitCheckout(
-      pendingItems.map(item => ({
-        batchId: item.batchId,
-        quantityRemoved: item.quantity,
-        actionType: item.actionType, // Pass the action type (sold/donate/dispose)
-        reason: 'scan-out',
-        storeId: activeStore?.store_id || '',
-        notes: t('batchRemovalNote', {
-          productName: item.productName,
-          quantity: item.quantity,
-        }),
-      })),
-      {
-        onSuccess: result => {
-          // Store the result for the success dialog
-          setSubmissionResult({
-            successCount: result.successCount || pendingItems.length,
-            totalCount: pendingItems.length,
-          })
+    const checkoutItems = pendingItems.map(item => ({
+      batchId: item.batchId,
+      quantityRemoved: item.quantity,
+      actionType: item.actionType, // Pass the action type (sold/donate/dispose)
+      reason: 'scan-out',
+      storeId: activeStore?.store_id || '',
+      notes: t('batchRemovalNote', {
+        productName: item.productName,
+        quantity: item.quantity,
+      }),
+      donationRecipientId: item.donationRecipientId, // Pass donation recipient if provided
+      disposalReason: item.disposalReason, // Pass disposal reason if provided
+    }))
 
+    console.log('[SCAN-OUT-UI] Submitting checkout:', {
+      itemCount: checkoutItems.length,
+      storeId: activeStore?.store_id,
+      actionBreakdown: actionBreakdown.map(a => ({
+        action: a.actionType,
+        count: a.count,
+        value: a.value,
+      })),
+      items: checkoutItems,
+      pendingItems: pendingItems.map(item => ({
+        batchId: item.batchId,
+        productName: item.productName,
+        quantity: item.quantity,
+        actionType: item.actionType,
+        maxQuantity: item.maxQuantity,
+      })),
+    })
+
+    // Submit the checkout/removal to inventory
+    submitCheckout(checkoutItems, {
+      onSuccess: result => {
+        console.log('[SCAN-OUT-UI] Submission successful:', {
+          result,
+          successCount: result.successCount,
+          failureCount: result.failureCount,
+          totalAttempted: pendingItems.length,
+          results: result.results,
+        })
+
+        // Store the result for the success dialog
+        setSubmissionResult({
+          successCount: result.successCount || 0,
+          totalCount: pendingItems.length,
+        })
+
+        // Only clear items and show success if at least one item succeeded
+        if (result.successCount && result.successCount > 0) {
           // Notify parent with all items
           pendingItems.forEach(item => {
             onItemRemoved?.(item)
@@ -401,12 +457,22 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
 
           // Show success dialog
           setShowSuccessDialog(true)
-        },
-        onError: _error => {
-          // Dialog stays open so user can retry or cancel
-        },
+        } else {
+          // All items failed - keep dialog open and show error
+          console.error('[SCAN-OUT-UI] All items failed to process')
+          // Dialog stays open so user can see what happened and retry
+        }
       },
-    )
+      onError: error => {
+        console.error('[SCAN-OUT-UI] Submission failed:', {
+          error,
+          message: error instanceof Error ? error.message : String(error),
+          stack: error instanceof Error ? error.stack : undefined,
+          attemptedItems: checkoutItems,
+        })
+        // Dialog stays open so user can retry or cancel
+      },
+    })
   }
 
   const formatPrice = (price: number) => `€${price.toFixed(2)}`
@@ -542,6 +608,34 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
                     {formatPrice(item.price)} × {item.quantity} ={' '}
                     {formatPrice(item.price * item.quantity)}
                   </div>
+
+                  {/* Action-specific inputs */}
+                  {item.actionType === 'donate' && (
+                    <div className="mt-2">
+                      <input
+                        type="text"
+                        placeholder={
+                          t('donationRecipientPlaceholder') || 'Donation recipient (optional)'
+                        }
+                        value={item.donationRecipientId || ''}
+                        onChange={e => updateItemDonationRecipient(item.batchId, e.target.value)}
+                        className="w-full px-2 py-1 text-xs border rounded-lg focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                  )}
+                  {item.actionType === 'dispose' && (
+                    <div className="mt-2">
+                      <input
+                        type="text"
+                        placeholder={
+                          t('disposalReasonPlaceholder') || 'Reason (e.g., Expired, Moldy)'
+                        }
+                        value={item.disposalReason || ''}
+                        onChange={e => updateItemDisposalReason(item.batchId, e.target.value)}
+                        className="w-full px-2 py-1 text-xs border rounded-lg focus:ring-2 focus:ring-red-500"
+                      />
+                    </div>
+                  )}
                 </div>
                 <div className="flex items-center gap-2 ml-2">
                   <Button

@@ -437,6 +437,8 @@
       "donate": "Doneren",
       "dispose": "Weggooien"
     },
+    "donationRecipientPlaceholder": "Donatieontvanger (optioneel)",
+    "disposalReasonPlaceholder": "Reden (bijv. Verlopen, Beschimmeld, Beschadigd)",
     "scanning": {
       "scanNextProduct": "Volgend product scannen",
       "scanProductBarcode": "Product barcode scannen",

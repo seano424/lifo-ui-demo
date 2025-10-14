@@ -53,6 +53,8 @@ export interface CheckoutItem {
   reason?: string // Optional additional reason/context
   storeId: string
   notes?: string
+  donationRecipientId?: string // Required when actionType === 'donate'
+  disposalReason?: string // Required when actionType === 'dispose'
 }
 
 /**

@@ -438,6 +438,8 @@
       "donate": "Donate",
       "dispose": "Dispose"
     },
+    "donationRecipientPlaceholder": "Donation recipient (optional)",
+    "disposalReasonPlaceholder": "Reason (e.g., Expired, Moldy, Damaged)",
     "scanning": {
       "scanNextProduct": "Scan next product",
       "scanProductBarcode": "Scan product barcode",
