@@ -2,14 +2,12 @@
 
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { Separator } from '@/components/ui/separator'
 import { useTranslations } from 'next-intl'
 import { useCallback } from 'react'
-import { TodoFiltersBar, type TodoFilterValues } from './todo-filters-bar'
-import { TodoSearchBar } from './todo-search-bar'
-import { TodoSortControls, type SortConfig } from './todo-sort-controls'
-import { TodoExpiryFilter } from './todo-expiry-filter'
 import type { TodoTabType } from '../todos-filtered-list'
+import { TodoExpiryFilter } from './todo-expiry-filter'
+import { TodoFiltersBar, type TodoFilterValues } from './todo-filters-bar'
+import { TodoSortControls, type SortConfig } from './todo-sort-controls'
 
 export interface TodoFiltersState {
   // Filters
@@ -63,16 +61,6 @@ export function TodoFiltersPanel({
     [onFiltersChange],
   )
 
-  const handleSearchChange = useCallback(
-    (product_name: string | undefined) => {
-      onFiltersChange((prevFilters: TodoFiltersState) => ({
-        ...prevFilters,
-        product_name,
-      }))
-    },
-    [onFiltersChange],
-  )
-
   const handleExpiryChange = useCallback(
     (value: { min?: number; max?: number }) => {
       onFiltersChange((prevFilters: TodoFiltersState) => ({
@@ -102,13 +90,6 @@ export function TodoFiltersPanel({
     <Card className={`p-4 space-y-4 ${className}`}>
       {/* Search Bar */}
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-        <TodoSearchBar
-          searchTerm={filters.product_name}
-          onSearchChange={handleSearchChange}
-          isLoading={isLoading}
-          placeholder={t('filters.searchPlaceholder')}
-        />
-
         <div className="flex items-center gap-2">
           {hasActiveFilters && (
             <>
@@ -122,8 +103,6 @@ export function TodoFiltersPanel({
           )}
         </div>
       </div>
-
-      <Separator />
 
       {/* Filter Controls */}
       <div className="space-y-4">

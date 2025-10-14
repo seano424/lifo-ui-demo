@@ -1,11 +1,11 @@
 'use client'
 
-import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { useTranslations } from 'next-intl'
-import { Search, X } from 'lucide-react'
-import { useState, useEffect } from 'react'
+import { Input } from '@/components/ui/input'
 import { useDebounce } from '@/hooks/use-debounce'
+import { Search, X } from 'lucide-react'
+import { useTranslations } from 'next-intl'
+import { useEffect, useState } from 'react'
 
 interface TodoSearchBarProps {
   searchTerm?: string
