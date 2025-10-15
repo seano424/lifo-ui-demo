@@ -41,11 +41,11 @@ export function UnifiedSearchFiltersBar({
 
   // Filter options for display
   const URGENCY_OPTIONS = [
-    { value: 'critical', label: t('filters.urgency.critical'), emoji: '🔴' },
-    { value: 'high', label: t('filters.urgency.high'), emoji: '🟠' },
-    { value: 'medium', label: t('filters.urgency.medium'), emoji: '🟡' },
-    { value: 'low', label: t('filters.urgency.low'), emoji: '🟢' },
-    { value: 'none', label: t('filters.urgency.none'), emoji: '⚪' },
+    { value: 'critical', label: t('filters.urgency.critical'), emoji: '🚨' },
+    { value: 'high', label: t('filters.urgency.high'), emoji: '⚠️' },
+    { value: 'medium', label: t('filters.urgency.medium'), emoji: '⚡' },
+    { value: 'low', label: t('filters.urgency.low'), emoji: '📋' },
+    { value: 'none', label: t('filters.urgency.none'), emoji: '✅' },
   ]
 
   const ACTION_OPTIONS = [
@@ -53,17 +53,17 @@ export function UnifiedSearchFiltersBar({
     { value: 'donate', label: t('filters.action.donate'), emoji: '❤️' },
     { value: 'donate_prepared', label: t('filters.action.donatePrepared'), emoji: '📦' },
     { value: 'maintain', label: t('filters.action.maintain'), emoji: '🔧' },
-    { value: 'dispose', label: t('filters.action.dispose'), emoji: '♻️' },
+    { value: 'dispose', label: t('filters.action.dispose'), emoji: '🗑️' },
   ]
 
   const BATCH_STATUS_OPTIONS = [
-    { value: 'active', label: t('filters.batchStatus.active'), emoji: '🟢' },
-    { value: 'expired', label: t('filters.batchStatus.expired'), emoji: '🔴' },
+    { value: 'active', label: t('filters.batchStatus.active'), emoji: '✅' },
+    { value: 'expired', label: t('filters.batchStatus.expired'), emoji: '❌' },
   ]
 
   const EXPIRY_OPTIONS = [
-    { value: 'expiring_soon', label: t('filters.expiry.expiringSoon'), emoji: '⏰' },
-    { value: 'recently_expired', label: t('filters.expiry.recentlyExpired'), emoji: '⚠️' },
+    { value: 'expiring_soon', label: t('filters.expiry.expiringSoon'), emoji: '⚠️' },
+    { value: 'recently_expired', label: t('filters.expiry.recentlyExpired'), emoji: '❌' },
   ]
 
   // Check if there are any active filters
