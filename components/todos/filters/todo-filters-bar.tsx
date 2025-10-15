@@ -8,13 +8,14 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import type { BatchStatus, TodoActionType, TodoUrgencyLevel } from '@/lib/queries/todos-rpc'
-import { useTranslations } from 'next-intl'
 import { ChevronDown, X } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 export interface TodoFilterValues {
   urgency_level?: TodoUrgencyLevel[]
   action_type?: TodoActionType[]
   batch_status?: BatchStatus[]
+  expiry_range?: string
 }
 
 interface TodoFiltersBarProps {

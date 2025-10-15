@@ -15,6 +15,7 @@ export interface TodoFiltersState {
   urgency_level?: TodoFilterValues['urgency_level']
   action_type?: TodoFilterValues['action_type']
   batch_status?: TodoFilterValues['batch_status']
+  expiry_range?: TodoFilterValues['expiry_range']
   product_name?: string
   days_to_expiry_min?: number
   days_to_expiry_max?: number

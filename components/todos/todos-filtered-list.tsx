@@ -16,11 +16,11 @@ import { ArrowUpDown, Filter } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { MobileFiltersOnlyModal } from './filters/mobile-filters-only-modal'
-import { MobileSortOnlyModal } from './filters/mobile-sort-only-modal'
-import { TodoFiltersPanel, type TodoFiltersState } from './filters/todo-filters-panel'
+import type { TodoFiltersState } from './filters/todo-filters-panel'
 import { TodoSearchBar } from './filters/todo-search-bar'
 import type { SortDirection, SortField } from './filters/todo-sort-controls'
+import { UnifiedFiltersModal } from './filters/unified-filters-modal'
+import { UnifiedSortModal } from './filters/unified-sort-modal'
 import { CompletedTab } from './todos-main-tabs/completed-tab'
 import { ExpiredTab } from './todos-main-tabs/expired-tab'
 import { ExpiringTab } from './todos-main-tabs/expiring-tab'
@@ -46,8 +46,8 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
   const t = useTranslations('todos')
   const router = useRouter()
   const { isMobile } = useMediaQuery()
-  const [showMobileFilters, setShowMobileFilters] = useState(false)
-  const [showMobileSort, setShowMobileSort] = useState(false)
+  const [showFilters, setShowFilters] = useState(false)
+  const [showSort, setShowSort] = useState(false)
 
   const [activeTab, setActiveTab] = useState<TodoTabType>(
     (initialFilters?.tab as TodoTabType) || 'pending',
@@ -234,7 +234,7 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
       <div className="flex sm:hidden justify-center gap-6 pt-4 border-t border-border">
         <Button
           variant="subtleTertiary"
-          onClick={() => setShowMobileFilters(true)}
+          onClick={() => setShowFilters(true)}
           className="flex items-center gap-2 h-12 px-6 text-base font-medium"
         >
           <Filter className="w-5 h-5" />
@@ -242,21 +242,12 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
         </Button>
         <Button
           variant="subtleTertiary"
-          onClick={() => setShowMobileSort(true)}
+          onClick={() => setShowSort(true)}
           className="flex items-center gap-2 h-12 px-6 text-base font-medium"
         >
           <ArrowUpDown className="w-5 h-5" />
           {t('filters.sortTitle')}
         </Button>
-      </div>
-      {/* Desktop Filters */}
-      <div className="hidden sm:block">
-        <TodoFiltersPanel
-          filters={filters}
-          onFiltersChange={handleFiltersChange}
-          isLoading={false}
-          activeTab={activeTab}
-        />
       </div>
       {/* Mobile Search Bar */}
       <div className="sm:hidden px-4 flex justify-center py-4">
@@ -271,27 +262,50 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
       {/* Mobile Separator after search */}
       <div className="sm:hidden border-t border-border mx-4" />
 
-      {/* Desktop Search Bar */}
+      {/* Desktop Search Bar with Filter/Sort Buttons */}
       <div className="hidden sm:block my-8">
         <div className="w-1/2 mx-auto">
-          <TodoSearchBar
-            searchTerm={filters.product_name}
-            onSearchChange={handleSearchChange}
-            isLoading={false}
-            placeholder={t('filters.searchPlaceholder')}
-            size="large"
-          />
+          <div className="flex items-center gap-4">
+            <div className="flex-1">
+              <TodoSearchBar
+                searchTerm={filters.product_name}
+                onSearchChange={handleSearchChange}
+                isLoading={false}
+                placeholder={t('filters.searchPlaceholder')}
+                size="large"
+              />
+            </div>
+            <div className="flex gap-2">
+              <Button
+                variant="subtleTertiary"
+                onClick={() => setShowFilters(true)}
+                className="flex items-center gap-2 h-12 px-4 font-semibold"
+              >
+                <Filter className="w-4 h-4" />
+                {t('filters.filtersTitle')}
+              </Button>
+              <Button
+                variant="subtleTertiary"
+                onClick={() => setShowSort(true)}
+                className="flex items-center gap-2 h-12 px-4 font-semibold"
+              >
+                <ArrowUpDown className="w-4 h-4" />
+                {t('filters.sortTitle')}
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Mobile Filters Modal */}
-      <MobileFiltersOnlyModal
-        isOpen={showMobileFilters}
-        onClose={() => setShowMobileFilters(false)}
+      {/* Unified Filters Modal */}
+      <UnifiedFiltersModal
+        isOpen={showFilters}
+        onClose={() => setShowFilters(false)}
         filters={{
           urgency_level: filters.urgency_level,
           action_type: filters.action_type,
           batch_status: filters.batch_status,
+          expiry_range: filters.expiry_range,
         }}
         onFiltersChange={newFilters => {
           handleFiltersChange(prev => ({
@@ -305,15 +319,16 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
             urgency_level: undefined,
             action_type: undefined,
             batch_status: undefined,
+            expiry_range: undefined,
           }))
         }}
         isLoading={false}
       />
 
-      {/* Mobile Sort Modal */}
-      <MobileSortOnlyModal
-        isOpen={showMobileSort}
-        onClose={() => setShowMobileSort(false)}
+      {/* Unified Sort Modal */}
+      <UnifiedSortModal
+        isOpen={showSort}
+        onClose={() => setShowSort(false)}
         sortConfig={filters.sortConfig || { field: 'urgency', direction: 'desc' }}
         onSortChange={sortConfig => {
           handleFiltersChange(prev => ({

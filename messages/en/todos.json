@@ -232,6 +232,35 @@
     "hideFilters": "Hide Filters",
     "currentSort": "Current Sort",
     "resetSort": "Reset Sort",
+    "sortBy": "Sort by",
+    "sortDirection": "Sort direction",
+    "ascending": "Ascending",
+    "descending": "Descending",
+    "expiry": {
+      "title": "Expiry Period",
+      "all": "All days",
+      "expiringSoon": "Expiring soon",
+      "recentlyExpired": "Recently expired",
+      "expiring": {
+        "all": "All expiring",
+        "3days": "3 days",
+        "1week": "1 week",
+        "2weeks": "2 weeks",
+        "1month": "1 month"
+      },
+      "expired": {
+        "all": "All expired",
+        "3days": "Last 3 days",
+        "1week": "Last week",
+        "2weeks": "Last 2 weeks",
+        "1month": "Last month"
+      },
+      "general": {
+        "all": "All dates",
+        "expiringSoon": "Expiring soon (7 days)",
+        "recentlyExpired": "Recently expired (7 days)"
+      }
+    },
     "urgency": {
       "title": "Urgency Level",
       "all": "All Urgency Levels",
@@ -258,6 +287,13 @@
       "expired": "Expired",
       "title": "Batch Status"
     },
+    "batchStatus": {
+      "all": "All Status",
+      "active": "Active",
+      "expired": "Expired",
+      "completed": "Completed",
+      "title": "Batch Status"
+    },
     "sort": {
       "sortBy": "Sort by",
       "direction": "Direction",
@@ -270,30 +306,6 @@
       "effectiveness": "Effectiveness",
       "ascending": "Ascending",
       "descending": "Descending"
-    },
-    "expiry": {
-      "expiringWithin": "Expiring within",
-      "expiredInLast": "Expired in last",
-      "expiryRange": "Expiry range",
-      "expiring": {
-        "all": "All expiring",
-        "3days": "3 days",
-        "1week": "1 week",
-        "2weeks": "2 weeks",
-        "1month": "1 month"
-      },
-      "expired": {
-        "all": "All expired",
-        "3days": "Last 3 days",
-        "1week": "Last week",
-        "2weeks": "Last 2 weeks",
-        "1month": "Last month"
-      },
-      "general": {
-        "all": "All dates",
-        "expiringSoon": "Expiring soon (7 days)",
-        "recentlyExpired": "Recently expired (7 days)"
-      }
     },
     "urgencyCount": "Urgency ({count})",
     "filterByUrgency": "Filter by urgency",
@@ -326,6 +338,10 @@
       "label": "Quantity",
       "description": "Sort by current stock quantity"
     },
+    "currentQuantity": {
+      "label": "Current Quantity",
+      "description": "Sort by current stock quantity"
+    },
     "potentialLoss": {
       "label": "Potential Loss",
       "description": "Sort by estimated financial impact"
@@ -334,8 +350,16 @@
       "label": "Product Name",
       "description": "Sort alphabetically by product name"
     },
+    "alphabetical": {
+      "label": "Alphabetical",
+      "description": "Sort alphabetically by product name"
+    },
     "lastAction": {
       "label": "Last Action",
+      "description": "Sort by when action was last taken"
+    },
+    "actionDate": {
+      "label": "Action Date",
       "description": "Sort by when action was last taken"
     },
     "effectiveness": {
@@ -350,5 +374,8 @@
     "loadingMore": "Loading more todos...",
     "scrollToLoad": "Scroll to load more ({count} loaded)",
     "updating": "Updating..."
+  },
+  "common": {
+    "cancel": "Cancel"
   }
 }
