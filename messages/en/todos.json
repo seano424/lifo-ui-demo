@@ -221,36 +221,26 @@
     "urgency": "Urgency"
   },
   "filters": {
+    "title": "Filter",
+    "filtersTitle": "Filters",
+    "sortTitle": "Sort",
     "searchPlaceholder": "Search products...",
     "activeFilters": "Active filters applied",
-    "clearAll": "Clear all",
-    "urgency": {
-      "all": "All Urgency Levels",
-      "critical": "Critical",
-      "high": "High",
-      "medium": "Medium",
-      "low": "Low",
-      "none": "None"
-    },
-    "action": {
-      "all": "All Actions",
-      "discount": "Discount",
-      "donate": "Donate",
-      "donatePrepared": "Donate Prepared",
-      "dispose": "Dispose",
-      "maintain": "Maintain",
-      "ignored": "Ignored",
-      "sold": "Sold"
-    },
-    "status": {
-      "all": "All Status",
-      "active": "Active",
-      "expired": "Expired"
-    },
+    "clearAll": "Clear all filters",
+    "apply": "Apply",
+    "showFilters": "Show Filters",
+    "hideFilters": "Hide Filters",
+    "currentSort": "Current Sort",
+    "resetSort": "Reset Sort",
+    "sortBy": "Sort by",
+    "sortDirection": "Sort direction",
+    "ascending": "Ascending",
+    "descending": "Descending",
     "expiry": {
-      "expiringWithin": "Expiring within",
-      "expiredInLast": "Expired in last",
-      "expiryRange": "Expiry range",
+      "title": "Expiry Period",
+      "all": "All days",
+      "expiringSoon": "Expiring soon",
+      "recentlyExpired": "Recently expired",
       "expiring": {
         "all": "All expiring",
         "3days": "3 days",
@@ -270,6 +260,52 @@
         "expiringSoon": "Expiring soon (7 days)",
         "recentlyExpired": "Recently expired (7 days)"
       }
+    },
+    "urgency": {
+      "title": "Urgency Level",
+      "all": "All Urgency Levels",
+      "critical": "Critical",
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low",
+      "none": "None"
+    },
+    "action": {
+      "title": "Action Type",
+      "all": "All Actions",
+      "discount": "Discount",
+      "donate": "Donate",
+      "donatePrepared": "Donate Prepared",
+      "dispose": "Dispose",
+      "maintain": "Maintain",
+      "ignored": "Ignored",
+      "sold": "Sold"
+    },
+    "status": {
+      "all": "All Status",
+      "active": "Active",
+      "expired": "Expired",
+      "title": "Batch Status"
+    },
+    "batchStatus": {
+      "all": "All Status",
+      "active": "Active",
+      "expired": "Expired",
+      "completed": "Completed",
+      "title": "Batch Status"
+    },
+    "sort": {
+      "sortBy": "Sort by",
+      "direction": "Direction",
+      "urgency": "Urgency",
+      "expiryDate": "Expiry Date",
+      "currentQuantity": "Current Quantity",
+      "potentialLoss": "Potential Loss",
+      "alphabetical": "Alphabetical",
+      "actionDate": "Action Date",
+      "effectiveness": "Effectiveness",
+      "ascending": "Ascending",
+      "descending": "Descending"
     },
     "urgencyCount": "Urgency ({count})",
     "filterByUrgency": "Filter by urgency",
@@ -302,6 +338,10 @@
       "label": "Quantity",
       "description": "Sort by current stock quantity"
     },
+    "currentQuantity": {
+      "label": "Current Quantity",
+      "description": "Sort by current stock quantity"
+    },
     "potentialLoss": {
       "label": "Potential Loss",
       "description": "Sort by estimated financial impact"
@@ -310,8 +350,16 @@
       "label": "Product Name",
       "description": "Sort alphabetically by product name"
     },
+    "alphabetical": {
+      "label": "Alphabetical",
+      "description": "Sort alphabetically by product name"
+    },
     "lastAction": {
       "label": "Last Action",
+      "description": "Sort by when action was last taken"
+    },
+    "actionDate": {
+      "label": "Action Date",
       "description": "Sort by when action was last taken"
     },
     "effectiveness": {
@@ -326,5 +374,8 @@
     "loadingMore": "Loading more todos...",
     "scrollToLoad": "Scroll to load more ({count} loaded)",
     "updating": "Updating..."
+  },
+  "common": {
+    "cancel": "Cancel"
   }
 }

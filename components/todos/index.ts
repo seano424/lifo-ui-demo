@@ -2,9 +2,10 @@
 export { TodosFilteredList } from './todos-filtered-list'
 
 // Filter components
-export { TodoFiltersPanel } from './filters/todo-filters-panel'
 export { TodoSearchBar } from './filters/todo-search-bar'
-export { TodoSortControls } from './filters/todo-sort-controls'
+export { UnifiedFiltersModal } from './filters/unified-filters-modal'
+export { UnifiedSearchFiltersBar } from './filters/unified-search-filters-bar'
+export { UnifiedSortModal } from './filters/unified-sort-modal'
 
 // Tab components
 export { CompletedTab } from './todos-main-tabs/completed-tab'
@@ -15,6 +16,11 @@ export { PendingTab } from './todos-main-tabs/pending-tab'
 export { TodoCardList } from './todo-card-list'
 
 // Types
-export type { TodoFiltersState } from './filters/todo-filters-panel'
-export type { SortConfig } from './filters/todo-sort-controls'
+export type {
+  SortConfig,
+  SortDirection,
+  SortField,
+  TodoFiltersState,
+  TodoFilterValues,
+} from './filters/types'
 export type { TodoTabType } from './todos-filtered-list'

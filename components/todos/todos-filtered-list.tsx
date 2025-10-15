@@ -15,8 +15,10 @@ import { cn } from '@/lib/utils'
 import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { TodoFiltersPanel, type TodoFiltersState } from './filters/todo-filters-panel'
-import type { SortDirection, SortField } from './filters/todo-sort-controls'
+import type { SortDirection, SortField, TodoFiltersState } from './filters/types'
+import { UnifiedFiltersModal } from './filters/unified-filters-modal'
+import { UnifiedSearchFiltersBar } from './filters/unified-search-filters-bar'
+import { UnifiedSortModal } from './filters/unified-sort-modal'
 import { CompletedTab } from './todos-main-tabs/completed-tab'
 import { ExpiredTab } from './todos-main-tabs/expired-tab'
 import { ExpiringTab } from './todos-main-tabs/expiring-tab'
@@ -43,6 +45,7 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
   const router = useRouter()
   const { isMobile } = useMediaQuery()
   const [showFilters, setShowFilters] = useState(false)
+  const [showSort, setShowSort] = useState(false)
 
   const [activeTab, setActiveTab] = useState<TodoTabType>(
     (initialFilters?.tab as TodoTabType) || 'pending',
@@ -213,34 +216,126 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
     [],
   )
 
+  const handleSearchChange = useCallback(
+    (searchTerm: string | undefined) => {
+      handleFiltersChange(prev => ({
+        ...prev,
+        product_name: searchTerm,
+      }))
+    },
+    [handleFiltersChange],
+  )
+
+  const handleRemoveFilter = useCallback(
+    (type: 'urgency' | 'action' | 'batch' | 'expiry', value?: string) => {
+      handleFiltersChange(prev => {
+        switch (type) {
+          case 'urgency':
+            return {
+              ...prev,
+              urgency_level: prev.urgency_level?.filter((level: string) => level !== value),
+            }
+          case 'action':
+            return {
+              ...prev,
+              action_type: prev.action_type?.filter(action => action !== value),
+            }
+          case 'batch':
+            return {
+              ...prev,
+              batch_status: prev.batch_status?.filter(status => status !== value),
+            }
+          case 'expiry':
+            return {
+              ...prev,
+              expiry_range: undefined,
+            }
+          default:
+            return prev
+        }
+      })
+    },
+    [handleFiltersChange],
+  )
+
+  const handleClearAll = useCallback(() => {
+    handleFiltersChange(prev => ({
+      ...prev,
+      urgency_level: undefined,
+      action_type: undefined,
+      batch_status: undefined,
+      expiry_range: undefined,
+    }))
+  }, [handleFiltersChange])
+
   return (
-    <div className="space-y-6">
-      {/* Filter Panel */}
-      <div className="flex sm:hidden justify-center py-4 border-y border-muted">
-        <Button variant="subtleTertiary" onClick={() => setShowFilters(!showFilters)}>
-          {t('filters.clearAll').replace(' all', 's')}
-        </Button>
-      </div>
+    <div className="space-y-2">
+      {/* Unified Search Bar with Filter/Sort Buttons */}
+      <UnifiedSearchFiltersBar
+        searchTerm={filters.product_name}
+        onSearchChange={handleSearchChange}
+        onFiltersClick={() => setShowFilters(true)}
+        onSortClick={() => setShowSort(true)}
+        isLoading={false}
+        placeholder={t('filters.searchPlaceholder')}
+        urgencyLevel={filters.urgency_level}
+        actionType={filters.action_type}
+        batchStatus={filters.batch_status}
+        expiryRange={filters.expiry_range}
+        onRemoveFilter={handleRemoveFilter}
+        onClearAll={handleClearAll}
+      />
 
-      {showFilters && (
-        <div className="sm:hidden">
-          <TodoFiltersPanel
-            filters={filters}
-            onFiltersChange={handleFiltersChange}
-            isLoading={false}
-            activeTab={activeTab}
-          />
-        </div>
-      )}
+      {/* Mobile Separator after search */}
+      <div className="border-t border-border mx-4" />
 
-      <div className="hidden sm:block">
-        <TodoFiltersPanel
-          filters={filters}
-          onFiltersChange={handleFiltersChange}
-          isLoading={false}
-          activeTab={activeTab}
-        />
-      </div>
+      {/* Unified Filters Modal */}
+      <UnifiedFiltersModal
+        isOpen={showFilters}
+        onClose={() => setShowFilters(false)}
+        filters={{
+          urgency_level: filters.urgency_level,
+          action_type: filters.action_type,
+          batch_status: filters.batch_status,
+          expiry_range: filters.expiry_range,
+        }}
+        onFiltersChange={newFilters => {
+          handleFiltersChange(prev => ({
+            ...prev,
+            ...newFilters,
+          }))
+        }}
+        onClearAll={() => {
+          handleFiltersChange(prev => ({
+            ...prev,
+            urgency_level: undefined,
+            action_type: undefined,
+            batch_status: undefined,
+            expiry_range: undefined,
+          }))
+        }}
+        isLoading={false}
+      />
+
+      {/* Unified Sort Modal */}
+      <UnifiedSortModal
+        isOpen={showSort}
+        onClose={() => setShowSort(false)}
+        sortConfig={filters.sortConfig || { field: 'urgency', direction: 'desc' }}
+        onSortChange={sortConfig => {
+          handleFiltersChange(prev => ({
+            ...prev,
+            sortConfig,
+          }))
+        }}
+        onReset={() => {
+          handleFiltersChange(prev => ({
+            ...prev,
+            sortConfig: defaultSortConfig,
+          }))
+        }}
+        isLoading={false}
+      />
 
       {/* Tab Navigation */}
       <div className="relative mb-10">

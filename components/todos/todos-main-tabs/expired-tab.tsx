@@ -1,10 +1,10 @@
 'use client'
 
-import { useTranslations } from 'next-intl'
-import { useExpiredTodos } from '@/hooks/use-todos-with-filters'
-import type { TodoFiltersState } from '../filters/todo-filters-panel'
-import { TodoCardList } from '../todo-card-list'
 import { Typography } from '@/components/ui/typography'
+import { useExpiredTodos } from '@/hooks/use-todos-with-filters'
+import { useTranslations } from 'next-intl'
+import type { TodoFiltersState } from '../filters/types'
+import { TodoCardList } from '../todo-card-list'
 
 interface ExpiredTabProps {
   filters: TodoFiltersState
