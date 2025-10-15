@@ -201,10 +201,40 @@ async function fetchFromOpenFoodFacts(
     return result
   } catch (error) {
     console.error('[ProductLookup] Open Food Facts lookup failed:', error)
+
+    // Categorize the error type
+    let errorType: ProductLookupResult['errorType'] = 'api_error'
+    let errorMessage = 'Failed to lookup product'
+
+    if (error instanceof Error) {
+      // Check for network errors
+      if (
+        (error as Error & { isNetworkError?: boolean }).isNetworkError ||
+        error.message.includes('NetworkError') ||
+        error.message.includes('Failed to fetch')
+      ) {
+        errorType = 'network'
+        errorMessage = 'Network error - please check your connection and try again'
+      }
+      // Check for 404 or product not found
+      else if ((error as Error & { status?: number }).status === 404) {
+        errorType = 'not_found'
+        errorMessage = 'Product not found in database'
+      }
+      // Invalid barcode format
+      else if (barcode.length < 8) {
+        errorType = 'invalid_barcode'
+        errorMessage = 'Invalid barcode format'
+      } else {
+        errorMessage = error.message
+      }
+    }
+
     return {
       barcode,
       found: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: errorMessage,
+      errorType,
       source: 'open_food_facts',
     }
   }

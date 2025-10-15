@@ -60,6 +60,7 @@ export interface ProductLookupResult {
   found: boolean
   product?: OpenFoodFactsProduct['product']
   error?: string
+  errorType?: 'network' | 'not_found' | 'invalid_barcode' | 'api_error'
   source: 'open_food_facts' | 'cache' | 'supabase'
   cached_at?: string
 }
@@ -79,12 +80,25 @@ class OpenFoodFactsClient {
       })
 
       if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+        const error = new Error(`HTTP ${response.status}: ${response.statusText}`)
+        ;(error as Error & { status: number }).status = response.status
+        throw error
       }
 
       const data = await response.json()
       return data
     } catch (error) {
+      // Enhance error with more context
+      if (error instanceof TypeError && error.message.includes('NetworkError')) {
+        const networkError = new Error('Network error - unable to reach Open Food Facts API')
+        ;(networkError as Error & { isNetworkError: boolean }).isNetworkError = true
+        logger.error('lib/queries/open-food-facts', 'Network error looking up barcode', {
+          error: error.message,
+          barcode,
+        })
+        throw networkError
+      }
+
       logger.error('lib/queries/open-food-facts', 'Failed to lookup barcode', {
         error: error instanceof Error ? error.message : String(error),
         barcode,
@@ -128,6 +142,7 @@ export function transformOpenFoodFactsProduct(
       barcode,
       found: false,
       error: 'Product not found in Open Food Facts database',
+      errorType: 'not_found',
       source: 'open_food_facts',
     }
   }
@@ -139,6 +154,7 @@ export function transformOpenFoodFactsProduct(
       barcode,
       found: false,
       error: 'Product found but has no meaningful name',
+      errorType: 'not_found',
       source: 'open_food_facts',
     }
   }
