@@ -549,10 +549,23 @@ class ScoringService:
                 "category_weights_retrieved", weight_results=len(category_weights_bulk)
             )
 
-            # STEP 5: In-memory scoring for all batches
+            # STEP 4.5: Fetch store donation config (for donation-first workflow)
+            store_donation_config = await self._get_store_donation_config(store_id)
+
+            self.performance_monitor.log_milestone(
+                "donation_config_retrieved",
+                donation_enabled=store_donation_config is not None,
+                strategy=store_donation_config.get("strategy") if store_donation_config else None,
+            )
+
+            # STEP 5: In-memory scoring for all batches (with optional donation integration)
             results, errors, high_priority_count = (
                 self.scoring_engine.score_all_batches(
-                    inventory_data, velocity_data_bulk, category_weights_bulk, store_id
+                    inventory_data,
+                    velocity_data_bulk,
+                    category_weights_bulk,
+                    store_id,
+                    store_donation_config,  # Pass donation config to enable donation-first workflow
                 )
             )
 
