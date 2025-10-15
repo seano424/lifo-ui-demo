@@ -1,4 +1,4 @@
-const CACHE_NAME = 'lifo-ai-v10'
+const CACHE_NAME = 'lifo-ai-v11'
 
 // Push notification handler
 self.addEventListener('push', event => {
@@ -63,6 +63,10 @@ self.addEventListener('fetch', event => {
   const shouldPassThrough =
     // Supabase requests (auth, database, storage)
     url.hostname.includes('supabase.co') ||
+    // Open Food Facts API requests
+    url.hostname.includes('openfoodfacts.org') ||
+    // DigitalOcean staging API (LIFO AI backend)
+    url.hostname.includes('ondigitalocean.app') ||
     // Same-origin navigation (Next.js routing)
     (url.origin === self.location.origin &&
       (request.mode === 'navigate' || request.destination === 'document')) ||

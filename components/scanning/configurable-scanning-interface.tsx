@@ -1,8 +1,9 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { BarcodeDetection } from '@/components/barcode/barcode-scanner'
-import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { Button } from '@/components/ui/button'
 import { useOCRWithFallback } from '@/hooks/use-ocr-processing'
 import { useProductLookup } from '@/hooks/use-product-lookup'
 import { captureImageFromVideo } from '@/lib/api/ocr-client'
@@ -16,6 +17,7 @@ import {
   useScanningStep,
 } from '@/lib/stores/scanning-workflow-store'
 import { useStoreState } from '@/lib/stores/store-context'
+import { AlertCircle, RefreshCw } from 'lucide-react'
 import {
   InventoryForm,
   type InventoryFormData,
@@ -89,6 +91,67 @@ export interface BaseScanningState {
     successCount: number
     totalCount: number
   } | null
+}
+
+// Helper function to get user-friendly error messages
+function getProductLookupErrorMessage(
+  lookupResult: ProductLookupResult | undefined,
+  lookupError: Error | null,
+): {
+  title: string
+  message: string
+  showRetry: boolean
+  showManualEntry: boolean
+} | null {
+  // No error if product was found
+  if (lookupResult?.found) return null
+
+  // Handle lookup errors from the hook
+  if (lookupError) {
+    return {
+      title: 'Lookup Error',
+      message: 'Unable to search for this product. Please try again.',
+      showRetry: true,
+      showManualEntry: true,
+    }
+  }
+
+  // Handle specific error types from the result
+  if (lookupResult && !lookupResult.found) {
+    switch (lookupResult.errorType) {
+      case 'network':
+        return {
+          title: 'Network Error',
+          message:
+            'Unable to connect to product database. Please check your internet connection and try again.',
+          showRetry: true,
+          showManualEntry: true,
+        }
+      case 'not_found':
+        return {
+          title: 'Product Not Found',
+          message: `No product information found for barcode ${lookupResult.barcode}. You can proceed by entering product details manually.`,
+          showRetry: false,
+          showManualEntry: true,
+        }
+      case 'invalid_barcode':
+        return {
+          title: 'Invalid Barcode',
+          message: 'The scanned barcode appears to be invalid. Please try scanning again.',
+          showRetry: true,
+          showManualEntry: false,
+        }
+      default:
+        return {
+          title: 'Lookup Failed',
+          message: lookupResult.error || 'An error occurred while looking up the product.',
+          showRetry: true,
+          showManualEntry: true,
+        }
+    }
+  }
+
+  return null
 }
 
 // Custom hook for base scanning logic
@@ -400,6 +463,12 @@ export default function BaseScanningInterface({ config, callbacks, className }: 
 
   const formatPrice = (price: number) => `€${price.toFixed(2)}`
 
+  // Memoize error message calculation for performance
+  const productLookupError = useMemo(
+    () => getProductLookupErrorMessage(logic.lookupResult, logic.lookupError),
+    [logic.lookupResult, logic.lookupError],
+  )
+
   return (
     <div className={`bg-white min-h-screen flex flex-col gap-4 ${className}`}>
       <div className="w-full">
@@ -437,21 +506,69 @@ export default function BaseScanningInterface({ config, callbacks, className }: 
 
               {/* Selected Product Display */}
               {logic.scannedProduct && (
-                <ProductCard
-                  product={{
-                    barcode: logic.scannedProduct.barcode,
-                    productName: logic.scannedProduct.productName,
-                    brand: logic.scannedProduct.brand,
-                  }}
-                  mode="selected"
-                  showRemoveButton
-                  showProceedButton={config.workflowType === 'scan-in'}
-                  onRemove={() => {
-                    logic.workflowActions.resetWorkflow()
-                    logic.setState(prev => ({ ...prev, lookupBarcode: null }))
-                  }}
-                  onProceed={() => logic.workflowActions.setCurrentStep('ocr')}
-                />
+                <>
+                  <ProductCard
+                    product={{
+                      barcode: logic.scannedProduct.barcode,
+                      productName: logic.scannedProduct.productName,
+                      brand: logic.scannedProduct.brand,
+                    }}
+                    mode="selected"
+                    showRemoveButton
+                    showProceedButton={
+                      config.workflowType === 'scan-in' && logic.lookupResult?.found !== false
+                    }
+                    onRemove={() => {
+                      logic.workflowActions.resetWorkflow()
+                      logic.setState(prev => ({ ...prev, lookupBarcode: null }))
+                    }}
+                    onProceed={() => logic.workflowActions.setCurrentStep('ocr')}
+                  />
+
+                  {/* Product Lookup Error Display */}
+                  {productLookupError && (
+                    <Alert variant="destructive" className="border-orange-200 bg-orange-50">
+                      <AlertCircle className="h-4 w-4 text-orange-600" />
+                      <AlertTitle className="text-orange-900 font-semibold">
+                        {productLookupError.title}
+                      </AlertTitle>
+                      <AlertDescription className="text-orange-800">
+                        {productLookupError.message}
+                      </AlertDescription>
+                      <div className="mt-3 flex gap-2">
+                        {productLookupError.showRetry && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="border-orange-300 text-orange-900 hover:bg-orange-100"
+                            onClick={() => {
+                              logic.workflowActions.resetWorkflow()
+                              logic.setState(prev => ({ ...prev, lookupBarcode: null }))
+                            }}
+                          >
+                            <RefreshCw className="w-4 h-4 mr-2" />
+                            Try Again
+                          </Button>
+                        )}
+                        {productLookupError.showManualEntry && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="border-orange-300 text-orange-900 hover:bg-orange-100"
+                            onClick={() => {
+                              logic.setState(prev => ({
+                                ...prev,
+                                showManualEntry: true,
+                              }))
+                            }}
+                          >
+                            Enter Manually
+                          </Button>
+                        )}
+                      </div>
+                    </Alert>
+                  )}
+                </>
               )}
             </>
           )}

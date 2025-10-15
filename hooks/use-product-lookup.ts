@@ -174,11 +174,40 @@ async function fallbackProductLookup(
   return await fetchFromOpenFoodFacts(barcode, supabase)
 }
 
+// Type guards for error handling
+function isNetworkError(error: unknown): error is Error & { isNetworkError: boolean } {
+  return (
+    error instanceof Error &&
+    ('isNetworkError' in error ||
+      error.message.includes('NetworkError') ||
+      error.message.includes('Failed to fetch'))
+  )
+}
+
+function isHttpError(error: unknown): error is Error & { status: number } {
+  return (
+    error instanceof Error &&
+    'status' in error &&
+    typeof (error as Record<string, unknown>).status === 'number'
+  )
+}
+
 // Open Food Facts lookup with caching
 async function fetchFromOpenFoodFacts(
   barcode: string,
   supabase: ReturnType<typeof createClient>,
 ): Promise<ProductLookupResult> {
+  // Validate barcode format FIRST before making API calls
+  if (barcode.length < 8 || barcode.length > 14) {
+    return {
+      barcode,
+      found: false,
+      error: 'Invalid barcode format',
+      errorType: 'invalid_barcode',
+      source: 'open_food_facts',
+    }
+  }
+
   try {
     const offResponse = await openFoodFactsClient.lookupProduct(barcode)
     const result = transformOpenFoodFactsProduct(barcode, offResponse)
@@ -201,10 +230,31 @@ async function fetchFromOpenFoodFacts(
     return result
   } catch (error) {
     console.error('[ProductLookup] Open Food Facts lookup failed:', error)
+
+    // Categorize the error type using proper type guards
+    let errorType: ProductLookupResult['errorType'] = 'api_error'
+    let errorMessage = 'Failed to lookup product'
+
+    // Check for network errors (highest priority for user-facing errors)
+    if (isNetworkError(error)) {
+      errorType = 'network'
+      errorMessage = 'Network error - please check your connection and try again'
+    }
+    // Check for 404 or product not found
+    else if (isHttpError(error) && error.status === 404) {
+      errorType = 'not_found'
+      errorMessage = 'Product not found in database'
+    }
+    // Generic error message
+    else if (error instanceof Error) {
+      errorMessage = error.message
+    }
+
     return {
       barcode,
       found: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: errorMessage,
+      errorType,
       source: 'open_food_facts',
     }
   }
