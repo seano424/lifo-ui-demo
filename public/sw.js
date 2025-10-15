@@ -1,4 +1,4 @@
-const CACHE_NAME = 'lifo-ai-v9'
+const CACHE_NAME = 'lifo-ai-v10'
 
 // Push notification handler
 self.addEventListener('push', event => {
@@ -53,29 +53,27 @@ self.addEventListener('activate', event => {
   )
 })
 
-// Fetch event - DON'T INTERCEPT SAME-ORIGIN NAVIGATION
+// Fetch event - Proper passthrough for critical requests
 self.addEventListener('fetch', event => {
   const { request } = event
   const url = new URL(request.url)
 
-  // CRITICAL: Don't intercept same-origin HTML requests
-  // Let Next.js middleware handle auth and routing
-  if (
-    url.origin === self.location.origin &&
-    (request.mode === 'navigate' || request.destination === 'document')
-  ) {
-    return // Pass through to Next.js
-  }
+  // CRITICAL: Explicitly pass through these requests with fetch()
+  // Don't just return - that can cause ECONNRESET errors
+  const shouldPassThrough =
+    // Supabase requests (auth, database, storage)
+    url.hostname.includes('supabase.co') ||
+    // Same-origin navigation (Next.js routing)
+    (url.origin === self.location.origin &&
+      (request.mode === 'navigate' || request.destination === 'document')) ||
+    // API routes and Next.js internals
+    url.pathname.startsWith('/api/') ||
+    url.pathname.startsWith('/_next/')
 
-  // Skip API calls and Next.js internals
-  if (url.pathname.startsWith('/api/') || url.pathname.startsWith('/_next/')) {
+  if (shouldPassThrough) {
+    // Explicitly pass through with fetch - prevents connection issues
+    event.respondWith(fetch(request))
     return
-  }
-
-  // CRITICAL: Never intercept Supabase requests
-  // This prevents ECONNRESET errors and auth issues
-  if (url.hostname.includes('supabase.co')) {
-    return // Pass through to Supabase
   }
 
   // Only cache external static assets
