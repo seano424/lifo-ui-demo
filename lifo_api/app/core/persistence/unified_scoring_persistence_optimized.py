@@ -467,30 +467,28 @@ class UnifiedScoringPersistenceOptimized:
                 batch_id = str(item.get("batch_id"))
                 recommended_action = item.get("recommendation", "maintain")
                 ai_score = float(item.get("composite_score", 0.0))
-                notes = str(item.get("reason", ""))[:500]  # Limit to 500 chars
+                notes_text = str(item.get("reason", ""))[:500]  # Limit to 500 chars
                 # Escape single quotes for SQL
-                notes_escaped = notes.replace("'", "''")
+                notes_escaped = notes_text.replace("'", "''")
 
                 values.append(
                     f"('{batch_id}', '{store_id}', '{recommended_action}', "
-                    f"{ai_score}, '{notes_escaped}', NOW())"
+                    f"{ai_score}, '{notes_escaped}')"
                 )
 
             if not values:
                 return 0
 
-            # Insert batch_actions
-            # NOTE: entry_id is the primary key, so multiple recommendations
-            # per batch are allowed (tracking history). The dashboard queries
-            # for action_type IS NULL to get pending recommendations.
+            # Insert batch_actions as pending recommendations
+            # action_type IS NULL = pending recommendation (user hasn't acted)
+            # Dashboard queries: WHERE action_type IS NULL to show pending items
             insert_query = f"""
                 INSERT INTO inventory.batch_actions (
                     batch_id,
                     store_id,
                     recommended_action,
                     ai_score,
-                    notes,
-                    created_at
+                    notes
                 )
                 VALUES {', '.join(values)}
             """
