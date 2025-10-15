@@ -1,42 +1,41 @@
-const CACHE_NAME = 'lifo-ai-v2'
+const CACHE_NAME = 'lifo-ai-v9'
 
-// Critical pages to cache for offline access
-const CRITICAL_PAGES = [
-  '/',
-  '/manifest.json',
-  '/offline',
-  '/dashboard',
-  '/scanning',
-  '/products',
-  '/batches',
-  '/settings',
-  '/auth/login',
-  '/pricing',
-]
+// Push notification handler
+self.addEventListener('push', event => {
+  if (event.data) {
+    const data = event.data.json()
+    const options = {
+      body: data.body,
+      icon: data.icon || '/icon.png',
+      badge: '/badge.png',
+      vibrate: [100, 50, 100],
+      data: {
+        dateOfArrival: Date.now(),
+        primaryKey: '2',
+      },
+    }
+    event.waitUntil(self.registration.showNotification(data.title, options))
+  }
+})
 
-// Install event - cache critical pages with error handling
+// Notification click handler
+self.addEventListener('notificationclick', event => {
+  console.log('Notification click received.')
+  event.notification.close()
+  event.waitUntil(clients.openWindow('http://localhost:3000'))
+})
+
+// Install event
 self.addEventListener('install', event => {
   event.waitUntil(
-    caches
-      .open(CACHE_NAME)
-      .then(cache => {
-        // Add pages individually to prevent one failure from breaking all caching
-        return Promise.allSettled(
-          CRITICAL_PAGES.map(url =>
-            cache.add(url).catch(err => {
-              console.log(`Failed to cache ${url}:`, err.message)
-            }),
-          ),
-        )
-      })
-      .then(() => {
-        // Skip waiting to activate immediately
-        return self.skipWaiting()
-      }),
+    caches.open(CACHE_NAME).then(() => {
+      console.log('Service Worker: Cache opened')
+      return self.skipWaiting()
+    }),
   )
 })
 
-// Activate event - clean up old caches
+// Activate event
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches
@@ -50,38 +49,58 @@ self.addEventListener('activate', event => {
           }),
         )
       })
-      .then(() => {
-        // Take control of all clients immediately
-        return self.clients.claim()
-      }),
+      .then(() => self.clients.claim()),
   )
 })
 
-// Fetch event with offline fallback
+// Fetch event - DON'T INTERCEPT SAME-ORIGIN NAVIGATION
 self.addEventListener('fetch', event => {
-  event.respondWith(
-    caches.match(event.request).then(response => {
-      // Return cached version if available
-      if (response) {
-        return response
-      }
+  const { request } = event
+  const url = new URL(request.url)
 
-      // Try to fetch from network
-      return fetch(event.request).catch(() => {
-        // If network fails and it's a page request, show offline page
-        if (event.request.destination === 'document') {
-          return (
-            caches.match('/offline') ||
-            new Response(
-              '<html><body><h1>You are offline</h1><p>Please check your connection and try again.</p></body></html>',
-              { headers: { 'Content-Type': 'text/html' } },
-            )
-          )
+  // CRITICAL: Don't intercept same-origin HTML requests
+  // Let Next.js middleware handle auth and routing
+  if (
+    url.origin === self.location.origin &&
+    (request.mode === 'navigate' || request.destination === 'document')
+  ) {
+    return // Pass through to Next.js
+  }
+
+  // Skip API calls and Next.js internals
+  if (url.pathname.startsWith('/api/') || url.pathname.startsWith('/_next/')) {
+    return
+  }
+
+  // CRITICAL: Never intercept Supabase requests
+  // This prevents ECONNRESET errors and auth issues
+  if (url.hostname.includes('supabase.co')) {
+    return // Pass through to Supabase
+  }
+
+  // Only cache external static assets
+  if (
+    request.destination === 'image' ||
+    request.destination === 'style' ||
+    request.destination === 'script' ||
+    request.destination === 'font'
+  ) {
+    event.respondWith(
+      caches.match(request).then(cachedResponse => {
+        if (cachedResponse) {
+          return cachedResponse
         }
 
-        // For other requests, return a basic offline response
-        return new Response('Offline', { status: 503 })
-      })
-    }),
-  )
+        return fetch(request).then(response => {
+          if (response.ok) {
+            const responseToCache = response.clone()
+            caches.open(CACHE_NAME).then(cache => {
+              cache.put(request, responseToCache)
+            })
+          }
+          return response
+        })
+      }),
+    )
+  }
 })

@@ -71,12 +71,14 @@ export async function fetchUserStores(
         .eq('stores.is_active', true)
 
       if (error) {
-        logger.error(context, 'Supabase error', {
+        // Log the error for debugging
+        logger.queryWarn(context, 'Supabase error', {
           userId,
           error: error.message,
           code: error.code,
         })
-        throw new Error(`Failed to fetch user stores: ${error.message}`)
+        // Throw the original error for proper error handling
+        throw error
       }
 
       const userStores = data
@@ -96,7 +98,7 @@ export async function fetchUserStores(
 
       return userStores
     } catch (err) {
-      logger.error(context, 'Unexpected error', { userId, error: err })
+      logger.queryWarn(context, 'Unexpected error', { userId, error: err })
       throw err
     }
   })
@@ -134,12 +136,14 @@ export async function fetchUserStoresAlternative(
           .eq('stores.is_active', true)
 
         if (error) {
-          logger.error(context, 'Supabase error', {
+          // Log the error for debugging
+          logger.queryWarn(context, 'Supabase error', {
             userId,
             error: error.message,
             code: error.code,
           })
-          throw new Error(`Failed to fetch user stores: ${error.message}`)
+          // Throw the original error so retry logic can handle it properly
+          throw error
         }
 
         const userStores = data.map(storeData => ({
@@ -174,7 +178,7 @@ export async function fetchUserStoresAlternative(
 
         return userStores
       } catch (err) {
-        logger.error(context, 'Unexpected error', { userId, error: err })
+        logger.queryWarn(context, 'Unexpected error', { userId, error: err })
         throw err
       }
     },
@@ -196,19 +200,21 @@ export async function fetchStoreById(storeId: string, serverClient?: ServerClien
         .single()
 
       if (error) {
-        logger.error(context, 'Supabase error', {
+        // Log the error for debugging
+        logger.queryWarn(context, 'Supabase error', {
           storeId,
           error: error.message,
           code: error.code,
         })
-        throw new Error(`Failed to fetch store: ${error.message}`)
+        // Throw the original error for proper error handling
+        throw error
       }
 
       logger.log(context, 'Store fetched successfully', { storeId })
 
       return data as Store
     } catch (err) {
-      logger.error(context, 'Unexpected error', { storeId, error: err })
+      logger.queryWarn(context, 'Unexpected error', { storeId, error: err })
       throw err
     }
   })
@@ -237,13 +243,13 @@ export async function fetchUserPreferences(
         .maybeSingle()
 
       if (error) {
-        logger.error(context, 'Supabase error', {
+        logger.queryWarn(context, 'Supabase error', {
           error: error.message,
           code: error.code,
         })
         // Handle specific error types
         if (error.code === 'PGRST116') {
-          logger.log(context, 'No user preferences found')
+          logger.query(context, 'No user preferences found')
           return null // No row found - this is OK
         }
         throw error
@@ -255,10 +261,10 @@ export async function fetchUserPreferences(
 
       return data
     } catch (err) {
-      logger.error(context, 'Unexpected error', { error: err })
+      logger.queryWarn(context, 'Unexpected error', { error: err })
       // Return null instead of throwing for 406 errors
       if (err instanceof Error && err.message.includes('406')) {
-        logger.warn(context, 'Authentication issue, returning null preferences')
+        logger.queryWarn(context, 'Authentication issue, returning null preferences')
         return null
       }
       throw err
@@ -291,18 +297,20 @@ export async function updateUserPrimaryStore(userId: string, storeId: string): P
         })
 
         if (error) {
-          logger.error(context, 'Supabase error', {
+          // Log the error for debugging
+          logger.queryWarn(context, 'Supabase error', {
             userId,
             storeId,
             error: error.message,
             code: error.code,
           })
-          throw new Error(`Failed to update primary store: ${error.message}`)
+          // Throw the original error for proper error handling
+          throw error
         }
 
-        logger.log(context, 'Primary store updated successfully', { userId, storeId })
+        logger.query(context, 'Primary store updated successfully', { userId, storeId })
       } catch (err) {
-        logger.error(context, 'Unexpected error', { userId, storeId, error: err })
+        logger.queryWarn(context, 'Unexpected error', { userId, storeId, error: err })
         throw err
       }
     },

@@ -1,7 +1,7 @@
 'use client'
 
 import type { ColumnDef, Header } from '@tanstack/react-table'
-import { Calendar, DollarSign, Package } from 'lucide-react'
+import { Calendar, DollarSign } from 'lucide-react'
 import { SortableHeader } from '@/components/batches/sortable-header'
 import type { BatchSort, BatchSortField, BatchWithProduct } from '@/lib/queries/batches'
 import { getExpiryBadge, getStatusBadge } from '@/lib/utils/batch-utils'
@@ -99,27 +99,6 @@ export function createBatchTableColumns({
       size: DEFAULT_COLUMN_WIDTHS.product,
       minSize: 120,
       maxSize: calculateMaxWidth(data, item => item.products?.name || ''),
-      enableResizing: true,
-    },
-    {
-      id: 'supplier',
-      accessorKey: 'supplier',
-      header: () => (
-        <SortableHeader field="supplier" currentSort={currentSort} updateSort={updateSort}>
-          {t('headers.supplier')}
-        </SortableHeader>
-      ),
-      cell: ({ row }) => (
-        <div className="flex items-center gap-2">
-          <Package className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-          <span className="truncate" title={row.original.supplier || 'Unknown'}>
-            {row.original.supplier || 'Unknown'}
-          </span>
-        </div>
-      ),
-      size: DEFAULT_COLUMN_WIDTHS.supplier,
-      minSize: 80,
-      maxSize: calculateMaxWidth(data, item => item.supplier || 'Unknown'),
       enableResizing: true,
     },
     {

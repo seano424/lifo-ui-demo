@@ -17,6 +17,8 @@ jest.mock('@/lib/utils/logger', () => ({
     log: jest.fn(),
     error: jest.fn(),
     warn: jest.fn(),
+    query: jest.fn(),
+    queryWarn: jest.fn(),
   },
 }))
 

@@ -9,7 +9,7 @@ const resend = new Resend(process.env.RESEND_API)
 
 export interface EmailCredentials {
   username: string
-  pin: string
+  password: string
   email: string
   full_name: string
   store_name?: string
@@ -58,18 +58,18 @@ export async function sendWelcomeEmail(
 }
 
 /**
- * Send PIN reset email to employee
+ * Send password reset email to employee
  */
-export async function sendPinResetEmail(
+export async function sendPasswordResetEmail(
   credentials: EmailCredentials,
 ): Promise<EmailDeliveryResult> {
   try {
     const { data, error } = await resend.emails.send({
       from: 'LIFO <noreply@lifo-app.com>', // Your verified domain
       to: [credentials.email],
-      subject: `LIFO - Nouveau code PIN généré`,
-      html: generatePinResetEmailHTML(credentials),
-      text: generatePinResetEmailText(credentials),
+      subject: `LIFO - Nouveau mot de passe généré`,
+      html: generatePasswordResetEmailHTML(credentials),
+      text: generatePasswordResetEmailText(credentials),
     })
 
     if (error) {
@@ -164,7 +164,7 @@ function generateWelcomeEmailHTML(credentials: EmailCredentials): string {
             font-weight: 600;
             color: #1e293b;
         }
-        .pin-value {
+        .password-value {
             font-size: 20px;
             color: #3b82f6;
             letter-spacing: 2px;
@@ -210,22 +210,22 @@ function generateWelcomeEmailHTML(credentials: EmailCredentials): string {
         </div>
 
         <p>Bonjour <strong>${credentials.full_name}</strong>,</p>
-        
+
         <p>Bienvenue dans l'équipe ! Votre compte LIFO a été créé et vous pouvez maintenant accéder au système de gestion des stocks.</p>
 
         <div class="credentials-box">
             <h3 style="margin: 0 0 16px 0; color: #1e293b;">Vos identifiants de connexion :</h3>
-            
+
             <div class="credential-item">
                 <span class="credential-label">Nom d'utilisateur :</span>
                 <span class="credential-value">${credentials.username}</span>
             </div>
-            
+
             <div class="credential-item">
-                <span class="credential-label">Code PIN :</span>
-                <span class="credential-value pin-value">${credentials.pin}</span>
+                <span class="credential-label">Mot de passe :</span>
+                <span class="credential-value password-value">${credentials.password}</span>
             </div>
-            
+
             <div class="credential-item">
                 <span class="credential-label">Email :</span>
                 <span class="credential-value">${credentials.email}</span>
@@ -237,12 +237,12 @@ function generateWelcomeEmailHTML(credentials: EmailCredentials): string {
             <ol class="steps">
                 <li>Ouvrez l'application LIFO sur la tablette du magasin</li>
                 <li>Sélectionnez l'onglet <strong>"Employé"</strong></li>
-                <li>Saisissez votre nom d'utilisateur et votre code PIN</li>
+                <li>Saisissez votre nom d'utilisateur et votre mot de passe</li>
                 <li>Commencez à scanner les produits et gérer l'inventaire</li>
             </ol>
         </div>
 
-        <p><strong>Important :</strong> Gardez vos identifiants en sécurité et ne les partagez avec personne. Votre code PIN peut être réinitialisé à tout moment par votre responsable.</p>
+        <p><strong>Important :</strong> Gardez vos identifiants en sécurité et ne les partagez avec personne. Votre mot de passe peut être réinitialisé à tout moment par votre responsable.</p>
 
         <div class="footer">
             <p>Besoin d'aide ? Contactez votre responsable ou <a href="mailto:support@lifo.ai" class="support-link">notre support</a></p>
@@ -267,16 +267,16 @@ Bienvenue dans l'équipe ! Votre compte LIFO a été créé avec succès.
 
 VOS IDENTIFIANTS DE CONNEXION :
 • Nom d'utilisateur : ${credentials.username}
-• Code PIN : ${credentials.pin}
+• Mot de passe : ${credentials.password}
 • Email : ${credentials.email}
 
 COMMENT VOUS CONNECTER :
 1. Ouvrez l'application LIFO sur la tablette du magasin
 2. Sélectionnez l'onglet "Employé"
-3. Saisissez votre nom d'utilisateur et votre code PIN
+3. Saisissez votre nom d'utilisateur et votre mot de passe
 4. Commencez à scanner les produits et gérer l'inventaire
 
-Important : Gardez vos identifiants en sécurité et ne les partagez avec personne. Votre code PIN peut être réinitialisé à tout moment par votre responsable.
+Important : Gardez vos identifiants en sécurité et ne les partagez avec personne. Votre mot de passe peut être réinitialisé à tout moment par votre responsable.
 
 Besoin d'aide ? Contactez votre responsable ou notre support : support@lifo.ai
 
@@ -285,16 +285,16 @@ Besoin d'aide ? Contactez votre responsable ou notre support : support@lifo.ai
 }
 
 /**
- * Generate HTML content for PIN reset email
+ * Generate HTML content for password reset email
  */
-function generatePinResetEmailHTML(credentials: EmailCredentials): string {
+function generatePasswordResetEmailHTML(credentials: EmailCredentials): string {
   return `
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nouveau code PIN - LIFO</title>
+    <title>Nouveau mot de passe - LIFO</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -364,28 +364,28 @@ function generatePinResetEmailHTML(credentials: EmailCredentials): string {
     <div class="email-container">
         <div class="header">
             <div class="logo">🔑</div>
-            <h1 style="margin: 0; color: #1e293b;">Nouveau code PIN généré</h1>
-            <p style="margin: 8px 0 0 0; color: #64748b;">Votre code PIN a été réinitialisé</p>
+            <h1 style="margin: 0; color: #1e293b;">Nouveau mot de passe généré</h1>
+            <p style="margin: 8px 0 0 0; color: #64748b;">Votre mot de passe a été réinitialisé</p>
         </div>
 
         <p>Bonjour <strong>${credentials.full_name}</strong>,</p>
-        
-        <p>Un nouveau code PIN a été généré pour votre compte LIFO chez ${credentials.store_name || 'votre magasin'}.</p>
+
+        <p>Un nouveau mot de passe a été généré pour votre compte LIFO chez ${credentials.store_name || 'votre magasin'}.</p>
 
         <div class="alert-box">
-            <h3 style="margin: 0 0 8px 0; color: #92400e;">Votre nouveau code PIN :</h3>
-            <div class="new-pin">${credentials.pin}</div>
-            <p style="margin: 8px 0 0 0; color: #92400e; font-size: 14px;">Ce code est actif immédiatement</p>
+            <h3 style="margin: 0 0 8px 0; color: #92400e;">Votre nouveau mot de passe :</h3>
+            <div class="new-pin">${credentials.password}</div>
+            <p style="margin: 8px 0 0 0; color: #92400e; font-size: 14px;">Ce mot de passe est actif immédiatement</p>
         </div>
 
         <div class="credentials-summary">
             <h4 style="margin: 0 0 12px 0; color: #1e293b;">Rappel de vos identifiants :</h4>
             <p style="margin: 4px 0;"><strong>Nom d'utilisateur :</strong> <code>${credentials.username}</code></p>
-            <p style="margin: 4px 0;"><strong>Nouveau PIN :</strong> <code>${credentials.pin}</code></p>
+            <p style="margin: 4px 0;"><strong>Nouveau mot de passe :</strong> <code>${credentials.password}</code></p>
             <p style="margin: 4px 0;"><strong>Email :</strong> ${credentials.email}</p>
         </div>
 
-        <p><strong>Important :</strong> Votre ancien code PIN ne fonctionne plus. Utilisez uniquement ce nouveau code pour vous connecter.</p>
+        <p><strong>Important :</strong> Votre ancien mot de passe ne fonctionne plus. Utilisez uniquement ce nouveau mot de passe pour vous connecter.</p>
 
         <p>Si vous n'avez pas demandé cette réinitialisation, contactez immédiatement votre responsable.</p>
 
@@ -400,24 +400,24 @@ function generatePinResetEmailHTML(credentials: EmailCredentials): string {
 }
 
 /**
- * Generate plain text content for PIN reset email
+ * Generate plain text content for password reset email
  */
-function generatePinResetEmailText(credentials: EmailCredentials): string {
+function generatePasswordResetEmailText(credentials: EmailCredentials): string {
   return `
-LIFO - Nouveau code PIN généré
+LIFO - Nouveau mot de passe généré
 
 Bonjour ${credentials.full_name},
 
-Un nouveau code PIN a été généré pour votre compte LIFO.
+Un nouveau mot de passe a été généré pour votre compte LIFO.
 
-VOTRE NOUVEAU CODE PIN : ${credentials.pin}
+VOTRE NOUVEAU MOT DE PASSE : ${credentials.password}
 
 RAPPEL DE VOS IDENTIFIANTS :
 • Nom d'utilisateur : ${credentials.username}
-• Nouveau PIN : ${credentials.pin}
+• Nouveau mot de passe : ${credentials.password}
 • Email : ${credentials.email}
 
-Important : Votre ancien code PIN ne fonctionne plus. Utilisez uniquement ce nouveau code pour vous connecter.
+Important : Votre ancien mot de passe ne fonctionne plus. Utilisez uniquement ce nouveau mot de passe pour vous connecter.
 
 Si vous n'avez pas demandé cette réinitialisation, contactez immédiatement votre responsable.
 

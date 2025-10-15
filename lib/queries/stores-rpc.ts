@@ -23,6 +23,13 @@ type ServerClient = Awaited<ReturnType<typeof createServerClient>>
 export async function fetchUserPreferencesRPC(
   serverClient?: ServerClient,
 ): Promise<UserPreferences | null> {
+  // IMPORTANT: serverClient must be provided in SSR context
+  // createClient() uses createBrowserClient which fails in Node.js
+  if (!serverClient && typeof window === 'undefined') {
+    logger.queryWarn('fetchUserPreferencesRPC', 'serverClient required in SSR context')
+    return null
+  }
+
   const supabase = serverClient || createClient()
   const context = 'fetchUserPreferencesRPC'
 
@@ -31,14 +38,14 @@ export async function fetchUserPreferencesRPC(
       const { data, error } = await supabase.schema('user_mgmt').rpc('get_current_user_preferences')
 
       if (error) {
-        logger.error(context, 'RPC error', {
+        logger.queryWarn(context, 'RPC error', {
           error: error.message,
           code: error.code,
         })
 
         // Handle authentication errors gracefully
         if (error.message.includes('Not authenticated')) {
-          logger.warn(context, 'User not authenticated, returning null')
+          logger.queryWarn(context, 'User not authenticated, returning null')
           return null
         }
 
@@ -54,11 +61,11 @@ export async function fetchUserPreferencesRPC(
 
       return preferences
     } catch (err) {
-      logger.error(context, 'Unexpected error', { error: err })
+      logger.queryWarn(context, 'Unexpected error', { error: err })
 
       // Return null for auth issues instead of throwing
       if (err instanceof Error && err.message.includes('Not authenticated')) {
-        logger.warn(context, 'Authentication issue, returning null preferences')
+        logger.queryWarn(context, 'Authentication issue, returning null preferences')
         return null
       }
 
@@ -85,6 +92,13 @@ export async function updateUserPrimaryStoreRPC(
   storeId: string,
   serverClient?: ServerClient,
 ): Promise<void> {
+  // IMPORTANT: serverClient must be provided in SSR context
+  // createClient() uses createBrowserClient which fails in Node.js
+  if (!serverClient && typeof window === 'undefined') {
+    logger.queryWarn('updateUserPrimaryStoreRPC', 'serverClient required in SSR context')
+    throw new Error('Server client required for SSR context')
+  }
+
   const supabase = serverClient || createClient()
   const context = 'updateUserPrimaryStoreRPC'
 
@@ -99,7 +113,7 @@ export async function updateUserPrimaryStoreRPC(
         })
 
         if (error) {
-          logger.error(context, 'RPC error', {
+          logger.queryWarn(context, 'RPC error', {
             storeId,
             error: error.message,
             code: error.code,
@@ -117,9 +131,9 @@ export async function updateUserPrimaryStoreRPC(
           throw new Error(`Failed to update primary store: ${error.message}`)
         }
 
-        logger.log(context, 'Primary store updated successfully (RPC)', { storeId })
+        logger.query(context, 'Primary store updated successfully (RPC)', { storeId })
       } catch (err) {
-        logger.error(context, 'Unexpected error', { storeId, error: err })
+        logger.queryWarn(context, 'Unexpected error', { storeId, error: err })
         throw err
       }
     },

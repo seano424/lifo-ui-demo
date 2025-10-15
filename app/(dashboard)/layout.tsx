@@ -1,8 +1,7 @@
+import { Button } from '@/components/ui/button'
 import { AppSidebar } from '@/components/app-sidebar'
 import DashboardBreadcrumbs from '@/components/dashboard/dashboard-breadcrumbs'
-import { SettingsError } from '@/components/settings/settings-error-boundary'
 import { TeamSwitcher } from '@/components/team-switcher'
-import { Button } from '@/components/ui/button'
 import { CompactLanguageSwitcher } from '@/components/ui/compact-language-switcher'
 import { Separator } from '@/components/ui/separator'
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
@@ -13,22 +12,6 @@ import { BellIcon } from 'lucide-react'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const dashboardData = await prefetchDashboardData()
-
-  // Handle authentication errors at the dashboard level
-  if (dashboardData.error) {
-    return (
-      <SettingsError
-        errorType="unauthorized"
-        title="Dashboard Access Required"
-        message="Please log in to access the dashboard."
-        showRefreshButton={false}
-        customAction={{
-          label: 'Go to Login',
-          href: '/login',
-        }}
-      />
-    )
-  }
 
   return (
     <HydrationBoundary state={dashboardData.dehydratedState}>

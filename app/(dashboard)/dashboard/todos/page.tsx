@@ -5,6 +5,7 @@ import { TodosFilteredList } from '@/components/todos/todos-filtered-list'
 import { fetchUserPreferences, fetchUserStores } from '@/lib/queries/stores'
 import { createPrefetchedQuery } from '@/lib/react-query/prefetch'
 import { createClient as createServerClient } from '@/lib/supabase/server'
+import { logger } from '@/lib/utils/logger'
 import { dehydrate, HydrationBoundary } from '@tanstack/react-query'
 import { redirect } from 'next/navigation'
 
@@ -34,6 +35,8 @@ export default async function TodosPage({ searchParams }: TodosPageProps) {
     redirect('/auth/login')
   }
 
+  let stores: Awaited<ReturnType<typeof fetchUserStores>> = []
+
   try {
     await Promise.all([
       queryClient.prefetchQuery({
@@ -48,13 +51,16 @@ export default async function TodosPage({ searchParams }: TodosPageProps) {
       }),
     ])
 
-    const stores = await fetchUserStores(user.id, serverClient)
-
-    if (stores.length === 0) {
-      return <NoStoresError />
-    }
+    stores = await fetchUserStores(user.id, serverClient)
   } catch (error) {
-    console.error('[TodosPage] Error prefetching data:', error)
+    // Silently handle - retry logic already attempted recovery
+    // If all retries failed, stores will be empty array
+    logger.queryWarn('TodosPage', 'Error prefetching data after retries', error)
+    stores = []
+  }
+
+  if (stores.length === 0) {
+    return <NoStoresError />
   }
 
   return (

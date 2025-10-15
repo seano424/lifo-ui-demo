@@ -2,79 +2,30 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { queryKeys } from '@/lib/queries/query-keys'
 import { createClient } from '@/lib/supabase/client'
-
-// Custom type for available batches with product info
-interface AvailableBatch {
-  batch_id: string
-  batch_number: string | null
-  product_id: string
-  store_id: string
-  expiry_date: string
-  current_quantity: number
-  available_quantity: number
-  cost_price: number
-  selling_price: number
-  location_code: string | null
-  status: string
-  created_at: string
-  products: {
-    product_name: string
-    brand_name: string
-    barcode: string
-    category_name?: string
-  }
-}
-
-interface CheckoutItem {
-  batchId: string
-  quantityRemoved: number
-  reason: 'scan-out' | 'sale' | 'waste' | 'transfer' | 'expired'
-  storeId: string
-  notes?: string
-}
-
-interface CheckoutResult {
-  success: boolean
-  successCount?: number
-  failureCount?: number
-  message: string
-  results: Array<{
-    batchId: string
-    success: boolean
-    error?: string
-  }>
-}
+import { logger } from '@/lib/utils/logger'
+import type { AvailableBatch, CheckoutItem, CheckoutResult } from '@/types/scanning'
+import { ADHOC_RECIPIENT_UUID } from '@/hooks/use-donation-recipients'
 
 // Type for RPC function results
 interface BatchRPCResult {
   batch_id: string
-  batch_number: string | null
+  batch_number: string
   product_id: string
   store_id: string
   expiry_date: string
   current_quantity: number
-  available_quantity: number
+  available_quantity: number | null
+  initial_quantity: number
   cost_price: number
   selling_price: number
   location_code: string | null
   status: string
+  verification_status: string | null
   created_at: string
   product_name: string
   brand_name: string | null
   product_barcode: string
   category_name: string | null
-}
-
-interface StoreAccessResult {
-  user_id: string
-  role_in_store: string
-  is_active: boolean
-}
-
-interface BatchUpdateResult {
-  success: boolean
-  new_quantity: number
-  error_message: string | null
 }
 
 /**
@@ -108,8 +59,8 @@ export function useScanOutActions() {
     }
 
     // Find exact match first
-    const exactMatch = batches.find(batch => {
-      const batchDate = new Date(batch.expiry_date)
+    const exactMatch = batches.find(availableBatch => {
+      const batchDate = new Date(availableBatch.batch.expiry_date)
       return (
         batchDate.getFullYear() === targetDate.getFullYear() &&
         batchDate.getMonth() === targetDate.getMonth() &&
@@ -126,13 +77,13 @@ export function useScanOutActions() {
     let closestBatch: AvailableBatch | null = null
     let smallestDifference = Infinity
 
-    for (const batch of batches) {
-      const batchDate = new Date(batch.expiry_date)
+    for (const availableBatch of batches) {
+      const batchDate = new Date(availableBatch.batch.expiry_date)
       const difference = Math.abs(batchDate.getTime() - targetDate.getTime())
 
       if (difference <= toleranceMs && difference < smallestDifference) {
         smallestDifference = difference
-        closestBatch = batch
+        closestBatch = availableBatch
       }
     }
 
@@ -156,7 +107,7 @@ export function useScanOutActions() {
       })
 
       if (error) {
-        console.error('RPC batch lookup failed:', error)
+        logger.error('ScanOut', 'RPC batch lookup failed', { error })
         throw new Error(`Failed to fetch available inventory: ${error.message}`)
       }
 
@@ -164,45 +115,69 @@ export function useScanOutActions() {
         return []
       }
 
-      // Transform with proper typing
-      return data.map(
-        (batch: BatchRPCResult): AvailableBatch => ({
-          batch_id: batch.batch_id,
-          batch_number: batch.batch_number,
-          product_id: batch.product_id,
-          store_id: batch.store_id,
-          expiry_date: batch.expiry_date,
-          current_quantity: Number(batch.current_quantity),
-          available_quantity: Number(batch.available_quantity || batch.current_quantity),
-          cost_price: Number(batch.cost_price),
-          selling_price: Number(batch.selling_price),
-          location_code: batch.location_code,
-          status: batch.status,
-          created_at: batch.created_at,
-          products: {
-            product_name: batch.product_name || 'Unknown Product',
-            brand_name: batch.brand_name || 'Unknown Brand',
-            barcode: batch.product_barcode || barcode,
-            category_name: batch.category_name || undefined,
+      // Transform to nested structure with batch and products
+      return data.map((rpcResult: BatchRPCResult): AvailableBatch => {
+        const currentQty = Number(rpcResult.current_quantity)
+        const initialQty = Number(rpcResult.initial_quantity)
+        const availableQty = rpcResult.available_quantity
+          ? Number(rpcResult.available_quantity)
+          : currentQty
+
+        return {
+          batch: {
+            batch_id: rpcResult.batch_id,
+            batch_number: rpcResult.batch_number,
+            product_id: rpcResult.product_id,
+            store_id: rpcResult.store_id,
+            expiry_date: rpcResult.expiry_date,
+            current_quantity: currentQty,
+            available_quantity: availableQty,
+            initial_quantity: initialQty,
+            cost_price: Number(rpcResult.cost_price),
+            selling_price: Number(rpcResult.selling_price),
+            location_code: rpcResult.location_code,
+            status: rpcResult.status,
+            verification_status: rpcResult.verification_status,
+            created_at: rpcResult.created_at,
+            // Additional required fields not returned by RPC (for full BatchRow compliance)
+            received_date: null,
+            reserved_quantity: null,
+            updated_at: rpcResult.created_at,
+            manufacture_date: null,
+            supplier: null,
+            ocr_extracted_date: null,
+            ocr_confidence: null,
+            processing_batch_id: null,
+            batch_source: null,
+            scanned_barcode: null,
+            scan_confidence: null,
+            created_by: null,
           },
-        }),
-      )
+          products: {
+            product_name: rpcResult.product_name || 'Unknown Product',
+            brand_name: rpcResult.brand_name || 'Unknown Brand',
+            barcode: rpcResult.product_barcode || barcode,
+            category_name: rpcResult.category_name || undefined,
+          },
+        }
+      })
     } catch (error) {
-      console.error('Error in findAvailableBatches:', error)
+      logger.error('ScanOut', 'Error in findAvailableBatches', { error })
       throw error
     }
   }
 
   /**
    * Process checkout/removal of items from inventory
-   * Uses RPC functions to avoid schema syntax issues
+   * Uses batch RPC function for optimal performance (single DB call vs N calls)
    */
   const checkoutMutation = useMutation({
     mutationFn: async (items: CheckoutItem[]): Promise<CheckoutResult> => {
       const supabase = createClient()
-      const results: CheckoutResult['results'] = []
-      let successCount = 0
-      let failureCount = 0
+
+      if (items.length === 0) {
+        throw new Error('No items to checkout')
+      }
 
       // Authentication check
       const {
@@ -211,85 +186,174 @@ export function useScanOutActions() {
       } = await supabase.auth.getUser()
 
       if (authError || !user) {
-        console.error('Authentication Error:', authError)
+        logger.error('ScanOut', 'Authentication error', { error: authError })
         throw new Error('User not authenticated. Please sign in and try again.')
       }
 
-      // Store access check using RPC function
-      if (items.length > 0 && items[0].storeId) {
-        const { data: storeAccessData, error: storeAccessError } = await supabase.rpc(
-          'check_store_access',
-          {
-            user_id_param: user.id,
-            store_id_param: items[0].storeId,
-          },
-        )
+      const storeId = items[0].storeId
 
-        if (storeAccessError) {
-          console.error('Store access check failed:', storeAccessError)
-          throw new Error('Failed to verify store access')
-        }
+      // Log the request payload for debugging
+      const rpcPayload = {
+        p_items: items.map(item => {
+          // Build notes field: include recipient name for ad-hoc donations
+          let notesField = item.notes || ''
 
-        const storeAccess = storeAccessData?.[0] as StoreAccessResult | undefined
+          // If this is a donation action and we have a recipient name, include it in notes
+          if (item.actionType === 'donate' && item.donationRecipientName) {
+            // Check if this is an ad-hoc recipient (UUID is special placeholder)
+            const isAdhoc = item.donationRecipientId === ADHOC_RECIPIENT_UUID
 
-        if (!storeAccess || !storeAccess.is_active) {
-          console.error('Store Access Denied:', {
-            storeId: items[0].storeId,
-            userId: user.id,
-          })
-          throw new Error('You do not have active access to this store')
-        }
+            if (isAdhoc) {
+              // For ad-hoc recipients, prepend the recipient name to notes
+              const recipientNote = `Recipient: ${item.donationRecipientName}`
+              notesField = notesField ? `${recipientNote} | ${notesField}` : recipientNote
+            }
+          }
+
+          const recipientId =
+            item.actionType === 'donate' &&
+            item.donationRecipientId &&
+            item.donationRecipientId !== ADHOC_RECIPIENT_UUID
+              ? item.donationRecipientId
+              : null
+
+          // Debug log to verify the fix is working
+          if (item.actionType === 'donate') {
+            logger.log('ScanOut', 'Donation recipient handling', {
+              originalId: item.donationRecipientId,
+              isAdhoc: item.donationRecipientId === ADHOC_RECIPIENT_UUID,
+              finalIdToSend: recipientId,
+              recipientName: item.donationRecipientName,
+              ADHOC_UUID: ADHOC_RECIPIENT_UUID,
+            })
+          }
+
+          return {
+            batch_id: item.batchId,
+            quantity: item.quantityRemoved,
+            action_type: item.actionType, // Use the new action_type field (sold/donate/dispose)
+            action_reason: item.reason || 'scan-out', // Keep for backward compatibility
+            notes: notesField,
+            // Only pass donation_recipient_id if it's a real DB recipient (not ad-hoc)
+            // Ad-hoc recipients use the placeholder UUID, which doesn't exist in DB
+            // Pass null for ad-hoc recipients - the name is already in notes field
+            donation_recipient_id: recipientId,
+            disposal_reason: item.disposalReason, // Required for 'dispose' action
+          }
+        }),
+        p_store_id: storeId,
       }
 
-      // Process each item in the checkout using RPC function
-      for (const item of items) {
-        try {
-          const { data: updateResults, error: updateError } = await supabase.rpc(
-            'update_batch_quantity',
-            {
-              batch_id_param: item.batchId,
-              quantity_to_remove: item.quantityRemoved,
-              reason_param: item.reason,
-            },
-          )
+      logger.log('ScanOut', 'RPC Request', {
+        function: 'batch_update_quantities',
+        storeId,
+        itemCount: items.length,
+        payload: rpcPayload,
+        itemDetails: items.map(item => ({
+          batchId: item.batchId,
+          actionType: item.actionType,
+          quantity: item.quantityRemoved,
+        })),
+      })
 
-          if (updateError) {
-            console.error('Batch update RPC failed:', updateError)
-            results.push({
-              batchId: item.batchId,
-              success: false,
-              error: updateError.message,
-            })
-            failureCount++
-            continue
-          }
+      // Process all items in a single batch RPC call (13x faster than loop)
+      const { data: batchResults, error: batchError } = await supabase.rpc(
+        'batch_update_quantities',
+        rpcPayload,
+      )
 
-          const updateResult = updateResults?.[0] as BatchUpdateResult | undefined
+      if (batchError) {
+        logger.error('ScanOut', 'RPC Error', {
+          error: batchError,
+          message: batchError.message,
+          details: batchError.details,
+          hint: batchError.hint,
+          code: batchError.code,
+          payload: rpcPayload,
+        })
+        throw new Error(`Checkout failed: ${batchError.message}`)
+      }
 
-          if (!updateResult || !updateResult.success) {
-            results.push({
-              batchId: item.batchId,
-              success: false,
-              error: updateResult?.error_message || 'Update failed',
-            })
-            failureCount++
-            continue
-          }
+      // The RPC returns an object with results array, not a direct array
+      if (!batchResults || typeof batchResults !== 'object') {
+        logger.error('ScanOut', 'Invalid batch results', { batchResults })
+        throw new Error('No results returned from batch update')
+      }
 
-          results.push({
-            batchId: item.batchId,
-            success: true,
+      // Type the response from the RPC
+      const response = batchResults as {
+        results: Array<{
+          batch_id: string
+          success: boolean
+          new_quantity: number | null
+          error_message: string | null
+        }>
+        success: boolean
+        store_id: string
+        timestamp: string
+        processed_count: number
+      }
+
+      if (!response.results || response.results.length === 0) {
+        logger.error('ScanOut', 'No results in batch response', { response })
+        throw new Error('No results returned from batch update')
+      }
+
+      // Process results
+      const results: CheckoutResult['results'] = response.results.map(result => ({
+        batchId: result.batch_id,
+        success: result.success,
+        error: result.error_message || undefined,
+      }))
+
+      const successCount = results.filter(r => r.success).length
+      const failureCount = results.filter(r => !r.success).length
+
+      // Enhanced logging with success/failure breakdown
+      logger.log('ScanOut', 'RPC Response', {
+        totalItems: results.length,
+        successCount,
+        failureCount,
+        rawResponse: response,
+      })
+
+      // Log successful items
+      const successfulItems = response.results.filter(r => r.success)
+      if (successfulItems.length > 0) {
+        logger.log('ScanOut', 'Successful items', {
+          count: successfulItems.length,
+          items: successfulItems.map(r => ({
+            batchId: r.batch_id,
+            newQuantity: r.new_quantity,
+          })),
+        })
+      }
+
+      // Log failed items with detailed error info
+      const failedItems = response.results.filter(r => !r.success)
+      if (failedItems.length > 0) {
+        logger.error('ScanOut', 'Failed items', {
+          count: failedItems.length,
+          items: failedItems.map(r => ({
+            batchId: r.batch_id,
+            error: r.error_message,
+            // Try to match with original item for more context
+            originalItem: items.find(item => item.batchId === r.batch_id),
+          })),
+        })
+
+        // Log each failure individually for visibility
+        failedItems.forEach((failedItem, index) => {
+          const originalItem = items.find(item => item.batchId === failedItem.batch_id)
+          logger.error('ScanOut', `Failure #${index + 1}`, {
+            batchId: failedItem.batch_id,
+            errorMessage: failedItem.error_message,
+            requestedQuantity: originalItem?.quantityRemoved,
+            actionType: originalItem?.actionType,
+            reason: originalItem?.reason,
+            notes: originalItem?.notes,
           })
-          successCount++
-        } catch (error) {
-          console.error(`Error processing checkout for batch ${item.batchId}:`, error)
-          results.push({
-            batchId: item.batchId,
-            success: false,
-            error: error instanceof Error ? error.message : 'Unknown error',
-          })
-          failureCount++
-        }
+        })
       }
 
       return {
@@ -306,24 +370,25 @@ export function useScanOutActions() {
 
     onSuccess: (result, items) => {
       if (result.success) {
-        // Invalidate relevant queries to refresh the UI
-        queryClient.invalidateQueries({
-          queryKey: queryKeys.batches.all,
-        })
+        const storeId = items[0]?.storeId
 
-        if (items.length > 0 && items[0].storeId) {
+        // Only invalidate affected store's data (not all stores)
+        if (storeId) {
+          // Invalidate this store's batches (more targeted than invalidating all batches)
           queryClient.invalidateQueries({
-            queryKey: queryKeys.batches.byStore(items[0].storeId),
+            queryKey: queryKeys.batches.byStore(storeId),
           })
 
+          // Invalidate store-specific dashboard data
           queryClient.invalidateQueries({
-            queryKey: queryKeys.products.byStore(items[0].storeId),
+            queryKey: ['dashboard', storeId],
+          })
+
+          // Invalidate store-specific product queries
+          queryClient.invalidateQueries({
+            queryKey: queryKeys.products.byStore(storeId),
           })
         }
-
-        queryClient.invalidateQueries({
-          queryKey: queryKeys.productLookup.all,
-        })
 
         // Show success message
         if (result.failureCount === 0) {
@@ -337,7 +402,7 @@ export function useScanOutActions() {
     },
 
     onError: (error: Error) => {
-      console.error('Checkout failed:', error)
+      logger.error('ScanOut', 'Checkout failed', { error })
       toast.error(`Checkout failed: ${error.message}`)
     },
   })

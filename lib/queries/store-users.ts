@@ -111,7 +111,7 @@ export async function fetchStoreUsers(
 
     if (error) {
       timer.end({ success: false, errorCode: error.code })
-      logger.error(context, 'RPC error', {
+      logger.queryWarn(context, 'RPC error', {
         error: error.message,
         code: error.code,
         details: error.details,
@@ -126,7 +126,7 @@ export async function fetchStoreUsers(
 
     return storeUsers
   } catch (err) {
-    logger.error(context, 'Unexpected error', {
+    logger.queryWarn(context, 'Unexpected error', {
       error: err instanceof Error ? err.message : String(err),
       stack: err instanceof Error ? err.stack : undefined,
       storeId,
@@ -161,7 +161,7 @@ export async function fetchStoreUsersPage(
     })
 
     if (error) {
-      logger.error(context, 'RPC error', {
+      logger.queryWarn(context, 'RPC error', {
         error: error.message,
         code: error.code,
         details: error.details,
@@ -206,7 +206,7 @@ export async function fetchStoreUsersPage(
       nextPage: totalCount > (page + 1) * pageSize ? page + 1 : undefined,
     }
   } catch (err) {
-    logger.error(context, 'Unexpected error', {
+    logger.queryWarn(context, 'Unexpected error', {
       error: err instanceof Error ? err.message : String(err),
       stack: err instanceof Error ? err.stack : undefined,
       storeId,
@@ -234,7 +234,7 @@ export async function fetchStoreUserById(
     })
 
     if (error) {
-      logger.error(context, 'RPC error', {
+      logger.queryWarn(context, 'RPC error', {
         error: error.message,
         code: error.code,
         details: error.details,
@@ -261,7 +261,7 @@ export async function fetchStoreUserById(
 
     return storeUser
   } catch (err) {
-    logger.error(context, 'Unexpected error', {
+    logger.queryWarn(context, 'Unexpected error', {
       error: err instanceof Error ? err.message : String(err),
       stack: err instanceof Error ? err.stack : undefined,
       storeId,
@@ -312,7 +312,7 @@ export async function updateStoreUser(
 
     if (rpcError) {
       timer.end({ success: false, errorCode: rpcError.code })
-      logger.error(context, 'RPC update failed', {
+      logger.queryWarn(context, 'RPC update failed', {
         error: rpcError.message,
         code: rpcError.code,
         details: rpcError.details,
@@ -326,7 +326,7 @@ export async function updateStoreUser(
 
     if (!rpcData || rpcData.length === 0) {
       timer.end({ success: false, reason: 'No data returned' })
-      logger.error(context, 'No data returned from RPC', { storeId, userId })
+      logger.queryWarn(context, 'No data returned from RPC', { storeId, userId })
       throw new Error('No data returned from RPC update')
     }
 
@@ -337,7 +337,7 @@ export async function updateStoreUser(
 
     return updatedUser
   } catch (err: unknown) {
-    logger.error(context, 'Update failed', {
+    logger.queryWarn(context, 'Update failed', {
       error: err instanceof Error ? err.message : String(err),
       stack: err instanceof Error ? err.stack : undefined,
       storeId,
@@ -360,10 +360,10 @@ export async function testStoreUserUpdate(storeId: string, userId: string) {
       can_use_pin_auth: true,
     })
 
-    logger.log(context, 'Test successful', { storeId, userId })
+    logger.query(context, 'Test successful', { storeId, userId })
     return { success: true, result }
   } catch (error: unknown) {
-    logger.error(context, 'Test failed', {
+    logger.queryWarn(context, 'Test failed', {
       error: error instanceof Error ? error.message : String(error),
       stack: error instanceof Error ? error.stack : undefined,
       storeId,
@@ -388,7 +388,7 @@ export async function removeUserFromStore(storeId: string, userId: string): Prom
 
     if (error) {
       timer.end({ success: false, errorCode: error.code })
-      logger.error(context, 'RPC error', {
+      logger.queryWarn(context, 'RPC error', {
         error: error.message,
         code: error.code,
         details: error.details,
@@ -402,7 +402,7 @@ export async function removeUserFromStore(storeId: string, userId: string): Prom
     // The RPC function returns JSON with success/error fields
     if (!data?.success) {
       timer.end({ success: false, rpcError: data?.error })
-      logger.error(context, 'RPC returned failure', {
+      logger.queryWarn(context, 'RPC returned failure', {
         rpcError: data?.error,
         rpcData: data,
         storeId,
@@ -417,7 +417,7 @@ export async function removeUserFromStore(storeId: string, userId: string): Prom
       removedBy: data?.removed_by,
     })
   } catch (err) {
-    logger.error(context, 'Unexpected error', {
+    logger.queryWarn(context, 'Unexpected error', {
       error: err instanceof Error ? err.message : String(err),
       stack: err instanceof Error ? err.stack : undefined,
       storeId,
@@ -474,7 +474,7 @@ export async function addUserToStore(
       .single()
 
     if (error) {
-      logger.error(context, 'Supabase upsert error', {
+      logger.queryWarn(context, 'Supabase upsert error', {
         error: error.message,
         code: error.code,
         details: error.details,
@@ -488,7 +488,7 @@ export async function addUserToStore(
 
     const newStoreUser = await fetchStoreUserById(storeId, userId)
     if (!newStoreUser) {
-      logger.error(context, 'User not found after addition', { storeId, userId })
+      logger.queryWarn(context, 'User not found after addition', { storeId, userId })
       throw new Error('Added user not found')
     }
 
@@ -501,7 +501,7 @@ export async function addUserToStore(
 
     return newStoreUser
   } catch (err) {
-    logger.error(context, 'Unexpected error', {
+    logger.queryWarn(context, 'Unexpected error', {
       error: err instanceof Error ? err.message : String(err),
       stack: err instanceof Error ? err.stack : undefined,
       storeId,
@@ -526,7 +526,7 @@ export async function canManageStoreUser(storeId: string, targetUserId?: string)
     })
 
     if (error) {
-      logger.error(context, 'RPC error', {
+      logger.queryWarn(context, 'RPC error', {
         error: error.message,
         code: error.code,
         details: error.details,
@@ -541,7 +541,7 @@ export async function canManageStoreUser(storeId: string, targetUserId?: string)
 
     return canManage
   } catch (err) {
-    logger.error(context, 'Unexpected error', {
+    logger.queryWarn(context, 'Unexpected error', {
       error: err instanceof Error ? err.message : String(err),
       stack: err instanceof Error ? err.stack : undefined,
       storeId,
@@ -602,7 +602,7 @@ export async function getCurrentUserRoleInStore(storeId: string): Promise<string
 
     return role
   } catch (err) {
-    logger.error(context, 'Unexpected error', {
+    logger.queryWarn(context, 'Unexpected error', {
       error: err instanceof Error ? err.message : String(err),
       stack: err instanceof Error ? err.stack : undefined,
       storeId,

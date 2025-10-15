@@ -76,12 +76,6 @@ export function BatchListFilters({
         </SelectContent>
       </Select>
 
-      {/* {isLoading && (
-        <div className="hidden md:flex flex-col justify-center gap-1">
-          <Skeleton className="h-1/4 w-16 bg-muted-foreground/5 rounded-none" />
-          <Skeleton className="h-1/4 w-10 bg-muted-foreground/5 rounded-none" />
-        </div>
-      )} */}
       {!isLoading && count > 0 && (
         <span className="text-sm text-nowrap items-center text-muted-foreground px-2 hidden md:flex">
           {t('itemCount', { count })}

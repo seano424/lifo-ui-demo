@@ -1,6 +1,7 @@
 const isDebugEnabled = process.env.NEXT_PUBLIC_DEBUG === 'true'
 const isQueryLoggingEnabled = process.env.NEXT_PUBLIC_LOG_QUERIES === 'true'
 const isOCRDebugEnabled = process.env.NEXT_PUBLIC_DEBUG_OCR === 'true'
+const isActionsDebugEnabled = process.env.NEXT_PUBLIC_DEBUG_ACTIONS === 'true'
 
 /**
  * Logger interface for type-safe logging throughout the application
@@ -24,6 +25,11 @@ const OCR_CONTEXTS = [
 ]
 
 /**
+ * Action-specific contexts that will use the NEXT_PUBLIC_DEBUG_ACTIONS flag
+ */
+const ACTION_CONTEXTS = ['ScanOut', 'BatchActions']
+
+/**
  * Check if a context should use OCR debugging
  */
 function isOCRContext(context: string): boolean {
@@ -31,11 +37,18 @@ function isOCRContext(context: string): boolean {
 }
 
 /**
+ * Check if a context should use actions debugging
+ */
+function isActionContext(context: string): boolean {
+  return ACTION_CONTEXTS.some(actionContext => context.includes(actionContext))
+}
+
+/**
  * Application logger with environment-controlled output
  *
  * Log Levels:
- * - log(): General app flow (auth, lifecycle) - controlled by NEXT_PUBLIC_DEBUG or NEXT_PUBLIC_DEBUG_OCR for OCR contexts
- * - warn(): General warnings - controlled by NEXT_PUBLIC_DEBUG or NEXT_PUBLIC_DEBUG_OCR for OCR contexts
+ * - log(): General app flow (auth, lifecycle) - controlled by NEXT_PUBLIC_DEBUG, NEXT_PUBLIC_DEBUG_OCR for OCR contexts, or NEXT_PUBLIC_DEBUG_ACTIONS for action contexts
+ * - warn(): General warnings - controlled by NEXT_PUBLIC_DEBUG, NEXT_PUBLIC_DEBUG_OCR for OCR contexts, or NEXT_PUBLIC_DEBUG_ACTIONS for action contexts
  * - error(): Critical errors - ALWAYS displayed
  * - query(): Query/performance logs - controlled by NEXT_PUBLIC_LOG_QUERIES
  * - queryWarn(): Query/performance warnings - controlled by NEXT_PUBLIC_LOG_QUERIES
@@ -43,13 +56,18 @@ function isOCRContext(context: string): boolean {
  * Environment Variables:
  * - NEXT_PUBLIC_DEBUG: Enable all debug logs
  * - NEXT_PUBLIC_DEBUG_OCR: Enable OCR-specific debug logs only
+ * - NEXT_PUBLIC_DEBUG_ACTIONS: Enable batch action and scan-out debug logs only
  * - NEXT_PUBLIC_LOG_QUERIES: Enable database query and API performance logs
  */
 export const logger: Logger = {
   // Regular log - for general app flow (auth events, lifecycle, etc.)
-  // Shows when NEXT_PUBLIC_DEBUG=true OR (NEXT_PUBLIC_DEBUG_OCR=true and context is OCR-related)
+  // Shows when NEXT_PUBLIC_DEBUG=true OR (NEXT_PUBLIC_DEBUG_OCR=true and context is OCR-related) OR (NEXT_PUBLIC_DEBUG_ACTIONS=true and context is action-related)
   log: (context: string, message: string, ...args: unknown[]) => {
-    if (isDebugEnabled || (isOCRDebugEnabled && isOCRContext(context))) {
+    if (
+      isDebugEnabled ||
+      (isOCRDebugEnabled && isOCRContext(context)) ||
+      (isActionsDebugEnabled && isActionContext(context))
+    ) {
       console.log(`[${context}] ${message}`, ...args)
     }
   },
@@ -58,9 +76,13 @@ export const logger: Logger = {
     console.error(`[${context}] ${message}`, ...args)
   },
   // Warnings for general app issues - controlled by debug flag
-  // Shows when NEXT_PUBLIC_DEBUG=true OR (NEXT_PUBLIC_DEBUG_OCR=true and context is OCR-related)
+  // Shows when NEXT_PUBLIC_DEBUG=true OR (NEXT_PUBLIC_DEBUG_OCR=true and context is OCR-related) OR (NEXT_PUBLIC_DEBUG_ACTIONS=true and context is action-related)
   warn: (context: string, message: string, ...args: unknown[]) => {
-    if (isDebugEnabled || (isOCRDebugEnabled && isOCRContext(context))) {
+    if (
+      isDebugEnabled ||
+      (isOCRDebugEnabled && isOCRContext(context)) ||
+      (isActionsDebugEnabled && isActionContext(context))
+    ) {
       console.warn(`[${context}] ${message}`, ...args)
     }
   },

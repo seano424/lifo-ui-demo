@@ -38,18 +38,34 @@ describe('useScanOutActions', () => {
 
       const batches = [
         {
-          batch_id: '1',
-          batch_number: 'B001',
-          product_id: 'p1',
-          store_id: 's1',
-          expiry_date: '2024-12-31',
-          current_quantity: 10,
-          available_quantity: 10,
-          cost_price: 5,
-          selling_price: 10,
-          location_code: 'A1',
-          status: 'active',
-          created_at: '2024-01-01',
+          batch: {
+            batch_id: '1',
+            batch_number: 'B001',
+            product_id: 'p1',
+            store_id: 's1',
+            expiry_date: '2024-12-31',
+            current_quantity: 10,
+            available_quantity: 10,
+            cost_price: 5,
+            selling_price: 10,
+            location_code: 'A1',
+            status: 'active',
+            created_at: '2024-01-01',
+            initial_quantity: 10,
+            received_date: null,
+            reserved_quantity: null,
+            updated_at: '2024-01-01',
+            manufacture_date: null,
+            supplier: null,
+            ocr_extracted_date: null,
+            ocr_confidence: null,
+            processing_batch_id: null,
+            batch_source: null,
+            scanned_barcode: null,
+            scan_confidence: null,
+            verification_status: 'verified',
+            created_by: null,
+          },
           products: {
             product_name: 'Test Product',
             brand_name: 'Test Brand',
@@ -57,18 +73,34 @@ describe('useScanOutActions', () => {
           },
         },
         {
-          batch_id: '2',
-          batch_number: 'B002',
-          product_id: 'p1',
-          store_id: 's1',
-          expiry_date: '2024-11-15',
-          current_quantity: 5,
-          available_quantity: 5,
-          cost_price: 5,
-          selling_price: 10,
-          location_code: 'A2',
-          status: 'active',
-          created_at: '2024-01-01',
+          batch: {
+            batch_id: '2',
+            batch_number: 'B002',
+            product_id: 'p1',
+            store_id: 's1',
+            expiry_date: '2024-11-15',
+            current_quantity: 5,
+            available_quantity: 5,
+            cost_price: 5,
+            selling_price: 10,
+            location_code: 'A2',
+            status: 'active',
+            created_at: '2024-01-01',
+            initial_quantity: 5,
+            received_date: null,
+            reserved_quantity: null,
+            updated_at: '2024-01-01',
+            manufacture_date: null,
+            supplier: null,
+            ocr_extracted_date: null,
+            ocr_confidence: null,
+            processing_batch_id: null,
+            batch_source: null,
+            scanned_barcode: null,
+            scan_confidence: null,
+            verification_status: 'verified',
+            created_by: null,
+          },
           products: {
             product_name: 'Test Product',
             brand_name: 'Test Brand',
@@ -80,8 +112,8 @@ describe('useScanOutActions', () => {
       const matched = result.current.matchBatchByExpiry(batches, '2024-11-15')
 
       expect(matched).not.toBeNull()
-      expect(matched?.batch_id).toBe('2')
-      expect(matched?.expiry_date).toBe('2024-11-15')
+      expect(matched?.batch.batch_id).toBe('2')
+      expect(matched?.batch.expiry_date).toBe('2024-11-15')
     })
 
     it('finds closest match within 7 days when no exact match', () => {
@@ -91,18 +123,34 @@ describe('useScanOutActions', () => {
 
       const batches = [
         {
-          batch_id: '1',
-          batch_number: 'B001',
-          product_id: 'p1',
-          store_id: 's1',
-          expiry_date: '2024-12-31',
-          current_quantity: 10,
-          available_quantity: 10,
-          cost_price: 5,
-          selling_price: 10,
-          location_code: 'A1',
-          status: 'active',
-          created_at: '2024-01-01',
+          batch: {
+            batch_id: '1',
+            batch_number: 'B001',
+            product_id: 'p1',
+            store_id: 's1',
+            expiry_date: '2024-12-31',
+            current_quantity: 10,
+            available_quantity: 10,
+            cost_price: 5,
+            selling_price: 10,
+            location_code: 'A1',
+            status: 'active',
+            created_at: '2024-01-01',
+            initial_quantity: 10,
+            received_date: null,
+            reserved_quantity: null,
+            updated_at: '2024-01-01',
+            manufacture_date: null,
+            supplier: null,
+            ocr_extracted_date: null,
+            ocr_confidence: null,
+            processing_batch_id: null,
+            batch_source: null,
+            scanned_barcode: null,
+            scan_confidence: null,
+            verification_status: 'verified',
+            created_by: null,
+          },
           products: {
             product_name: 'Test Product',
             brand_name: 'Test Brand',
@@ -110,18 +158,34 @@ describe('useScanOutActions', () => {
           },
         },
         {
-          batch_id: '2',
-          batch_number: 'B002',
-          product_id: 'p1',
-          store_id: 's1',
-          expiry_date: '2024-12-05', // 3 days away from search
-          current_quantity: 5,
-          available_quantity: 5,
-          cost_price: 5,
-          selling_price: 10,
-          location_code: 'A2',
-          status: 'active',
-          created_at: '2024-01-01',
+          batch: {
+            batch_id: '2',
+            batch_number: 'B002',
+            product_id: 'p1',
+            store_id: 's1',
+            expiry_date: '2024-12-05', // 3 days away from search
+            current_quantity: 5,
+            available_quantity: 5,
+            cost_price: 5,
+            selling_price: 10,
+            location_code: 'A2',
+            status: 'active',
+            created_at: '2024-01-01',
+            initial_quantity: 5,
+            received_date: null,
+            reserved_quantity: null,
+            updated_at: '2024-01-01',
+            manufacture_date: null,
+            supplier: null,
+            ocr_extracted_date: null,
+            ocr_confidence: null,
+            processing_batch_id: null,
+            batch_source: null,
+            scanned_barcode: null,
+            scan_confidence: null,
+            verification_status: 'verified',
+            created_by: null,
+          },
           products: {
             product_name: 'Test Product',
             brand_name: 'Test Brand',
@@ -133,7 +197,7 @@ describe('useScanOutActions', () => {
       const matched = result.current.matchBatchByExpiry(batches, '2024-12-08')
 
       expect(matched).not.toBeNull()
-      expect(matched?.batch_id).toBe('2')
+      expect(matched?.batch.batch_id).toBe('2')
     })
 
     it('returns null when no batches within 7 day tolerance', () => {
@@ -143,18 +207,34 @@ describe('useScanOutActions', () => {
 
       const batches = [
         {
-          batch_id: '1',
-          batch_number: 'B001',
-          product_id: 'p1',
-          store_id: 's1',
-          expiry_date: '2024-12-31',
-          current_quantity: 10,
-          available_quantity: 10,
-          cost_price: 5,
-          selling_price: 10,
-          location_code: 'A1',
-          status: 'active',
-          created_at: '2024-01-01',
+          batch: {
+            batch_id: '1',
+            batch_number: 'B001',
+            product_id: 'p1',
+            store_id: 's1',
+            expiry_date: '2024-12-31',
+            current_quantity: 10,
+            available_quantity: 10,
+            cost_price: 5,
+            selling_price: 10,
+            location_code: 'A1',
+            status: 'active',
+            created_at: '2024-01-01',
+            initial_quantity: 10,
+            received_date: null,
+            reserved_quantity: null,
+            updated_at: '2024-01-01',
+            manufacture_date: null,
+            supplier: null,
+            ocr_extracted_date: null,
+            ocr_confidence: null,
+            processing_batch_id: null,
+            batch_source: null,
+            scanned_barcode: null,
+            scan_confidence: null,
+            verification_status: 'verified',
+            created_by: null,
+          },
           products: {
             product_name: 'Test Product',
             brand_name: 'Test Brand',
@@ -186,18 +266,34 @@ describe('useScanOutActions', () => {
 
       const batches = [
         {
-          batch_id: '1',
-          batch_number: 'B001',
-          product_id: 'p1',
-          store_id: 's1',
-          expiry_date: '2024-12-31',
-          current_quantity: 10,
-          available_quantity: 10,
-          cost_price: 5,
-          selling_price: 10,
-          location_code: 'A1',
-          status: 'active',
-          created_at: '2024-01-01',
+          batch: {
+            batch_id: '1',
+            batch_number: 'B001',
+            product_id: 'p1',
+            store_id: 's1',
+            expiry_date: '2024-12-31',
+            current_quantity: 10,
+            available_quantity: 10,
+            cost_price: 5,
+            selling_price: 10,
+            location_code: 'A1',
+            status: 'active',
+            created_at: '2024-01-01',
+            initial_quantity: 10,
+            received_date: null,
+            reserved_quantity: null,
+            updated_at: '2024-01-01',
+            manufacture_date: null,
+            supplier: null,
+            ocr_extracted_date: null,
+            ocr_confidence: null,
+            processing_batch_id: null,
+            batch_source: null,
+            scanned_barcode: null,
+            scan_confidence: null,
+            verification_status: 'verified',
+            created_by: null,
+          },
           products: {
             product_name: 'Test Product',
             brand_name: 'Test Brand',
@@ -247,7 +343,7 @@ describe('useScanOutActions', () => {
       const batches = await result.current.findAvailableBatches('123456789', 'store-1')
 
       expect(batches).toHaveLength(1)
-      expect(batches[0].batch_id).toBe('batch-1')
+      expect(batches[0].batch.batch_id).toBe('batch-1')
       expect(batches[0].products.product_name).toBe('Apple Juice')
       expect(mockSupabase.rpc).toHaveBeenCalledWith('find_available_batches_by_barcode', {
         barcode_param: '123456789',
@@ -293,17 +389,17 @@ describe('useScanOutActions', () => {
         error: null,
       })
 
-      mockSupabase.rpc
-        .mockResolvedValueOnce({
-          // check_store_access
-          data: [{ user_id: 'user-1', role_in_store: 'owner', is_active: true }],
-          error: null,
-        })
-        .mockResolvedValueOnce({
-          // update_batch_quantity
-          data: [{ success: true, new_quantity: 5, error_message: null }],
-          error: null,
-        })
+      mockSupabase.rpc.mockResolvedValueOnce({
+        // batch_update_quantities
+        data: {
+          results: [{ batch_id: 'batch-1', success: true, new_quantity: 5, error_message: null }],
+          success: true,
+          store_id: 'store-1',
+          timestamp: new Date().toISOString(),
+          processed_count: 1,
+        },
+        error: null,
+      })
 
       const { result } = renderHook(() => useScanOutActions(), {
         wrapper: createWrapper(),
@@ -313,6 +409,7 @@ describe('useScanOutActions', () => {
         {
           batchId: 'batch-1',
           quantityRemoved: 5,
+          actionType: 'sold',
           reason: 'sale',
           storeId: 'store-1',
         },
@@ -339,6 +436,7 @@ describe('useScanOutActions', () => {
         {
           batchId: 'batch-1',
           quantityRemoved: 5,
+          actionType: 'sold',
           reason: 'sale',
           storeId: 'store-1',
         },

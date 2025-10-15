@@ -66,6 +66,8 @@
       "title": "Producten Uitslag",
       "description": "Scan artikelen om ze uit uw voorraad te verwijderen. Elke scan verwijdert automatisch de meest recente batch van het gescande product, volgens het LIFO-principe.",
       "recentlyRemoved": "{count, plural, =0 {Geen artikelen verwijderd} =1 {1 artikel verwijderd} other {# artikelen verwijderd}}",
+      "removedQuantityExpires": "Verwijderd {quantity}x • Verloopt op: {date}",
+      "andMoreItems": "... en {count} meer items",
       "success": "Product succesvol verwijderd"
     },
     "errors": {
@@ -430,6 +432,14 @@
     "pointCameraAtBarcode": "Richt camera op product barcode",
     "title": "Scannen voor uitgang",
     "description": "Scan artikelen wanneer ze de voorraad verlaten",
+    "actions": {
+      "sold": "Verkocht",
+      "sell": "Verkopen",
+      "donate": "Doneren",
+      "dispose": "Weggooien"
+    },
+    "donationRecipientPlaceholder": "Donatieontvanger (optioneel)",
+    "disposalReasonPlaceholder": "Reden (bijv. Verlopen, Beschimmeld, Beschadigd)",
     "scanning": {
       "scanNextProduct": "Volgend product scannen",
       "scanProductBarcode": "Product barcode scannen",
@@ -539,6 +549,9 @@
     "clearAll": "Alles wissen",
     "submitAll": "Alles indienen ({count} items)",
     "confirmCheckout": "Uitgang bevestigen",
+    "confirmSale": "Verkoop bevestigen",
+    "confirmDonation": "Donatie bevestigen",
+    "confirmDisposal": "Verwijdering bevestigen",
     "reviewItemsBeforeRemoval": "Controleer onderstaande items voordat u ze uit de voorraad verwijdert.",
     "aboutToRemoveItems": "U staat op het punt {count} items uit de voorraad te verwijderen:",
     "totalItemsRemoved": "Totaal verwijderde items",
@@ -556,6 +569,12 @@
     "noInventoryAvailable": "Geen voorraad beschikbaar voor dit product in de huidige winkel.",
     "ocrProcessingFailed": "OCR-verwerking mislukt",
     "batchRemovalNote": "Batch verwijdering: {productName} x{quantity}",
+    "recentlyRemoved": "Recent verwijderd ({count} items)",
+    "removedQuantityExpires": "Verwijderd {quantity}x • Verloopt op: {date}",
+    "andMoreItems": "... en {count} meer items",
+    "donationRecipientRequired": "Selecteer een donatieontvanger voor: {itemNames}",
+    "disposalReasonRequired": "Geef een verwijderingsreden op voor: {itemNames}",
+    "selectRecipientRequired": "Selecteer een ontvanger",
     "cancel": "Annuleren"
   },
   "buttons": {
@@ -616,13 +635,13 @@
     "email": "E-mail",
     "role": "Rol",
     "status": "Status",
-    "pinStatus": "PIN Status",
+    "passwordStatus": "Wachtwoord Status",
     "actions": "Acties",
     "active": "Actief",
     "inactive": "Inactief",
     "locked": "Vergrendeld",
-    "pinActive": "PIN Actief",
-    "noPin": "Geen PIN",
+    "passwordActive": "Wachtwoord Actief",
+    "noPassword": "Geen Wachtwoord",
     "loadMoreUsers": "Meer gebruikers laden",
     "loadingMore": "Laden...",
     "noUsersMessage": "Deze winkel heeft nog geen gebruikers.",
@@ -644,8 +663,8 @@
       "makeEmployee": "Maak medewerker",
       "makeManager": "Maak gérant",
       "makeOwner": "Maak eigenaar",
-      "resetPin": "PIN resetten",
-      "unlockPin": "PIN ontgrendelen",
+      "resetPassword": "Wachtwoord resetten",
+      "unlockPassword": "Wachtwoord ontgrendelen",
       "deactivateUser": "Gebruiker deactiveren",
       "reactivateUser": "Gebruiker reactiveren",
       "removeFromStore": "Verwijderen uit winkel"
@@ -666,8 +685,8 @@
         "confirm": "Verwijderen uit winkel"
       },
       "resetPin": {
-        "title": "PIN resetten voor {name}",
-        "description": "Dit genereert een nieuwe PIN en stuurt deze naar de medewerker via e-mail. Hun huidige PIN werkt niet meer.",
+        "title": "Reset wachtwoord voor {name}",
+        "description": "Dit genereert een nieuw wachtwoord en stuurt deze naar de medewerker via e-mail. Hun huidige wachtwoord werkt niet meer.",
         "employee": "Medewerker",
         "username": "Gebruikersnaam",
         "email": "E-mail",
@@ -675,16 +694,16 @@
         "statusLocked": "Vergrendeld",
         "statusActive": "Actief",
         "cancel": "Annuleren",
-        "confirm": "PIN resetten"
+        "confirm": "Wachtwoord resetten"
       },
-      "unlockPin": {
-        "title": "PIN ontgrendelen voor {name}",
-        "description": "Dit ontgrendelt onmiddellijk de PIN van de medewerker en reset hun teller voor mislukte pogingen.",
+      "unlockPassword": {
+        "title": "Wachtwoord ontgrendelen voor {name}",
+        "description": "Dit ontgrendelt onmiddellijk het wachtwoord van de medewerker en reset hun teller voor mislukte pogingen.",
         "employee": "Medewerker",
         "username": "Gebruikersnaam",
-        "lockedMessage": "Het account is momenteel vergrendeld vanwege mislukte PIN-pogingen",
+        "lockedMessage": "Het account is momenteel vergrendeld vanwege mislukte wachtwoord-pogingen",
         "cancel": "Annuleren",
-        "confirm": "PIN ontgrendelen"
+        "confirm": "Wachtwoord ontgrendelen"
       }
     },
     "roles": {
@@ -697,19 +716,19 @@
       "unknown": "Onbekend"
     },
     "card": {
-      "pinStatus": {
-        "disabled": "PIN Uitgeschakeld",
-        "locked": "PIN Vergrendeld",
-        "pending": "PIN In afwachting",
-        "active": "PIN Actief"
+      "passwordStatus": {
+        "disabled": "Wachtwoord Uitgeschakeld",
+        "locked": "Wachtwoord Vergrendeld",
+        "pending": "Wachtwoord In afwachting",
+        "active": "Wachtwoord Actief"
       },
       "inactive": "Inactief",
       "username": "Gebruikersnaam",
       "permissions": "Machtigingen",
       "lastLogin": "Laatste aanmelding",
-      "failedAttempts": "{count} mislukte PIN poging{plural}",
-      "enablePin": "PIN inschakelen",
-      "disablePin": "PIN uitschakelen",
+      "failedAttempts": "{count} mislukte wachtwoord poging{plural}",
+      "enablePassword": "Wachtwoord inschakelen",
+      "disablePassword": "Wachtwoord uitschakelen",
       "removeDialog": {
         "title": "Gebruiker uit winkel verwijderen",
         "description": "Weet u zeker dat u {name} uit deze winkel wilt verwijderen? Dit deactiveert hun toegang maar verwijdert hun account niet.",
@@ -720,7 +739,7 @@
   },
   "addEmployee": {
     "title": "Nieuwe medewerker toevoegen",
-    "description": "Maak een nieuw medewerkersaccount aan met PIN-authenticatie. Inloggegevens worden per e-mail verzonden.",
+    "description": "Maak een nieuw medewerkersaccount aan met wachtwoord-authenticatie. Inloggegevens worden per e-mail verzonden.",
     "form": {
       "firstName": "Voornaam",
       "lastName": "Achternaam",
@@ -751,9 +770,9 @@
     },
     "preview": {
       "username": "Gebruikersnaam:",
-      "pin": "PIN:",
-      "pinNote": "Wordt automatisch gegenereerd (6 cijfers)",
-      "loginNote": "De medewerker kan inloggen via het \"Medewerker\" tabblad met hun gebruikersnaam en PIN"
+      "password": "Wachtwoord:",
+      "passwordNote": "Wordt automatisch gegenereerd (6 cijfers)",
+      "loginNote": "De medewerker kan inloggen met hun gebruikersnaam en wachtwoord"
     },
     "buttons": {
       "cancel": "Annuleren",
@@ -774,13 +793,13 @@
     "credentials": {
       "email": "E-mail",
       "username": "Gebruikersnaam",
-      "pin": "PIN"
+      "password": "Wachtwoord"
     },
     "nextSteps": {
       "title": "Volgende stappen:",
-      "loginTab": "• De medewerker kan inloggen via het \"Medewerker\" tabblad op de inlogpagina",
-      "useCredentials": "• Gebruik gebruikersnaam: {username} en PIN: {pin}",
-      "resetPin": "• De PIN kan op elk moment worden gereset vanaf de teambeheerpagina",
+      "loginTab": "• De medewerker kan inloggen met hun gebruikersnaam en wachtwoord",
+      "useCredentials": "• Gebruik gebruikersnaam: {username} en wachtwoord: {password}",
+      "resetPassword": "• Het wachtwoord kan op elk moment worden gereset vanaf de teambeheerpagina",
       "permissions": "• De medewerker kan producten scannen en basisvoorraad beheren"
     },
     "errors": {

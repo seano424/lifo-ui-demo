@@ -66,6 +66,8 @@
       "title": "Sortie des produits",
       "description": "Scannez les articles à retirer de votre inventaire. Chaque scan retire automatiquement le lot le plus récent du produit scanné, selon le principe LIFO.",
       "recentlyRemoved": "{count, plural, =0 {Aucun article retiré} =1 {1 article retiré} other {# articles retirés}}",
+      "removedQuantityExpires": "Retiré {quantity}x • Expire le : {date}",
+      "andMoreItems": "... et {count} autres articles",
       "success": "Produit retiré avec succès"
     },
     "errors": {
@@ -430,6 +432,14 @@
     "pointCameraAtBarcode": "Pointez la caméra vers le code-barres du produit",
     "title": "Scanner pour sortir",
     "description": "Scanner les articles lors de leur sortie d'inventaire",
+    "actions": {
+      "sold": "Vendu",
+      "sell": "Vendre",
+      "donate": "Don",
+      "dispose": "Jeter"
+    },
+    "donationRecipientPlaceholder": "Destinataire du don (optionnel)",
+    "disposalReasonPlaceholder": "Raison (ex: Expiré, Moisi, Endommagé)",
     "scanning": {
       "scanNextProduct": "Scanner le produit suivant",
       "scanProductBarcode": "Scanner le code-barres du produit",
@@ -539,6 +549,9 @@
     "clearAll": "Tout effacer",
     "submitAll": "Soumettre tout ({count} articles)",
     "confirmCheckout": "Confirmer la sortie",
+    "confirmSale": "Confirmer la vente",
+    "confirmDonation": "Confirmer le don",
+    "confirmDisposal": "Confirmer l'élimination",
     "reviewItemsBeforeRemoval": "Vérifiez les articles ci-dessous avant de les retirer de l'inventaire.",
     "aboutToRemoveItems": "Vous êtes sur le point de retirer {count} articles de l'inventaire :",
     "totalItemsRemoved": "Total des articles retirés",
@@ -556,6 +569,12 @@
     "noInventoryAvailable": "Aucun inventaire disponible pour ce produit dans le magasin actuel.",
     "ocrProcessingFailed": "Le traitement OCR a échoué",
     "batchRemovalNote": "Retrait de lot : {productName} x{quantity}",
+    "recentlyRemoved": "Récemment retiré ({count} articles)",
+    "removedQuantityExpires": "Retiré {quantity}x • Expire le : {date}",
+    "andMoreItems": "... et {count} autres articles",
+    "donationRecipientRequired": "Veuillez sélectionner un destinataire de don pour : {itemNames}",
+    "disposalReasonRequired": "Veuillez fournir une raison d'élimination pour : {itemNames}",
+    "selectRecipientRequired": "Veuillez sélectionner un destinataire",
     "cancel": "Annuler"
   },
   "buttons": {
@@ -616,13 +635,13 @@
     "email": "E-mail",
     "role": "Rôle",
     "status": "Statut",
-    "pinStatus": "Statut PIN",
+    "passwordStatus": "Statut du mot de passe",
     "actions": "Actions",
     "active": "Actif",
     "inactive": "Inactif",
     "locked": "Verrouillé",
-    "pinActive": "PIN Actif",
-    "noPin": "Aucun PIN",
+    "passwordActive": "Mot de passe actif",
+    "noPassword": "Aucun mot de passe",
     "loadMoreUsers": "Charger plus d'utilisateurs",
     "loadingMore": "Chargement...",
     "noUsersMessage": "Ce magasin n'a encore aucun utilisateur.",
@@ -644,8 +663,8 @@
       "makeEmployee": "Nommer employé",
       "makeManager": "Nommer gérant",
       "makeOwner": "Nommer propriétaire",
-      "resetPin": "Réinitialiser PIN",
-      "unlockPin": "Déverrouiller PIN",
+      "resetPassword": "Réinitialiser le mot de passe",
+      "unlockPassword": "Déverrouiller le mot de passe",
       "deactivateUser": "Désactiver utilisateur",
       "reactivateUser": "Réactiver utilisateur",
       "removeFromStore": "Retirer du magasin"
@@ -666,8 +685,8 @@
         "confirm": "Retirer du magasin"
       },
       "resetPin": {
-        "title": "Réinitialiser PIN pour {name}",
-        "description": "Ceci générera un nouveau PIN et l'enverra à l'employé par e-mail. Son PIN actuel ne fonctionnera plus.",
+        "title": "Réinitialiser le mot de passe pour {name}",
+        "description": "Ceci générera un nouveau mot de passe et l'enverra à l'employé par e-mail. Son mot de passe actuel ne fonctionnera plus.",
         "employee": "Employé",
         "username": "Nom d'utilisateur",
         "email": "E-mail",
@@ -675,16 +694,16 @@
         "statusLocked": "Verrouillé",
         "statusActive": "Actif",
         "cancel": "Annuler",
-        "confirm": "Réinitialiser PIN"
+        "confirm": "Réinitialiser le mot de passe"
       },
-      "unlockPin": {
-        "title": "Déverrouiller PIN pour {name}",
-        "description": "Ceci déverrouillera immédiatement le PIN de l'employé et réinitialisera son compteur de tentatives échouées.",
+      "unlockPassword": {
+        "title": "Déverrouiller le mot de passe pour {name}",
+        "description": "Ceci déverrouillera immédiatement le mot de passe de l'employé et réinitialisera son compteur de tentatives échouées.",
         "employee": "Employé",
         "username": "Nom d'utilisateur",
-        "lockedMessage": "Le compte est actuellement verrouillé à cause de tentatives PIN échouées",
+        "lockedMessage": "Le compte est actuellement verrouillé à cause de tentatives de mot de passe échouées",
         "cancel": "Annuler",
-        "confirm": "Déverrouiller PIN"
+        "confirm": "Déverrouiller le mot de passe"
       }
     },
     "roles": {
@@ -697,19 +716,19 @@
       "unknown": "Inconnu"
     },
     "card": {
-      "pinStatus": {
-        "disabled": "PIN Désactivé",
-        "locked": "PIN Verrouillé",
-        "pending": "PIN En attente",
-        "active": "PIN Actif"
+      "passwordStatus": {
+        "disabled": "Mot de passe désactivé",
+        "locked": "Mot de passe verrouillé",
+        "pending": "Mot de passe en attente",
+        "active": "Mot de passe actif"
       },
       "inactive": "Inactif",
       "username": "Nom d'utilisateur",
       "permissions": "Permissions",
       "lastLogin": "Dernière connexion",
-      "failedAttempts": "{count} tentative{plural} PIN échouée{plural}",
-      "enablePin": "Activer PIN",
-      "disablePin": "Désactiver PIN",
+      "failedAttempts": "{count} tentative{plural} de mot de passe échouée{plural}",
+      "enablePassword": "Activer le mot de passe",
+      "disablePassword": "Désactiver le mot de passe",
       "removeDialog": {
         "title": "Retirer l'utilisateur du magasin",
         "description": "Êtes-vous sûr de vouloir retirer {name} de ce magasin ? Ceci désactivera son accès mais ne supprimera pas son compte.",
@@ -720,7 +739,7 @@
   },
   "addEmployee": {
     "title": "Ajouter un nouvel employé",
-    "description": "Créer un nouveau compte employé avec authentification PIN. Les identifiants de connexion seront envoyés par e-mail.",
+    "description": "Créer un nouveau compte employé avec authentification par mot de passe. Les identifiants de connexion seront envoyés par e-mail.",
     "form": {
       "firstName": "Prénom",
       "lastName": "Nom de famille",
@@ -751,9 +770,9 @@
     },
     "preview": {
       "username": "Nom d'utilisateur:",
-      "pin": "PIN:",
-      "pinNote": "Sera généré automatiquement (6 chiffres)",
-      "loginNote": "L'employé peut se connecter en utilisant l'onglet \"Employé\" avec son nom d'utilisateur et son PIN"
+      "password": "Mot de passe:",
+      "passwordNote": "Sera généré automatiquement (6 chiffres)",
+      "loginNote": "L'employé peut se connecter avec son nom d'utilisateur et son mot de passe"
     },
     "buttons": {
       "cancel": "Annuler",
@@ -774,13 +793,13 @@
     "credentials": {
       "email": "E-mail",
       "username": "Nom d'utilisateur",
-      "pin": "PIN"
+      "password": "Mot de passe"
     },
     "nextSteps": {
       "title": "Prochaines étapes:",
-      "loginTab": "• L'employé peut se connecter en utilisant l'onglet \"Employé\" sur la page de connexion",
-      "useCredentials": "• Utiliser le nom d'utilisateur: {username} et le PIN: {pin}",
-      "resetPin": "• Le PIN peut être réinitialisé à tout moment depuis la page de gestion d'équipe",
+      "loginTab": "• L'employé peut se connecter avec son nom d'utilisateur et son mot de passe",
+      "useCredentials": "• Utiliser le nom d'utilisateur: {username} et le mot de passe: {password}",
+      "resetPassword": "• Le mot de passe peut être réinitialisé à tout moment depuis la page de gestion d'équipe",
       "permissions": "• L'employé peut scanner les produits et gérer l'inventaire de base"
     },
     "errors": {

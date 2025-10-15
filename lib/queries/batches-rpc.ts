@@ -28,7 +28,7 @@ export async function hasBatchesRPC(
     })
 
     if (error) {
-      logger.error(context, 'RPC error', {
+      logger.queryWarn(context, 'RPC error', {
         error: error.message,
         code: error.code,
         storeId,
@@ -96,7 +96,7 @@ export async function fetchBatchesPageRPC(
       })
 
       if (error) {
-        logger.error(context, 'RPC error', {
+        logger.queryWarn(context, 'RPC error', {
           error: error.message,
           code: error.code,
           storeId: filters.storeId,
@@ -180,7 +180,7 @@ export async function fetchExpiringBatchesRPC(
       })
 
       if (error) {
-        logger.error(context, 'RPC error', {
+        logger.queryWarn(context, 'RPC error', {
           error: error.message,
           code: error.code,
           storeId,
@@ -252,7 +252,7 @@ export async function fetchLowStockBatchesRPC(
       })
 
       if (error) {
-        logger.error(context, 'RPC error', {
+        logger.queryWarn(context, 'RPC error', {
           error: error.message,
           code: error.code,
           storeId,

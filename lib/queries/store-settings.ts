@@ -104,8 +104,8 @@ export async function fetchStoreSettings(
           throw new Error('User not authenticated')
         }
 
-        // Log all other errors normally and let React Query handle them
-        logger.error('lib/queries/store-settings', 'Store fetch error', {
+        // Log query errors with queryWarn to respect NEXT_PUBLIC_LOG_QUERIES setting
+        logger.queryWarn('lib/queries/store-settings', 'Store fetch error', {
           error: error.message,
           code: error.code,
           storeId,
@@ -156,7 +156,7 @@ export async function updateStoreBasicInfo(
       })
 
       if (error) {
-        logger.error('lib/queries/store-settings', 'Store update error via RPC', {
+        logger.queryWarn('lib/queries/store-settings', 'Store update error via RPC', {
           error: error.message,
           code: error.code,
           storeId,
@@ -199,7 +199,7 @@ export async function updateStoreAdvancedSettings(
       })
 
       if (error) {
-        logger.error('lib/queries/store-settings', 'Failed to update store advanced settings', {
+        logger.queryWarn('lib/queries/store-settings', 'Failed to update store advanced settings', {
           error: error.message,
           code: error.code,
           storeId,
@@ -208,7 +208,7 @@ export async function updateStoreAdvancedSettings(
       }
 
       if (!data || data.length === 0) {
-        logger.error('lib/queries/store-settings', 'No data returned from update operation', {
+        logger.queryWarn('lib/queries/store-settings', 'No data returned from update operation', {
           storeId,
         })
         throw new Error('No data returned from update operation')
@@ -242,7 +242,7 @@ export async function updateStoreThresholds(
       })
 
       if (error) {
-        logger.error('lib/queries/store-settings', 'Failed to update store thresholds', {
+        logger.queryWarn('lib/queries/store-settings', 'Failed to update store thresholds', {
           error: error.message,
           code: error.code,
           storeId,
@@ -251,7 +251,7 @@ export async function updateStoreThresholds(
       }
 
       if (!data || data.length === 0) {
-        logger.error('lib/queries/store-settings', 'No data returned from threshold update', {
+        logger.queryWarn('lib/queries/store-settings', 'No data returned from threshold update', {
           storeId,
         })
         throw new Error('No data returned from threshold update operation')
@@ -337,7 +337,7 @@ export async function validateStoreCode(
 
     return data.length === 0 // Returns true if code is available
   } catch (error) {
-    logger.error('lib/queries/store-settings', 'validateStoreCode error', {
+    logger.queryWarn('lib/queries/store-settings', 'validateStoreCode error', {
       error: error instanceof Error ? error.message : String(error),
       storeCode,
     })
@@ -368,7 +368,7 @@ export async function validateStoreEmail(
 
     return data.length === 0 // Returns true if email is available
   } catch (error) {
-    logger.error('lib/queries/store-settings', 'validateStoreEmail error', {
+    logger.queryWarn('lib/queries/store-settings', 'validateStoreEmail error', {
       error: error instanceof Error ? error.message : String(error),
       email,
     })
@@ -393,7 +393,7 @@ export async function testTableAccess(
       return { success: true, method: 'RPC function' }
     }
   } catch (error) {
-    logger.error('lib/queries/store-settings', 'testTableAccess error', {
+    logger.queryWarn('lib/queries/store-settings', 'testTableAccess error', {
       error: error instanceof Error ? error.message : String(error),
       storeId,
     })
@@ -412,7 +412,7 @@ export async function testTableAccess(
       return { success: true, method: 'business schema' }
     }
   } catch (error) {
-    logger.error('lib/queries/store-settings', 'Method 2 (business schema) exception', {
+    logger.queryWarn('lib/queries/store-settings', 'Method 2 (business schema) exception', {
       error: error instanceof Error ? error.message : String(error),
       storeId,
     })
@@ -526,7 +526,7 @@ export async function deactivateStore(
       })
 
       if (error) {
-        logger.error('lib/queries/store-settings', 'Store deactivation error', {
+        logger.queryWarn('lib/queries/store-settings', 'Store deactivation error', {
           error: error.message,
           code: error.code,
           storeId,

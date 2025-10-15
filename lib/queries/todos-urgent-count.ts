@@ -29,7 +29,7 @@ export async function fetchUrgentTodosCount(
         })
 
         if (error) {
-          logger.error(context, 'RPC error', {
+          logger.queryWarn(context, 'RPC error', {
             error: error.message,
             code: error.code,
             storeId,
@@ -46,7 +46,7 @@ export async function fetchUrgentTodosCount(
 
         return count
       } catch (err) {
-        logger.error(context, 'Unexpected error', {
+        logger.queryWarn(context, 'Unexpected error', {
           error: err instanceof Error ? err.message : String(err),
         })
         throw err

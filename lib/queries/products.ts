@@ -140,7 +140,7 @@ export async function fetchProducts(
       .order('created_at', { ascending: false })
 
     if (storeError) {
-      logger.error('fetchProducts', 'Error fetching store products', {
+      logger.queryWarn('fetchProducts', 'Error fetching store products', {
         error: storeError.message,
         code: storeError.code,
       })
@@ -167,7 +167,7 @@ export async function fetchProducts(
       .in('product_id', productIds)
 
     if (batchError) {
-      logger.warn('fetchProducts', 'Error fetching batch data', { error: batchError.message })
+      logger.queryWarn('fetchProducts', 'Error fetching batch data', { error: batchError.message })
     }
 
     const productAggregations = new Map<
@@ -223,7 +223,7 @@ export async function fetchProducts(
 
     return transformedData as Product[]
   } catch (err) {
-    logger.error('fetchProducts', 'Unexpected error', {
+    logger.queryWarn('fetchProducts', 'Unexpected error', {
       error: err instanceof Error ? err.message : String(err),
     })
     throw err
@@ -358,7 +358,7 @@ export async function fetchProductsPage(
             error instanceof Error && 'code' in error
               ? (error as Error & { code?: string }).code
               : undefined
-          logger.error(context, 'Query failed', {
+          logger.queryWarn(context, 'Query failed', {
             error: error instanceof Error ? error.message : String(error),
             code: errorCode,
             storeId: filters.storeId,
@@ -379,7 +379,7 @@ export async function fetchProductsPage(
 
         const productsWithNullJoin = storeProductsData.filter(sp => !sp.products)
         if (productsWithNullJoin.length > 0) {
-          logger.warn(context, 'Products with null join detected', {
+          logger.queryWarn(context, 'Products with null join detected', {
             count: productsWithNullJoin.length,
             total: storeProductsData.length,
             sampleIds: productsWithNullJoin.slice(0, 3).map(sp => sp.product_id),
@@ -421,7 +421,7 @@ export async function fetchProductsPage(
           .in('product_id', productIds)
 
         if (batchError) {
-          logger.warn(context, 'Error fetching batch data', {
+          logger.queryWarn(context, 'Error fetching batch data', {
             error: batchError.message,
             code: batchError.code,
           })
@@ -529,7 +529,7 @@ export async function fetchProductsPage(
           nextPage: finalCount > (page + 1) * pageSize ? page + 1 : undefined,
         }
       } catch (err) {
-        logger.error(context, 'Unexpected error', {
+        logger.queryWarn(context, 'Unexpected error', {
           error: err instanceof Error ? err.message : String(err),
         })
         throw err
@@ -592,7 +592,7 @@ export async function createProduct(productData: CreateProductData): Promise<Pro
           .single()
 
         if (globalError) {
-          logger.error(context, 'Error creating global product', {
+          logger.queryWarn(context, 'Error creating global product', {
             error: globalError.message,
             code: globalError.code,
             sku: productData.sku,
@@ -621,7 +621,7 @@ export async function createProduct(productData: CreateProductData): Promise<Pro
           .single()
 
         if (storeError) {
-          logger.error(context, 'Error creating store-product association', {
+          logger.queryWarn(context, 'Error creating store-product association', {
             error: storeError.message,
             code: storeError.code,
             productId: globalProduct.product_id,
@@ -645,7 +645,7 @@ export async function createProduct(productData: CreateProductData): Promise<Pro
           supplier_code: storeProduct.supplier_code,
         }
 
-        logger.log(context, 'Product created successfully', {
+        logger.query(context, 'Product created successfully', {
           productId: globalProduct.product_id,
           storeId: productData.storeId,
           name: productData.name,
@@ -653,7 +653,7 @@ export async function createProduct(productData: CreateProductData): Promise<Pro
 
         return combinedProduct as Product
       } catch (err) {
-        logger.error(context, 'Unexpected error', {
+        logger.queryWarn(context, 'Unexpected error', {
           error: err instanceof Error ? err.message : String(err),
         })
         throw err
@@ -720,7 +720,7 @@ export async function updateProduct(
           .eq('product_id', productId)
 
         if (error) {
-          logger.error(context, 'Error updating global product', {
+          logger.queryWarn(context, 'Error updating global product', {
             error: error.message,
             code: error.code,
             productId,
@@ -746,7 +746,7 @@ export async function updateProduct(
           .eq('store_id', storeId)
 
         if (error) {
-          logger.error(context, 'Error updating store product', {
+          logger.queryWarn(context, 'Error updating store product', {
             error: error.message,
             code: error.code,
             productId,
@@ -768,7 +768,7 @@ export async function updateProduct(
 
       return updatedProduct
     } catch (err) {
-      logger.error(context, 'Unexpected error', {
+      logger.queryWarn(context, 'Unexpected error', {
         error: err instanceof Error ? err.message : String(err),
       })
       throw err
@@ -791,7 +791,7 @@ export async function deleteProduct(productId: string, storeId: string): Promise
         .limit(1)
 
       if (batchError) {
-        logger.error(context, 'Error checking batches', {
+        logger.queryWarn(context, 'Error checking batches', {
           error: batchError.message,
           code: batchError.code,
           productId,
@@ -812,7 +812,7 @@ export async function deleteProduct(productId: string, storeId: string): Promise
         .eq('store_id', storeId)
 
       if (storeProductError) {
-        logger.error(context, 'Error deleting store-product association', {
+        logger.queryWarn(context, 'Error deleting store-product association', {
           error: storeProductError.message,
           code: storeProductError.code,
           productId,
@@ -826,7 +826,7 @@ export async function deleteProduct(productId: string, storeId: string): Promise
         storeId,
       })
     } catch (err) {
-      logger.error(context, 'Unexpected error', {
+      logger.queryWarn(context, 'Unexpected error', {
         error: err instanceof Error ? err.message : String(err),
       })
       throw err
@@ -845,20 +845,20 @@ export async function fetchCategories(serverClient?: ServerClient): Promise<Cate
         .rpc('get_categories_for_dropdown')
 
       if (error) {
-        logger.error(context, 'Error fetching categories', {
+        logger.queryWarn(context, 'Error fetching categories', {
           error: error.message,
           code: error.code,
         })
         throw new Error(`Failed to fetch categories: ${error.message}`)
       }
 
-      logger.log(context, 'Categories fetched successfully', {
+      logger.query(context, 'Categories fetched successfully', {
         count: categories?.length || 0,
       })
 
       return categories || []
     } catch (err) {
-      logger.error(context, 'Unexpected error', {
+      logger.queryWarn(context, 'Unexpected error', {
         error: err instanceof Error ? err.message : String(err),
       })
       throw err
@@ -919,7 +919,7 @@ export async function fetchProductById(
           .single()
 
         if (error) {
-          logger.error(context, 'Query failed', {
+          logger.queryWarn(context, 'Query failed', {
             error: error.message,
             code: error.code,
             productId,
@@ -946,7 +946,7 @@ export async function fetchProductById(
           .eq('product_id', productId)
 
         if (batchError) {
-          logger.warn(context, 'Error fetching batch data', {
+          logger.queryWarn(context, 'Error fetching batch data', {
             error: batchError.message,
             code: batchError.code,
             productId,
@@ -986,7 +986,7 @@ export async function fetchProductById(
           avg_days_to_expiry: null,
         }
 
-        logger.log(context, 'Product fetched successfully', {
+        logger.query(context, 'Product fetched successfully', {
           productId,
           storeId,
           totalStock: total_stock,
@@ -995,7 +995,7 @@ export async function fetchProductById(
 
         return combinedProduct as Product
       } catch (err) {
-        logger.error(context, 'Unexpected error', {
+        logger.queryWarn(context, 'Unexpected error', {
           error: err instanceof Error ? err.message : String(err),
         })
         throw err

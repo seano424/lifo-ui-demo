@@ -65,12 +65,6 @@ export function BatchListSortControls({
               {t('batchNumber')}
             </span>
           </SelectItem>
-          <SelectItem value="supplier">
-            <span className="flex items-center gap-2">
-              <Package className="h-4 w-4" />
-              {t('supplier')}
-            </span>
-          </SelectItem>
           <SelectItem value="current_quantity">
             <span className="flex items-center gap-2">
               <TrendingUp className="h-4 w-4" />

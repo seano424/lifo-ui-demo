@@ -75,7 +75,7 @@ export async function fetchStoreInsights(
       })
 
       if (error) {
-        logger.error('lib/queries/store-insights', 'Error fetching store insights', {
+        logger.queryWarn('lib/queries/store-insights', 'Error fetching store insights', {
           error: error.message,
           code: error.code,
           storeId,
@@ -105,7 +105,7 @@ export async function fetchActionableBatches(
       })
 
       if (error) {
-        logger.error('lib/queries/store-insights', 'Error fetching actionable batches', {
+        logger.queryWarn('lib/queries/store-insights', 'Error fetching actionable batches', {
           error: error.message,
           code: error.code,
           storeId,

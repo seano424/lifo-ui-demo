@@ -166,36 +166,42 @@ export type Database = {
           assigned_at: string | null
           assigned_by: string | null
           can_use_pin_auth: boolean | null
+          created_at: string | null
           is_active: boolean | null
           permissions: Json | null
           pin_access_level: string | null
           pin_permissions: Json | null
           role_in_store: string | null
           store_id: string
+          updated_at: string | null
           user_id: string
         }
         Insert: {
           assigned_at?: string | null
           assigned_by?: string | null
           can_use_pin_auth?: boolean | null
+          created_at?: string | null
           is_active?: boolean | null
           permissions?: Json | null
           pin_access_level?: string | null
           pin_permissions?: Json | null
           role_in_store?: string | null
           store_id: string
+          updated_at?: string | null
           user_id: string
         }
         Update: {
           assigned_at?: string | null
           assigned_by?: string | null
           can_use_pin_auth?: boolean | null
+          created_at?: string | null
           is_active?: boolean | null
           permissions?: Json | null
           pin_access_level?: string | null
           pin_permissions?: Json | null
           role_in_store?: string | null
           store_id?: string
+          updated_at?: string | null
           user_id?: string
         }
         Relationships: [
@@ -305,6 +311,30 @@ export type Database = {
         }
         Relationships: []
       }
+      user_store_permissions: {
+        Row: {
+          assigned_at: string | null
+          can_use_pin_auth: boolean | null
+          effective_role: string | null
+          is_active: boolean | null
+          is_store_owner: boolean | null
+          owner_id: string | null
+          permissions: Json | null
+          pin_access_level: string | null
+          role_in_store: string | null
+          store_id: string | null
+          user_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "store_users_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["store_id"]
+          },
+        ]
+      }
     }
     Functions: {
       create_store_for_user: {
@@ -350,6 +380,10 @@ export type Database = {
           website_url: string | null
         }
       }
+      deactivate_store_safe: {
+        Args: { p_store_id: string }
+        Returns: Json
+      }
       delete_store_and_data: {
         Args: {
           deletion_reason?: string
@@ -362,7 +396,49 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: Database["business"]["Enums"]["store_type_enum"][]
       }
+      get_user_accessible_store_ids: {
+        Args: { check_user_id?: string }
+        Returns: {
+          store_id: string
+        }[]
+      }
+      get_user_stores_fast: {
+        Args: { check_user_id?: string }
+        Returns: string[]
+      }
+      update_store_user_safe: {
+        Args: {
+          input_can_use_pin_auth?: boolean
+          input_is_active?: boolean
+          input_permissions?: Json
+          input_pin_access_level?: string
+          input_pin_permissions?: Json
+          input_role_in_store?: string
+          input_store_id: string
+          input_user_id: string
+        }
+        Returns: {
+          assigned_at: string
+          assigned_by: string
+          can_use_pin_auth: boolean
+          created_at: string
+          email: string
+          is_active: boolean
+          permissions: Json
+          pin_access_level: string
+          pin_permissions: Json
+          raw_user_meta_data: Json
+          role_in_store: string
+          store_id: string
+          updated_at: string
+          user_id: string
+        }[]
+      }
       user_can_manage_store_users: {
+        Args: { target_store_id: string; target_user_id?: string }
+        Returns: boolean
+      }
+      user_can_manage_store_users_v2: {
         Args: { target_store_id: string; target_user_id?: string }
         Returns: boolean
       }
@@ -1419,6 +1495,26 @@ export type Database = {
           total_recovered_value: number
         }[]
       }
+      get_available_batches_by_product: {
+        Args: { p_product_id: string; p_store_id: string }
+        Returns: {
+          available_quantity: number
+          barcode: string
+          batch_id: string
+          batch_number: string
+          brand_name: string
+          cost_price: number
+          created_at: string
+          current_quantity: number
+          expiry_date: string
+          location_code: string
+          product_id: string
+          product_name: string
+          selling_price: number
+          status: string
+          store_id: string
+        }[]
+      }
       get_batch_action_breakdown: {
         Args: { p_batch_id: string }
         Returns: {
@@ -1439,6 +1535,65 @@ export type Database = {
           quantity_affected: number
           recovered_value: number
           verified_at: string
+        }[]
+      }
+      get_batches_paginated: {
+        Args: {
+          p_expiring_in_days?: number
+          p_expiry_date_from?: string
+          p_expiry_date_to?: string
+          p_has_stock?: boolean
+          p_location_code?: string
+          p_page?: number
+          p_page_size?: number
+          p_product_id?: string
+          p_received_date_from?: string
+          p_received_date_to?: string
+          p_sort_direction?: string
+          p_sort_field?: string
+          p_status?: string
+          p_store_id: string
+          p_supplier?: string
+        }
+        Returns: {
+          available_quantity: number
+          batch_id: string
+          batch_number: string
+          batch_source: string
+          cost_price: number
+          created_at: string
+          created_by: string
+          current_quantity: number
+          expiry_date: string
+          initial_quantity: number
+          location_code: string
+          manufacture_date: string
+          ocr_confidence: number
+          ocr_extracted_date: string
+          product_barcode: string
+          product_brand: string
+          product_category_code: string
+          product_category_id: string
+          product_category_name_en: string
+          product_category_name_fr: string
+          product_description: string
+          product_id: string
+          product_image_url: string
+          product_name: string
+          product_sku: string
+          product_typical_shelf_life_days: number
+          product_unit_type: string
+          received_date: string
+          reserved_quantity: number
+          scan_confidence: number
+          scanned_barcode: string
+          selling_price: number
+          status: string
+          store_id: string
+          supplier: string
+          total_count: number
+          updated_at: string
+          verification_status: string
         }[]
       }
       get_categories_for_dropdown: {
@@ -1474,6 +1629,32 @@ export type Database = {
           recipient_type: Database["public"]["Enums"]["donation_recipient_type"]
         }[]
       }
+      get_expiring_batches: {
+        Args: { p_days_ahead?: number; p_store_id: string }
+        Returns: {
+          available_quantity: number
+          batch_id: string
+          batch_number: string
+          cost_price: number
+          current_quantity: number
+          days_until_expiry: number
+          expiry_date: string
+          location_code: string
+          product_barcode: string
+          product_brand: string
+          product_category_code: string
+          product_category_name_en: string
+          product_category_name_fr: string
+          product_id: string
+          product_name: string
+          product_sku: string
+          selling_price: number
+          status: string
+          store_id: string
+          supplier: string
+          total_value: number
+        }[]
+      }
       get_expiry_job_status: {
         Args: Record<PropertyKey, never>
         Returns: {
@@ -1482,6 +1663,70 @@ export type Database = {
           jobid: number
           jobname: string
           schedule: string
+        }[]
+      }
+      get_low_stock_batches: {
+        Args: { p_store_id: string; p_threshold_quantity?: number }
+        Returns: {
+          available_quantity: number
+          batch_id: string
+          batch_number: string
+          current_quantity: number
+          expiry_date: string
+          product_category_code: string
+          product_category_name_en: string
+          product_id: string
+          product_name: string
+          product_sku: string
+          status: string
+        }[]
+      }
+      get_products_paginated: {
+        Args: {
+          p_brand?: string
+          p_category_code?: string
+          p_page_offset?: number
+          p_page_size?: number
+          p_sort_direction?: string
+          p_sort_field?: string
+          p_store_id: string
+        }
+        Returns: {
+          active_batches_count: number
+          avg_days_to_expiry: number
+          barcode: string
+          barcode_type: string
+          base_cost_price: number
+          base_selling_price: number
+          brand: string
+          calculated_active_batches_count: number
+          calculated_total_stock: number
+          category_code: string
+          category_display_name: string
+          category_display_name_fr: string
+          category_id: string
+          created_at: string
+          created_by: string
+          description: string
+          image_url: string
+          is_verified: boolean
+          last_scanned_at: string
+          last_verified: string
+          name: string
+          open_food_facts_data: Json
+          product_id: string
+          sku: string
+          store_cost_price: number
+          store_is_active: boolean
+          store_selling_price: number
+          store_sku: string
+          supplier_code: string
+          total_count: number
+          total_stock: number
+          typical_shelf_life_days: number
+          unit_type: string
+          updated_at: string
+          verification_count: number
         }[]
       }
       get_recent_actions: {
@@ -1499,6 +1744,10 @@ export type Database = {
           recovered_value: number
         }[]
       }
+      get_urgent_todos_count: {
+        Args: { p_store_id: string }
+        Returns: number
+      }
       get_user_stores: {
         Args: Record<PropertyKey, never>
         Returns: {
@@ -1506,6 +1755,10 @@ export type Database = {
           store_id: string
           store_name: string
         }[]
+      }
+      has_batches: {
+        Args: { p_store_id: string }
+        Returns: boolean
       }
       manual_expire_batch: {
         Args: { batch_uuid: string }
@@ -1518,6 +1771,10 @@ export type Database = {
       record_batch_actions: {
         Args: { p_actions: Json; p_batch_id: string }
         Returns: Json
+      }
+      refresh_batch_todo_states: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
       }
       refresh_todo_states: {
         Args: Record<PropertyKey, never>
@@ -1709,6 +1966,13 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: string
       }
+      cleanup_duplicate_batches: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          deleted_count: number
+          iteration: number
+        }[]
+      }
       create_employee_with_pin: {
         Args: {
           p_email: string
@@ -1720,6 +1984,12 @@ export type Database = {
           p_username: string
         }
         Returns: Json
+      }
+      delete_next_duplicate_batch: {
+        Args: { batch_size?: number }
+        Returns: {
+          deleted_count: number
+        }[]
       }
       disable_batch_automation: {
         Args: Record<PropertyKey, never>
@@ -1832,6 +2102,13 @@ export type Database = {
           current_quantity: number
           expiry_date: string
           sku: string
+        }[]
+      }
+      fix_duplicate_batch_numbers: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          batch_numbers_fixed: number
+          batches_updated: number
         }[]
       }
       get_action_history_enhanced: {
@@ -1953,7 +2230,10 @@ export type Database = {
           batch_status: string
           completion_status: string
           composite_score: number
+          cost_price: number
           current_quantity: number
+          current_selling_price: number
+          current_total_value: number
           days_to_expiry: number
           expiry_date: string
           hours_since_last_action: number
@@ -1961,9 +2241,14 @@ export type Database = {
           last_action_time: string
           last_action_type: string
           last_discount_percent: number
+          potential_loss_value: number
+          potential_revenue_value: number
           priority_order: number
           product_brand: string
           product_name: string
+          profit_margin: number
+          profit_margin_percent: number
+          selling_price: number
           store_id: string
           todo_state: string
           total_actions_ever: number
@@ -1972,6 +2257,7 @@ export type Database = {
           total_donated_quantity: number
           total_ignored_quantity: number
           total_sold_quantity: number
+          unit_price: number
           urgency_level: string
           view_refreshed_at: string
         }[]
@@ -2012,6 +2298,94 @@ export type Database = {
           urgency_level: string
         }[]
       }
+      get_batches_page: {
+        Args: {
+          p_filters?: Json
+          p_page?: number
+          p_page_size?: number
+          p_store_id: string
+        }
+        Returns: {
+          available_quantity: number
+          barcode: string
+          batch_id: string
+          batch_number: string
+          batch_source: string
+          cost_price: number
+          created_at: string
+          current_quantity: number
+          expiry_date: string
+          location_code: string
+          product_brand: string
+          product_id: string
+          product_name: string
+          selling_price: number
+          sku: string
+          status: string
+          total_count: number
+          updated_at: string
+          verification_status: string
+        }[]
+      }
+      get_batches_paginated: {
+        Args: {
+          p_expiring_in_days?: number
+          p_expiry_date_from?: string
+          p_expiry_date_to?: string
+          p_has_stock?: boolean
+          p_location_code?: string
+          p_page?: number
+          p_page_size?: number
+          p_product_id?: string
+          p_received_date_from?: string
+          p_received_date_to?: string
+          p_sort_direction?: string
+          p_sort_field?: string
+          p_status?: string
+          p_store_id: string
+          p_supplier?: string
+        }
+        Returns: {
+          available_quantity: number
+          batch_id: string
+          batch_number: string
+          batch_source: string
+          cost_price: number
+          created_at: string
+          created_by: string
+          current_quantity: number
+          expiry_date: string
+          initial_quantity: number
+          location_code: string
+          manufacture_date: string
+          ocr_confidence: number
+          ocr_extracted_date: string
+          product_barcode: string
+          product_brand: string
+          product_category_code: string
+          product_category_id: string
+          product_category_name_en: string
+          product_category_name_fr: string
+          product_description: string
+          product_id: string
+          product_image_url: string
+          product_name: string
+          product_sku: string
+          product_typical_shelf_life_days: number
+          product_unit_type: string
+          received_date: string
+          reserved_quantity: number
+          scan_confidence: number
+          scanned_barcode: string
+          selling_price: number
+          status: string
+          store_id: string
+          supplier: string
+          total_count: number
+          updated_at: string
+          verification_status: string
+        }[]
+      }
       get_csv_upload_stats: {
         Args: { p_days_back?: number; p_store_id: string }
         Returns: {
@@ -2028,6 +2402,16 @@ export type Database = {
           kpi_name: string
           kpi_value: number
           timestamp_value: string
+        }[]
+      }
+      get_current_user_preferences: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          created_at: string
+          preferences: Json
+          primary_store_id: string
+          updated_at: string
+          user_id: string
         }[]
       }
       get_current_user_with_pin_auth: {
@@ -2048,6 +2432,10 @@ export type Database = {
           ok_count: number
           total_active_batches: number
         }[]
+      }
+      get_dashboard_summary_json: {
+        Args: { p_store_id: string }
+        Returns: Json
       }
       get_donated_items: {
         Args: {
@@ -2072,6 +2460,32 @@ export type Database = {
       get_enum_values: {
         Args: { enum_name: string; schema_name?: string }
         Returns: string[]
+      }
+      get_expiring_batches: {
+        Args: { p_days_ahead?: number; p_store_id: string }
+        Returns: {
+          available_quantity: number
+          batch_id: string
+          batch_number: string
+          cost_price: number
+          current_quantity: number
+          days_until_expiry: number
+          expiry_date: string
+          location_code: string
+          product_barcode: string
+          product_brand: string
+          product_category_code: string
+          product_category_name_en: string
+          product_category_name_fr: string
+          product_id: string
+          product_name: string
+          product_sku: string
+          selling_price: number
+          status: string
+          store_id: string
+          supplier: string
+          total_value: number
+        }[]
       }
       get_items_needing_reeval: {
         Args: { p_limit?: number; p_offset?: number; p_store_id: string }
@@ -2106,6 +2520,22 @@ export type Database = {
           previous_value: number
         }[]
       }
+      get_low_stock_batches: {
+        Args: { p_store_id: string; p_threshold_quantity?: number }
+        Returns: {
+          available_quantity: number
+          batch_id: string
+          batch_number: string
+          current_quantity: number
+          expiry_date: string
+          product_category_code: string
+          product_category_name_en: string
+          product_id: string
+          product_name: string
+          product_sku: string
+          status: string
+        }[]
+      }
       get_pending_actions: {
         Args: { p_limit?: number; p_offset?: number; p_store_id: string }
         Returns: {
@@ -2121,6 +2551,54 @@ export type Database = {
           product_name: string
           total_count: number
           urgency_level: string
+        }[]
+      }
+      get_products_paginated: {
+        Args: {
+          p_brand?: string
+          p_category_code?: string
+          p_page_offset?: number
+          p_page_size?: number
+          p_sort_direction?: string
+          p_sort_field?: string
+          p_store_id: string
+        }
+        Returns: {
+          active_batches_count: number
+          avg_days_to_expiry: number
+          barcode: string
+          barcode_type: string
+          base_cost_price: number
+          base_selling_price: number
+          brand: string
+          calculated_active_batches_count: number
+          calculated_total_stock: number
+          category_code: string
+          category_display_name: string
+          category_display_name_fr: string
+          category_id: string
+          created_at: string
+          created_by: string
+          description: string
+          image_url: string
+          is_verified: boolean
+          last_scanned_at: string
+          last_verified: string
+          name: string
+          open_food_facts_data: Json
+          product_id: string
+          sku: string
+          store_cost_price: number
+          store_is_active: boolean
+          store_selling_price: number
+          store_sku: string
+          supplier_code: string
+          total_count: number
+          total_stock: number
+          typical_shelf_life_days: number
+          unit_type: string
+          updated_at: string
+          verification_count: number
         }[]
       }
       get_recently_discounted: {
@@ -2216,6 +2694,10 @@ export type Database = {
         Returns: Json
       }
       get_store_settings: {
+        Args: { store_id_param: string }
+        Returns: Json
+      }
+      get_store_settings_complete: {
         Args: { store_id_param: string }
         Returns: Json
       }
@@ -2367,6 +2849,10 @@ export type Database = {
         }
         Returns: unknown[]
       }
+      get_urgent_todos_count: {
+        Args: { p_store_id: string }
+        Returns: number
+      }
       get_user_by_username: {
         Args: { p_username: string }
         Returns: Json
@@ -2374,6 +2860,16 @@ export type Database = {
       get_user_complete_profile: {
         Args: { p_store_id?: string; p_user_id: string }
         Returns: Json
+      }
+      get_user_preferences_fast: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          created_at: string
+          preferences: Json
+          primary_store_id: string
+          updated_at: string
+          user_id: string
+        }[]
       }
       get_user_store_role: {
         Args: { p_store_id: string; p_user_id: string }
@@ -2386,6 +2882,32 @@ export type Database = {
           store_id: string
           store_name: string
           user_id: string
+        }[]
+      }
+      get_user_stores_with_details: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          address: string
+          assigned_at: string
+          business_name: string
+          city: string
+          country: string
+          created_at: string
+          default_markup_percent: number
+          is_active: boolean
+          onboarding_completed: boolean
+          owner_id: string
+          permissions: Json
+          postal_code: string
+          role_in_store: string
+          size_category: string
+          store_code: string
+          store_id: string
+          store_name: string
+          store_type: string
+          timezone: string
+          updated_at: string
+          waste_reduction_target_percent: number
         }[]
       }
       get_users_with_metadata: {
@@ -2406,6 +2928,10 @@ export type Database = {
           updated_at: string
           username: string
         }[]
+      }
+      has_batches: {
+        Args: { p_store_id: string }
+        Returns: boolean
       }
       invite_user_to_store: {
         Args: {
@@ -2433,6 +2959,10 @@ export type Database = {
           p_user_id?: string
         }
         Returns: boolean
+      }
+      remove_user_from_store: {
+        Args: { p_store_id: string; p_target_user_id: string }
+        Returns: Json
       }
       reset_pin_attempts: {
         Args: { p_username: string }
@@ -2674,6 +3204,7 @@ export type Database = {
         | "ignored"
         | "donate_prepared"
         | "sold"
+      actiontype: "DISCOUNT" | "DONATE" | "DISPOSE" | "MAINTAIN" | "IGNORED"
       donation_recipient_type:
         | "food_bank"
         | "soup_kitchen"
@@ -2685,6 +3216,17 @@ export type Database = {
         | "elderly_care"
         | "homeless_shelter"
         | "other"
+      donationrecipienttype:
+        | "FOOD_BANK"
+        | "SOUP_KITCHEN"
+        | "CHARITY"
+        | "RELIGIOUS_ORG"
+        | "COMMUNITY_GROUP"
+        | "ANIMAL_SHELTER"
+        | "SCHOOL"
+        | "ELDERLY_CARE"
+        | "HOMELESS_SHELTER"
+        | "OTHER"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -3087,6 +3629,7 @@ export type Database = {
           full_name: string | null
           is_active: boolean | null
           password_hash: string | null
+          updated_at: string | null
           user_id: string
           username: string | null
         }
@@ -3096,6 +3639,7 @@ export type Database = {
           full_name?: string | null
           is_active?: boolean | null
           password_hash?: string | null
+          updated_at?: string | null
           user_id: string
           username?: string | null
         }
@@ -3105,6 +3649,7 @@ export type Database = {
           full_name?: string | null
           is_active?: boolean | null
           password_hash?: string | null
+          updated_at?: string | null
           user_id?: string
           username?: string | null
         }
@@ -3132,6 +3677,26 @@ export type Database = {
         }
         Returns: Json
       }
+      get_current_user_preferences: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          created_at: string
+          preferences: Json
+          primary_store_id: string
+          updated_at: string
+          user_id: string
+        }[]
+      }
+      get_current_user_preferences_v2: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          created_at: string
+          preferences: Json
+          primary_store_id: string
+          updated_at: string
+          user_id: string
+        }[]
+      }
       get_user_roles: {
         Args: { user_uuid?: string }
         Returns: string[]
@@ -3147,6 +3712,10 @@ export type Database = {
       request_account_deletion: {
         Args: { deletion_reason?: string }
         Returns: Json
+      }
+      update_primary_store: {
+        Args: { p_store_id: string }
+        Returns: undefined
       }
       user_can_access_store: {
         Args: { store_uuid: string }
@@ -3313,6 +3882,7 @@ export const Constants = {
         "donate_prepared",
         "sold",
       ],
+      actiontype: ["DISCOUNT", "DONATE", "DISPOSE", "MAINTAIN", "IGNORED"],
       donation_recipient_type: [
         "food_bank",
         "soup_kitchen",
@@ -3324,6 +3894,18 @@ export const Constants = {
         "elderly_care",
         "homeless_shelter",
         "other",
+      ],
+      donationrecipienttype: [
+        "FOOD_BANK",
+        "SOUP_KITCHEN",
+        "CHARITY",
+        "RELIGIOUS_ORG",
+        "COMMUNITY_GROUP",
+        "ANIMAL_SHELTER",
+        "SCHOOL",
+        "ELDERLY_CARE",
+        "HOMELESS_SHELTER",
+        "OTHER",
       ],
     },
   },

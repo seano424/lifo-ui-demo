@@ -2,10 +2,17 @@ import { dehydrate } from '@tanstack/react-query'
 import { getActiveStoreCookie } from '@/lib/actions/store-actions'
 import { queryKeys } from '@/lib/queries/query-keys'
 import { fetchCategories } from '@/lib/queries/products'
-import { fetchUserStores, selectDefaultStore } from '@/lib/queries/stores'
+import {
+  fetchUserStores,
+  selectDefaultStore,
+  type Store,
+  type UserPreferences,
+  type UserStore,
+} from '@/lib/queries/stores'
 import { fetchUserPreferencesRPC } from '@/lib/queries/stores-rpc'
 import { fetchCurrentUser } from '@/lib/queries/users'
 import { createClient as createServerClient } from '@/lib/supabase/server'
+import { logger } from '@/lib/utils/logger'
 import { createQueryClient } from './client'
 
 export async function createPrefetchedQuery() {
@@ -29,7 +36,7 @@ export async function prefetchCurrentUser() {
       dehydratedState: dehydrate(queryClient),
     }
   } catch (error) {
-    console.error('Failed to prefetch current user:', error)
+    logger.queryWarn('prefetchCurrentUser', 'Failed to prefetch current user', { error })
     return {
       queryClient,
       dehydratedState: dehydrate(queryClient),
@@ -40,27 +47,62 @@ export async function prefetchCurrentUser() {
 export async function prefetchDashboardData() {
   const queryClient = createQueryClient()
   const supabase = await createServerClient()
+  const perfStart = performance.now()
 
   try {
     // Get the current authenticated user
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser()
+    let user = null
+    try {
+      const { data, error: authError } = await supabase.auth.getUser()
 
-    if (authError || !user) {
+      if (authError) {
+        // Check if it's a transient fetch error vs actual auth error
+        if (authError.message?.includes('fetch failed')) {
+          logger.queryWarn(
+            'prefetchDashboardData',
+            'Auth fetch failed (likely transient), returning empty state',
+          )
+          // Return empty state - client will handle auth check
+          return {
+            queryClient,
+            dehydratedState: dehydrate(queryClient),
+            error: new Error('Auth check temporarily unavailable'),
+          }
+        }
+        throw new Error('Authentication required')
+      }
+
+      user = data?.user
+    } catch (authFetchError) {
+      // Handle fetch errors gracefully
+      const errorMessage =
+        authFetchError instanceof Error ? authFetchError.message : String(authFetchError)
+      if (errorMessage.includes('fetch failed')) {
+        logger.queryWarn(
+          'prefetchDashboardData',
+          'Auth check failed due to network issue, returning empty state',
+        )
+        return {
+          queryClient,
+          dehydratedState: dehydrate(queryClient),
+          error: new Error('Auth check temporarily unavailable'),
+        }
+      }
+      throw authFetchError
+    }
+
+    if (!user) {
       throw new Error('Authentication required')
     }
 
-    // Prefetch shared data that rarely changes
-    await Promise.all([
-      // Current user data
+    // Prefetch all critical data in parallel with Promise.allSettled for resilience
+    const prefetchStart = performance.now()
+    const results = await Promise.allSettled([
       queryClient.prefetchQuery({
         queryKey: ['currentUser'],
         queryFn: () => fetchCurrentUser(supabase),
         staleTime: 5 * 60 * 1000,
       }),
-      // Categories (shared across all stores and pages)
       queryClient.prefetchQuery({
         queryKey: queryKeys.categories.list,
         queryFn: () => fetchCategories(supabase),
@@ -68,53 +110,122 @@ export async function prefetchDashboardData() {
         gcTime: 30 * 60 * 1000, // 30 minutes
       }),
     ])
+    const prefetchDuration = performance.now() - prefetchStart
 
-    // Fetch and prefetch user stores
-    const userStores = await fetchUserStores(user.id, supabase)
-
-    await queryClient.prefetchQuery({
-      queryKey: queryKeys.stores.userStores(user.id),
-      queryFn: () => userStores,
-      staleTime: 2 * 60 * 1000, // 2 minutes - stores don't change often
+    // Log any failed prefetches
+    results.forEach((result, index) => {
+      if (result.status === 'rejected') {
+        const queries = ['currentUser', 'categories']
+        logger.queryWarn('prefetchDashboardData', `Failed to prefetch ${queries[index]}`, {
+          error: result.reason,
+        })
+      }
     })
 
-    // Fetch user preferences using optimized RPC
-    const userPreferences = await fetchUserPreferencesRPC(supabase)
+    // Fetch and prefetch user stores (with graceful fallback)
+    let userStores: UserStore[] = []
+    let userPreferences: UserPreferences | null = null
 
-    await queryClient.prefetchQuery({
-      queryKey: queryKeys.userPreferences.detail(user.id),
-      queryFn: () => userPreferences,
-      staleTime: 10 * 60 * 1000, // 10 minutes - preferences rarely change
-    })
+    try {
+      userStores = await fetchUserStores(user.id, supabase)
+      await queryClient.prefetchQuery({
+        queryKey: queryKeys.stores.userStores(user.id),
+        queryFn: () => userStores,
+        staleTime: 2 * 60 * 1000, // 2 minutes - stores don't change often
+      })
+    } catch (storeError) {
+      logger.queryWarn(
+        'prefetchDashboardData',
+        'Failed to prefetch user stores, will fetch on client',
+        {
+          error: storeError instanceof Error ? storeError.message : String(storeError),
+        },
+      )
+      // Don't throw - let client fetch this data
+    }
+
+    // Fetch user preferences using optimized RPC (with graceful fallback)
+    try {
+      userPreferences = await fetchUserPreferencesRPC(supabase)
+      await queryClient.prefetchQuery({
+        queryKey: queryKeys.userPreferences.detail(user.id),
+        queryFn: () => userPreferences,
+        staleTime: 10 * 60 * 1000, // 10 minutes - preferences rarely change
+      })
+    } catch (prefError) {
+      logger.queryWarn(
+        'prefetchDashboardData',
+        'Failed to prefetch user preferences, will fetch on client',
+        {
+          error: prefError instanceof Error ? prefError.message : String(prefError),
+        },
+      )
+      // Don't throw - let client fetch this data
+    }
 
     // Get active store from cookies and use smart selection
-    const lastActiveStoreId = await getActiveStoreCookie()
-    const primaryStoreId = userPreferences?.primary_store_id
+    let targetStore: Store | null = null
 
-    // Use smart selection logic
-    const targetStore = selectDefaultStore(
-      userStores,
-      primaryStoreId || null,
-      lastActiveStoreId || null,
-    )
+    if (userStores.length > 0) {
+      const lastActiveStoreId = await getActiveStoreCookie()
+      const primaryStoreId = userPreferences?.primary_store_id
 
-    if (targetStore) {
-      await queryClient.prefetchQuery({
-        queryKey: ['activeStore'],
-        queryFn: async () => targetStore,
-        staleTime: 2 * 60 * 1000,
-      })
+      // Use smart selection logic
+      targetStore = selectDefaultStore(
+        userStores,
+        primaryStoreId || null,
+        lastActiveStoreId || null,
+      )
+
+      if (targetStore) {
+        const storeId = targetStore.store_id
+        // Prefetch active store and urgent todos count in parallel
+        await Promise.all([
+          queryClient.prefetchQuery({
+            queryKey: ['activeStore'],
+            queryFn: async () => targetStore,
+            staleTime: 2 * 60 * 1000,
+          }),
+          queryClient.prefetchQuery({
+            queryKey: queryKeys.todos.urgentCount(storeId),
+            queryFn: async () => {
+              const { fetchUrgentTodosCount } = await import('@/lib/queries/todos-urgent-count')
+              return fetchUrgentTodosCount(storeId, supabase)
+            },
+            staleTime: 2 * 60 * 1000,
+          }),
+        ])
+      }
     }
+
+    const totalDuration = performance.now() - perfStart
+    logger.query(
+      'prefetchDashboardData',
+      `Dashboard prefetch completed in ${totalDuration.toFixed(0)}ms (prefetch: ${prefetchDuration.toFixed(0)}ms)`,
+    )
 
     return {
       queryClient,
       dehydratedState: dehydrate(queryClient),
       user,
-      userStores,
+      userStores: userStores || [],
       activeStore: targetStore,
     }
   } catch (error) {
-    console.error('Failed to prefetch dashboard data:', error)
+    // Log connection errors more gracefully
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    const isConnectionError =
+      errorMessage.includes('ECONNRESET') || errorMessage.includes('fetch failed')
+
+    if (isConnectionError) {
+      logger.queryWarn(
+        'prefetchDashboardData',
+        'Connection error during dashboard prefetch (retries will be attempted)',
+        { error: errorMessage },
+      )
+    } else {
+      logger.queryWarn('prefetchDashboardData', 'Failed to prefetch dashboard data', { error })
+    }
 
     return {
       queryClient,
