@@ -227,6 +227,38 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
     [handleFiltersChange],
   )
 
+  const handleRemoveFilter = useCallback(
+    (type: 'urgency' | 'action' | 'batch' | 'expiry', value?: string) => {
+      handleFiltersChange(prev => {
+        switch (type) {
+          case 'urgency':
+            return {
+              ...prev,
+              urgency_level: prev.urgency_level?.filter((level: string) => level !== value),
+            }
+          case 'action':
+            return {
+              ...prev,
+              action_type: prev.action_type?.filter(action => action !== value),
+            }
+          case 'batch':
+            return {
+              ...prev,
+              batch_status: prev.batch_status?.filter(status => status !== value),
+            }
+          case 'expiry':
+            return {
+              ...prev,
+              expiry_range: undefined,
+            }
+          default:
+            return prev
+        }
+      })
+    },
+    [handleFiltersChange],
+  )
+
   return (
     <div className="space-y-2">
       {/* Unified Search Bar with Filter/Sort Buttons */}
@@ -237,6 +269,11 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
         onSortClick={() => setShowSort(true)}
         isLoading={false}
         placeholder={t('filters.searchPlaceholder')}
+        urgencyLevel={filters.urgency_level}
+        actionType={filters.action_type}
+        batchStatus={filters.batch_status}
+        expiryRange={filters.expiry_range}
+        onRemoveFilter={handleRemoveFilter}
       />
 
       {/* Mobile Separator after search */}
