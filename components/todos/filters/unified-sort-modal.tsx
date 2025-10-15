@@ -6,7 +6,7 @@ import { Separator } from '@/components/ui/separator'
 import { useMediaQuery } from '@/hooks/use-mobile'
 import { ArrowUpDown } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import type { SortDirection, SortField } from './todo-sort-controls'
+import type { SortDirection, SortField } from './types'
 
 const SORT_OPTIONS: {
   value: SortField

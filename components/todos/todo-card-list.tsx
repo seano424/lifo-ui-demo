@@ -9,8 +9,8 @@ import { DEFAULT_ROOT_MARGIN } from '@/lib/constants/todos'
 import type { TodoItem } from '@/lib/queries/todos-rpc'
 import { useTranslations } from 'next-intl'
 import { useEffect, useMemo, useState } from 'react'
-import type { SortConfig } from './filters/todo-sort-controls'
 import { Typography } from '../ui/typography'
+import type { SortConfig } from './filters/types'
 
 interface TodoCardListProps {
   todos: TodoItem[]
