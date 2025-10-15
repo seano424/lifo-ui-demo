@@ -302,9 +302,9 @@ export function UnifiedFiltersModal({
               {filters.urgency_level?.map(urgency => {
                 const option = URGENCY_OPTIONS.find(opt => opt.value === urgency)
                 return (
-                  <Badge key={urgency} variant="secondary" className="gap-1">
-                    {option?.emoji}
-                    {t(option?.translationKey || '')}
+                  <Badge key={urgency} variant="secondary" className="gap-2">
+                    <span>{option?.emoji}</span>
+                    <span>{t(option?.translationKey || '')}</span>
                     <X
                       className="w-3 h-3 cursor-pointer hover:text-destructive"
                       onClick={() => handleUrgencyChange(urgency)}
@@ -315,9 +315,9 @@ export function UnifiedFiltersModal({
               {filters.action_type?.map(action => {
                 const option = ACTION_OPTIONS.find(opt => opt.value === action)
                 return (
-                  <Badge key={action} variant="secondary" className="gap-1">
-                    {option?.emoji}
-                    {t(option?.translationKey || '')}
+                  <Badge key={action} variant="secondary" className="gap-2">
+                    <span>{option?.emoji}</span>
+                    <span>{t(option?.translationKey || '')}</span>
                     <X
                       className="w-3 h-3 cursor-pointer hover:text-destructive"
                       onClick={() => handleActionChange(action)}
@@ -328,9 +328,9 @@ export function UnifiedFiltersModal({
               {filters.batch_status?.map(status => {
                 const option = BATCH_STATUS_OPTIONS.find(opt => opt.value === status)
                 return (
-                  <Badge key={status} variant="secondary" className="gap-1">
-                    {option?.emoji}
-                    {t(option?.translationKey || '')}
+                  <Badge key={status} variant="secondary" className="gap-2">
+                    <span>{option?.emoji}</span>
+                    <span>{t(option?.translationKey || '')}</span>
                     <X
                       className="w-3 h-3 cursor-pointer hover:text-destructive"
                       onClick={() => handleStatusChange(status)}
@@ -339,12 +339,16 @@ export function UnifiedFiltersModal({
                 )
               })}
               {filters.expiry_range && (
-                <Badge variant="secondary" className="gap-1">
-                  {EXPIRY_OPTIONS.find(opt => opt.value === filters.expiry_range)?.emoji}
-                  {t(
-                    EXPIRY_OPTIONS.find(opt => opt.value === filters.expiry_range)
-                      ?.translationKey || '',
-                  )}
+                <Badge variant="secondary" className="gap-2">
+                  <span>
+                    {EXPIRY_OPTIONS.find(opt => opt.value === filters.expiry_range)?.emoji}
+                  </span>
+                  <span>
+                    {t(
+                      EXPIRY_OPTIONS.find(opt => opt.value === filters.expiry_range)
+                        ?.translationKey || '',
+                    )}
+                  </span>
                   <X
                     className="w-3 h-3 cursor-pointer hover:text-destructive"
                     onClick={() => handleExpiryChange('all')}
