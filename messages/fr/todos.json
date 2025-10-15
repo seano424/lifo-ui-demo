@@ -225,7 +225,6 @@
     "filtersTitle": "Filtres",
     "sortTitle": "Trier",
     "searchPlaceholder": "Rechercher des produits...",
-    "activeFilters": "Filtres actifs appliqués",
     "clearAll": "Effacer tous les filtres",
     "apply": "Appliquer",
     "showFilters": "Afficher les filtres",
@@ -258,20 +257,53 @@
       "expired": "Expiré",
       "title": "Statut du lot"
     },
+    "batchStatus": {
+      "all": "Tous les statuts",
+      "active": "Actif",
+      "expired": "Expiré",
+      "completed": "Terminé",
+      "title": "Statut du lot"
+    },
     "sort": {
       "sortBy": "Trier par",
       "direction": "Direction",
-      "urgency": "Urgence",
-      "expiryDate": "Date d'expiration",
-      "currentQuantity": "Quantité actuelle",
-      "potentialLoss": "Perte potentielle",
-      "alphabetical": "Alphabétique",
-      "actionDate": "Date d'action",
-      "effectiveness": "Efficacité",
+
       "ascending": "Croissant",
-      "descending": "Décroissant"
+      "descending": "Décroissant",
+      "urgency": {
+        "label": "Urgence",
+        "description": "Trier par niveau d'urgence"
+      },
+      "expiryDate": {
+        "label": "Date d'expiration",
+        "description": "Trier par date d'expiration"
+      },
+      "currentQuantity": {
+        "label": "Quantité actuelle",
+        "description": "Trier par quantité en stock"
+      },
+      "potentialLoss": {
+        "label": "Perte potentielle",
+        "description": "Trier par perte potentielle"
+      },
+      "alphabetical": {
+        "label": "Alphabétique",
+        "description": "Trier par nom de produit"
+      },
+      "actionDate": {
+        "label": "Date d'action",
+        "description": "Trier par date de dernière action"
+      },
+      "effectiveness": {
+        "label": "Efficacité",
+        "description": "Trier par efficacité des actions"
+      }
     },
     "expiry": {
+      "title": "Période d'expiration",
+      "all": "Tous les jours",
+      "expiringSoon": "Expire bientôt",
+      "recentlyExpired": "Récemment expiré",
       "expiringWithin": "Expirant dans",
       "expiredInLast": "Expiré dans le dernier",
       "expiryRange": "Périmètre de péremption",
@@ -303,7 +335,15 @@
     "filterByStatus": "Filtrer par statut",
     "activeUrgency": "Urgence : {urgency}",
     "activeAction": "Action : {action}",
-    "activeStatus": "Statut : {status}"
+    "activeStatus": "Statut : {status}",
+    "sortBy": "Trier par",
+    "sortDirection": "Direction du tri",
+    "ascending": "Croissant",
+    "descending": "Décroissant",
+    "activeFilters": "Filtres actifs"
+  },
+  "common": {
+    "cancel": "Annuler"
   },
   "search": {
     "placeholder": "Rechercher des produits...",
@@ -326,6 +366,10 @@
       "label": "Quantité",
       "description": "Trier par quantité en stock actuelle"
     },
+    "currentQuantity": {
+      "label": "Quantité actuelle",
+      "description": "Trier par quantité en stock actuelle"
+    },
     "potentialLoss": {
       "label": "Perte potentielle",
       "description": "Trier par impact financier estimé"
@@ -334,8 +378,16 @@
       "label": "Nom du produit",
       "description": "Trier alphabétiquement par nom de produit"
     },
+    "alphabetical": {
+      "label": "Alphabétique",
+      "description": "Trier alphabétiquement par nom de produit"
+    },
     "lastAction": {
       "label": "Dernière action",
+      "description": "Trier par date de la dernière action effectuée"
+    },
+    "actionDate": {
+      "label": "Date d'action",
       "description": "Trier par date de la dernière action effectuée"
     },
     "effectiveness": {
