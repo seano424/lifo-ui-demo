@@ -431,10 +431,12 @@ class UnifiedScoringPersistenceOptimized:
         self, conn: asyncpg.Connection, results: list[dict[str, Any]], store_id: str
     ) -> int:
         """
-        Persist AI recommendations to batch_actions table.
+        Persist AI recommendations to batch_actions table using COPY protocol.
 
         This creates pending action entries that users can act on.
         Enables the donation-first workflow dashboard.
+
+        Uses same COPY optimization as product_scores for large batches.
 
         Args:
             conn: Active asyncpg connection
@@ -460,29 +462,43 @@ class UnifiedScoringPersistenceOptimized:
                 )
                 return 0
 
-            # Create batch_actions using multi-value INSERT
-            # Faster than individual INSERTs for small data
-            values = []
+            # Use COPY protocol for large batches (same optimization as product_scores)
+            staging_table = "temp_batch_actions_staging"
+
+            # Create UNLOGGED temp table for batch_actions
+            await conn.execute(f"""
+                CREATE UNLOGGED TABLE IF NOT EXISTS {staging_table} (
+                    batch_id UUID NOT NULL,
+                    store_id UUID NOT NULL,
+                    recommended_action TEXT,
+                    ai_score NUMERIC,
+                    notes TEXT
+                );
+                TRUNCATE {staging_table};
+            """)
+
+            # Prepare records as tuples
+            records = []
             for item in actionable:
-                batch_id = str(item.get("batch_id"))
-                recommended_action = item.get("recommendation", "maintain")
-                ai_score = float(item.get("composite_score", 0.0))
-                notes_text = str(item.get("reason", ""))[:500]  # Limit to 500 chars
-                # Escape single quotes for SQL
-                notes_escaped = notes_text.replace("'", "''")
-
-                values.append(
-                    f"('{batch_id}', '{store_id}', '{recommended_action}', "
-                    f"{ai_score}, '{notes_escaped}')"
+                record = (
+                    str(item.get("batch_id")),
+                    str(store_id),
+                    str(item.get("recommendation", "maintain")),
+                    float(item.get("composite_score", 0.0)),
+                    str(item.get("reason", ""))[:500],  # Limit to 500 chars
                 )
+                records.append(record)
 
-            if not values:
-                return 0
+            # Execute BINARY COPY command (same as product_scores)
+            await conn.copy_records_to_table(
+                staging_table,
+                records=records,
+                columns=["batch_id", "store_id", "recommended_action", "ai_score", "notes"],
+            )
 
-            # Insert batch_actions as pending recommendations
+            # Single INSERT...SELECT to move data to final table
             # action_type IS NULL = pending recommendation (user hasn't acted)
-            # Dashboard queries: WHERE action_type IS NULL to show pending items
-            insert_query = f"""
+            result = await conn.execute(f"""
                 INSERT INTO inventory.batch_actions (
                     batch_id,
                     store_id,
@@ -490,10 +506,14 @@ class UnifiedScoringPersistenceOptimized:
                     ai_score,
                     notes
                 )
-                VALUES {', '.join(values)}
-            """
-
-            result = await conn.execute(insert_query)
+                SELECT
+                    batch_id,
+                    store_id,
+                    recommended_action::action_type,
+                    ai_score,
+                    notes
+                FROM {staging_table}
+            """)
 
             # Parse affected rows
             rows_affected = len(actionable)
@@ -503,7 +523,7 @@ class UnifiedScoringPersistenceOptimized:
                     rows_affected = int(parts[-1])
 
             self.logger.info(
-                "Batch actions persisted",
+                "Batch actions persisted via COPY",
                 total_actions=len(actionable),
                 rows_affected=rows_affected,
                 donations=sum(
@@ -512,6 +532,7 @@ class UnifiedScoringPersistenceOptimized:
                 discounts=sum(
                     1 for r in actionable if r.get("recommendation") == "discount"
                 ),
+                method="binary_copy",
             )
 
             return rows_affected
