@@ -101,12 +101,10 @@ export function useScanOutActions() {
     const supabase = createClient()
 
     try {
-      const { data, error } = await supabase
-        .schema('inventory')
-        .rpc('find_available_batches_by_barcode', {
-          barcode_param: barcode,
-          store_id_param: storeId,
-        })
+      const { data, error } = await supabase.rpc('find_available_batches_by_barcode', {
+        barcode_param: barcode,
+        store_id_param: storeId,
+      })
 
       if (error) {
         logger.error('ScanOut', 'RPC batch lookup failed', { error })
