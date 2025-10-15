@@ -150,6 +150,11 @@ class InMemoryScoringEngine:
     Handles bulk scoring without database calls during computation
     """
 
+    # Donation engine evaluation thresholds
+    # European compliance: Only evaluate donation for eligible items
+    MIN_SCORE_FOR_DONATION = 0.4  # Medium+ urgency threshold
+    MAX_DAYS_FOR_DONATION = 7  # EU food safety window (max shelf life for donation)
+
     def __init__(self):
         self.logger = structlog.get_logger().bind(component="inmemory_scoring_engine")
 
@@ -159,8 +164,19 @@ class InMemoryScoringEngine:
         daily_sales: float,
         category_weights: dict[str, float],
         store_id: str,
+        store_donation_config: dict[str, Any] | None = None,
     ) -> ScoringResult | None:
-        """Score a single batch using in-memory calculations only"""
+        """
+        Score a single batch using in-memory calculations only
+
+        Args:
+            batch_data: Batch information
+            daily_sales: Average daily sales velocity
+            category_weights: Category-specific scoring weights
+            store_id: Store identifier
+            store_donation_config: Donation preferences
+                (enables donation-first workflow)
+        """
         try:
             # Create scorer with category-specific weights
             scorer = InventoryScorer(category=batch_data.get("category"))
@@ -198,13 +214,89 @@ class InMemoryScoringEngine:
                 expiry_score, velocity_score, margin_score, category_weights
             )
 
-            # Generate recommendation
-            recommendation = scorer.generate_recommendation(
-                composite_score,
-                days_to_expiry,
-                margin_percent,
-                batch_data["current_quantity"],
+            # DONATION-FIRST INTEGRATION: Check if donation should be recommended
+            donation_recommendation = None
+            use_donation_engine = (
+                composite_score >= self.MIN_SCORE_FOR_DONATION
+                and days_to_expiry <= self.MAX_DAYS_FOR_DONATION
+                and store_donation_config is not None  # Store has donation config
             )
+
+            if use_donation_engine:
+                try:
+                    from app.core.donation_engine import SimplifiedDonationEngine
+
+                    donation_engine = SimplifiedDonationEngine()
+
+                    # Prepare batch data for donation engine
+                    donation_batch_data = {
+                        "batch_id": batch_data["batch_id"],
+                        "category": batch_data.get("category"),
+                        "expiry_date": batch_data.get("expiry_date"),
+                        "cost_price": float(batch_data["cost_price"]),
+                        "selling_price": float(batch_data["selling_price"]),
+                        "current_quantity": float(batch_data["current_quantity"]),
+                    }
+
+                    # Evaluate donation recommendation
+                    donation_recommendation = (
+                        donation_engine.evaluate_action_recommendation(
+                            batch_data=donation_batch_data,
+                            ai_score=composite_score,
+                            store_donation_config=store_donation_config,
+                        )
+                    )
+
+                    self.logger.debug(
+                        "Donation engine evaluated in bulk scoring",
+                        batch_id=batch_data["batch_id"],
+                        donation_action=donation_recommendation.recommended_action.value,
+                    )
+
+                except Exception as e:
+                    self.logger.error(
+                        "Donation engine failed in bulk scoring, falling back to discount-only",
+                        batch_id=batch_data.get("batch_id"),
+                        error=str(e),
+                        error_type=type(e).__name__,
+                        exc_info=True,  # Include stack trace for debugging
+                    )
+                    donation_recommendation = None
+
+            # Choose recommendation source
+            if (
+                donation_recommendation
+                and donation_recommendation.recommended_action.value
+                in ["donate", "discount", "dispose", "maintain"]
+            ):
+                # Use donation engine's recommendation
+                is_critical = donation_recommendation.priority.value == "critical"
+                recommendation = {
+                    "action": donation_recommendation.recommended_action.value,
+                    "discount_percent": 0,
+                    "reason": donation_recommendation.notes,
+                    "priority": 1 if is_critical else 2,
+                }
+
+                # Calculate discount percentage if action is discount
+                if donation_recommendation.recommended_action.value == "discount":
+                    default_rec = scorer.generate_recommendation(
+                        composite_score,
+                        days_to_expiry,
+                        margin_percent,
+                        batch_data["current_quantity"],
+                    )
+                    recommendation["discount_percent"] = default_rec.get(
+                        "discount_percent", 0
+                    )
+            else:
+                # Fall back to default discount-only recommendation
+                recommendation = scorer.generate_recommendation(
+                    composite_score,
+                    days_to_expiry,
+                    margin_percent,
+                    batch_data["current_quantity"],
+                )
 
             # Determine urgency level
             urgency_level = self._get_urgency_level(days_to_expiry, composite_score)
@@ -227,7 +319,8 @@ class InMemoryScoringEngine:
                 discount_percent=recommendation.get("discount_percent", 0),
                 reason=recommendation.get(
                     "reason",
-                    f"Score: {composite_score:.2f}. Automated scoring based on expiry, velocity, and margin factors.",
+                    f"Score: {composite_score:.2f}. Automated scoring "
+                    "based on expiry, velocity, and margin factors.",
                 ),
                 confidence_level=0.85,
                 ml_enhanced=True,
@@ -255,8 +348,19 @@ class InMemoryScoringEngine:
         velocity_data_bulk: dict[str, dict[str, float]],
         category_weights_bulk: dict[str, dict[str, float]],
         store_id: str,
+        store_donation_config: dict[str, Any] | None = None,
     ) -> tuple[list[ScoringResult], list[str], int]:
-        """Score all batches using in-memory calculations"""
+        """
+        Score all batches using in-memory calculations
+
+        Args:
+            inventory_data: List of batch data dictionaries
+            velocity_data_bulk: Pre-fetched velocity data by product_id
+            category_weights_bulk: Pre-fetched category weights
+            store_id: Store identifier
+            store_donation_config: Donation preferences
+                (enables donation-first workflow)
+        """
         results = []
         errors = []
         high_priority_count = 0
@@ -265,6 +369,7 @@ class InMemoryScoringEngine:
             "Starting bulk in-memory scoring",
             total_batches=len(inventory_data),
             store_id=store_id,
+            donation_enabled=store_donation_config is not None,
         )
 
         for batch_data in inventory_data:
@@ -277,9 +382,13 @@ class InMemoryScoringEngine:
                     batch_data.get("category"), {}
                 )
 
-                # Score batch in memory
+                # Score batch in memory (with optional donation integration)
                 score_result = self.score_batch_in_memory(
-                    batch_data, daily_sales, category_weights, store_id
+                    batch_data,
+                    daily_sales,
+                    category_weights,
+                    store_id,
+                    store_donation_config,
                 )
 
                 if score_result:

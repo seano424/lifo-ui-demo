@@ -366,7 +366,7 @@ class UnifiedScoringPersistenceOptimized:
                 )
 
                 self.logger.info(
-                    "OPTIMIZED COPY-based persistence successful",
+                    "OPTIMIZED COPY-based persistence successful (product_scores)",
                     total_items=len(results),
                     rows_affected=rows_affected,
                     copy_time_ms=round(copy_time_ms, 2),
@@ -374,6 +374,17 @@ class UnifiedScoringPersistenceOptimized:
                     total_time_ms=round(total_time_ms, 2),
                     records_per_second=records_per_second,
                     optimization="binary_copy_unlogged_table",
+                )
+
+                # STEP 5: Also persist AI recommendations to batch_actions table
+                # This enables the donation-first workflow dashboard
+                batch_actions_count = await self._persist_batch_actions(
+                    conn, results, store_id
+                )
+
+                self.logger.info(
+                    "Batch actions persistence completed",
+                    batch_actions_created=batch_actions_count,
                 )
 
                 return {
@@ -415,6 +426,126 @@ class UnifiedScoringPersistenceOptimized:
                     self.logger.debug(
                         "Connection cleanup failed", error=str(cleanup_error)
                     )
+
+    async def _persist_batch_actions(
+        self, conn: asyncpg.Connection, results: list[dict[str, Any]], store_id: str
+    ) -> int:
+        """
+        Persist AI recommendations to batch_actions table using COPY protocol.
+
+        This creates pending action entries that users can act on.
+        Enables the donation-first workflow dashboard.
+
+        Uses same COPY optimization as product_scores for large batches.
+
+        Args:
+            conn: Active asyncpg connection
+            results: Scoring results with recommendations
+            store_id: Store identifier
+
+        Returns:
+            Number of batch_actions created
+        """
+        try:
+            # Only create batch_actions for results with actionable recommendations
+            actionable = [
+                r
+                for r in results
+                if r.get("recommendation")
+                in ["donate", "discount", "dispose", "maintain"]
+            ]
+
+            if not actionable:
+                self.logger.debug(
+                    "No actionable recommendations to persist",
+                    total_results=len(results),
+                )
+                return 0
+
+            # Use COPY protocol for large batches (same optimization as product_scores)
+            staging_table = "temp_batch_actions_staging"
+
+            # Create UNLOGGED temp table for batch_actions
+            await conn.execute(f"""
+                CREATE UNLOGGED TABLE IF NOT EXISTS {staging_table} (
+                    batch_id UUID NOT NULL,
+                    store_id UUID NOT NULL,
+                    recommended_action TEXT,
+                    ai_score NUMERIC,
+                    notes TEXT
+                );
+                TRUNCATE {staging_table};
+            """)
+
+            # Prepare records as tuples
+            records = []
+            for item in actionable:
+                record = (
+                    str(item.get("batch_id")),
+                    str(store_id),
+                    str(item.get("recommendation", "maintain")),
+                    float(item.get("composite_score", 0.0)),
+                    str(item.get("reason", ""))[:500],  # Limit to 500 chars
+                )
+                records.append(record)
+
+            # Execute BINARY COPY command (same as product_scores)
+            await conn.copy_records_to_table(
+                staging_table,
+                records=records,
+                columns=["batch_id", "store_id", "recommended_action", "ai_score", "notes"],
+            )
+
+            # Single INSERT...SELECT to move data to final table
+            # action_type IS NULL = pending recommendation (user hasn't acted)
+            result = await conn.execute(f"""
+                INSERT INTO inventory.batch_actions (
+                    batch_id,
+                    store_id,
+                    recommended_action,
+                    ai_score,
+                    notes
+                )
+                SELECT
+                    batch_id,
+                    store_id,
+                    recommended_action::action_type,
+                    ai_score,
+                    notes
+                FROM {staging_table}
+            """)
+
+            # Parse affected rows
+            rows_affected = len(actionable)
+            if result:
+                parts = result.split()
+                if len(parts) >= 2:
+                    rows_affected = int(parts[-1])
+
+            self.logger.info(
+                "Batch actions persisted via COPY",
+                total_actions=len(actionable),
+                rows_affected=rows_affected,
+                donations=sum(
+                    1 for r in actionable if r.get("recommendation") == "donate"
+                ),
+                discounts=sum(
+                    1 for r in actionable if r.get("recommendation") == "discount"
+                ),
+                method="binary_copy",
+            )
+
+            return rows_affected
+
+        except Exception as e:
+            self.logger.error(
+                "Failed to persist batch_actions",
+                error=str(e),
+                error_type=type(e).__name__,
+                total_results=len(results),
+            )
+            # Don't fail the entire persistence if batch_actions fails
+            return 0
 
     async def _persist_via_multi_value_insert(
         self, results: list[dict[str, Any]], store_id: str, start_time: float

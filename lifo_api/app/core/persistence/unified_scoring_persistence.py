@@ -321,7 +321,7 @@ class UnifiedScoringPersistence:
                         rows_affected = int(parts[-1])
 
                 self.logger.info(
-                    "COPY-based persistence successful",
+                    "COPY-based persistence successful (product_scores)",
                     total_items=len(results),
                     rows_affected=rows_affected,
                     copy_time_ms=round(copy_time_ms, 2),
@@ -330,6 +330,10 @@ class UnifiedScoringPersistence:
                         len(results) / ((copy_time_ms + insert_time_ms) / 1000)
                     ),
                 )
+
+                # STEP 5: Also persist AI recommendations to batch_actions table
+                # This enables the donation-first workflow dashboard
+                await self._persist_batch_actions(conn, results, store_id)
 
                 await conn.close()
 
@@ -367,6 +371,107 @@ class UnifiedScoringPersistence:
                 "failed": len(results),
                 "errors": [f"COPY failed: {str(e)}"],
             }
+
+    async def _persist_batch_actions(
+        self, conn: asyncpg.Connection, results: list[dict[str, Any]], store_id: str
+    ) -> int:
+        """
+        Persist AI recommendations to batch_actions table.
+
+        This creates pending action entries that users can act on.
+        Enables the donation-first workflow dashboard.
+
+        Args:
+            conn: Active asyncpg connection
+            results: Scoring results with recommendations
+            store_id: Store identifier
+
+        Returns:
+            Number of batch_actions created
+        """
+        try:
+            # Only create batch_actions for results with actionable recommendations
+            actionable = [
+                r
+                for r in results
+                if r.get("recommendation")
+                in ["donate", "discount", "dispose", "maintain"]
+            ]
+
+            if not actionable:
+                self.logger.debug(
+                    "No actionable recommendations to persist",
+                    total_results=len(results),
+                )
+                return 0
+
+            # Create batch_actions using multi-value INSERT
+            # Faster than individual INSERTs for small data
+            values = []
+            for item in actionable:
+                batch_id = str(item.get("batch_id"))
+                recommended_action = item.get("recommendation", "maintain")
+                ai_score = float(item.get("composite_score", 0.0))
+                notes = str(item.get("reason", ""))[:500]  # Limit to 500 chars
+                # Escape single quotes for SQL
+                notes_escaped = notes.replace("'", "''")
+
+                values.append(
+                    f"('{batch_id}', '{store_id}', '{recommended_action}', "
+                    f"{ai_score}, '{notes_escaped}', NOW())"
+                )
+
+            if not values:
+                return 0
+
+            # Insert batch_actions
+            # NOTE: entry_id is the primary key, so multiple recommendations
+            # per batch are allowed (tracking history). The dashboard queries
+            # for action_type IS NULL to get pending recommendations.
+            insert_query = f"""
+                INSERT INTO inventory.batch_actions (
+                    batch_id,
+                    store_id,
+                    recommended_action,
+                    ai_score,
+                    notes,
+                    created_at
+                )
+                VALUES {', '.join(values)}
+            """
+
+            result = await conn.execute(insert_query)
+
+            # Parse affected rows
+            rows_affected = len(actionable)
+            if result:
+                parts = result.split()
+                if len(parts) >= 2:
+                    rows_affected = int(parts[-1])
+
+            self.logger.info(
+                "Batch actions persisted",
+                total_actions=len(actionable),
+                rows_affected=rows_affected,
+                donations=sum(
+                    1 for r in actionable if r.get("recommendation") == "donate"
+                ),
+                discounts=sum(
+                    1 for r in actionable if r.get("recommendation") == "discount"
+                ),
+            )
+
+            return rows_affected
+
+        except Exception as e:
+            self.logger.error(
+                "Failed to persist batch_actions",
+                error=str(e),
+                error_type=type(e).__name__,
+                total_results=len(results),
+            )
+            # Don't fail the entire persistence if batch_actions fails
+            return 0
 
     async def _persist_via_rest_chunked(
         self, results: list[dict[str, Any]], store_id: str, start_time: float

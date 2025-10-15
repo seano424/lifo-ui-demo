@@ -8,23 +8,25 @@ REFACTORED: Uses UnifiedScoringPersistence instead of deprecated BulkResultPersi
 """
 
 from datetime import date, datetime, timedelta
+from decimal import Decimal
 from typing import Any
 
 import structlog
 from sqlalchemy import and_, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from decimal import Decimal
+
 from app.core.config import get_scoring_weights
 from app.core.scoring.engine import InventoryScorer
 from app.utils.recommendation_migration import migrate_recommendation
+
 from .models import ScoringResult
+from .monitoring import PerformanceMonitor
 from .services import (
     BulkDataRetriever,
     CategoryWeightService,
     InMemoryScoringEngine,
     VelocityCalculationService,
 )
-from .monitoring import PerformanceMonitor
 
 logger = structlog.get_logger()
 
@@ -97,6 +99,57 @@ class ScoringService:
                 "Error getting category weights", category=category, error=str(e)
             )
             return get_scoring_weights()  # Fallback to default
+
+    async def _get_store_donation_config(self, store_id: str) -> dict[str, Any] | None:
+        """
+        Retrieve store donation preferences from store_settings table.
+
+        Returns:
+            Dictionary with donation configuration or None if not configured
+            Example: {"strategy": "balanced", "categories": [], "min_value_threshold": 10.0}
+        """
+        try:
+            from app.database.models import StoreSettings
+
+            result = await self.db.execute(
+                select(StoreSettings.donation_preference_config).where(
+                    StoreSettings.store_id == store_id
+                )
+            )
+            donation_config = result.scalar_one_or_none()
+
+            if donation_config:
+                self.logger.debug(
+                    "Store donation config retrieved",
+                    store_id=store_id,
+                    strategy=donation_config.get("strategy", "balanced"),
+                )
+                return donation_config
+            else:
+                # Return default balanced strategy
+                default_config = {
+                    "strategy": "balanced",
+                    "categories": [],
+                    "min_value_threshold": 10.0,
+                }
+                self.logger.debug(
+                    "Using default donation config",
+                    store_id=store_id,
+                    config=default_config,
+                )
+                return default_config
+
+        except Exception as e:
+            self.logger.warning(
+                "Error retrieving store donation config, using defaults",
+                store_id=store_id,
+                error=str(e),
+            )
+            return {
+                "strategy": "balanced",
+                "categories": [],
+                "min_value_threshold": 10.0,
+            }
 
     async def calculate_days_to_expiry(self, expiry_date: date) -> int:
         """Calculate days until expiry"""
@@ -271,13 +324,109 @@ class ScoringService:
                 expiry_score, velocity_score, margin_score, category_weights
             )
 
-            # Generate recommendation
-            recommendation = scorer.generate_recommendation(
-                composite_score,
-                days_to_expiry,
-                margin_percent,
-                float(batch_data["current_quantity"]),
+            # DONATION-FIRST INTEGRATION: Check if donation should be recommended
+            # Get store donation configuration
+            store_donation_config = await self._get_store_donation_config(
+                batch_data["store_id"]
             )
+
+            # Evaluate donation eligibility using European compliance engine
+            donation_recommendation = None
+            use_donation_engine = (
+                composite_score >= 0.4  # Only evaluate for medium+ urgency
+                and days_to_expiry <= 7  # Only within donation planning window
+                and store_donation_config is not None  # Store has donation config
+            )
+
+            if use_donation_engine:
+                try:
+                    from app.core.donation_engine import SimplifiedDonationEngine
+
+                    donation_engine = SimplifiedDonationEngine()
+
+                    # Prepare batch data for donation engine
+                    donation_batch_data = {
+                        "batch_id": batch_data["batch_id"],
+                        "category": batch_data["category"],
+                        "expiry_date": batch_data["expiry_date"],
+                        "cost_price": batch_data["cost_price"],
+                        "selling_price": batch_data["selling_price"],
+                        "current_quantity": batch_data["current_quantity"],
+                    }
+
+                    # Evaluate donation recommendation
+                    donation_recommendation = donation_engine.evaluate_action_recommendation(
+                        batch_data=donation_batch_data,
+                        ai_score=composite_score,
+                        store_donation_config=store_donation_config,
+                    )
+
+                    self.logger.info(
+                        "Donation engine evaluated",
+                        batch_id=batch_data["batch_id"],
+                        donation_action=donation_recommendation.recommended_action.value,
+                        store_strategy=store_donation_config.get("strategy", "balanced"),
+                        ai_score=composite_score,
+                    )
+
+                except Exception as e:
+                    self.logger.warning(
+                        "Donation engine evaluation failed, falling back to discount logic",
+                        batch_id=batch_data["batch_id"],
+                        error=str(e),
+                    )
+                    donation_recommendation = None
+
+            # Choose recommendation source: donation engine or default discount logic
+            if donation_recommendation and donation_recommendation.recommended_action.value in [
+                "donate",
+                "discount",
+                "dispose",
+                "maintain",
+            ]:
+                # Use donation engine's recommendation with user-facing reasoning
+                recommendation = {
+                    "action": donation_recommendation.recommended_action.value,
+                    "discount_percent": 0,  # Will be calculated below if needed
+                    "urgency": donation_recommendation.priority.value,
+                    "reason": donation_recommendation.notes,  # EU-compliant reasoning
+                    "priority": 1 if donation_recommendation.priority.value == "critical" else 2,
+                    "decision_factors": donation_recommendation.decision_factors,
+                }
+
+                # Calculate discount percentage if action is discount
+                if donation_recommendation.recommended_action.value == "discount":
+                    # Use default discount logic for percentage calculation
+                    default_rec = scorer.generate_recommendation(
+                        composite_score,
+                        days_to_expiry,
+                        margin_percent,
+                        float(batch_data["current_quantity"]),
+                    )
+                    recommendation["discount_percent"] = default_rec.get(
+                        "discount_percent", 0
+                    )
+
+                self.logger.info(
+                    "Using donation engine recommendation",
+                    batch_id=batch_data["batch_id"],
+                    action=recommendation["action"],
+                    reason=recommendation["reason"][:100],  # Truncate for logging
+                )
+            else:
+                # Fall back to default discount-only recommendation logic
+                recommendation = scorer.generate_recommendation(
+                    composite_score,
+                    days_to_expiry,
+                    margin_percent,
+                    float(batch_data["current_quantity"]),
+                )
+
+                self.logger.debug(
+                    "Using default discount recommendation",
+                    batch_id=batch_data["batch_id"],
+                    action=recommendation["action"],
+                )
 
             # Determine urgency level
             urgency_level = self._get_urgency_level(days_to_expiry, composite_score)
@@ -400,10 +549,23 @@ class ScoringService:
                 "category_weights_retrieved", weight_results=len(category_weights_bulk)
             )
 
-            # STEP 5: In-memory scoring for all batches
+            # STEP 4.5: Fetch store donation config (for donation-first workflow)
+            store_donation_config = await self._get_store_donation_config(store_id)
+
+            self.performance_monitor.log_milestone(
+                "donation_config_retrieved",
+                donation_enabled=store_donation_config is not None,
+                strategy=store_donation_config.get("strategy") if store_donation_config else None,
+            )
+
+            # STEP 5: In-memory scoring for all batches (with optional donation integration)
             results, errors, high_priority_count = (
                 self.scoring_engine.score_all_batches(
-                    inventory_data, velocity_data_bulk, category_weights_bulk, store_id
+                    inventory_data,
+                    velocity_data_bulk,
+                    category_weights_bulk,
+                    store_id,
+                    store_donation_config,  # Pass donation config to enable donation-first workflow
                 )
             )
 
@@ -523,7 +685,10 @@ class ScoringService:
         store_donation_config: dict | None = None,
         include_donation_rationale: bool = False,
     ) -> dict[str, Any]:
-        """Score all active batches for a store and save results to database with proper transaction isolation"""
+        """
+        Score all active batches for a store and save results to database
+        with proper transaction isolation
+        """
         start_time = datetime.utcnow()
 
         # Initialize tracking variables
@@ -711,8 +876,9 @@ class ScoringService:
         self, result: ScoringResult, store_id: str
     ) -> bool:
         """
-        Save scoring result using isolated transaction with advanced retry logic and health monitoring
-        Returns True if successful, False if failed (but doesn't raise exception)
+        Save scoring result using isolated transaction with advanced retry logic
+        and health monitoring. Returns True if successful, False if failed
+        (but doesn't raise exception)
         """
         from app.utils.database_health import create_fresh_session, execute_with_retry
 
@@ -799,7 +965,8 @@ class ScoringService:
         )
 
         if success:
-            # Track recommendation in separate isolated transaction (don't let this failure affect score saving)
+            # Track recommendation in separate isolated transaction
+            # (don't let this failure affect score saving)
             await self._track_recommendation_isolated(result, store_id)
             return True
         else:
@@ -813,7 +980,10 @@ class ScoringService:
     async def _track_recommendation_isolated(
         self, result: ScoringResult, store_id: str | None = None
     ) -> bool:
-        """Track AI recommendation using isolated transaction with health monitoring and error handling"""
+        """
+        Track AI recommendation using isolated transaction with health monitoring
+        and error handling
+        """
         from app.utils.database_health import create_fresh_session, execute_with_retry
 
         async def track_operation():
