@@ -150,6 +150,11 @@ class InMemoryScoringEngine:
     Handles bulk scoring without database calls during computation
     """
 
+    # Donation engine evaluation thresholds
+    # European compliance: Only evaluate donation for eligible items
+    MIN_SCORE_FOR_DONATION = 0.4  # Medium+ urgency threshold
+    MAX_DAYS_FOR_DONATION = 7  # EU food safety window (max shelf life for donation)
+
     def __init__(self):
         self.logger = structlog.get_logger().bind(component="inmemory_scoring_engine")
 
@@ -212,8 +217,8 @@ class InMemoryScoringEngine:
             # DONATION-FIRST INTEGRATION: Check if donation should be recommended
             donation_recommendation = None
             use_donation_engine = (
-                composite_score >= 0.4  # Medium+ urgency
-                and days_to_expiry <= 7  # Within donation window
+                composite_score >= self.MIN_SCORE_FOR_DONATION
+                and days_to_expiry <= self.MAX_DAYS_FOR_DONATION
                 and store_donation_config is not None  # Store has donation config
             )
 
@@ -249,10 +254,12 @@ class InMemoryScoringEngine:
                     )
 
                 except Exception as e:
-                    self.logger.warning(
-                        "Donation engine failed in bulk scoring, falling back",
+                    self.logger.error(
+                        "Donation engine failed in bulk scoring, falling back to discount-only",
                         batch_id=batch_data.get("batch_id"),
                         error=str(e),
+                        error_type=type(e).__name__,
+                        exc_info=True,  # Include stack trace for debugging
                     )
                     donation_recommendation = None
 
