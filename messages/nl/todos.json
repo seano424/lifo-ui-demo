@@ -221,138 +221,6 @@
     "urgency": "Urgentie"
   },
   "filters": {
-    "title": "Filter",
-    "filtersTitle": "Filters",
-    "sortTitle": "Sorteren",
-    "searchPlaceholder": "Zoek producten...",
-    "activeFilters": "Actieve filters toegepast",
-    "clearAll": "Alle filters wissen",
-    "apply": "Toepassen",
-    "showFilters": "Filters tonen",
-    "hideFilters": "Filters verbergen",
-    "currentSort": "Huidige sortering",
-    "resetSort": "Sortering resetten",
-    "urgency": {
-      "title": "Urgentieniveau",
-      "all": "Alle urgentieniveaus",
-      "critical": "Kritiek",
-      "high": "Hoog",
-      "medium": "Gemiddeld",
-      "low": "Laag",
-      "none": "Geen"
-    },
-    "action": {
-      "title": "Actietype",
-      "all": "Alle acties",
-      "discount": "Korting",
-      "donate": "Doneren",
-      "donatePrepared": "Donatie voorbereid",
-      "dispose": "Weggooien",
-      "maintain": "Behouden",
-      "ignored": "Genegeerd",
-      "sold": "Verkocht"
-    },
-    "status": {
-      "all": "Alle statussen",
-      "active": "Actief",
-      "expired": "Verlopen",
-      "title": "Batch status"
-    },
-    "batchStatus": {
-      "all": "Alle statussen",
-      "active": "Actief",
-      "expired": "Verlopen",
-      "completed": "Voltooid",
-      "title": "Batch status"
-    },
-    "sort": {
-      "sortBy": "Sorteren op",
-      "direction": "Richting",
-
-      "ascending": "Oplopend",
-      "descending": "Aflopend",
-      "urgency": {
-        "label": "Urgentie",
-        "description": "Sorteren op urgentieniveau"
-      },
-      "expiryDate": {
-        "label": "Vervaldatum",
-        "description": "Sorteren op vervaldatum"
-      },
-      "currentQuantity": {
-        "label": "Huidige hoeveelheid",
-        "description": "Sorteren op voorraad"
-      },
-      "potentialLoss": {
-        "label": "Potentieel verlies",
-        "description": "Sorteren op potentieel verlies"
-      },
-      "alphabetical": {
-        "label": "Alfabetisch",
-        "description": "Sorteren op productnaam"
-      },
-      "actionDate": {
-        "label": "Actiedatum",
-        "description": "Sorteren op laatste actiedatum"
-      },
-      "effectiveness": {
-        "label": "Effectiviteit",
-        "description": "Sorteren op actie-effectiviteit"
-      }
-    },
-    "expiry": {
-      "title": "Vervalperiode",
-      "all": "Alle dagen",
-      "expiringSoon": "Verloopt binnenkort",
-      "recentlyExpired": "Recent verlopen",
-      "expiringWithin": "Verloopt in",
-      "expiredInLast": "Verlopen in de laatste",
-      "expiryRange": "Vervalperiode",
-      "expiring": {
-        "all": "Alle verlopen",
-        "3days": "3 dagen",
-        "1week": "1 week",
-        "2weeks": "2 weken",
-        "1month": "1 maand"
-      },
-      "expired": {
-        "all": "Alle verlopen",
-        "3days": "Laatste 3 dagen",
-        "1week": "Laatste week",
-        "2weeks": "Laatste 2 weken",
-        "1month": "Laatste maand"
-      },
-      "general": {
-        "all": "Alle datums",
-        "expiringSoon": "Verloopt binnenkort (7 dagen)",
-        "recentlyExpired": "Verlopen laatst (7 dagen)"
-      }
-    },
-    "urgencyCount": "Urgentie ({count})",
-    "filterByUrgency": "Filteren op urgentie",
-    "actionsCount": "Acties ({count})",
-    "filterByAction": "Filteren op actie",
-    "statusCount": "Status ({count})",
-    "filterByStatus": "Filteren op status",
-    "activeUrgency": "Urgentie: {urgency}",
-    "activeAction": "Actie: {action}",
-    "activeStatus": "Status: {status}",
-    "sortBy": "Sorteren op",
-    "sortDirection": "Sorteerrichting",
-    "ascending": "Oplopend",
-    "descending": "Aflopend",
-    "activeFilters": "Actieve filters",
-    "expiry": {
-      "title": "Vervalperiode",
-      "all": "Alle dagen",
-      "expiringSoon": "Verloopt binnenkort",
-      "recentlyExpired": "Recent verlopen"
-    }
-  },
-  "common": {
-    "cancel": "Annuleren"
-  },
-  "filters": {
     "title": "Filteren",
     "filtersTitle": "Filters",
     "sortTitle": "Sorteren",
@@ -383,9 +251,6 @@
       "discount": "Korting",
       "donate": "Doneren",
       "donatePrepared": "Doneren voorbereid",
-      "discard": "Weggooien",
-      "sell": "Verkopen",
-      "use": "Gebruiken",
       "maintain": "Onderhouden",
       "dispose": "Wegdoen"
     },
@@ -403,14 +268,38 @@
       "recentlyExpired": "Recent verlopen"
     },
     "sort": {
-      "urgency": "Urgentie",
-      "expiryDate": "Vervaldatum",
-      "currentQuantity": "Huidige hoeveelheid",
-      "potentialLoss": "Potentieel verlies",
-      "alphabetical": "Alfabetisch",
-      "actionDate": "Actiedatum",
-      "effectiveness": "Effectiviteit"
+      "urgency": {
+        "label": "Urgentie",
+        "description": "Sorteren op prioriteitsniveau (kritiek → laag)"
+      },
+      "expiryDate": {
+        "label": "Vervaldatum",
+        "description": "Sorteren op wanneer items verlopen"
+      },
+      "currentQuantity": {
+        "label": "Huidige hoeveelheid",
+        "description": "Sorteren op huidige voorraad"
+      },
+      "potentialLoss": {
+        "label": "Potentieel verlies",
+        "description": "Sorteren op geschatte financiële impact"
+      },
+      "alphabetical": {
+        "label": "Alfabetisch",
+        "description": "Alfabetisch sorteren op productnaam"
+      },
+      "actionDate": {
+        "label": "Actiedatum",
+        "description": "Sorteren op wanneer actie voor het laatst is ondernomen"
+      },
+      "effectiveness": {
+        "label": "Effectiviteit",
+        "description": "Sorteren op actie-effectiviteitsscore"
+      }
     }
+  },
+  "common": {
+    "cancel": "Annuleren"
   },
   "search": {
     "placeholder": "Zoek producten...",
