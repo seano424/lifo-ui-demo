@@ -149,7 +149,7 @@ export function UnifiedSortModal({
                       {t(option.labelKey)}
                     </span>
                     <span
-                      className={`${isMobile ? 'text-xs' : 'text-xs'} text-muted-foreground line-clamp-2 leading-tight`}
+                      className={`${isMobile ? 'text-xs' : 'text-xs'} line-clamp-2 leading-tight`}
                     >
                       {t(option.descriptionKey)}
                     </span>
@@ -214,7 +214,7 @@ export function UnifiedSortModal({
       </div>
 
       {/* Action Buttons */}
-      <div className={`flex gap-3 py-4 px-8 ${isMobile ? 'pt-2' : ' border-t '}`}>
+      <div className={`flex gap-3 py-8 px-8 ${isMobile ? 'pt-2' : ' border-t '}`}>
         <Button variant="outline" onClick={onReset} disabled={isLoading} className="flex-1">
           {t('filters.resetSort')}
         </Button>

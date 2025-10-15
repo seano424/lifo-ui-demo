@@ -12,14 +12,13 @@ import {
 } from '@/hooks/use-todos-with-filters'
 import type { BatchStatus, TodoActionType, TodoUrgencyLevel } from '@/lib/queries/todos-rpc'
 import { cn } from '@/lib/utils'
-import { ArrowUpDown, Filter } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { TodoFiltersState } from './filters/todo-filters-panel'
-import { TodoSearchBar } from './filters/todo-search-bar'
 import type { SortDirection, SortField } from './filters/todo-sort-controls'
 import { UnifiedFiltersModal } from './filters/unified-filters-modal'
+import { UnifiedSearchFiltersBar } from './filters/unified-search-filters-bar'
 import { UnifiedSortModal } from './filters/unified-sort-modal'
 import { CompletedTab } from './todos-main-tabs/completed-tab'
 import { ExpiredTab } from './todos-main-tabs/expired-tab'
@@ -230,72 +229,18 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
 
   return (
     <div className="space-y-2">
-      {/* Mobile Filter & Sort Buttons */}
-      <div className="flex sm:hidden justify-center gap-6 pt-4 border-t border-border">
-        <Button
-          variant="subtleTertiary"
-          onClick={() => setShowFilters(true)}
-          className="flex items-center gap-2 h-12 px-6 text-base font-medium"
-        >
-          <Filter className="w-5 h-5" />
-          {t('filters.filtersTitle')}
-        </Button>
-        <Button
-          variant="subtleTertiary"
-          onClick={() => setShowSort(true)}
-          className="flex items-center gap-2 h-12 px-6 text-base font-medium"
-        >
-          <ArrowUpDown className="w-5 h-5" />
-          {t('filters.sortTitle')}
-        </Button>
-      </div>
-      {/* Mobile Search Bar */}
-      <div className="sm:hidden px-4 flex justify-center py-4">
-        <TodoSearchBar
-          searchTerm={filters.product_name}
-          onSearchChange={handleSearchChange}
-          isLoading={false}
-          placeholder={t('filters.searchPlaceholder')}
-        />
-      </div>
+      {/* Unified Search Bar with Filter/Sort Buttons */}
+      <UnifiedSearchFiltersBar
+        searchTerm={filters.product_name}
+        onSearchChange={handleSearchChange}
+        onFiltersClick={() => setShowFilters(true)}
+        onSortClick={() => setShowSort(true)}
+        isLoading={false}
+        placeholder={t('filters.searchPlaceholder')}
+      />
 
       {/* Mobile Separator after search */}
-      <div className="sm:hidden border-t border-border mx-4" />
-
-      {/* Desktop Search Bar with Filter/Sort Buttons */}
-      <div className="hidden sm:block my-8">
-        <div className="w-1/2 mx-auto">
-          <div className="flex items-center gap-4">
-            <div className="flex-1">
-              <TodoSearchBar
-                searchTerm={filters.product_name}
-                onSearchChange={handleSearchChange}
-                isLoading={false}
-                placeholder={t('filters.searchPlaceholder')}
-                size="large"
-              />
-            </div>
-            <div className="flex gap-2">
-              <Button
-                variant="subtleTertiary"
-                onClick={() => setShowFilters(true)}
-                className="flex items-center gap-2 h-12 px-4 font-semibold"
-              >
-                <Filter className="w-4 h-4" />
-                {t('filters.filtersTitle')}
-              </Button>
-              <Button
-                variant="subtleTertiary"
-                onClick={() => setShowSort(true)}
-                className="flex items-center gap-2 h-12 px-4 font-semibold"
-              >
-                <ArrowUpDown className="w-4 h-4" />
-                {t('filters.sortTitle')}
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
+      <div className="border-t border-border mx-4" />
 
       {/* Unified Filters Modal */}
       <UnifiedFiltersModal

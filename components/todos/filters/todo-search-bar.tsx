@@ -12,7 +12,7 @@ interface TodoSearchBarProps {
   onSearchChange: (searchTerm: string | undefined) => void
   placeholder?: string
   isLoading?: boolean
-  size?: 'default' | 'large'
+  size?: 'default' | 'medium' | 'large'
 }
 
 export function TodoSearchBar({
@@ -46,32 +46,49 @@ export function TodoSearchBar({
 
   const hasSearch = localSearchTerm.trim().length > 0
   const isLarge = size === 'large'
+  const isMedium = size === 'medium'
 
   return (
     <div
-      className={`relative flex items-center gap-2 w-full ${isLarge ? 'max-w-none' : 'max-w-sm'}`}
+      className={`relative flex items-center gap-2 w-full ${
+        isLarge
+          ? 'min-w-[300px] max-w-[400px]'
+          : isMedium
+            ? 'min-w-[200px] max-w-[350px]'
+            : 'max-w-sm'
+      }`}
     >
       {/* Search Input */}
       <div className="relative flex-1">
         <Search
-          className={`absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground ${isLarge ? 'h-5 w-5' : 'h-4 w-4'}`}
+          className={`absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground ${
+            isLarge ? 'h-5 w-5' : isMedium ? 'h-4 w-4' : 'h-4 w-4'
+          }`}
         />
         <Input
           type="text"
-          placeholder={placeholder || t('filters.searchPlaceholder')}
+          placeholder={placeholder || t('filters.searchPlaceholder') || 'Search products...'}
           value={localSearchTerm}
           onChange={e => setLocalSearchTerm(e.target.value)}
           disabled={isLoading}
-          className={`pl-10 pr-10 ${isLarge ? 'h-14 text-lg border-2 focus:border-primary' : ''}`}
+          className={`pl-10 pr-10 w-full ${
+            isLarge
+              ? 'h-12 text-lg border-2 focus:border-primary'
+              : isMedium
+                ? 'h-11 text-base border-2 focus:border-primary'
+                : ''
+          }`}
         />
         {hasSearch && (
           <Button
             variant="ghost"
-            size={isLarge ? 'default' : 'sm'}
+            size={isLarge ? 'default' : isMedium ? 'sm' : 'sm'}
             onClick={handleClear}
-            className={`absolute right-1 top-1/2 transform -translate-y-1/2 p-0 hover:bg-muted ${isLarge ? 'h-12 w-12' : 'h-8 w-8'}`}
+            className={`absolute right-1 top-1/2 transform -translate-y-1/2 p-0 hover:bg-muted ${
+              isLarge ? 'h-12 w-12' : isMedium ? 'h-9 w-9' : 'h-8 w-8'
+            }`}
           >
-            <X className={isLarge ? 'h-5 w-5' : 'h-4 w-4'} />
+            <X className={isLarge ? 'h-5 w-5' : isMedium ? 'h-4 w-4' : 'h-4 w-4'} />
           </Button>
         )}
       </div>
@@ -79,7 +96,9 @@ export function TodoSearchBar({
       {/* Search Stats */}
       {isLoading && hasSearch && (
         <div
-          className={`text-muted-foreground whitespace-nowrap ${isLarge ? 'text-sm' : 'text-xs'}`}
+          className={`text-muted-foreground whitespace-nowrap ${
+            isLarge ? 'text-sm' : isMedium ? 'text-sm' : 'text-xs'
+          }`}
         >
           {t('filters.searching')}
         </div>
