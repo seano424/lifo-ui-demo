@@ -294,17 +294,18 @@ class Settings(BaseSettings):
 
             # Add ONLY explicitly configured frontend URL in production
             if self.frontend_url:
-                # Validate URL format
-                if self.frontend_url.startswith("https://"):
-                    origins.append(self.frontend_url)
+                # Parse comma-separated FRONTEND_URL into individual URLs
+                frontend_urls = self.parse_list_fields(self.frontend_url)
 
-                    # Add www subdomain only if original doesn't have it
-                    if not self.frontend_url.startswith("https://www."):
-                        www_url = self.frontend_url.replace("https://", "https://www.")
-                        origins.append(www_url)
-                else:
-                    # In production, only HTTPS is allowed
-                    pass
+                for url in frontend_urls:
+                    # Validate URL format - only HTTPS in production
+                    if url.startswith("https://"):
+                        origins.append(url)
+
+                        # Add www subdomain variant if original doesn't have it
+                        if not url.startswith("https://www."):
+                            www_url = url.replace("https://", "https://www.")
+                            origins.append(www_url)
 
             # For DigitalOcean App Platform health checks - add null origin for internal requests
             # Health checks come from internal networks without proper origins
@@ -320,7 +321,9 @@ class Settings(BaseSettings):
             # Staging environment - limited CORS
             origins = []
             if self.frontend_url:
-                origins.append(self.frontend_url)
+                # Parse comma-separated FRONTEND_URL into individual URLs
+                frontend_urls = self.parse_list_fields(self.frontend_url)
+                origins.extend(frontend_urls)
 
             # Limited development origins for staging
             origins.extend(
