@@ -193,7 +193,7 @@ export function TodoExpiryFilter({
               variant={currentPreset?.value === preset.value ? 'secondary' : 'ghost'}
               size="sm"
               onClick={() => handlePresetSelect(preset)}
-              className="w-full justify-start"
+              className="w-full justify-start rounded-sm"
             >
               {t(preset.translationKey)}
             </Button>
