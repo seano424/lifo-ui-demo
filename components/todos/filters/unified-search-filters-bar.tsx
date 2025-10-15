@@ -21,6 +21,7 @@ interface UnifiedSearchFiltersBarProps {
   batchStatus?: BatchStatus[]
   expiryRange?: string
   onRemoveFilter?: (type: 'urgency' | 'action' | 'batch' | 'expiry', value?: string) => void
+  onClearAll?: () => void
 }
 
 export function UnifiedSearchFiltersBar({
@@ -35,6 +36,7 @@ export function UnifiedSearchFiltersBar({
   batchStatus,
   expiryRange,
   onRemoveFilter,
+  onClearAll,
 }: UnifiedSearchFiltersBarProps) {
   const t = useTranslations('todos')
   const { isMobile } = useMediaQuery()
@@ -107,9 +109,21 @@ export function UnifiedSearchFiltersBar({
         {/* Active Filters Display */}
         {hasActiveFilters && onRemoveFilter && (
           <div className="space-y-2">
-            <h4 className="text-sm font-medium text-muted-foreground text-center">
-              {t('filters.activeFilters')}
-            </h4>
+            <div className="flex items-center justify-center gap-3">
+              <h4 className="text-sm font-medium text-muted-foreground">
+                {t('filters.activeFilters')}
+              </h4>
+              {onClearAll && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={onClearAll}
+                  className="h-7 px-3 text-xs text-primary"
+                >
+                  {t('filters.clearAll')}
+                </Button>
+              )}
+            </div>
             <div className="flex flex-wrap justify-center gap-2">
               {/* Urgency Filters */}
               {urgencyLevel?.map(urgency => {
@@ -229,9 +243,21 @@ export function UnifiedSearchFiltersBar({
             <div className="flex justify-center mt-8">
               <div className="w-1/2 border-t border-border" />
             </div>
-            <h4 className="text-sm font-medium text-muted-foreground text-center">
-              {t('filters.activeFilters')}
-            </h4>
+            <div className="flex items-center justify-center gap-3">
+              <h4 className="text-sm font-medium text-muted-foreground">
+                {t('filters.activeFilters')}
+              </h4>
+              {onClearAll && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={onClearAll}
+                  className="h-7 px-3 text-xs text-primary"
+                >
+                  {t('filters.clearAll')}
+                </Button>
+              )}
+            </div>
             <div className="flex flex-wrap justify-center gap-2">
               {/* Urgency Filters */}
               {urgencyLevel?.map(urgency => {

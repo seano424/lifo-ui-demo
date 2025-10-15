@@ -259,6 +259,16 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
     [handleFiltersChange],
   )
 
+  const handleClearAll = useCallback(() => {
+    handleFiltersChange(prev => ({
+      ...prev,
+      urgency_level: undefined,
+      action_type: undefined,
+      batch_status: undefined,
+      expiry_range: undefined,
+    }))
+  }, [handleFiltersChange])
+
   return (
     <div className="space-y-2">
       {/* Unified Search Bar with Filter/Sort Buttons */}
@@ -274,6 +284,7 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
         batchStatus={filters.batch_status}
         expiryRange={filters.expiry_range}
         onRemoveFilter={handleRemoveFilter}
+        onClearAll={handleClearAll}
       />
 
       {/* Mobile Separator after search */}
