@@ -52,9 +52,6 @@ export function UnifiedSearchFiltersBar({
     { value: 'discount', label: t('filters.action.discount'), emoji: '🏷️' },
     { value: 'donate', label: t('filters.action.donate'), emoji: '❤️' },
     { value: 'donate_prepared', label: t('filters.action.donatePrepared'), emoji: '📦' },
-    { value: 'discard', label: t('filters.action.discard'), emoji: '🗑️' },
-    { value: 'sell', label: t('filters.action.sell'), emoji: '💰' },
-    { value: 'use', label: t('filters.action.use'), emoji: '👤' },
     { value: 'maintain', label: t('filters.action.maintain'), emoji: '🔧' },
     { value: 'dispose', label: t('filters.action.dispose'), emoji: '♻️' },
   ]
@@ -229,6 +226,9 @@ export function UnifiedSearchFiltersBar({
         {/* Active Filters Display */}
         {hasActiveFilters && onRemoveFilter && (
           <div className="mt-4 space-y-2">
+            <div className="flex justify-center mt-8">
+              <div className="w-1/2 border-t border-border" />
+            </div>
             <h4 className="text-sm font-medium text-muted-foreground text-center">
               {t('filters.activeFilters')}
             </h4>
