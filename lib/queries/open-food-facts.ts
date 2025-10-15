@@ -86,7 +86,18 @@ class OpenFoodFactsClient {
       }
 
       const data = await response.json()
-      return data
+
+      // Validate response format
+      if (!data || typeof data !== 'object') {
+        throw new Error('Invalid response format from Open Food Facts API')
+      }
+
+      // Validate required fields for OpenFoodFactsProduct
+      if (!('status' in data) || typeof data.status !== 'number') {
+        throw new Error('Invalid response: missing or invalid status field')
+      }
+
+      return data as OpenFoodFactsProduct
     } catch (error) {
       // Enhance error with more context
       if (error instanceof TypeError && error.message.includes('NetworkError')) {

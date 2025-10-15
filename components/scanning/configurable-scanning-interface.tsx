@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { BarcodeDetection } from '@/components/barcode/barcode-scanner'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -463,6 +463,12 @@ export default function BaseScanningInterface({ config, callbacks, className }: 
 
   const formatPrice = (price: number) => `€${price.toFixed(2)}`
 
+  // Memoize error message calculation for performance
+  const productLookupError = useMemo(
+    () => getProductLookupErrorMessage(logic.lookupResult, logic.lookupError),
+    [logic.lookupResult, logic.lookupError],
+  )
+
   return (
     <div className={`bg-white min-h-screen flex flex-col gap-4 ${className}`}>
       <div className="w-full">
@@ -520,57 +526,48 @@ export default function BaseScanningInterface({ config, callbacks, className }: 
                   />
 
                   {/* Product Lookup Error Display */}
-                  {(() => {
-                    const errorInfo = getProductLookupErrorMessage(
-                      logic.lookupResult,
-                      logic.lookupError,
-                    )
-                    if (errorInfo) {
-                      return (
-                        <Alert variant="destructive" className="border-orange-200 bg-orange-50">
-                          <AlertCircle className="h-4 w-4 text-orange-600" />
-                          <AlertTitle className="text-orange-900 font-semibold">
-                            {errorInfo.title}
-                          </AlertTitle>
-                          <AlertDescription className="text-orange-800">
-                            {errorInfo.message}
-                          </AlertDescription>
-                          <div className="mt-3 flex gap-2">
-                            {errorInfo.showRetry && (
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="border-orange-300 text-orange-900 hover:bg-orange-100"
-                                onClick={() => {
-                                  logic.workflowActions.resetWorkflow()
-                                  logic.setState(prev => ({ ...prev, lookupBarcode: null }))
-                                }}
-                              >
-                                <RefreshCw className="w-4 h-4 mr-2" />
-                                Try Again
-                              </Button>
-                            )}
-                            {errorInfo.showManualEntry && (
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="border-orange-300 text-orange-900 hover:bg-orange-100"
-                                onClick={() => {
-                                  logic.setState(prev => ({
-                                    ...prev,
-                                    showManualEntry: true,
-                                  }))
-                                }}
-                              >
-                                Enter Manually
-                              </Button>
-                            )}
-                          </div>
-                        </Alert>
-                      )
-                    }
-                    return null
-                  })()}
+                  {productLookupError && (
+                    <Alert variant="destructive" className="border-orange-200 bg-orange-50">
+                      <AlertCircle className="h-4 w-4 text-orange-600" />
+                      <AlertTitle className="text-orange-900 font-semibold">
+                        {productLookupError.title}
+                      </AlertTitle>
+                      <AlertDescription className="text-orange-800">
+                        {productLookupError.message}
+                      </AlertDescription>
+                      <div className="mt-3 flex gap-2">
+                        {productLookupError.showRetry && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="border-orange-300 text-orange-900 hover:bg-orange-100"
+                            onClick={() => {
+                              logic.workflowActions.resetWorkflow()
+                              logic.setState(prev => ({ ...prev, lookupBarcode: null }))
+                            }}
+                          >
+                            <RefreshCw className="w-4 h-4 mr-2" />
+                            Try Again
+                          </Button>
+                        )}
+                        {productLookupError.showManualEntry && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="border-orange-300 text-orange-900 hover:bg-orange-100"
+                            onClick={() => {
+                              logic.setState(prev => ({
+                                ...prev,
+                                showManualEntry: true,
+                              }))
+                            }}
+                          >
+                            Enter Manually
+                          </Button>
+                        )}
+                      </div>
+                    </Alert>
+                  )}
                 </>
               )}
             </>
