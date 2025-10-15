@@ -22,6 +22,9 @@ class RecommendationMigrator:
         "alert": "alert",
         "monitor": "monitor",
         "maintain": "maintain",
+        # Donation-first workflow actions
+        "donate": "donate",
+        "discount": "discount",
     }
 
     # Reverse mapping for compatibility
@@ -32,16 +35,21 @@ class RecommendationMigrator:
         "alert": "Monitor Closely",
         "monitor": "Routine Monitoring",
         "maintain": "No Action Needed",
+        # Donation-first workflow actions
+        "donate": "Donate to Charity",
+        "discount": "Apply Discount",
     }
 
     # Priority mapping for sorting
     PRIORITY_ORDER: dict[str, int] = {
-        "dispose": 1,
-        "discount_aggressive": 2,
-        "discount_moderate": 3,
-        "alert": 4,
-        "monitor": 5,
-        "maintain": 6,
+        "donate": 1,  # Donation is highest priority (time-sensitive)
+        "dispose": 2,
+        "discount": 3,  # Generic discount action
+        "discount_aggressive": 4,
+        "discount_moderate": 5,
+        "alert": 6,
+        "monitor": 7,
+        "maintain": 8,
     }
 
     @classmethod
@@ -135,9 +143,9 @@ class RecommendationMigrator:
         """
         standard_recommendation = cls.migrate_recommendation(recommendation)
 
-        if standard_recommendation in ["dispose"]:
+        if standard_recommendation in ["donate", "dispose"]:
             return "critical"
-        elif standard_recommendation in ["discount_aggressive"]:
+        elif standard_recommendation in ["discount", "discount_aggressive"]:
             return "action_needed"
         elif standard_recommendation in ["discount_moderate", "alert"]:
             return "monitor"
