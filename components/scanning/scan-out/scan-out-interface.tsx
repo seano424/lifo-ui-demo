@@ -795,7 +795,7 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
                     return (
                       <div
                         key={action.actionType}
-                        className={`p-2 rounded-xl border ${colorClass}`}
+                        className={`p-2 flex gap-1 rounded-xl border ${colorClass}`}
                       >
                         <Typography>{t(`actions.${action.actionType}`)}</Typography>
                         <Typography>{action.count}</Typography>
