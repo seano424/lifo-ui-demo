@@ -8,7 +8,7 @@ import { useMediaQuery } from '@/hooks/use-mobile'
 import type { BatchStatus, TodoActionType, TodoUrgencyLevel } from '@/lib/queries/todos-rpc'
 import { Filter, X } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import type { TodoFilterValues } from './todo-filters-bar'
+import type { TodoFilterValues } from './types'
 
 const URGENCY_OPTIONS: {
   value: TodoUrgencyLevel | 'all'
@@ -100,7 +100,7 @@ export function UnifiedFiltersModal({
     } else {
       const currentUrgency = filters.urgency_level || []
       const newUrgency = currentUrgency.includes(urgency)
-        ? currentUrgency.filter(u => u !== urgency)
+        ? currentUrgency.filter((u: TodoUrgencyLevel) => u !== urgency)
         : [...currentUrgency, urgency]
       onFiltersChange({ ...filters, urgency_level: newUrgency.length > 0 ? newUrgency : undefined })
     }
@@ -112,7 +112,7 @@ export function UnifiedFiltersModal({
     } else {
       const currentAction = filters.action_type || []
       const newAction = currentAction.includes(action)
-        ? currentAction.filter(a => a !== action)
+        ? currentAction.filter((a: TodoActionType) => a !== action)
         : [...currentAction, action]
       onFiltersChange({ ...filters, action_type: newAction.length > 0 ? newAction : undefined })
     }
@@ -124,7 +124,7 @@ export function UnifiedFiltersModal({
     } else {
       const currentStatus = filters.batch_status || []
       const newStatus = currentStatus.includes(status)
-        ? currentStatus.filter(s => s !== status)
+        ? currentStatus.filter((s: BatchStatus) => s !== status)
         : [...currentStatus, status]
       onFiltersChange({ ...filters, batch_status: newStatus.length > 0 ? newStatus : undefined })
     }
@@ -299,7 +299,7 @@ export function UnifiedFiltersModal({
               {t('filters.activeFilters')}
             </h4>
             <div className="flex flex-wrap gap-2">
-              {filters.urgency_level?.map(urgency => {
+              {filters.urgency_level?.map((urgency: TodoUrgencyLevel) => {
                 const option = URGENCY_OPTIONS.find(opt => opt.value === urgency)
                 return (
                   <Badge key={urgency} variant="secondary" className="gap-2">
@@ -312,7 +312,7 @@ export function UnifiedFiltersModal({
                   </Badge>
                 )
               })}
-              {filters.action_type?.map(action => {
+              {filters.action_type?.map((action: TodoActionType) => {
                 const option = ACTION_OPTIONS.find(opt => opt.value === action)
                 return (
                   <Badge key={action} variant="secondary" className="gap-2">
@@ -325,7 +325,7 @@ export function UnifiedFiltersModal({
                   </Badge>
                 )
               })}
-              {filters.batch_status?.map(status => {
+              {filters.batch_status?.map((status: BatchStatus) => {
                 const option = BATCH_STATUS_OPTIONS.find(opt => opt.value === status)
                 return (
                   <Badge key={status} variant="secondary" className="gap-2">
