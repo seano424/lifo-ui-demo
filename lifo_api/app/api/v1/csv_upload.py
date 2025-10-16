@@ -600,7 +600,9 @@ async def upload_csv_and_create_batches(
             if total_items <= AUTO_SCORE_THRESHOLD:
                 try:
                     # Import the automated scoring scheduler
-                    from app.core.automated_scoring import get_automated_scoring_scheduler
+                    from app.core.automated_scoring import (
+                        get_automated_scoring_scheduler,
+                    )
 
                     scheduler = get_automated_scoring_scheduler()
 

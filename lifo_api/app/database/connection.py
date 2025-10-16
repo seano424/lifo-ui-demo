@@ -108,7 +108,9 @@ def get_direct_engine():
             )
             return get_engine()
 
-        logger.info("Creating database engine via Supavisor session mode for bulk operations")
+        logger.info(
+            "Creating database engine via Supavisor session mode for bulk operations"
+        )
         _direct_engine = create_async_engine(
             direct_url,
             echo=False,

@@ -169,7 +169,7 @@ class OptimizedBatchCreationService:
             logger.info(
                 "Using SEQUENTIAL chunk processing (avoids transaction conflicts)",
                 total_chunks=len(chunks),
-                reason="direct_asyncpg_connection"
+                reason="direct_asyncpg_connection",
             )
             results_list = []
             for chunk_data in chunks:
@@ -209,22 +209,24 @@ class OptimizedBatchCreationService:
                                 "error": f"Chunk processing failed: {str(e)}",
                             }
                         )
-                    results_list.append((
-                        {
-                            "successful": [],
-                            "failed": failed_results,
-                            "created_products": set(),
-                            "updated_products": set(),
-                        },
-                        0
-                    ))
+                    results_list.append(
+                        (
+                            {
+                                "successful": [],
+                                "failed": failed_results,
+                                "created_products": set(),
+                                "updated_products": set(),
+                            },
+                            0,
+                        )
+                    )
         else:
             # CONCURRENT: Use semaphore limiting (may cause issues with direct asyncpg)
             logger.warning(
                 "Using CONCURRENT chunk processing - may cause transaction conflicts",
                 total_chunks=len(chunks),
                 max_concurrent=self.MAX_CONCURRENT_CHUNKS,
-                recommendation="Set USE_SEQUENTIAL_PROCESSING=True for stability"
+                recommendation="Set USE_SEQUENTIAL_PROCESSING=True for stability",
             )
             semaphore = asyncio.Semaphore(self.MAX_CONCURRENT_CHUNKS)
 
@@ -389,7 +391,7 @@ class OptimizedBatchCreationService:
                 logger.debug(
                     "Products/store_products committed before batch insertion",
                     chunk_start=chunk_start,
-                    products_count=len(product_mapping)
+                    products_count=len(product_mapping),
                 )
 
                 # Step 4: Bulk INSERT all batches using direct asyncpg (separate transaction)
@@ -857,7 +859,7 @@ class OptimizedBatchCreationService:
                 # Fallback to slow method if DATABASE_DIRECT_URL not configured
                 logger.warning(
                     "DATABASE_DIRECT_URL not set - using slow SQLAlchemy fallback",
-                    recommendation="Configure DATABASE_DIRECT_URL for 16x faster performance"
+                    recommendation="Configure DATABASE_DIRECT_URL for 16x faster performance",
                 )
                 await self._bulk_insert_batches_fallback(session, batches_to_insert)
             else:
@@ -869,7 +871,9 @@ class OptimizedBatchCreationService:
                 try:
                     # Connect via Supavisor session mode with optimized statement caching
                     # Small cache (10) provides ~5-7% performance gain with minimal risk
-                    conn = await asyncpg.connect(db_url, timeout=10, statement_cache_size=10)
+                    conn = await asyncpg.connect(
+                        db_url, timeout=10, statement_cache_size=10
+                    )
 
                     insert_start = time.perf_counter()
 
@@ -879,7 +883,7 @@ class OptimizedBatchCreationService:
                     CHUNK_SIZE = 80
 
                     for chunk_idx in range(0, len(batches_to_insert), CHUNK_SIZE):
-                        chunk = batches_to_insert[chunk_idx:chunk_idx + CHUNK_SIZE]
+                        chunk = batches_to_insert[chunk_idx : chunk_idx + CHUNK_SIZE]
 
                         # Build multi-value INSERT with parameterized values
                         placeholders = []
@@ -888,7 +892,9 @@ class OptimizedBatchCreationService:
                         for i, batch in enumerate(chunk):
                             # Calculate parameter positions for this row (18 params per row)
                             param_start = i * 18 + 1
-                            param_nums = [f"${j}" for j in range(param_start, param_start + 18)]
+                            param_nums = [
+                                f"${j}" for j in range(param_start, param_start + 18)
+                            ]
                             placeholders.append(f"({', '.join(param_nums)})")
 
                             # Prepare values for this row
@@ -933,9 +939,13 @@ class OptimizedBatchCreationService:
                         "HIGH-PERFORMANCE batch insertion completed",
                         batches_count=len(batches_to_insert),
                         insert_time_ms=round(insert_time_ms, 2),
-                        items_per_second=int(len(batches_to_insert) / (insert_time_ms / 1000)) if insert_time_ms > 0 else 0,
+                        items_per_second=int(
+                            len(batches_to_insert) / (insert_time_ms / 1000)
+                        )
+                        if insert_time_ms > 0
+                        else 0,
                         method="asyncpg_multi_value_insert",
-                        optimization="16x_faster_than_manual_sql"
+                        optimization="16x_faster_than_manual_sql",
                     )
 
                 except Exception as e:
@@ -943,7 +953,7 @@ class OptimizedBatchCreationService:
                         "High-performance batch insertion failed, falling back to SQLAlchemy",
                         error=str(e),
                         error_type=type(e).__name__,
-                        batches_count=len(batches_to_insert)
+                        batches_count=len(batches_to_insert),
                     )
                     # Fallback to slow method
                     await self._bulk_insert_batches_fallback(session, batches_to_insert)
@@ -952,7 +962,9 @@ class OptimizedBatchCreationService:
                         try:
                             await conn.close()
                         except Exception as cleanup_error:
-                            logger.debug("Connection cleanup failed", error=str(cleanup_error))
+                            logger.debug(
+                                "Connection cleanup failed", error=str(cleanup_error)
+                            )
 
         return successful_batches
 
