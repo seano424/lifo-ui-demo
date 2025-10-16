@@ -1,0 +1,151 @@
+{
+  "privacypage": {
+    "title": "Privacybeleid",
+    "lastUpdated": "Laatst bijgewerkt: 16 oktober 2025",
+    "metadata": {
+      "title": "Privacybeleid | LIFO.AI",
+      "description": "Privacybeleid voor het LIFO.AI voedselverspillingsbeheersysteem"
+    },
+    "section1": {
+      "title": "1. Wie Wij Zijn",
+      "content": "LIFO biedt batch-niveau voorraadbeheer software voor winkels. We helpen u de vervaldata van producten bij te houden, voedselverspilling te verminderen en datagestuurde beslissingen te nemen over kortingen en donaties. Neem contact met ons op: E-mail: contact@lifo-app.com | Voor AVG-rechtenverzoeken: contact@lifo-app.com"
+    },
+    "section2": {
+      "title": "2. Welke Gegevens Wij Verzamelen",
+      "intro": "We verzamelen de volgende soorten gegevens:",
+      "items": [
+        "Accountinformatie: Naam, e-mailadres, winkelnaam en locatie, gebruikersrol (beheerder, manager of medewerker), inloggegevens (versleuteld)",
+        "Voorraadgegevens: Productnamen en beschrijvingen, batchnummers en hoeveelheden, vervaldata, barcode-informatie, korting- en donatiebeslissingen",
+        "Productafbeeldingen: Foto's gemaakt tijdens het scannen van barcodes en vervaldata, verwerkt door beeldherkenningstechnologie, uitsluitend gebruikt voor het extraheren van productinformatie en data",
+        "Gebruiksgegevens: Acties uitgevoerd in de app (scans, updates, beslissingen), tijdstempels van activiteiten, apparaatinformatie (browsertype, besturingssysteem, IP-adres), prestatie- en foutlogboeken"
+      ]
+    },
+    "section3": {
+      "title": "3. Hoe Wij Uw Gegevens Gebruiken",
+      "intro": "We verwerken uw gegevens om:",
+      "items": [
+        "Onze dienst te leveren: Voorraadbeheer mogelijk maken, aanbevelingen voor kortingen en donaties genereren, analytische dashboards maken die voorraadwaarde en verspillingsstatistieken tonen, belangrijke meldingen sturen over producten die verlopen",
+        "Onze dienst te verbeteren: De nauwkeurigheid van beeldherkenning verbeteren, aanbevelingsalgoritmen optimaliseren, technische problemen identificeren en oplossen, nieuwe functies ontwikkelen op basis van gebruikspatronen",
+        "Met u te communiceren: Service-updates en belangrijke aankondigingen sturen, reageren op uw ondersteuningsverzoeken, u op de hoogte stellen van wijzigingen in onze voorwaarden of beleid",
+        "Te voldoen aan wettelijke verplichtingen: Voldoen aan voedselveiligheids- en afvalrapportagevereisten, reageren op juridische verzoeken wanneer vereist, beschermen tegen fraude en misbruik"
+      ]
+    },
+    "section4": {
+      "title": "4. Juridische Basis voor Verwerking (AVG)",
+      "legalBasis": {
+        "title": "We verwerken uw gegevens op basis van:",
+        "intro": "",
+        "items": [
+          "Uitvoering van overeenkomst: Om de dienst te leveren waarvoor u zich hebt aangemeld",
+          "Legitieme belangen: Om onze dienst te verbeteren, fraude te voorkomen en de beveiliging te waarborgen",
+          "Uw toestemming: Wanneer we expliciet om toestemming vragen (bijv. voor optionele functies)",
+          "Wettelijke verplichting: Om te voldoen aan toepasselijke wet- en regelgeving"
+        ]
+      }
+    },
+    "section5": {
+      "title": "5. Gegevensopslag en Beveiliging",
+      "intro": "",
+      "items": [
+        "Waar we uw gegevens opslaan: Alle gegevens worden opgeslagen op beveiligde servers in de Europese Unie. We gebruiken Supabase (EU-regio) voor database-hosting. Gegevens worden zowel in transit (TLS/SSL) als in rust versleuteld.",
+        "Hoe we uw gegevens beschermen: Branchestandaard versleutelingsprotocollen, regelmatige beveiligingsaudits en kwetsbaarheidsbeoordelingen, toegangscontroles en multi-factor authenticatie, veilige ontwikkelingspraktijken en codebeoordelingen, training van medewerkers op het gebied van gegevensbescherming.",
+        "Gegevensbewaring: We bewaren uw gegevens zolang uw account actief blijft. Bij verwijdering van het account verwijderen of anonimiseren we uw gegevens binnen 90 dagen. Sommige gegevens kunnen langer bewaard worden als de wet dit vereist (bijv. boekhoudkundige gegevens)."
+      ],
+      "outro": ""
+    },
+    "section6": {
+      "title": "6. Gegevensdeling en Derde Partijen",
+      "storage": {
+        "title": "We verkopen uw persoonlijke gegevens niet.",
+        "content": "We kunnen gegevens alleen delen met: Dienstverleners (Cloud Hosting: Supabase - gevestigd in de EU, AVG-conform; Beeldverwerking: Google Vision API voor herkenning van vervaldata; E-maildiensten: Resend of vergelijkbaar voor accountmeldingen; Analytics: Gebruiksanalytics om de dienst te verbeteren), voor Wettelijke vereisten (voldoen aan wettelijke verplichtingen of gerechtelijke bevelen, onze rechten beschermen of fraude voorkomen, beveiligingsincidenten onderzoeken, reageren op verzoeken van wetshandhaving), of Met uw toestemming (voor andere doeleinden alleen met uw expliciete toestemming)."
+      },
+      "retention": {
+        "title": "Externe Verwerkers",
+        "content": "Alle externe verwerkers zijn contractueel gebonden aan AVG-normen, verwerken gegevens alleen volgens onze instructies en implementeren passende beveiligingsmaatregelen."
+      }
+    },
+    "section7": {
+      "title": "7. Uw Privacyrechten (AVG)",
+      "intro": "Onder de AVG hebt u het recht om:",
+      "items": [
+        "Toegang tot uw gegevens: Een kopie opvragen van alle persoonlijke gegevens die we over u hebben",
+        "Onjuiste gegevens corrigeren: Informatie corrigeren die onvolledig of onjuist is",
+        "Uw gegevens verwijderen (\"Recht om vergeten te worden\"): Verwijdering van uw persoonlijke gegevens aanvragen (onder voorbehoud van wettelijke bewaarvereisten)",
+        "Gegevensportabiliteit: Uw gegevens ontvangen in een gestructureerd, veelgebruikt formaat (CSV, JSON)",
+        "Bezwaar maken tegen verwerking: Bezwaar maken tegen bepaalde gegevensverwerkingsactiviteiten (bijv. direct marketing)",
+        "Verwerking beperken: Beperken hoe we uw gegevens verwerken in specifieke omstandigheden",
+        "Toestemming intrekken: Toestemming op elk moment intrekken wanneer verwerking op toestemming is gebaseerd (heeft geen invloed op eerdere verwerking)"
+      ],
+      "contact": "Om deze rechten uit te oefenen, neem contact met ons op via",
+      "email": "contact@lifo-app.com",
+      "responseTime": "We zullen binnen 30 dagen op uw verzoek reageren (of 60 dagen voor complexe verzoeken, met kennisgeving)."
+    },
+    "section8": {
+      "title": "8. Cookies en Volgtechnologieën",
+      "intro": "We gebruiken momenteel essentiële cookies (vereist voor de dienst): authenticatietokens (houdt u ingelogd), sessiebeheer (houdt uw actieve sessie in stand), beveiligingscookies (voorkomt ongeautoriseerde toegang). We kunnen aanvullende cookies implementeren voor:",
+      "items": [
+        "Prestatiebewaking en analytics",
+        "Opslag van gebruikersvoorkeuren (bijv. taalinstellingen)",
+        "Serviceverbetering en A/B-testen"
+      ],
+      "outro": "U wordt op de hoogte gesteld voordat we nieuwe cookietypes introduceren. U kunt cookievoorkeuren beheren via uw browserinstellingen. Let op: Het uitschakelen van essentiële cookies kan de functionaliteit van de dienst beperken."
+    },
+    "section9": {
+      "title": "9. Internationale Gegevensoverdrachten",
+      "intro": "Uw gegevens worden voornamelijk opgeslagen in de Europese Unie. Als we gegevens buiten de EU overdragen, zorgen we voor adequate bescherming door:",
+      "items": [
+        "Standaard Contractuele Clausules (SCC's) goedgekeurd door de Europese Commissie",
+        "Adequaatheidsbeslissingen (voor landen erkend als zijnde adequate bescherming)",
+        "Andere wettige overdrachtsmechanismen onder AVG Artikel 46"
+      ],
+      "outro": "We zullen u op de hoogte stellen van eventuele wijzigingen in onze gegevensoverdracht praktijken."
+    },
+    "section10": {
+      "title": "10. Melding van Datalekken",
+      "content": "In het onwaarschijnlijke geval van een datalek dat uw persoonlijke gegevens beïnvloedt, zullen we u binnen 72 uur nadat we op de hoogte zijn op de hoogte stellen en relevante toezichthoudende autoriteiten informeren zoals vereist door de AVG. We zullen informatie verstrekken over de aard van het lek, mogelijk getroffen gegevens, waarschijnlijke gevolgen, maatregelen genomen om het lek aan te pakken en stappen die u kunt nemen om uzelf te beschermen."
+    },
+    "section11": {
+      "title": "11. Privacy van Kinderen",
+      "intro": "De LIFO-dienst is niet bedoeld voor personen jonger dan 16 jaar. We verzamelen niet bewust persoonlijke gegevens van kinderen. Als we ontdekken dat we per ongeluk gegevens van een kind hebben verzameld, zullen we deze onmiddellijk verwijderen.",
+      "items": [
+        "Als u denkt dat we gegevens van een kind hebben verzameld, neem dan contact met ons op via: contact@lifo-app.com"
+      ]
+    },
+    "section12": {
+      "title": "12. Geautomatiseerde Besluitvorming",
+      "content": "We gebruiken geautomatiseerde systemen om aanbevelingen voor kortingen en donaties te genereren op basis van vervaldatums van producten, historische verkooppatronen, voorraadniveaus en winkelspecifieke gegevens. Belangrijk: Deze aanbevelingen zijn alleen adviserend. U behoudt volledige controle over alle zakelijke beslissingen. We nemen geen geautomatiseerde beslissingen met juridische of significante effecten zonder menselijk toezicht."
+    },
+    "section13": {
+      "title": "13. Wijzigingen in Dit Privacybeleid",
+      "content": "We kunnen dit privacybeleid van tijd tot tijd bijwerken om wijzigingen in onze praktijken, juridische of regelgevende updates, of nieuwe functies of diensten weer te geven. We zullen u op de hoogte stellen van belangrijke wijzigingen via e-mail naar uw geregistreerde adres, in-app melding of kennisgeving op onze website. Voortgezet gebruik van de dienst na wijzigingen vormt acceptatie van het bijgewerkte beleid."
+    },
+    "section14": {
+      "title": "14. Uw Autoriteit Persoonsgegevens",
+      "intro": "U hebt het recht om een klacht in te dienen bij uw lokale autoriteit voor gegevensbescherming als u denkt dat we de AVG of uw privacyrechten hebben geschonden.",
+      "euAuthorities": {
+        "title": "EU Autoriteiten voor Gegevensbescherming:",
+        "content": "Vind uw lokale autoriteit op",
+        "link": "https://edpb.europa.eu/about-edpb/board/members_en"
+      },
+      "netherlands": {
+        "title": "Nederland (Onze Primaire Jurisdictie):",
+        "authority": "Autoriteit Persoonsgegevens (AP)",
+        "website": "https://autoriteitpersoonsgegevens.nl",
+        "email": "info@autoriteitpersoonsgegevens.nl"
+      }
+    },
+    "section15": {
+      "title": "15. Eigendom van Gegevens",
+      "content": "U bent eigenaar van uw gegevens. Alle voorraadgegevens, productinformatie en bedrijfsinzichten gegenereerd via LIFO blijven uw eigendom. Wij zijn slechts verwerkers van deze gegevens namens u. U kunt uw gegevens op elk moment exporteren in standaardformaten (CSV, JSON) via uw accountinstellingen."
+    },
+    "section16": {
+      "title": "16. Neem Contact Met Ons Op",
+      "intro": "Voor vragen over dit privacybeleid, om uw AVG-rechten uit te oefenen, of voor privacykwesties:",
+      "email": "contact@lifo-app.com",
+      "responseTime": "We streven ernaar om binnen 2 werkdagen te reageren op alle privacyvragen."
+    },
+    "finalStatement": {
+      "content": "Door LIFO te gebruiken, erkent u dat u dit privacybeleid hebt gelezen en begrepen."
+    }
+  }
+}

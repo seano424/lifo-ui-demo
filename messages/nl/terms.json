@@ -1,0 +1,195 @@
+{
+  "termspage": {
+    "title": "Algemene Voorwaarden",
+    "lastUpdated": "Laatst bijgewerkt: 16 oktober 2025",
+    "metadata": {
+      "title": "Algemene Voorwaarden | LIFO.AI",
+      "description": "Servicevoorwaarden en privacybeleid voor het LIFO.AI voedselverspillingsmanagementplatform"
+    },
+    "section1": {
+      "title": "1. Acceptatie van Voorwaarden",
+      "content": "Door een account aan te maken en de LIFO-applicatie en website (gezamenlijk de \"Service\") te gebruiken, gaat u akkoord met deze Algemene Voorwaarden, inclusief onze privacypraktijken zoals hierin beschreven. Als u niet akkoord gaat met deze voorwaarden, gebruik de Service dan niet."
+    },
+    "section2": {
+      "title": "2. Beschrijving van de Service",
+      "content": "LIFO biedt voorraadbeheersoftware op lotniveau, ontworpen om detailhandels te helpen bij het bijhouden van vervaldatums van producten, het verminderen van voedselverspilling en het optimaliseren van kortings- en donatiebeslissingen door middel van beeldherkenning en data-analyse."
+    },
+    "section3": {
+      "title": "3. Gebruikersaccounts",
+      "intro": "U bent verantwoordelijk voor:",
+      "items": [
+        "Het verstrekken van nauwkeurige informatie tijdens registratie",
+        "Het handhaven van de beveiliging van uw accountgegevens",
+        "Alle activiteiten die plaatsvinden onder uw account",
+        "Ons onmiddellijk op de hoogte stellen van ongeautoriseerde toegang"
+      ],
+      "outro": "We kunnen verschillende gebruikersrollen (beheerder, manager, medewerker) toewijzen met verschillende toegangsniveaus om uw winkelactiviteiten te ondersteunen."
+    },
+    "section4": {
+      "title": "4. Gegevensverzameling en -gebruik",
+      "whatWeCollect": {
+        "title": "Welke gegevens we verzamelen:",
+        "items": [
+          "Accountinformatie (naam, e-mail, winkelgegevens, gebruikersrol)",
+          "Voorraadgegevens (productnamen, lotnummers, vervaldatums, hoeveelheden)",
+          "Productafbeeldingen vastgelegd door scannen (verwerkt voor herkenning van vervaldatums)",
+          "Gebruiksgegevens (uitgevoerde acties, scantijdstempels, kortings-/donatiebeslissingen)",
+          "Apparaatinformatie (browsertype, besturingssysteem, IP-adres)"
+        ]
+      },
+      "howWeUse": {
+        "title": "Hoe we uw gegevens gebruiken:",
+        "items": [
+          "Om de functionaliteit van de Service te leveren en te onderhouden",
+          "Om kortings- en donatieaanbevelingen te genereren",
+          "Om analytische dashboards te maken met voorraadwaarde en verspillingsstatistieken",
+          "Om onze beeldherkenningsalgoritmen te verbeteren",
+          "Om belangrijke Service-updates te communiceren",
+          "Om naleving van regelgeving inzake voedselverspilling te waarborgen"
+        ]
+      },
+      "legalBasis": {
+        "title": "Juridische grondslag (AVG):",
+        "intro": "We verwerken uw gegevens op basis van:",
+        "items": [
+          "Uitvoering van contract (het leveren van de Service waarvoor u zich hebt aangemeld)",
+          "Gerechtvaardigde belangen (verbetering van onze Service, fraudepreventie)",
+          "Uw toestemming (waar expliciet gevraagd)"
+        ]
+      }
+    },
+    "section5": {
+      "title": "5. Eigendom en Opslag van Gegevens",
+      "yourData": {
+        "title": "Uw gegevens:",
+        "content": "U behoudt het volledige eigendom van alle gegevens die u invoert in de Service. Uw gegevens worden veilig opgeslagen op servers in de Europese Unie en worden zowel tijdens verzending als in rust versleuteld."
+      },
+      "dataRetention": {
+        "title": "Gegevensbewaring:",
+        "content": "We bewaren uw gegevens zolang uw account actief blijft. Bij het verwijderen van uw account zullen we uw gegevens binnen 90 dagen verwijderen of anonimiseren, behalve waar bewaring wettelijk verplicht is."
+      }
+    },
+    "section6": {
+      "title": "6. Gegevensdeling en Derden",
+      "intro": "We verkopen uw persoonlijke gegevens niet. We kunnen gegevens alleen delen:",
+      "items": [
+        "Met dienstverleners die ons helpen de Service te exploiteren (cloudhosting, analyse)",
+        "Wanneer wettelijk vereist of bij juridische procedures",
+        "Om onze rechten te beschermen of fraude te voorkomen",
+        "Met uw expliciete toestemming"
+      ],
+      "outro": "Alle externe verwerkers zijn contractueel gebonden aan AVG-normen."
+    },
+    "section7": {
+      "title": "7. Uw Privacyrechten (AVG)",
+      "intro": "U heeft het recht om:",
+      "items": [
+        "Toegang te krijgen tot uw persoonlijke gegevens en een kopie te ontvangen",
+        "Onjuiste of onvolledige gegevens te corrigeren",
+        "Uw gegevens te verwijderen (\"recht op vergetelheid\")",
+        "Uw gegevens in een gestructureerd formaat over te dragen naar een andere service",
+        "Bezwaar te maken tegen bepaalde gegevensverwerkingsactiviteiten",
+        "Verwerking te beperken in specifieke omstandigheden",
+        "Toestemming op elk moment in te trekken wanneer verwerking op toestemming is gebaseerd"
+      ],
+      "contact": "Om deze rechten uit te oefenen, neem contact met ons op via",
+      "email": "contact@lifo-app.com"
+    },
+    "section8": {
+      "title": "8. Cookies en Trackingtechnologieën",
+      "intro": "We gebruiken momenteel essentiële cookies die noodzakelijk zijn voor de functionaliteit van de Service (authenticatie, sessiebeheer). We kunnen in de toekomst aanvullende cookies implementeren voor:",
+      "items": [
+        "Analyse en prestatiemonitoring",
+        "Opslag van gebruikersvoorkeuren",
+        "Serviceverbetering"
+      ],
+      "outro": "U kunt cookievoorkeuren beheren via uw browserinstellingen. Het uitschakelen van essentiële cookies kan de functionaliteit van de Service beperken. We zullen u informeren als we nieuwe cookietypes introduceren."
+    },
+    "section9": {
+      "title": "9. Verantwoordelijkheden van Gebruikers",
+      "intro": "U gaat ermee akkoord om:",
+      "items": [
+        "De Service te gebruiken in overeenstemming met alle toepasselijke wetten en voedselveiligheidsvoorschriften",
+        "De nauwkeurigheid van vervaldatums en productinformatie te waarborgen",
+        "Productveiligheid onafhankelijk te verifiëren; LIFO-aanbevelingen zijn uitsluitend adviserend",
+        "De Service niet te misbruiken, te verstoren of te proberen ongeautoriseerde toegang te krijgen",
+        "De Service niet te gebruiken voor onwettige of frauduleuze doeleinden",
+        "Passende back-upsystemen te onderhouden voor kritieke bedrijfsgegevens"
+      ]
+    },
+    "section10": {
+      "title": "10. Beschikbaarheid en Wijzigingen van de Service",
+      "content": "We streven ernaar betrouwbare service te leveren maar garanderen geen ononderbroken toegang. We behouden ons het recht voor om elk aspect van de Service te wijzigen, op te schorten of te beëindigen met redelijke kennisgeving. Wezenlijke wijzigingen in deze Voorwaarden worden gecommuniceerd via e-mail of in-app melding."
+    },
+    "section11": {
+      "title": "11. Intellectueel Eigendom",
+      "content": "De Service, inclusief het ontwerp, functies, beeldherkenningstechnologie en onderliggende software, is eigendom van LIFO en wordt beschermd door intellectuele eigendomswetten. U mag geen enkel deel van de Service kopiëren, wijzigen, reverse-engineeren of afgeleide werken creëren."
+    },
+    "section12": {
+      "title": "12. Gegevensbeveiliging",
+      "intro": "We implementeren beveiligingsmaatregelen volgens industrienormen, waaronder:",
+      "items": [
+        "Versleuteling van gegevens tijdens verzending (TLS/SSL) en in rust",
+        "Regelmatige beveiligingsaudits en kwetsbaarheidsbeoordelingen",
+        "Toegangscontroles en authenticatiemechanismen",
+        "Veilige ontwikkelingspraktijken"
+      ],
+      "outro": "Echter, geen enkel systeem is volledig veilig. U erkent dat u gegevens op eigen risico verstrekt."
+    },
+    "section13": {
+      "title": "13. Beperking van Aansprakelijkheid",
+      "intro": "De Service wordt geleverd \"zoals het is\" zonder garanties van welke aard dan ook. LIFO is niet aansprakelijk voor:",
+      "items": [
+        "Zakelijke beslissingen genomen op basis van Service-aanbevelingen",
+        "Voedselveiligheidsincidenten of problemen met naleving van regelgeving",
+        "Verlies van gegevens door technische storingen of gebruikersfouten",
+        "Indirecte, incidentele, gevolgschade of punitieve schade",
+        "Service-onderbrekingen of datalekken ondanks redelijke beveiligingsmaatregelen"
+      ],
+      "outro": "Maximale aansprakelijkheid is beperkt tot het bedrag dat is betaald voor de Service in de voorafgaande 12 maanden."
+    },
+    "section14": {
+      "title": "14. Beëindiging",
+      "intro": "Beide partijen kunnen deze overeenkomst op elk moment beëindigen. Bij beëindiging:",
+      "items": [
+        "Wordt uw toegang tot de Service onmiddellijk beëindigd",
+        "Kunt u binnen 30 dagen export van uw gegevens aanvragen",
+        "Zullen we uw gegevens verwijderen in overeenstemming met Sectie 5 en AVG-vereisten",
+        "Blijven uitstaande kosten verschuldigd"
+      ]
+    },
+    "section15": {
+      "title": "15. Melding van Datalekken",
+      "content": "In het geval van een datalek dat uw persoonlijke gegevens betreft, zullen we u en de relevante toezichthoudende autoriteiten binnen 72 uur informeren zoals vereist door de AVG, met informatie over de aard van het lek en genomen herstelmaatregelen."
+    },
+    "section16": {
+      "title": "16. Internationale Gegevensoverdrachten",
+      "intro": "Als we gegevens buiten de EU overdragen, waarborgen we adequate bescherming door:",
+      "items": [
+        "Standaard Contractuele Bepalingen goedgekeurd door de EU-Commissie",
+        "Adequaatheidsbeslissingen",
+        "Andere wettige overdrachtsmechanismen onder de AVG"
+      ]
+    },
+    "section17": {
+      "title": "17. Privacy van Kinderen",
+      "content": "De Service is niet bedoeld voor personen onder de 16 jaar. We verzamelen niet bewust gegevens van kinderen."
+    },
+    "section18": {
+      "title": "18. Toepasselijk Recht en Geschillen",
+      "content": "Deze Voorwaarden worden beheerst door de wetten van de Europese Unie en Nederland. Eventuele geschillen worden beslecht bij de rechtbanken van Amsterdam, Nederland."
+    },
+    "section19": {
+      "title": "19. Contactinformatie",
+      "intro": "Voor vragen over deze Voorwaarden, privacyzorgen of om uw AVG-rechten uit te oefenen:",
+      "email": "Email: contact@lifo-app.com"
+    },
+    "section20": {
+      "title": "20. Toezichthoudende Autoriteit",
+      "content": "U heeft het recht een klacht in te dienen bij uw lokale gegevensbeschermingsautoriteit als u van mening bent dat we de AVG of uw privacyrechten hebben geschonden."
+    },
+    "finalStatement": {
+      "content": "Door LIFO te gebruiken, erkent u dat u deze Algemene Voorwaarden hebt gelezen, begrepen en ermee akkoord gaat gebonden te zijn, inclusief onze gegevensverzamelings- en privacypraktijken."
+    }
+  }
+}
