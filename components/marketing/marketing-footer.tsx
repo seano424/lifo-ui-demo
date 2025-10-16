@@ -118,7 +118,7 @@ export function MarketingFooter() {
           </Typography>
           <div className="flex items-center gap-6">
             <Link
-              href="#"
+              href="/privacy"
               className="text-xs text-muted-foreground hover:text-foreground transition-colors"
             >
               {t('legal.privacyPolicy')}

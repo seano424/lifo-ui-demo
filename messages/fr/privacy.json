@@ -1,0 +1,151 @@
+{
+  "privacypage": {
+    "title": "Politique de Confidentialité",
+    "lastUpdated": "Dernière mise à jour : 16 octobre 2025",
+    "metadata": {
+      "title": "Politique de Confidentialité | LIFO.AI",
+      "description": "Politique de Confidentialité pour la plateforme de gestion des déchets alimentaires LIFO.AI"
+    },
+    "section1": {
+      "title": "1. Qui Sommes-Nous",
+      "content": "LIFO fournit un logiciel de gestion d'inventaire par lots pour les magasins de détail. Nous vous aidons à suivre les dates d'expiration des produits, à réduire le gaspillage alimentaire et à prendre des décisions basées sur les données concernant les rabais et les dons. Contactez-nous : Email : contact@lifo-app.com | Pour les demandes de droits RGPD : contact@lifo-app.com"
+    },
+    "section2": {
+      "title": "2. Quelles Données Nous Collectons",
+      "intro": "Nous collectons les types de données suivants :",
+      "items": [
+        "Informations du compte : Nom, adresse e-mail, nom et emplacement du magasin, rôle de l'utilisateur (administrateur, gestionnaire ou employé), identifiants de connexion (cryptés)",
+        "Données d'inventaire : Noms et descriptions des produits, numéros de lot et quantités, dates d'expiration, informations de code-barres, décisions de rabais et de dons",
+        "Images de produits : Photos capturées lors du scan de codes-barres et de dates d'expiration, traitées par technologie de reconnaissance d'images, utilisées uniquement pour extraire les informations et dates des produits",
+        "Données d'utilisation : Actions effectuées dans l'application (scans, mises à jour, décisions), horodatages des activités, informations sur l'appareil (type de navigateur, système d'exploitation, adresse IP), journaux de performance et d'erreurs"
+      ]
+    },
+    "section3": {
+      "title": "3. Comment Nous Utilisons Vos Données",
+      "intro": "Nous traitons vos données pour :",
+      "items": [
+        "Fournir notre service : Activer le suivi et la gestion de l'inventaire, générer des recommandations de rabais et de dons, créer des tableaux de bord analytiques montrant la valeur de l'inventaire et les métriques de gaspillage, envoyer des notifications importantes sur les produits expirant",
+        "Améliorer notre service : Améliorer la précision de la reconnaissance d'images, optimiser les algorithmes de recommandation, identifier et corriger les problèmes techniques, développer de nouvelles fonctionnalités basées sur les modèles d'utilisation",
+        "Communiquer avec vous : Envoyer des mises à jour de service et des annonces importantes, répondre à vos demandes de support, vous informer des modifications de nos conditions ou politiques",
+        "Se conformer aux obligations légales : Respecter les exigences de sécurité alimentaire et de déclaration des déchets, répondre aux demandes légales si nécessaire, protéger contre la fraude et les abus"
+      ]
+    },
+    "section4": {
+      "title": "4. Base Juridique du Traitement (RGPD)",
+      "legalBasis": {
+        "title": "Nous traitons vos données sur la base de :",
+        "intro": "",
+        "items": [
+          "Exécution du contrat : Pour fournir le service auquel vous vous êtes inscrit",
+          "Intérêts légitimes : Pour améliorer notre service, prévenir la fraude et assurer la sécurité",
+          "Votre consentement : Lorsque nous demandons explicitement la permission (par exemple, pour des fonctionnalités optionnelles)",
+          "Obligation légale : Pour se conformer aux lois et réglementations applicables"
+        ]
+      }
+    },
+    "section5": {
+      "title": "5. Stockage et Sécurité des Données",
+      "intro": "",
+      "items": [
+        "Où nous stockons vos données : Toutes les données sont stockées sur des serveurs sécurisés situés dans l'Union européenne. Nous utilisons Supabase (région UE) pour l'hébergement de bases de données. Les données sont cryptées en transit (TLS/SSL) et au repos.",
+        "Comment nous protégeons vos données : Protocoles de cryptage standard de l'industrie, audits de sécurité réguliers et évaluations de vulnérabilité, contrôles d'accès et authentification multifactorielle, pratiques de développement sécurisées et révisions de code, formation des employés sur la protection des données.",
+        "Conservation des données : Nous conservons vos données tant que votre compte reste actif. Lors de la suppression du compte, nous supprimons ou anonymisons vos données dans les 90 jours. Certaines données peuvent être conservées plus longtemps si la loi l'exige (par exemple, les registres comptables)."
+      ],
+      "outro": ""
+    },
+    "section6": {
+      "title": "6. Partage de Données et Tiers",
+      "storage": {
+        "title": "Nous ne vendons pas vos données personnelles.",
+        "content": "Nous pouvons partager des données uniquement avec : Fournisseurs de services (Hébergement cloud : Supabase - basé dans l'UE, conforme au RGPD ; Traitement d'images : API Google Vision pour la reconnaissance de dates d'expiration ; Services d'e-mail : Resend ou similaire pour les notifications de compte ; Analytique : Analytique d'utilisation pour améliorer le service), pour Exigences légales (se conformer aux obligations légales ou aux ordonnances judiciaires, protéger nos droits ou prévenir la fraude, enquêter sur les incidents de sécurité, répondre aux demandes des forces de l'ordre), ou Avec votre consentement (pour d'autres fins uniquement avec votre permission explicite)."
+      },
+      "retention": {
+        "title": "Processeurs Tiers",
+        "content": "Tous les processeurs tiers sont contractuellement liés aux normes RGPD, traitent les données uniquement selon nos instructions et mettent en œuvre des mesures de sécurité appropriées."
+      }
+    },
+    "section7": {
+      "title": "7. Vos Droits en Matière de Confidentialité (RGPD)",
+      "intro": "En vertu du RGPD, vous avez le droit de :",
+      "items": [
+        "Accéder à vos données : Demander une copie de toutes les données personnelles que nous détenons à votre sujet",
+        "Rectifier les données inexactes : Corriger toute information incomplète ou incorrecte",
+        "Supprimer vos données (« Droit à l'oubli ») : Demander la suppression de vos données personnelles (sous réserve des exigences de conservation légale)",
+        "Portabilité des données : Recevoir vos données dans un format structuré et couramment utilisé (CSV, JSON)",
+        "Vous opposer au traitement : Vous opposer à certaines activités de traitement de données (par exemple, marketing direct)",
+        "Restreindre le traitement : Limiter la façon dont nous traitons vos données dans des circonstances spécifiques",
+        "Retirer le consentement : Retirer le consentement à tout moment lorsque le traitement est basé sur le consentement (n'affecte pas le traitement antérieur)"
+      ],
+      "contact": "Pour exercer ces droits, contactez-nous à",
+      "email": "contact@lifo-app.com",
+      "responseTime": "Nous répondrons à votre demande dans les 30 jours (ou 60 jours pour les demandes complexes, avec notification)."
+    },
+    "section8": {
+      "title": "8. Cookies et Technologies de Suivi",
+      "intro": "Nous utilisons actuellement des cookies essentiels (requis pour le service) : jetons d'authentification (vous garde connecté), gestion de session (maintient votre session active), cookies de sécurité (empêche l'accès non autorisé). Nous pouvons mettre en œuvre des cookies supplémentaires pour :",
+      "items": [
+        "Surveillance des performances et analytique",
+        "Stockage des préférences utilisateur (par exemple, paramètres de langue)",
+        "Amélioration du service et tests A/B"
+      ],
+      "outro": "Vous serez informé avant que nous introduisions de nouveaux types de cookies. Vous pouvez contrôler les préférences de cookies via les paramètres de votre navigateur. Remarque : La désactivation des cookies essentiels peut limiter la fonctionnalité du service."
+    },
+    "section9": {
+      "title": "9. Transferts Internationaux de Données",
+      "intro": "Vos données sont principalement stockées dans l'Union européenne. Si nous transférons des données en dehors de l'UE, nous assurons une protection adéquate par :",
+      "items": [
+        "Clauses contractuelles types (CCT) approuvées par la Commission européenne",
+        "Décisions d'adéquation (pour les pays reconnus comme offrant une protection adéquate)",
+        "Autres mécanismes de transfert légaux en vertu de l'article 46 du RGPD"
+      ],
+      "outro": "Nous vous informerons de tout changement dans nos pratiques de transfert de données."
+    },
+    "section10": {
+      "title": "10. Notification de Violation de Données",
+      "content": "Dans le cas improbable d'une violation de données affectant vos données personnelles, nous vous informerons dans les 72 heures après en avoir pris connaissance et informerons les autorités de surveillance compétentes comme l'exige le RGPD. Nous fournirons des informations sur la nature de la violation, les données potentiellement affectées, les conséquences probables, les mesures prises pour traiter la violation et les mesures que vous pouvez prendre pour vous protéger."
+    },
+    "section11": {
+      "title": "11. Confidentialité des Enfants",
+      "intro": "Le service LIFO n'est pas destiné aux personnes de moins de 16 ans. Nous ne collectons pas sciemment de données personnelles auprès d'enfants. Si nous découvrons que nous avons collecté par inadvertance des données d'un enfant, nous les supprimerons immédiatement.",
+      "items": [
+        "Si vous pensez que nous avons collecté des données d'un enfant, veuillez nous contacter à : contact@lifo-app.com"
+      ]
+    },
+    "section12": {
+      "title": "12. Prise de Décision Automatisée",
+      "content": "Nous utilisons des systèmes automatisés pour générer des recommandations de rabais et de dons basées sur les dates d'expiration des produits, les modèles de ventes historiques, les niveaux d'inventaire et les données spécifiques au magasin. Important : Ces recommandations sont uniquement consultatives. Vous conservez le contrôle total de toutes les décisions commerciales. Nous ne prenons pas de décisions automatisées ayant des effets juridiques ou significatifs sans surveillance humaine."
+    },
+    "section13": {
+      "title": "13. Modifications de Cette Politique de Confidentialité",
+      "content": "Nous pouvons mettre à jour cette politique de confidentialité de temps en temps pour refléter des changements dans nos pratiques, des mises à jour légales ou réglementaires, ou de nouvelles fonctionnalités ou services. Nous vous informerons des changements importants par e-mail à votre adresse enregistrée, notification dans l'application ou avis sur notre site Web. L'utilisation continue du service après les modifications constitue l'acceptation de la politique mise à jour."
+    },
+    "section14": {
+      "title": "14. Votre Autorité de Protection des Données",
+      "intro": "Vous avez le droit de déposer une plainte auprès de votre autorité locale de protection des données si vous pensez que nous avons violé le RGPD ou vos droits à la vie privée.",
+      "euAuthorities": {
+        "title": "Autorités Européennes de Protection des Données:",
+        "content": "Trouvez votre autorité locale à",
+        "link": "https://edpb.europa.eu/about-edpb/board/members_en"
+      },
+      "netherlands": {
+        "title": "Pays-Bas (Notre Juridiction Principale):",
+        "authority": "Autoriteit Persoonsgegevens (AP)",
+        "website": "https://autoriteitpersoonsgegevens.nl",
+        "email": "info@autoriteitpersoonsgegevens.nl"
+      }
+    },
+    "section15": {
+      "title": "15. Propriété des Données",
+      "content": "Vous êtes propriétaire de vos données. Toutes les données d'inventaire, les informations sur les produits et les informations commerciales générées via LIFO restent votre propriété. Nous ne sommes que des processeurs de ces données en votre nom. Vous pouvez exporter vos données à tout moment dans des formats standard (CSV, JSON) via les paramètres de votre compte."
+    },
+    "section16": {
+      "title": "16. Nous Contacter",
+      "intro": "Pour toute question concernant cette politique de confidentialité, pour exercer vos droits RGPD, ou pour toute préoccupation en matière de confidentialité:",
+      "email": "contact@lifo-app.com",
+      "responseTime": "Nous nous efforçons de répondre à toutes les demandes de confidentialité dans les 2 jours ouvrables."
+    },
+    "finalStatement": {
+      "content": "En utilisant LIFO, vous reconnaissez avoir lu et compris cette politique de confidentialité."
+    }
+  }
+}

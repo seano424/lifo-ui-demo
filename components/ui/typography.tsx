@@ -47,9 +47,9 @@ const variantElementMap: Record<string, React.ElementType> = {
   p: 'p',
   blockquote: 'blockquote',
   code: 'code',
-  small: 'span',
-  muted: 'span',
-  extraSmall: 'span',
+  small: 'p',
+  muted: 'p',
+  extraSmall: 'p',
 }
 
 const Typography = React.forwardRef<HTMLElement, TypographyProps>(
