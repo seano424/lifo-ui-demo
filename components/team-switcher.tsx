@@ -92,7 +92,8 @@ export function TeamSwitcher({ compact = false }: TeamSwitcherProps) {
                 variant="outline"
                 className={cn(
                   'flex items-center gap-2',
-                  compact && 'px-2 w-auto md:px-3 md:w-auto',
+                  compact && 'px-2.5 w-auto md:px-3 md:w-auto',
+                  'rounded-full sm:rounded-2xl', // More rounded on mobile, less on desktop
                 )}
               >
                 <StoreIcon className="w-4 h-4" />
