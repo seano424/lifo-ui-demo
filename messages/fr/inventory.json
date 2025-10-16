@@ -223,7 +223,8 @@
   "scanningInterface": {
     "camera": {
       "scanProduct": "Scanner le produit",
-      "scanDifferentProduct": "Scanner un autre produit"
+      "scanDifferentProduct": "Scanner un autre produit",
+      "productNotFoundScanAgain": "Produit non trouvé - Scanner un autre produit ou ajouter manuellement"
     },
     "product": {
       "productFound": "Produit trouvé ! Prêt à procéder au scan de la date d'expiration.",

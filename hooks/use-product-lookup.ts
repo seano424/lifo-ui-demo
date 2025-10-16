@@ -6,6 +6,7 @@ import {
 } from '@/lib/queries/open-food-facts'
 import { queryKeys } from '@/lib/queries/query-keys'
 import { createClient } from '@/lib/supabase/client'
+import { logger } from '@/lib/utils/logger'
 
 // Constants
 const LOOKUP_CONFIG = {
@@ -229,8 +230,6 @@ async function fetchFromOpenFoodFacts(
 
     return result
   } catch (error) {
-    console.error('[ProductLookup] Open Food Facts lookup failed:', error)
-
     // Categorize the error type using proper type guards
     let errorType: ProductLookupResult['errorType'] = 'api_error'
     let errorMessage = 'Failed to lookup product'
@@ -239,15 +238,19 @@ async function fetchFromOpenFoodFacts(
     if (isNetworkError(error)) {
       errorType = 'network'
       errorMessage = 'Network error - please check your connection and try again'
+      logger.error('[ProductLookup]', 'Open Food Facts network error', { error, barcode })
     }
     // Check for 404 or product not found
     else if (isHttpError(error) && error.status === 404) {
       errorType = 'not_found'
       errorMessage = 'Product not found in database'
+      // 404 is expected - log only in debug mode
+      logger.log('[ProductLookup]', 'Product not found in Open Food Facts', { barcode })
     }
     // Generic error message
     else if (error instanceof Error) {
       errorMessage = error.message
+      logger.error('[ProductLookup]', 'Open Food Facts lookup failed', { error, barcode })
     }
 
     return {
