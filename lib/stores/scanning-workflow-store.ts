@@ -198,9 +198,13 @@ export const useScanningWorkflowStore = create<ScanningWorkflowState>()(
                   state.currentStep = 'ocr'
                 }
               } else {
-                // Product not found - set Unknown Product and stay on barcode/product step
-                // User must manually enter product details or retry
+                // Product not found - set Unknown Product and stay on current step
+                // User must manually enter product details or retry scanning
                 state.scannedProduct.productName = 'Unknown Product'
+                // Keep user on barcode step - do NOT auto-advance
+                if (state.currentStep === 'product') {
+                  state.currentStep = 'barcode'
+                }
               }
 
               // Add to history for quick rescanning

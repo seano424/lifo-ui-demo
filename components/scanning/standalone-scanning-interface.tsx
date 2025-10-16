@@ -142,8 +142,13 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
   useEffect(() => {
     if (lookupResult && lookupBarcode) {
       workflowActions.setProductLookupResult(lookupResult)
+
+      // Automatically open manual entry if product not found
+      if (!lookupResult.found && !showManualBarcode) {
+        setShowManualBarcode(true)
+      }
     }
-  }, [lookupResult, lookupBarcode, workflowActions])
+  }, [lookupResult, lookupBarcode, workflowActions, showManualBarcode])
 
   // Sync workflow state with UI
   useEffect(() => {
@@ -451,18 +456,29 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
               {/* Camera Interface */}
               <ScanningCamera
                 mode="barcode"
-                title={scannedProduct ? t('camera.scanDifferentProduct') : t('camera.scanProduct')}
+                title={
+                  scannedProduct?.lookupResult && !scannedProduct.lookupResult.found
+                    ? t('camera.productNotFoundScanAgain')
+                    : scannedProduct
+                      ? t('camera.scanDifferentProduct')
+                      : t('camera.scanProduct')
+                }
                 onBarcodeScanned={handleScan}
                 onScanError={handleError}
                 showManualEntry={showManualBarcode}
                 onToggleManualEntry={() => setShowManualBarcode(!showManualBarcode)}
                 onManualProductSelected={handleManualProductSelected}
                 onCloseManualEntry={() => setShowManualBarcode(false)}
+                defaultBarcode={
+                  scannedProduct?.lookupResult && !scannedProduct.lookupResult.found
+                    ? scannedProduct.barcode
+                    : undefined
+                }
                 autoStart
               />
 
-              {/* Selected Product Display */}
-              {scannedProduct && (
+              {/* Selected Product Display - Only show when product is found */}
+              {scannedProduct?.lookupResult?.found && (
                 <ProductCard
                   product={{
                     barcode: scannedProduct.barcode,
@@ -505,26 +521,26 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
                 }}
               />
 
-              {!isLookingUp && !lookupError && scannedProduct.lookupResult && (
-                <>
-                  {scannedProduct.lookupResult.found ? (
+              {!isLookingUp &&
+                !lookupError &&
+                scannedProduct.lookupResult &&
+                (scannedProduct.lookupResult.found ? (
+                  <>
                     <Alert>
                       <Check className="w-6 h-6 text-secondary-900 stroke-5 border-2 border-secondary-900 rounded-full p-[3px] bg-primary-100" />
                       <AlertDescription>{t('product.productFound')}</AlertDescription>
                     </Alert>
-                  ) : (
-                    <Alert variant="destructive">
-                      <AlertCircle className="h-4 w-4" />
-                      <AlertDescription>{t('product.productNotFound')}</AlertDescription>
+                    <Alert>
+                      <ArrowRight className="h-4 w-4 text-blue-600" />
+                      <AlertDescription>{t('product.autoProceeding')}</AlertDescription>
                     </Alert>
-                  )}
-
-                  <Alert>
-                    <ArrowRight className="h-4 w-4 text-blue-600" />
-                    <AlertDescription>{t('product.autoProceeding')}</AlertDescription>
+                  </>
+                ) : (
+                  <Alert variant="destructive">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>{t('product.productNotFound')}</AlertDescription>
                   </Alert>
-                </>
-              )}
+                ))}
             </div>
           )}
 

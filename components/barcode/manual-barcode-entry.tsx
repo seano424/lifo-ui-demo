@@ -68,6 +68,7 @@ interface ManualBarcodeEntryProps {
   className?: string
   mode?: 'inbound' | 'outbound' // Determines which API to use
   storeId?: string // Required for outbound mode to filter products by store
+  defaultBarcode?: string // Pre-fill barcode input
 }
 
 export default function ManualBarcodeEntry({
@@ -75,6 +76,7 @@ export default function ManualBarcodeEntry({
   className = '',
   mode = 'inbound', // Default to inbound for backward compatibility
   storeId,
+  defaultBarcode = '',
 }: ManualBarcodeEntryProps) {
   const t = useTranslations('products.manualEntry')
   const tButtons = useTranslations('buttons')
@@ -83,7 +85,7 @@ export default function ManualBarcodeEntry({
 
   const { getCategoriesForDropdown, isLoading: categoriesLoading } = useCategories()
 
-  const [barcode, setBarcode] = useState('')
+  const [barcode, setBarcode] = useState(defaultBarcode)
   const [selectedProduct, setSelectedProduct] = useState<ProductData | null>(null)
   const [manualProductData, setManualProductData] = useState({
     productName: '',
