@@ -46,7 +46,9 @@ class UnifiedScoringPersistence:
     CHUNK_SIZE = 100  # Optimized chunk size (4x increase from 25)
     MAX_RETRIES = 3
     RETRY_DELAY_BASE = 0.3
-    MAX_CONCURRENT_CHUNKS = 15  # Increased concurrency for WSL2 REST fallback (1.5x increase from 10)
+    MAX_CONCURRENT_CHUNKS = (
+        15  # Increased concurrency for WSL2 REST fallback (1.5x increase from 10)
+    )
     CHUNK_TIMEOUT = 15.0  # Increased timeout for larger chunks
 
     # Performance notes:
@@ -437,7 +439,7 @@ class UnifiedScoringPersistence:
                     notes,
                     created_at
                 )
-                VALUES {', '.join(values)}
+                VALUES {", ".join(values)}
             """
 
             result = await conn.execute(insert_query)

@@ -36,7 +36,7 @@ class Settings(BaseSettings):
     )
 
     # Production URLs (set via environment variables)
-    frontend_url: str | None = None
+    frontend_url: str | list[str] | None = None
     api_url: str | None = None
 
     # Database Configuration
@@ -255,10 +255,18 @@ class Settings(BaseSettings):
         default=80, description="CPU usage warning threshold (%)"
     )
 
-    @field_validator("backend_cors_origins", "allowed_hosts", "api_keys", mode="before")
+    @field_validator(
+        "backend_cors_origins",
+        "allowed_hosts",
+        "api_keys",
+        "frontend_url",
+        mode="before",
+    )
     @classmethod
     def parse_list_fields(cls, v) -> list[str]:
         """Parse comma-separated strings or lists into lists of strings"""
+        if v is None:  # Handle None for optional fields
+            return []
         if isinstance(v, str):
             if not v.strip():
                 return []
@@ -296,23 +304,29 @@ class Settings(BaseSettings):
             # 1. Use BACKEND_CORS_ORIGINS environment variable if explicitly set
             if self.backend_cors_origins_list:
                 # Filter to only HTTPS origins in production
-                origins.extend([
-                    origin for origin in self.backend_cors_origins_list
-                    if origin.startswith("https://")
-                ])
+                origins.extend(
+                    [
+                        origin
+                        for origin in self.backend_cors_origins_list
+                        if origin.startswith("https://")
+                    ]
+                )
 
-            # 2. Add frontend URL if configured
+            # 2. Add frontend URL if configured (now a list)
             if self.frontend_url:
-                # Validate URL format
-                if self.frontend_url.startswith("https://"):
-                    if self.frontend_url not in origins:
-                        origins.append(self.frontend_url)
+                for url in self.frontend_url:
+                    if not url:
+                        continue
+                    # Validate URL format
+                    if url.startswith("https://"):
+                        if url not in origins:
+                            origins.append(url)
 
-                    # Add www subdomain only if original doesn't have it
-                    if not self.frontend_url.startswith("https://www."):
-                        www_url = self.frontend_url.replace("https://", "https://www.")
-                        if www_url not in origins:
-                            origins.append(www_url)
+                        # Add www subdomain only if original doesn't have it
+                        if not url.startswith("https://www."):
+                            www_url = url.replace("https://", "https://www.")
+                            if www_url not in origins:
+                                origins.append(www_url)
 
             # 3. Fallback: if no origins configured, allow localhost for initial setup
             if not origins:
@@ -331,9 +345,11 @@ class Settings(BaseSettings):
             if self.backend_cors_origins_list:
                 origins.extend(self.backend_cors_origins_list)
 
-            # 2. Add frontend URL if configured
-            if self.frontend_url and self.frontend_url not in origins:
-                origins.append(self.frontend_url)
+            # 2. Add frontend URL if configured (now a list)
+            if self.frontend_url:
+                for url in self.frontend_url:
+                    if url and url not in origins:
+                        origins.append(url)
 
             # 3. Always allow localhost for development
             if "http://localhost:3000" not in origins:
@@ -342,11 +358,15 @@ class Settings(BaseSettings):
             return origins
 
         # Development - use BACKEND_CORS_ORIGINS environment variable
-        return self.backend_cors_origins_list if self.backend_cors_origins_list else [
-            "http://localhost:3000",
-            "http://localhost:3001",
-            "http://127.0.0.1:3000"
-        ]
+        return (
+            self.backend_cors_origins_list
+            if self.backend_cors_origins_list
+            else [
+                "http://localhost:3000",
+                "http://localhost:3001",
+                "http://127.0.0.1:3000",
+            ]
+        )
 
     def get_allowed_hosts(self) -> list[str]:
         """Get allowed hosts based on environment - SECURE VERSION"""
@@ -355,9 +375,12 @@ class Settings(BaseSettings):
 
             # Add ONLY explicitly configured hosts in production
             if self.frontend_url:
-                host = self.frontend_url.replace("https://", "").replace("http://", "")
-                if host and not host.startswith("*"):  # No wildcards in production
-                    hosts.append(host)
+                for url in self.frontend_url:
+                    if not url:
+                        continue
+                    host = url.replace("https://", "").replace("http://", "")
+                    if host and not host.startswith("*"):  # No wildcards in production
+                        hosts.append(host)
 
             if self.api_url:
                 host = self.api_url.replace("https://", "").replace("http://", "")
@@ -388,9 +411,12 @@ class Settings(BaseSettings):
             )
 
             if self.frontend_url:
-                host = self.frontend_url.replace("https://", "").replace("http://", "")
-                if host:
-                    hosts.append(host)
+                for url in self.frontend_url:
+                    if not url:
+                        continue
+                    host = url.replace("https://", "").replace("http://", "")
+                    if host:
+                        hosts.append(host)
             return hosts
 
         # Development - use configured hosts
@@ -406,7 +432,6 @@ class Settings(BaseSettings):
         case_sensitive=False,
         extra="ignore",  # Ignore extra environment variables not defined in the model
         env_nested_delimiter=None,  # Disable nested parsing
-        env_ignore_empty=True,  # Ignore empty .env files
     )
 
 

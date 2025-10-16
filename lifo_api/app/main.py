@@ -415,6 +415,7 @@ class HealthCheckBypassMiddleware(BaseHTTPMiddleware):
 
         return await call_next(request)
 
+
 app.add_middleware(HealthCheckBypassMiddleware)
 
 # CORS middleware MUST be early (before security middleware) to handle preflight OPTIONS requests
@@ -464,6 +465,7 @@ if settings.rate_limit_enabled:
 
 # Security blocking middleware
 app.middleware("http")(check_blocked_ip)
+
 
 # Health check debugging middleware (for production troubleshooting)
 @app.middleware("http")

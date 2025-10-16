@@ -1371,7 +1371,7 @@ class SecureReadOnlyOperations:
             all_batch_mappings = []
 
             for i in range(0, len(product_ids), PRODUCT_CHUNK_SIZE):
-                product_chunk = product_ids[i:i + PRODUCT_CHUNK_SIZE]
+                product_chunk = product_ids[i : i + PRODUCT_CHUNK_SIZE]
 
                 try:
                     # Get batch_id to product_id mapping for this chunk
@@ -1415,8 +1415,7 @@ class SecureReadOnlyOperations:
 
             # Create batch_id -> product_id mapping
             batch_to_product = {
-                batch["batch_id"]: batch["product_id"]
-                for batch in all_batch_mappings
+                batch["batch_id"]: batch["product_id"] for batch in all_batch_mappings
             }
             batch_ids = list(batch_to_product.keys())
 
@@ -1425,7 +1424,8 @@ class SecureReadOnlyOperations:
                 store_id=store_id,
                 product_count=len(product_ids),
                 batch_count=len(batch_ids),
-                chunks_processed=(len(product_ids) + PRODUCT_CHUNK_SIZE - 1) // PRODUCT_CHUNK_SIZE,
+                chunks_processed=(len(product_ids) + PRODUCT_CHUNK_SIZE - 1)
+                // PRODUCT_CHUNK_SIZE,
             )
 
             # FIXED: Chunk batch IDs to avoid URL length limits
@@ -1436,7 +1436,7 @@ class SecureReadOnlyOperations:
 
             # Process in chunks
             for i in range(0, len(batch_ids), CHUNK_SIZE):
-                chunk = batch_ids[i:i + CHUNK_SIZE]
+                chunk = batch_ids[i : i + CHUNK_SIZE]
 
                 try:
                     # Get sales data for this chunk of batches
@@ -1477,9 +1477,7 @@ class SecureReadOnlyOperations:
                 ]
 
                 # FIXED: Use 'quantity' column (not 'quantity_sold')
-                total_quantity = sum(
-                    sale.get("quantity", 0) for sale in product_sales
-                )
+                total_quantity = sum(sale.get("quantity", 0) for sale in product_sales)
                 avg_daily_sales = total_quantity / days if days > 0 else 0
 
                 velocity_data[product_id] = {

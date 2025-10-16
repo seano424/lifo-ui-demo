@@ -142,7 +142,9 @@ class UnifiedScoringPersistenceOptimized:
                     self.logger.warning(
                         "Multi-value INSERT failed, falling back to REST API",
                         total_items=total_items,
-                        insert_error=result.get("errors", ["Unknown error"])[0] if result.get("errors") else "Unknown",
+                        insert_error=result.get("errors", ["Unknown error"])[0]
+                        if result.get("errors")
+                        else "Unknown",
                     )
                     result = await self._persist_via_rest_chunked_legacy(
                         results, store_id, start_time
@@ -158,7 +160,9 @@ class UnifiedScoringPersistenceOptimized:
                 self.logger.warning(
                     "Multi-value INSERT failed, falling back to REST API",
                     total_items=total_items,
-                    insert_error=result.get("errors", ["Unknown error"])[0] if result.get("errors") else "Unknown",
+                    insert_error=result.get("errors", ["Unknown error"])[0]
+                    if result.get("errors")
+                    else "Unknown",
                 )
                 result = await self._persist_via_rest_chunked_legacy(
                     results, store_id, start_time
@@ -493,7 +497,13 @@ class UnifiedScoringPersistenceOptimized:
             await conn.copy_records_to_table(
                 staging_table,
                 records=records,
-                columns=["batch_id", "store_id", "recommended_action", "ai_score", "notes"],
+                columns=[
+                    "batch_id",
+                    "store_id",
+                    "recommended_action",
+                    "ai_score",
+                    "notes",
+                ],
             )
 
             # Single INSERT...SELECT to move data to final table

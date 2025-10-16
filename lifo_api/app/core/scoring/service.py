@@ -355,17 +355,21 @@ class ScoringService:
                     }
 
                     # Evaluate donation recommendation
-                    donation_recommendation = donation_engine.evaluate_action_recommendation(
-                        batch_data=donation_batch_data,
-                        ai_score=composite_score,
-                        store_donation_config=store_donation_config,
+                    donation_recommendation = (
+                        donation_engine.evaluate_action_recommendation(
+                            batch_data=donation_batch_data,
+                            ai_score=composite_score,
+                            store_donation_config=store_donation_config,
+                        )
                     )
 
                     self.logger.info(
                         "Donation engine evaluated",
                         batch_id=batch_data["batch_id"],
                         donation_action=donation_recommendation.recommended_action.value,
-                        store_strategy=store_donation_config.get("strategy", "balanced"),
+                        store_strategy=store_donation_config.get(
+                            "strategy", "balanced"
+                        ),
                         ai_score=composite_score,
                     )
 
@@ -378,19 +382,25 @@ class ScoringService:
                     donation_recommendation = None
 
             # Choose recommendation source: donation engine or default discount logic
-            if donation_recommendation and donation_recommendation.recommended_action.value in [
-                "donate",
-                "discount",
-                "dispose",
-                "maintain",
-            ]:
+            if (
+                donation_recommendation
+                and donation_recommendation.recommended_action.value
+                in [
+                    "donate",
+                    "discount",
+                    "dispose",
+                    "maintain",
+                ]
+            ):
                 # Use donation engine's recommendation with user-facing reasoning
                 recommendation = {
                     "action": donation_recommendation.recommended_action.value,
                     "discount_percent": 0,  # Will be calculated below if needed
                     "urgency": donation_recommendation.priority.value,
                     "reason": donation_recommendation.notes,  # EU-compliant reasoning
-                    "priority": 1 if donation_recommendation.priority.value == "critical" else 2,
+                    "priority": 1
+                    if donation_recommendation.priority.value == "critical"
+                    else 2,
                     "decision_factors": donation_recommendation.decision_factors,
                 }
 
@@ -555,7 +565,9 @@ class ScoringService:
             self.performance_monitor.log_milestone(
                 "donation_config_retrieved",
                 donation_enabled=store_donation_config is not None,
-                strategy=store_donation_config.get("strategy") if store_donation_config else None,
+                strategy=store_donation_config.get("strategy")
+                if store_donation_config
+                else None,
             )
 
             # STEP 5: In-memory scoring for all batches (with optional donation integration)
