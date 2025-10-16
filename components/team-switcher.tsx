@@ -23,7 +23,11 @@ import { MapPin, Settings, Store as StoreIcon } from 'lucide-react'
 import { Button } from './ui/button'
 import { Skeleton } from './ui/skeleton'
 
-export function TeamSwitcher() {
+interface TeamSwitcherProps {
+  compact?: boolean
+}
+
+export function TeamSwitcher({ compact = false }: TeamSwitcherProps) {
   const { isMobile } = useSidebar()
   const { userStores, isLoading } = useUserStores()
   const { switchStore, isChangingStore } = useStoreActions()
@@ -86,14 +90,23 @@ export function TeamSwitcher() {
               <Button
                 disabled={isChangingStore}
                 variant="outline"
-                className="flex items-center gap-2"
+                className={cn(
+                  'flex items-center gap-2',
+                  compact && 'px-2 w-auto md:px-3 md:w-auto',
+                )}
               >
                 <StoreIcon className="w-4 h-4" />
-                {activeStore?.store_name || 'No store selected'}
+                {compact ? (
+                  <span className="hidden sm:inline">
+                    {activeStore?.store_name || 'No store selected'}
+                  </span>
+                ) : (
+                  activeStore?.store_name || 'No store selected'
+                )}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent
-              className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-2xl"
+              className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-2xl mr-1"
               align="start"
               side={isMobile ? 'bottom' : 'right'}
               sideOffset={4}

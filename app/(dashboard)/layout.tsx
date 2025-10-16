@@ -1,7 +1,7 @@
-import { Button } from '@/components/ui/button'
 import { AppSidebar } from '@/components/app-sidebar'
 import DashboardBreadcrumbs from '@/components/dashboard/dashboard-breadcrumbs'
 import { TeamSwitcher } from '@/components/team-switcher'
+import { Button } from '@/components/ui/button'
 import { CompactLanguageSwitcher } from '@/components/ui/compact-language-switcher'
 import { Separator } from '@/components/ui/separator'
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
@@ -33,9 +33,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
                 <BellIcon className="w-4 h-4" />
               </Button>
 
-              <div className="hidden md:block">
-                <TeamSwitcher />
-              </div>
+              <TeamSwitcher compact />
               <UserButton />
             </div>
           </header>
