@@ -1,9 +1,5 @@
 'use client'
 
-import { ChevronRight, type LucideIcon } from 'lucide-react'
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { useEffect, useState } from 'react'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import {
   SidebarGroup,
@@ -17,33 +13,22 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar'
 import { cn } from '@/lib/utils'
+import { ChevronRight, type LucideIcon } from 'lucide-react'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import { useEffect, useState } from 'react'
 import { Typography } from './ui/typography'
+
+import { NotificationCount } from '@/components/notifications/notification-count'
 
 // Badge component for navigation items
 function NavBadge({ count, className }: { count: number; className?: string }) {
-  if (count <= 0) return null
-
   return (
-    <>
-      {/* Badge for expanded sidebar */}
-      <span
-        className={cn(
-          'ml-auto flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary-900 text-xs font-medium text-white',
-          'group-data-[collapsible=icon]:hidden',
-          count > 9 && 'w-6', // Make wider for double digits
-          className,
-        )}
-      >
-        {count > 99 ? '99+' : count}
-      </span>
-      {/* Small dot indicator for collapsed sidebar */}
-      <span
-        className={cn(
-          'absolute -top-0.5 -right-0.5 h-3 w-3 rounded-full bg-red-500',
-          'hidden group-data-[collapsible=icon]:block',
-        )}
-      />
-    </>
+    <NotificationCount
+      count={count}
+      variant="sidebar"
+      className={cn('ml-auto shrink-0', className)}
+    />
   )
 }
 
