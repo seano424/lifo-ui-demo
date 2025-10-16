@@ -1,0 +1,195 @@
+{
+  "termspage": {
+    "title": "Terms and Conditions",
+    "lastUpdated": "Last Updated: October 16, 2025",
+    "metadata": {
+      "title": "Terms and Conditions | LIFO.AI",
+      "description": "Terms of Service and Privacy Policy for LIFO.AI food waste management platform"
+    },
+    "section1": {
+      "title": "1. Acceptance of Terms",
+      "content": "By creating an account and using the LIFO application and website (collectively, the \"Service\"), you agree to be bound by these Terms and Conditions, including our privacy practices described herein. If you do not agree to these terms, please do not use the Service."
+    },
+    "section2": {
+      "title": "2. Description of Service",
+      "content": "LIFO provides batch-level inventory management software designed to help retail stores track product expiration dates, reduce food waste, and optimize discount and donation decisions through image recognition technology and data analytics."
+    },
+    "section3": {
+      "title": "3. User Accounts",
+      "intro": "You are responsible for:",
+      "items": [
+        "Providing accurate information during registration",
+        "Maintaining the security of your account credentials",
+        "All activities that occur under your account",
+        "Notifying us immediately of any unauthorized access"
+      ],
+      "outro": "We may assign different user roles (admin, manager, employee) with varying access levels to support your store operations."
+    },
+    "section4": {
+      "title": "4. Data Collection and Use",
+      "whatWeCollect": {
+        "title": "What Data We Collect:",
+        "items": [
+          "Account information (name, email, store details, user role)",
+          "Inventory data (product names, batch numbers, expiration dates, quantities)",
+          "Product images captured through scanning (processed for expiration date recognition)",
+          "Usage data (actions taken, scan timestamps, discount/donation decisions)",
+          "Device information (browser type, operating system, IP address)"
+        ]
+      },
+      "howWeUse": {
+        "title": "How We Use Your Data:",
+        "items": [
+          "To provide and maintain the Service functionality",
+          "To generate discount and donation recommendations",
+          "To create analytics dashboards showing inventory value and waste metrics",
+          "To improve our image recognition algorithms",
+          "To communicate important Service updates",
+          "To ensure compliance with food waste regulations"
+        ]
+      },
+      "legalBasis": {
+        "title": "Legal Basis (GDPR):",
+        "intro": "We process your data based on:",
+        "items": [
+          "Performance of contract (providing the Service you signed up for)",
+          "Legitimate interests (improving our Service, preventing fraud)",
+          "Your consent (where explicitly requested)"
+        ]
+      }
+    },
+    "section5": {
+      "title": "5. Data Ownership and Storage",
+      "yourData": {
+        "title": "Your Data:",
+        "content": "You retain full ownership of all data you input into the Service. Your data is stored securely on servers located in the European Union and is encrypted both in transit and at rest."
+      },
+      "dataRetention": {
+        "title": "Data Retention:",
+        "content": "We retain your data for as long as your account remains active. Upon account deletion, we will delete or anonymize your data within 90 days, except where retention is required by law."
+      }
+    },
+    "section6": {
+      "title": "6. Data Sharing and Third Parties",
+      "intro": "We do not sell your personal data. We may share data only:",
+      "items": [
+        "With service providers who help us operate the Service (cloud hosting, analytics)",
+        "When required by law or legal process",
+        "To protect our rights or prevent fraud",
+        "With your explicit consent"
+      ],
+      "outro": "All third-party processors are contractually bound to GDPR standards."
+    },
+    "section7": {
+      "title": "7. Your Privacy Rights (GDPR)",
+      "intro": "You have the right to:",
+      "items": [
+        "Access your personal data and receive a copy",
+        "Rectify inaccurate or incomplete data",
+        "Delete your data (\"right to be forgotten\")",
+        "Port your data to another service in a structured format",
+        "Object to certain data processing activities",
+        "Restrict processing in specific circumstances",
+        "Withdraw consent at any time where processing is based on consent"
+      ],
+      "contact": "To exercise these rights, contact us at",
+      "email": "contact@lifo-app.com"
+    },
+    "section8": {
+      "title": "8. Cookies and Tracking Technologies",
+      "intro": "We currently use essential cookies necessary for Service functionality (authentication, session management). We may implement additional cookies in the future for:",
+      "items": [
+        "Analytics and performance monitoring",
+        "User preference storage",
+        "Service improvement"
+      ],
+      "outro": "You can control cookie preferences through your browser settings. Disabling essential cookies may limit Service functionality. We will update you if we introduce new cookie types."
+    },
+    "section9": {
+      "title": "9. User Responsibilities",
+      "intro": "You agree to:",
+      "items": [
+        "Use the Service in compliance with all applicable laws and food safety regulations",
+        "Ensure accuracy of expiration dates and product information entered",
+        "Verify product safety independently; LIFO recommendations are advisory only",
+        "Not misuse, disrupt, or attempt to gain unauthorized access to the Service",
+        "Not use the Service for any unlawful or fraudulent purpose",
+        "Maintain appropriate backup systems for critical business data"
+      ]
+    },
+    "section10": {
+      "title": "10. Service Availability and Changes",
+      "content": "We strive to provide reliable service but do not guarantee uninterrupted access. We reserve the right to modify, suspend, or discontinue any aspect of the Service with reasonable notice. Material changes to these Terms will be communicated via email or in-app notification."
+    },
+    "section11": {
+      "title": "11. Intellectual Property",
+      "content": "The Service, including its design, features, image recognition technology, and underlying software, is owned by LIFO and protected by intellectual property laws. You may not copy, modify, reverse engineer, or create derivative works from any part of the Service."
+    },
+    "section12": {
+      "title": "12. Data Security",
+      "intro": "We implement industry-standard security measures including:",
+      "items": [
+        "Encryption of data in transit (TLS/SSL) and at rest",
+        "Regular security audits and vulnerability assessments",
+        "Access controls and authentication mechanisms",
+        "Secure development practices"
+      ],
+      "outro": "However, no system is completely secure. You acknowledge that you provide data at your own risk."
+    },
+    "section13": {
+      "title": "13. Limitation of Liability",
+      "intro": "The Service is provided \"as is\" without warranties of any kind. LIFO is not liable for:",
+      "items": [
+        "Business decisions made based on Service recommendations",
+        "Food safety incidents or regulatory compliance issues",
+        "Loss of data due to technical failures or user error",
+        "Indirect, incidental, consequential, or punitive damages",
+        "Service interruptions or data breaches despite reasonable security measures"
+      ],
+      "outro": "Maximum liability is limited to the amount paid for the Service in the preceding 12 months."
+    },
+    "section14": {
+      "title": "14. Termination",
+      "intro": "Either party may terminate this agreement at any time. Upon termination:",
+      "items": [
+        "Your access to the Service will cease immediately",
+        "You may request export of your data within 30 days",
+        "We will delete your data in accordance with Section 5 and GDPR requirements",
+        "Outstanding fees remain due"
+      ]
+    },
+    "section15": {
+      "title": "15. Data Breach Notification",
+      "content": "In the event of a data breach affecting your personal data, we will notify you and relevant supervisory authorities within 72 hours as required by GDPR, providing information about the nature of the breach and remedial actions taken."
+    },
+    "section16": {
+      "title": "16. International Data Transfers",
+      "intro": "If we transfer data outside the EU, we ensure adequate protection through:",
+      "items": [
+        "Standard Contractual Clauses approved by the EU Commission",
+        "Adequacy decisions",
+        "Other lawful transfer mechanisms under GDPR"
+      ]
+    },
+    "section17": {
+      "title": "17. Children's Privacy",
+      "content": "The Service is not intended for individuals under 16 years of age. We do not knowingly collect data from children."
+    },
+    "section18": {
+      "title": "18. Governing Law and Disputes",
+      "content": "These Terms are governed by the laws of the European Union and the Netherlands. Any disputes shall be resolved in the courts of Amsterdam, Netherlands."
+    },
+    "section19": {
+      "title": "19. Contact Information",
+      "intro": "For questions about these Terms, privacy concerns, or to exercise your GDPR rights:",
+      "email": "Email: contact@lifo-app.com"
+    },
+    "section20": {
+      "title": "20. Supervisory Authority",
+      "content": "You have the right to lodge a complaint with your local data protection authority if you believe we have violated GDPR or your privacy rights."
+    },
+    "finalStatement": {
+      "content": "By using LIFO, you acknowledge that you have read, understood, and agree to be bound by these Terms and Conditions, including our data collection and privacy practices."
+    }
+  }
+}

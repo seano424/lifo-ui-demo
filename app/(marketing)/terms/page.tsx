@@ -1,6 +1,12 @@
+'use client'
+
 import { Typography } from '@/components/ui/typography'
+import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 
 export default function TermsPage() {
+  const t = useTranslations('termspage')
+
   return (
     <main className="min-h-screen py-20 px-4 relative overflow-hidden">
       <div className="max-w-4xl mx-auto relative z-10">
@@ -10,10 +16,10 @@ export default function TermsPage() {
             variant="h1"
             className="text-center text-4xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary-800 via-primary-700 to-secondary-900 mb-6"
           >
-            Terms and Conditions
+            {t('title')}
           </Typography>
           <Typography variant="p" className="text-center text-sm text-muted-foreground">
-            Last Updated: October 16, 2025
+            {t('lastUpdated')}
           </Typography>
         </div>
 
@@ -22,163 +28,84 @@ export default function TermsPage() {
           {/* Section 1 */}
           <section className="space-y-4">
             <Typography variant="h2" className="text-2xl font-bold text-foreground">
-              1. Acceptance of Terms
+              {t('section1.title')}
             </Typography>
             <Typography variant="p" className="text-foreground/80 leading-relaxed">
-              By creating an account and using the LIFO application and website (collectively, the
-              "Service"), you agree to be bound by these Terms and Conditions, including our privacy
-              practices described herein. If you do not agree to these terms, please do not use the
-              Service.
+              {t('section1.content')}
             </Typography>
           </section>
 
           {/* Section 2 */}
           <section className="space-y-4">
             <Typography variant="h2" className="text-2xl font-bold text-foreground">
-              2. Description of Service
+              {t('section2.title')}
             </Typography>
             <Typography variant="p" className="text-foreground/80 leading-relaxed">
-              LIFO provides batch-level inventory management software designed to help retail stores
-              track product expiration dates, reduce food waste, and optimize discount and donation
-              decisions through image recognition technology and data analytics.
+              {t('section2.content')}
             </Typography>
           </section>
 
           {/* Section 3 */}
           <section className="space-y-4">
             <Typography variant="h2" className="text-2xl font-bold text-foreground">
-              3. User Accounts
+              {t('section3.title')}
             </Typography>
             <Typography variant="p" className="text-foreground/80 leading-relaxed">
-              You are responsible for:
+              {t('section3.intro')}
             </Typography>
-            <ul className="space-y-2 ml-6">
-              <li>
-                <Typography variant="p" className="text-foreground/80 leading-relaxed">
-                  • Providing accurate information during registration
-                </Typography>
-              </li>
-              <li>
-                <Typography variant="p" className="text-foreground/80 leading-relaxed">
-                  • Maintaining the security of your account credentials
-                </Typography>
-              </li>
-              <li>
-                <Typography variant="p" className="text-foreground/80 leading-relaxed">
-                  • All activities that occur under your account
-                </Typography>
-              </li>
-              <li>
-                <Typography variant="p" className="text-foreground/80 leading-relaxed">
-                  • Notifying us immediately of any unauthorized access
-                </Typography>
-              </li>
+            <ul className="list-disc list-inside space-y-2 ml-6 text-foreground/80 leading-relaxed">
+              <li>{t('section3.items.0')}</li>
+              <li>{t('section3.items.1')}</li>
+              <li>{t('section3.items.2')}</li>
+              <li>{t('section3.items.3')}</li>
             </ul>
             <Typography variant="p" className="text-foreground/80 leading-relaxed">
-              We may assign different user roles (admin, manager, employee) with varying access
-              levels to support your store operations.
+              {t('section3.outro')}
             </Typography>
           </section>
 
           {/* Section 4 */}
           <section className="space-y-4">
             <Typography variant="h2" className="text-2xl font-bold text-foreground">
-              4. Data Collection and Use
+              {t('section4.title')}
             </Typography>
             <div className="space-y-4">
               <div>
                 <Typography variant="h3" className="text-lg font-semibold text-foreground mb-2">
-                  What Data We Collect:
+                  {t('section4.whatWeCollect.title')}
                 </Typography>
-                <ul className="space-y-2 ml-6">
-                  <li>
-                    <Typography variant="p" className="text-foreground/80 leading-relaxed">
-                      • Account information (name, email, store details, user role)
-                    </Typography>
-                  </li>
-                  <li>
-                    <Typography variant="p" className="text-foreground/80 leading-relaxed">
-                      • Inventory data (product names, batch numbers, expiration dates, quantities)
-                    </Typography>
-                  </li>
-                  <li>
-                    <Typography variant="p" className="text-foreground/80 leading-relaxed">
-                      • Product images captured through scanning (processed for expiration date
-                      recognition)
-                    </Typography>
-                  </li>
-                  <li>
-                    <Typography variant="p" className="text-foreground/80 leading-relaxed">
-                      • Usage data (actions taken, scan timestamps, discount/donation decisions)
-                    </Typography>
-                  </li>
-                  <li>
-                    <Typography variant="p" className="text-foreground/80 leading-relaxed">
-                      • Device information (browser type, operating system, IP address)
-                    </Typography>
-                  </li>
+                <ul className="list-disc list-inside space-y-2 ml-6 text-foreground/80 leading-relaxed">
+                  <li>{t('section4.whatWeCollect.items.0')}</li>
+                  <li>{t('section4.whatWeCollect.items.1')}</li>
+                  <li>{t('section4.whatWeCollect.items.2')}</li>
+                  <li>{t('section4.whatWeCollect.items.3')}</li>
+                  <li>{t('section4.whatWeCollect.items.4')}</li>
                 </ul>
               </div>
               <div>
                 <Typography variant="h3" className="text-lg font-semibold text-foreground mb-2">
-                  How We Use Your Data:
+                  {t('section4.howWeUse.title')}
                 </Typography>
-                <ul className="space-y-2 ml-6">
-                  <li>
-                    <Typography variant="p" className="text-foreground/80 leading-relaxed">
-                      • To provide and maintain the Service functionality
-                    </Typography>
-                  </li>
-                  <li>
-                    <Typography variant="p" className="text-foreground/80 leading-relaxed">
-                      • To generate discount and donation recommendations
-                    </Typography>
-                  </li>
-                  <li>
-                    <Typography variant="p" className="text-foreground/80 leading-relaxed">
-                      • To create analytics dashboards showing inventory value and waste metrics
-                    </Typography>
-                  </li>
-                  <li>
-                    <Typography variant="p" className="text-foreground/80 leading-relaxed">
-                      • To improve our image recognition algorithms
-                    </Typography>
-                  </li>
-                  <li>
-                    <Typography variant="p" className="text-foreground/80 leading-relaxed">
-                      • To communicate important Service updates
-                    </Typography>
-                  </li>
-                  <li>
-                    <Typography variant="p" className="text-foreground/80 leading-relaxed">
-                      • To ensure compliance with food waste regulations
-                    </Typography>
-                  </li>
+                <ul className="list-disc list-inside space-y-2 ml-6 text-foreground/80 leading-relaxed">
+                  <li>{t('section4.howWeUse.items.0')}</li>
+                  <li>{t('section4.howWeUse.items.1')}</li>
+                  <li>{t('section4.howWeUse.items.2')}</li>
+                  <li>{t('section4.howWeUse.items.3')}</li>
+                  <li>{t('section4.howWeUse.items.4')}</li>
+                  <li>{t('section4.howWeUse.items.5')}</li>
                 </ul>
               </div>
               <div>
                 <Typography variant="h3" className="text-lg font-semibold text-foreground mb-2">
-                  Legal Basis (GDPR):
+                  {t('section4.legalBasis.title')}
                 </Typography>
                 <Typography variant="p" className="text-foreground/80 leading-relaxed">
-                  We process your data based on:
+                  {t('section4.legalBasis.intro')}
                 </Typography>
-                <ul className="space-y-2 ml-6">
-                  <li>
-                    <Typography variant="p" className="text-foreground/80 leading-relaxed">
-                      • Performance of contract (providing the Service you signed up for)
-                    </Typography>
-                  </li>
-                  <li>
-                    <Typography variant="p" className="text-foreground/80 leading-relaxed">
-                      • Legitimate interests (improving our Service, preventing fraud)
-                    </Typography>
-                  </li>
-                  <li>
-                    <Typography variant="p" className="text-foreground/80 leading-relaxed">
-                      • Your consent (where explicitly requested)
-                    </Typography>
-                  </li>
+                <ul className="list-disc list-inside space-y-2 ml-6 text-foreground/80 leading-relaxed">
+                  <li>{t('section4.legalBasis.items.0')}</li>
+                  <li>{t('section4.legalBasis.items.1')}</li>
+                  <li>{t('section4.legalBasis.items.2')}</li>
                 </ul>
               </div>
             </div>
@@ -187,27 +114,23 @@ export default function TermsPage() {
           {/* Section 5 */}
           <section className="space-y-4">
             <Typography variant="h2" className="text-2xl font-bold text-foreground">
-              5. Data Ownership and Storage
+              {t('section5.title')}
             </Typography>
             <div className="space-y-4">
               <div>
                 <Typography variant="h3" className="text-lg font-semibold text-foreground mb-2">
-                  Your Data:
+                  {t('section5.yourData.title')}
                 </Typography>
                 <Typography variant="p" className="text-foreground/80 leading-relaxed">
-                  You retain full ownership of all data you input into the Service. Your data is
-                  stored securely on servers located in the European Union and is encrypted both in
-                  transit and at rest.
+                  {t('section5.yourData.content')}
                 </Typography>
               </div>
               <div>
                 <Typography variant="h3" className="text-lg font-semibold text-foreground mb-2">
-                  Data Retention:
+                  {t('section5.dataRetention.title')}
                 </Typography>
                 <Typography variant="p" className="text-foreground/80 leading-relaxed">
-                  We retain your data for as long as your account remains active. Upon account
-                  deletion, we will delete or anonymize your data within 90 days, except where
-                  retention is required by law.
+                  {t('section5.dataRetention.content')}
                 </Typography>
               </div>
             </div>
@@ -216,92 +139,47 @@ export default function TermsPage() {
           {/* Section 6 */}
           <section className="space-y-4">
             <Typography variant="h2" className="text-2xl font-bold text-foreground">
-              6. Data Sharing and Third Parties
+              {t('section6.title')}
             </Typography>
             <Typography variant="p" className="text-foreground/80 leading-relaxed">
-              We do not sell your personal data. We may share data only:
+              {t('section6.intro')}
             </Typography>
-            <ul className="space-y-2 ml-6">
-              <li>
-                <Typography variant="p" className="text-foreground/80 leading-relaxed">
-                  • With service providers who help us operate the Service (cloud hosting,
-                  analytics)
-                </Typography>
-              </li>
-              <li>
-                <Typography variant="p" className="text-foreground/80 leading-relaxed">
-                  • When required by law or legal process
-                </Typography>
-              </li>
-              <li>
-                <Typography variant="p" className="text-foreground/80 leading-relaxed">
-                  • To protect our rights or prevent fraud
-                </Typography>
-              </li>
-              <li>
-                <Typography variant="p" className="text-foreground/80 leading-relaxed">
-                  • With your explicit consent
-                </Typography>
-              </li>
+            <ul className="list-disc list-inside space-y-2 ml-6 text-foreground/80 leading-relaxed">
+              <li>{t('section6.items.0')}</li>
+              <li>{t('section6.items.1')}</li>
+              <li>{t('section6.items.2')}</li>
+              <li>{t('section6.items.3')}</li>
             </ul>
             <Typography variant="p" className="text-foreground/80 leading-relaxed">
-              All third-party processors are contractually bound to GDPR standards.
+              {t('section6.outro')}
             </Typography>
           </section>
 
           {/* Section 7 */}
           <section className="space-y-4">
             <Typography variant="h2" className="text-2xl font-bold text-foreground">
-              7. Your Privacy Rights (GDPR)
+              {t('section7.title')}
             </Typography>
             <Typography variant="p" className="text-foreground/80 leading-relaxed">
-              You have the right to:
+              {t('section7.intro')}
             </Typography>
-            <ul className="space-y-2 ml-6">
-              <li>
-                <Typography variant="p" className="text-foreground/80 leading-relaxed">
-                  • Access your personal data and receive a copy
-                </Typography>
-              </li>
-              <li>
-                <Typography variant="p" className="text-foreground/80 leading-relaxed">
-                  • Rectify inaccurate or incomplete data
-                </Typography>
-              </li>
-              <li>
-                <Typography variant="p" className="text-foreground/80 leading-relaxed">
-                  • Delete your data ("right to be forgotten")
-                </Typography>
-              </li>
-              <li>
-                <Typography variant="p" className="text-foreground/80 leading-relaxed">
-                  • Port your data to another service in a structured format
-                </Typography>
-              </li>
-              <li>
-                <Typography variant="p" className="text-foreground/80 leading-relaxed">
-                  • Object to certain data processing activities
-                </Typography>
-              </li>
-              <li>
-                <Typography variant="p" className="text-foreground/80 leading-relaxed">
-                  • Restrict processing in specific circumstances
-                </Typography>
-              </li>
-              <li>
-                <Typography variant="p" className="text-foreground/80 leading-relaxed">
-                  • Withdraw consent at any time where processing is based on consent
-                </Typography>
-              </li>
+            <ul className="list-disc list-inside space-y-2 ml-6 text-foreground/80 leading-relaxed">
+              <li>{t('section7.items.0')}</li>
+              <li>{t('section7.items.1')}</li>
+              <li>{t('section7.items.2')}</li>
+              <li>{t('section7.items.3')}</li>
+              <li>{t('section7.items.4')}</li>
+              <li>{t('section7.items.5')}</li>
+              <li>{t('section7.items.6')}</li>
             </ul>
             <Typography variant="p" className="text-foreground/80 leading-relaxed">
-              To exercise these rights, contact us at{' '}
-              <a
-                href="mailto:contact@lifo-app.com"
+              {t('section7.contact')}{' '}
+              <Link
+                href={`mailto:${t('section7.email')}`}
                 className="text-primary-700 hover:text-primary-600 underline"
               >
-                contact@lifo-app.com
-              </a>
+                {t('section7.email')}
+              </Link>
               .
             </Typography>
           </section>
@@ -309,312 +187,192 @@ export default function TermsPage() {
           {/* Section 8 */}
           <section className="space-y-4">
             <Typography variant="h2" className="text-2xl font-bold text-foreground">
-              8. Cookies and Tracking Technologies
+              {t('section8.title')}
             </Typography>
             <Typography variant="p" className="text-foreground/80 leading-relaxed">
-              We currently use essential cookies necessary for Service functionality
-              (authentication, session management). We may implement additional cookies in the
-              future for:
+              {t('section8.intro')}
             </Typography>
-            <ul className="space-y-2 ml-6">
-              <li>
-                <Typography variant="p" className="text-foreground/80 leading-relaxed">
-                  • Analytics and performance monitoring
-                </Typography>
-              </li>
-              <li>
-                <Typography variant="p" className="text-foreground/80 leading-relaxed">
-                  • User preference storage
-                </Typography>
-              </li>
-              <li>
-                <Typography variant="p" className="text-foreground/80 leading-relaxed">
-                  • Service improvement
-                </Typography>
-              </li>
+            <ul className="list-disc list-inside space-y-2 ml-6 text-foreground/80 leading-relaxed">
+              <li>{t('section8.items.0')}</li>
+              <li>{t('section8.items.1')}</li>
+              <li>{t('section8.items.2')}</li>
             </ul>
             <Typography variant="p" className="text-foreground/80 leading-relaxed">
-              You can control cookie preferences through your browser settings. Disabling essential
-              cookies may limit Service functionality. We will update you if we introduce new cookie
-              types.
+              {t('section8.outro')}
             </Typography>
           </section>
 
           {/* Section 9 */}
           <section className="space-y-4">
             <Typography variant="h2" className="text-2xl font-bold text-foreground">
-              9. User Responsibilities
+              {t('section9.title')}
             </Typography>
             <Typography variant="p" className="text-foreground/80 leading-relaxed">
-              You agree to:
+              {t('section9.intro')}
             </Typography>
-            <ul className="space-y-2 ml-6">
-              <li>
-                <Typography variant="p" className="text-foreground/80 leading-relaxed">
-                  • Use the Service in compliance with all applicable laws and food safety
-                  regulations
-                </Typography>
-              </li>
-              <li>
-                <Typography variant="p" className="text-foreground/80 leading-relaxed">
-                  • Ensure accuracy of expiration dates and product information entered
-                </Typography>
-              </li>
-              <li>
-                <Typography variant="p" className="text-foreground/80 leading-relaxed">
-                  • Verify product safety independently; LIFO recommendations are advisory only
-                </Typography>
-              </li>
-              <li>
-                <Typography variant="p" className="text-foreground/80 leading-relaxed">
-                  • Not misuse, disrupt, or attempt to gain unauthorized access to the Service
-                </Typography>
-              </li>
-              <li>
-                <Typography variant="p" className="text-foreground/80 leading-relaxed">
-                  • Not use the Service for any unlawful or fraudulent purpose
-                </Typography>
-              </li>
-              <li>
-                <Typography variant="p" className="text-foreground/80 leading-relaxed">
-                  • Maintain appropriate backup systems for critical business data
-                </Typography>
-              </li>
+            <ul className="list-disc list-inside space-y-2 ml-6 text-foreground/80 leading-relaxed">
+              <li>{t('section9.items.0')}</li>
+              <li>{t('section9.items.1')}</li>
+              <li>{t('section9.items.2')}</li>
+              <li>{t('section9.items.3')}</li>
+              <li>{t('section9.items.4')}</li>
+              <li>{t('section9.items.5')}</li>
             </ul>
           </section>
 
           {/* Section 10 */}
           <section className="space-y-4">
             <Typography variant="h2" className="text-2xl font-bold text-foreground">
-              10. Service Availability and Changes
+              {t('section10.title')}
             </Typography>
             <Typography variant="p" className="text-foreground/80 leading-relaxed">
-              We strive to provide reliable service but do not guarantee uninterrupted access. We
-              reserve the right to modify, suspend, or discontinue any aspect of the Service with
-              reasonable notice. Material changes to these Terms will be communicated via email or
-              in-app notification.
+              {t('section10.content')}
             </Typography>
           </section>
 
           {/* Section 11 */}
           <section className="space-y-4">
             <Typography variant="h2" className="text-2xl font-bold text-foreground">
-              11. Intellectual Property
+              {t('section11.title')}
             </Typography>
             <Typography variant="p" className="text-foreground/80 leading-relaxed">
-              The Service, including its design, features, image recognition technology, and
-              underlying software, is owned by LIFO and protected by intellectual property laws. You
-              may not copy, modify, reverse engineer, or create derivative works from any part of
-              the Service.
+              {t('section11.content')}
             </Typography>
           </section>
 
           {/* Section 12 */}
           <section className="space-y-4">
             <Typography variant="h2" className="text-2xl font-bold text-foreground">
-              12. Data Security
+              {t('section12.title')}
             </Typography>
             <Typography variant="p" className="text-foreground/80 leading-relaxed">
-              We implement industry-standard security measures including:
+              {t('section12.intro')}
             </Typography>
-            <ul className="space-y-2 ml-6">
-              <li>
-                <Typography variant="p" className="text-foreground/80 leading-relaxed">
-                  • Encryption of data in transit (TLS/SSL) and at rest
-                </Typography>
-              </li>
-              <li>
-                <Typography variant="p" className="text-foreground/80 leading-relaxed">
-                  • Regular security audits and vulnerability assessments
-                </Typography>
-              </li>
-              <li>
-                <Typography variant="p" className="text-foreground/80 leading-relaxed">
-                  • Access controls and authentication mechanisms
-                </Typography>
-              </li>
-              <li>
-                <Typography variant="p" className="text-foreground/80 leading-relaxed">
-                  • Secure development practices
-                </Typography>
-              </li>
+            <ul className="list-disc list-inside space-y-2 ml-6 text-foreground/80 leading-relaxed">
+              <li>{t('section12.items.0')}</li>
+              <li>{t('section12.items.1')}</li>
+              <li>{t('section12.items.2')}</li>
+              <li>{t('section12.items.3')}</li>
             </ul>
             <Typography variant="p" className="text-foreground/80 leading-relaxed">
-              However, no system is completely secure. You acknowledge that you provide data at your
-              own risk.
+              {t('section12.outro')}
             </Typography>
           </section>
 
           {/* Section 13 */}
           <section className="space-y-4">
             <Typography variant="h2" className="text-2xl font-bold text-foreground">
-              13. Limitation of Liability
+              {t('section13.title')}
             </Typography>
             <Typography variant="p" className="text-foreground/80 leading-relaxed">
-              The Service is provided "as is" without warranties of any kind. LIFO is not liable
-              for:
+              {t('section13.intro')}
             </Typography>
-            <ul className="space-y-2 ml-6">
-              <li>
-                <Typography variant="p" className="text-foreground/80 leading-relaxed">
-                  • Business decisions made based on Service recommendations
-                </Typography>
-              </li>
-              <li>
-                <Typography variant="p" className="text-foreground/80 leading-relaxed">
-                  • Food safety incidents or regulatory compliance issues
-                </Typography>
-              </li>
-              <li>
-                <Typography variant="p" className="text-foreground/80 leading-relaxed">
-                  • Loss of data due to technical failures or user error
-                </Typography>
-              </li>
-              <li>
-                <Typography variant="p" className="text-foreground/80 leading-relaxed">
-                  • Indirect, incidental, consequential, or punitive damages
-                </Typography>
-              </li>
-              <li>
-                <Typography variant="p" className="text-foreground/80 leading-relaxed">
-                  • Service interruptions or data breaches despite reasonable security measures
-                </Typography>
-              </li>
+            <ul className="list-disc list-inside space-y-2 ml-6 text-foreground/80 leading-relaxed">
+              <li>{t('section13.items.0')}</li>
+              <li>{t('section13.items.1')}</li>
+              <li>{t('section13.items.2')}</li>
+              <li>{t('section13.items.3')}</li>
+              <li>{t('section13.items.4')}</li>
             </ul>
             <Typography variant="p" className="text-foreground/80 leading-relaxed">
-              Maximum liability is limited to the amount paid for the Service in the preceding 12
-              months.
+              {t('section13.outro')}
             </Typography>
           </section>
 
           {/* Section 14 */}
           <section className="space-y-4">
             <Typography variant="h2" className="text-2xl font-bold text-foreground">
-              14. Termination
+              {t('section14.title')}
             </Typography>
             <Typography variant="p" className="text-foreground/80 leading-relaxed">
-              Either party may terminate this agreement at any time. Upon termination:
+              {t('section14.intro')}
             </Typography>
-            <ul className="space-y-2 ml-6">
-              <li>
-                <Typography variant="p" className="text-foreground/80 leading-relaxed">
-                  • Your access to the Service will cease immediately
-                </Typography>
-              </li>
-              <li>
-                <Typography variant="p" className="text-foreground/80 leading-relaxed">
-                  • You may request export of your data within 30 days
-                </Typography>
-              </li>
-              <li>
-                <Typography variant="p" className="text-foreground/80 leading-relaxed">
-                  • We will delete your data in accordance with Section 5 and GDPR requirements
-                </Typography>
-              </li>
-              <li>
-                <Typography variant="p" className="text-foreground/80 leading-relaxed">
-                  • Outstanding fees remain due
-                </Typography>
-              </li>
+            <ul className="list-disc list-inside space-y-2 ml-6 text-foreground/80 leading-relaxed">
+              <li>{t('section14.items.0')}</li>
+              <li>{t('section14.items.1')}</li>
+              <li>{t('section14.items.2')}</li>
+              <li>{t('section14.items.3')}</li>
             </ul>
           </section>
 
           {/* Section 15 */}
           <section className="space-y-4">
             <Typography variant="h2" className="text-2xl font-bold text-foreground">
-              15. Data Breach Notification
+              {t('section15.title')}
             </Typography>
             <Typography variant="p" className="text-foreground/80 leading-relaxed">
-              In the event of a data breach affecting your personal data, we will notify you and
-              relevant supervisory authorities within 72 hours as required by GDPR, providing
-              information about the nature of the breach and remedial actions taken.
+              {t('section15.content')}
             </Typography>
           </section>
 
           {/* Section 16 */}
           <section className="space-y-4">
             <Typography variant="h2" className="text-2xl font-bold text-foreground">
-              16. International Data Transfers
+              {t('section16.title')}
             </Typography>
             <Typography variant="p" className="text-foreground/80 leading-relaxed">
-              If we transfer data outside the EU, we ensure adequate protection through:
+              {t('section16.intro')}
             </Typography>
-            <ul className="space-y-2 ml-6">
-              <li>
-                <Typography variant="p" className="text-foreground/80 leading-relaxed">
-                  • Standard Contractual Clauses approved by the EU Commission
-                </Typography>
-              </li>
-              <li>
-                <Typography variant="p" className="text-foreground/80 leading-relaxed">
-                  • Adequacy decisions
-                </Typography>
-              </li>
-              <li>
-                <Typography variant="p" className="text-foreground/80 leading-relaxed">
-                  • Other lawful transfer mechanisms under GDPR
-                </Typography>
-              </li>
+            <ul className="list-disc list-inside space-y-2 ml-6 text-foreground/80 leading-relaxed">
+              <li>{t('section16.items.0')}</li>
+              <li>{t('section16.items.1')}</li>
+              <li>{t('section16.items.2')}</li>
             </ul>
           </section>
 
           {/* Section 17 */}
           <section className="space-y-4">
             <Typography variant="h2" className="text-2xl font-bold text-foreground">
-              17. Children's Privacy
+              {t('section17.title')}
             </Typography>
             <Typography variant="p" className="text-foreground/80 leading-relaxed">
-              The Service is not intended for individuals under 16 years of age. We do not knowingly
-              collect data from children.
+              {t('section17.content')}
             </Typography>
           </section>
 
           {/* Section 18 */}
           <section className="space-y-4">
             <Typography variant="h2" className="text-2xl font-bold text-foreground">
-              18. Governing Law and Disputes
+              {t('section18.title')}
             </Typography>
             <Typography variant="p" className="text-foreground/80 leading-relaxed">
-              These Terms are governed by the laws of the European Union and the Netherlands. Any
-              disputes shall be resolved in the courts of Amsterdam, Netherlands.
+              {t('section18.content')}
             </Typography>
           </section>
 
           {/* Section 19 */}
           <section className="space-y-4">
             <Typography variant="h2" className="text-2xl font-bold text-foreground">
-              19. Contact Information
+              {t('section19.title')}
             </Typography>
             <Typography variant="p" className="text-foreground/80 leading-relaxed">
-              For questions about these Terms, privacy concerns, or to exercise your GDPR rights:
+              {t('section19.intro')}
             </Typography>
             <Typography variant="p" className="text-foreground/80 leading-relaxed">
-              Email:{' '}
-              <a
-                href="mailto:contact@lifo-app.com"
+              {t('section19.email').replace('Email: ', '')}
+              <Link
+                href={`mailto:${t('section7.email')}`}
                 className="text-primary-700 hover:text-primary-600 underline"
               >
-                contact@lifo-app.com
-              </a>
+                {t('section7.email')}
+              </Link>
             </Typography>
           </section>
 
           {/* Section 20 */}
           <section className="space-y-4">
             <Typography variant="h2" className="text-2xl font-bold text-foreground">
-              20. Supervisory Authority
+              {t('section20.title')}
             </Typography>
             <Typography variant="p" className="text-foreground/80 leading-relaxed">
-              You have the right to lodge a complaint with your local data protection authority if
-              you believe we have violated GDPR or your privacy rights.
+              {t('section20.content')}
             </Typography>
           </section>
 
           {/* Final Statement */}
           <section className="pt-6 border-t border-foreground/10">
             <Typography variant="p" className="text-foreground/80 leading-relaxed italic">
-              By using LIFO, you acknowledge that you have read, understood, and agree to be bound
-              by these Terms and Conditions, including our data collection and privacy practices.
+              {t('finalStatement.content')}
             </Typography>
           </section>
         </div>

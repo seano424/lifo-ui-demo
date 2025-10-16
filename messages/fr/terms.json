@@ -1,0 +1,195 @@
+{
+  "termspage": {
+    "title": "Conditions Générales",
+    "lastUpdated": "Dernière mise à jour : 16 octobre 2025",
+    "metadata": {
+      "title": "Conditions Générales | LIFO.AI",
+      "description": "Conditions d'utilisation et politique de confidentialité pour la plateforme de gestion du gaspillage alimentaire LIFO.AI"
+    },
+    "section1": {
+      "title": "1. Acceptation des Conditions",
+      "content": "En créant un compte et en utilisant l'application et le site web LIFO (collectivement, le \"Service\"), vous acceptez d'être lié par ces Conditions Générales, y compris nos pratiques de confidentialité décrites ci-après. Si vous n'acceptez pas ces conditions, veuillez ne pas utiliser le Service."
+    },
+    "section2": {
+      "title": "2. Description du Service",
+      "content": "LIFO fournit un logiciel de gestion des stocks au niveau des lots conçu pour aider les magasins de détail à suivre les dates de péremption des produits, à réduire le gaspillage alimentaire et à optimiser les décisions de réduction et de don grâce à la technologie de reconnaissance d'images et à l'analyse de données."
+    },
+    "section3": {
+      "title": "3. Comptes Utilisateurs",
+      "intro": "Vous êtes responsable de :",
+      "items": [
+        "Fournir des informations exactes lors de l'inscription",
+        "Maintenir la sécurité de vos identifiants de compte",
+        "Toutes les activités qui se produisent sous votre compte",
+        "Nous informer immédiatement de tout accès non autorisé"
+      ],
+      "outro": "Nous pouvons attribuer différents rôles d'utilisateur (administrateur, gestionnaire, employé) avec des niveaux d'accès variables pour soutenir les opérations de votre magasin."
+    },
+    "section4": {
+      "title": "4. Collecte et Utilisation des Données",
+      "whatWeCollect": {
+        "title": "Quelles données nous collectons :",
+        "items": [
+          "Informations de compte (nom, e-mail, détails du magasin, rôle d'utilisateur)",
+          "Données d'inventaire (noms de produits, numéros de lot, dates de péremption, quantités)",
+          "Images de produits capturées par numérisation (traitées pour la reconnaissance des dates de péremption)",
+          "Données d'utilisation (actions effectuées, horodatages des numérisations, décisions de réduction/don)",
+          "Informations sur l'appareil (type de navigateur, système d'exploitation, adresse IP)"
+        ]
+      },
+      "howWeUse": {
+        "title": "Comment nous utilisons vos données :",
+        "items": [
+          "Pour fournir et maintenir la fonctionnalité du Service",
+          "Pour générer des recommandations de réduction et de don",
+          "Pour créer des tableaux de bord analytiques montrant la valeur des stocks et les indicateurs de gaspillage",
+          "Pour améliorer nos algorithmes de reconnaissance d'images",
+          "Pour communiquer les mises à jour importantes du Service",
+          "Pour garantir la conformité aux réglementations sur le gaspillage alimentaire"
+        ]
+      },
+      "legalBasis": {
+        "title": "Base légale (RGPD) :",
+        "intro": "Nous traitons vos données sur la base de :",
+        "items": [
+          "Exécution du contrat (fourniture du Service auquel vous vous êtes inscrit)",
+          "Intérêts légitimes (amélioration de notre Service, prévention de la fraude)",
+          "Votre consentement (lorsque explicitement demandé)"
+        ]
+      }
+    },
+    "section5": {
+      "title": "5. Propriété et Stockage des Données",
+      "yourData": {
+        "title": "Vos données :",
+        "content": "Vous conservez la pleine propriété de toutes les données que vous saisissez dans le Service. Vos données sont stockées de manière sécurisée sur des serveurs situés dans l'Union européenne et sont chiffrées à la fois en transit et au repos."
+      },
+      "dataRetention": {
+        "title": "Conservation des données :",
+        "content": "Nous conservons vos données tant que votre compte reste actif. Lors de la suppression du compte, nous supprimerons ou anonymiserons vos données dans les 90 jours, sauf si la conservation est requise par la loi."
+      }
+    },
+    "section6": {
+      "title": "6. Partage des Données et Tiers",
+      "intro": "Nous ne vendons pas vos données personnelles. Nous ne pouvons partager des données que :",
+      "items": [
+        "Avec des fournisseurs de services qui nous aident à exploiter le Service (hébergement cloud, analytique)",
+        "Lorsque requis par la loi ou une procédure judiciaire",
+        "Pour protéger nos droits ou prévenir la fraude",
+        "Avec votre consentement explicite"
+      ],
+      "outro": "Tous les sous-traitants tiers sont contractuellement liés aux normes du RGPD."
+    },
+    "section7": {
+      "title": "7. Vos Droits en Matière de Confidentialité (RGPD)",
+      "intro": "Vous avez le droit de :",
+      "items": [
+        "Accéder à vos données personnelles et en recevoir une copie",
+        "Rectifier des données inexactes ou incomplètes",
+        "Supprimer vos données (« droit à l'oubli »)",
+        "Transférer vos données vers un autre service dans un format structuré",
+        "Vous opposer à certaines activités de traitement des données",
+        "Limiter le traitement dans des circonstances spécifiques",
+        "Retirer votre consentement à tout moment lorsque le traitement est basé sur le consentement"
+      ],
+      "contact": "Pour exercer ces droits, contactez-nous à",
+      "email": "contact@lifo-app.com"
+    },
+    "section8": {
+      "title": "8. Cookies et Technologies de Suivi",
+      "intro": "Nous utilisons actuellement des cookies essentiels nécessaires au fonctionnement du Service (authentification, gestion de session). Nous pourrions mettre en œuvre des cookies supplémentaires à l'avenir pour :",
+      "items": [
+        "L'analyse et la surveillance des performances",
+        "Le stockage des préférences utilisateur",
+        "L'amélioration du Service"
+      ],
+      "outro": "Vous pouvez contrôler les préférences des cookies via les paramètres de votre navigateur. La désactivation des cookies essentiels peut limiter la fonctionnalité du Service. Nous vous informerons si nous introduisons de nouveaux types de cookies."
+    },
+    "section9": {
+      "title": "9. Responsabilités de l'Utilisateur",
+      "intro": "Vous acceptez de :",
+      "items": [
+        "Utiliser le Service conformément à toutes les lois applicables et aux réglementations sur la sécurité alimentaire",
+        "Assurer l'exactitude des dates de péremption et des informations sur les produits saisies",
+        "Vérifier la sécurité des produits de manière indépendante ; les recommandations LIFO sont uniquement consultatives",
+        "Ne pas abuser, perturber ou tenter d'accéder de manière non autorisée au Service",
+        "Ne pas utiliser le Service à des fins illégales ou frauduleuses",
+        "Maintenir des systèmes de sauvegarde appropriés pour les données commerciales critiques"
+      ]
+    },
+    "section10": {
+      "title": "10. Disponibilité et Modifications du Service",
+      "content": "Nous nous efforçons de fournir un service fiable mais ne garantissons pas un accès ininterrompu. Nous nous réservons le droit de modifier, suspendre ou interrompre tout aspect du Service avec un préavis raisonnable. Les modifications importantes de ces Conditions seront communiquées par e-mail ou notification dans l'application."
+    },
+    "section11": {
+      "title": "11. Propriété Intellectuelle",
+      "content": "Le Service, y compris sa conception, ses fonctionnalités, sa technologie de reconnaissance d'images et son logiciel sous-jacent, appartient à LIFO et est protégé par les lois sur la propriété intellectuelle. Vous ne pouvez pas copier, modifier, procéder à l'ingénierie inverse ou créer des œuvres dérivées à partir de toute partie du Service."
+    },
+    "section12": {
+      "title": "12. Sécurité des Données",
+      "intro": "Nous mettons en œuvre des mesures de sécurité conformes aux normes de l'industrie, notamment :",
+      "items": [
+        "Chiffrement des données en transit (TLS/SSL) et au repos",
+        "Audits de sécurité réguliers et évaluations de vulnérabilité",
+        "Contrôles d'accès et mécanismes d'authentification",
+        "Pratiques de développement sécurisées"
+      ],
+      "outro": "Cependant, aucun système n'est totalement sécurisé. Vous reconnaissez que vous fournissez des données à vos propres risques."
+    },
+    "section13": {
+      "title": "13. Limitation de Responsabilité",
+      "intro": "Le Service est fourni « en l'état » sans garanties d'aucune sorte. LIFO n'est pas responsable de :",
+      "items": [
+        "Les décisions commerciales prises sur la base des recommandations du Service",
+        "Les incidents de sécurité alimentaire ou les problèmes de conformité réglementaire",
+        "La perte de données due à des défaillances techniques ou à une erreur de l'utilisateur",
+        "Les dommages indirects, accessoires, consécutifs ou punitifs",
+        "Les interruptions de service ou les violations de données malgré des mesures de sécurité raisonnables"
+      ],
+      "outro": "La responsabilité maximale est limitée au montant payé pour le Service au cours des 12 mois précédents."
+    },
+    "section14": {
+      "title": "14. Résiliation",
+      "intro": "L'une ou l'autre partie peut résilier cet accord à tout moment. Lors de la résiliation :",
+      "items": [
+        "Votre accès au Service cessera immédiatement",
+        "Vous pouvez demander l'exportation de vos données dans les 30 jours",
+        "Nous supprimerons vos données conformément à la Section 5 et aux exigences du RGPD",
+        "Les frais impayés restent dus"
+      ]
+    },
+    "section15": {
+      "title": "15. Notification de Violation de Données",
+      "content": "En cas de violation de données affectant vos données personnelles, nous vous informerons ainsi que les autorités de contrôle compétentes dans les 72 heures comme requis par le RGPD, en fournissant des informations sur la nature de la violation et les mesures correctives prises."
+    },
+    "section16": {
+      "title": "16. Transferts Internationaux de Données",
+      "intro": "Si nous transférons des données en dehors de l'UE, nous assurons une protection adéquate par :",
+      "items": [
+        "Les Clauses Contractuelles Types approuvées par la Commission européenne",
+        "Les décisions d'adéquation",
+        "D'autres mécanismes de transfert légaux en vertu du RGPD"
+      ]
+    },
+    "section17": {
+      "title": "17. Confidentialité des Enfants",
+      "content": "Le Service n'est pas destiné aux personnes de moins de 16 ans. Nous ne collectons pas sciemment de données auprès d'enfants."
+    },
+    "section18": {
+      "title": "18. Loi Applicable et Litiges",
+      "content": "Ces Conditions sont régies par les lois de l'Union européenne et des Pays-Bas. Tout litige sera résolu devant les tribunaux d'Amsterdam, Pays-Bas."
+    },
+    "section19": {
+      "title": "19. Informations de Contact",
+      "intro": "Pour toute question concernant ces Conditions, préoccupations en matière de confidentialité, ou pour exercer vos droits RGPD :",
+      "email": "Email: contact@lifo-app.com"
+    },
+    "section20": {
+      "title": "20. Autorité de Contrôle",
+      "content": "Vous avez le droit de déposer une plainte auprès de votre autorité locale de protection des données si vous estimez que nous avons violé le RGPD ou vos droits à la vie privée."
+    },
+    "finalStatement": {
+      "content": "En utilisant LIFO, vous reconnaissez avoir lu, compris et accepté d'être lié par ces Conditions Générales, y compris nos pratiques de collecte de données et de confidentialité."
+    }
+  }
+}
