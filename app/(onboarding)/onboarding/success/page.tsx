@@ -41,7 +41,7 @@ function SuccessContent() {
             <Typography>
               Didn&#39;t receive the email? Check your spam folder or{' '}
               <a
-                href="mailto:support@lifo.ai?subject=Email Verification Issue"
+                href="mailto:support@lifo-app?subject=Email Verification Issue"
                 className="text-primary hover:underline"
               >
                 contact support

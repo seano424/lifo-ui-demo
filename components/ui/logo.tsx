@@ -48,8 +48,8 @@ export function Logo({ variant = 'vertical', size = 'md', className, darkMode, h
           height={280}
           priority
         />
-        <Typography className="font-black font-heading text-3xl lg:text-4xl" variant="h2">
-          Lifo
+        <Typography className="font-heading font-normal text-3xl lg:text-4xl" variant="h2">
+          LIFO
         </Typography>
       </div>
     )

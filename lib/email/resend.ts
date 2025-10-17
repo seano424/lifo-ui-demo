@@ -245,7 +245,7 @@ function generateWelcomeEmailHTML(credentials: EmailCredentials): string {
         <p><strong>Important :</strong> Gardez vos identifiants en sécurité et ne les partagez avec personne. Votre mot de passe peut être réinitialisé à tout moment par votre responsable.</p>
 
         <div class="footer">
-            <p>Besoin d'aide ? Contactez votre responsable ou <a href="mailto:support@lifo.ai" class="support-link">notre support</a></p>
+            <p>Besoin d'aide ? Contactez votre responsable ou <a href="mailto:support@lifo-app" class="support-link">notre support</a></p>
             <p style="margin: 8px 0 0 0;">© 2025 LIFO - Réduction intelligente du gaspillage alimentaire</p>
         </div>
     </div>
@@ -278,7 +278,7 @@ COMMENT VOUS CONNECTER :
 
 Important : Gardez vos identifiants en sécurité et ne les partagez avec personne. Votre mot de passe peut être réinitialisé à tout moment par votre responsable.
 
-Besoin d'aide ? Contactez votre responsable ou notre support : support@lifo.ai
+Besoin d'aide ? Contactez votre responsable ou notre support : support@lifo-app
 
 © 2025 LIFO - Réduction intelligente du gaspillage alimentaire
   `
@@ -390,7 +390,7 @@ function generatePasswordResetEmailHTML(credentials: EmailCredentials): string {
         <p>Si vous n'avez pas demandé cette réinitialisation, contactez immédiatement votre responsable.</p>
 
         <div class="footer">
-            <p>Questions ? Contactez votre responsable ou <a href="mailto:support@lifo.ai" style="color: #3b82f6;">notre support</a></p>
+            <p>Questions ? Contactez votre responsable ou <a href="mailto:support@lifo-app" style="color: #3b82f6;">notre support</a></p>
             <p style="margin: 8px 0 0 0;">© 2025 LIFO</p>
         </div>
     </div>
@@ -421,7 +421,7 @@ Important : Votre ancien mot de passe ne fonctionne plus. Utilisez uniquement ce
 
 Si vous n'avez pas demandé cette réinitialisation, contactez immédiatement votre responsable.
 
-Questions ? Contactez votre responsable ou notre support : support@lifo.ai
+Questions ? Contactez votre responsable ou notre support : support@lifo-app
 
 © 2025 LIFO
   `

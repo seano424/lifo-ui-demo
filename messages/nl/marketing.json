@@ -196,7 +196,7 @@
     },
     "businessStats": {
       "title": "Maximaliseer uw winst, minimaliseer uw verlies",
-      "subtitle": "Zie de echte impact die LIFO.AI heeft op bedrijven zoals het uwe",
+      "subtitle": "Zie de echte impact die LIFO heeft op bedrijven zoals het uwe",
       "disclaimer": "Resultaten kunnen variëren. Gebaseerd op gemiddelde klantgegevens over 12 maanden.",
       "revenue": {
         "label": "Omzetstijging",
@@ -411,7 +411,7 @@
     },
     "cta": {
       "title": "Klaar om uw voorraad te transformeren?",
-      "description": "Transformeer uw voorraadbeheer met LIFO.AI en begin vandaag nog met afvalvermindering.",
+      "description": "Transformeer uw voorraadbeheer met LIFO en begin vandaag nog met afvalvermindering.",
       "button": "Start gratis proefperiode"
     }
   },
@@ -759,7 +759,7 @@
     },
     "contactUs": "Neem Contact Op",
     "email": "contact@lifo-app.com",
-    "copyright": "© {year} LIFO.AI. Alle rechten voorbehouden.",
+    "copyright": "© {year} LIFO. Alle rechten voorbehouden.",
     "legal": {
       "privacyPolicy": "Privacybeleid",
       "termsOfService": "Servicevoorwaarden"

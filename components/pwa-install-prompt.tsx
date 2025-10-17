@@ -118,14 +118,14 @@ export default function PWAInstallPrompt() {
             <div className="w-6 h-6 bg-white rounded flex items-center justify-center">
               <Image
                 src="/logos/lifo-logo-icon.svg"
-                alt="LIFO.AI"
+                alt="LIFO"
                 width={16}
                 height={16}
                 className="w-4 h-4"
               />
             </div>
             <div>
-              <p className="font-medium text-xs">Install LIFO.AI</p>
+              <p className="font-medium text-xs">Install LIFO</p>
               <p className="text-blue-100 text-xs">Experimental PWA</p>
             </div>
           </div>
@@ -156,14 +156,14 @@ export default function PWAInstallPrompt() {
             <div className="w-8 h-8 rounded flex items-center justify-center flex-shrink-0">
               <Image
                 src="/logos/LIFO-Logo-dark-BG.png"
-                alt="LIFO.AI"
+                alt="LIFO"
                 width={24}
                 height={24}
                 className="w-6 h-6"
               />
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="font-medium text-gray-900 text-xs">Install LIFO.AI</h3>
+              <h3 className="font-medium text-gray-900 text-xs">Install LIFO</h3>
               <p className="text-gray-500 text-xs">Experimental PWA</p>
             </div>
             <div className="flex gap-1">

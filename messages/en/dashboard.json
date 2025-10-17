@@ -35,7 +35,7 @@
       },
       "todoSuggestions": {
         "title": "Todo Suggestions",
-        "description": "View and manage tasks suggested by LIFO.AI to optimize your inventory.",
+        "description": "View and manage tasks suggested by LIFO to optimize your inventory.",
         "action": "View todos"
       },
       "removeProducts": {

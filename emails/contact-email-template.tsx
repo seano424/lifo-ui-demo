@@ -321,13 +321,13 @@ export default function ContactEmailTemplate({
               }}
             >
               <Link
-                href="https://lifo.ai"
+                href="https://LIFO"
                 style={{
                   color: '#2563eb',
                   textDecoration: 'none',
                 }}
               >
-                LIFO.AI
+                LIFO
               </Link>
             </Text>
           </Section>

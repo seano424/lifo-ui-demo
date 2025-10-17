@@ -35,7 +35,7 @@
       },
       "todoSuggestions": {
         "title": "Todo Suggesties",
-        "description": "Bekijk en beheer taken die door LIFO.AI zijn voorgesteld om uw voorraad te optimaliseren.",
+        "description": "Bekijk en beheer taken die door LIFO zijn voorgesteld om uw voorraad te optimaliseren.",
         "action": "Bekijk todos"
       },
       "removeProducts": {
