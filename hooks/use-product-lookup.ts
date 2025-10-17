@@ -1,4 +1,3 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   openFoodFactsClient,
   type ProductLookupResult,
@@ -6,6 +5,7 @@ import {
 } from '@/lib/queries/open-food-facts'
 import { queryKeys } from '@/lib/queries/query-keys'
 import { createClient } from '@/lib/supabase/client'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { logger } from '@/lib/utils/logger'
 
 // Constants
@@ -326,7 +326,7 @@ async function fallbackProductSearch(
   supabase: ReturnType<typeof createClient>,
 ): Promise<SupabaseProductSearchResult[]> {
   if (storeId) {
-    // For outbound: Use a simplified approach with two separate queries
+    // For scan-out: Use a simplified approach with two separate queries
     // First get products that match the search
     const { data: matchingProducts, error: productError } = await supabase
       .schema('inventory')
@@ -426,7 +426,7 @@ async function fallbackProductSearch(
       })
       .filter(result => !result.isOutOfStock) // Only return products with stock
   } else {
-    // For inbound: Simple products search
+    // For deliveries: Simple products search
     const { data, error } = await supabase
       .schema('inventory')
       .from('products')

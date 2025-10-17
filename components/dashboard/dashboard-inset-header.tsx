@@ -23,8 +23,8 @@ function getPageIcon(pathname: string) {
 
   // Main dashboard pages from sidebar
   if (cleanPath === '/dashboard') return ChartNoAxesCombined
-  if (cleanPath.startsWith('/dashboard/inbound')) return ScanSearch
-  if (cleanPath.startsWith('/dashboard/outbound')) return ScanBarcode
+  if (cleanPath.startsWith('/dashboard/deliveries')) return ScanSearch
+  if (cleanPath.startsWith('/dashboard/scan-out')) return ScanBarcode
   if (cleanPath.startsWith('/dashboard/todos')) return ListTodo
   if (cleanPath.startsWith('/dashboard/inventory/products')) return Package
   if (cleanPath.startsWith('/dashboard/inventory/batches')) return Layers

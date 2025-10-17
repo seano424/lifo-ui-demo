@@ -1,23 +1,23 @@
 /**
- * Global state management for inbound scanning sessions
+ * Global state management for delivery scanning sessions
  * Eliminates circular dependencies by providing centralized state
  */
 
-import { useCallback, useEffect, useState } from 'react'
 import type { ScannedItem } from '@/components/scanning/shared'
+import { useCallback, useEffect, useState } from 'react'
 
-interface InboundScanningSession {
+interface DeliveryScanningSession {
   items: ScannedItem[]
   storeId?: string
   timestamp: number
 }
 
-const SESSION_KEY = 'lifo-inbound-scanning-session'
+const SESSION_KEY = 'lifo-delivery-scanning-session'
 
 /**
  * Get stored session from localStorage
  */
-function getStoredSession(): InboundScanningSession | null {
+function getStoredSession(): DeliveryScanningSession | null {
   try {
     const stored = localStorage.getItem(SESSION_KEY)
     if (!stored) return null
@@ -35,7 +35,7 @@ function getStoredSession(): InboundScanningSession | null {
 /**
  * Store session to localStorage
  */
-function storeSession(session: InboundScanningSession): void {
+function storeSession(session: DeliveryScanningSession): void {
   try {
     localStorage.setItem(SESSION_KEY, JSON.stringify(session))
   } catch {
@@ -55,10 +55,10 @@ function clearStoredSession(): void {
 }
 
 /**
- * Hook for managing inbound scanning sessions with global state and persistence
+ * Hook for managing delivery scanning sessions with global state and persistence
  */
-export function useInboundScanningSession(storeId?: string) {
-  const [session, setSession] = useState<InboundScanningSession>(() => {
+export function useDeliveryScanningSession(storeId?: string) {
+  const [session, setSession] = useState<DeliveryScanningSession>(() => {
     const stored = getStoredSession()
 
     // If we have a stored session for the same store, use it
@@ -181,8 +181,8 @@ export function useInboundScanningSession(storeId?: string) {
 /**
  * Hook to observe scanning session without modifying it (for parent components)
  */
-export function useInboundScanningSessionObserver(storeId?: string) {
-  const session = useInboundScanningSession(storeId)
+export function useDeliveryScanningSessionObserver(storeId?: string) {
+  const session = useDeliveryScanningSession(storeId)
 
   return {
     items: session.items,

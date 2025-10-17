@@ -27,7 +27,7 @@ export function QuickActionCards() {
           description="addProducts.description"
           primaryIcon={<Plus className="h-3.5 w-3.5" />}
           secondaryIcon={<ShoppingBag className="h-4 w-4" />}
-          link="/dashboard/inbound"
+          link="/dashboard/deliveries"
           translationKey="dashboard.quickActions"
         />
 
@@ -37,7 +37,7 @@ export function QuickActionCards() {
           description="removeProducts.description"
           primaryIcon={<Minus className="h-3.5 w-3.5" />}
           secondaryIcon={<PackageOpen className="h-4 w-4" />}
-          link="/dashboard/outbound"
+          link="/dashboard/scan-out"
           translationKey="dashboard.quickActions"
         />
         <QuickActionCard

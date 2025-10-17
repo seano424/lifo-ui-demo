@@ -1,8 +1,6 @@
 'use client'
 
-import { AlertCircle, BarChart3, Check, Minus, Plus, RefreshCcw, Trash2 } from 'lucide-react'
-import { useTranslations } from 'next-intl'
-import { useCallback, useState } from 'react'
+import { RecipientSelector } from '@/components/donation/recipient-selector'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -14,23 +12,25 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { Typography } from '@/components/ui/typography'
 import { useAutoOCRScanner } from '@/hooks/use-auto-ocr-scanner'
 import { useOCRWithFallback } from '@/hooks/use-ocr-processing'
 import { captureImageFromVideo } from '@/lib/api/ocr-client'
 import { useStoreState } from '@/lib/stores/store-context'
 import { createClient } from '@/lib/supabase/client'
-import { RecipientSelector } from '@/components/donation/recipient-selector'
+import { AlertCircle, BarChart3, Check, Minus, Plus, RefreshCcw, Trash2 } from 'lucide-react'
+import { useTranslations } from 'next-intl'
+import { useCallback, useState } from 'react'
 import { toast } from 'sonner'
-import { Typography } from '@/components/ui/typography'
 
+import { Input } from '@/components/ui/input'
+import type { ActionType, AvailableBatch } from '@/types/scanning'
+import type { Database } from '@/types/supabase'
 import type { ScannedItem } from '../shared'
-import ActionTypeSelector from './action-type-selector'
 import BatchSelectionList from '../shared/batch-selection-list'
 import ScanningCamera from '../shared/scanning-camera'
+import ActionTypeSelector from './action-type-selector'
 import { useScanOutActions } from './use-scan-out-actions'
-import type { Database } from '@/types/supabase'
-import type { ActionType, AvailableBatch } from '@/types/scanning'
-import { Input } from '@/components/ui/input'
 
 type batch = Database['inventory']['Tables']['batches']['Row']
 
@@ -597,7 +597,7 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
               setShowManualEntry(false)
             }}
             onCloseManualEntry={() => setShowManualEntry(false)}
-            manualEntryMode="outbound"
+            manualEntryMode="scan-out"
             storeId={activeStore?.store_id}
             title={t('scanProductToRemove')}
             subtitle={t('pointCameraAtBarcode')}

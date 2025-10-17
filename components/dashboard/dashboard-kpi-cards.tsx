@@ -1,9 +1,5 @@
 'use client'
 
-import { useQueryClient } from '@tanstack/react-query'
-import { RefreshCw } from 'lucide-react'
-import { useTranslations } from 'next-intl'
-import { useState } from 'react'
 import { KPICard } from '@/components/dashboard/kpi-card'
 import { type TimePeriod, TimeSelector } from '@/components/dashboard/TimeSelector'
 import { Button } from '@/components/ui/button'
@@ -23,6 +19,10 @@ import {
 import type { KPITrendData } from '@/lib/queries/dashboard-kpi-trends'
 import { queryKeys } from '@/lib/queries/query-keys'
 import { useActiveStoreId } from '@/lib/stores/store-context'
+import { useQueryClient } from '@tanstack/react-query'
+import { RefreshCw } from 'lucide-react'
+import { useTranslations } from 'next-intl'
+import { useState } from 'react'
 
 export function DashboardKPICards() {
   const t = useTranslations('dashboard.kpis')
@@ -155,7 +155,7 @@ export function DashboardKPICards() {
           isLoading={salesQuery.isLoading || (showTrends && salesTrendsQuery.isLoading)}
           isError={salesQuery.isError || (showTrends && salesTrendsQuery.isError)}
           isLink={true}
-          link="/dashboard/outbound"
+          link="/dashboard/scan-out"
           showTrends={showTrends}
           trendData={salesTrendData}
         />

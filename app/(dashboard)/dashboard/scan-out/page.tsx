@@ -6,7 +6,7 @@ import { Typography } from '@/components/ui/typography'
 import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 
-export default function OutboundPage() {
+export default function ScanOutPage() {
   const t = useTranslations('dashboard.scanOut')
   const [removedItems, setRemovedItems] = useState<ScannedItem[]>([])
 

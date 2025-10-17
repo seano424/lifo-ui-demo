@@ -6,7 +6,7 @@
       "badge": "Commençons avec votre inventaire",
       "actions": {
         "getStarted": "Commencer",
-        "inbound": {
+        "deliveries": {
           "title": "Ajouter Vos Premiers Produits",
           "description": "Commencez par ajouter des produits à votre inventaire par numérisation ou saisie manuelle."
         },
@@ -44,7 +44,7 @@
         "action": "Supprimer des produits"
       }
     },
-    "inbound": {
+    "deliveries": {
       "title": "Réception des stocks",
       "description": "Scannez ou saisissez de nouveaux articles pour les ajouter à votre inventaire. Vous pouvez scanner des codes-barres, importer un fichier CSV ou saisir manuellement les articles.",
       "desktop": {
@@ -273,8 +273,8 @@
     "dashboard": "Tableau de bord",
     "operations": "Opérations",
     "inventory": "Inventaire",
-    "inbound": "Entrées",
-    "outbound": "Sorties",
+    "deliveries": "Livraisons",
+    "scanOut": "Sorties",
     "todos": "À faire",
     "performance": "Performance",
     "milestones": "Étapes",
@@ -536,9 +536,6 @@
       "scanError": "Erreur de scan : {error}",
       "submissionError": "Erreur lors de la soumission : {error}"
     },
-    "recentlyRemoved": "Récemment retiré ({count} articles)",
-    "removedQuantityExpires": "Retiré {quantity}x • Expire: {date}",
-    "andMoreItems": "... et {count} articles de plus",
     "captureExpiryDate": "Capturer la date d'expiration",
     "pointCameraAtExpiry": "Pointez la caméra vers la date d'expiration",
     "backToChangeProduct": "Retour pour changer de produit",

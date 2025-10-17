@@ -1,8 +1,5 @@
 'use client'
 
-import { AlertCircle, Check, Loader2, Package, Plus, RefreshCcw, Trash2 } from 'lucide-react'
-import { useTranslations } from 'next-intl'
-import { useState } from 'react'
 import ManualBarcodeEntry from '@/components/barcode/manual-barcode-entry'
 import {
   InventoryForm,
@@ -22,10 +19,13 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Typography } from '@/components/ui/typography'
-import { useInboundScanningSession } from '@/hooks/use-inbound-scanning-session'
+import { useDeliveryScanningSession } from '@/hooks/use-delivery-scanning-session'
 import { useInventoryActions, useScannedItemConverter } from '@/hooks/use-inventory-submission'
 import type { InventorySubmissionResult } from '@/lib/queries/inventory'
 import { useStoreState } from '@/lib/stores/store-context'
+import { AlertCircle, Check, Loader2, Package, Plus, RefreshCcw, Trash2 } from 'lucide-react'
+import { useTranslations } from 'next-intl'
+import { useState } from 'react'
 
 interface ProductData {
   barcode: string
@@ -38,7 +38,7 @@ interface ProductData {
   productId?: string
 }
 
-interface ManualInboundEntryProps {
+interface ManualDeliveryEntryProps {
   storeId?: string
   onBatchSubmitted?: (result: InventorySubmissionResult[]) => void
   className?: string
@@ -52,12 +52,12 @@ interface SelectedProduct {
   imageUrl?: string
 }
 
-export default function ManualInboundEntry({
+export default function ManualDeliveryEntry({
   storeId: propStoreId,
   onBatchSubmitted,
   className = '',
-}: ManualInboundEntryProps) {
-  const t = useTranslations('manualInbound')
+}: ManualDeliveryEntryProps) {
+  const t = useTranslations('manualDelivery')
   const { activeStore } = useStoreState()
   const storeId = propStoreId || activeStore?.store_id
 
@@ -78,7 +78,7 @@ export default function ManualInboundEntry({
     removeItem,
     updateItem,
     clearSession,
-  } = useInboundScanningSession(storeId)
+  } = useDeliveryScanningSession(storeId)
 
   // Submission state
   const [showSubmissionDialog, setShowSubmissionDialog] = useState(false)
@@ -228,7 +228,7 @@ export default function ManualInboundEntry({
           {!selectedProduct ? (
             <ManualBarcodeEntry
               onProductSelected={handleProductSelected}
-              mode="inbound"
+              mode="deliveries"
               storeId={storeId}
             />
           ) : (
