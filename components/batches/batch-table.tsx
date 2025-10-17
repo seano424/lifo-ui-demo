@@ -1,17 +1,8 @@
 'use client'
 
-import {
-  flexRender,
-  getCoreRowModel,
-  getSortedRowModel,
-  type SortingState,
-  useReactTable,
-} from '@tanstack/react-table'
-import { Package } from 'lucide-react'
-import { useTranslations } from 'next-intl'
-import { useEffect, useState } from 'react'
 import { BatchListSkeleton } from '@/components/batches/batch-list-skeleton'
 import { ColumnResizer, createBatchTableColumns } from '@/components/batches/batch-table-columns'
+import { TodoActionBottomSheet } from '@/components/todos/todo-action-bottom-sheet'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardTitle } from '@/components/ui/card'
 import {
@@ -22,10 +13,19 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { useBatchTodo } from '@/hooks/use-batch-todo'
 import { useColumnSizing } from '@/hooks/use-column-sizing'
 import type { BatchSort, BatchSortField, BatchWithProduct } from '@/lib/queries/batches'
-import { TodoActionBottomSheet } from '@/components/todos/todo-action-bottom-sheet'
-import { useBatchTodo } from '@/hooks/use-batch-todo'
+import {
+  flexRender,
+  getCoreRowModel,
+  getSortedRowModel,
+  type SortingState,
+  useReactTable,
+} from '@tanstack/react-table'
+import { Package } from 'lucide-react'
+import { useTranslations } from 'next-intl'
+import { useEffect, useState } from 'react'
 
 const VALID_COLUMN_IDS = [
   'batch_number',
@@ -131,7 +131,7 @@ export function BatchTable({ data, currentSort, updateSort, isLoading }: BatchTa
           <CardDescription className="text-center max-w-md">
             {t('emptyState.description')}
           </CardDescription>
-          <Button asLink href="/dashboard/inbound" className="mt-4">
+          <Button asLink href="/dashboard/deliveries" className="mt-4">
             {t('emptyState.addFirstBatch')}
           </Button>
         </CardContent>

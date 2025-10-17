@@ -1,15 +1,5 @@
 'use client'
 
-import {
-  flexRender,
-  getCoreRowModel,
-  getSortedRowModel,
-  type SortingState,
-  useReactTable,
-} from '@tanstack/react-table'
-import { Package } from 'lucide-react'
-import { useTranslations } from 'next-intl'
-import { useEffect, useState } from 'react'
 import { ProductListSkeleton } from '@/components/products/product-list-skeleton'
 import {
   ColumnResizer,
@@ -28,6 +18,16 @@ import {
 import { useProductColumnSizing } from '@/hooks/use-product-column-sizing'
 import { useProductActions } from '@/hooks/use-products'
 import type { Product, ProductSort, SortField } from '@/lib/queries/products'
+import {
+  flexRender,
+  getCoreRowModel,
+  getSortedRowModel,
+  type SortingState,
+  useReactTable,
+} from '@tanstack/react-table'
+import { Package } from 'lucide-react'
+import { useTranslations } from 'next-intl'
+import { useEffect, useState } from 'react'
 
 const VALID_COLUMN_IDS = [
   'name',
@@ -123,7 +123,7 @@ export function ProductsTable({ data, currentSort, updateSort, isLoading }: Prod
           <CardDescription className="text-center max-w-md">
             {t('empty.storeDescription')}
           </CardDescription>
-          <Button asLink href="/dashboard/inbound" className="mt-4">
+          <Button asLink href="/dashboard/deliveries" className="mt-4">
             {tButtons('addProduct')}
           </Button>
         </CardContent>

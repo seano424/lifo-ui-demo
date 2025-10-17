@@ -6,7 +6,7 @@
       "badge": "Laten we beginnen met uw voorraad",
       "actions": {
         "getStarted": "Aan de slag",
-        "inbound": {
+        "deliveries": {
           "title": "Voeg Uw Eerste Producten Toe",
           "description": "Begin met het toevoegen van producten aan uw voorraad via scannen of handmatige invoer."
         },
@@ -44,7 +44,7 @@
         "action": "Verwijder producten"
       }
     },
-    "inbound": {
+    "deliveries": {
       "title": "Voorraad Ontvangst",
       "description": "Scan of voer nieuwe artikelen in om ze aan uw voorraad toe te voegen. U kunt barcodes scannen, een CSV-bestand uploaden of handmatig artikelen invoeren.",
       "desktop": {
@@ -273,7 +273,7 @@
     "dashboard": "Dashboard",
     "operations": "Operaties",
     "inventory": "Voorraad",
-    "inbound": "Inkomend",
+    "deliveries": "Leveringen",
     "outbound": "Uitgaand",
     "todos": "Te doen",
     "performance": "Prestaties",

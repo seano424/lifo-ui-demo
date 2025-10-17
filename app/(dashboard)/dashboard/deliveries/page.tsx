@@ -2,7 +2,7 @@
 
 import { CSVUploadForm } from '@/components/csv-upload/csv-upload-form'
 import DashboardInsetHeader from '@/components/dashboard/dashboard-inset-header'
-import ManualInboundEntry from '@/components/inbound/manual-inbound-entry'
+import ManualDeliveryEntry from '@/components/deliveries/manual-delivery-entry'
 import ScanningInterface from '@/components/scanning/standalone-scanning-interface'
 import { Card } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -11,10 +11,10 @@ import { useStoreState } from '@/lib/stores/store-context'
 import { Keyboard, Scan, Upload } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
-export default function InboundPage() {
+export default function DeliveriesPage() {
   const { activeStore: currentStore } = useStoreState()
   const { isTablet, isMobile } = useMediaQuery()
-  const t = useTranslations('dashboard.inbound')
+  const t = useTranslations('dashboard.deliveries')
 
   return (
     <div className="space-y-6">
@@ -71,7 +71,7 @@ export default function InboundPage() {
           <TabsContent value="manual" className="mt-6">
             <div className="max-w-6xl mx-auto">
               {currentStore ? (
-                <ManualInboundEntry
+                <ManualDeliveryEntry
                   storeId={currentStore.store_id}
                   onBatchSubmitted={_result => {
                     // Batch submitted

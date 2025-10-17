@@ -120,7 +120,7 @@
       "daysLeft": "{days}d over"
     }
   },
-  "inbound": {
+  "deliveries": {
     "mobile": {
       "barcodeScanning": "Barcode scannen",
       "csvBulkImport": "CSV bulk import"
@@ -134,7 +134,7 @@
       "selectStoreInventory": "Selecteer een winkel om voorraad toe te voegen."
     }
   },
-  "manualInbound": {
+  "manualDelivery": {
     "selectedProduct": {
       "title": "Geselecteerd product",
       "fields": {

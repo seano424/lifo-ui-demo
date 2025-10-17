@@ -6,7 +6,7 @@
       "badge": "Commençons avec votre inventaire",
       "actions": {
         "getStarted": "Commencer",
-        "inbound": {
+        "deliveries": {
           "title": "Ajouter Vos Premiers Produits",
           "description": "Commencez par ajouter des produits à votre inventaire par numérisation ou saisie manuelle."
         },
@@ -44,7 +44,7 @@
         "action": "Supprimer des produits"
       }
     },
-    "inbound": {
+    "deliveries": {
       "title": "Réception des stocks",
       "description": "Scannez ou saisissez de nouveaux articles pour les ajouter à votre inventaire. Vous pouvez scanner des codes-barres, importer un fichier CSV ou saisir manuellement les articles.",
       "desktop": {
@@ -273,7 +273,7 @@
     "dashboard": "Tableau de bord",
     "operations": "Opérations",
     "inventory": "Inventaire",
-    "inbound": "Entrées",
+    "deliveries": "Livraisons",
     "outbound": "Sorties",
     "todos": "À faire",
     "performance": "Performance",

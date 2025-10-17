@@ -66,14 +66,14 @@ interface ProductData {
 interface ManualBarcodeEntryProps {
   onProductSelected?: (barcode: string, productData: ProductData) => void
   className?: string
-  mode?: 'inbound' | 'outbound' // Determines which API to use
+  mode?: 'deliveries' | 'outbound' // Determines which API to use
   storeId?: string // Required for outbound mode to filter products by store
 }
 
 export default function ManualBarcodeEntry({
   onProductSelected,
   className = '',
-  mode = 'inbound', // Default to inbound for backward compatibility
+  mode = 'deliveries', // Default to deliveries for backward compatibility
   storeId,
 }: ManualBarcodeEntryProps) {
   const t = useTranslations('products.manualEntry')
@@ -190,7 +190,7 @@ export default function ManualBarcodeEntry({
           }
           await supabaseSearch.mutateAsync(query)
         } else {
-          // For inbound mode, search both Supabase and Open Food Facts with better error handling
+          // For deliveries mode, search both Supabase and Open Food Facts with better error handling
           const [supabaseResult, offResult] = await Promise.allSettled([
             supabaseSearch.mutateAsync(query),
             productSearch.mutateAsync(query),
@@ -415,7 +415,7 @@ export default function ManualBarcodeEntry({
                   {/* Search Results Dropdown */}
                   {showProductSearchResults &&
                     ((mode === 'outbound' && activeSearch.data && activeSearch.data.length > 0) ||
-                      (mode === 'inbound' &&
+                      (mode === 'deliveries' &&
                         ((supabaseSearch.data && supabaseSearch.data.length > 0) ||
                           (productSearch.data && productSearch.data.length > 0)))) && (
                       <div className="border rounded-2xl max-h-64 overflow-y-auto bg-white shadow-lg p-2">
@@ -480,7 +480,7 @@ export default function ManualBarcodeEntry({
                             </Button>
                           ))
                         ) : (
-                          // Combined results for inbound mode
+                          // Combined results for deliveries mode
                           <>
                             {/* Supabase products first (higher priority) */}
                             {supabaseSearch.data &&
@@ -570,7 +570,7 @@ export default function ManualBarcodeEntry({
 
                   {showProductSearchResults &&
                     ((mode === 'outbound' && activeSearch.data && activeSearch.data.length === 0) ||
-                      (mode === 'inbound' &&
+                      (mode === 'deliveries' &&
                         (!supabaseSearch.data || supabaseSearch.data.length === 0) &&
                         (!productSearch.data || productSearch.data.length === 0))) && (
                       <div className="text-sm text-gray-500 p-3 border rounded-2xl">
@@ -720,7 +720,7 @@ export default function ManualBarcodeEntry({
                 </div>
               )}
 
-              {!lookupResult?.found && mode === 'inbound' && (
+              {!lookupResult?.found && mode === 'deliveries' && (
                 <div className="border-dashed border-2 p-4 rounded-2xl">
                   <div className="pb-3">
                     <div className="text-sm flex items-center gap-2">

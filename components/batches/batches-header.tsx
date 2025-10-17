@@ -1,10 +1,10 @@
 'use client'
 
-import { Plus } from 'lucide-react'
-import Link from 'next/link'
-import { useTranslations } from 'next-intl'
 import DashboardInsetHeader from '@/components/dashboard/dashboard-inset-header'
 import { Button } from '@/components/ui/button'
+import { Plus } from 'lucide-react'
+import { useTranslations } from 'next-intl'
+import Link from 'next/link'
 
 export default function BatchesHeader() {
   const t = useTranslations('dashboardNav.pages')
@@ -20,7 +20,7 @@ export default function BatchesHeader() {
       description={pageDescription}
       rightContent={
         <div className="flex gap-2">
-          <Link href="/dashboard/inbound">
+          <Link href="/dashboard/deliveries">
             <Button>
               <Plus className="mr-2 h-4 w-4" />
               {tButtons('addBatch')}

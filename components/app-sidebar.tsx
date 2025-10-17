@@ -50,8 +50,8 @@ function useNavigationData() {
           title: t('operations'),
           items: [
             {
-              title: t('inbound'),
-              url: '/dashboard/inbound',
+              title: t('deliveries'),
+              url: '/dashboard/deliveries',
               icon: ScanSearch,
             },
             {

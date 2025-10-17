@@ -1,8 +1,5 @@
 'use client'
 
-import { useEffect } from 'react'
-import { AlertCircle, Camera, Keyboard } from 'lucide-react'
-import { useTranslations } from 'next-intl'
 import BarcodeScanner, { type BarcodeDetection } from '@/components/barcode/barcode-scanner'
 import ManualBarcodeEntry from '@/components/barcode/manual-barcode-entry'
 import { Alert, AlertDescription } from '@/components/ui/alert'
@@ -10,6 +7,9 @@ import { Button } from '@/components/ui/button'
 import type { AutoOCRScannerState } from '@/hooks/use-auto-ocr-scanner'
 import { cn } from '@/lib/utils'
 import { logger } from '@/lib/utils/logger'
+import { AlertCircle, Camera, Keyboard } from 'lucide-react'
+import { useTranslations } from 'next-intl'
+import { useEffect } from 'react'
 import OCRFrameQualityIndicator from './ocr-frame-quality-indicator'
 
 export interface ScanningCameraProps {
@@ -37,7 +37,7 @@ export interface ScanningCameraProps {
   onToggleManualEntry?: () => void
   onManualProductSelected?: (barcode: string) => void
   onCloseManualEntry?: () => void
-  manualEntryMode?: 'inbound' | 'outbound' // For ManualBarcodeEntry mode
+  manualEntryMode?: 'deliveries' | 'outbound' // For ManualBarcodeEntry mode
   storeId?: string // For outbound manual entry
 
   // Backend health
@@ -60,7 +60,7 @@ export default function ScanningCamera({
   onClearOCRError,
   autoOCRState,
   showManualEntry = false,
-  manualEntryMode = 'inbound',
+  manualEntryMode = 'deliveries',
   storeId,
   onToggleManualEntry,
   onManualProductSelected,
