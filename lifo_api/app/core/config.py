@@ -314,19 +314,18 @@ class Settings(BaseSettings):
 
             # 2. Add frontend URL if configured (now a list)
             if self.frontend_url:
-                for url in self.frontend_url:
-                    if not url:
-                        continue
-                    # Validate URL format
-                    if url.startswith("https://"):
-                        if url not in origins:
-                            origins.append(url)
+                # Parse comma-separated FRONTEND_URL into individual URLs
+                frontend_urls = self.parse_list_fields(self.frontend_url)
 
-                        # Add www subdomain only if original doesn't have it
+                for url in frontend_urls:
+                    # Validate URL format - only HTTPS in production
+                    if url.startswith("https://"):
+                        origins.append(url)
+
+                        # Add www subdomain variant if original doesn't have it
                         if not url.startswith("https://www."):
                             www_url = url.replace("https://", "https://www.")
-                            if www_url not in origins:
-                                origins.append(www_url)
+                            origins.append(www_url)
 
             # 3. Fallback: if no origins configured, allow localhost for initial setup
             if not origins:
@@ -347,14 +346,16 @@ class Settings(BaseSettings):
 
             # 2. Add frontend URL if configured (now a list)
             if self.frontend_url:
-                for url in self.frontend_url:
-                    if url and url not in origins:
-                        origins.append(url)
+                # Parse comma-separated FRONTEND_URL into individual URLs
+                frontend_urls = self.parse_list_fields(self.frontend_url)
+                origins.extend(frontend_urls)
 
-            # 3. Always allow localhost for development
-            if "http://localhost:3000" not in origins:
-                origins.append("http://localhost:3000")
-
+            # Limited development origins for staging
+            origins.extend(
+                [
+                    "http://localhost:3000",  # Local development
+                ]
+            )
             return origins
 
         # Development - use BACKEND_CORS_ORIGINS environment variable

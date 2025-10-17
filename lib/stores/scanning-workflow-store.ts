@@ -191,13 +191,20 @@ export const useScanningWorkflowStore = create<ScanningWorkflowState>()(
                   : undefined
                 state.scannedProduct.imageUrl =
                   result.product.image_front_url || result.product.image_url || undefined
-              }
 
-              // Auto-advance to OCR step after lookup completes (whether found or not)
-              // This eliminates the manual "Proceed to Expiry Date Scanning" step
-              // BUT don't auto-advance if we're already on barcode step (user went back deliberately)
-              if (state.currentStep !== 'barcode') {
-                state.currentStep = 'ocr'
+                // Only auto-advance to OCR step if product was found
+                // Don't auto-advance if we're already on barcode step (user went back deliberately)
+                if (state.currentStep !== 'barcode') {
+                  state.currentStep = 'ocr'
+                }
+              } else {
+                // Product not found - set Unknown Product and stay on current step
+                // User must manually enter product details or retry scanning
+                state.scannedProduct.productName = 'Unknown Product'
+                // Keep user on barcode step - do NOT auto-advance
+                if (state.currentStep === 'product') {
+                  state.currentStep = 'barcode'
+                }
               }
 
               // Add to history for quick rescanning

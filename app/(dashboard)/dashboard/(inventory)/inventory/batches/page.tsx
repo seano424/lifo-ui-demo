@@ -13,6 +13,7 @@ import { queryKeys } from '@/lib/queries/query-keys'
 import { fetchUserPreferences, fetchUserStores } from '@/lib/queries/stores'
 import { createPrefetchedQuery } from '@/lib/react-query/prefetch'
 import { createClient as createServerClient } from '@/lib/supabase/server'
+import { logger } from '@/lib/utils/logger'
 
 interface InventoryBatchesPageProps {
   searchParams: Promise<{
@@ -113,7 +114,7 @@ export default async function InventoryBatchesPage({ searchParams }: InventoryBa
       })
     }
   } catch (error) {
-    console.error('[InventoryBatchesPage] Error prefetching data:', error)
+    logger.warn('InventoryBatchesPage', 'Error prefetching data, will load client-side:', error)
     // Continue without prefetch - client will handle loading
   }
 

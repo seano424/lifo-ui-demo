@@ -1,9 +1,9 @@
 'use client'
 
-import { useTranslations } from 'next-intl'
 import { Typography } from '@/components/ui/typography'
 import { useInProgressTodos } from '@/hooks/use-todos-with-filters'
-import type { TodoFiltersState } from '../filters/todo-filters-panel'
+import { useTranslations } from 'next-intl'
+import type { TodoFiltersState } from '../filters/types'
 import { TodoCardList } from '../todo-card-list'
 
 interface InProgressTabProps {

@@ -59,7 +59,30 @@ export async function updateSession(request: NextRequest) {
   // Try twice with 300ms delay
   for (let attempt = 1; attempt <= 2; attempt++) {
     try {
-      const { data, error } = await supabase.auth.getUser()
+      // Suppress ECONNRESET errors during auth check since we handle them gracefully
+      const originalConsoleError = console.error
+      let authResult: Awaited<ReturnType<typeof supabase.auth.getUser>>
+
+      try {
+        console.error = (message, ...args) => {
+          // Suppress fetch failed / ECONNRESET errors - we handle these gracefully
+          const msg = String(message)
+          if (
+            msg.includes('ECONNRESET') ||
+            msg.includes('fetch failed') ||
+            (args[0] && String(args[0]).includes('ECONNRESET'))
+          ) {
+            return
+          }
+          originalConsoleError(message, ...args)
+        }
+
+        authResult = await supabase.auth.getUser()
+      } finally {
+        console.error = originalConsoleError
+      }
+
+      const { data, error } = authResult
 
       if (error) {
         const errorMsg = error.message || ''
@@ -104,14 +127,18 @@ export async function updateSession(request: NextRequest) {
       // Handle connection errors (EPIPE, ECONNRESET, etc.)
       const errorMessage = err instanceof Error ? err.message : String(err)
 
-      // Connection aborted/closed - don't log as error, don't retry
+      // Connection aborted/closed - silently handle, don't retry
       if (
         errorMessage.includes('EPIPE') ||
         errorMessage.includes('ECONNRESET') ||
         errorMessage.includes('ECONNABORTED') ||
-        errorMessage.includes('connection closed')
+        errorMessage.includes('connection closed') ||
+        errorMessage.includes('fetch failed')
       ) {
-        logger.query('middleware', 'Connection closed during auth check')
+        // Only log on first attempt to reduce noise
+        if (attempt === 1) {
+          logger.query('middleware', 'Connection closed during auth check (handled gracefully)')
+        }
         networkError = false // Don't treat as network error
         user = null
         break // Exit retry loop

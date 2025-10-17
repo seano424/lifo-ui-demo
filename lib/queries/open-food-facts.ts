@@ -60,6 +60,7 @@ export interface ProductLookupResult {
   found: boolean
   product?: OpenFoodFactsProduct['product']
   error?: string
+  errorType?: 'network' | 'not_found' | 'invalid_barcode' | 'api_error'
   source: 'open_food_facts' | 'cache' | 'supabase'
   cached_at?: string
 }
@@ -79,16 +80,64 @@ class OpenFoodFactsClient {
       })
 
       if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+        const error = new Error(`HTTP ${response.status}: ${response.statusText}`)
+        ;(error as Error & { status: number }).status = response.status
+
+        // 404 is expected when product not in database - log only in debug mode
+        if (response.status === 404) {
+          logger.log('lib/queries/open-food-facts', 'Product not found in Open Food Facts', {
+            barcode,
+            status: response.status,
+          })
+        }
+
+        throw error
       }
 
       const data = await response.json()
-      return data
+
+      // Validate response format
+      if (!data || typeof data !== 'object') {
+        throw new Error('Invalid response format from Open Food Facts API')
+      }
+
+      // Validate required fields for OpenFoodFactsProduct
+      if (!('status' in data) || typeof data.status !== 'number') {
+        throw new Error('Invalid response: missing or invalid status field')
+      }
+
+      return data as OpenFoodFactsProduct
     } catch (error) {
-      logger.error('lib/queries/open-food-facts', 'Failed to lookup barcode', {
-        error: error instanceof Error ? error.message : String(error),
-        barcode,
-      })
+      // Enhance error with more context
+      if (error instanceof TypeError && error.message.includes('NetworkError')) {
+        const networkError = new Error('Network error - unable to reach Open Food Facts API')
+        ;(networkError as Error & { isNetworkError: boolean }).isNetworkError = true
+        logger.error('lib/queries/open-food-facts', 'Network error looking up barcode', {
+          error: error.message,
+          barcode,
+        })
+        throw networkError
+      }
+
+      // Check if this is a 404 error (product not found) - expected behavior
+      const is404 =
+        error instanceof Error &&
+        'status' in error &&
+        (error as Error & { status: number }).status === 404
+
+      if (is404) {
+        // 404 is expected - log only in debug mode, not as error
+        logger.log('lib/queries/open-food-facts', 'Product not found in database', {
+          barcode,
+        })
+      } else {
+        // Actual errors (network, server errors, etc.)
+        logger.error('lib/queries/open-food-facts', 'Failed to lookup barcode', {
+          error: error instanceof Error ? error.message : String(error),
+          barcode,
+        })
+      }
+
       throw error
     }
   }
@@ -128,6 +177,7 @@ export function transformOpenFoodFactsProduct(
       barcode,
       found: false,
       error: 'Product not found in Open Food Facts database',
+      errorType: 'not_found',
       source: 'open_food_facts',
     }
   }
@@ -139,6 +189,7 @@ export function transformOpenFoodFactsProduct(
       barcode,
       found: false,
       error: 'Product found but has no meaningful name',
+      errorType: 'not_found',
       source: 'open_food_facts',
     }
   }
