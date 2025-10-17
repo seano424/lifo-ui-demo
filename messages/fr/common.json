@@ -44,7 +44,7 @@
     "dashboard": "Tableau de bord",
     "inventory": "Inventaire",
     "deliveries": "Livraisons",
-    "outbound": "Sorties",
+    "scanOut": "Sorties",
     "analytics": "Analyses",
     "performance": "Performance",
     "milestones": "Étapes",

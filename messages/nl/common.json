@@ -44,7 +44,7 @@
     "dashboard": "Dashboard",
     "inventory": "Voorraad",
     "deliveries": "Leveringen",
-    "outbound": "Uitgaand",
+    "scanOut": "Scan Uit",
     "analytics": "Analyses",
     "performance": "Prestaties",
     "milestones": "Mijlpalen",

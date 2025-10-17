@@ -274,7 +274,7 @@
     "operations": "Opérations",
     "inventory": "Inventaire",
     "deliveries": "Livraisons",
-    "outbound": "Sorties",
+    "scanOut": "Sorties",
     "todos": "À faire",
     "performance": "Performance",
     "milestones": "Étapes",
@@ -536,9 +536,6 @@
       "scanError": "Erreur de scan : {error}",
       "submissionError": "Erreur lors de la soumission : {error}"
     },
-    "recentlyRemoved": "Récemment retiré ({count} articles)",
-    "removedQuantityExpires": "Retiré {quantity}x • Expire: {date}",
-    "andMoreItems": "... et {count} articles de plus",
     "captureExpiryDate": "Capturer la date d'expiration",
     "pointCameraAtExpiry": "Pointez la caméra vers la date d'expiration",
     "backToChangeProduct": "Retour pour changer de produit",

@@ -323,7 +323,7 @@ async function fallbackProductSearch(
   supabase: ReturnType<typeof createClient>,
 ): Promise<SupabaseProductSearchResult[]> {
   if (storeId) {
-    // For outbound: Use a simplified approach with two separate queries
+    // For scan-out: Use a simplified approach with two separate queries
     // First get products that match the search
     const { data: matchingProducts, error: productError } = await supabase
       .schema('inventory')

@@ -274,7 +274,7 @@
     "operations": "Operaties",
     "inventory": "Voorraad",
     "deliveries": "Leveringen",
-    "outbound": "Uitgaand",
+    "scanOut": "Scan Uit",
     "todos": "Te doen",
     "performance": "Prestaties",
     "milestones": "Mijlpalen",
@@ -536,9 +536,6 @@
       "scanError": "Scanfout: {error}",
       "submissionError": "Indienfout: {error}"
     },
-    "recentlyRemoved": "Recent verwijderd ({count} items)",
-    "removedQuantityExpires": "Verwijderd {quantity}x • Verloopt: {date}",
-    "andMoreItems": "... en nog {count} items",
     "captureExpiryDate": "Vervaldatum vastleggen",
     "pointCameraAtExpiry": "Richt camera op vervaldatum",
     "backToChangeProduct": "Terug om product te wijzigen",

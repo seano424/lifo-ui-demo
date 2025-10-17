@@ -55,8 +55,8 @@ function useNavigationData() {
               icon: ScanSearch,
             },
             {
-              title: t('outbound'),
-              url: '/dashboard/outbound',
+              title: t('scanOut'),
+              url: '/dashboard/scan-out',
               icon: ScanBarcode,
             },
             {

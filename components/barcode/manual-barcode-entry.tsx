@@ -66,8 +66,8 @@ interface ProductData {
 interface ManualBarcodeEntryProps {
   onProductSelected?: (barcode: string, productData: ProductData) => void
   className?: string
-  mode?: 'deliveries' | 'outbound' // Determines which API to use
-  storeId?: string // Required for outbound mode to filter products by store
+  mode?: 'deliveries' | 'scan-out' // Determines which API to use
+  storeId?: string // Required for scan-out mode to filter products by store
 }
 
 export default function ManualBarcodeEntry({
@@ -108,7 +108,7 @@ export default function ManualBarcodeEntry({
   const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   // Use the appropriate search based on mode
-  const activeSearch = mode === 'outbound' ? supabaseSearch : productSearch
+  const activeSearch = mode === 'scan-out' ? supabaseSearch : productSearch
 
   const [barcodeStockStatus, setBarcodeStockStatus] = useState<{
     hasStock: boolean
@@ -127,10 +127,10 @@ export default function ManualBarcodeEntry({
     setBarcodeStockStatus(null) // Reset stock status
   }
 
-  // Check stock status when lookup result changes in outbound mode
+  // Check stock status when lookup result changes in scan-out mode
   const checkStockStatus = useCallback(
     async (barcode: string) => {
-      if (mode !== 'outbound' || !storeId || !activeStore) {
+      if (mode !== 'scan-out' || !storeId || !activeStore) {
         return
       }
 
@@ -164,7 +164,7 @@ export default function ManualBarcodeEntry({
 
   // Check stock when lookup result changes
   React.useEffect(() => {
-    if (lookupResult?.found && lookupResult.product && mode === 'outbound') {
+    if (lookupResult?.found && lookupResult.product && mode === 'scan-out') {
       checkStockStatus(barcode)
     }
   }, [lookupResult, barcode, mode, checkStockStatus])
@@ -183,9 +183,9 @@ export default function ManualBarcodeEntry({
       }
 
       try {
-        if (mode === 'outbound') {
+        if (mode === 'scan-out') {
           if (!storeId) {
-            console.error('Store ID is required for outbound product search')
+            console.error('Store ID is required for scan-out product search')
             return
           }
           await supabaseSearch.mutateAsync(query)
@@ -277,7 +277,7 @@ export default function ManualBarcodeEntry({
           <div className="flex justify-between">
             <CardTitle className="flex items-center gap-2">
               <Keyboard className="w-5 h-5" />
-              {mode === 'outbound' ? t('manualSearch') : t('title')}
+              {mode === 'scan-out' ? t('manualSearch') : t('title')}
             </CardTitle>
           </div>
         </CardHeader>
@@ -386,7 +386,7 @@ export default function ManualBarcodeEntry({
                 <div className="space-y-2">
                   <Label>
                     {t('searchByProductName')}
-                    {mode === 'outbound' && (
+                    {mode === 'scan-out' && (
                       <span className="text-xs text-gray-500 ml-2">{t('inStockItemsOnly')}</span>
                     )}
                   </Label>
@@ -399,7 +399,7 @@ export default function ManualBarcodeEntry({
                         handleProductNameSearch(e.target.value)
                       }}
                       placeholder={
-                        mode === 'outbound'
+                        mode === 'scan-out'
                           ? t('inventorySearchPlaceholder')
                           : t('searchPlaceholder')
                       }
@@ -414,13 +414,13 @@ export default function ManualBarcodeEntry({
 
                   {/* Search Results Dropdown */}
                   {showProductSearchResults &&
-                    ((mode === 'outbound' && activeSearch.data && activeSearch.data.length > 0) ||
+                    ((mode === 'scan-out' && activeSearch.data && activeSearch.data.length > 0) ||
                       (mode === 'deliveries' &&
                         ((supabaseSearch.data && supabaseSearch.data.length > 0) ||
                           (productSearch.data && productSearch.data.length > 0)))) && (
                       <div className="border rounded-2xl max-h-64 overflow-y-auto bg-white shadow-lg p-2">
-                        {mode === 'outbound' ? (
-                          // Supabase results for outbound
+                        {mode === 'scan-out' ? (
+                          // Supabase results for scan-out
                           (activeSearch.data as SupabaseProductSearchResult[]).map(product => (
                             <Button
                               key={product.product_id}
@@ -432,7 +432,7 @@ export default function ManualBarcodeEntry({
                               onClick={() => {
                                 if (product.isOutOfStock) return
 
-                                // For outbound/Supabase results, use the product_id if no barcode exists
+                                // For scan-out/Supabase results, use the product_id if no barcode exists
                                 // This ensures we have a unique identifier that won't cause lookup failures
                                 const effectiveBarcode =
                                   product.barcode && product.barcode.trim() !== ''
@@ -446,7 +446,7 @@ export default function ManualBarcodeEntry({
                                   category: product.category || '',
                                   imageUrl: product.image_url || '',
                                   isManualEntry: true,
-                                  // Store the actual product_id for outbound operations
+                                  // Store the actual product_id for scan-out operations
                                   productId: product.product_id,
                                 }
 
@@ -569,7 +569,7 @@ export default function ManualBarcodeEntry({
                     )}
 
                   {showProductSearchResults &&
-                    ((mode === 'outbound' && activeSearch.data && activeSearch.data.length === 0) ||
+                    ((mode === 'scan-out' && activeSearch.data && activeSearch.data.length === 0) ||
                       (mode === 'deliveries' &&
                         (!supabaseSearch.data || supabaseSearch.data.length === 0) &&
                         (!productSearch.data || productSearch.data.length === 0))) && (
@@ -594,8 +594,8 @@ export default function ManualBarcodeEntry({
                   {lookupResult.found ? (
                     <Card>
                       <CardContent className="p-4">
-                        {/* Show different status based on stock availability in outbound mode */}
-                        {mode === 'outbound' && barcodeStockStatus !== null ? (
+                        {/* Show different status based on stock availability in scan-out mode */}
+                        {mode === 'scan-out' && barcodeStockStatus !== null ? (
                           barcodeStockStatus.hasStock ? (
                             <div className="flex justify-center items-center gap-2">
                               <Check className="w-6 h-6 text-secondary-900 stroke-5 border-2 border-secondary-900 rounded-full p-[3px] bg-primary-100" />
@@ -639,8 +639,8 @@ export default function ManualBarcodeEntry({
                               </div>
                             )}
 
-                            {/* Show stock information for outbound mode */}
-                            {mode === 'outbound' && barcodeStockStatus !== null && (
+                            {/* Show stock information for scan-out mode */}
+                            {mode === 'scan-out' && barcodeStockStatus !== null && (
                               <div>
                                 <strong>Stock:</strong>{' '}
                                 {barcodeStockStatus.hasStock ? (
@@ -690,7 +690,7 @@ export default function ManualBarcodeEntry({
                             }
                           }}
                           className={`w-full mt-3 ${
-                            mode === 'outbound' &&
+                            mode === 'scan-out' &&
                             barcodeStockStatus !== null &&
                             !barcodeStockStatus.hasStock
                               ? 'opacity-50 cursor-not-allowed'
@@ -698,12 +698,12 @@ export default function ManualBarcodeEntry({
                           }`}
                           disabled={
                             !lookupResult.product ||
-                            (mode === 'outbound' &&
+                            (mode === 'scan-out' &&
                               barcodeStockStatus !== null &&
                               !barcodeStockStatus.hasStock)
                           }
                         >
-                          {mode === 'outbound' &&
+                          {mode === 'scan-out' &&
                           barcodeStockStatus !== null &&
                           !barcodeStockStatus.hasStock
                             ? t('outOfStockCannotSelect')

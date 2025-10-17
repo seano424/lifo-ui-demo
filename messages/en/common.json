@@ -44,7 +44,7 @@
     "dashboard": "Dashboard",
     "inventory": "Inventory",
     "deliveries": "Deliveries",
-    "outbound": "Outbound",
+    "scanOut": "Scan Out",
     "analytics": "Analytics",
     "performance": "Performance",
     "milestones": "Milestones",

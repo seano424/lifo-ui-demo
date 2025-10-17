@@ -275,7 +275,7 @@
     "operations": "Operations",
     "inventory": "Inventory",
     "deliveries": "Deliveries",
-    "outbound": "Outbound",
+    "scanOut": "Scan Out",
     "todos": "Todos",
     "performance": "Performance",
     "milestones": "Milestones",

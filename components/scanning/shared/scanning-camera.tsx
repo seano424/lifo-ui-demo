@@ -37,8 +37,8 @@ export interface ScanningCameraProps {
   onToggleManualEntry?: () => void
   onManualProductSelected?: (barcode: string) => void
   onCloseManualEntry?: () => void
-  manualEntryMode?: 'deliveries' | 'outbound' // For ManualBarcodeEntry mode
-  storeId?: string // For outbound manual entry
+  manualEntryMode?: 'deliveries' | 'scan-out' // For ManualBarcodeEntry mode
+  storeId?: string // For scan-out manual entry
 
   // Backend health
   isBackendHealthy?: boolean | null
