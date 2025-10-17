@@ -1,42 +1,14 @@
-const CACHE_NAME = 'lifo-ai-v11'
+const CACHE_NAME = 'lifo-ai-v12'
 
-// Push notification handler
-self.addEventListener('push', event => {
-  if (event.data) {
-    const data = event.data.json()
-    const options = {
-      body: data.body,
-      icon: data.icon || '/icon.png',
-      badge: '/badge.png',
-      vibrate: [100, 50, 100],
-      data: {
-        dateOfArrival: Date.now(),
-        primaryKey: '2',
-      },
-    }
-    event.waitUntil(self.registration.showNotification(data.title, options))
-  }
-})
-
-// Notification click handler
-self.addEventListener('notificationclick', event => {
-  console.log('Notification click received.')
-  event.notification.close()
-  event.waitUntil(clients.openWindow('http://localhost:3000'))
-})
-
-// Install event
+// Install event - claim immediately
 self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then(() => {
-      console.log('Service Worker: Cache opened')
-      return self.skipWaiting()
-    }),
-  )
+  console.log('Service Worker: Installing v12 - minimal pass-through mode')
+  event.waitUntil(self.skipWaiting())
 })
 
-// Activate event
+// Activate event - clean up old caches and claim clients
 self.addEventListener('activate', event => {
+  console.log('Service Worker: Activating v12')
   event.waitUntil(
     caches
       .keys()
@@ -44,6 +16,7 @@ self.addEventListener('activate', event => {
         return Promise.all(
           cacheNames.map(cacheName => {
             if (cacheName !== CACHE_NAME) {
+              console.log('Service Worker: Deleting old cache:', cacheName)
               return caches.delete(cacheName)
             }
           }),
@@ -53,56 +26,11 @@ self.addEventListener('activate', event => {
   )
 })
 
-// Fetch event - Proper passthrough for critical requests
+// Fetch event - SIMPLIFIED: Pass through everything
+// No caching - Next.js 15 handles its own caching better
+// This prevents auth issues, ECONNRESET errors, and stream issues
 self.addEventListener('fetch', event => {
-  const { request } = event
-  const url = new URL(request.url)
-
-  // CRITICAL: Explicitly pass through these requests with fetch()
-  // Don't just return - that can cause ECONNRESET errors
-  const shouldPassThrough =
-    // Supabase requests (auth, database, storage)
-    url.hostname.includes('supabase.co') ||
-    // Open Food Facts API requests
-    url.hostname.includes('openfoodfacts.org') ||
-    // DigitalOcean staging API (LIFO AI backend)
-    url.hostname.includes('ondigitalocean.app') ||
-    // Same-origin navigation (Next.js routing)
-    (url.origin === self.location.origin &&
-      (request.mode === 'navigate' || request.destination === 'document')) ||
-    // API routes and Next.js internals
-    url.pathname.startsWith('/api/') ||
-    url.pathname.startsWith('/_next/')
-
-  if (shouldPassThrough) {
-    // Explicitly pass through with fetch - prevents connection issues
-    event.respondWith(fetch(request))
-    return
-  }
-
-  // Only cache external static assets
-  if (
-    request.destination === 'image' ||
-    request.destination === 'style' ||
-    request.destination === 'script' ||
-    request.destination === 'font'
-  ) {
-    event.respondWith(
-      caches.match(request).then(cachedResponse => {
-        if (cachedResponse) {
-          return cachedResponse
-        }
-
-        return fetch(request).then(response => {
-          if (response.ok) {
-            const responseToCache = response.clone()
-            caches.open(CACHE_NAME).then(cache => {
-              cache.put(request, responseToCache)
-            })
-          }
-          return response
-        })
-      }),
-    )
-  }
+  // Simply pass through all requests without intervention
+  // This maintains PWA installability while avoiding caching conflicts
+  event.respondWith(fetch(event.request))
 })
