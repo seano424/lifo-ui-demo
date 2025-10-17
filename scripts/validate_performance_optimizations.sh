@@ -138,10 +138,10 @@ case "$ENVIRONMENT" in
         API_URL="http://localhost:8000"
         ;;
     staging)
-        API_URL="https://api-staging.LIFO"
+        API_URL="https://api-staging.lifo.ai"
         ;;
     production)
-        API_URL="https://api.LIFO"
+        API_URL="https://api.lifo.ai"
         ;;
     *)
         echo -e "${RED}Unknown environment: $ENVIRONMENT${NC}"

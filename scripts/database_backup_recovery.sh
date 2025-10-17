@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Database Backup and Recovery System for LIFO
+# Database Backup and Recovery System for LIFO.AI
 # Handles Supabase PostgreSQL backup with enterprise scaling
 # Supports both MCP-based operations and traditional pg_dump
 
@@ -362,7 +362,7 @@ generate_backup_report() {
     log "Generating backup report"
     
     {
-        echo "LIFO Database Backup Report"
+        echo "LIFO.AI Database Backup Report"
         echo "Generated: $(date)"
         echo "======================================="
         echo
@@ -400,7 +400,7 @@ generate_backup_report() {
 run_backup() {
     local backup_type="${1:-daily}"
     
-    log "Starting LIFO database backup - Type: $backup_type"
+    log "Starting LIFO.AI database backup - Type: $backup_type"
     
     # Initialize
     init_directories
@@ -519,7 +519,7 @@ case "${1:-}" in
         check_replication_lag
         ;;
     *)
-        echo "LIFO Database Backup and Recovery System"
+        echo "LIFO.AI Database Backup and Recovery System"
         echo
         echo "Usage: $0 <command> [options]"
         echo
