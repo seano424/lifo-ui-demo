@@ -16,14 +16,16 @@ export function DashboardWelcome() {
     <div className="w-full flex flex-col gap-12">
       {/* Welcome header */}
       <div className="flex flex-col gap-10 mt-8 text-center">
-        {/* Title with subtle gradient */}
-        <Typography
-          variant="h2"
-          as="h1"
-          className="font-bold text-4xl md:text-5xl lg:text-6xl bg-clip-text text-transparent bg-gradient-to-r from-secondary-900 via-primary-800 to-secondary-700"
-        >
-          {t('welcome.title')}
-        </Typography>
+        {/* Title with icon and gradient - similar to dashboard inset header */}
+        <div className="flex items-center justify-center gap-3">
+          <Typography
+            variant="h2"
+            as="h1"
+            className="font-black text-4xl md:text-5xl lg:text-6xl bg-gradient-to-r from-gray-900 to-gray-600 dark:from-gray-100 dark:to-gray-400 bg-clip-text text-transparent capitalize pb-1"
+          >
+            {t('welcome.title')}
+          </Typography>
+        </div>
 
         <Typography variant="p" className="text-muted-foreground max-w-2xl mx-auto text-lg">
           {t('welcome.description')}
@@ -78,7 +80,7 @@ export function DashboardWelcome() {
               <Button
                 asLink
                 href="/support"
-                target="_blank"
+                target="blank"
                 variant="outline"
                 className="w-fit mt-2 group text-secondary"
               >
