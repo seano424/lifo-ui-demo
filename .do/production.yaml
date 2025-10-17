@@ -56,7 +56,7 @@ services:
   
   # CORS settings for production (restrictive but allow health checks)
   - key: BACKEND_CORS_ORIGINS
-    value: "https://lifo-app.com,https://www.lifo-app.com,null"  # Production domains + internal health checks
+    value: "https://lifo-app.com,https://www.lifo-app.com,https://clownfish-app-y2uru.ondigitalocean.app,null"  # Production domains + internal health checks
 
   - key: FRONTEND_URL
     value: "https://lifo-app.com"  # Primary production frontend URL
