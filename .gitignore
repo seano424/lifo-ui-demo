@@ -184,3 +184,6 @@ certificates
 !dataset_tools/
 !test_data/
 CLAUDE.md
+
+# Exploration and brainstorming (future improvements, not for production)
+_exploration/

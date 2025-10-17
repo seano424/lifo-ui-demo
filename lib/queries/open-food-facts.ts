@@ -82,6 +82,15 @@ class OpenFoodFactsClient {
       if (!response.ok) {
         const error = new Error(`HTTP ${response.status}: ${response.statusText}`)
         ;(error as Error & { status: number }).status = response.status
+
+        // 404 is expected when product not in database - log only in debug mode
+        if (response.status === 404) {
+          logger.log('lib/queries/open-food-facts', 'Product not found in Open Food Facts', {
+            barcode,
+            status: response.status,
+          })
+        }
+
         throw error
       }
 
@@ -110,10 +119,25 @@ class OpenFoodFactsClient {
         throw networkError
       }
 
-      logger.error('lib/queries/open-food-facts', 'Failed to lookup barcode', {
-        error: error instanceof Error ? error.message : String(error),
-        barcode,
-      })
+      // Check if this is a 404 error (product not found) - expected behavior
+      const is404 =
+        error instanceof Error &&
+        'status' in error &&
+        (error as Error & { status: number }).status === 404
+
+      if (is404) {
+        // 404 is expected - log only in debug mode, not as error
+        logger.log('lib/queries/open-food-facts', 'Product not found in database', {
+          barcode,
+        })
+      } else {
+        // Actual errors (network, server errors, etc.)
+        logger.error('lib/queries/open-food-facts', 'Failed to lookup barcode', {
+          error: error instanceof Error ? error.message : String(error),
+          barcode,
+        })
+      }
+
       throw error
     }
   }

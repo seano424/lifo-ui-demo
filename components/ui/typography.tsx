@@ -38,9 +38,24 @@ export type TypographyProps = {
 } & Omit<React.HTMLAttributes<HTMLElement>, 'color'> &
   VariantProps<typeof typographyVariants>
 
+const variantElementMap: Record<string, React.ElementType> = {
+  h1: 'h1',
+  h2: 'h2',
+  h3: 'h3',
+  h4: 'h4',
+  h5: 'h5',
+  p: 'p',
+  blockquote: 'blockquote',
+  code: 'code',
+  small: 'p',
+  muted: 'p',
+  extraSmall: 'p',
+}
+
 const Typography = React.forwardRef<HTMLElement, TypographyProps>(
   ({ className, variant, color, asChild = false, as: CompProp, ...props }, ref) => {
-    const Comp = asChild ? Slot : CompProp || 'span'
+    // Use provided 'as' prop, or infer from variant, or default to 'span'
+    const Comp = asChild ? Slot : CompProp || (variant && variantElementMap[variant]) || 'span'
     return (
       <Comp
         className={cn(typographyVariants({ variant, color, className }))}

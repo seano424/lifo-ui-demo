@@ -223,7 +223,8 @@
   "scanningInterface": {
     "camera": {
       "scanProduct": "Product scannen",
-      "scanDifferentProduct": "Ander product scannen"
+      "scanDifferentProduct": "Ander product scannen",
+      "productNotFoundScanAgain": "Product niet gevonden - Scan een ander product of voeg het handmatig toe"
     },
     "product": {
       "productFound": "Product gevonden! Klaar om verder te gaan met het scannen van de vervaldatum.",

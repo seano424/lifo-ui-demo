@@ -1,21 +1,13 @@
 'use client'
 
-import type { ColumnDef, Header } from '@tanstack/react-table'
-import { Building2, Edit, Euro, Eye, MoreHorizontal, Package, Tag, Trash2 } from 'lucide-react'
 import type { useTranslations } from 'next-intl'
-import { SortableHeader } from '@/components/products/sortable-header'
+import { Building2, Tag } from 'lucide-react'
+import type { ColumnDef, Header } from '@tanstack/react-table'
+
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+import { SortableHeader } from '@/components/products/sortable-header'
+import { Typography } from '@/components/ui/typography'
 import type { Product, ProductSort, SortField } from '@/lib/queries/products'
-import { Typography } from '../ui/typography'
 
 interface ColumnResizerProps {
   header: Header<Product, unknown>
@@ -68,9 +60,6 @@ const getCategoryBadgeColor = (category: string) => {
 export function createProductTableColumns({
   currentSort,
   updateSort,
-  updateProductPrice,
-  deleteProduct,
-  isUpdating,
   DEFAULT_COLUMN_WIDTHS,
   t,
 }: {
@@ -257,63 +246,63 @@ export function createProductTableColumns({
       maxSize: 120,
       enableResizing: true,
     },
-    {
-      id: 'actions',
-      header: '',
-      cell: ({ row }) => (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="sm" disabled={isUpdating}>
-              <MoreHorizontal className="h-4 w-4" />
-              <span className="sr-only">{t('openMenu')}</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>{t('actions')}</DropdownMenuLabel>
-            <DropdownMenuItem>
-              <Eye className="mr-2 h-4 w-4" />
-              {t('viewDetails')}
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Package className="mr-2 h-4 w-4" />
-              {t('viewBatches')}
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Edit className="mr-2 h-4 w-4" />
-              {t('editProduct')}
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onClick={() => {
-                const currentPrice = row.original.base_selling_price || 0
-                const newPrice = prompt(t('enterNewPrice'), currentPrice.toString())
-                if (newPrice && !Number.isNaN(Number(newPrice))) {
-                  updateProductPrice(row.original.product_id, Number(newPrice))
-                }
-              }}
-            >
-              <Euro className="mr-2 h-4 w-4" />
-              {t('updatePrice')}
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onClick={() => {
-                if (confirm(t('confirmDeleteProduct'))) {
-                  deleteProduct(row.original.product_id)
-                }
-              }}
-              className="text-destructive"
-            >
-              <Trash2 className="mr-2 h-4 w-4" />
-              {t('deleteProduct')}
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      ),
-      enableResizing: false,
-      size: DEFAULT_COLUMN_WIDTHS.actions || 60,
-      minSize: 50,
-    },
+    // {
+    //   id: 'actions',
+    //   header: '',
+    //   cell: ({ row }) => (
+    //     <DropdownMenu>
+    //       <DropdownMenuTrigger asChild>
+    //         <Button variant="ghost" size="sm" disabled={isUpdating}>
+    //           <MoreHorizontal className="h-4 w-4" />
+    //           <span className="sr-only">{t('openMenu')}</span>
+    //         </Button>
+    //       </DropdownMenuTrigger>
+    //       <DropdownMenuContent align="end">
+    //         <DropdownMenuLabel>{t('actions')}</DropdownMenuLabel>
+    //         <DropdownMenuItem>
+    //           <Eye className="mr-2 h-4 w-4" />
+    //           {t('viewDetails')}
+    //         </DropdownMenuItem>
+    //         <DropdownMenuItem>
+    //           <Package className="mr-2 h-4 w-4" />
+    //           {t('viewBatches')}
+    //         </DropdownMenuItem>
+    //         <DropdownMenuItem>
+    //           <Edit className="mr-2 h-4 w-4" />
+    //           {t('editProduct')}
+    //         </DropdownMenuItem>
+    //         <DropdownMenuSeparator />
+    //         <DropdownMenuItem
+    //           onClick={() => {
+    //             const currentPrice = row.original.base_selling_price || 0
+    //             const newPrice = prompt(t('enterNewPrice'), currentPrice.toString())
+    //             if (newPrice && !Number.isNaN(Number(newPrice))) {
+    //               updateProductPrice(row.original.product_id, Number(newPrice))
+    //             }
+    //           }}
+    //         >
+    //           <Euro className="mr-2 h-4 w-4" />
+    //           {t('updatePrice')}
+    //         </DropdownMenuItem>
+    //         <DropdownMenuSeparator />
+    //         <DropdownMenuItem
+    //           onClick={() => {
+    //             if (confirm(t('confirmDeleteProduct'))) {
+    //               deleteProduct(row.original.product_id)
+    //             }
+    //           }}
+    //           className="text-destructive"
+    //         >
+    //           <Trash2 className="mr-2 h-4 w-4" />
+    //           {t('deleteProduct')}
+    //         </DropdownMenuItem>
+    //       </DropdownMenuContent>
+    //     </DropdownMenu>
+    //   ),
+    //   enableResizing: false,
+    //   size: DEFAULT_COLUMN_WIDTHS.actions || 60,
+    //   minSize: 50,
+    // },
   ]
 }
 

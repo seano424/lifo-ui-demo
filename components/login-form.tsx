@@ -44,14 +44,8 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
             <Building2 className="w-6 h-6 text-primary" />
           </div>
           <div className="space-y-1.5 flex flex-col">
-            <CardTitle>
-              <Typography variant="h1">{t('welcomeTitle')}</Typography>
-            </CardTitle>
-            <CardDescription>
-              <Typography variant="p" color="muted">
-                {t('description')}
-              </Typography>
-            </CardDescription>
+            <CardTitle>{t('welcomeTitle')}</CardTitle>
+            <CardDescription>{t('description')}</CardDescription>
           </div>
         </CardHeader>
 

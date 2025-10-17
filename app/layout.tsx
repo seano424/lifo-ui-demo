@@ -49,6 +49,7 @@ const robotoMono = Roboto_Mono({
   display: 'swap',
   subsets: ['latin'],
   weight: ['400', '500', '600', '700'],
+  preload: false, // Only used in specific components, not on every page
 })
 
 export default async function RootLayout({

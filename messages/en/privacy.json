@@ -1,0 +1,151 @@
+{
+  "privacypage": {
+    "title": "Privacy Policy",
+    "lastUpdated": "Last Updated: October 16, 2025",
+    "metadata": {
+      "title": "Privacy Policy | LIFO.AI",
+      "description": "Privacy Policy for LIFO.AI food waste management platform"
+    },
+    "section1": {
+      "title": "1. Who We Are",
+      "content": "LIFO provides batch-level inventory management software for retail stores. We help you track product expiration dates, reduce food waste, and make data-driven decisions about discounts and donations. Contact Us: Email: contact@lifo-app.com | For GDPR rights requests: contact@lifo-app.com"
+    },
+    "section2": {
+      "title": "2. What Data We Collect",
+      "intro": "We collect the following types of data:",
+      "items": [
+        "Account Information: Name, email address, store name and location, user role (admin, manager, or employee), login credentials (encrypted)",
+        "Inventory Data: Product names and descriptions, batch numbers and quantities, expiration dates, barcode information, discount and donation decisions",
+        "Product Images: Photos captured during barcode and expiration date scanning, processed through image recognition technology, used solely for extracting product information and dates",
+        "Usage Data: Actions taken within the app (scans, updates, decisions), timestamps of activities, device information (browser type, operating system, IP address), performance and error logs"
+      ]
+    },
+    "section3": {
+      "title": "3. How We Use Your Data",
+      "intro": "We process your data to:",
+      "items": [
+        "Provide Our Service: Enable inventory tracking and management, generate discount and donation recommendations, create analytics dashboards showing inventory value and waste metrics, send important notifications about expiring products",
+        "Improve Our Service: Enhance image recognition accuracy, optimize recommendation algorithms, identify and fix technical issues, develop new features based on usage patterns",
+        "Communicate With You: Send service updates and important announcements, respond to your support requests, notify you of changes to our terms or policies",
+        "Comply With Legal Obligations: Meet food safety and waste reporting requirements, respond to legal requests when required, protect against fraud and abuse"
+      ]
+    },
+    "section4": {
+      "title": "4. Legal Basis for Processing (GDPR)",
+      "legalBasis": {
+        "title": "We process your data based on:",
+        "intro": "",
+        "items": [
+          "Performance of Contract: To provide the Service you signed up for",
+          "Legitimate Interests: To improve our Service, prevent fraud, and ensure security",
+          "Your Consent: Where we explicitly request permission (e.g., for optional features)",
+          "Legal Obligation: To comply with applicable laws and regulations"
+        ]
+      }
+    },
+    "section5": {
+      "title": "5. Data Storage and Security",
+      "intro": "",
+      "items": [
+        "Where We Store Your Data: All data is stored on secure servers located in the European Union. We use Supabase (EU region) for database hosting. Data is encrypted both in transit (TLS/SSL) and at rest.",
+        "How We Protect Your Data: Industry-standard encryption protocols, regular security audits and vulnerability assessments, access controls and multi-factor authentication, secure development practices and code reviews, employee training on data protection.",
+        "Data Retention: We retain your data for as long as your account remains active. Upon account deletion, we delete or anonymize your data within 90 days. Some data may be retained longer if required by law (e.g., accounting records)."
+      ],
+      "outro": ""
+    },
+    "section6": {
+      "title": "6. Data Sharing and Third Parties",
+      "storage": {
+        "title": "We do not sell your personal data.",
+        "content": "We may share data only with: Service Providers (Cloud Hosting: Supabase - EU-based, GDPR-compliant; Image Processing: Google Vision API for expiration date recognition; Email Services: Resend or similar for account notifications; Analytics: Usage analytics to improve the Service), for Legal Requirements (comply with legal obligations or court orders, protect our rights or prevent fraud, investigate security incidents, respond to law enforcement requests), or With Your Consent (for other purposes only with your explicit permission)."
+      },
+      "retention": {
+        "title": "Third-Party Processors",
+        "content": "All third-party processors are contractually bound to GDPR standards, process data only according to our instructions, and implement appropriate security measures."
+      }
+    },
+    "section7": {
+      "title": "7. Your Privacy Rights (GDPR)",
+      "intro": "Under GDPR, you have the right to:",
+      "items": [
+        "Access Your Data: Request a copy of all personal data we hold about you",
+        "Rectify Inaccurate Data: Correct any information that is incomplete or incorrect",
+        "Delete Your Data (\"Right to Be Forgotten\"): Request deletion of your personal data (subject to legal retention requirements)",
+        "Data Portability: Receive your data in a structured, commonly used format (CSV, JSON)",
+        "Object to Processing: Object to certain data processing activities (e.g., direct marketing)",
+        "Restrict Processing: Limit how we process your data in specific circumstances",
+        "Withdraw Consent: Withdraw consent at any time where processing is based on consent (does not affect prior processing)"
+      ],
+      "contact": "To exercise these rights, contact us at",
+      "email": "contact@lifo-app.com",
+      "responseTime": "We will respond to your request within 30 days (or 60 days for complex requests, with notification)."
+    },
+    "section8": {
+      "title": "8. Cookies and Tracking Technologies",
+      "intro": "We currently use Essential Cookies (required for Service): authentication tokens (keeps you logged in), session management (maintains your active session), security cookies (prevents unauthorized access). We may implement additional cookies for:",
+      "items": [
+        "Performance monitoring and analytics",
+        "User preference storage (e.g., language settings)",
+        "Service improvement and A/B testing"
+      ],
+      "outro": "You will be notified before we introduce new cookie types. You can control cookie preferences through your browser settings. Note: Disabling essential cookies may limit Service functionality."
+    },
+    "section9": {
+      "title": "9. International Data Transfers",
+      "intro": "Your data is primarily stored in the European Union. If we transfer data outside the EU, we ensure adequate protection through:",
+      "items": [
+        "Standard Contractual Clauses (SCCs) approved by the EU Commission",
+        "Adequacy Decisions (for countries recognized as providing adequate protection)",
+        "Other lawful transfer mechanisms under GDPR Article 46"
+      ],
+      "outro": "We will notify you of any changes to our data transfer practices."
+    },
+    "section10": {
+      "title": "10. Data Breach Notification",
+      "content": "In the unlikely event of a data breach affecting your personal data, we will notify you within 72 hours of becoming aware and inform relevant supervisory authorities as required by GDPR. We will provide information about the nature of the breach, data potentially affected, likely consequences, measures taken to address the breach, and steps you can take to protect yourself."
+    },
+    "section11": {
+      "title": "11. Children's Privacy",
+      "intro": "The LIFO Service is not intended for individuals under 16 years of age. We do not knowingly collect personal data from children. If we discover that we have inadvertently collected data from a child, we will delete it immediately.",
+      "items": [
+        "If you believe we have collected data from a child, please contact us at: contact@lifo-app.com"
+      ]
+    },
+    "section12": {
+      "title": "12. Automated Decision-Making",
+      "content": "We use automated systems to generate discount and donation recommendations based on product expiration dates, historical sales patterns, inventory levels, and store-specific data. Important: These recommendations are advisory only. You retain full control over all business decisions. We do not make automated decisions with legal or significant effects without human oversight."
+    },
+    "section13": {
+      "title": "13. Changes to This Privacy Policy",
+      "content": "We may update this Privacy Policy from time to time to reflect changes in our practices, legal or regulatory updates, or new features or services. We will notify you of material changes via email to your registered address, in-app notification, or notice on our website. Continued use of the Service after changes constitutes acceptance of the updated policy."
+    },
+    "section14": {
+      "title": "14. Your Data Protection Authority",
+      "intro": "You have the right to lodge a complaint with your local data protection authority if you believe we have violated GDPR or your privacy rights.",
+      "euAuthorities": {
+        "title": "EU Data Protection Authorities:",
+        "content": "Find your local authority at",
+        "link": "https://edpb.europa.eu/about-edpb/board/members_en"
+      },
+      "netherlands": {
+        "title": "Netherlands (Our Primary Jurisdiction):",
+        "authority": "Autoriteit Persoonsgegevens (AP)",
+        "website": "https://autoriteitpersoonsgegevens.nl",
+        "email": "info@autoriteitpersoonsgegevens.nl"
+      }
+    },
+    "section15": {
+      "title": "15. Data Ownership",
+      "content": "You own your data. All inventory data, product information, and business insights generated through LIFO remain your property. We are merely processors of this data on your behalf. You can export your data at any time in standard formats (CSV, JSON) through your account settings."
+    },
+    "section16": {
+      "title": "16. Contact Us",
+      "intro": "For questions about this Privacy Policy, to exercise your GDPR rights, or for any privacy concerns:",
+      "email": "contact@lifo-app.com",
+      "responseTime": "We aim to respond to all privacy inquiries within 2 business days."
+    },
+    "finalStatement": {
+      "content": "By using LIFO, you acknowledge that you have read and understood this Privacy Policy."
+    }
+  }
+}

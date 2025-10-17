@@ -39,7 +39,7 @@ export interface ScanningCameraProps {
   onCloseManualEntry?: () => void
   manualEntryMode?: 'deliveries' | 'scan-out' // For ManualBarcodeEntry mode
   storeId?: string // For scan-out manual entry
-
+  defaultBarcode?: string // For scan-out manual entry
   // Backend health
   isBackendHealthy?: boolean | null
 
@@ -62,6 +62,7 @@ export default function ScanningCamera({
   showManualEntry = false,
   manualEntryMode = 'deliveries',
   storeId,
+  defaultBarcode,
   onToggleManualEntry,
   onManualProductSelected,
   onCloseManualEntry,
@@ -238,6 +239,7 @@ export default function ScanningCamera({
                 onProductSelected={onManualProductSelected}
                 mode={manualEntryMode}
                 storeId={storeId}
+                defaultBarcode={defaultBarcode}
               />
             </div>
           )}
