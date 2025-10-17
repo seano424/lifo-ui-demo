@@ -91,7 +91,7 @@ export function DashboardWelcome() {
             <div className="flex-shrink-0 relative w-48 h-48 hidden md:block">
               <Image
                 src="/logos/lifo-logo-icon.svg"
-                alt="LIFO.AI"
+                alt="LIFO"
                 fill
                 className="object-contain opacity-30"
               />

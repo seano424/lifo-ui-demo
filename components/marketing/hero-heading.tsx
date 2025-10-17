@@ -23,7 +23,7 @@ export function HeroHeading() {
           as="h1"
           className="text-5xl md:text-7xl py-6 bg-clip-text text-transparent bg-gradient-to-r from-violet-700 via-indigo-400 to-blue-600"
         >
-          LIFO.AI
+          LIFO
         </Typography>
       </div>
       <Typography as="h2" className="text-4xl md:text-6xl text-foreground/80">

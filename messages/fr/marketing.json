@@ -196,7 +196,7 @@
     },
     "businessStats": {
       "title": "Maximisez vos profits, minimisez vos pertes",
-      "subtitle": "Découvrez l'impact réel de LIFO.AI sur des entreprises comme la vôtre",
+      "subtitle": "Découvrez l'impact réel de LIFO sur des entreprises comme la vôtre",
       "disclaimer": "Les résultats peuvent varier. Basé sur les données moyennes des clients sur 12 mois.",
       "revenue": {
         "label": "Augmentation des revenus",
@@ -414,7 +414,7 @@
     },
     "cta": {
       "title": "Prêt à transformer votre inventaire ?",
-      "description": "Transformez votre gestion d'inventaire avec LIFO.AI et commencez à réduire les déchets dès aujourd'hui.",
+      "description": "Transformez votre gestion d'inventaire avec LIFO et commencez à réduire les déchets dès aujourd'hui.",
       "button": "Commencer l'essai gratuit"
     }
   },
@@ -762,7 +762,7 @@
     },
     "contactUs": "Contactez-Nous",
     "email": "contact@lifo-app.com",
-    "copyright": "© {year} LIFO.AI. Tous droits réservés.",
+    "copyright": "© {year} LIFO. Tous droits réservés.",
     "legal": {
       "privacyPolicy": "Politique de Confidentialité",
       "termsOfService": "Conditions d'Utilisation"

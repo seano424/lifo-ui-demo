@@ -1,5 +1,5 @@
 #!/bin/bash
-# LIFO.AI Comprehensive Backup and Recovery System
+# LIFO Comprehensive Backup and Recovery System
 # Production-ready backup automation with monitoring and alerting
 
 set -euo pipefail
@@ -44,7 +44,7 @@ log() {
 send_alert() {
     local level="$1"
     local message="$2"
-    local subject="LIFO.AI Backup Alert - $level"
+    local subject="LIFO Backup Alert - $level"
     
     log "$level" "$message"
     
@@ -406,7 +406,7 @@ main() {
     local backup_type="${1:-daily}"
     local timestamp=$(date '+%Y%m%d_%H%M%S')
     
-    log "INFO" "Starting LIFO.AI $backup_type backup - Version 2.0.0"
+    log "INFO" "Starting LIFO $backup_type backup - Version 2.0.0"
     
     acquire_lock
     
@@ -441,13 +441,13 @@ main() {
     
     cleanup_old_backups
     
-    log "INFO" "LIFO.AI backup process completed"
+    log "INFO" "LIFO backup process completed"
 }
 
 # Script usage
 usage() {
     cat <<EOF
-LIFO.AI Database Backup System v2.0.0
+LIFO Database Backup System v2.0.0
 
 Usage: $0 [backup_type]
 

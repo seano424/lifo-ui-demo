@@ -1,13 +1,13 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy | LIFO.AI',
+  title: 'Privacy Policy | LIFO',
   description:
-    'Privacy Policy for LIFO.AI food waste management platform. Learn about our data collection practices, GDPR compliance, and how we protect your personal information.',
+    'Privacy Policy for LIFO food waste management platform. Learn about our data collection practices, GDPR compliance, and how we protect your personal information.',
   robots: 'index, follow',
   openGraph: {
-    title: 'Privacy Policy | LIFO.AI',
-    description: 'Privacy Policy for LIFO.AI food waste management platform',
+    title: 'Privacy Policy | LIFO',
+    description: 'Privacy Policy for LIFO food waste management platform',
     type: 'website',
   },
 }

@@ -35,7 +35,7 @@
       },
       "todoSuggestions": {
         "title": "Suggestions de Todo",
-        "description": "Afficher et gérer les tâches suggérées par LIFO.AI pour optimiser votre inventaire.",
+        "description": "Afficher et gérer les tâches suggérées par LIFO pour optimiser votre inventaire.",
         "action": "Afficher les todos"
       },
       "removeProducts": {

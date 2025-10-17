@@ -132,7 +132,7 @@ export function OnboardingFlow() {
             <p className="text-sm text-muted-foreground">
               Need help with business verification?{' '}
               <a
-                href="mailto:support@lifo.ai?subject=Business Already Registered"
+                href="mailto:support@LIFO?subject=Business Already Registered"
                 className="text-primary hover:underline"
               >
                 Contact Support

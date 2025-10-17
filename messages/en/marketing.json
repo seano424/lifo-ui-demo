@@ -196,7 +196,7 @@
     },
     "businessStats": {
       "title": "Maximize Your Profits, Minimize Your Losses",
-      "subtitle": "See the real impact LIFO.AI has on businesses like yours",
+      "subtitle": "See the real impact LIFO has on businesses like yours",
       "disclaimer": "Results may vary. Based on average customer data over 12 months.",
       "revenue": {
         "label": "Revenue Increase",
@@ -324,7 +324,7 @@
     },
     "cta": {
       "title": "Ready to Transform Your Inventory?",
-      "description": "Transform your inventory management with LIFO.AI and start reducing waste today.",
+      "description": "Transform your inventory management with LIFO and start reducing waste today.",
       "button": "Start Free Trial"
     }
   },
@@ -759,7 +759,7 @@
     },
     "contactUs": "Contact Us",
     "email": "contact@lifo-app.com",
-    "copyright": "© {year} LIFO.AI. All rights reserved.",
+    "copyright": "© {year} LIFO. All rights reserved.",
     "legal": {
       "privacyPolicy": "Privacy Policy",
       "termsOfService": "Terms of Service"

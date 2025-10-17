@@ -116,7 +116,7 @@ function generateWelcomeEmailHTML(
                     <!-- Header -->
                     <tr>
                         <td style="padding: 40px 40px 20px 40px; text-align: center;">
-                            <img src="https://jrgmetdsohowtxickqij.supabase.co/storage/v1/object/public/brand-assets/logo-white-bg.png" alt="LIFO.AI" style="height: 80px;">
+                            <img src="https://jrgmetdsohowtxickqij.supabase.co/storage/v1/object/public/brand-assets/logo-white-bg.png" alt="LIFO" style="height: 80px;">
                           
                             <h1 style="color: hsl(225 42% 8%); font-size: 28px; font-weight: 700; margin: 0; letter-spacing: -0.5px; font-family: 'Raleway', sans-serif;">
                                 Welcome to LIFO!

@@ -97,7 +97,7 @@ export function ConfirmDetailsStep() {
   }
 
   const handleContactSupport = () => {
-    window.open('mailto:support@lifo.ai?subject=Business Already Registered', '_blank')
+    window.open('mailto:support@LIFO?subject=Business Already Registered', '_blank')
   }
 
   if (!selectedStoreForm) {
