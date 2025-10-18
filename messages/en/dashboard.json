@@ -5,7 +5,6 @@
       "description": "Get started with your inventory management by adding your first products. Here are some quick actions to help you get started.",
       "badge": "Let's get started with your inventory",
       "actions": {
-        "getStarted": "Get Started",
         "deliveries": {
           "title": "Add Your First Products",
           "description": "Start by adding products to your inventory through scanning or manual entry."
