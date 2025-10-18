@@ -63,34 +63,38 @@ export function DashboardWelcome() {
       </div>
 
       {/* Help section with subtle design */}
-      <div className="mt-4 rounded-xl overflow-hidden border">
+      <div className="mt-4 rounded-xl border">
         <div className="bg-muted/30 dark:bg-muted/10">
-          <div className="p-6 flex flex-col md:flex-row gap-6 items-center">
+          <div className="p-3 sm:p-6 flex flex-col md:flex-row gap-3 sm:gap-4 md:gap-6 items-center">
             {/* Left side with icon and text */}
-            <div className="flex flex-col gap-4 flex-1">
-              <div className="flex items-center gap-2">
-                <BarChart3 className="text-secondary h-5 w-5" />
-                <Typography variant="h4" className="font-semibold">
+            <div className="flex flex-col justify-center items-center md:items-start gap-3 md:gap-4 flex-1 text-center md:text-left">
+              <div className="flex items-center gap-2 justify-center md:justify-start">
+                <BarChart3 className="text-secondary h-5 w-5 flex-shrink-0" />
+                <Typography variant="h4" className="font-semibold text-base sm:text-lg">
                   {t('welcome.help.title')}
                 </Typography>
               </div>
-              <Typography variant="p" className="text-muted-foreground">
+              <Typography
+                variant="p"
+                className="mx-4 sm:mx-2 text-muted-foreground text-sm sm:text-base leading-relaxed"
+              >
                 {t('welcome.help.description')}
               </Typography>
+
               <Button
                 asLink
                 href="/support"
                 target="blank"
                 variant="outline"
-                className="w-fit mt-2 group text-secondary"
+                className="w-[90%] sm:w-fit mt-2 group text-secondary text-xs sm:text-sm"
               >
                 {t('welcome.help.learnMore')}
-                <ArrowRight className=" h-4 w-4 ml-1 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="h-4 w-4 ml-1 group-hover:translate-x-1 transition-transform" />
               </Button>
             </div>
 
             {/* Right side with illustration */}
-            <div className="flex-shrink-0 relative w-48 h-48 hidden md:block">
+            <div className="flex-shrink-0 relative w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48">
               <Image
                 src="/logos/lifo-logo-icon.svg"
                 alt="LIFO"
