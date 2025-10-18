@@ -26,18 +26,7 @@ export function QuickActionCards() {
           title="addProducts.title"
           description="addProducts.description"
           primaryIcon={<ScanSearch className="h-6 w-6" />}
-          secondaryIcon={<ScanSearch className="h-6 w-6" />}
           link="/dashboard/deliveries"
-          translationKey="dashboard.quickActions"
-        />
-
-        <QuickActionCard
-          variant="secondary"
-          title="removeProducts.title"
-          description="removeProducts.description"
-          primaryIcon={<ScanBarcode className="h-6 w-6" />}
-          secondaryIcon={<ScanBarcode className="h-6 w-6" />}
-          link="/dashboard/scan-out"
           translationKey="dashboard.quickActions"
         />
         <QuickActionCard
@@ -45,8 +34,15 @@ export function QuickActionCards() {
           title="todoSuggestions.title"
           description="todoSuggestions.description"
           primaryIcon={<ListTodo className="h-6 w-6" />}
-          secondaryIcon={<ListTodo className="h-6 w-6" />}
           link="/dashboard/todos"
+          translationKey="dashboard.quickActions"
+        />
+        <QuickActionCard
+          variant="secondary"
+          title="removeProducts.title"
+          description="removeProducts.description"
+          primaryIcon={<ScanBarcode className="h-6 w-6" />}
+          link="/dashboard/scan-out"
           translationKey="dashboard.quickActions"
         />
       </div>

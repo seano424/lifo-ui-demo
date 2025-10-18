@@ -11,7 +11,6 @@ type QuickActionCardProps = {
   title: string
   description: string
   primaryIcon: React.ReactNode
-  secondaryIcon: React.ReactNode
   link: string
   translationKey: string
   variant: 'primary' | 'secondary'
@@ -21,7 +20,6 @@ export function QuickActionCard({
   title,
   description,
   primaryIcon,
-  secondaryIcon,
   link,
   translationKey,
   variant = 'primary',
