@@ -125,7 +125,7 @@ function PricingCard({
       )}
 
       {/* Selling Point */}
-      <div className="mb-6 p-4 rounded-2xl bg-gradient-to-r from-secondary-50/50 to-primary-50/50 border border-secondary-100/50">
+      <div className="mb-6 p-4 rounded-2xl bg-card border border-secondary-100/50">
         <Typography variant="p" className="text-sm font-medium text-secondary-800">
           💡 {sellingPoint}
         </Typography>

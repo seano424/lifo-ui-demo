@@ -17,12 +17,10 @@ function Feature({ icon, title, description }: FeatureProps) {
         {icon}
       </div>
       <div className="flex flex-col gap-2">
-        <Typography variant="h3" className="font-semibold mb-2 text-secondary-950">
+        <Typography variant="h3" className="font-semibold mb-2 ">
           {title}
         </Typography>
-        <Typography variant="p" className="text-secondary-950">
-          {description}
-        </Typography>
+        <Typography variant="p">{description}</Typography>
       </div>
     </div>
   )

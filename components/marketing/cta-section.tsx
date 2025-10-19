@@ -13,16 +13,14 @@ interface CtaFeatureProps {
 function CtaFeature({ icon, title, description }: CtaFeatureProps) {
   return (
     <div className="flex gap-4 items-start">
-      <div className="text-secondary-600 bg-blue-100/70 p-2.5 rounded-2xl border border-blue-200/50 shadow-sm">
+      <div className="text-primary-900 bg-blue-100/70 p-2.5 rounded-2xl border border-blue-200/50 shadow-sm">
         {icon}
       </div>
       <div className="flex flex-col gap-1">
-        <Typography variant="h4" className="font-bold text-secondary-950 mb-1">
+        <Typography variant="h4" className="font-bold mb-1">
           {title}
         </Typography>
-        <Typography variant="p" className="text-secondary-950/80">
-          {description}
-        </Typography>
+        <Typography variant="p">{description}</Typography>
       </div>
     </div>
   )
@@ -74,12 +72,12 @@ export function CtaSection() {
           </div>
 
           {/* Right column - CTA card */}
-          <div className="flex flex-col rounded-2xl bg-gradient-to-br from-white to-secondary-50/80 border border-blue-100 shadow-xl p-8 mb-8 space-y-6">
+          <div className="flex flex-col rounded-2xl bg-card border shadow-xl p-8 mb-8 space-y-6">
             <div className="flex flex-col gap-1">
-              <Typography variant="h3" className="text-2xl font-bold text-secondary-950 mb-4">
+              <Typography variant="h3" className="text-2xl font-bold text-secondary-900 mb-4">
                 {t('card.title')}
               </Typography>
-              <Typography variant="p" className="text-secondary-950/80">
+              <Typography variant="p" className="text-secondary-900/80">
                 {t('card.description')}
               </Typography>
             </div>
@@ -89,7 +87,7 @@ export function CtaSection() {
                 <div className="text-secondary-600">
                   <Check size={20} />
                 </div>
-                <Typography variant="p" className="text-gray-700 font-semibold">
+                <Typography variant="p" className=" font-semibold">
                   {t('card.benefits.noCommitment')}
                 </Typography>
               </div>
@@ -97,7 +95,7 @@ export function CtaSection() {
                 <div className="text-secondary-600">
                   <Check size={20} />
                 </div>
-                <Typography variant="p" className="text-gray-700 font-semibold">
+                <Typography variant="p" className="font-semibold">
                   {t('card.benefits.instantSetup')}
                 </Typography>
               </div>
@@ -105,7 +103,7 @@ export function CtaSection() {
                 <div className="text-secondary-600">
                   <Check size={20} />
                 </div>
-                <Typography variant="p" className="text-gray-700 font-semibold">
+                <Typography variant="p" className="font-semibold">
                   {t('card.benefits.support')}
                 </Typography>
               </div>
@@ -120,7 +118,7 @@ export function CtaSection() {
               {t('card.button')} <ArrowRight size={18} />
             </Button>
 
-            <Typography variant="p" className="text-sm text-center text-secondary-950/60">
+            <Typography variant="p" className="text-sm text-center text-secondary-900">
               {t('card.noCreditCard')}
             </Typography>
           </div>
