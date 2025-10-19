@@ -70,7 +70,8 @@
     "account": "Account",
     "billing": "Facturering",
     "notifications": "Notificaties",
-    "language": "Taal"
+    "language": "Taal",
+    "theme": "Thema"
   },
   "errors": {
     "pageNotFoundTitle": "Pagina niet gevonden",
