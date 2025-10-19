@@ -63,6 +63,42 @@ export function useCSVUpload() {
 
     const preview: CsvPreviewItem[] = []
 
+    // Helper: convert common date formats (dd/mm/yyyy, dd-mm-yyyy, yyyy-mm-dd) to ISO yyyy-MM-dd
+    const convertToISODate = (raw: string): string => {
+      if (!raw) return ''
+      const s = raw.trim()
+
+      // Already ISO-like: 2025-10-18
+      if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s
+
+      // dd/mm/yyyy or dd-mm-yyyy
+      const dmY = s.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{2,4})$/)
+      if (dmY) {
+        const day = dmY[1].padStart(2, '0')
+        const month = dmY[2].padStart(2, '0')
+        let year = dmY[3]
+        if (year.length === 2) {
+          // Assume 20xx for two-digit years
+          year = `20${year}`
+        }
+        // Basic validation
+        if (+month >= 1 && +month <= 12 && +day >= 1 && +day <= 31) {
+          return `${year}-${month}-${day}`
+        }
+      }
+
+      // Fallback: try Date parse, then format
+      const parsed = new Date(s)
+      if (!Number.isNaN(parsed.getTime())) {
+        const y = parsed.getFullYear()
+        const m = String(parsed.getMonth() + 1).padStart(2, '0')
+        const d = String(parsed.getDate()).padStart(2, '0')
+        return `${y}-${m}-${d}`
+      }
+
+      return ''
+    }
+
     const skuIndex = headers.findIndex(h => h.toLowerCase().includes('sku'))
     const nameIndex = headers.findIndex(h => h.toLowerCase().includes('name'))
     const categoryIndex = headers.findIndex(h => h.toLowerCase().includes('category'))
@@ -74,8 +110,9 @@ export function useCSVUpload() {
 
     for (let i = 1; i < lines.length; i++) {
       const values = lines[i].split(',').map(v => v.trim().replace(/"/g, ''))
-      const expiryValue = values[expiryIndex] || ''
-      if (!expiryValue || expiryValue.trim() === '') {
+      const rawExpiry = values[expiryIndex] || ''
+      const expiryValue = convertToISODate(rawExpiry)
+      if (!expiryValue) {
         _itemsWithoutExpiry++
       }
 
@@ -95,11 +132,12 @@ export function useCSVUpload() {
     if (!hasExpiryColumn) {
       totalItemsWithoutExpiry = lines.length - 1 // All data rows
     } else {
-      // Count empty expiry dates in the entire file
+      // Count empty expiry dates in the entire file (use normalized ISO)
       for (let i = 1; i < lines.length; i++) {
         const values = lines[i].split(',').map(v => v.trim().replace(/"/g, ''))
-        const expiryValue = values[expiryIndex] || ''
-        if (!expiryValue || expiryValue.trim() === '') {
+        const rawExpiry = values[expiryIndex] || ''
+        const expiryValue = convertToISODate(rawExpiry)
+        if (!expiryValue) {
           totalItemsWithoutExpiry++
         }
       }
