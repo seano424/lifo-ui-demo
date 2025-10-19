@@ -274,6 +274,12 @@
       "title": "Préférence de langue",
       "description": "Choisissez votre langue préférée pour l'interface"
     },
+    "theme": {
+      "title": "Préférence de thème",
+      "description": "Choisissez votre thème préféré pour l'interface",
+      "currentTheme": "Thème actuel",
+      "system": "Système"
+    },
     "status": {
       "title": "Statut du compte",
       "accountStatus": "Statut:",

@@ -1,11 +1,6 @@
 'use client'
 
-import { zodResolver } from '@hookform/resolvers/zod'
-import { AlertCircle, Check, Edit, Shield, X } from 'lucide-react'
-import { useTranslations } from 'next-intl'
-import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
+import { ThemeSwitcher } from '@/components/theme-switcher'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
@@ -16,6 +11,12 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Typography } from '@/components/ui/typography'
 import { useCurrentUser, useUpdatePhone, useUserActions } from '@/hooks/use-users'
 import { formatPhoneNumber, isValidPhoneNumber } from '@/lib/types/user'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { AlertCircle, Check, Edit, Shield, X } from 'lucide-react'
+import { useTranslations } from 'next-intl'
+import { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
 
 const createProfileSchema = (t: (key: string) => string) =>
   z.object({
@@ -354,6 +355,22 @@ export default function UserAccountInformation() {
               </Typography>
             </div>
             <LanguageSwitcher />
+          </div>
+        </div>
+
+        <div className="space-y-4 pt-4 border-t">
+          <Typography variant="h4" className="font-black">
+            {t('theme.title')}
+          </Typography>
+
+          <div className="flex items-center justify-between mt-2">
+            <div className="flex flex-col gap-2">
+              <Typography variant="p">{t('theme.description')}</Typography>
+            </div>
+            <Typography variant="p" className="text-muted-foreground">
+              {t('theme.currentTheme')}: {t('theme.system')}
+            </Typography>
+            <ThemeSwitcher />
           </div>
         </div>
 

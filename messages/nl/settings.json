@@ -237,6 +237,12 @@
       "title": "Taalvoorkeur",
       "description": "Kies uw voorkeurstaal voor de interface"
     },
+    "theme": {
+      "title": "Themavoorkeur",
+      "description": "Kies uw voorkeursthema voor de interface",
+      "currentTheme": "Huidig thema",
+      "system": "Systeem"
+    },
     "status": {
       "title": "Accountstatus",
       "accountStatus": "Status:",
