@@ -4,7 +4,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-LIFO.AI is an intelligent food waste management platform with AI-powered inventory optimization. The system consists of a Next.js 15 frontend, FastAPI backend, and Supabase PostgreSQL database. It provides mobile-optimized scanning interfaces with AI scoring, Google Vision OCR, and real-time analytics.
+LIFO.AI is an intelligent food waste management platform with AI-powered inventory optimization. This repository contains the **Next.js 15 frontend** application with Supabase PostgreSQL database integration. It provides mobile-optimized scanning interfaces with AI scoring, Google Vision OCR, and real-time analytics.
+
+**Repository Split**: The backend has been moved to a separate repository.
+- **Frontend (this repo)**: https://github.com/lifo-ai/lifo-app - Next.js 15 frontend
+- **Backend repo**: https://github.com/lifo-ai/lifo-api - FastAPI backend service
+
+**Note**: A deprecated local copy of the backend (`lifo_api/`) may still exist in this repository for local development. For production backend changes, use the dedicated backend repository.
 
 ## Development Commands
 
@@ -22,9 +28,12 @@ npm run check:fix             # Auto-fix linting issues
 npm run format               # Format code with Biome
 ```
 
-### Backend (FastAPI)
+### Backend (FastAPI) - Local Development Only
+**Note**: For production backend development, use the dedicated backend repository at https://github.com/lifo-ai/lifo-api
+
+If using the local deprecated backend copy:
 ```bash
-# Development
+# Development (local copy only - deprecated)
 npm run api:dev              # Start FastAPI with reload (port 8000)
 npm run api                  # Start production API server
 cd lifo_api && uvicorn app.main:app --reload  # Direct command
@@ -76,38 +85,47 @@ lifo-app/
 │   ├── (dashboard)/        # Protected dashboard routes
 │   ├── (marketing)/        # Public marketing pages
 │   ├── (onboarding)/       # User onboarding flow
+│   ├── (auth)/            # Authentication pages
 │   ├── api/               # Next.js API routes
 │   └── protected/         # Protected application pages
-├── components/            # Shared React components (Radix UI + shadcn/ui)
-├── lib/                  # Utility functions & Supabase client
-├── lifo_api/            # FastAPI Backend Service
-│   └── app/
-│       ├── core/        # Business logic (scoring, donation engine)
-│       ├── api/v1/      # 26 API endpoint files (~11,700 lines)
-│       ├── auth/        # Supabase authentication
-│       ├── database/    # Models & operations
-│       ├── security/    # Security utilities & monitoring
-│       └── middleware/  # CORS, rate limiting, performance
-└── supabase/           # Database schema & migrations
+├── components/            # React components (171 files)
+│   ├── ui/               # Base UI components (Radix UI + shadcn/ui)
+│   ├── todos/            # Todo/batch management
+│   ├── donation/         # Donation management
+│   ├── scanning/         # Barcode/OCR scanning
+│   └── ... (various feature components)
+├── lib/                  # Utility functions & services (79 files)
+│   ├── api/             # API clients
+│   ├── auth/            # Authentication utilities
+│   ├── supabase/        # Supabase client configuration
+│   ├── queries/         # React Query setup
+│   └── ... (various utilities)
+├── supabase/            # Database schema & migrations
+│   └── migrations/      # SQL migration files
+├── messages/            # Internationalization (en, fr, nl)
+└── lifo_api/           # [DEPRECATED] Local backend copy for development
+                         # Use https://github.com/lifo-ai/lifo-api for backend work
 ```
 
 ### Core Architecture Patterns
 
-**Backend (FastAPI)**:
-- `lifo_api/app/core/` contains consolidated business logic:
-  - `scoring.py` - AI-powered inventory scoring system
-  - `donation_engine.py` - European pilot donation management
-  - `database.py` - Database connection re-exports for backward compatibility
-- Authentication via Supabase API keys and JWT tokens
-- Security-first design with input validation, rate limiting, CORS
-- Performance optimized for mobile (<300ms response targets)
-
 **Frontend (Next.js)**:
-- App Router with TypeScript and React 19
-- Supabase SSR authentication patterns
-- Component architecture with Radix UI primitives
-- State management with Zustand
-- Mobile-first responsive design
+- **Routing**: App Router with TypeScript and React 19
+- **Authentication**: Supabase SSR authentication patterns
+- **UI Components**: Radix UI primitives + shadcn/ui design system
+- **State Management**:
+  - Zustand for client state
+  - React Query v5 for server state
+- **Styling**: Tailwind CSS 4.1 with mobile-first responsive design
+- **Internationalization**: next-intl (English, French, Dutch)
+- **Forms**: React Hook Form + Zod validation
+
+**Backend Integration**:
+- Backend API deployed separately (https://github.com/lifo-ai/lifo-api)
+- FastAPI service with AI-powered scoring and OCR
+- Authentication via Supabase API keys and JWT tokens
+- Performance optimized for mobile (<300ms response targets)
+- API Documentation: Available at backend service /docs endpoint
 
 **Database (Supabase PostgreSQL)**:
 - Row Level Security (RLS) enabled on all tables
@@ -139,115 +157,126 @@ lifo-app/
 ## Environment Setup
 
 ### Required Files
-- **Single environment file**: `.env.example` → `.env.local`
-- **Shared config**: Both Next.js and FastAPI read from same `.env.local`
-- **Frontend vars**: Prefixed with `NEXT_PUBLIC_*` (exposed to client)
-- **Backend vars**: No prefix (server-side only)
-- **Critical variables**:
-  - `NEXT_PUBLIC_SUPABASE_URL` & `NEXT_PUBLIC_SUPABASE_ANON_KEY` (frontend)
-  - `SUPABASE_SERVICE_ROLE_KEY` & `DATABASE_URL` (backend)
-  - `GOOGLE_CLOUD_PROJECT_ID` for OCR
-  - **Important**: Use Application Default Credentials (ADC) for Google Cloud auth
-    - Run: `gcloud auth application-default login`
-    - Do NOT set `GOOGLE_APPLICATION_CREDENTIALS` in development
+- **Environment file**: Copy `.env.example` → `.env.local`
+- **Frontend-focused config**: Frontend variables prefixed with `NEXT_PUBLIC_*` (exposed to client)
+- **Critical frontend variables**:
+  - `NEXT_PUBLIC_SUPABASE_URL` - Supabase project URL
+  - `NEXT_PUBLIC_SUPABASE_ANON_KEY` - Supabase anonymous key
+  - `NEXT_PUBLIC_API_URL` - Backend API URL (if using external backend)
+- **Server-side variables** (for Next.js API routes):
+  - `SUPABASE_SERVICE_ROLE_KEY` - Service role key for server-side operations
+  - `RESEND_API_KEY` - For email functionality
+
+**Backend Configuration**: Backend environment is managed separately in the lifo-api repository.
 
 ### Installation
 ```bash
 # Frontend dependencies
 npm install
 
-# Backend dependencies
-cd lifo_api && pip install -r requirements.txt
+# Start local Supabase (optional, for local development)
+npm run supabase:start
+
+# Generate TypeScript types from database schema
+npm run update-types
 ```
 
 ## Key Development Patterns
 
-### API Development
-- **26 endpoint files** in `lifo_api/app/api/v1/` (~11,700 total lines)
-- **Key endpoints**:
-  - `automated_scoring.py` - Bulk scoring with chunking for performance
-  - `csv_upload.py` - CSV processing with security validation
-  - `image_recognition.py` - Google Vision OCR integration
-  - `donation_queries.py` - European pilot donation logic
-- **Business logic**: Always centralize in `lifo_api/app/core/` (not in endpoints)
-- **Dependencies**: Use FastAPI dependency injection:
-  ```python
-  async def endpoint(db: AsyncSession = Depends(get_db)):
-  ```
-- **Performance**: Mobile endpoints must respond in <300ms
-- **Error Handling**: Use structured logging with `structlog`
-
 ### Frontend Development
-- Use existing component patterns from `components/`
-- Leverage Supabase SSR for authentication
-- Follow existing routing patterns in `app/`
-- Use TypeScript strictly (configured in `tsconfig.json`)
-- Mobile-first responsive design with Tailwind CSS
+- **Component Patterns**: Use existing patterns from `components/` directory
+  - 171 React components organized by feature
+  - Radix UI primitives + shadcn/ui components
+  - Co-location of components by feature (todos/, donation/, scanning/, etc.)
+- **Authentication**: Leverage Supabase SSR patterns from `lib/auth/`
+- **Routing**: Follow App Router patterns in `app/` directory
+  - Protected routes: `app/(dashboard)/`
+  - Public routes: `app/(marketing)/`
+  - Auth routes: `app/(auth)/`
+- **Type Safety**: Strict TypeScript (configured in `tsconfig.json`)
+- **Styling**: Tailwind CSS 4.1 with mobile-first responsive design
+- **State Management**:
+  - Use Zustand stores from `lib/stores/` for client state
+  - React Query from `lib/queries/` for server state
+- **API Integration**: Use API clients from `lib/api/` to communicate with backend
+- **Internationalization**: Use next-intl for i18n (messages/ directory)
+
+### Backend API Integration
+**Note**: Backend development happens in the separate repository (https://github.com/lifo-ai/lifo-api)
+- **API Client**: Use OCR client from `lib/api/ocr-client.ts` as reference
+- **Authentication**: Pass Supabase tokens to backend via headers
+- **Error Handling**: Handle API errors gracefully with user-friendly messages
 
 ### Security Considerations
-- CSV upload security with formula injection prevention
-- API key authentication with store-level authorization
-- Rate limiting configured per endpoint
-- Input validation on all user inputs using Pydantic models
-- Row Level Security (RLS) enforced at database level
+- **Authentication**: Supabase SSR authentication with secure session handling
+- **Row Level Security**: RLS policies enforced at database level
+- **Input Validation**: Zod schemas for form validation
+- **XSS Protection**: React's built-in XSS protection + Content Security Policy
+- **CSRF Protection**: Next.js CSRF protection for API routes
+- **Environment Variables**: Never expose secrets in NEXT_PUBLIC_* variables
 
 ### Testing Requirements
-- Maintain >85% code coverage
-- Security tests for authentication and input validation
-- Performance tests for mobile endpoints
-- Integration tests for complete workflows
-- Use fixtures from `tests/conftest.py` for consistency
+- **Test Framework**: Jest + React Testing Library
+- **Component Testing**: Test user interactions and accessibility
+- **Integration Testing**: Test complete user flows
+- **Type Safety**: Strict TypeScript compilation serves as static testing
+- **E2E Testing**: Consider Playwright or Cypress for critical flows
 
 ## Code Quality Standards
 
-- **Python**: Configured with ruff (linting/formatting) + mypy (type checking)
 - **TypeScript**: Biome for linting/formatting, strict TypeScript compiler settings
-- **Git hooks**: Pre-commit configuration in `.pre-commit-config.yaml`
-- **Testing**: pytest with comprehensive fixtures in `conftest.py`
-- **Type Safety**: Strict type checking enabled in both Python (mypy) and TypeScript
+- **Code Formatting**: Biome with automatic formatting on save
+- **Type Safety**: Strict TypeScript with no implicit any
+- **Testing**: Jest + React Testing Library
+- **Component Standards**: Follow existing patterns from components/ directory
+- **Accessibility**: WCAG 2.1 AA compliance with ARIA labels
 
 ## Performance Targets
 
-- Mobile API endpoints: <300ms response time
-- Quick batch scoring: <200ms
-- Store health checks: <400ms
-- Database queries optimized with proper indexing
-- Bounded caching to prevent memory leaks
-- Async/await patterns for I/O operations
+- **First Contentful Paint (FCP)**: <1.8s
+- **Largest Contentful Paint (LCP)**: <2.5s
+- **Time to Interactive (TTI)**: <3.8s
+- **Cumulative Layout Shift (CLS)**: <0.1
+- **Mobile Performance**: Optimized for 3G networks
+- **Image Optimization**: Next.js Image component for automatic optimization
+- **Code Splitting**: Automatic route-based code splitting with App Router
 
 ## Critical Development Notes
 
 ### Database Operations
-- Always use schema prefixes when querying across schemas
-- Use async sessions with proper context managers
-- Prefer direct PostgreSQL queries over PostgREST for performance-critical operations
-- Database connection pooling configured: 20 pool size, 30 max overflow
+- **Migrations**: Located in `supabase/migrations/*.sql`
+- **Type Generation**: Run `npm run update-types` after schema changes
+- **Direct Database Access**: Use Supabase client from `lib/supabase/`
+- **RLS**: All tables have Row Level Security enabled
+- **Schema Prefixes**: Always use schema prefixes when querying (user_mgmt, inventory, etc.)
 
-### CSV Upload Security
-- Formula injection prevention implemented
-- File size limits: 10MB max
-- Validation before processing
-- Chunked processing for large files
+### Component Development
+- **shadcn/ui**: Use `components.json` for shadcn component configuration
+- **Radix UI**: Leverage Radix primitives for accessible components
+- **Styling**: Use Tailwind CSS classes, avoid inline styles
+- **Icons**: Use Lucide React icons
+- **Forms**: Use React Hook Form + Zod for form validation
 
-### Google Vision OCR
-- Confidence thresholds:
-  - OCR general: 0.7
-  - Barcode: 0.6
-  - Expiry date: 0.65
-- Max image size: 15MB
-- Supported formats: JPEG, JPG, PNG, WebP
-- Timeout: 10 seconds
+### Internationalization
+- **Languages**: English (en), French (fr), Dutch (nl)
+- **Messages**: Update all three language files in `messages/` directory
+- **Usage**: Import from `next-intl` and use `useTranslations()` hook
 
-### Scoring System
-- Weights configurable: expiry (0.5), velocity (0.3), margin (0.2)
-- Must sum to 1.0
-- AI scoring engine in `app/core/scoring.py`
-- Chunked batch processing for performance
+### API Integration
+- **Backend URL**: Configure in `NEXT_PUBLIC_API_URL` environment variable
+- **Authentication**: Pass Supabase session token in Authorization header
+- **Error Handling**: Use try/catch with user-friendly error messages
+- **Loading States**: Always show loading indicators for async operations
 
 ## Documentation References
 
-- **Complete System Documentation**: `DOCUMENTATION.md`
-- **Testing Guide**: `lifo_api/TESTING.md`
-- **Product Scoring Rules**: `PRODUCT_SCORING_RULES_DOCUMENTATION.md`
-- **API Documentation**: http://localhost:8000/docs (when running)
-- **Comprehensive API Guide**: `docs/COMPREHENSIVE_FASTAPI_MICROSERVICE_DOCUMENTATION.md`
+- **Frontend Documentation**: This repository's README.md
+- **Backend API Documentation**: https://github.com/lifo-ai/lifo-api
+- **Backend API Endpoints**: http://[backend-url]/docs (Swagger UI)
+- **Database Schema**: `supabase/migrations/` directory
+- **Component Library**: `components/` directory with organized features
+
+## Related Repositories
+
+- **Backend API**: https://github.com/lifo-ai/lifo-api - FastAPI backend service
+- **Database Migrations**: Managed in this repository (`supabase/migrations/`)
