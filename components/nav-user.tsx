@@ -1,7 +1,6 @@
 'use client'
 
 import { LogoutButton } from '@/components/logout-button'
-import { ThemeSwitcher } from '@/components/theme-switcher'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
   DropdownMenu,
@@ -19,6 +18,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@/components/ui/sidebar'
+import { ThemeSwitcherSelect } from '@/components/ui/theme-switcher-select'
 import type { User } from '@/lib/types/user'
 import {
   BadgeCheck,
@@ -133,7 +133,7 @@ export function NavUser({ user }: { user: User }) {
                   <span className="text-sm">{t('theme')}</span>
                 </div>
                 <div className="px-2 pb-2">
-                  <ThemeSwitcher />
+                  <ThemeSwitcherSelect />
                 </div>
               </DropdownMenuItem>
             </DropdownMenuGroup>

@@ -447,7 +447,7 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
   const formatPrice = (price: number) => `€${price.toFixed(2)}`
 
   return (
-    <div className={`bg-white min-h-screen flex flex-col gap-4 ${className}`}>
+    <div className={`min-h-screen flex flex-col gap-4 ${className}`}>
       <div className="w-full">
         <div className="px-4 space-y-4">
           {/* Step 1: Barcode Scanning */}

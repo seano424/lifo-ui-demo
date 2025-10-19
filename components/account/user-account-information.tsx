@@ -1,6 +1,5 @@
 'use client'
 
-import { ThemeSwitcher } from '@/components/theme-switcher'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
@@ -8,6 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { LanguageSwitcher } from '@/components/ui/language-switcher'
 import { Skeleton } from '@/components/ui/skeleton'
+import { ThemeSwitcherSelect } from '@/components/ui/theme-switcher-select'
 import { Typography } from '@/components/ui/typography'
 import { useCurrentUser, useUpdatePhone, useUserActions } from '@/hooks/use-users'
 import { formatPhoneNumber, isValidPhoneNumber } from '@/lib/types/user'
@@ -379,12 +379,12 @@ export default function UserAccountInformation() {
           <div className="flex items-center justify-between mt-2">
             <div className="flex flex-col gap-2">
               <Typography variant="p">{t('theme.description')}</Typography>
-            </div>
-            <div className="flex items-center gap-2">
               <Typography variant="p">
                 {t('theme.currentTheme')}: {getCurrentThemeDisplay()}
               </Typography>
-              <ThemeSwitcher />
+            </div>
+            <div className="flex items-center gap-2">
+              <ThemeSwitcherSelect />
             </div>
           </div>
         </div>

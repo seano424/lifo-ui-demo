@@ -13,7 +13,7 @@ import { useTranslations } from 'next-intl'
 import { useTheme } from 'next-themes'
 import { useEffect, useState } from 'react'
 
-const ThemeSwitcher = () => {
+const CompactThemeSwitcher = () => {
   const [mounted, setMounted] = useState(false)
   const { theme, setTheme } = useTheme()
   const t = useTranslations('common.aria')
@@ -59,4 +59,4 @@ const ThemeSwitcher = () => {
   )
 }
 
-export { ThemeSwitcher }
+export { CompactThemeSwitcher }
