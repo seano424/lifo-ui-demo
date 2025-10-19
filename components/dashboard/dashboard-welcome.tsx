@@ -2,11 +2,11 @@
 
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
+import { Logo } from '@/components/ui/logo'
 import { Typography } from '@/components/ui/typography'
 import { cn } from '@/lib/utils'
 import { ArrowRight, BarChart3, PackageOpen, ScanSearch, Settings } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import Image from 'next/image'
 import Link from 'next/link'
 
 export function DashboardWelcome() {
@@ -95,12 +95,7 @@ export function DashboardWelcome() {
 
             {/* Right side with illustration */}
             <div className="flex-shrink-0 relative w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48">
-              <Image
-                src="/logos/lifo-logo-icon.svg"
-                alt="LIFO"
-                fill
-                className="object-contain opacity-30"
-              />
+              <Logo variant="icon" size="xl" className="w-full h-full opacity-30" />
             </div>
           </div>
         </div>
