@@ -82,6 +82,7 @@ npm install
 # Configure environment
 cp .env.example .env.local
 # Edit .env.local with your Supabase credentials
+# See ENV_SETUP.md for detailed configuration guide
 
 # Start local Supabase (optional, for local development)
 npm run supabase:start
