@@ -37,7 +37,7 @@ function PricingCard({
   const t = useTranslations('pricingpage')
 
   return (
-    <div className="group relative flex flex-col p-8 rounded-3xl backdrop-blur-md border transition-all duration-500 h-full bg-gradient-to-br from-white/80 to-white/60 border-white/20 shadow-lg hover:shadow-xl hover:from-white/90 hover:to-white/70">
+    <div className="group relative flex flex-col p-8 rounded-3xl backdrop-blur-md border transition-all duration-500 h-full bg-card border-white/20 shadow-lg hover:shadow-xl hover:from-white/90 hover:to-white/70">
       {/* Popular badge */}
       {isPopular && (
         <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-50">
@@ -294,7 +294,7 @@ export default function PricingPage() {
 
         {/* Bottom Note */}
         <div className="text-center">
-          <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-primary-50 to-secondary-50 border border-primary-100">
+          <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-card border border-primary-100">
             <Typography variant="p" className="text-sm text-foreground/70">
               💡 <strong>{t('common.note')}</strong> {t('common.pricingNote')}
             </Typography>

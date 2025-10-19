@@ -222,7 +222,7 @@ export default function SupportPage() {
         {/* Contact Support */}
         <div className="border-t pt-6 sm:pt-8 mt-8 sm:mt-12">
           <Card className="bg-muted/30">
-            <CardContent className="p-4 sm:p-6 bg-white/75 rounded-2xl">
+            <CardContent className="p-4 sm:p-6 bg-card rounded-2xl">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 ">
                 <div className="flex flex-col md:flex-row md:items-center gap-4">
                   <Typography variant="h3" className="text-base sm:text-lg font-semibold mb-1">
