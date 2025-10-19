@@ -1,9 +1,5 @@
 'use client'
 
-import { Laptop, Moon, Sun } from 'lucide-react'
-import { useTheme } from 'next-themes'
-import { useTranslations } from 'next-intl'
-import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -12,6 +8,10 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { Laptop, Moon, Sun } from 'lucide-react'
+import { useTranslations } from 'next-intl'
+import { useTheme } from 'next-themes'
+import { useEffect, useState } from 'react'
 
 const ThemeSwitcher = () => {
   const [mounted, setMounted] = useState(false)
@@ -32,7 +32,7 @@ const ThemeSwitcher = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size={'sm'} aria-label={t('toggleTheme')}>
+        <Button variant="outline" size={'sm'} aria-label={t('toggleTheme')}>
           {theme === 'light' ? (
             <Sun key="light" size={ICON_SIZE} className={'text-muted-foreground'} />
           ) : theme === 'dark' ? (

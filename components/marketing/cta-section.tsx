@@ -77,7 +77,7 @@ export function CtaSection() {
               <Typography variant="h3" className="text-2xl font-bold text-secondary-900 mb-4">
                 {t('card.title')}
               </Typography>
-              <Typography variant="p" className="text-secondary-900/80">
+              <Typography variant="p" className="text-secondary-900">
                 {t('card.description')}
               </Typography>
             </div>

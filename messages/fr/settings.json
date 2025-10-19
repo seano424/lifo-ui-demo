@@ -278,6 +278,8 @@
       "title": "Préférence de thème",
       "description": "Choisissez votre thème préféré pour l'interface",
       "currentTheme": "Thème actuel",
+      "light": "Clair",
+      "dark": "Sombre",
       "system": "Système"
     },
     "status": {

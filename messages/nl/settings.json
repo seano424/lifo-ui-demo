@@ -241,6 +241,8 @@
       "title": "Themavoorkeur",
       "description": "Kies uw voorkeursthema voor de interface",
       "currentTheme": "Huidig thema",
+      "light": "Licht",
+      "dark": "Donker",
       "system": "Systeem"
     },
     "status": {

@@ -14,6 +14,7 @@ import { formatPhoneNumber, isValidPhoneNumber } from '@/lib/types/user'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { AlertCircle, Check, Edit, Shield, X } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import { useTheme } from 'next-themes'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -36,6 +37,7 @@ type ProfileFormData = z.infer<ReturnType<typeof createProfileSchema>>
 
 export default function UserAccountInformation() {
   const t = useTranslations('account')
+  const { theme } = useTheme()
   const { data: user, isLoading } = useCurrentUser()
 
   const updatePhone = useUpdatePhone()
@@ -115,6 +117,17 @@ export default function UserAccountInformation() {
     setPhoneForm(user?.phone || '')
     setPhoneError('')
     setIsEditingPhone(false)
+  }
+
+  const getCurrentThemeDisplay = () => {
+    switch (theme) {
+      case 'light':
+        return t('theme.light')
+      case 'dark':
+        return t('theme.dark')
+      case 'system':
+        return t('theme.system')
+    }
   }
 
   if (isLoading) {
@@ -367,10 +380,12 @@ export default function UserAccountInformation() {
             <div className="flex flex-col gap-2">
               <Typography variant="p">{t('theme.description')}</Typography>
             </div>
-            <Typography variant="p" className="text-muted-foreground">
-              {t('theme.currentTheme')}: {t('theme.system')}
-            </Typography>
-            <ThemeSwitcher />
+            <div className="flex items-center gap-2">
+              <Typography variant="p">
+                {t('theme.currentTheme')}: {getCurrentThemeDisplay()}
+              </Typography>
+              <ThemeSwitcher />
+            </div>
           </div>
         </div>
 

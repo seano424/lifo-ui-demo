@@ -277,7 +277,9 @@
       "title": "Theme Preference",
       "description": "Choose your preferred theme for the interface",
       "currentTheme": "Current Theme",
-      "system": "System"
+      "system": "System",
+      "light": "Light",
+      "dark": "Dark"
     },
     "status": {
       "title": "Account Status",

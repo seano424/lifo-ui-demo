@@ -40,27 +40,27 @@ export function FeaturesSummary() {
           {t('title')}
         </Typography>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 py-8 px-8 rounded-2xl bg-card border border-blue-100 shadow-lg overflow-hidden h-full">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 py-8 px-8 rounded-2xl bg-card border shadow-lg overflow-hidden h-full">
           <Feature
-            icon={<Calendar size={28} className="text-secondary-900" strokeWidth={1.5} />}
+            icon={<Calendar size={28} className="text-primary-900" strokeWidth={1.5} />}
             title={t('expiryTracking.title')}
             description={t('expiryTracking.description')}
           />
 
           <Feature
-            icon={<Bell size={28} className="text-secondary-900" strokeWidth={1.5} />}
+            icon={<Bell size={28} className="text-primary-900" strokeWidth={1.5} />}
             title={t('predictiveAlerts.title')}
             description={t('predictiveAlerts.description')}
           />
 
           <Feature
-            icon={<Clock size={28} className="text-secondary-900" strokeWidth={1.5} />}
+            icon={<Clock size={28} className="text-primary-900" strokeWidth={1.5} />}
             title={t('timeSaving.title')}
             description={t('timeSaving.description')}
           />
 
           <Feature
-            icon={<Tablet size={28} className="text-secondary-900" strokeWidth={1.5} />}
+            icon={<Tablet size={28} className="text-primary-900" strokeWidth={1.5} />}
             title={t('errorFree.title')}
             description={t('errorFree.description')}
           />
