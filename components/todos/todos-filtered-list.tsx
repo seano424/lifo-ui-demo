@@ -200,8 +200,8 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
       updateScrollIndicators()
     }, 1)
 
-    // Add scroll listener to update indicator when scrolling
-    const scrollContainer = document.querySelector('.overflow-x-auto')
+    // Use the ref instead of querySelector to avoid memory leaks and wrong element selection
+    const scrollContainer = scrollContainerRef.current
     if (scrollContainer) {
       scrollContainer.addEventListener('scroll', handleScroll)
     }
@@ -270,14 +270,16 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
   const scrollLeft = () => {
     const container = scrollContainerRef.current
     if (container) {
-      container.scrollBy({ left: -200, behavior: 'smooth' })
+      const scrollAmount = container.clientWidth * 0.8 // Scroll 80% of visible width
+      container.scrollBy({ left: -scrollAmount, behavior: 'smooth' })
     }
   }
 
   const scrollRight = () => {
     const container = scrollContainerRef.current
     if (container) {
-      container.scrollBy({ left: 200, behavior: 'smooth' })
+      const scrollAmount = container.clientWidth * 0.8
+      container.scrollBy({ left: scrollAmount, behavior: 'smooth' })
     }
   }
 
@@ -417,6 +419,7 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
             variant="ghost"
             size="sm"
             onClick={scrollLeft}
+            aria-label="Scroll tabs left"
             className="absolute left-0 top-1/2 -translate-y-1/2 z-20 bg-background/80 backdrop-blur-sm border shadow-sm hover:bg-background/90 h-6 w-6 p-0"
           >
             <ChevronLeft className="h-3 w-3" />
@@ -429,6 +432,7 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
             variant="ghost"
             size="sm"
             onClick={scrollRight}
+            aria-label="Scroll tabs right"
             className="absolute right-0 top-1/2 -translate-y-1/2 z-20 bg-background/80 backdrop-blur-sm border shadow-sm hover:bg-background/90 h-6 w-6 p-0"
           >
             <ChevronRight className="h-3 w-3" />
