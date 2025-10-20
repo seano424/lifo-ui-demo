@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Typography } from '@/components/ui/typography'
 import { cn } from '@/lib/utils'
-import { Building2 } from 'lucide-react'
+import { ArrowLeft, Building2 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { useActionState, useEffect } from 'react'
@@ -38,6 +38,21 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
 
   return (
     <div className={cn('flex flex-col gap-6 max-w-md mx-auto', className)} {...props}>
+      {/* Back button */}
+      <div className="flex justify-start">
+        <Button
+          variant="ghost"
+          size="sm"
+          asChild
+          className="text-muted-foreground hover:text-foreground"
+        >
+          <Link href="/" className="flex items-center gap-2">
+            <ArrowLeft className="w-4 h-4" />
+            <span>{t('backToHome')}</span>
+          </Link>
+        </Button>
+      </div>
+
       <Card>
         <CardHeader className="text-center space-y-4 mb-4">
           <div className="mx-auto w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center">

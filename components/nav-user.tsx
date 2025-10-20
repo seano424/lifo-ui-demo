@@ -139,7 +139,7 @@ export function NavUser({ user }: { user: User }) {
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem className="cursor-default hover:!bg-transparent">
-              <LogoutButton className="w-full bg-transparent text-black" />
+              <LogoutButton className="w-full bg-transparent text-foreground" />
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
