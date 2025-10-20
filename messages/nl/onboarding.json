@@ -105,6 +105,42 @@
       "testingButton": "Testen",
       "termsAndPrivacy": "Door een account aan te maken, gaat u akkoord met onze Servicevoorwaarden en Privacybeleid. U ontvangt een bevestigingse-mail om uw account te verifiëren.",
       "testModePrefix": "🧪 {mode} modus: "
+    },
+    "success": {
+      "accountCreated": "Account succesvol aangemaakt!",
+      "checkEmail": "Controleer uw e-mail",
+      "emailSent": "We hebben u een bevestigingse-mail gestuurd. Controleer uw inbox en klik op de verificatielink om uw registratie te voltooien.",
+      "whatsNext": "Wat nu?",
+      "steps": {
+        "checkEmail": "Controleer uw e-mail voor de verificatielink",
+        "clickLink": "Klik op de link om uw account te bevestigen",
+        "redirected": "U wordt doorgestuurd naar de inlogpagina",
+        "signIn": "Log in en krijg toegang tot uw winkel dashboard"
+      },
+      "noEmail": "Geen e-mail ontvangen? Controleer uw spam map of",
+      "contactSupport": "neem contact op met ondersteuning",
+      "loading": "Laden...",
+      "welcome": "Welkom bij LIFO!",
+      "storeSetup": "Uw winkel \"{storeName}\" is succesvol ingesteld. U bent klaar om uw voorraad te beheren en verspilling te verminderen!",
+      "whatsNextTitle": "Wat nu?",
+      "nextSteps": {
+        "completeSetup": {
+          "title": "Winkelinstelling voltooien",
+          "description": "Configureer uw winkelinstellingen, voorkeuren en openingstijden"
+        },
+        "addProducts": {
+          "title": "Voeg uw eerste producten toe",
+          "description": "Begin met het opbouwen van uw voorraad om vervaldatums bij te houden en verspilling te verminderen"
+        },
+        "inviteTeam": {
+          "title": "Nodig uw team uit",
+          "description": "Voeg teamleden toe om u te helpen bij het beheren van de voorraad van uw winkel"
+        }
+      },
+      "actions": {
+        "goToDashboard": "Ga naar dashboard",
+        "completeSetup": "Instelling voltooien"
+      }
     }
   }
 }

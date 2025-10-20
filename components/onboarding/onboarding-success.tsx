@@ -1,10 +1,11 @@
 'use client'
 
-import { ArrowRight, Check } from 'lucide-react'
-import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Typography } from '@/components/ui/typography'
+import { ArrowRight, Check } from 'lucide-react'
+import { useTranslations } from 'next-intl'
+import { useRouter } from 'next/navigation'
 
 interface OnboardingSuccessProps {
   storeName: string
@@ -12,6 +13,7 @@ interface OnboardingSuccessProps {
 
 export function OnboardingSuccess({ storeName }: OnboardingSuccessProps) {
   const router = useRouter()
+  const t = useTranslations('onboarding.success')
 
   const handleGoToSettings = () => {
     router.push('/dashboard/settings?tab=store')
@@ -25,16 +27,15 @@ export function OnboardingSuccess({ storeName }: OnboardingSuccessProps) {
     <div className="max-w-md mx-auto space-y-6">
       <div className="text-center space-y-4 flex flex-col items-center justify-center">
         <Check className="w-10 h-10 stroke-2 rounded-full p-2 bg-primary-900 text-white" />
-        <Typography variant="h1">Welcome to LIFO!</Typography>
+        <Typography variant="h1">{t('welcome')}</Typography>
         <Typography variant="p" color="muted">
-          Your store "{storeName}" has been set up successfully. You're ready to start managing your
-          inventory and reducing waste!
+          {t('storeSetup', { storeName })}
         </Typography>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-center">What's Next?</CardTitle>
+          <CardTitle className="text-center">{t('whatsNextTitle')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-3">
@@ -44,10 +45,10 @@ export function OnboardingSuccess({ storeName }: OnboardingSuccessProps) {
               </div>
               <div className="space-y-1 flex flex-col">
                 <Typography variant="small" className="font-medium">
-                  Complete Store Setup
+                  {t('nextSteps.completeSetup.title')}
                 </Typography>
                 <Typography variant="small" color="muted">
-                  Configure your store settings, preferences, and operational hours
+                  {t('nextSteps.completeSetup.description')}
                 </Typography>
               </div>
             </div>
@@ -58,10 +59,10 @@ export function OnboardingSuccess({ storeName }: OnboardingSuccessProps) {
               </div>
               <div className="space-y-1 flex flex-col">
                 <Typography variant="small" className="font-medium">
-                  Add Your First Products
+                  {t('nextSteps.addProducts.title')}
                 </Typography>
                 <Typography variant="small" color="muted">
-                  Start building your inventory to track expiration dates and reduce waste
+                  {t('nextSteps.addProducts.description')}
                 </Typography>
               </div>
             </div>
@@ -72,10 +73,10 @@ export function OnboardingSuccess({ storeName }: OnboardingSuccessProps) {
               </div>
               <div className="space-y-1 flex flex-col">
                 <Typography variant="small" className="font-medium">
-                  Invite Your Team
+                  {t('nextSteps.inviteTeam.title')}
                 </Typography>
                 <Typography variant="small" color="muted">
-                  Add staff members to help manage your store's inventory
+                  {t('nextSteps.inviteTeam.description')}
                 </Typography>
               </div>
             </div>
@@ -83,10 +84,10 @@ export function OnboardingSuccess({ storeName }: OnboardingSuccessProps) {
 
           <div className="flex gap-3 pt-4">
             <Button variant="outline" onClick={handleGoToDashboard} className="w-full">
-              Go to Dashboard
+              {t('actions.goToDashboard')}
             </Button>
             <Button onClick={handleGoToSettings} className="w-full">
-              Complete Setup
+              {t('actions.completeSetup')}
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           </div>

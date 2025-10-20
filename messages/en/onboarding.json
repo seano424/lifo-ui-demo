@@ -105,6 +105,42 @@
       "testingButton": "Testing",
       "termsAndPrivacy": "By creating an account, you agree to our Terms of Service and Privacy Policy. You'll receive a confirmation email to verify your account.",
       "testModePrefix": "🧪 {mode} mode: "
+    },
+    "success": {
+      "accountCreated": "Account Created Successfully!",
+      "checkEmail": "Check Your Email",
+      "emailSent": "We've sent you a confirmation email. Please check your inbox and click the verification link to complete your registration.",
+      "whatsNext": "What's next?",
+      "steps": {
+        "checkEmail": "Check your email for the verification link",
+        "clickLink": "Click the link to confirm your account",
+        "redirected": "You'll be redirected to the login page",
+        "signIn": "Sign in and access your store dashboard"
+      },
+      "noEmail": "Didn't receive the email? Check your spam folder or",
+      "contactSupport": "contact support",
+      "loading": "Loading...",
+      "welcome": "Welcome to LIFO!",
+      "storeSetup": "Your store \"{storeName}\" has been set up successfully. You're ready to start managing your inventory and reducing waste!",
+      "whatsNextTitle": "What's Next?",
+      "nextSteps": {
+        "completeSetup": {
+          "title": "Complete Store Setup",
+          "description": "Configure your store settings, preferences, and operational hours"
+        },
+        "addProducts": {
+          "title": "Add Your First Products",
+          "description": "Start building your inventory to track expiration dates and reduce waste"
+        },
+        "inviteTeam": {
+          "title": "Invite Your Team",
+          "description": "Add staff members to help manage your store's inventory"
+        }
+      },
+      "actions": {
+        "goToDashboard": "Go to Dashboard",
+        "completeSetup": "Complete Setup"
+      }
     }
   }
 }

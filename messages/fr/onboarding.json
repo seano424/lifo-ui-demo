@@ -105,6 +105,42 @@
       "testingButton": "Test",
       "termsAndPrivacy": "En créant un compte, vous acceptez nos Conditions d'utilisation et notre Politique de confidentialité. Vous recevrez un email de confirmation pour vérifier votre compte.",
       "testModePrefix": "🧪 Mode {mode} : "
+    },
+    "success": {
+      "accountCreated": "Compte créé avec succès !",
+      "checkEmail": "Vérifiez votre email",
+      "emailSent": "Nous vous avons envoyé un email de confirmation. Veuillez vérifier votre boîte de réception et cliquer sur le lien de vérification pour terminer votre inscription.",
+      "whatsNext": "Et maintenant ?",
+      "steps": {
+        "checkEmail": "Vérifiez votre email pour le lien de vérification",
+        "clickLink": "Cliquez sur le lien pour confirmer votre compte",
+        "redirected": "Vous serez redirigé vers la page de connexion",
+        "signIn": "Connectez-vous et accédez au tableau de bord de votre magasin"
+      },
+      "noEmail": "Vous n'avez pas reçu l'email ? Vérifiez votre dossier spam ou",
+      "contactSupport": "contactez le support",
+      "loading": "Chargement...",
+      "welcome": "Bienvenue sur LIFO !",
+      "storeSetup": "Votre magasin \"{storeName}\" a été configuré avec succès. Vous êtes prêt à commencer à gérer votre inventaire et à réduire le gaspillage !",
+      "whatsNextTitle": "Et maintenant ?",
+      "nextSteps": {
+        "completeSetup": {
+          "title": "Terminer la configuration du magasin",
+          "description": "Configurez les paramètres de votre magasin, les préférences et les heures d'ouverture"
+        },
+        "addProducts": {
+          "title": "Ajoutez vos premiers produits",
+          "description": "Commencez à construire votre inventaire pour suivre les dates d'expiration et réduire le gaspillage"
+        },
+        "inviteTeam": {
+          "title": "Invitez votre équipe",
+          "description": "Ajoutez des membres du personnel pour vous aider à gérer l'inventaire de votre magasin"
+        }
+      },
+      "actions": {
+        "goToDashboard": "Aller au tableau de bord",
+        "completeSetup": "Terminer la configuration"
+      }
     }
   }
 }
