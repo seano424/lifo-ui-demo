@@ -122,7 +122,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <NavbarLogo variant="icon" size="sm" className="dark:hidden" />
           <NavbarLogo variant="icon-dark" size="sm" className="dark:block hidden" />
           <Typography variant="h2" className="font-black">
-            Lifo
+            LIFO
           </Typography>
         </Link>
 

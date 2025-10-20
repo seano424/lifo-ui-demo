@@ -130,7 +130,7 @@ export function Logo({ variant = 'vertical', size = 'md', className, href, darkM
           sizes="(max-width: 640px) 64px, (max-width: 768px) 80px, 96px"
           priority
         />
-        <Typography className="font-heading font-bold bold text-3xl lg:text-4xl" variant="h2">
+        <Typography className="font-black text-3xl lg:text-4xl" variant="h2">
           LIFO
         </Typography>
       </div>
