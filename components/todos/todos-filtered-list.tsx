@@ -12,6 +12,7 @@ import {
 } from '@/hooks/use-todos-with-filters'
 import type { BatchStatus, TodoActionType, TodoUrgencyLevel } from '@/lib/queries/todos-rpc'
 import { cn } from '@/lib/utils'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -54,6 +55,11 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
   // Tab indicator animation
   const buttonRefs = useRef<(HTMLButtonElement | null)[]>([])
   const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 })
+
+  // Scroll indicators state
+  const [showLeftIndicator, setShowLeftIndicator] = useState(false)
+  const [showRightIndicator, setShowRightIndicator] = useState(false)
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
 
   // Track if filters/tab have been initialized from URL
   const [isInitialized, setIsInitialized] = useState(false)
@@ -142,7 +148,7 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
     ],
   )
 
-  // Update tab indicator position
+  // Update tab indicator position and scroll indicators
   useEffect(() => {
     const updateIndicator = () => {
       const activeIndex = tabs.findIndex(tab => tab.id === activeTab)
@@ -174,23 +180,40 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
       }
     }
 
+    const updateScrollIndicators = () => {
+      const container = scrollContainerRef.current
+      if (container) {
+        const { scrollLeft, scrollWidth, clientWidth } = container
+        setShowLeftIndicator(scrollLeft > 0)
+        setShowRightIndicator(scrollLeft < scrollWidth - clientWidth - 1)
+      }
+    }
+
+    const handleScroll = () => {
+      updateIndicator()
+      updateScrollIndicators()
+    }
+
     // Add a small delay to ensure DOM is ready
-    const timeoutId = setTimeout(updateIndicator, 1)
+    const timeoutId = setTimeout(() => {
+      updateIndicator()
+      updateScrollIndicators()
+    }, 1)
 
     // Add scroll listener to update indicator when scrolling
     const scrollContainer = document.querySelector('.overflow-x-auto')
     if (scrollContainer) {
-      scrollContainer.addEventListener('scroll', updateIndicator)
+      scrollContainer.addEventListener('scroll', handleScroll)
     }
 
-    window.addEventListener('resize', updateIndicator)
+    window.addEventListener('resize', handleScroll)
 
     return () => {
       clearTimeout(timeoutId)
       if (scrollContainer) {
-        scrollContainer.removeEventListener('scroll', updateIndicator)
+        scrollContainer.removeEventListener('scroll', handleScroll)
       }
-      window.removeEventListener('resize', updateIndicator)
+      window.removeEventListener('resize', handleScroll)
     }
   }, [activeTab, tabs])
 
@@ -242,6 +265,20 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
     setActiveTab(tabId)
     // Optionally reset filters when changing tabs
     // setFilters(prev => ({ ...prev, product_name: undefined }))
+  }
+
+  const scrollLeft = () => {
+    const container = scrollContainerRef.current
+    if (container) {
+      container.scrollBy({ left: -200, behavior: 'smooth' })
+    }
+  }
+
+  const scrollRight = () => {
+    const container = scrollContainerRef.current
+    if (container) {
+      container.scrollBy({ left: 200, behavior: 'smooth' })
+    }
   }
 
   const handleFiltersChange = useCallback(
@@ -374,7 +411,31 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
 
       {/* Tab Navigation */}
       <div className="relative mb-10">
-        <div className="overflow-x-auto scrollbar-hide">
+        {/* Left scroll indicator */}
+        {showLeftIndicator && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={scrollLeft}
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-20 bg-background/80 backdrop-blur-sm border shadow-sm hover:bg-background/90 h-6 w-6 p-0"
+          >
+            <ChevronLeft className="h-3 w-3" />
+          </Button>
+        )}
+
+        {/* Right scroll indicator */}
+        {showRightIndicator && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={scrollRight}
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-20 bg-background/80 backdrop-blur-sm border shadow-sm hover:bg-background/90 h-6 w-6 p-0"
+          >
+            <ChevronRight className="h-3 w-3" />
+          </Button>
+        )}
+
+        <div ref={scrollContainerRef} className="overflow-x-auto scrollbar-hide">
           <div className="flex gap-2 sm:gap-4 min-w-max px-2 sm:px-0">
             {tabs.map((tab, index) => (
               <Button
