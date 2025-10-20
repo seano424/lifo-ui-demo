@@ -19,7 +19,7 @@ export function OnboardingSignUpForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<'div'>) {
-  const t = useTranslations('marketing.onboarding.signupForm')
+  const t = useTranslations('onboarding.signupForm')
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')

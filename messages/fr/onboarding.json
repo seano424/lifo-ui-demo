@@ -1,0 +1,110 @@
+{
+  "onboarding": {
+    "stepLabels": {
+      "storeLookup": "Recherche de magasin",
+      "addStoreDetails": "Ajouter les détails du magasin",
+      "reviewVerify": "Examiner et vérifier",
+      "createAccount": "Créer un compte"
+    },
+    "storeSearch": {
+      "placeholder": "Entrez le nom ou l'adresse de votre magasin..."
+    },
+    "confirmDetails": {
+      "title": "Examinez les détails de votre magasin",
+      "subtitle": "Nous vérifierons que cette entreprise n'est pas déjà enregistrée avant de créer votre compte",
+      "fields": {
+        "type": "Type",
+        "address": "Adresse",
+        "phone": "Téléphone",
+        "country": "Pays",
+        "businessName": "Nom de l'entreprise"
+      },
+      "values": {
+        "notSpecified": "Non spécifié",
+        "notProvided": "Non fourni"
+      },
+      "businessCheck": {
+        "verifyPrompt": "Avant de créer votre compte, nous devons vérifier que cette entreprise n'est pas déjà enregistrée.",
+        "verifyButton": "Vérifier l'entreprise",
+        "checking": "Vérification...",
+        "alreadyRegistered": "Cette entreprise est déjà enregistrée.",
+        "alreadyRegisteredDesc": "Le magasin que vous avez sélectionné a déjà un compte. Connectez-vous ou contactez-nous pour obtenir de l'aide.",
+        "existingStore": "Magasin existant :",
+        "contactSupport": "Contacter le support",
+        "tryDifferentStore": "Essayer un autre magasin",
+        "businessVerified": "Entreprise vérifiée !",
+        "businessVerifiedDesc": "Ce magasin n'est pas encore enregistré. Vous pouvez procéder à la création de votre compte."
+      },
+      "errors": {
+        "noStoreInfo": "Aucune information de magasin trouvée. Veuillez revenir en arrière et compléter les étapes précédentes.",
+        "startOver": "Recommencer"
+      }
+    },
+    "storeType": {
+      "addStoreDetailsTitle": "Ajouter détails du magasin",
+      "completeStoreInformationTitle": "Compléter les informations du magasin",
+      "storeInformationCardTitle": "Informations du magasin",
+      "storeNameLabel": "Nom du magasin",
+      "storeTypeLabel": "Type de magasin",
+      "businessNameLabel": "Nom de l'entreprise",
+      "addressLabel": "Adresse",
+      "cityLabel": "Ville",
+      "postalCodeLabel": "Code postal",
+      "countryLabel": "Pays",
+      "phoneLabel": "Numéro de téléphone",
+      "continueButton": "Continuer",
+      "storeNamePlaceholder": "Nom de votre magasin",
+      "selectStoreType": "Sélectionner le type de magasin",
+      "businessNamePlaceholder": "Si différent du nom du magasin",
+      "addressPlaceholder": "123 Rue de la Paix",
+      "cityPlaceholder": "Paris",
+      "postalCodePlaceholder": "75001",
+      "countryPlaceholder": "France",
+      "phonePlaceholder": "01 23 45 67 89"
+    },
+    "signupForm": {
+      "businessRegistered": "Entreprise déjà enregistrée",
+      "businessRegisteredDesc": "Cette entreprise est déjà dans notre système. Veuillez contacter le support ou essayer un autre magasin.",
+      "backButton": "Retour",
+      "tryDifferentStore": "Essayer un autre magasin",
+      "signInRequired": "Connexion requise :",
+      "testModeWarning": "Le mode test nécessite que vous soyez connecté d'abord. Passez en mode MOCK si vous voulez tester sans authentification.",
+      "createAccount": "Créez votre compte",
+      "createAccountDesc": "Presque terminé ! Créez votre compte pour accéder au tableau de bord de {storeName}.",
+      "fullName": "Nom complet",
+      "fullNamePlaceholder": "Votre nom complet",
+      "email": "Email",
+      "emailPlaceholder": "manager@votremagasin.com",
+      "password": "Mot de passe",
+      "confirmPassword": "Confirmer le mot de passe",
+      "creatingAccount": "Création du compte",
+      "createAccountButton": "Créer le compte",
+      "noChanges": "Aucun changement réel ne sera effectué",
+      "realChanges": "Changements réels de base de données avec votre compte",
+      "passwordRequirement": "Le mot de passe doit contenir au moins 6 caractères",
+      "loggedInMessage": "Vous êtes connecté en tant que {email}. Ce magasin sera associé à votre compte.",
+      "loginInstead": "Se connecter à la place",
+      "tryAgain": "Réessayer",
+      "forgotPassword": "Mot de passe oublié ?",
+      "creatingStore": "Création du magasin...",
+      "createStore": "Créer le magasin",
+      "termsAndPrivacy": "En créant un compte, vous acceptez nos Conditions d'utilisation et notre Politique de confidentialité",
+      "errors": {
+        "passwordTooShort": "Le mot de passe doit contenir au moins 6 caractères",
+        "passwordsNoMatch": "Les mots de passe ne correspondent pas",
+        "storeInfoMissing": "Les informations du magasin sont manquantes. Veuillez revenir en arrière et compléter la configuration du magasin.",
+        "businessAlreadyRegistered": "Cette entreprise est déjà enregistrée. Veuillez contacter le support.",
+        "testModeSignInRequired": "Le mode test nécessite que vous soyez connecté d'abord.",
+        "signupError": "Une erreur s'est produite lors de l'inscription",
+        "noStoreInfo": "Aucune information de magasin trouvée. Veuillez revenir en arrière et compléter les étapes précédentes.",
+        "startOver": "Recommencer"
+      }
+    },
+    "form": {
+      "passwordRequirement": "Doit contenir au moins 6 caractères",
+      "testingButton": "Test",
+      "termsAndPrivacy": "En créant un compte, vous acceptez nos Conditions d'utilisation et notre Politique de confidentialité. Vous recevrez un email de confirmation pour vérifier votre compte.",
+      "testModePrefix": "🧪 Mode {mode} : "
+    }
+  }
+}
