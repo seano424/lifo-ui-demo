@@ -1,14 +1,14 @@
-const CACHE_NAME = 'lifo-ai-v13'
+const CACHE_NAME = 'lifo-ai-v14'
 
 // Install event - claim immediately
 self.addEventListener('install', event => {
-  console.log('Service Worker: Installing v13 - minimal pass-through mode with WASM bypass')
+  console.log('Service Worker: Installing v14 - zero-intervention mode for Next.js 15')
   event.waitUntil(self.skipWaiting())
 })
 
 // Activate event - clean up old caches and claim clients
 self.addEventListener('activate', event => {
-  console.log('Service Worker: Activating v13')
+  console.log('Service Worker: Activating v14')
   event.waitUntil(
     caches
       .keys()
@@ -26,19 +26,13 @@ self.addEventListener('activate', event => {
   )
 })
 
-// Fetch event - SIMPLIFIED: Pass through everything
-// No caching - Next.js 15 handles its own caching better
-// This prevents auth issues, ECONNRESET errors, and stream issues
-self.addEventListener('fetch', event => {
-  const url = new URL(event.request.url)
-
-  // Skip service worker for WASM files - Safari/iOS requires direct fetch
-  // WASM streaming compilation fails when intercepted by service workers on iOS
-  if (url.pathname.endsWith('.wasm')) {
-    return // Don't intercept - let browser handle directly
-  }
-
-  // Simply pass through all other requests without intervention
-  // This maintains PWA installability while avoiding caching conflicts
-  event.respondWith(fetch(event.request))
+// Fetch event - MINIMAL INTERVENTION MODE
+// Don't intercept ANY requests - let Next.js 15 and the browser handle everything
+// This prevents auth issues, RSC request failures, and message channel errors
+// PWA installability is maintained just by having the service worker registered
+self.addEventListener('fetch', _event => {
+  // Don't call event.respondWith() at all - let browser handle all requests naturally
+  // This is the recommended approach for Next.js 15 PWAs
+  // Reference: https://web.dev/articles/service-worker-lifecycle
+  return
 })

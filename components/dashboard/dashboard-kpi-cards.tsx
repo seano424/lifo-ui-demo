@@ -155,7 +155,7 @@ export function DashboardKPICards() {
           isLoading={salesQuery.isLoading || (showTrends && salesTrendsQuery.isLoading)}
           isError={salesQuery.isError || (showTrends && salesTrendsQuery.isError)}
           isLink={true}
-          link="/dashboard/scan-out"
+          link="/dashboard"
           showTrends={showTrends}
           trendData={salesTrendData}
         />
@@ -170,7 +170,7 @@ export function DashboardKPICards() {
           isLoading={donationQuery.isLoading || (showTrends && donationTrendsQuery.isLoading)}
           isError={donationQuery.isError || (showTrends && donationTrendsQuery.isError)}
           isLink={true}
-          link="/dashboard/donations"
+          link="/dashboard"
           showTrends={showTrends}
           trendData={donationTrendData}
         />
@@ -185,7 +185,7 @@ export function DashboardKPICards() {
           isLoading={wasteQuery.isLoading || (showTrends && wasteTrendsQuery.isLoading)}
           isError={wasteQuery.isError || (showTrends && wasteTrendsQuery.isError)}
           isLink={true}
-          link="/dashboard/waste"
+          link="/dashboard"
           showTrends={showTrends}
           trendData={wasteTrendData}
         />
