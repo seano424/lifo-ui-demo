@@ -1,8 +1,10 @@
 'use client'
 
 import { cn } from '@/lib/utils'
+import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
 import { Typography } from './typography'
 
 type LogoVariant = 'vertical' | 'horizontal' | 'icon' | 'text' | 'icon-dark'
@@ -30,7 +32,14 @@ const sizeMapHorizontal = {
   xl: 'h-16',
 }
 
-export function Logo({ variant = 'vertical', size = 'md', className, href }: LogoProps) {
+export function Logo({ variant = 'vertical', size = 'md', className, href, darkMode }: LogoProps) {
+  const { resolvedTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
   // Get proper aspect ratio dimensions for each variant
   // These match the intrinsic SVG viewBox dimensions
   const getDimensions = (): { width: number; height: number } => {
@@ -47,26 +56,58 @@ export function Logo({ variant = 'vertical', size = 'md', className, href }: Log
     }
   }
 
+  // Determine which image to load based on theme
+  const getImageSrc = () => {
+    if (!mounted) {
+      // Return light mode as default during SSR
+      switch (variant) {
+        case 'icon':
+        case 'text':
+          return '/logos/lifo-logo-icon.svg'
+        case 'vertical':
+          return '/logos/lifo-logo-vertical-light.svg'
+        case 'horizontal':
+          return '/logos/lifo-logo-horizontal-light.svg'
+        case 'icon-dark':
+          return '/logos/lifo-logo-icon-white.svg'
+        default:
+          return '/logos/lifo-logo-vertical-light.svg'
+      }
+    }
+
+    const isDark = darkMode !== undefined ? darkMode : resolvedTheme === 'dark'
+
+    switch (variant) {
+      case 'icon':
+      case 'text':
+        return isDark ? '/logos/lifo-logo-icon-white.svg' : '/logos/lifo-logo-icon.svg'
+      case 'vertical':
+        return isDark
+          ? '/logos/lifo-logo-vertical-black.svg'
+          : '/logos/lifo-logo-vertical-light.svg'
+      case 'horizontal':
+        return isDark
+          ? '/logos/lifo-logo-horizontal-dark.svg'
+          : '/logos/lifo-logo-horizontal-light.svg'
+      case 'icon-dark':
+        return '/logos/lifo-logo-icon-white.svg'
+      default:
+        return isDark
+          ? '/logos/lifo-logo-vertical-black.svg'
+          : '/logos/lifo-logo-vertical-light.svg'
+    }
+  }
+
   const dimensions = getDimensions()
   const sizeClass = variant === 'vertical' ? sizeMapVertical[size] : sizeMapHorizontal[size]
 
   if (variant === 'text') {
     const textElement = (
       <div className="flex items-center gap-2">
-        {/* Light mode icon */}
         <Image
-          src="/logos/lifo-logo-icon.svg"
+          src={getImageSrc()}
           alt="LIFO Icon"
-          className={cn('w-16 h-auto dark:hidden', className)}
-          width={600}
-          height={280}
-          priority
-        />
-        {/* Dark mode icon */}
-        <Image
-          src="/logos/lifo-logo-icon-white.svg"
-          alt="LIFO Icon"
-          className={cn('w-16 h-auto hidden dark:block', className)}
+          className={cn('w-16 h-auto', className)}
           width={600}
           height={280}
           priority
@@ -84,29 +125,17 @@ export function Logo({ variant = 'vertical', size = 'md', className, href }: Log
     return textElement
   }
 
-  // For icon variant, show both and use CSS to toggle
+  // For icon variant, load only the required theme image
   if (variant === 'icon') {
     const iconElement = (
-      <div className="relative">
-        {/* Light mode icon */}
-        <Image
-          src="/logos/lifo-logo-icon.svg"
-          alt="LIFO"
-          className={cn(sizeClass, 'w-auto dark:hidden', className)}
-          priority
-          width={dimensions.width}
-          height={dimensions.height}
-        />
-        {/* Dark mode icon */}
-        <Image
-          src="/logos/lifo-logo-icon-white.svg"
-          alt="LIFO"
-          className={cn(sizeClass, 'w-auto hidden dark:block', className)}
-          priority
-          width={dimensions.width}
-          height={dimensions.height}
-        />
-      </div>
+      <Image
+        src={getImageSrc()}
+        alt="LIFO"
+        className={cn(sizeClass, 'w-auto', className)}
+        priority
+        width={dimensions.width}
+        height={dimensions.height}
+      />
     )
 
     if (href) {
@@ -144,29 +173,17 @@ export function Logo({ variant = 'vertical', size = 'md', className, href }: Log
     return iconElement
   }
 
-  // For vertical variant
+  // For vertical variant, load only the required theme image
   if (variant === 'vertical') {
     const verticalElement = (
-      <div className="relative">
-        {/* Light mode vertical logo */}
-        <Image
-          src="/logos/lifo-logo-vertical-light.svg"
-          alt="LIFO"
-          className={cn(sizeClass, 'w-auto dark:hidden', className)}
-          priority
-          width={dimensions.width}
-          height={dimensions.height}
-        />
-        {/* Dark mode vertical logo */}
-        <Image
-          src="/logos/lifo-logo-vertical-black.svg"
-          alt="LIFO"
-          className={cn(sizeClass, 'w-auto hidden dark:block', className)}
-          priority
-          width={dimensions.width}
-          height={dimensions.height}
-        />
-      </div>
+      <Image
+        src={getImageSrc()}
+        alt="LIFO"
+        className={cn(sizeClass, 'w-auto', className)}
+        priority
+        width={dimensions.width}
+        height={dimensions.height}
+      />
     )
 
     if (href) {
@@ -180,29 +197,17 @@ export function Logo({ variant = 'vertical', size = 'md', className, href }: Log
     return verticalElement
   }
 
-  // For horizontal variant
+  // For horizontal variant, load only the required theme image
   if (variant === 'horizontal') {
     const horizontalElement = (
-      <div className="relative">
-        {/* Light mode horizontal logo */}
-        <Image
-          src="/logos/lifo-logo-horizontal-light.svg"
-          alt="LIFO"
-          className={cn(sizeClass, 'w-auto dark:hidden', className)}
-          priority
-          width={dimensions.width}
-          height={dimensions.height}
-        />
-        {/* Dark mode horizontal logo */}
-        <Image
-          src="/logos/lifo-logo-horizontal-dark.svg"
-          alt="LIFO"
-          className={cn(sizeClass, 'w-auto hidden dark:block', className)}
-          priority
-          width={dimensions.width}
-          height={dimensions.height}
-        />
-      </div>
+      <Image
+        src={getImageSrc()}
+        alt="LIFO"
+        className={cn(sizeClass, 'w-auto', className)}
+        priority
+        width={dimensions.width}
+        height={dimensions.height}
+      />
     )
 
     if (href) {
@@ -216,28 +221,16 @@ export function Logo({ variant = 'vertical', size = 'md', className, href }: Log
     return horizontalElement
   }
 
-  // Default case - use vertical
+  // Default case - use vertical, load only the required theme image
   const defaultElement = (
-    <div className="relative">
-      {/* Light mode vertical logo */}
-      <Image
-        src="/logos/lifo-logo-vertical-light.svg"
-        alt="LIFO"
-        className={cn(sizeClass, 'w-auto dark:hidden', className)}
-        priority
-        width={dimensions.width}
-        height={dimensions.height}
-      />
-      {/* Dark mode vertical logo */}
-      <Image
-        src="/logos/lifo-logo-vertical-black.svg"
-        alt="LIFO"
-        className={cn(sizeClass, 'w-auto hidden dark:block', className)}
-        priority
-        width={dimensions.width}
-        height={dimensions.height}
-      />
-    </div>
+    <Image
+      src={getImageSrc()}
+      alt="LIFO"
+      className={cn(sizeClass, 'w-auto', className)}
+      priority
+      width={dimensions.width}
+      height={dimensions.height}
+    />
   )
 
   if (href) {
