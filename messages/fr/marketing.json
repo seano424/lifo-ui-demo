@@ -139,17 +139,25 @@
         "creatingAccount": "Création du compte",
         "createAccountButton": "Créer le compte",
         "noChanges": "Aucun changement réel ne sera effectué",
-        "realChanges": "Changements réels de base de données avec votre compte"
-      },
-      "errors": {
-        "passwordTooShort": "Le mot de passe doit contenir au moins 6 caractères",
-        "passwordsNoMatch": "Les mots de passe ne correspondent pas",
-        "storeInfoMissing": "Les informations du magasin sont manquantes. Veuillez revenir en arrière et compléter la configuration du magasin.",
-        "businessAlreadyRegistered": "Cette entreprise est déjà enregistrée. Veuillez contacter le support.",
-        "testModeSignInRequired": "Le mode test nécessite que vous soyez connecté d'abord.",
-        "signupError": "Une erreur s'est produite lors de l'inscription",
-        "noStoreInfo": "Aucune information de magasin trouvée. Veuillez revenir en arrière et compléter les étapes précédentes.",
-        "startOver": "Recommencer"
+        "realChanges": "Changements réels de base de données avec votre compte",
+        "passwordRequirement": "Le mot de passe doit contenir au moins 6 caractères",
+        "loggedInMessage": "Vous êtes connecté en tant que {email}. Ce magasin sera associé à votre compte.",
+        "loginInstead": "Se connecter à la place",
+        "tryAgain": "Réessayer",
+        "forgotPassword": "Mot de passe oublié ?",
+        "creatingStore": "Création du magasin...",
+        "createStore": "Créer le magasin",
+        "termsAndPrivacy": "En créant un compte, vous acceptez nos Conditions d'utilisation et notre Politique de confidentialité",
+        "errors": {
+          "passwordTooShort": "Le mot de passe doit contenir au moins 6 caractères",
+          "passwordsNoMatch": "Les mots de passe ne correspondent pas",
+          "storeInfoMissing": "Les informations du magasin sont manquantes. Veuillez revenir en arrière et compléter la configuration du magasin.",
+          "businessAlreadyRegistered": "Cette entreprise est déjà enregistrée. Veuillez contacter le support.",
+          "testModeSignInRequired": "Le mode test nécessite que vous soyez connecté d'abord.",
+          "signupError": "Une erreur s'est produite lors de l'inscription",
+          "noStoreInfo": "Aucune information de magasin trouvée. Veuillez revenir en arrière et compléter les étapes précédentes.",
+          "startOver": "Recommencer"
+        }
       },
       "form": {
         "passwordRequirement": "Doit contenir au moins 6 caractères",

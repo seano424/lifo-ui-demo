@@ -1,6 +1,7 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
+import { useTranslations } from 'next-intl'
 
 interface FormNavigationProps {
   onBack?: () => void
@@ -24,6 +25,8 @@ export function FormNavigation({
   showBack = true,
   nextType = 'submit',
 }: FormNavigationProps) {
+  const t = useTranslations('common.buttons')
+
   return (
     <div className="flex gap-3 pt-4">
       {showBack && onBack && (
@@ -34,7 +37,7 @@ export function FormNavigation({
           className="w-full"
           disabled={isSubmitting}
         >
-          Back
+          {t('back')}
         </Button>
       )}
       {onNext && (
@@ -44,7 +47,7 @@ export function FormNavigation({
           className="w-full"
           disabled={isNextDisabled || isSubmitting}
         >
-          {isSubmitting ? 'Processing...' : nextLabel}
+          {isSubmitting ? t('processing') : nextLabel}
         </Button>
       )}
     </div>
@@ -67,21 +70,23 @@ export function ConfirmNavigation({
   isProcessing?: boolean
   isDisabled?: boolean
 }) {
+  const t = useTranslations('common.buttons')
+
   return (
     <div className="flex gap-3 pt-4">
       {onBack && (
         <Button variant="outline" onClick={onBack} className="w-full" disabled={isProcessing}>
-          Back
+          {t('back')}
         </Button>
       )}
       {onEdit && (
         <Button variant="outline" onClick={onEdit} className="w-full" disabled={isProcessing}>
-          Edit
+          {t('edit')}
         </Button>
       )}
       {onConfirm && (
         <Button onClick={onConfirm} className="w-full" disabled={isDisabled || isProcessing}>
-          {isProcessing ? 'Processing...' : isDisabled ? 'Verify First' : 'Create Account'}
+          {isProcessing ? t('processing') : isDisabled ? t('verifyFirst') : t('createAccount')}
         </Button>
       )}
     </div>

@@ -139,17 +139,25 @@
         "creatingAccount": "Creating Account",
         "createAccountButton": "Create Account",
         "noChanges": "No real changes will be made",
-        "realChanges": "Real database changes with your account"
-      },
-      "errors": {
-        "passwordTooShort": "Password must be at least 6 characters",
-        "passwordsNoMatch": "Passwords do not match",
-        "storeInfoMissing": "Store information is missing. Please go back and complete store setup.",
-        "businessAlreadyRegistered": "This business is already registered. Please contact support.",
-        "testModeSignInRequired": "Test mode requires you to be signed in first.",
-        "signupError": "An error occurred during signup",
-        "noStoreInfo": "No store information found. Please go back and complete the previous steps.",
-        "startOver": "Start Over"
+        "realChanges": "Real database changes with your account",
+        "passwordRequirement": "Password must be at least 6 characters long",
+        "loggedInMessage": "You are logged in as {email}. This store will be associated with your account.",
+        "loginInstead": "Login Instead",
+        "tryAgain": "Try Again",
+        "forgotPassword": "Forgot your password?",
+        "creatingStore": "Creating store...",
+        "createStore": "Create Store",
+        "termsAndPrivacy": "By creating an account, you agree to our Terms of Service and Privacy Policy",
+        "errors": {
+          "passwordTooShort": "Password must be at least 6 characters",
+          "passwordsNoMatch": "Passwords do not match",
+          "storeInfoMissing": "Store information is missing. Please go back and complete store setup.",
+          "businessAlreadyRegistered": "This business is already registered. Please contact support.",
+          "testModeSignInRequired": "Test mode requires you to be signed in first.",
+          "signupError": "An error occurred during signup",
+          "noStoreInfo": "No store information found. Please go back and complete the previous steps.",
+          "startOver": "Start Over"
+        }
       },
       "form": {
         "passwordRequirement": "Must be at least 6 characters",

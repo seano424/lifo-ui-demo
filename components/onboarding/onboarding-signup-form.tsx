@@ -341,7 +341,7 @@ export function OnboardingSignUpForm({
                       onChange={e => setPassword(e.target.value)}
                     />
                     <Typography variant="p" color="muted">
-                      Password must be at least 6 characters long
+                      {t('passwordRequirement')}
                     </Typography>
                   </div>
 
@@ -362,8 +362,7 @@ export function OnboardingSignUpForm({
               {isLoggedIn && (
                 <Alert>
                   <AlertDescription>
-                    You are logged in as {currentUser?.email}. This store will be associated with
-                    your account.
+                    {t('loggedInMessage', { email: currentUser?.email })}
                   </AlertDescription>
                 </Alert>
               )}
@@ -383,7 +382,7 @@ export function OnboardingSignUpForm({
                             variant="default"
                             onClick={() => router.push('/auth/login')}
                           >
-                            Login Instead
+                            {t('loginInstead')}
                           </Button>
                           <Button
                             type="button"
@@ -394,7 +393,7 @@ export function OnboardingSignUpForm({
                               setEmail('')
                             }}
                           >
-                            Try Again
+                            {t('tryAgain')}
                           </Button>
                         </div>
                         <Button
@@ -403,7 +402,7 @@ export function OnboardingSignUpForm({
                           className="text-sm"
                           onClick={() => router.push('/auth/forgot-password')}
                         >
-                          Forgot your password?
+                          {t('forgotPassword')}
                         </Button>
                       </div>
                     </div>
@@ -415,17 +414,17 @@ export function OnboardingSignUpForm({
                 <Button type="submit" className="w-full" disabled={isLoading}>
                   {isLoading
                     ? isLoggedIn
-                      ? 'Creating store...'
-                      : 'Creating account...'
+                      ? t('creatingStore')
+                      : t('creatingAccount')
                     : isLoggedIn
-                      ? 'Create Store'
+                      ? t('createStore')
                       : t('createAccountButton')}
                 </Button>
               )}
 
               {!isLoggedIn && (
                 <Typography variant="p" color="muted" className="text-center text-sm">
-                  By creating an account, you agree to our Terms of Service and Privacy Policy
+                  {t('termsAndPrivacy')}
                 </Typography>
               )}
             </div>

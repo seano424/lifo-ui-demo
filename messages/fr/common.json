@@ -36,6 +36,13 @@
     "aria": {
       "toggleTheme": "Changer le thème",
       "selectLanguage": "Sélectionner la langue"
+    },
+    "buttons": {
+      "back": "Retour",
+      "edit": "Modifier",
+      "processing": "Traitement...",
+      "verifyFirst": "Vérifier d'abord",
+      "createAccount": "Créer un compte"
     }
   },
   "breadcrumbs": {
@@ -133,6 +140,13 @@
       "deleting": "Suppression...",
       "updating": "Mise à jour..."
     }
+  },
+  "buttons": {
+    "back": "Retour",
+    "edit": "Modifier",
+    "processing": "Traitement...",
+    "verifyFirst": "Vérifier d'abord",
+    "createAccount": "Créer un compte"
   },
   "cancel": "Annuler",
   "close": "Fermer",
