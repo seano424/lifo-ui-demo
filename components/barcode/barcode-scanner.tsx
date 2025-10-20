@@ -108,14 +108,42 @@ export default function BarcodeScanner({
         await new Promise(resolve => setTimeout(resolve, 100))
       }
 
-      // Request camera permission
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode: 'environment', // Use back camera if available
-          width: { ideal: 1280 },
-          height: { ideal: 720 },
+      // Try multiple constraint configurations for iPad compatibility
+      let stream: MediaStream | null = null
+      const constraints = [
+        // Attempt 1: Back camera with ideal dimensions (works on phones)
+        {
+          video: {
+            facingMode: { ideal: 'environment' },
+            width: { ideal: 1280 },
+            height: { ideal: 720 },
+          },
         },
-      })
+        // Attempt 2: Any camera with ideal dimensions (fallback for iPads)
+        {
+          video: {
+            width: { ideal: 1280 },
+            height: { ideal: 720 },
+          },
+        },
+        // Attempt 3: Basic video only (maximum compatibility)
+        { video: true },
+      ]
+
+      let lastError: Error | null = null
+      for (const constraint of constraints) {
+        try {
+          stream = await navigator.mediaDevices.getUserMedia(constraint)
+          break // Success - exit loop
+        } catch (err) {
+          lastError = err instanceof Error ? err : new Error(String(err))
+          // Continue to next constraint
+        }
+      }
+
+      if (!stream) {
+        throw lastError || new Error('Failed to access camera with any constraints')
+      }
 
       // Check if component is still mounted and user hasn't stopped
       if (!isMounted || userStoppedCamera) {
@@ -138,7 +166,36 @@ export default function BarcodeScanner({
         }
       }
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to access camera'
+      // Enhanced error reporting for debugging
+      let errorMessage = 'Failed to access camera'
+      if (err instanceof Error) {
+        errorMessage = `${err.name}: ${err.message}`
+
+        // Check if this is a simulator/no camera issue
+        if (err.name === 'NotFoundError' || err.message.includes('not found')) {
+          errorMessage +=
+            '\n\n📱 No camera detected. If you are using a simulator, please test on a real device.'
+        }
+        // For constraint errors, provide more detail
+        else if (err.name === 'OverconstrainedError' || err.message.includes('constraint')) {
+          errorMessage += '\n\n⚠️ Camera constraints not supported.'
+          // Check if any cameras are available at all
+          navigator.mediaDevices.enumerateDevices().then(devices => {
+            const cameras = devices.filter(d => d.kind === 'videoinput')
+            if (cameras.length === 0) {
+              setError(
+                prev =>
+                  `${prev}\n\n📱 No cameras found on this device. If using a simulator, test on a real iPad/iPhone.`,
+              )
+            } else {
+              setError(
+                prev =>
+                  `${prev}\n\n📹 Found ${cameras.length} camera(s). This may be a simulator limitation.`,
+              )
+            }
+          })
+        }
+      }
       setError(errorMessage)
       setHasPermission(false)
       onError?.(new Error(errorMessage))
@@ -277,9 +334,9 @@ export default function BarcodeScanner({
       <div className="space-y-4">
         {/* Error Display */}
         {displayError && (
-          <Alert variant="destructive">
+          <Alert variant="destructive" className="flex flex-col items-center justify-center gap-2">
             <AlertCircle className="h-4 w-4" />
-            <AlertDescription>{displayError}</AlertDescription>
+            <AlertDescription className="whitespace-pre-wrap">{displayError}</AlertDescription>
           </Alert>
         )}
 

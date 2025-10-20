@@ -94,6 +94,22 @@ const nextConfig: NextConfig = {
           },
         ],
       },
+      {
+        // WASM files headers for Safari/iOS compatibility
+        source: '/:path*.wasm',
+        headers: [
+          {
+            // Ensure WASM files are served with correct MIME type
+            key: 'Content-Type',
+            value: 'application/wasm',
+          },
+          {
+            // Allow WASM execution in CSP
+            key: 'Content-Security-Policy',
+            value: "script-src 'self' 'wasm-unsafe-eval'",
+          },
+        ],
+      },
     ]
   },
   async redirects() {
@@ -122,6 +138,20 @@ const nextConfig: NextConfig = {
       /Critical dependency: the request of a dependency is an expression/,
       /Serializing big strings/,
     ]
+
+    // Configure WASM support for Safari/iOS compatibility
+    // Required for barcode-detector package
+    config.experiments = {
+      ...config.experiments,
+      asyncWebAssembly: true,
+      syncWebAssembly: true,
+    }
+
+    // Ensure WASM files are treated as assets and copied to output
+    config.module.rules.push({
+      test: /\.wasm$/,
+      type: 'asset/resource',
+    })
 
     return config
   },
