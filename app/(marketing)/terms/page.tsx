@@ -24,7 +24,7 @@ export default function TermsPage() {
         </div>
 
         {/* Content */}
-        <div className="rounded-3xl bg-gradient-to-br from-white/80 to-white/60 border border-white/20 shadow-lg p-8 md:p-12 space-y-8">
+        <div className="rounded-3xl bg-card border border-white/20 shadow-lg p-8 md:p-12 space-y-8">
           {/* Section 1 */}
           <section className="space-y-4">
             <Typography variant="h2" className="text-2xl font-bold text-foreground">
