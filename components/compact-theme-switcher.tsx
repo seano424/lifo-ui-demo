@@ -24,7 +24,12 @@ const CompactThemeSwitcher = () => {
   }, [])
 
   if (!mounted) {
-    return null
+    // Return disabled button with default state to prevent hydration mismatch
+    return (
+      <Button variant="outline" size={'sm'} disabled aria-label={t('toggleTheme')}>
+        <Laptop size={16} className={'text-muted-foreground'} />
+      </Button>
+    )
   }
 
   const ICON_SIZE = 16

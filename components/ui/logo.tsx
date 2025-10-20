@@ -56,6 +56,22 @@ export function Logo({ variant = 'vertical', size = 'md', className, href, darkM
     }
   }
 
+  // Get responsive sizes for better mobile performance
+  const getSizes = (): string => {
+    switch (size) {
+      case 'sm':
+        return '(max-width: 640px) 32px, (max-width: 768px) 40px, 48px'
+      case 'md':
+        return '(max-width: 640px) 48px, (max-width: 768px) 64px, 80px'
+      case 'lg':
+        return '(max-width: 640px) 64px, (max-width: 768px) 80px, 96px'
+      case 'xl':
+        return '(max-width: 640px) 80px, (max-width: 768px) 96px, 128px'
+      default:
+        return '(max-width: 640px) 48px, (max-width: 768px) 64px, 80px'
+    }
+  }
+
   // Determine which image to load based on theme
   const getImageSrc = () => {
     if (!mounted) {
@@ -99,6 +115,7 @@ export function Logo({ variant = 'vertical', size = 'md', className, href, darkM
   }
 
   const dimensions = getDimensions()
+  const sizes = getSizes()
   const sizeClass = variant === 'vertical' ? sizeMapVertical[size] : sizeMapHorizontal[size]
 
   if (variant === 'text') {
@@ -110,6 +127,7 @@ export function Logo({ variant = 'vertical', size = 'md', className, href, darkM
           className={cn('w-16 h-auto', className)}
           width={600}
           height={280}
+          sizes="(max-width: 640px) 64px, (max-width: 768px) 80px, 96px"
           priority
         />
         <Typography className="font-heading font-bold bold text-3xl lg:text-4xl" variant="h2">
@@ -135,6 +153,7 @@ export function Logo({ variant = 'vertical', size = 'md', className, href, darkM
         priority
         width={dimensions.width}
         height={dimensions.height}
+        sizes={sizes}
       />
     )
 
@@ -159,6 +178,7 @@ export function Logo({ variant = 'vertical', size = 'md', className, href, darkM
         priority
         width={dimensions.width}
         height={dimensions.height}
+        sizes={sizes}
       />
     )
 
@@ -183,6 +203,7 @@ export function Logo({ variant = 'vertical', size = 'md', className, href, darkM
         priority
         width={dimensions.width}
         height={dimensions.height}
+        sizes={sizes}
       />
     )
 
@@ -207,6 +228,7 @@ export function Logo({ variant = 'vertical', size = 'md', className, href, darkM
         priority
         width={dimensions.width}
         height={dimensions.height}
+        sizes={sizes}
       />
     )
 
@@ -230,6 +252,7 @@ export function Logo({ variant = 'vertical', size = 'md', className, href, darkM
       priority
       width={dimensions.width}
       height={dimensions.height}
+      sizes={sizes}
     />
   )
 

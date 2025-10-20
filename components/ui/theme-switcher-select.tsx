@@ -27,7 +27,17 @@ export function ThemeSwitcherSelect() {
   }, [])
 
   if (!mounted) {
-    return null
+    // Return disabled select with default state to prevent hydration mismatch
+    return (
+      <Select disabled>
+        <SelectTrigger className="w-44">
+          <div className="flex items-center gap-2">
+            <Laptop className="h-4 w-4" />
+            <SelectValue placeholder="System" />
+          </div>
+        </SelectTrigger>
+      </Select>
+    )
   }
 
   const getCurrentThemeIcon = () => {
