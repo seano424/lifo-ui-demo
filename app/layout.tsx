@@ -34,6 +34,8 @@ const raleway = Raleway({
   display: 'swap',
   subsets: ['latin'],
   weight: ['400', '500', '600', '700', '800', '900'],
+  preload: true,
+  fallback: ['system-ui', 'arial'],
 })
 
 // Montserrat font for body text
@@ -42,6 +44,7 @@ const montserrat = Montserrat({
   display: 'swap',
   subsets: ['latin'],
   weight: ['400', '500', '600', '700', '800', '900'],
+  preload: true,
 })
 
 const robotoMono = Roboto_Mono({
@@ -49,7 +52,7 @@ const robotoMono = Roboto_Mono({
   display: 'swap',
   subsets: ['latin'],
   weight: ['400', '500', '600', '700'],
-  preload: false, // Only used in specific components, not on every page
+  preload: true,
 })
 
 export default async function RootLayout({

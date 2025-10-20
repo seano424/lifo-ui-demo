@@ -178,6 +178,8 @@ function isPublicRoute(request: NextRequest): boolean {
     pathname.startsWith('/features') ||
     pathname.startsWith('/pricing') ||
     pathname.startsWith('/support') ||
+    pathname.startsWith('/privacy') ||
+    pathname.startsWith('/terms') ||
     request.nextUrl.searchParams.has('code')
   )
 }
