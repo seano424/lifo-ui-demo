@@ -139,8 +139,6 @@ export function DashboardKPICards() {
           subtitle={`${showTrends ? (inventoryTrendData?.metadata?.batchCount ?? 0) : (inventoryData?.batchCount ?? 0)} ${t('inventory.subtitle')}`}
           isLoading={inventoryQuery.isLoading || (showTrends && inventoryTrendsQuery.isLoading)}
           isError={inventoryQuery.isError || (showTrends && inventoryTrendsQuery.isError)}
-          isLink={true}
-          link="/dashboard/inventory"
           showTrends={showTrends}
           trendData={inventoryTrendData}
         />
@@ -154,8 +152,6 @@ export function DashboardKPICards() {
           subtitle={`${showTrends ? (salesTrendData?.metadata?.transactionCount ?? 0) : (salesData?.transactionCount ?? 0)} ${t('sales.subtitle')}`}
           isLoading={salesQuery.isLoading || (showTrends && salesTrendsQuery.isLoading)}
           isError={salesQuery.isError || (showTrends && salesTrendsQuery.isError)}
-          isLink={true}
-          link="/dashboard"
           showTrends={showTrends}
           trendData={salesTrendData}
         />
@@ -169,8 +165,6 @@ export function DashboardKPICards() {
           subtitle={`${showTrends ? (donationTrendData?.metadata?.recipientCount ?? 0) : (donationData?.recipientCount ?? 0)} ${t('donations.subtitle')}`}
           isLoading={donationQuery.isLoading || (showTrends && donationTrendsQuery.isLoading)}
           isError={donationQuery.isError || (showTrends && donationTrendsQuery.isError)}
-          isLink={true}
-          link="/dashboard"
           showTrends={showTrends}
           trendData={donationTrendData}
         />
@@ -184,8 +178,6 @@ export function DashboardKPICards() {
           subtitle={`${showTrends ? (wasteTrendData?.metadata?.itemCount ?? 0) : (wasteData?.itemCount ?? 0)} ${t('waste.subtitle')}`}
           isLoading={wasteQuery.isLoading || (showTrends && wasteTrendsQuery.isLoading)}
           isError={wasteQuery.isError || (showTrends && wasteTrendsQuery.isError)}
-          isLink={true}
-          link="/dashboard"
           showTrends={showTrends}
           trendData={wasteTrendData}
         />

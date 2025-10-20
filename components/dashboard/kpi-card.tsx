@@ -147,15 +147,17 @@ export function KPICard({
         </div>
 
         {/* Action button */}
-        <div className="mt-4 pt-3 border-t border-border/50">
-          <Button
-            variant="outline"
-            size="sm"
-            className="w-full border-secondary text-secondary bg-secondary/5"
-          >
-            {t('viewDetails')}
-          </Button>
-        </div>
+        {isLink && (
+          <div className="mt-4 pt-3 border-t border-border/50">
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full border-secondary text-secondary bg-secondary/5"
+            >
+              {t('viewDetails')}
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   )
