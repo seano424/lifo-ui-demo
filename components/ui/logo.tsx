@@ -71,7 +71,7 @@ export function Logo({ variant = 'vertical', size = 'md', className, href }: Log
           height={280}
           priority
         />
-        <Typography className="font-heading font-normal text-3xl lg:text-4xl" variant="h2">
+        <Typography className="font-heading font-bold bold text-3xl lg:text-4xl" variant="h2">
           LIFO
         </Typography>
       </div>
