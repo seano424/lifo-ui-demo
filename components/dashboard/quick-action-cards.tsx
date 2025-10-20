@@ -1,6 +1,6 @@
 'use client'
 
-import { CheckSquare, ListTodo, Minus, PackageOpen, Plus, ShoppingBag } from 'lucide-react'
+import { ListTodo, ScanBarcode, ScanSearch } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
 import { Typography } from '@/components/ui/typography'
@@ -25,28 +25,24 @@ export function QuickActionCards() {
           variant="primary"
           title="addProducts.title"
           description="addProducts.description"
-          primaryIcon={<Plus className="h-3.5 w-3.5" />}
-          secondaryIcon={<ShoppingBag className="h-4 w-4" />}
+          primaryIcon={<ScanSearch className="h-6 w-6" />}
           link="/dashboard/deliveries"
-          translationKey="dashboard.quickActions"
-        />
-
-        <QuickActionCard
-          variant="secondary"
-          title="removeProducts.title"
-          description="removeProducts.description"
-          primaryIcon={<Minus className="h-3.5 w-3.5" />}
-          secondaryIcon={<PackageOpen className="h-4 w-4" />}
-          link="/dashboard/scan-out"
           translationKey="dashboard.quickActions"
         />
         <QuickActionCard
           variant="secondary"
           title="todoSuggestions.title"
           description="todoSuggestions.description"
-          primaryIcon={<CheckSquare className="h-3.5 w-3.5" />}
-          secondaryIcon={<ListTodo className="h-4 w-4" />}
+          primaryIcon={<ListTodo className="h-6 w-6" />}
           link="/dashboard/todos"
+          translationKey="dashboard.quickActions"
+        />
+        <QuickActionCard
+          variant="secondary"
+          title="removeProducts.title"
+          description="removeProducts.description"
+          primaryIcon={<ScanBarcode className="h-6 w-6" />}
+          link="/dashboard/scan-out"
           translationKey="dashboard.quickActions"
         />
       </div>

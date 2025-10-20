@@ -1,12 +1,12 @@
 'use client'
 
-import { Euro, GiftIcon, type LucideIcon, Trash2, ZapIcon } from 'lucide-react'
-import Link from 'next/link'
-import { useTranslations } from 'next-intl'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Typography } from '@/components/ui/typography'
 import type { KPITrendData } from '@/lib/queries/dashboard-kpi-trends'
 import { cn } from '@/lib/utils'
+import { Euro, GiftIcon, type LucideIcon, Trash2, ZapIcon } from 'lucide-react'
+import { useTranslations } from 'next-intl'
+import Link from 'next/link'
 import { Button } from '../ui/button'
 
 interface KPICardProps {
@@ -67,16 +67,23 @@ export function KPICard({
 
   if (isLoading) {
     return (
-      <div
-        className={cn(
-          'bg-white dark:bg-brand-dark dark:border-primary-900 rounded-4xl p-6 shadow-sm border border-gray-100 space-y-3 flex flex-col items-center',
-          className,
-        )}
-      >
-        <Skeleton className="h-8 w-full rounded-4xl" />
-        <Skeleton className="h-8 w-2/3 rounded-4xl" />
-        <Skeleton className="h-8 w-3/5 rounded-4xl" />
-        <Skeleton className="h-8 w-1/2 rounded-4xl" />
+      <div className={cn('bg-background border rounded-2xl p-5 flex flex-col h-full', className)}>
+        <div className="flex items-start gap-3 mb-4">
+          <Skeleton className="h-10 w-10 rounded-xl flex-shrink-0" />
+          <Skeleton className="h-5 flex-1 rounded-lg" />
+        </div>
+        <div className="flex-1 flex flex-col justify-between">
+          <div className="space-y-3">
+            <Skeleton className="h-8 w-2/3 rounded-lg" />
+            <div className="space-y-1">
+              <Skeleton className="h-4 w-full rounded-lg" />
+              <Skeleton className="h-4 w-3/4 rounded-lg" />
+            </div>
+          </div>
+          <div className="mt-4 pt-3 border-t border-border/50">
+            <Skeleton className="h-8 w-full rounded-lg" />
+          </div>
+        </div>
       </div>
     )
   }
@@ -85,54 +92,75 @@ export function KPICard({
     return (
       <div
         className={cn(
-          'bg-white dark:bg-brand-dark dark:border-primary-900 rounded-4xl p-6 shadow-sm border border-gray-100 space-y-3 flex flex-col items-center min-h-[200px] justify-center',
+          'bg-background border rounded-2xl p-5 flex flex-col items-center justify-center min-h-[160px]',
           className,
         )}
       >
-        <Typography className="text-secondary-600">{t('failedToLoad')}</Typography>
+        <div className="text-center space-y-2">
+          <div className="w-12 h-12 rounded-xl bg-destructive/10 flex items-center justify-center mx-auto mb-3">
+            <Typography className="text-destructive text-xl">⚠</Typography>
+          </div>
+          <Typography className="text-muted-foreground text-sm">{t('failedToLoad')}</Typography>
+        </div>
       </div>
     )
   }
 
   const cardContent = (
-    <div className="space-y-2 flex flex-col items-center text-center">
-      <Typography variant="h4" className="font-bold flex items-center gap-2">
+    <div className="flex flex-col h-full">
+      {/* Header with icon and label */}
+      <div className="flex items-start gap-3 mb-4">
         {iconMap[icon as keyof typeof iconMap] &&
           (() => {
             const IconComponent = iconMap[icon as keyof typeof iconMap]
             return IconComponent ? (
-              <IconComponent className="w-6 h-6 bg-primary-50/30 rounded-full p-1" />
+              <div className="p-2.5 rounded-xl bg-primary/10 text-primary flex-shrink-0">
+                <IconComponent className="w-5 h-5" />
+              </div>
             ) : null
           })()}
+        <div className="flex-1 min-w-0">
+          <Typography variant="h4" className="font-semibold text-foreground leading-tight">
+            {label}
+          </Typography>
+        </div>
+      </div>
 
-        {label}
-      </Typography>
+      {/* Main content area */}
+      <div className="flex-1 flex flex-col justify-between">
+        {/* Value and details */}
+        <div className="space-y-3">
+          <Typography variant="h2" className="font-bold text-foreground text-2xl">
+            {showTrends && trendData ? formatValue(trendData.current) : formatValue(value)}
+          </Typography>
 
-      <div className="flex flex-col gap-3 items-center">
-        <Typography variant="h3" className="font-bold">
-          {showTrends && trendData ? formatValue(trendData.current) : formatValue(value)}
-        </Typography>
-
-        <div className="flex items-center gap-2 mb-2">
-          <Typography variant="p">{subtitle}</Typography>
-          {productCount && (
-            <Typography variant="p" className="">
-              {productCount} product{productCount > 1 ? 's' : ''}
+          <div className="space-y-1">
+            <Typography variant="p" className="text-muted-foreground text-sm leading-relaxed">
+              {subtitle}
             </Typography>
-          )}
+            {productCount && (
+              <Typography variant="p" className="text-muted-foreground text-sm">
+                {productCount} product{productCount > 1 ? 's' : ''}
+              </Typography>
+            )}
+          </div>
         </div>
 
-        <Button variant="subtleSecondary">{t('viewDetails')}</Button>
+        {/* Action button */}
+        <div className="mt-4 pt-3 border-t border-border/50">
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-full border-secondary text-secondary bg-secondary/5"
+          >
+            {t('viewDetails')}
+          </Button>
+        </div>
       </div>
     </div>
   )
 
-  const cardClassName = cn(
-    'rounded-4xl py-6 border bg-white dark:bg-brand-dark dark:border-primary-900',
-    'transition-all duration-200',
-    (isLink || onClick) && 'cursor-pointer hover:shadow-md hover:border-primary-100/50 group',
-    className,
-  )
+  const cardClassName = cn('rounded-2xl p-5 border bg-background', className)
 
   // If isLink is true and link is provided, render as Next.js Link
   if (isLink && link) {

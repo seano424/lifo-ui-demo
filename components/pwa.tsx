@@ -1,7 +1,7 @@
 'use client'
 
+import { Logo } from '@/components/ui/logo'
 import { X } from 'lucide-react'
-import Image from 'next/image'
 import { useEffect, useState } from 'react'
 
 interface BeforeInstallPromptEvent extends Event {
@@ -116,13 +116,7 @@ export default function PWA() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-6 h-6 bg-white rounded flex items-center justify-center">
-              <Image
-                src="/logos/lifo-logo-icon.svg"
-                alt="LIFO"
-                width={16}
-                height={16}
-                className="w-4 h-4"
-              />
+              <Logo variant="icon-dark" size="sm" className="w-4 h-4" />
             </div>
             <div>
               <p className="font-medium text-xs">Install LIFO</p>
@@ -154,13 +148,7 @@ export default function PWA() {
         <div className="bg-white rounded-lg shadow-lg border border-gray-200 p-3 max-w-xs">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded flex items-center justify-center flex-shrink-0">
-              <Image
-                src="/logos/LIFO-Logo-dark-BG.png"
-                alt="LIFO"
-                width={24}
-                height={24}
-                className="w-6 h-6"
-              />
+              <Logo variant="icon-dark" size="sm" className="w-6 h-6" />
             </div>
             <div className="flex-1 min-w-0">
               <h3 className="font-medium text-gray-900 text-xs">Install LIFO</h3>

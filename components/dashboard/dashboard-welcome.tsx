@@ -2,11 +2,11 @@
 
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
+import { Logo } from '@/components/ui/logo'
 import { Typography } from '@/components/ui/typography'
 import { cn } from '@/lib/utils'
 import { ArrowRight, BarChart3, PackageOpen, ScanSearch, Settings } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import Image from 'next/image'
 import Link from 'next/link'
 
 export function DashboardWelcome() {
@@ -16,14 +16,16 @@ export function DashboardWelcome() {
     <div className="w-full flex flex-col gap-12">
       {/* Welcome header */}
       <div className="flex flex-col gap-10 mt-8 text-center">
-        {/* Title with subtle gradient */}
-        <Typography
-          variant="h2"
-          as="h1"
-          className="font-bold text-4xl md:text-5xl lg:text-6xl bg-clip-text text-transparent bg-gradient-to-r from-secondary-900 via-primary-800 to-secondary-700"
-        >
-          {t('welcome.title')}
-        </Typography>
+        {/* Title with icon and gradient - similar to dashboard inset header */}
+        <div className="flex items-center justify-center gap-3">
+          <Typography
+            variant="h2"
+            as="h1"
+            className="font-black text-4xl md:text-5xl lg:text-6xl bg-gradient-to-r from-gray-900 to-gray-600 dark:from-gray-100 dark:to-gray-400 bg-clip-text text-transparent capitalize pb-1"
+          >
+            {t('welcome.title')}
+          </Typography>
+        </div>
 
         <Typography variant="p" className="text-muted-foreground max-w-2xl mx-auto text-lg">
           {t('welcome.description')}
@@ -61,40 +63,39 @@ export function DashboardWelcome() {
       </div>
 
       {/* Help section with subtle design */}
-      <div className="mt-4 rounded-xl overflow-hidden border">
+      <div className="mt-4 rounded-xl border">
         <div className="bg-muted/30 dark:bg-muted/10">
-          <div className="p-6 flex flex-col md:flex-row gap-6 items-center">
+          <div className="p-3 sm:p-6 flex flex-col md:flex-row gap-3 sm:gap-4 md:gap-6 items-center">
             {/* Left side with icon and text */}
-            <div className="flex flex-col gap-4 flex-1">
-              <div className="flex items-center gap-2">
-                <BarChart3 className="text-secondary h-5 w-5" />
-                <Typography variant="h4" className="font-semibold">
+            <div className="flex flex-col justify-center items-center md:items-start gap-3 md:gap-4 flex-1 text-center md:text-left">
+              <div className="flex items-center gap-2 justify-center md:justify-start">
+                <BarChart3 className="text-secondary h-5 w-5 flex-shrink-0" />
+                <Typography variant="h4" className="font-semibold text-base sm:text-lg">
                   {t('welcome.help.title')}
                 </Typography>
               </div>
-              <Typography variant="p" className="text-muted-foreground">
+              <Typography
+                variant="p"
+                className="mx-4 sm:mx-2 text-muted-foreground text-sm sm:text-base leading-relaxed"
+              >
                 {t('welcome.help.description')}
               </Typography>
+
               <Button
                 asLink
                 href="/support"
-                target="_blank"
+                target="blank"
                 variant="outline"
-                className="w-fit mt-2 group text-secondary"
+                className="w-[90%] sm:w-fit mt-2 group text-secondary text-xs sm:text-sm"
               >
                 {t('welcome.help.learnMore')}
-                <ArrowRight className=" h-4 w-4 ml-1 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="h-4 w-4 ml-1 group-hover:translate-x-1 transition-transform" />
               </Button>
             </div>
 
             {/* Right side with illustration */}
-            <div className="flex-shrink-0 relative w-48 h-48 hidden md:block">
-              <Image
-                src="/logos/lifo-logo-icon.svg"
-                alt="LIFO"
-                fill
-                className="object-contain opacity-30"
-              />
+            <div className="flex-shrink-0 relative w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48">
+              <Logo variant="icon" size="xl" className="w-full h-full opacity-30" />
             </div>
           </div>
         </div>

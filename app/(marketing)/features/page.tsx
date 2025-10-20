@@ -58,7 +58,7 @@ function FeatureCard({ title, description, icon, image, reversed = false }: Feat
         <div className="flex-1 flex justify-center w-full">
           <div className="relative w-full max-w-md">
             <div className="absolute inset-0 bg-gradient-to-br from-primary-100/20 to-secondary-100/20 rounded-3xl blur-3xl"></div>
-            <div className="relative bg-gradient-to-br from-white/90 to-white/70 backdrop-blur-sm rounded-3xl p-4 sm:p-6 xl:p-8 shadow-2xl border border-white/20">
+            <div className="relative bg-card backdrop-blur-sm rounded-3xl p-4 sm:p-6 xl:p-8 shadow-2xl border border-white/20">
               {image}
             </div>
           </div>
@@ -342,7 +342,7 @@ export default function FeaturesPage() {
             ].map(feature => (
               <div
                 key={feature.title}
-                className="group p-6 rounded-3xl bg-gradient-to-br from-white to-secondary-50/80 backdrop-blur-sm border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300"
+                className="group p-6 rounded-3xl bg-card/90 backdrop-blur-sm border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300"
               >
                 <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary-100 to-secondary-100 flex items-center justify-center text-primary-700 mb-4 group-hover:scale-110 transition-transform duration-300">
                   {feature.icon}

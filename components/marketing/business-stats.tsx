@@ -8,14 +8,13 @@ interface StatProps {
   label: string
   description: string
   subtext: string
-  gradient: string
   accentColor: string
 }
 
-function Stat({ icon, label, description, subtext, gradient, accentColor }: StatProps) {
+function Stat({ icon, label, description, subtext, accentColor }: StatProps) {
   return (
     <div
-      className={`group relative flex flex-col p-8 rounded-3xl ${gradient} border border-white/20 shadow-xl hover:shadow-2xl overflow-hidden transform hover:-translate-y-2 transition-all duration-500 h-full backdrop-blur-sm`}
+      className={`group relative flex flex-col p-8 rounded-3xl bg-card/50 border border-white/20 shadow-xl hover:shadow-2xl overflow-hidden transform hover:-translate-y-2 transition-all duration-500 h-full backdrop-blur-sm`}
     >
       {/* Floating sparkles */}
       <div className="absolute top-6 right-6 opacity-40 group-hover:opacity-80 transition-opacity duration-300">
@@ -99,7 +98,6 @@ export function BusinessStats() {
             label={t('revenue.label')}
             description={t('revenue.description')}
             subtext={t('revenue.subtext')}
-            gradient="bg-gradient-to-br from-white to-secondary-50/80"
             accentColor="text-primary-700"
           />
 
@@ -108,7 +106,6 @@ export function BusinessStats() {
             label={t('lossReduction.label')}
             description={t('lossReduction.description')}
             subtext={t('lossReduction.subtext')}
-            gradient="bg-gradient-to-br from-white to-secondary-50/80"
             accentColor="text-primary-700"
           />
 
@@ -117,7 +114,6 @@ export function BusinessStats() {
             label={t('taxCredits.label')}
             description={t('taxCredits.description')}
             subtext={t('taxCredits.subtext')}
-            gradient="bg-gradient-to-br from-white to-secondary-50/80"
             accentColor="text-primary-800"
           />
         </div>

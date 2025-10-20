@@ -1,8 +1,5 @@
 'use client'
 
-import { BadgeCheck, Bell, ChevronsUpDown, CreditCard, Globe, Sparkles } from 'lucide-react'
-import Link from 'next/link'
-import { useTranslations } from 'next-intl'
 import { LogoutButton } from '@/components/logout-button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
@@ -21,7 +18,19 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@/components/ui/sidebar'
+import { ThemeSwitcherSelect } from '@/components/ui/theme-switcher-select'
 import type { User } from '@/lib/types/user'
+import {
+  BadgeCheck,
+  Bell,
+  ChevronsUpDown,
+  CreditCard,
+  Globe,
+  Palette,
+  Sparkles,
+} from 'lucide-react'
+import { useTranslations } from 'next-intl'
+import Link from 'next/link'
 
 export function NavUser({ user }: { user: User }) {
   const { isMobile } = useSidebar()
@@ -117,8 +126,20 @@ export function NavUser({ user }: { user: User }) {
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <DropdownMenuItem className="flex-col items-start p-0 cursor-default hover:!bg-transparent">
+                <div className="flex items-center gap-2 px-2 py-1.5 w-full hover:text-black group-hover:text-black">
+                  <Palette className="h-4 w-4" />
+                  <span className="text-sm">{t('theme')}</span>
+                </div>
+                <div className="px-2 pb-2">
+                  <ThemeSwitcherSelect />
+                </div>
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
             <DropdownMenuItem className="cursor-default hover:!bg-transparent">
-              <LogoutButton className="w-full bg-transparent text-black" />
+              <LogoutButton className="w-full bg-transparent text-foreground" />
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

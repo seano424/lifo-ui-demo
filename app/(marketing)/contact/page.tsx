@@ -30,7 +30,7 @@ export default function Contact() {
         {/* Contact Form and Features */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-14 items-start max-w-6xl mx-auto">
           {/* Left column - Contact Form */}
-          <div className="flex flex-col rounded-3xl bg-gradient-to-br from-white/80 to-white/60 border border-white/20 shadow-lg p-6 lg:p-8 space-y-6">
+          <div className="flex flex-col rounded-3xl bg-card/90 border border-white/20 shadow-lg p-6 lg:p-8 space-y-6">
             <div className="flex flex-col gap-1">
               <Typography
                 variant="h3"
@@ -49,7 +49,7 @@ export default function Contact() {
           {/* Right column - Features */}
           <div className="space-y-6 lg:space-y-8 h-full flex flex-col justify-center py-4 lg:py-0">
             <div className="space-y-4 lg:space-y-6">
-              <div className="flex gap-3 items-start group p-4 rounded-2xl bg-gradient-to-br from-white to-secondary-50/80 backdrop-blur-sm border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300">
+              <div className="flex gap-3 items-start group p-4 rounded-2xl bg-card backdrop-blur-sm border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300">
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-100 to-secondary-100 flex items-center justify-center text-primary-700 group-hover:scale-110 transition-transform duration-300">
                   <MessageSquare size={20} strokeWidth={1.5} />
                 </div>
@@ -69,7 +69,7 @@ export default function Contact() {
                 </div>
               </div>
 
-              <div className="flex gap-3 items-start group p-4 rounded-2xl bg-gradient-to-br from-white to-secondary-50/80 backdrop-blur-sm border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300">
+              <div className="flex gap-3 items-start group p-4 rounded-2xl bg-card backdrop-blur-sm border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300">
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-100 to-secondary-100 flex items-center justify-center text-primary-700 group-hover:scale-110 transition-transform duration-300">
                   <Users size={20} strokeWidth={1.5} />
                 </div>
@@ -89,7 +89,7 @@ export default function Contact() {
                 </div>
               </div>
 
-              <div className="flex gap-3 items-start group p-4 rounded-2xl bg-gradient-to-br from-white to-secondary-50/80 backdrop-blur-sm border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300">
+              <div className="flex gap-3 items-start group p-4 rounded-2xl bg-card backdrop-blur-sm border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300">
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-100 to-secondary-100 flex items-center justify-center text-primary-700 group-hover:scale-110 transition-transform duration-300">
                   <Mail size={20} strokeWidth={1.5} />
                 </div>

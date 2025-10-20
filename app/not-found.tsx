@@ -1,12 +1,12 @@
 'use client'
 
+import { Button } from '@/components/ui/button'
+import { Logo } from '@/components/ui/logo'
+import { Typography } from '@/components/ui/typography'
 import { motion } from 'framer-motion'
 import { ArrowLeft, Home } from 'lucide-react'
-import Image from 'next/image'
-import Link from 'next/link'
 import { useTranslations } from 'next-intl'
-import { Button } from '@/components/ui/button'
-import { Typography } from '@/components/ui/typography'
+import Link from 'next/link'
 
 export default function NotFound() {
   const t = useTranslations('errors')
@@ -20,13 +20,7 @@ export default function NotFound() {
           transition={{ duration: 0.5 }}
         >
           <div className="flex justify-center mb-6">
-            <Image
-              src="/logos/lifo-logo-icon.svg"
-              alt="LIFO AI Logo"
-              width={80}
-              height={80}
-              className="h-20 w-auto opacity-70"
-            />
+            <Logo variant="icon" size="lg" className="h-20 w-auto opacity-70" />
           </div>
 
           <motion.div

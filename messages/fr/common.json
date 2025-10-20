@@ -70,7 +70,8 @@
     "account": "Compte",
     "billing": "Facturation",
     "notifications": "Notifications",
-    "language": "Langue"
+    "language": "Langue",
+    "theme": "Thème"
   },
   "errors": {
     "pageNotFoundTitle": "Page non trouvée",

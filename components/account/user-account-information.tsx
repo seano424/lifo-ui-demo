@@ -1,11 +1,5 @@
 'use client'
 
-import { zodResolver } from '@hookform/resolvers/zod'
-import { AlertCircle, Check, Edit, Shield, X } from 'lucide-react'
-import { useTranslations } from 'next-intl'
-import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
@@ -13,9 +7,17 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { LanguageSwitcher } from '@/components/ui/language-switcher'
 import { Skeleton } from '@/components/ui/skeleton'
+import { ThemeSwitcherSelect } from '@/components/ui/theme-switcher-select'
 import { Typography } from '@/components/ui/typography'
 import { useCurrentUser, useUpdatePhone, useUserActions } from '@/hooks/use-users'
 import { formatPhoneNumber, isValidPhoneNumber } from '@/lib/types/user'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { AlertCircle, Check, Edit, Shield, X } from 'lucide-react'
+import { useTranslations } from 'next-intl'
+import { useTheme } from 'next-themes'
+import { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
 
 const createProfileSchema = (t: (key: string) => string) =>
   z.object({
@@ -35,6 +37,7 @@ type ProfileFormData = z.infer<ReturnType<typeof createProfileSchema>>
 
 export default function UserAccountInformation() {
   const t = useTranslations('account')
+  const { theme } = useTheme()
   const { data: user, isLoading } = useCurrentUser()
 
   const updatePhone = useUpdatePhone()
@@ -114,6 +117,17 @@ export default function UserAccountInformation() {
     setPhoneForm(user?.phone || '')
     setPhoneError('')
     setIsEditingPhone(false)
+  }
+
+  const getCurrentThemeDisplay = () => {
+    switch (theme) {
+      case 'light':
+        return t('theme.light')
+      case 'dark':
+        return t('theme.dark')
+      case 'system':
+        return t('theme.system')
+    }
   }
 
   if (isLoading) {
@@ -354,6 +368,24 @@ export default function UserAccountInformation() {
               </Typography>
             </div>
             <LanguageSwitcher />
+          </div>
+        </div>
+
+        <div className="space-y-4 pt-4 border-t">
+          <Typography variant="h4" className="font-black">
+            {t('theme.title')}
+          </Typography>
+
+          <div className="flex items-center justify-between mt-2">
+            <div className="flex flex-col gap-2">
+              <Typography variant="p">{t('theme.description')}</Typography>
+              <Typography variant="p">
+                {t('theme.currentTheme')}: {getCurrentThemeDisplay()}
+              </Typography>
+            </div>
+            <div className="flex items-center gap-2">
+              <ThemeSwitcherSelect />
+            </div>
           </div>
         </div>
 

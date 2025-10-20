@@ -1,12 +1,12 @@
 'use client'
 
-import { Linkedin } from 'lucide-react'
-import Image from 'next/image'
-import Link from 'next/link'
-import { useTranslations } from 'next-intl'
-import { ThemeSwitcher } from '@/components/theme-switcher'
+import { CompactThemeSwitcher } from '@/components/compact-theme-switcher'
 import { LanguageSwitcher } from '@/components/ui/language-switcher'
+import { Logo } from '@/components/ui/logo'
 import { Typography } from '@/components/ui/typography'
+import { Linkedin } from 'lucide-react'
+import { useTranslations } from 'next-intl'
+import Link from 'next/link'
 
 export function MarketingFooter() {
   const currentYear = new Date().getFullYear()
@@ -19,14 +19,7 @@ export function MarketingFooter() {
           {/* Logo and Description */}
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <Image
-                src="/logos/lifo-logo-icon.svg"
-                alt="LIFO Logo"
-                width={600}
-                height={280}
-                className="w-10 h-auto"
-                priority
-              />
+              <Logo variant="icon" size="sm" className="w-10 h-auto" />
               <Typography
                 variant="h4"
                 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-violet-700 via-indigo-400 to-blue-600"
@@ -103,7 +96,7 @@ export function MarketingFooter() {
                   <Linkedin size={16} />
                 </a>
                 <div className="flex items-center gap-2">
-                  <ThemeSwitcher />
+                  <CompactThemeSwitcher />
                   <LanguageSwitcher />
                 </div>
               </div>

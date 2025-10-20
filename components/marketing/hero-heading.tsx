@@ -1,7 +1,7 @@
 'use client'
 
-import Image from 'next/image'
 import { useTranslations } from 'next-intl'
+import { Logo } from '../ui/logo'
 import { Typography } from '../ui/typography'
 
 export function HeroHeading() {
@@ -9,16 +9,7 @@ export function HeroHeading() {
   return (
     <header className="text-6xl md:text-5xl font-bold mb-6 leading-tight">
       <div className="flex items-center justify-center gap-4 mb-2">
-        <div className="relative w-20 lg:w-24 aspect-video">
-          <Image
-            src="/logos/lifo-logo-icon.svg"
-            alt="LIFO AI Logo"
-            fill
-            className="h-full w-full object-contain"
-            priority
-            sizes="(max-width: 768px) 80px, 96px"
-          />
-        </div>
+        <Logo variant="icon" size="lg" className="w-20 lg:w-24" />
         <Typography
           as="h1"
           className="text-5xl md:text-7xl py-6 bg-clip-text text-transparent bg-gradient-to-r from-violet-700 via-indigo-400 to-blue-600"
