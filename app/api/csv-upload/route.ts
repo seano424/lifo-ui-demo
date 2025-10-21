@@ -41,14 +41,27 @@ export async function POST(request: NextRequest) {
       userId: user.id,
     })
 
-    // Forward to FastAPI with service role key
+    // Get user's session token to pass to FastAPI
+    const {
+      data: { session },
+      error: sessionError,
+    } = await supabase.auth.getSession()
+
+    if (sessionError || !session) {
+      logger.error('csv-upload', 'Failed to get user session', { error: sessionError })
+      return NextResponse.json({ error: 'Authentication session required' }, { status: 401 })
+    }
+
+    // Forward to FastAPI with user's JWT token (not service role key)
     const fastapiUrl = process.env.FASTAPI_URL
     if (!fastapiUrl) {
       logger.error('csv-upload', 'FASTAPI_URL not configured')
       return NextResponse.json({ error: 'Backend configuration error' }, { status: 500 })
     }
 
-    const uploadUrl = `${fastapiUrl}/api/v1/csv-upload/upload`
+    // ✅ FIX: Use the endpoint that actually creates batches in the database
+    // The /upload endpoint only validates, /upload-and-create-batches actually persists data
+    const uploadUrl = `${fastapiUrl}/api/v1/csv-upload/upload-and-create-batches`
 
     // Create new FormData for FastAPI
     const fastApiFormData = new FormData()
@@ -57,10 +70,12 @@ export async function POST(request: NextRequest) {
 
     const startTime = Date.now()
 
+    // ✅ SECURITY: Use user's JWT token instead of service role key
+    // This ensures RLS policies are enforced
     const response = await fetch(uploadUrl, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`,
+        Authorization: `Bearer ${session.access_token}`,
       },
       body: fastApiFormData,
     })
@@ -88,13 +103,74 @@ export async function POST(request: NextRequest) {
 
     const result = await response.json()
 
-    logger.log('csv-upload', 'CSV upload completed successfully', {
-      processed: result.processed,
-      total: result.total_items,
+    // 🐛 DEBUG: Log the full response to investigate silent failures
+    console.log('🔍 [CSV-UPLOAD-DEBUG] Full backend response:', JSON.stringify(result, null, 2))
+    console.log('🔍 [CSV-UPLOAD-DEBUG] Response keys:', Object.keys(result))
+
+    // ✅ FIX: Map backend response to frontend-expected format
+    // Backend uses different field names than frontend expects
+    const totalItems = result.data_summary?.total_items || 0
+    const successfulBatches = result.batch_creation?.successful_batches || 0
+    const failedBatches = result.batch_creation?.failed_batches || 0
+
+    // Calculate skipped: items that weren't processed (likely duplicates)
+    // skipped = total - (successful + failed)
+    const skippedCount = Math.max(0, totalItems - successfulBatches - failedBatches)
+
+    const normalizedResponse = {
+      success: result.success,
+      message: result.message,
+      processed: successfulBatches,
+      skipped: skippedCount, // ✅ Fixed: Calculate actual skipped items (duplicates)
+      total_items: totalItems,
+      processing_time_ms: result.performance_metrics?.total_processing_ms || 0,
+      errors: result.failed_items?.map((item: { error: string }) => item.error) || [],
+      failed_items: result.failed_items || [],
+      csv_warnings: result.csv_processing?.csv_warnings || [],
+      duplicates_skipped: result.duplicates_skipped || [], // Pass through duplicate details if backend provides them
+      performance_metrics: {
+        items_per_second: result.performance_metrics?.items_per_second || 0,
+        duplicate_detection_ms: result.performance_metrics?.duplicate_detection_ms || 0,
+        product_resolution_ms: result.performance_metrics?.product_resolution_ms || 0,
+        batch_insertion_ms: result.performance_metrics?.batch_insertion_ms || 0,
+        database_processing_time_ms: result.performance_metrics?.database_operations_ms || 0,
+        products_created: result.batch_creation?.product_statistics?.created_products,
+        updated_products: result.batch_creation?.product_statistics?.updated_products,
+      },
+    }
+
+    console.log('🔍 [CSV-UPLOAD-DEBUG] Normalized response:', {
+      processed: normalizedResponse.processed,
+      total: normalizedResponse.total_items,
+      failed: normalizedResponse.failed_items?.length,
+    })
+
+    logger.log('csv-upload', 'CSV upload completed', {
+      processed: normalizedResponse.processed,
+      failed: normalizedResponse.skipped,
+      total: normalizedResponse.total_items,
       processingTime,
     })
 
-    return NextResponse.json(result)
+    // ⚠️ If all items failed, return appropriate error
+    if (normalizedResponse.processed === 0 && normalizedResponse.total_items > 0) {
+      logger.error('csv-upload', 'All items failed validation', {
+        total: normalizedResponse.total_items,
+        errors: normalizedResponse.errors.slice(0, 5), // Log first 5 errors
+      })
+
+      return NextResponse.json(
+        {
+          error: `All ${normalizedResponse.total_items} items failed validation`,
+          details: normalizedResponse.failed_items.slice(0, 10), // Show first 10 failures
+          common_errors: [...new Set(normalizedResponse.errors)].slice(0, 3), // Unique errors
+          full_result: normalizedResponse,
+        },
+        { status: 422 },
+      )
+    }
+
+    return NextResponse.json(normalizedResponse)
   } catch (error) {
     logger.error('csv-upload', 'Upload error', {
       error: error instanceof Error ? error.message : 'Unknown error',

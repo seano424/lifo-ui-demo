@@ -34,6 +34,7 @@ interface CsvPreviewItem {
   Category: string
   Quantity: number
   Expiry_Date: string
+  [key: string]: string | number // Allow additional columns
 }
 
 interface CsvColumnMapping {
@@ -153,16 +154,72 @@ export function useCSVUpload() {
     mutationFn: async ({
       file,
       storeId,
+      csvData,
     }: {
       file: File
       storeId: string
       csvData?: CsvPreviewItem[]
     }): Promise<CSVUploadResponse> => {
-      const formData = new FormData()
+      // ⚠️ WORKAROUND: Backend rejects entire batch if ONE item has expired date
+      // Filter out items with dates more than 7 days in the past to allow valid items through
+      let fileToUpload = file
 
-      // Python API expects 'store_id' parameter and doesn't handle csvData JSON
-      // Always use file upload for Python API
-      formData.append('file', file)
+      if (csvData && csvData.length > 0) {
+        const today = new Date()
+        today.setHours(0, 0, 0, 0)
+        const sevenDaysAgo = new Date(today)
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
+
+        const validItems = csvData.filter(item => {
+          if (!item.Expiry_Date) return false
+          const expiryDate = new Date(item.Expiry_Date)
+          return expiryDate >= sevenDaysAgo
+        })
+
+        const filteredCount = csvData.length - validItems.length
+
+        if (filteredCount > 0) {
+          toast.warning(`Filtered out ${filteredCount} expired items (>7 days past expiry)`, {
+            description: `Uploading ${validItems.length} valid items with current/future expiry dates`,
+            duration: 5000,
+          })
+        }
+
+        if (validItems.length === 0) {
+          throw new Error(
+            'All items have expired (>7 days past expiry). Please update expiry dates and try again.',
+          )
+        }
+
+        // Rebuild CSV with only valid items, preserving all original columns
+        const originalText = await file.text()
+        const allLines = originalText.trim().split('\n')
+        const headerLine = allLines[0]
+        const originalHeaders = headerLine.split(',').map(h => h.trim().replace(/"/g, ''))
+
+        const expiryIndex = originalHeaders.findIndex(h => h.toLowerCase().includes('expiry'))
+
+        const validRowLines = [headerLine]
+        for (let i = 1; i < allLines.length; i++) {
+          const values = allLines[i].split(',').map(v => v.trim().replace(/"/g, ''))
+          const expiryDateStr = values[expiryIndex] || ''
+          if (expiryDateStr) {
+            const expiryDate = new Date(expiryDateStr)
+            if (expiryDate >= sevenDaysAgo) {
+              validRowLines.push(allLines[i])
+            }
+          }
+        }
+
+        const csvContent = validRowLines.join('\n')
+
+        fileToUpload = new File([csvContent], file.name, {
+          type: 'text/csv',
+        })
+      }
+
+      const formData = new FormData()
+      formData.append('file', fileToUpload)
       formData.append('store_id', storeId)
 
       // Use Next.js API route proxy (securely forwards to FastAPI with service role key)
@@ -173,6 +230,25 @@ export function useCSVUpload() {
 
       if (!response.ok) {
         const error = await response.json()
+
+        // ✅ Enhanced error handling for validation failures
+        if (response.status === 422 && error.common_errors) {
+          // Extract common validation errors
+          const commonErrors = error.common_errors as string[]
+          const uniqueErrors = [
+            ...new Set(
+              commonErrors.map((err: string) => {
+                // Extract just the error message (e.g., "Expiry date too far in past")
+                const match = err.match(/: (.+)$/)
+                return match ? match[1] : err
+              }),
+            ),
+          ]
+
+          const errorMessage = `${error.error}: ${uniqueErrors.join(', ')}`
+          throw new Error(errorMessage)
+        }
+
         throw new Error(error.error || `Upload failed: ${response.statusText}`)
       }
 
@@ -195,28 +271,9 @@ export function useCSVUpload() {
       // Cache upload results for error review
       queryClient.setQueryData(['csv-upload-results'], data)
 
-      // 🎯 AUTOMATIC SCORING: Trigger scoring calculations after successful import
-      if (data.processed > 0) {
-        try {
-          await fetch('/api/scoring/trigger', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              storeId,
-              metadata: {
-                triggeredBy: 'csv-import',
-                itemsImported: data.processed,
-                timestamp: new Date().toISOString(),
-              },
-            }),
-          })
-        } catch (error) {
-          // Don't fail the upload if scoring fails
-          console.error('Scoring trigger failed:', error)
-        }
-      }
+      // ✅ REMOVED: Duplicate scoring trigger - backend already handles this automatically
+      // Backend triggers scoring in background (see auto_scoring in response)
+      // No need for frontend to trigger it again (was causing 41s blocking delay)
 
       // Enhanced success notification with detailed performance metrics
       const metrics = data.performance_metrics || {}
