@@ -93,6 +93,7 @@ export default function ManualBarcodeEntry({
     category: '',
     imageUrl: '',
   })
+  const [shouldLookup, setShouldLookup] = useState(false)
 
   const { setProductSelected } = useScanningActions()
   const { activeStore } = useStoreState()
@@ -101,7 +102,7 @@ export default function ManualBarcodeEntry({
     data: lookupResult,
     isLoading: isLookingUp,
     error: lookupError,
-  } = useProductLookup(barcode, barcode.length >= 8)
+  } = useProductLookup(barcode, shouldLookup && barcode.length >= 8)
 
   const productSearch = useProductSearch() // OpenFoodFacts search
   const supabaseSearch = useSupabaseProductSearch(storeId) // Supabase search
@@ -127,6 +128,7 @@ export default function ManualBarcodeEntry({
       return
     }
     setBarcodeStockStatus(null) // Reset stock status
+    setShouldLookup(true) // Trigger the lookup
   }
 
   // Check stock status when lookup result changes in scan-out mode
@@ -345,7 +347,10 @@ export default function ManualBarcodeEntry({
                     <Input
                       type="text"
                       value={barcode}
-                      onChange={e => setBarcode(e.target.value)}
+                      onChange={e => {
+                        setBarcode(e.target.value)
+                        setShouldLookup(false) // Reset lookup trigger when user types
+                      }}
                       onKeyDown={e => {
                         if (
                           e.key === 'Enter' &&
@@ -736,7 +741,10 @@ export default function ManualBarcodeEntry({
                         <Label>{tFields('barcode')} *</Label>
                         <Input
                           value={barcode}
-                          onChange={e => setBarcode(e.target.value)}
+                          onChange={e => {
+                            setBarcode(e.target.value)
+                            setShouldLookup(false) // Reset lookup trigger when user types
+                          }}
                           placeholder={tPlaceholders('barcode')}
                           className="font-mono"
                           required
