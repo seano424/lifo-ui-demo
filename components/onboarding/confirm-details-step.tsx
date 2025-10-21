@@ -1,8 +1,5 @@
 'use client'
 
-import { AlertTriangle, CheckCircle, Phone } from 'lucide-react'
-import { useTranslations } from 'next-intl'
-import { useState } from 'react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -14,9 +11,12 @@ import { useBusinessCheck } from '@/hooks/use-business-check'
 import { convertFormDataToStoreInsert, STORE_TYPE_LABELS } from '@/lib/schemas/store-schemas'
 import { useOnboardingStore } from '@/lib/stores/onboarding-store'
 import { generateTempStoreCode } from '@/lib/utils/form-helpers'
+import { AlertTriangle, CheckCircle, Phone } from 'lucide-react'
+import { useTranslations } from 'next-intl'
+import { useState } from 'react'
 
 export function ConfirmDetailsStep() {
-  const t = useTranslations('marketing.onboarding.confirmDetails')
+  const t = useTranslations('onboarding.confirmDetails')
 
   const {
     selectedStoreForm,

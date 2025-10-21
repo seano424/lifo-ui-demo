@@ -181,47 +181,6 @@
       }
     }
   },
-  "onboarding": {
-    "stepLabels": {
-      "storeLookup": "Store Lookup",
-      "addStoreDetails": "Add Store Details",
-      "reviewVerify": "Review & Verify",
-      "createAccount": "Create Account"
-    },
-    "storeSearch": {
-      "title": "Find Your Store",
-      "subtitle": "Search for your business or add it manually",
-      "placeholder": "Enter your store name or address...",
-      "searchingText": "Searching for stores...",
-      "noResultsFound": "No stores found matching \"{query}\"",
-      "tryDifferentTerm": "Try a different search term or add your store manually",
-      "addManuallyButton": "Add store details manually",
-      "helpText": "Can't find your store? You can add all details manually in the next step.",
-      "searchError": "Something went wrong while searching. Please try again."
-    },
-    "storeType": {
-      "addStoreDetailsTitle": "Add Store Details",
-      "completeStoreInformationTitle": "Complete Store Information",
-      "storeInformationCardTitle": "Store Information",
-      "storeNameLabel": "Store Name",
-      "storeTypeLabel": "Store Type",
-      "businessNameLabel": "Business Name",
-      "addressLabel": "Address",
-      "cityLabel": "City",
-      "postalCodeLabel": "Postal Code",
-      "countryLabel": "Country",
-      "phoneLabel": "Phone Number",
-      "continueButton": "Continue",
-      "storeNamePlaceholder": "Your Store Name",
-      "selectStoreType": "Select store type",
-      "businessNamePlaceholder": "If different from store name",
-      "addressPlaceholder": "123 Main Street",
-      "cityPlaceholder": "Paris",
-      "postalCodePlaceholder": "75001",
-      "countryPlaceholder": "France",
-      "phonePlaceholder": "01 23 45 67 89"
-    }
-  },
   "account": {
     "title": "Account Information",
     "description": "Manage your account settings and preferences.",
