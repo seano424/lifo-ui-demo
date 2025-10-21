@@ -119,6 +119,26 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
               </Link>
             </Typography>
           </div>
+
+          {/* Privacy and Terms */}
+          <div className="mt-4 text-center text-sm text-muted-foreground">
+            <Typography variant="extraSmall" color="muted" className="leading-loose">
+              {t('termsAndPrivacyPrefix')}{' '}
+              <Link
+                href="/terms"
+                className="underline hover:text-foreground font-medium text-foreground underline-offset-4"
+              >
+                {t('termsOfUse')}
+              </Link>{' '}
+              {t('termsAndPrivacyMiddle')}{' '}
+              <Link
+                href="/privacy"
+                className="underline hover:text-foreground font-medium text-foreground underline-offset-4"
+              >
+                {t('privacyPolicy')}
+              </Link>
+            </Typography>
+          </div>
         </CardContent>
       </Card>
     </div>

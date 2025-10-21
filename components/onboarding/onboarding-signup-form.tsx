@@ -12,6 +12,7 @@ import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
 import { AlertTriangle } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
@@ -424,7 +425,20 @@ export function OnboardingSignUpForm({
 
               {!isLoggedIn && (
                 <Typography variant="p" color="muted" className="text-center text-sm">
-                  {t('termsAndPrivacy')}
+                  {t('termsAndPrivacyPrefix')}{' '}
+                  <Link
+                    href="/terms"
+                    className="underline underline-offset-4 hover:text-foreground"
+                  >
+                    {t('termsOfUse')}
+                  </Link>{' '}
+                  {t('termsAndPrivacyMiddle')}{' '}
+                  <Link
+                    href="/privacy"
+                    className="underline underline-offset-4 hover:text-foreground"
+                  >
+                    {t('privacyPolicy')}
+                  </Link>
                 </Typography>
               )}
             </div>

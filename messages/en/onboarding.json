@@ -88,7 +88,10 @@
       "forgotPassword": "Forgot your password?",
       "creatingStore": "Creating store...",
       "createStore": "Create Store",
-      "termsAndPrivacy": "By creating an account, you agree to our Terms of Service and Privacy Policy",
+      "termsAndPrivacyPrefix": "By continuing, you agree to our",
+      "termsAndPrivacyMiddle": "and acknowledge that you have read our",
+      "termsOfUse": "Terms of Use",
+      "privacyPolicy": "Privacy Policy",
       "errors": {
         "passwordTooShort": "Password must be at least 6 characters",
         "passwordsNoMatch": "Passwords do not match",
