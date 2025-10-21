@@ -271,28 +271,9 @@ export function useCSVUpload() {
       // Cache upload results for error review
       queryClient.setQueryData(['csv-upload-results'], data)
 
-      // 🎯 AUTOMATIC SCORING: Trigger scoring calculations after successful import
-      if (data.processed > 0) {
-        try {
-          await fetch('/api/scoring/trigger', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              storeId,
-              metadata: {
-                triggeredBy: 'csv-import',
-                itemsImported: data.processed,
-                timestamp: new Date().toISOString(),
-              },
-            }),
-          })
-        } catch (error) {
-          // Don't fail the upload if scoring fails
-          console.error('Scoring trigger failed:', error)
-        }
-      }
+      // ✅ REMOVED: Duplicate scoring trigger - backend already handles this automatically
+      // Backend triggers scoring in background (see auto_scoring in response)
+      // No need for frontend to trigger it again (was causing 41s blocking delay)
 
       // Enhanced success notification with detailed performance metrics
       const metrics = data.performance_metrics || {}

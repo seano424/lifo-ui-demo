@@ -41,7 +41,18 @@ export async function POST(request: NextRequest) {
       userId: user.id,
     })
 
-    // Forward to FastAPI with service role key
+    // Get user's session token to pass to FastAPI
+    const {
+      data: { session },
+      error: sessionError,
+    } = await supabase.auth.getSession()
+
+    if (sessionError || !session) {
+      logger.error('csv-upload', 'Failed to get user session', { error: sessionError })
+      return NextResponse.json({ error: 'Authentication session required' }, { status: 401 })
+    }
+
+    // Forward to FastAPI with user's JWT token (not service role key)
     const fastapiUrl = process.env.FASTAPI_URL
     if (!fastapiUrl) {
       logger.error('csv-upload', 'FASTAPI_URL not configured')
@@ -59,10 +70,12 @@ export async function POST(request: NextRequest) {
 
     const startTime = Date.now()
 
+    // ✅ SECURITY: Use user's JWT token instead of service role key
+    // This ensures RLS policies are enforced
     const response = await fetch(uploadUrl, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`,
+        Authorization: `Bearer ${session.access_token}`,
       },
       body: fastApiFormData,
     })
@@ -96,22 +109,33 @@ export async function POST(request: NextRequest) {
 
     // ✅ FIX: Map backend response to frontend-expected format
     // Backend uses different field names than frontend expects
+    const totalItems = result.data_summary?.total_items || 0
+    const successfulBatches = result.batch_creation?.successful_batches || 0
+    const failedBatches = result.batch_creation?.failed_batches || 0
+
+    // Calculate skipped: items that weren't processed (likely duplicates)
+    // skipped = total - (successful + failed)
+    const skippedCount = Math.max(0, totalItems - successfulBatches - failedBatches)
+
     const normalizedResponse = {
       success: result.success,
       message: result.message,
-      processed: result.batch_creation?.successful_batches || 0,
-      skipped: result.batch_creation?.failed_batches || 0,
-      total_items: result.data_summary?.total_items || 0,
+      processed: successfulBatches,
+      skipped: skippedCount, // ✅ Fixed: Calculate actual skipped items (duplicates)
+      total_items: totalItems,
       processing_time_ms: result.performance_metrics?.total_processing_ms || 0,
       errors: result.failed_items?.map((item: { error: string }) => item.error) || [],
       failed_items: result.failed_items || [],
       csv_warnings: result.csv_processing?.csv_warnings || [],
+      duplicates_skipped: result.duplicates_skipped || [], // Pass through duplicate details if backend provides them
       performance_metrics: {
         items_per_second: result.performance_metrics?.items_per_second || 0,
         duplicate_detection_ms: result.performance_metrics?.duplicate_detection_ms || 0,
         product_resolution_ms: result.performance_metrics?.product_resolution_ms || 0,
         batch_insertion_ms: result.performance_metrics?.batch_insertion_ms || 0,
         database_processing_time_ms: result.performance_metrics?.database_operations_ms || 0,
+        products_created: result.batch_creation?.product_statistics?.created_products,
+        updated_products: result.batch_creation?.product_statistics?.updated_products,
       },
     }
 
