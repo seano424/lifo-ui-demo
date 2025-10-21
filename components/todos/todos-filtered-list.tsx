@@ -439,7 +439,7 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
           </Button>
         )}
 
-        <div ref={scrollContainerRef} className="overflow-x-auto scrollbar-hide">
+        <div ref={scrollContainerRef} className="overflow-x-auto scrollbar-none">
           <div className="flex gap-2 sm:gap-4 min-w-max px-2 sm:px-0">
             {tabs.map((tab, index) => (
               <Button
