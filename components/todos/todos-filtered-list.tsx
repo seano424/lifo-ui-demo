@@ -12,6 +12,7 @@ import {
 } from '@/hooks/use-todos-with-filters'
 import type { BatchStatus, TodoActionType, TodoUrgencyLevel } from '@/lib/queries/todos-rpc'
 import { cn } from '@/lib/utils'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -54,6 +55,11 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
   // Tab indicator animation
   const buttonRefs = useRef<(HTMLButtonElement | null)[]>([])
   const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 })
+
+  // Scroll indicators state
+  const [showLeftIndicator, setShowLeftIndicator] = useState(false)
+  const [showRightIndicator, setShowRightIndicator] = useState(false)
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
 
   // Track if filters/tab have been initialized from URL
   const [isInitialized, setIsInitialized] = useState(false)
@@ -142,21 +148,73 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
     ],
   )
 
-  // Update tab indicator position
+  // Update tab indicator position and scroll indicators
   useEffect(() => {
     const updateIndicator = () => {
       const activeIndex = tabs.findIndex(tab => tab.id === activeTab)
       const activeButton = buttonRefs.current[activeIndex]
 
       if (activeButton) {
-        const { offsetLeft, offsetWidth } = activeButton
-        setIndicatorStyle({ left: offsetLeft, width: offsetWidth })
+        // Get the scrollable container and its inner flex container
+        const scrollContainer = activeButton.closest('.overflow-x-auto')
+        const flexContainer = activeButton.closest('.flex')
+
+        if (scrollContainer && flexContainer) {
+          // Get the main container (where the indicator will be positioned)
+          const mainContainer = scrollContainer.parentElement
+          if (mainContainer) {
+            const mainRect = mainContainer.getBoundingClientRect()
+            const buttonRect = activeButton.getBoundingClientRect()
+
+            // Calculate position relative to the main container
+            const left = buttonRect.left - mainRect.left
+            const width = buttonRect.width
+
+            setIndicatorStyle({ left, width })
+          }
+        } else {
+          // Fallback to original method
+          const { offsetLeft, offsetWidth } = activeButton
+          setIndicatorStyle({ left: offsetLeft, width: offsetWidth })
+        }
       }
     }
 
-    updateIndicator()
-    window.addEventListener('resize', updateIndicator)
-    return () => window.removeEventListener('resize', updateIndicator)
+    const updateScrollIndicators = () => {
+      const container = scrollContainerRef.current
+      if (container) {
+        const { scrollLeft, scrollWidth, clientWidth } = container
+        setShowLeftIndicator(scrollLeft > 0)
+        setShowRightIndicator(scrollLeft < scrollWidth - clientWidth - 1)
+      }
+    }
+
+    const handleScroll = () => {
+      updateIndicator()
+      updateScrollIndicators()
+    }
+
+    // Add a small delay to ensure DOM is ready
+    const timeoutId = setTimeout(() => {
+      updateIndicator()
+      updateScrollIndicators()
+    }, 1)
+
+    // Use the ref instead of querySelector to avoid memory leaks and wrong element selection
+    const scrollContainer = scrollContainerRef.current
+    if (scrollContainer) {
+      scrollContainer.addEventListener('scroll', handleScroll)
+    }
+
+    window.addEventListener('resize', handleScroll)
+
+    return () => {
+      clearTimeout(timeoutId)
+      if (scrollContainer) {
+        scrollContainer.removeEventListener('scroll', handleScroll)
+      }
+      window.removeEventListener('resize', handleScroll)
+    }
   }, [activeTab, tabs])
 
   // Mark as initialized after first render
@@ -207,6 +265,22 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
     setActiveTab(tabId)
     // Optionally reset filters when changing tabs
     // setFilters(prev => ({ ...prev, product_name: undefined }))
+  }
+
+  const scrollLeft = () => {
+    const container = scrollContainerRef.current
+    if (container) {
+      const scrollAmount = container.clientWidth * 0.8 // Scroll 80% of visible width
+      container.scrollBy({ left: -scrollAmount, behavior: 'smooth' })
+    }
+  }
+
+  const scrollRight = () => {
+    const container = scrollContainerRef.current
+    if (container) {
+      const scrollAmount = container.clientWidth * 0.8
+      container.scrollBy({ left: scrollAmount, behavior: 'smooth' })
+    }
   }
 
   const handleFiltersChange = useCallback(
@@ -339,31 +413,61 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
 
       {/* Tab Navigation */}
       <div className="relative mb-10">
-        <div className="overflow-x-auto flex gap-4 justify-between sm:justify-start w-full">
-          {tabs.map((tab, index) => (
-            <Button
-              key={tab.id}
-              ref={(el: HTMLButtonElement | null) => {
-                buttonRefs.current[index] = el
-              }}
-              variant="ghost"
-              size={isMobile ? 'default' : 'lg'}
-              onClick={() => handleTabChange(tab.id)}
-              className={cn(
-                'rounded-none select-none relative flex flex-col-reverse sm:flex-row items-center pb-4 whitespace-nowrap gap-1',
-                'hover:bg-transparent group/tab',
-                activeTab === tab.id ? 'text-primary' : 'text-muted-foreground/90',
-              )}
-            >
-              {tab.label}
-              <Badge
-                className="cursor-pointer group-hover/tab:text-primary text-xs sm:text-sm flex items-center justify-center rounded-full px-3"
-                variant={activeTab === tab.id ? 'primary' : 'default'}
+        {/* Left scroll indicator */}
+        {showLeftIndicator && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={scrollLeft}
+            aria-label="Scroll tabs left"
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-20 bg-background/80 backdrop-blur-sm border shadow-sm hover:bg-background/90 h-6 w-6 p-0"
+          >
+            <ChevronLeft className="h-3 w-3" />
+          </Button>
+        )}
+
+        {/* Right scroll indicator */}
+        {showRightIndicator && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={scrollRight}
+            aria-label="Scroll tabs right"
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-20 bg-background/80 backdrop-blur-sm border shadow-sm hover:bg-background/90 h-6 w-6 p-0"
+          >
+            <ChevronRight className="h-3 w-3" />
+          </Button>
+        )}
+
+        <div ref={scrollContainerRef} className="overflow-x-auto scrollbar-none">
+          <div className="flex gap-2 sm:gap-4 min-w-max px-2 sm:px-0">
+            {tabs.map((tab, index) => (
+              <Button
+                key={tab.id}
+                ref={(el: HTMLButtonElement | null) => {
+                  buttonRefs.current[index] = el
+                }}
+                variant="ghost"
+                size={isMobile ? 'sm' : 'lg'}
+                onClick={() => handleTabChange(tab.id)}
+                className={cn(
+                  'rounded-none select-none relative flex flex-col-reverse sm:flex-row items-center pb-4 gap-1 min-w-0 flex-shrink-0',
+                  'hover:bg-transparent group/tab',
+                  activeTab === tab.id ? 'text-primary' : 'text-muted-foreground/90',
+                )}
               >
-                {tab.count}
-              </Badge>
-            </Button>
-          ))}
+                <span className="text-xs sm:text-sm font-medium truncate max-w-[80px] sm:max-w-none">
+                  {tab.label}
+                </span>
+                <Badge
+                  className="cursor-pointer group-hover/tab:text-primary text-xs sm:text-sm flex items-center justify-center rounded-full px-2 sm:px-3 min-w-[24px] h-6"
+                  variant={activeTab === tab.id ? 'primary' : 'default'}
+                >
+                  {tab.count}
+                </Badge>
+              </Button>
+            ))}
+          </div>
         </div>
 
         {/* Tab indicator */}

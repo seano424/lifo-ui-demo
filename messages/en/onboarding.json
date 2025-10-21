@@ -1,0 +1,146 @@
+{
+  "onboarding": {
+    "stepLabels": {
+      "storeLookup": "Store Lookup",
+      "addStoreDetails": "Add Store Details",
+      "reviewVerify": "Review & Verify",
+      "createAccount": "Create Account"
+    },
+    "storeSearch": {
+      "placeholder": "Enter your store name or address..."
+    },
+    "confirmDetails": {
+      "title": "Review Your Store Details",
+      "subtitle": "We'll verify this business isn't already registered before creating your account",
+      "fields": {
+        "type": "Type",
+        "address": "Address",
+        "phone": "Phone",
+        "country": "Country",
+        "businessName": "Business Name"
+      },
+      "values": {
+        "notSpecified": "Not specified",
+        "notProvided": "Not provided"
+      },
+      "businessCheck": {
+        "verifyPrompt": "Before creating your account, we need to verify this business isn't already registered.",
+        "verifyButton": "Verify Business",
+        "checking": "Checking...",
+        "alreadyRegistered": "This business is already registered.",
+        "alreadyRegisteredDesc": "The store you selected already has an account. Log in or contact us for help.",
+        "existingStore": "Existing Store:",
+        "contactSupport": "Contact Support",
+        "tryDifferentStore": "Try Different Store",
+        "businessVerified": "Business verified!",
+        "businessVerifiedDesc": "This store is not yet registered. You can proceed with creating your account."
+      },
+      "errors": {
+        "noStoreInfo": "No store information found. Please go back and complete the previous steps.",
+        "startOver": "Start Over"
+      }
+    },
+    "storeType": {
+      "addStoreDetailsTitle": "Add Store Details",
+      "completeStoreInformationTitle": "Complete Store Information",
+      "storeInformationCardTitle": "Store Information",
+      "storeNameLabel": "Store Name",
+      "storeTypeLabel": "Store Type",
+      "businessNameLabel": "Business Name",
+      "addressLabel": "Address",
+      "cityLabel": "City",
+      "postalCodeLabel": "Postal Code",
+      "countryLabel": "Country",
+      "phoneLabel": "Phone Number",
+      "continueButton": "Continue",
+      "storeNamePlaceholder": "Your Store Name",
+      "selectStoreType": "Select store type",
+      "businessNamePlaceholder": "If different from store name",
+      "addressPlaceholder": "123 Main Street",
+      "cityPlaceholder": "Paris",
+      "postalCodePlaceholder": "75001",
+      "countryPlaceholder": "France",
+      "phonePlaceholder": "01 23 45 67 89"
+    },
+    "signupForm": {
+      "businessRegistered": "Business Already Registered",
+      "businessRegisteredDesc": "This business is already in our system. Please contact support or try a different store.",
+      "backButton": "Back",
+      "tryDifferentStore": "Try Different Store",
+      "signInRequired": "Sign in required:",
+      "testModeWarning": "Test mode requires you to be signed in first. Switch to MOCK mode if you want to test without authentication.",
+      "createAccount": "Create Your Account",
+      "createAccountDesc": "Almost done! Create your account to access your {storeName} dashboard.",
+      "fullName": "Full Name",
+      "fullNamePlaceholder": "Your full name",
+      "email": "Email",
+      "emailPlaceholder": "manager@yourstore.com",
+      "password": "Password",
+      "confirmPassword": "Confirm Password",
+      "creatingAccount": "Creating Account",
+      "createAccountButton": "Create Account",
+      "noChanges": "No real changes will be made",
+      "realChanges": "Real database changes with your account",
+      "passwordRequirement": "Password must be at least 6 characters long",
+      "loggedInMessage": "You are logged in as {email}. This store will be associated with your account.",
+      "loginInstead": "Login Instead",
+      "tryAgain": "Try Again",
+      "forgotPassword": "Forgot your password?",
+      "creatingStore": "Creating store...",
+      "createStore": "Create Store",
+      "termsAndPrivacy": "By creating an account, you agree to our Terms of Service and Privacy Policy",
+      "errors": {
+        "passwordTooShort": "Password must be at least 6 characters",
+        "passwordsNoMatch": "Passwords do not match",
+        "storeInfoMissing": "Store information is missing. Please go back and complete store setup.",
+        "businessAlreadyRegistered": "This business is already registered. Please contact support.",
+        "testModeSignInRequired": "Test mode requires you to be signed in first.",
+        "signupError": "An error occurred during signup",
+        "noStoreInfo": "No store information found. Please go back and complete the previous steps.",
+        "startOver": "Start Over"
+      }
+    },
+    "form": {
+      "passwordRequirement": "Must be at least 6 characters",
+      "testingButton": "Testing",
+      "termsAndPrivacy": "By creating an account, you agree to our Terms of Service and Privacy Policy. You'll receive a confirmation email to verify your account.",
+      "testModePrefix": "🧪 {mode} mode: "
+    },
+    "success": {
+      "accountCreated": "Account Created Successfully!",
+      "checkEmail": "Check Your Email",
+      "emailSent": "We've sent you a confirmation email. Please check your inbox and click the verification link to complete your registration.",
+      "whatsNext": "What's next?",
+      "steps": {
+        "checkEmail": "Check your email for the verification link",
+        "clickLink": "Click the link to confirm your account",
+        "redirected": "You'll be redirected to the login page",
+        "signIn": "Sign in and access your store dashboard"
+      },
+      "noEmail": "Didn't receive the email? Check your spam folder or",
+      "contactSupport": "contact support",
+      "loading": "Loading...",
+      "welcome": "Welcome to LIFO!",
+      "storeSetup": "Your store \"{storeName}\" has been set up successfully. You're ready to start managing your inventory and reducing waste!",
+      "whatsNextTitle": "What's Next?",
+      "nextSteps": {
+        "completeSetup": {
+          "title": "Complete Store Setup",
+          "description": "Configure your store settings, preferences, and operational hours"
+        },
+        "addProducts": {
+          "title": "Add Your First Products",
+          "description": "Start building your inventory to track expiration dates and reduce waste"
+        },
+        "inviteTeam": {
+          "title": "Invite Your Team",
+          "description": "Add staff members to help manage your store's inventory"
+        }
+      },
+      "actions": {
+        "goToDashboard": "Go to Dashboard",
+        "completeSetup": "Complete Setup"
+      }
+    }
+  }
+}

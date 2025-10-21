@@ -182,47 +182,6 @@
       }
     }
   },
-  "onboarding": {
-    "stepLabels": {
-      "storeLookup": "Recherche de magasin",
-      "addStoreDetails": "Ajouter détails du magasin",
-      "reviewVerify": "Réviser et vérifier",
-      "createAccount": "Créer un compte"
-    },
-    "storeSearch": {
-      "title": "Trouver votre magasin",
-      "subtitle": "Recherchez votre entreprise ou ajoutez-la manuellement",
-      "placeholder": "Saisissez le nom ou l'adresse de votre magasin...",
-      "searchingText": "Recherche de magasins...",
-      "noResultsFound": "Aucun magasin trouvé correspondant à \"{query}\"",
-      "tryDifferentTerm": "Essayez un terme différent ou ajoutez votre magasin manuellement",
-      "addManuallyButton": "Ajouter les détails du magasin manuellement",
-      "helpText": "Vous ne trouvez pas votre magasin ? Vous pouvez ajouter tous les détails manuellement à l'étape suivante.",
-      "searchError": "Une erreur s'est produite lors de la recherche. Veuillez réessayer."
-    },
-    "storeType": {
-      "addStoreDetailsTitle": "Ajouter détails du magasin",
-      "completeStoreInformationTitle": "Compléter les informations du magasin",
-      "storeInformationCardTitle": "Informations du magasin",
-      "storeNameLabel": "Nom du magasin",
-      "storeTypeLabel": "Type de magasin",
-      "businessNameLabel": "Nom de l'entreprise",
-      "addressLabel": "Adresse",
-      "cityLabel": "Ville",
-      "postalCodeLabel": "Code postal",
-      "countryLabel": "Pays",
-      "phoneLabel": "Numéro de téléphone",
-      "continueButton": "Continuer",
-      "storeNamePlaceholder": "Nom de votre magasin",
-      "selectStoreType": "Sélectionner le type de magasin",
-      "businessNamePlaceholder": "Si différent du nom du magasin",
-      "addressPlaceholder": "123 Rue de la Paix",
-      "cityPlaceholder": "Paris",
-      "postalCodePlaceholder": "75001",
-      "countryPlaceholder": "France",
-      "phonePlaceholder": "01 23 45 67 89"
-    }
-  },
   "account": {
     "title": "Informations du compte",
     "description": "Gérez les paramètres et préférences de votre compte.",

@@ -36,6 +36,13 @@
     "aria": {
       "toggleTheme": "Toggle theme",
       "selectLanguage": "Select language"
+    },
+    "buttons": {
+      "back": "Back",
+      "edit": "Edit",
+      "processing": "Processing...",
+      "verifyFirst": "Verify First",
+      "createAccount": "Create Account"
     }
   },
   "breadcrumbs": {

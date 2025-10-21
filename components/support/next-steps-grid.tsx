@@ -33,7 +33,7 @@ export function NextStepsGrid({ title, items }: NextStepsGridProps) {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-2">
         {items.map(item => (
           <Link key={item.title} href={item.linkHref} className="block group">
-            <Card className="h-full hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 border-0 bg-gradient-to-br from-background to-muted/20 hover:from-primary/5 hover:to-primary/10 cursor-pointer">
+            <Card className="h-full hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 border-0 bg-card hover:from-primary/5 hover:to-primary/10 cursor-pointer">
               <CardContent className="p-6">
                 <div className="space-y-4">
                   {/* Title with icon */}
