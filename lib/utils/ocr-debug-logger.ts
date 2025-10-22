@@ -37,14 +37,10 @@ class OCRDebugLogger {
 
     // Console log with styling
     const style = 'background: #4CAF50; color: white; padding: 2px 5px; border-radius: 3px;'
-    console.log(
-      `%c[OCR DEBUG] ${event}`,
-      style,
-      {
-        ...data,
-        ...(duration ? { duration: `${duration}ms` } : {}),
-      },
-    )
+    console.log(`%c[OCR DEBUG] ${event}`, style, {
+      ...data,
+      ...(duration ? { duration: `${duration}ms` } : {}),
+    })
   }
 
   /**
@@ -159,7 +155,10 @@ class OCRDebugLogger {
     if (!IS_OCR_DEBUG_ENABLED) return
 
     const stats = this.getStats()
-    console.group('%c[OCR DEBUG] Session Statistics', 'background: #2196F3; color: white; padding: 2px 5px; border-radius: 3px; font-weight: bold;')
+    console.group(
+      '%c[OCR DEBUG] Session Statistics',
+      'background: #2196F3; color: white; padding: 2px 5px; border-radius: 3px; font-weight: bold;',
+    )
     console.log('Session Duration:', stats.sessionDuration)
     console.log('Total Events:', stats.totalEvents)
     console.group('API Calls')
