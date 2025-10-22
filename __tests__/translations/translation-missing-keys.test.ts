@@ -3,20 +3,23 @@ import path from 'node:path'
 
 describe('Missing Translation Keys', () => {
   const supportedLocales = ['en', 'fr', 'nl']
-  const translationFiles = [
-    'auth.json',
-    'common.json',
-    'dashboard.json',
-    'inventory.json',
-    'marketing.json',
-    'onboarding.json',
-    'settings.json',
-    'todos.json',
-    'ocr.json',
-    'donation.json',
-    'terms.json',
-    'privacy.json',
-  ]
+
+  // Dynamically discover all translation files
+  const getTranslationFiles = (): string[] => {
+    const messagesDir = path.join(process.cwd(), 'messages')
+    const enDir = path.join(messagesDir, 'en')
+
+    if (!fs.existsSync(enDir)) {
+      return []
+    }
+
+    return fs
+      .readdirSync(enDir)
+      .filter(file => file.endsWith('.json'))
+      .sort()
+  }
+
+  const translationFiles = getTranslationFiles()
 
   // Helper function to get all keys from a nested object
   function getAllKeys(obj: any, prefix = ''): string[] {
@@ -51,6 +54,9 @@ describe('Missing Translation Keys', () => {
 
   it('should have consistent keys across all languages', () => {
     const allIssues: string[] = []
+
+    // Log discovered translation files for debugging
+    console.log(`📁 Found ${translationFiles.length} translation files:`, translationFiles)
 
     translationFiles.forEach(filename => {
       const allLocaleKeys: { [locale: string]: string[] } = {}
