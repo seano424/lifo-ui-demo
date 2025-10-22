@@ -50,6 +50,20 @@ interface BatchDetail {
   [key: string]: unknown
 }
 
+interface BatchTodoData {
+  current_quantity: number
+  current_selling_price: number
+  last_discount_percent: number
+  view_refreshed_at: string
+  [key: string]: unknown
+}
+
+interface BatchDetailData {
+  current_quantity: number
+  selling_price: number
+  [key: string]: unknown
+}
+
 // Type definitions for RPC function parameters
 interface DonateActionParams {
   p_batch_id: string
@@ -365,8 +379,59 @@ export function useBatchActionRPC(providedStoreId?: string) {
       }
 
       const invalidationPromiseStart = performance.now()
+
+      // Log which queries are being invalidated
+      const filteredQueries = queryClient.getQueryCache().findAll({
+        predicate: query => {
+          const queryKey = query.queryKey as readonly unknown[]
+          if (queryKey[0] === 'todos' && queryKey[1] === 'filtered') {
+            const params = queryKey?.[2] as { storeId?: string } | undefined
+            return params?.storeId === storeId
+          }
+          return false
+        },
+      })
+
+      logger.log(
+        'BatchActions',
+        `📋 Found ${filteredQueries.length} filtered todo queries to invalidate`,
+        {
+          storeId,
+          queries: filteredQueries.map(q => ({
+            key: q.queryKey,
+            state: q.state.status,
+            dataUpdateCount: q.state.dataUpdateCount,
+          })),
+        },
+      )
+
       await Promise.all([...coreInvalidations, ...actionSpecificInvalidations])
       const invalidationPromiseEnd = performance.now()
+
+      // Log what queries look like after invalidation
+      const queriesAfterInvalidation = queryClient.getQueryCache().findAll({
+        predicate: query => {
+          const queryKey = query.queryKey as readonly unknown[]
+          if (queryKey[0] === 'todos' && queryKey[1] === 'filtered') {
+            const params = queryKey?.[2] as { storeId?: string } | undefined
+            return params?.storeId === storeId
+          }
+          return false
+        },
+      })
+
+      logger.log(
+        'BatchActions',
+        `📋 After invalidation: ${queriesAfterInvalidation.length} queries`,
+        {
+          storeId,
+          queries: queriesAfterInvalidation.map(q => ({
+            key: q.queryKey,
+            state: q.state.status,
+            isFetching: q.state.fetchStatus === 'fetching',
+          })),
+        },
+      )
 
       const totalInvalidationTime = performance.now() - invalidationStartTime
       logger.log(
@@ -379,6 +444,30 @@ export function useBatchActionRPC(providedStoreId?: string) {
           promiseTime: (invalidationPromiseEnd - invalidationPromiseStart).toFixed(2),
         },
       )
+
+      // Wait a moment for refetches to complete, then check what data we have
+      setTimeout(() => {
+        const batchTodoQuery = queryClient.getQueryData(queryKeys.batches.todo(batchId))
+        const batchDetailQuery = queryClient.getQueryData(queryKeys.batches.detail(batchId))
+
+        logger.log('BatchActions', '🔍 Data in cache after invalidation and refetch:', {
+          batchId,
+          batchTodoData: batchTodoQuery
+            ? {
+                current_quantity: (batchTodoQuery as BatchTodoData).current_quantity,
+                current_selling_price: (batchTodoQuery as BatchTodoData).current_selling_price,
+                last_discount_percent: (batchTodoQuery as BatchTodoData).last_discount_percent,
+                view_refreshed_at: (batchTodoQuery as BatchTodoData).view_refreshed_at,
+              }
+            : 'no data',
+          batchDetailData: batchDetailQuery
+            ? {
+                current_quantity: (batchDetailQuery as BatchDetailData).current_quantity,
+                selling_price: (batchDetailQuery as BatchDetailData).selling_price,
+              }
+            : 'no data',
+        })
+      }, 2000) // Wait 2 seconds for refetches to complete
     }
   }
 
@@ -419,9 +508,11 @@ export function useBatchActionRPC(providedStoreId?: string) {
       logger.log('BatchActions', `Donate RPC completed in ${(endTime - startTime).toFixed(2)}ms`, {
         success: !error,
         batchId: params.batchId,
+        rpcResult: data,
       })
 
       if (error) {
+        logger.error('BatchActions', 'Donate RPC error', { error, batchId: params.batchId })
         throw error
       }
 
@@ -453,11 +544,21 @@ export function useBatchActionRPC(providedStoreId?: string) {
       return { storeId }
     },
     onSuccess: async (result, variables, context) => {
+      logger.log('BatchActions', '✅ Donate onSuccess called', {
+        success: result.success,
+        batchId: variables.batchId,
+        quantity: variables.quantity,
+        remainingQuantity: result.remaining_quantity,
+        storeId: context?.storeId,
+      })
+
       if (result.success) {
         toast.success(`Successfully donated ${variables.quantity} units`, {
           description: `Total value donated: €${result.total_value_donated?.toFixed(2)}`,
         })
+        logger.log('BatchActions', '🔄 Starting query invalidation after donate')
         await invalidateRelatedQueries(variables.batchId, context?.storeId, 'donate')
+        logger.log('BatchActions', '✅ Query invalidation complete after donate')
       } else {
         toast.error(result.error || 'Donation failed')
       }
@@ -517,10 +618,12 @@ export function useBatchActionRPC(providedStoreId?: string) {
         {
           success: !error,
           batchId: params.batchId,
+          rpcResult: data,
         },
       )
 
       if (error) {
+        logger.error('BatchActions', 'Discount RPC error', { error, batchId: params.batchId })
         throw error
       }
 
@@ -551,11 +654,22 @@ export function useBatchActionRPC(providedStoreId?: string) {
       return { storeId }
     },
     onSuccess: async (result, variables, context) => {
+      logger.log('BatchActions', '✅ Discount onSuccess called', {
+        success: result.success,
+        batchId: variables.batchId,
+        discountPercentage: variables.discountPercentage,
+        newPrice: result.new_price,
+        originalPrice: result.original_price,
+        storeId: context?.storeId,
+      })
+
       if (result.success) {
         toast.success(`Applied ${variables.discountPercentage}% discount`, {
           description: `New price: €${result.new_price?.toFixed(2)}`,
         })
+        logger.log('BatchActions', '🔄 Starting query invalidation after discount')
         await invalidateRelatedQueries(variables.batchId, context?.storeId, 'discount')
+        logger.log('BatchActions', '✅ Query invalidation complete after discount')
       } else {
         toast.error(result.error || 'Discount failed')
       }

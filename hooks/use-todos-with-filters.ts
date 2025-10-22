@@ -8,6 +8,7 @@ import {
 } from '@/lib/queries/todos-rpc'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
+import { useMemo } from 'react'
 
 /**
  * Main hook for flexible todo filtering with infinite scroll
@@ -40,8 +41,23 @@ export function useTodosWithFilters(filters: TodoFilters = {}, pageSize: number 
     gcTime: 3 * 60 * 1000, // 3 minutes
   })
 
-  // Flatten pages into single array (like your existing pattern)
-  const data = result.data?.pages.flat() ?? []
+  // Flatten pages into single array with deduplication to prevent duplicate keys during refetches
+  const data = useMemo(() => {
+    if (!result.data?.pages) return []
+
+    // Flatten all pages
+    const flattened = result.data.pages.flat()
+
+    // Deduplicate by batch_id to handle cases where refetches cause temporary duplicates
+    const seen = new Set<string>()
+    return flattened.filter(todo => {
+      if (!todo.batch_id || seen.has(todo.batch_id)) {
+        return false
+      }
+      seen.add(todo.batch_id)
+      return true
+    })
+  }, [result.data?.pages])
 
   return {
     data,
