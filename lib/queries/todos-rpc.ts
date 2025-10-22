@@ -263,3 +263,39 @@ export function createExpiringFilter(daysMax: number = 3): TodoFilters {
     batch_status: ['active'],
   }
 }
+
+/**
+ * Counts for all todo tabs
+ */
+export type TodoCounts = {
+  pending: number
+  in_progress: number
+  completed: number
+  expiring: number
+  expired: number
+}
+
+/**
+ * Fetch counts for all todo tabs with filters
+ * This is more efficient than fetching full todo data just to get counts
+ */
+export async function fetchTodosCounts(storeId: string, filters: TodoFilters): Promise<TodoCounts> {
+  const supabase = createClient()
+
+  const { data, error } = await supabase.rpc('get_todos_counts_with_filters', {
+    p_store_id: storeId,
+    p_filters: filters,
+  })
+
+  if (error) throw error
+
+  return (
+    data || {
+      pending: 0,
+      in_progress: 0,
+      completed: 0,
+      expiring: 0,
+      expired: 0,
+    }
+  )
+}

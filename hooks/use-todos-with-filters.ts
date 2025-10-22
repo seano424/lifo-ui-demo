@@ -1,12 +1,13 @@
 import { queryKeys } from '@/lib/queries/query-keys'
 import {
   fetchTodosWithFilters,
+  fetchTodosCounts,
   type TodoActionType,
   type TodoFilters,
   type TodoUrgencyLevel,
 } from '@/lib/queries/todos-rpc'
 import { useActiveStoreId } from '@/lib/stores/store-context'
-import { useInfiniteQuery } from '@tanstack/react-query'
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 
 /**
  * Main hook for flexible todo filtering with infinite scroll
@@ -243,4 +244,23 @@ export function useCompletedTodosRecent(daysBack: number = 7, pageSize: number =
     },
     pageSize,
   )
+}
+
+/**
+ * Hook to fetch counts for all todo tabs
+ * This is more efficient than loading all todos just to get counts
+ */
+export function useTodosCounts(filters: TodoFilters = {}) {
+  const activeStoreId = useActiveStoreId()
+
+  return useQuery({
+    queryKey: queryKeys.todos.counts(activeStoreId || '', filters),
+    queryFn: () => {
+      if (!activeStoreId) throw new Error('No active store')
+      return fetchTodosCounts(activeStoreId, filters)
+    },
+    enabled: !!activeStoreId,
+    staleTime: 30 * 1000, // 30 seconds - same as other todo queries
+    gcTime: 3 * 60 * 1000, // 3 minutes
+  })
 }

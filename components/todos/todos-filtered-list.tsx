@@ -3,13 +3,7 @@
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { useMediaQuery } from '@/hooks/use-mobile'
-import {
-  useCompletedTodos,
-  useExpiredTodos,
-  useExpiringTodos,
-  useInProgressTodos,
-  usePendingTodos,
-} from '@/hooks/use-todos-with-filters'
+import { useTodosCounts } from '@/hooks/use-todos-with-filters'
 import type { BatchStatus, TodoActionType, TodoUrgencyLevel } from '@/lib/queries/todos-rpc'
 import { cn } from '@/lib/utils'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
@@ -88,21 +82,8 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
     }
   })
 
-  // Get data for tab counts
-  const { data: pendingTodos } = usePendingTodos(filters, pageSize)
-  const { data: inProgressTodos } = useInProgressTodos(filters, pageSize)
-  const { data: completedTodos } = useCompletedTodos(filters, pageSize)
-  const { data: expiringTodos } = useExpiringTodos(
-    {
-      urgency_level: filters.urgency_level,
-      action_type: filters.action_type,
-      product_name: filters.product_name,
-      days_to_expiry_min: filters.days_to_expiry_min,
-      days_to_expiry_max: filters.days_to_expiry_max,
-    },
-    pageSize,
-  )
-  const { data: expiredTodos } = useExpiredTodos(filters, pageSize)
+  // Get counts for all tabs efficiently (without loading all todo data)
+  const { data: counts } = useTodosCounts(filters)
 
   // Tab configuration
   const tabs = useMemo(
@@ -110,42 +91,35 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
       {
         id: 'expiring' as TodoTabType,
         label: t('tabs.expiring'),
-        count: expiringTodos?.length || 0,
+        count: counts?.expiring || 0,
         component: ExpiringTab,
       },
       {
         id: 'pending' as TodoTabType,
         label: t('tabs.pending'),
-        count: pendingTodos?.length || 0,
+        count: counts?.pending || 0,
         component: PendingTab,
       },
       {
         id: 'in_progress' as TodoTabType,
         label: t('tabs.inProgress'),
-        count: inProgressTodos?.length || 0,
+        count: counts?.in_progress || 0,
         component: InProgressTab,
       },
       {
         id: 'completed' as TodoTabType,
         label: t('tabs.completed'),
-        count: completedTodos?.length || 0,
+        count: counts?.completed || 0,
         component: CompletedTab,
       },
       {
         id: 'expired' as TodoTabType,
         label: t('tabs.expired'),
-        count: expiredTodos?.length || 0,
+        count: counts?.expired || 0,
         component: ExpiredTab,
       },
     ],
-    [
-      pendingTodos?.length,
-      inProgressTodos?.length,
-      expiringTodos?.length,
-      expiredTodos?.length,
-      completedTodos?.length,
-      t,
-    ],
+    [counts, t],
   )
 
   // Update tab indicator position and scroll indicators

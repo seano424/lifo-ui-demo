@@ -42,6 +42,10 @@ export const queryKeys = {
     // Ultra-fast urgent count for sidebar badge (uses materialized view)
     urgentCount: (storeId: string) => [...queryKeys.todos.all, 'urgent-count', storeId] as const,
 
+    // Tab counts for all filters (efficient count query without fetching full data)
+    counts: (storeId: string, filters: TodoFilters) =>
+      [...queryKeys.todos.all, 'counts', { storeId, filters }] as const,
+
     // Specific convenience keys for common combinations
     pending: (storeId: string, filters?: Partial<TodoFilters>, pageSize: number = 20) =>
       [...queryKeys.todos.all, 'pending', { storeId, filters, pageSize }] as const,

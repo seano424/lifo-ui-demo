@@ -302,6 +302,15 @@ export function useBatchActionRPC(providedStoreId?: string) {
             return params?.storeId === storeId
           },
         }),
+        // Invalidate todos counts (tab badges)
+        queryClient.invalidateQueries({
+          queryKey: [...queryKeys.todos.all, 'counts'],
+          predicate: query => {
+            const queryKey = query.queryKey as readonly unknown[]
+            const params = queryKey?.[2] as { storeId?: string } | undefined
+            return params?.storeId === storeId
+          },
+        }),
         // Refresh specific batch details
         queryClient.invalidateQueries({
           queryKey: queryKeys.batches.detail(batchId),
