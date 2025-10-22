@@ -101,7 +101,8 @@
         "label": "Afvalkosten",
         "subtitle": "items"
       },
-      "errorMessage": "Sommige statistieken konden niet worden geladen. Probeer te vernieuwen."
+      "errorMessage": "Sommige statistieken konden niet worden geladen. Probeer te vernieuwen.",
+      "cancel": "Annuleren"
     }
   },
   "alerts": {

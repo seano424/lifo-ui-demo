@@ -101,7 +101,8 @@
         "label": "Coût des déchets",
         "subtitle": "articles"
       },
-      "errorMessage": "Certaines métriques n'ont pas pu être chargées. Veuillez actualiser."
+      "errorMessage": "Certaines métriques n'ont pas pu être chargées. Veuillez actualiser.",
+      "cancel": "Annuler"
     }
   },
   "alerts": {

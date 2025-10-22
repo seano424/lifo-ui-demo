@@ -141,13 +141,6 @@
       "updating": "Bijwerken..."
     }
   },
-  "buttons": {
-    "back": "Terug",
-    "edit": "Bewerken",
-    "processing": "Verwerken...",
-    "verifyFirst": "Eerst verifiëren",
-    "createAccount": "Account aanmaken"
-  },
   "cancel": "Annuleren",
   "close": "Sluiten",
   "save": "Opslaan",

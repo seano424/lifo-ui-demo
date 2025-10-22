@@ -3,10 +3,9 @@
     "title": "Paramètres",
     "description": "Gérez vos préférences et paramètres de compte",
     "language": {
-      "currentLanguage": "Langue actuelle",
       "title": "Langue",
       "description": "Choisissez votre langue préférée pour l'interface",
-      "preferred": "Langue préférée"
+      "currentLanguage": "Langue actuelle"
     },
     "tabs": {
       "store": "Magasin",

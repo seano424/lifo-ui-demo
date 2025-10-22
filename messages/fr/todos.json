@@ -247,9 +247,7 @@
       "donate": "Don",
       "donatePrepared": "Don préparé",
       "dispose": "Éliminer",
-      "maintain": "Maintenir",
-      "ignored": "Ignoré",
-      "sold": "Vendu"
+      "maintain": "Maintenir"
     },
     "status": {
       "all": "Tous les statuts",
@@ -264,49 +262,11 @@
       "completed": "Terminé",
       "title": "Statut du lot"
     },
-    "sort": {
-      "sortBy": "Trier par",
-      "direction": "Direction",
-
-      "ascending": "Croissant",
-      "descending": "Décroissant",
-      "urgency": {
-        "label": "Urgence",
-        "description": "Trier par niveau d'urgence"
-      },
-      "expiryDate": {
-        "label": "Date d'expiration",
-        "description": "Trier par date d'expiration"
-      },
-      "currentQuantity": {
-        "label": "Quantité actuelle",
-        "description": "Trier par quantité en stock"
-      },
-      "potentialLoss": {
-        "label": "Perte potentielle",
-        "description": "Trier par perte potentielle"
-      },
-      "alphabetical": {
-        "label": "Alphabétique",
-        "description": "Trier par nom de produit"
-      },
-      "actionDate": {
-        "label": "Date d'action",
-        "description": "Trier par date de dernière action"
-      },
-      "effectiveness": {
-        "label": "Efficacité",
-        "description": "Trier par efficacité des actions"
-      }
-    },
     "expiry": {
       "title": "Période d'expiration",
       "all": "Tous les jours",
       "expiringSoon": "Expire bientôt",
       "recentlyExpired": "Récemment expiré",
-      "expiringWithin": "Expirant dans",
-      "expiredInLast": "Expiré dans le dernier",
-      "expiryRange": "Périmètre de péremption",
       "expiring": {
         "all": "Tous expirants",
         "3days": "3 jours",

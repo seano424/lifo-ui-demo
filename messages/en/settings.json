@@ -5,7 +5,7 @@
     "language": {
       "title": "Language",
       "description": "Choose your preferred language for the interface",
-      "preferred": "Preferred Language"
+      "currentLanguage": "Current Language"
     },
     "tabs": {
       "store": "Store",

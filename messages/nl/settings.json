@@ -3,10 +3,9 @@
     "title": "Instellingen",
     "description": "Beheer uw voorkeuren en accountinstellingen",
     "language": {
-      "currentLanguage": "Huidige taal",
       "title": "Taal",
       "description": "Kies uw voorkeurstaal voor de interface",
-      "preferred": "Voorkeurstaal"
+      "currentLanguage": "Huidige taal"
     },
     "tabs": {
       "store": "Winkel",
@@ -132,6 +131,17 @@
       "addStore": "Winkel toevoegen",
       "manageMultipleStores": "Meerdere winkels beheren",
       "addStoreDescription": "Maak extra winkels aan om verschillende locaties vanaf één account te beheren"
+    },
+    "addStoreSearch": {
+      "title": "Voeg uw winkel toe",
+      "subtitle": "Zoek naar uw bedrijf of voeg het handmatig toe",
+      "placeholder": "Voer uw winkelnaam of adres in...",
+      "searchingText": "Zoeken naar winkels...",
+      "noResultsFound": "Geen winkels gevonden die overeenkomen met \"{query}\"",
+      "tryDifferentTerm": "Probeer een andere zoekterm of voeg uw winkel handmatig toe",
+      "addManuallyButton": "Winkeldetails handmatig toevoegen",
+      "helpText": "Kunt u uw winkel niet vinden? U kunt alle details handmatig toevoegen in de volgende stap.",
+      "searchError": "Er is iets misgegaan tijdens het zoeken. Probeer het opnieuw."
     }
   },
   "account": {
@@ -216,6 +226,43 @@
     },
     "security": {
       "notice": "Dit is uw persoonlijke account. U kunt uw wachtwoord wijzigen in de login pagina."
+    }
+  },
+  "storeSettings": {
+    "addStoreDetails": {
+      "title": {
+        "manual": "Winkeldetails toevoegen",
+        "complete": "Winkelinformatie voltooien"
+      },
+      "subtitle": {
+        "manual": "Voer uw winkelinformatie in",
+        "complete": "Selecteer uw winkeltype en verifieer details"
+      },
+      "labels": {
+        "storeName": "Winkelnaam",
+        "businessName": "Bedrijfsnaam (optioneel)",
+        "address": "Adres",
+        "city": "Stad",
+        "postalCode": "Postcode",
+        "country": "Land",
+        "phone": "Telefoonnummer (optioneel)",
+        "storeType": "Winkeltype"
+      },
+      "placeholders": {
+        "storeName": "Uw winkelnaam",
+        "businessName": "Indien anders dan winkelnaam",
+        "address": "123 Hoofdstraat",
+        "city": "Amsterdam",
+        "postalCode": "1012 AB",
+        "country": "Nederland",
+        "phone": "020 123 4567",
+        "selectStoreType": "Selecteer winkeltype"
+      },
+      "buttons": {
+        "back": "Terug",
+        "creating": "Winkel aanmaken...",
+        "create": "Winkel aanmaken"
+      }
     }
   }
 }
