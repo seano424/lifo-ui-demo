@@ -20,6 +20,7 @@ import type { Store } from '@/lib/queries/stores'
 import { useStoreState } from '@/lib/stores/store-context'
 import { cn } from '@/lib/utils'
 import { MapPin, Settings, Store as StoreIcon } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { Button } from './ui/button'
 import { Skeleton } from './ui/skeleton'
 
@@ -32,6 +33,7 @@ export function TeamSwitcher({ compact = false }: TeamSwitcherProps) {
   const { userStores, isLoading } = useUserStores()
   const { switchStore, isChangingStore } = useStoreActions()
   const { activeStore } = useStoreState()
+  const t = useTranslations('teamSwitcher')
 
   const handleStoreSwitch = (store: Store, makePrimary: boolean = false) => {
     if (store.store_id !== activeStore?.store_id) {
@@ -72,7 +74,7 @@ export function TeamSwitcher({ compact = false }: TeamSwitcherProps) {
                 <StoreIcon className="w-4 h-4 text-muted-foreground" />
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="text-muted-foreground">No stores available</span>
+                <span className="text-muted-foreground">{t('noStoresAvailable')}</span>
               </div>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -99,10 +101,10 @@ export function TeamSwitcher({ compact = false }: TeamSwitcherProps) {
                 <StoreIcon className="w-4 h-4" />
                 {compact ? (
                   <span className="hidden sm:inline">
-                    {activeStore?.store_name || 'No store selected'}
+                    {activeStore?.store_name || t('noStoreSelected')}
                   </span>
                 ) : (
-                  activeStore?.store_name || 'No store selected'
+                  activeStore?.store_name || t('noStoreSelected')
                 )}
               </Button>
             </DropdownMenuTrigger>
@@ -113,7 +115,7 @@ export function TeamSwitcher({ compact = false }: TeamSwitcherProps) {
               sideOffset={4}
             >
               <DropdownMenuLabel className="text-xs text-muted-foreground">
-                Your Stores ({userStores.length})
+                {t('yourStores')} ({userStores.length})
               </DropdownMenuLabel>
 
               {userStores.map((userStore, index) => {
@@ -143,7 +145,7 @@ export function TeamSwitcher({ compact = false }: TeamSwitcherProps) {
                       <div className="flex items-center gap-2">
                         {isActive && (
                           <Badge variant="primary" className="text-xs">
-                            Active
+                            {t('active')}
                           </Badge>
                         )}
                         <Badge variant="outline" className="text-xs capitalize">
@@ -169,7 +171,7 @@ export function TeamSwitcher({ compact = false }: TeamSwitcherProps) {
                   <div className="flex size-6 items-center justify-center rounded-2xl border bg-transparent">
                     <Settings className="size-4" />
                   </div>
-                  <div className="font-medium text-muted-foreground">Set as Primary Store</div>
+                  <div className="font-medium text-muted-foreground">{t('setAsPrimaryStore')}</div>
                 </DropdownMenuItem>
               )}
             </DropdownMenuContent>

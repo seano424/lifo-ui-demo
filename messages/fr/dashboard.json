@@ -286,6 +286,13 @@
     "batches": "Lots",
     "products": "Produits"
   },
+  "teamSwitcher": {
+    "noStoresAvailable": "Aucun magasin disponible",
+    "setAsPrimaryStore": "Définir comme magasin principal",
+    "yourStores": "Vos magasins",
+    "active": "Actif",
+    "noStoreSelected": "Aucun magasin sélectionné"
+  },
   "batchFilters": {
     "expiryFilter": "Filtre d'expiration",
     "allItems": "Tous les articles",

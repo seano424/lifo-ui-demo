@@ -1,9 +1,10 @@
 'use client'
 
-import { AlertCircle, RefreshCw } from 'lucide-react'
-import React, { type ErrorInfo, type ReactNode } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { AlertCircle, RefreshCw } from 'lucide-react'
+import { useTranslations } from 'next-intl'
+import React, { type ErrorInfo, type ReactNode } from 'react'
 
 interface Props {
   children: ReactNode
@@ -106,14 +107,16 @@ export function SimpleErrorFallback({
   error: Error
   resetError: () => void
 }) {
+  const t = useTranslations('common.errors.common')
+
   return (
     <div className="text-center py-8">
       <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-4" />
-      <h3 className="text-lg font-semibold mb-2">Something went wrong</h3>
-      <p className="text-muted-foreground mb-4">Unable to load this content. Please try again.</p>
+      <h3 className="text-lg font-semibold mb-2">{t('somethingWrong')}</h3>
+      <p className="text-muted-foreground mb-4">{t('unableToLoadContent')}</p>
       <Button onClick={resetError} variant="outline">
         <RefreshCw className="h-4 w-4 mr-2" />
-        Retry
+        {t('retry')}
       </Button>
     </div>
   )
@@ -121,11 +124,13 @@ export function SimpleErrorFallback({
 
 // Specific error boundary for infinite scroll components
 export function InfiniteScrollErrorBoundary({ children }: { children: ReactNode }) {
+  const t = useTranslations('common.errors.common')
+
   return (
     <ErrorBoundary
       fallback={
         <div className="text-center py-8 text-muted-foreground">
-          <p>Unable to load more items. Please refresh the page to try again.</p>
+          <p>{t('unableToLoadMoreItems')}</p>
         </div>
       }
       onError={(error, errorInfo) => {

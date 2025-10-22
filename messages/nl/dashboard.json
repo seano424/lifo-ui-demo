@@ -286,6 +286,13 @@
     "batches": "Batches",
     "products": "Producten"
   },
+  "teamSwitcher": {
+    "noStoresAvailable": "Geen winkels beschikbaar",
+    "setAsPrimaryStore": "Instellen als hoofdwinkel",
+    "yourStores": "Uw winkels",
+    "active": "Actief",
+    "noStoreSelected": "Geen winkel geselecteerd"
+  },
   "batchFilters": {
     "expiryFilter": "Vervaldatum filter",
     "allItems": "Alle items",

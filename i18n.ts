@@ -1,6 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
-import { cookies, headers } from 'next/headers'
 import { getRequestConfig } from 'next-intl/server'
+import { cookies, headers } from 'next/headers'
 import { loadMessages } from './lib/load-messages'
 
 async function detectLanguageFromHeaders(): Promise<string> {

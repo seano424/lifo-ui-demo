@@ -23,7 +23,8 @@
       "careers": "Careers",
       "careersDesc": "Browse job listing and discover our workspace",
       "support": "Support",
-      "supportDesc": "Get in touch with our support team or visit our community forums"
+      "supportDesc": "Get in touch with our support team or visit our community forums",
+      "language": "Language"
     },
     "auth": {
       "login": "Login",

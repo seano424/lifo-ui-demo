@@ -98,7 +98,17 @@
       "unknownError": "Une erreur inconnue s'est produite",
       "unexpected": "Une erreur inattendue s'est produite",
       "somethingWrong": "Quelque chose s'est mal passé",
-      "permissionDenied": "Permission refusée"
+      "permissionDenied": "Permission refusée",
+      "unableToLoadContent": "Impossible de charger ce contenu. Veuillez réessayer.",
+      "unableToLoadMoreItems": "Impossible de charger plus d'éléments. Veuillez actualiser la page pour réessayer.",
+      "retry": "Réessayer"
+    },
+    "pages": {
+      "users": {
+        "loginRequired": "Veuillez vous connecter pour voir les utilisateurs.",
+        "noStoreAccess": "Aucun accès au magasin",
+        "noStoreAccessDescription": "Vous n'avez pas encore accès à des magasins."
+      }
     },
     "forms": {
       "required": "Ce champ est obligatoire",
@@ -146,5 +156,14 @@
   "save": "Sauvegarder",
   "edit": "Modifier",
   "saving": "Enregistrement...",
-  "optional": "facultatif"
+  "optional": "facultatif",
+  "pwa": {
+    "installPrompt": {
+      "title": "Installer LIFO",
+      "subtitle": "PWA Expérimental",
+      "installButton": "Installer",
+      "dismissAriaLabel": "Ignorer",
+      "closeAriaLabel": "Fermer"
+    }
+  }
 }

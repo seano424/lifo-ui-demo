@@ -286,6 +286,13 @@
     "batches": "Batches",
     "products": "Products"
   },
+  "teamSwitcher": {
+    "noStoresAvailable": "No stores available",
+    "setAsPrimaryStore": "Set as Primary Store",
+    "yourStores": "Your Stores",
+    "active": "Active",
+    "noStoreSelected": "No store selected"
+  },
   "batchFilters": {
     "expiryFilter": "Expiry filter",
     "allItems": "All items",

@@ -23,7 +23,8 @@
       "careers": "Carrières",
       "careersDesc": "Bekijk vacatures en ontdek onze werkruimte",
       "support": "Ondersteuning",
-      "supportDesc": "Neem contact op met ons ondersteuningsteam of bezoek onze communityforums"
+      "supportDesc": "Neem contact op met ons ondersteuningsteam of bezoek onze communityforums",
+      "language": "Taal"
     },
     "auth": {
       "login": "Inloggen",

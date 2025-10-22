@@ -98,7 +98,17 @@
       "unknownError": "Er is een onbekende fout opgetreden",
       "unexpected": "Er is een onverwachte fout opgetreden",
       "somethingWrong": "Er is iets misgegaan",
-      "permissionDenied": "Toegang geweigerd"
+      "permissionDenied": "Toegang geweigerd",
+      "unableToLoadContent": "Kan deze inhoud niet laden. Probeer het opnieuw.",
+      "unableToLoadMoreItems": "Kan geen extra items laden. Ververs de pagina om opnieuw te proberen.",
+      "retry": "Opnieuw proberen"
+    },
+    "pages": {
+      "users": {
+        "loginRequired": "Log in om gebruikers te bekijken.",
+        "noStoreAccess": "Geen winkeltoegang",
+        "noStoreAccessDescription": "U heeft nog geen toegang tot winkels."
+      }
     },
     "forms": {
       "required": "Dit veld is verplicht",
@@ -146,5 +156,14 @@
   "save": "Opslaan",
   "edit": "Bewerken",
   "saving": "Opslaan...",
-  "optional": "optioneel"
+  "optional": "optioneel",
+  "pwa": {
+    "installPrompt": {
+      "title": "LIFO Installeren",
+      "subtitle": "Experimentele PWA",
+      "installButton": "Installeren",
+      "dismissAriaLabel": "Negeren",
+      "closeAriaLabel": "Sluiten"
+    }
+  }
 }
