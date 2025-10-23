@@ -25,7 +25,7 @@ interface BatchesFilteredListProps {
   pageSize?: number
 }
 
-export function BatchesFilteredList({ initialFilters, pageSize = 20 }: BatchesFilteredListProps) {
+export function BatchesFilteredList({ initialFilters, pageSize = 100 }: BatchesFilteredListProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const activeStoreId = useActiveStoreId()

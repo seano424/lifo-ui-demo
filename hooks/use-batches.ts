@@ -31,7 +31,7 @@ import type { TodoFilters } from '@/lib/queries/todos-rpc'
 import { useCallback, useState } from 'react'
 import { toast } from 'sonner'
 
-export function useBatches(filters: BatchFilters = {}, pageSize: number = 20) {
+export function useBatches(filters: BatchFilters = {}, pageSize: number = 100) {
   const activeStoreId = useActiveStoreId()
 
   const result = useInfiniteQuery({
@@ -72,7 +72,7 @@ export function useBatches(filters: BatchFilters = {}, pageSize: number = 20) {
   }
 }
 
-export function useBatchesWithSort(initialSort?: BatchSort, pageSize: number = 20) {
+export function useBatchesWithSort(initialSort?: BatchSort, pageSize: number = 100) {
   const [currentSort, setCurrentSort] = useState<BatchSort>(
     initialSort || { field: 'expiry_date', direction: 'asc' },
   )
@@ -126,7 +126,7 @@ export function useBatch(batchId: string) {
 export function useBatchesForProduct(
   productId: string,
   filters: Omit<BatchFilters, 'product_id'> = {},
-  pageSize: number = 20,
+  pageSize: number = 100,
 ) {
   const activeStoreId = useActiveStoreId()
 

@@ -95,7 +95,7 @@ export default async function InventoryBatchesPage({ searchParams }: InventoryBa
     await queryClient.prefetchInfiniteQuery({
       queryKey: queryKeys.batches.infinite(storeToUse.store_id, filters),
       queryFn: ({ pageParam = 0 }) =>
-        fetchBatchesPage({ page: pageParam, pageSize: 20 }, filters, serverClient),
+        fetchBatchesPage({ page: pageParam, pageSize: 100 }, filters, serverClient),
       initialPageParam: 0,
       getNextPageParam: lastPage => lastPage.nextPage,
       pages: 1, // Only prefetch first page
