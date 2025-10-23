@@ -91,6 +91,7 @@
         "costPrice": "Cost Price",
         "sellPrice": "Sell Price",
         "status": "Status",
+        "createdAt": "Created At",
         "location": "Location"
       },
       "actions": {

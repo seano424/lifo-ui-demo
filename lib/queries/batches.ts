@@ -37,6 +37,7 @@ export type BatchWithProduct = Batch & {
 // Enhanced sorting types for batches
 export type BatchSortField =
   | 'batch_number'
+  | 'product_name' // Note: Only supported in RPC version (fetchBatchesPageRPC)
   | 'supplier'
   | 'manufacture_date'
   | 'expiry_date'
@@ -85,8 +86,27 @@ function applySingleColumnSort<
   }
 
   switch (sort.field) {
+    case 'batch_number':
+      return query.order('batch_number', {
+        ascending: sort.direction === 'asc',
+      })
+    case 'product_name':
+      // Product name sorting not supported in query builder (use fetchBatchesPageRPC instead)
+      // Fallback to expiry date
+      console.warn('product_name sorting only supported via RPC - use fetchBatchesPageRPC')
+      return query.order('expiry_date', { ascending: true })
+    case 'supplier':
+      return query.order('supplier', { ascending: sort.direction === 'asc' })
+    case 'manufacture_date':
+      return query.order('manufacture_date', {
+        ascending: sort.direction === 'asc',
+      })
     case 'expiry_date':
       return query.order('expiry_date', { ascending: sort.direction === 'asc' })
+    case 'received_date':
+      return query.order('received_date', {
+        ascending: sort.direction === 'asc',
+      })
     case 'current_quantity':
       return query.order('current_quantity', {
         ascending: sort.direction === 'asc',
@@ -97,20 +117,6 @@ function applySingleColumnSort<
       return query.order('selling_price', {
         ascending: sort.direction === 'asc',
       })
-    case 'received_date':
-      return query.order('received_date', {
-        ascending: sort.direction === 'asc',
-      })
-    case 'manufacture_date':
-      return query.order('manufacture_date', {
-        ascending: sort.direction === 'asc',
-      })
-    case 'batch_number':
-      return query.order('batch_number', {
-        ascending: sort.direction === 'asc',
-      })
-    case 'supplier':
-      return query.order('supplier', { ascending: sort.direction === 'asc' })
     case 'status':
       return query.order('status', { ascending: sort.direction === 'asc' })
     case 'created_at':

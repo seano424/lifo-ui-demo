@@ -349,6 +349,7 @@
     "createdDate": "Created Date",
     "expiryDate": "Expiry Date",
     "batchNumber": "Batch Number",
+    "productName": "Product Name",
     "supplier": "Supplier",
     "stockLevel": "Stock Level",
     "costPrice": "Cost Price",

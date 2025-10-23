@@ -348,6 +348,7 @@
     "createdDate": "Date de création",
     "expiryDate": "Date d'expiration",
     "batchNumber": "Numéro de lot",
+    "productName": "Nom du produit",
     "supplier": "Fournisseur",
     "stockLevel": "Niveau de stock",
     "costPrice": "Prix de revient",

@@ -29,13 +29,14 @@ import { useEffect, useState } from 'react'
 
 const VALID_COLUMN_IDS = [
   'batch_number',
-  'product',
+  'product_name',
   'supplier',
   'expiry_date',
   'current_quantity',
   'cost_price',
   'selling_price',
   'status',
+  'created_at',
 ]
 
 interface BatchTableProps {

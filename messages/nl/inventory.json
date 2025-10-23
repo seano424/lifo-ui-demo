@@ -91,6 +91,7 @@
         "costPrice": "Kostprijs",
         "sellPrice": "Verkoopprijs",
         "status": "Status",
+        "createdAt": "Aangemaakt op",
         "location": "Locatie"
       },
       "actions": {

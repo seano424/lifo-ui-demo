@@ -91,6 +91,7 @@
         "costPrice": "Prix de revient",
         "sellPrice": "Prix de vente",
         "status": "Statut",
+        "createdAt": "Créé le",
         "location": "Emplacement"
       },
       "actions": {
