@@ -348,6 +348,7 @@
     "createdDate": "Aanmaakdatum",
     "expiryDate": "Vervaldatum",
     "batchNumber": "Batchnummer",
+    "productName": "Productnaam",
     "supplier": "Leverancier",
     "stockLevel": "Voorraadniveau",
     "costPrice": "Kostprijs",

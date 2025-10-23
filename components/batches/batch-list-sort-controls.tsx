@@ -6,6 +6,7 @@ import {
   Clock,
   DollarSign,
   Package,
+  ShoppingBag,
   TrendingUp,
 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
@@ -63,6 +64,12 @@ export function BatchListSortControls({
             <span className="flex items-center gap-2">
               <Package className="h-4 w-4" />
               {t('batchNumber')}
+            </span>
+          </SelectItem>
+          <SelectItem value="product_name">
+            <span className="flex items-center gap-2">
+              <ShoppingBag className="h-4 w-4" />
+              {t('productName')}
             </span>
           </SelectItem>
           <SelectItem value="current_quantity">
