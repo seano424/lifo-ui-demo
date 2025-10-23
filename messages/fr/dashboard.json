@@ -731,7 +731,6 @@
       "username": "Nom d'utilisateur",
       "permissions": "Permissions",
       "lastLogin": "Dernière connexion",
-      "failedAttempts": "{count} tentative{plural} de mot de passe échouée{plural}",
       "enablePassword": "Activer le mot de passe",
       "disablePassword": "Désactiver le mot de passe",
       "removeDialog": {

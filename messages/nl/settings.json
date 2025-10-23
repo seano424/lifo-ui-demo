@@ -221,8 +221,7 @@
       "title": "Accountactiviteit",
       "memberSince": "Lid sinds {date}",
       "lastLogin": "Laatste login: {date}",
-      "neverLoggedIn": "Nooit ingelogd",
-      "failedAttempts": "{count} mislukte PIN poging{plural}"
+      "neverLoggedIn": "Nooit ingelogd"
     },
     "security": {
       "notice": "Dit is uw persoonlijke account. U kunt uw wachtwoord wijzigen in de login pagina."

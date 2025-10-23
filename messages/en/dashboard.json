@@ -731,7 +731,6 @@
       "username": "Username",
       "permissions": "Permissions",
       "lastLogin": "Last login",
-      "failedAttempts": "{count} failed password attempt{plural}",
       "enablePassword": "Enable Password",
       "disablePassword": "Disable Password",
       "removeDialog": {

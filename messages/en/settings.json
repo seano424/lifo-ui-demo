@@ -258,8 +258,7 @@
       "title": "Account Activity",
       "memberSince": "Member since {date}",
       "lastLogin": "Last login: {date}",
-      "neverLoggedIn": "Never logged in",
-      "failedAttempts": "{count} failed PIN attempt{plural}"
+      "neverLoggedIn": "Never logged in"
     },
     "security": {
       "notice": "This is your personal account. You can change your password in the login page."

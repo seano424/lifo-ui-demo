@@ -34,7 +34,6 @@
       "title": "4. Legal Basis for Processing (GDPR)",
       "legalBasis": {
         "title": "We process your data based on:",
-        "intro": "",
         "items": [
           "Performance of Contract: To provide the Service you signed up for",
           "Legitimate Interests: To improve our Service, prevent fraud, and ensure security",
@@ -45,13 +44,11 @@
     },
     "section5": {
       "title": "5. Data Storage and Security",
-      "intro": "",
       "items": [
         "Where We Store Your Data: All data is stored on secure servers located in the European Union. We use Supabase (EU region) for database hosting. Data is encrypted both in transit (TLS/SSL) and at rest.",
         "How We Protect Your Data: Industry-standard encryption protocols, regular security audits and vulnerability assessments, access controls and multi-factor authentication, secure development practices and code reviews, employee training on data protection.",
         "Data Retention: We retain your data for as long as your account remains active. Upon account deletion, we delete or anonymize your data within 90 days. Some data may be retained longer if required by law (e.g., accounting records)."
-      ],
-      "outro": ""
+      ]
     },
     "section6": {
       "title": "6. Data Sharing and Third Parties",

@@ -731,7 +731,6 @@
       "username": "Gebruikersnaam",
       "permissions": "Machtigingen",
       "lastLogin": "Laatste aanmelding",
-      "failedAttempts": "{count} mislukte wachtwoord poging{plural}",
       "enablePassword": "Wachtwoord inschakelen",
       "disablePassword": "Wachtwoord uitschakelen",
       "removeDialog": {
