@@ -64,6 +64,7 @@ export type BatchFilters = {
   supplier?: string
   expiringInDays?: number // Batches expiring within X days
   hasStock?: boolean // Only batches with current_quantity > 0
+  search?: string // Search across batch number, product name, brand, barcode, SKU, location, supplier
   sort?: BatchSort
   // Date range filtering
   expiry_date_from?: string

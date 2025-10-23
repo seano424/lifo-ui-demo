@@ -20,6 +20,7 @@ interface InventoryBatchesPageProps {
     filter?: string
     expiringDays?: string
     status?: string
+    search?: string
     sort?: string
     direction?: string
   }>
@@ -83,6 +84,11 @@ export default async function InventoryBatchesPage({ searchParams }: InventoryBa
       filters.status = params.status as 'active' | 'expired' | 'damaged' | 'sold_out' | 'reserved'
     }
 
+    // Handle search
+    if (params.search) {
+      filters.search = params.search
+    }
+
     // Handle sorting
     if (params.sort) {
       filters.sort = {
@@ -130,6 +136,7 @@ export default async function InventoryBatchesPage({ searchParams }: InventoryBa
             filter: params.filter,
             expiringDays: params.expiringDays,
             status: params.status,
+            search: params.search,
             sort: params.sort,
             direction: params.direction,
           }}
