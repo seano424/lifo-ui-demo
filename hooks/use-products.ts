@@ -20,7 +20,7 @@ import { fetchProductsPageRPC } from '@/lib/queries/products-rpc'
 import { queryKeys } from '@/lib/queries/query-keys'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 
-export function useProducts(filters: ProductFilters = {}, pageSize: number = 20) {
+export function useProducts(filters: ProductFilters = {}, pageSize: number = 100) {
   const activeStoreId = useActiveStoreId()
 
   // Don't fetch if no active store
@@ -65,7 +65,7 @@ export function useProducts(filters: ProductFilters = {}, pageSize: number = 20)
   }
 }
 
-export function useProductsWithSort(initialSort?: ProductSort, pageSize: number = 20) {
+export function useProductsWithSort(initialSort?: ProductSort, pageSize: number = 100) {
   const [currentSort, setCurrentSort] = useState<ProductSort>(
     initialSort || { field: 'created_at', direction: 'desc' },
   )

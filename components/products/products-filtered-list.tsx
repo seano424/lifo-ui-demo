@@ -23,7 +23,10 @@ interface ProductsFilteredListProps {
   pageSize?: number
 }
 
-export function ProductsFilteredList({ initialFilters, pageSize = 20 }: ProductsFilteredListProps) {
+export function ProductsFilteredList({
+  initialFilters,
+  pageSize = 100,
+}: ProductsFilteredListProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const activeStoreId = useActiveStoreId()

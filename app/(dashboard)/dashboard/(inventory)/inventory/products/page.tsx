@@ -74,7 +74,7 @@ export default async function InventoryProductsPage({ searchParams }: InventoryP
     await queryClient.prefetchInfiniteQuery({
       queryKey: queryKeys.products.infinite(storeToUse.store_id, filters),
       queryFn: ({ pageParam = 0 }) =>
-        fetchProductsPageRPC({ page: pageParam, pageSize: 20 }, filters, serverClient),
+        fetchProductsPageRPC({ page: pageParam, pageSize: 100 }, filters, serverClient),
       initialPageParam: 0,
       getNextPageParam: lastPage => lastPage.nextPage,
       pages: 1, // Only prefetch first page

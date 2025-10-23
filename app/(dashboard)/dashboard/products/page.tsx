@@ -58,7 +58,7 @@ export default async function ProductsPage() {
       queryKey: queryKeys.products.infinite(storeToUse.store_id, {}),
       queryFn: ({ pageParam = 0 }) =>
         fetchProductsPage(
-          { page: pageParam, pageSize: 20 },
+          { page: pageParam, pageSize: 100 },
           { storeId: storeToUse.store_id },
           serverClient,
         ),

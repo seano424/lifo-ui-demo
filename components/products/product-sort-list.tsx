@@ -18,7 +18,7 @@ interface ProductSortListProps {
 
 export function ProductSortList({
   initialSort = { field: 'created_at', direction: 'desc' },
-  pageSize = 20,
+  pageSize = 100,
   showQuickSortByDefault = false,
 }: ProductSortListProps) {
   const [showQuickSort, setShowQuickSort] = useState(showQuickSortByDefault)

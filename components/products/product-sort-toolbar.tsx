@@ -7,7 +7,6 @@ import {
   Boxes,
   Building,
   Calendar,
-  DollarSign,
   Package,
   SortAsc,
   Tag,
@@ -70,12 +69,6 @@ export function ProductsSortToolbar({
       label: t('stockLevel'),
       icon: Boxes,
       description: t('stockLevelDesc'),
-    },
-    {
-      field: 'base_selling_price',
-      label: t('sellingPrice'),
-      icon: DollarSign,
-      description: t('sellingPriceDesc'),
     },
     {
       field: 'active_batches_count',
@@ -202,10 +195,6 @@ export function QuickSortButtons({ onSortChange, currentSort, isLoading }: Quick
     },
     { label: t('aToZ'), sort: { field: 'name', direction: 'asc' } },
     { label: t('lowStock'), sort: { field: 'total_stock', direction: 'asc' } },
-    {
-      label: t('highestPrice'),
-      sort: { field: 'base_selling_price', direction: 'desc' },
-    },
     {
       label: t('mostBatches'),
       sort: { field: 'active_batches_count', direction: 'desc' },
