@@ -84,6 +84,7 @@ export type ProductFilters = {
   storeId?: string
   category?: string
   brand?: string
+  search?: string
   expiringOnly?: boolean
   sort?: ProductSort
 }
