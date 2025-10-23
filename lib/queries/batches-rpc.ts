@@ -91,6 +91,7 @@ export async function fetchBatchesPageRPC(
         p_expiry_date_to: filters.expiry_date_to || null,
         p_received_date_from: filters.received_date_from || null,
         p_received_date_to: filters.received_date_to || null,
+        p_search: filters.search || null,
         p_sort_field: filters.sort?.field || 'expiry_date',
         p_sort_direction: filters.sort?.direction || 'asc',
       })
