@@ -70,7 +70,6 @@ export type SortField =
   | 'category'
   | 'brand'
   | 'total_stock'
-  | 'base_selling_price'
   | 'active_batches_count'
   | 'created_at'
 
@@ -325,10 +324,6 @@ export async function fetchProductsPage(
           query = query.order('created_at', { ascending: false })
         } else if (filters.sort?.field === 'brand') {
           query = query.order('products(brand)', {
-            ascending: filters.sort.direction === 'asc',
-          })
-        } else if (filters.sort?.field === 'base_selling_price') {
-          query = query.order('products(base_selling_price)', {
             ascending: filters.sort.direction === 'asc',
           })
         } else {

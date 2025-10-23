@@ -229,14 +229,7 @@ export function ProductsListPresentation({
                   <SortableHeader field="total_stock" currentSort={currentSort} onSort={updateSort}>
                     {t('table.stock')}
                   </SortableHeader>
-                  <SortableHeader
-                    field="base_selling_price"
-                    currentSort={currentSort}
-                    onSort={updateSort}
-                    className="text-right"
-                  >
-                    {t('table.pricing')}
-                  </SortableHeader>
+                  <TableHead className="text-right">{t('table.pricing')}</TableHead>
                   <SortableHeader
                     field="active_batches_count"
                     currentSort={currentSort}
