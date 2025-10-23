@@ -54,7 +54,6 @@ interface BatchTodoData {
   current_quantity: number
   current_selling_price: number
   last_discount_percent: number
-  view_refreshed_at: string
   [key: string]: unknown
 }
 
@@ -457,7 +456,6 @@ export function useBatchActionRPC(providedStoreId?: string) {
                 current_quantity: (batchTodoQuery as BatchTodoData).current_quantity,
                 current_selling_price: (batchTodoQuery as BatchTodoData).current_selling_price,
                 last_discount_percent: (batchTodoQuery as BatchTodoData).last_discount_percent,
-                view_refreshed_at: (batchTodoQuery as BatchTodoData).view_refreshed_at,
               }
             : 'no data',
           batchDetailData: batchDetailQuery
