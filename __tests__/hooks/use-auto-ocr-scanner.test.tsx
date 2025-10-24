@@ -292,8 +292,10 @@ describe('useAutoOCRScanner', () => {
       })
 
       await waitFor(() => {
-        expect(result.current.lastReason).toContain('No text detected')
-        expect(result.current.lastReason).toContain('1.5%')
+        // With new logic, text confidence is not a hard requirement
+        // The reason should reflect date pattern confidence being too low (0%)
+        expect(result.current.lastReason).toContain('Date pattern confidence too low')
+        expect(result.current.lastReason).toContain('0%')
       })
     })
 
@@ -316,6 +318,64 @@ describe('useAutoOCRScanner', () => {
 
       // Should not crash, should continue analyzing
       expect(result.current.isAnalyzing).toBe(true)
+    })
+
+    it('should recognize all thresholds met with low text confidence but high date confidence (key PR use case)', async () => {
+      const onExpiryDetected = jest.fn()
+
+      // This is the key use case from the PR review:
+      // Low text confidence (3%) due to low-contrast stamped date
+      // High date confidence (65%) due to clear number-like shapes
+      // Overall score (45%) meets threshold due to weighted calculation
+      // shouldTriggerOCR is true because text confidence is NOT a hard requirement
+      const mockAnalysis = {
+        shouldTriggerOCR: true, // Should trigger with new logic
+        hasTextLikeContent: false, // May be false
+        textConfidence: 0.03, // Low text confidence (3%)
+        hasDatePattern: true,
+        datePatternConfidence: 0.65, // High date confidence (65%)
+        overallScore: 0.45, // Overall score meets threshold (45%)
+        brightness: 0.5,
+        sharpness: 0.02, // Meets minimum sharpness
+        contrast: 0.5,
+        isBarcodeDetected: false,
+        barcodeConfidence: 0,
+      }
+
+      ;(frameAnalyzer.analyzeFrame as jest.Mock).mockReturnValue(mockAnalysis)
+
+      const { result } = renderHook(() =>
+        useAutoOCRScanner({
+          isEnabled: true,
+          onExpiryDetected,
+          storeId: 'test-store',
+          preCheckIntervalMs: 100,
+          minTextConfidence: 0.05, // Low threshold (not a hard gate)
+          minDateConfidence: 0.35, // Date pattern required
+          minOverallScore: 0.3, // Overall score required
+          minSharpness: 0.005, // Sharpness required
+        }),
+      )
+
+      await waitFor(() => expect(result.current.isAnalyzing).toBe(true))
+
+      // Advance time to trigger frame analysis
+      act(() => {
+        jest.advanceTimersByTime(100)
+      })
+
+      // Wait for analysis to complete
+      await waitFor(() => {
+        expect(result.current.lastAnalysis).toBeTruthy()
+      })
+
+      // The key verification: with low text confidence (3%) but high date confidence (65%)
+      // and overall score (45%), the system should recognize all thresholds are met
+      expect(result.current.lastReason).toBe('All thresholds met')
+      expect(result.current.lastAnalysis?.textConfidence).toBe(0.03)
+      expect(result.current.lastAnalysis?.datePatternConfidence).toBe(0.65)
+      expect(result.current.lastAnalysis?.overallScore).toBe(0.45)
+      expect(result.current.lastAnalysis?.shouldTriggerOCR).toBe(true)
     })
   })
 

@@ -66,7 +66,9 @@ export function analyzeFrame(
 ): FrameAnalysis {
   const {
     debug = false,
-    minTextConfidence = parseEnvFloat(
+    // minTextConfidence is kept for API compatibility but no longer used as a hard threshold
+    // It still contributes to overall score calculation (30% weight) via textDetection.confidence
+    minTextConfidence: _minTextConfidence = parseEnvFloat(
       process.env.NEXT_PUBLIC_AUTO_OCR_MIN_TEXT_CONFIDENCE,
       OCR_DEFAULTS.SCANNING.MIN_TEXT_CONFIDENCE,
     ),
@@ -109,12 +111,12 @@ export function analyzeFrame(
 
   // Determine if we should trigger OCR
   // IMPORTANT: Skip OCR if barcode is detected (wrong scanner mode!)
+  // NOTE: Text confidence is NOT a hard requirement - it's already factored into overallScore (30% weight)
+  // If date pattern confidence is high, that's sufficient signal to trigger OCR
   const shouldTriggerOCR =
     !barcodeDetection.isBarcode && // No barcode detected
-    textDetection.hasText &&
-    textDetection.confidence >= minTextConfidence &&
-    dateDetection.confidence >= minDateConfidence &&
-    overallScore >= minOverallScore &&
+    dateDetection.confidence >= minDateConfidence && // Strong date pattern signal
+    overallScore >= minOverallScore && // Overall quality check (includes text confidence)
     quality.brightness > 0.2 && // Not too dark
     quality.brightness < 0.9 && // Not overexposed
     quality.sharpness >= minSharpness // Reasonably sharp (configurable, >= not >)
