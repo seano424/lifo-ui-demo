@@ -52,7 +52,8 @@ export function useCSVUpload() {
     hasExpiryColumn: false,
     itemsWithoutExpiry: 0,
   })
-  const [cachedFileContent, setCachedFileContent] = useState<string | null>(null)
+  const [cachedFileName, setCachedFileName] = useState<string | null>(null)
+  const [cachedParsedData, setCachedParsedData] = useState<Record<string, string>[] | null>(null)
   const queryClient = useQueryClient()
 
   // Helper: convert common date formats to ISO yyyy-MM-dd
@@ -106,9 +107,15 @@ export function useCSVUpload() {
   // CSV preview using papaparse for proper parsing
   const previewCsvFile = async (file: File): Promise<CsvPreviewItem[]> => {
     try {
-      // Read and cache file content once
+      // Clear cache if different file
+      if (cachedFileName && cachedFileName !== file.name) {
+        setCachedFileName(null)
+        setCachedParsedData(null)
+      }
+
+      // Read file content once
       const text = await file.text()
-      setCachedFileContent(text)
+      setCachedFileName(file.name)
 
       return new Promise((resolve, reject) => {
         Papa.parse<Record<string, string>>(text, {
@@ -120,6 +127,9 @@ export function useCSVUpload() {
               reject(new Error('CSV file is empty or has no data rows'))
               return
             }
+
+            // Cache parsed data for reuse in normalization and upload
+            setCachedParsedData(results.data)
 
             const firstRow = results.data[0]
             const headers = Object.keys(firstRow)
@@ -182,7 +192,8 @@ export function useCSVUpload() {
       setCsvPreview([])
       setIsPreviewReady(false)
       setColumnMapping({ hasExpiryColumn: false, itemsWithoutExpiry: 0 })
-      setCachedFileContent(null)
+      setCachedFileName(null)
+      setCachedParsedData(null)
 
       const errorMessage = error instanceof Error ? error.message : 'Failed to parse CSV file'
       throw new Error(`CSV parsing failed: ${errorMessage}`)
@@ -190,19 +201,16 @@ export function useCSVUpload() {
   }
 
   // Pure function to normalize CSV: lowercase headers + add pricing columns
-  // Pass preview data as parameter to avoid closure dependency
-  const normalizeCsvHeaders = (csvContent: string, previewData: CsvPreviewItem[]): string => {
-    // Use papaparse to properly handle quoted values
-    const parseResult = Papa.parse<Record<string, string>>(csvContent, {
-      header: true,
-      skipEmptyLines: true,
-    })
-
-    if (!parseResult.data || parseResult.data.length === 0) {
-      return csvContent
+  // Uses cached parsed data to avoid re-parsing
+  const normalizeCsvHeaders = (
+    parsedData: Record<string, string>[],
+    previewData: CsvPreviewItem[],
+  ): string => {
+    if (!parsedData || parsedData.length === 0) {
+      return ''
     }
 
-    const firstRow = parseResult.data[0]
+    const firstRow = parsedData[0]
     const originalHeaders = Object.keys(firstRow)
 
     // Normalize headers to lowercase with underscores
@@ -224,7 +232,7 @@ export function useCSVUpload() {
     // Rebuild CSV with normalized headers and pricing values from preview
     const csvRows = [normalizedHeaders.join(',')]
 
-    parseResult.data.forEach((row, index) => {
+    parsedData.forEach((row, index) => {
       const values = originalHeaders.map(header => row[header] || '')
 
       // Add pricing values from preview data
@@ -245,10 +253,10 @@ export function useCSVUpload() {
     const result = csvRows.join('\n')
 
     if (process.env.NODE_ENV === 'development') {
-      console.log('[CSV] Normalization complete:', {
+      console.log('[CSV] Normalization complete (using cached parse):', {
         originalHeaders,
         normalizedHeaders,
-        totalRows: parseResult.data.length,
+        totalRows: parsedData.length,
       })
     }
 
@@ -265,15 +273,13 @@ export function useCSVUpload() {
       storeId: string
       csvData?: CsvPreviewItem[]
     }): Promise<CSVUploadResponse> => {
-      // Use cached file content to avoid re-reading
-      let csvContent = cachedFileContent
-      if (!csvContent) {
-        csvContent = await file.text()
-        setCachedFileContent(csvContent)
-      }
-
       let fileToUpload = file
       const dataToProcess = csvData || csvPreview
+
+      // Use cached parsed data to avoid re-parsing
+      if (!cachedParsedData) {
+        throw new Error('No cached data available. Please preview the file first.')
+      }
 
       if (dataToProcess && dataToProcess.length > 0) {
         const today = new Date()
@@ -310,28 +316,18 @@ export function useCSVUpload() {
           )
         }
 
-        // O(n) filtering - parse CSV once and filter by index
-        const parseResult = Papa.parse<Record<string, string>>(csvContent, {
-          header: true,
-          skipEmptyLines: true,
-        })
+        // O(n) filtering using cached parsed data - no re-parsing!
+        const filteredData = cachedParsedData.filter((_, index) => validIndices.has(index))
 
-        const filteredData = parseResult.data.filter((_, index) => validIndices.has(index))
-
-        // Rebuild CSV with only valid rows
-        const filteredCsvContent = Papa.unparse(filteredData, {
-          header: true,
-        })
-
-        // Normalize with valid items data
-        const normalizedContent = normalizeCsvHeaders(filteredCsvContent, validItems)
+        // Normalize with valid items data (no parsing, just formatting)
+        const normalizedContent = normalizeCsvHeaders(filteredData, validItems)
 
         fileToUpload = new File([normalizedContent], file.name, {
           type: 'text/csv',
         })
       } else {
-        // No filtering needed, but still normalize headers
-        const normalizedContent = normalizeCsvHeaders(csvContent, dataToProcess)
+        // No filtering needed, but still normalize headers (using cached data)
+        const normalizedContent = normalizeCsvHeaders(cachedParsedData, dataToProcess)
         fileToUpload = new File([normalizedContent], file.name, {
           type: 'text/csv',
         })
@@ -465,7 +461,8 @@ export function useCSVUpload() {
       setCsvPreview([])
       setIsPreviewReady(false)
       setColumnMapping({ hasExpiryColumn: false, itemsWithoutExpiry: 0 })
-      setCachedFileContent(null) // Clear cached content
+      setCachedFileName(null) // Clear cached filename
+      setCachedParsedData(null) // Clear cached parsed data
       mutation.reset() // Reset mutation state to clear uploadResult
     },
     columnMapping,

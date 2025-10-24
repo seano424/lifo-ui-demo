@@ -3,13 +3,6 @@ import { type NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { logger } from '@/lib/utils/logger'
 
-interface BackendErrorResponse {
-  error?: string | object
-  message?: string
-  detail?: string | object
-  status?: number
-}
-
 export async function POST(request: NextRequest) {
   try {
     logger.log('csv-upload', 'Received CSV upload request')
@@ -116,15 +109,22 @@ export async function POST(request: NextRequest) {
       }
 
       let errorMessage = 'Upload failed'
-      let errorDetails: BackendErrorResponse | null = null
+      let errorDetails: unknown = null
 
       try {
-        const errorJson = JSON.parse(errorText) as BackendErrorResponse
+        const errorJson = JSON.parse(errorText) as Record<string, unknown>
 
-        // Extract error message from various possible fields and ensure it's a string
-        const rawError = errorJson.error || errorJson.message || errorJson.detail
-        if (rawError) {
-          errorMessage = typeof rawError === 'string' ? rawError : JSON.stringify(rawError)
+        // Type-safe error extraction
+        if (typeof errorJson.error === 'string') {
+          errorMessage = errorJson.error
+        } else if (typeof errorJson.message === 'string') {
+          errorMessage = errorJson.message
+        } else if (typeof errorJson.detail === 'string') {
+          errorMessage = errorJson.detail
+        } else if (errorJson.error && typeof errorJson.error === 'object') {
+          errorMessage = JSON.stringify(errorJson.error)
+        } else if (errorJson.detail && typeof errorJson.detail === 'object') {
+          errorMessage = JSON.stringify(errorJson.detail)
         }
 
         // Preserve full error details for debugging

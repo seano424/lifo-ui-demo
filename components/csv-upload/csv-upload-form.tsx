@@ -12,7 +12,7 @@ import {
   Zap,
 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -33,6 +33,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
   const [dragActive, setDragActive] = useState(false)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [currentPage, setCurrentPage] = useState(0)
+  const [hasInvalidPricing, setHasInvalidPricing] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const itemsPerPage = 10
@@ -94,6 +95,18 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
     updateCsvItemSellingPrice,
   } = useCSVUpload()
 
+  // Validate prices on initial render and when preview changes
+  useEffect(() => {
+    if (csvPreview.length > 0) {
+      const invalidPricing = csvPreview.some(
+        item => item.Cost_Price < 0.01 || item.Selling_Price < 0.01,
+      )
+      setHasInvalidPricing(invalidPricing)
+    } else {
+      setHasInvalidPricing(false)
+    }
+  }, [csvPreview])
+
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault()
     e.stopPropagation()
@@ -145,9 +158,9 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
     }
 
     try {
-      // Validate pricing values before upload
+      // Validate pricing values before upload (must be >= 0.01)
       const invalidPricing = csvPreview.some(
-        item => item.Cost_Price <= 0 || item.Selling_Price <= 0,
+        item => item.Cost_Price < 0.01 || item.Selling_Price < 0.01,
       )
 
       if (invalidPricing) {
@@ -344,6 +357,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                             value={item.SKU}
                             onChange={e => updateCsvItemSku(actualIndex, e.target.value)}
                             className="font-mono text-xs h-7 min-w-[100px]"
+                            maxLength={100}
                           />
                         </td>
                         <td className="border border-gray-200 p-2">
@@ -351,6 +365,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                             value={item.Product_Name}
                             onChange={e => updateCsvItemProductName(actualIndex, e.target.value)}
                             className="text-sm h-7 min-w-[150px]"
+                            maxLength={255}
                           />
                         </td>
                         <td className="border border-gray-200 p-2">
@@ -394,7 +409,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                             }
                             className={cn(
                               'font-mono text-xs h-7 min-w-[80px]',
-                              item.Cost_Price <= 0 && 'border-red-500 focus:border-red-500',
+                              item.Cost_Price < 0.01 && 'border-red-500 focus:border-red-500',
                             )}
                             min="0.01"
                             max="1000000"
@@ -413,7 +428,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                             }
                             className={cn(
                               'font-mono text-xs h-7 min-w-[80px]',
-                              item.Selling_Price <= 0 && 'border-red-500 focus:border-red-500',
+                              item.Selling_Price < 0.01 && 'border-red-500 focus:border-red-500',
                             )}
                             min="0.01"
                             max="1000000"
@@ -467,6 +482,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                           onChange={e => updateCsvItemSku(actualIndex, e.target.value)}
                           className="font-mono text-xs h-7 flex-1"
                           placeholder="SKU"
+                          maxLength={100}
                         />
                       </div>
                       <Input
@@ -474,6 +490,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                         onChange={e => updateCsvItemProductName(actualIndex, e.target.value)}
                         className="font-medium text-sm h-8"
                         placeholder="Product Name"
+                        maxLength={255}
                       />
                       <div className="text-xs font-medium text-gray-700 bg-gray-50 p-2 rounded-lg">
                         Category: {getCategoryLabel(item.Category)}
@@ -519,13 +536,13 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                             }
                             className={cn(
                               'text-sm h-8',
-                              item.Cost_Price <= 0 && 'border-red-500 focus:border-red-500',
+                              item.Cost_Price < 0.01 && 'border-red-500 focus:border-red-500',
                             )}
                             min="0.01"
                             max="1000000"
                             step="0.01"
                           />
-                          {item.Cost_Price <= 0 && (
+                          {item.Cost_Price < 0.01 && (
                             <span className="text-xs text-red-600">
                               {t('csvUpload.errors.priceTooLow')}
                             </span>
@@ -546,13 +563,13 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                             }
                             className={cn(
                               'text-sm h-8',
-                              item.Selling_Price <= 0 && 'border-red-500 focus:border-red-500',
+                              item.Selling_Price < 0.01 && 'border-red-500 focus:border-red-500',
                             )}
                             min="0.01"
                             max="1000000"
                             step="0.01"
                           />
-                          {item.Selling_Price <= 0 && (
+                          {item.Selling_Price < 0.01 && (
                             <span className="text-xs text-red-600">
                               {t('csvUpload.errors.priceTooLow')}
                             </span>
@@ -597,9 +614,12 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
             <div className="flex gap-3">
               <Button
                 onClick={handleUpload}
-                disabled={isUploading || columnMapping.itemsWithoutExpiry > 0}
+                disabled={isUploading || columnMapping.itemsWithoutExpiry > 0 || hasInvalidPricing}
                 className="flex-1"
                 size="lg"
+                title={
+                  hasInvalidPricing ? t('csvUpload.errors.invalidPricingDescription') : undefined
+                }
               >
                 {isUploading ? (
                   <>
