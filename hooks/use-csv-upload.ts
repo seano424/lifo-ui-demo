@@ -334,6 +334,7 @@ export function useCSVUpload() {
       const formData = new FormData()
       formData.append('file', fileToUpload)
       formData.append('store_id', storeId)
+      formData.append('chunk_size', '100') // Optimal chunk size (tested on backend)
 
       // Use Next.js API route proxy (securely forwards to FastAPI with service role key)
       const response = await fetch('/api/csv-upload', {

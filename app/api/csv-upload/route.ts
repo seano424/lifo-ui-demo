@@ -68,6 +68,12 @@ export async function POST(request: NextRequest) {
     fastApiFormData.append('file', file)
     fastApiFormData.append('store_id', storeId)
 
+    // Forward chunk_size if provided (optimal: 100)
+    const chunkSize = formData.get('chunk_size')
+    if (chunkSize && typeof chunkSize === 'string') {
+      fastApiFormData.append('chunk_size', chunkSize)
+    }
+
     // Debug logging (without consuming file stream)
     if (process.env.NODE_ENV === 'development') {
       logger.log('csv-upload', 'Sending file to backend', {
