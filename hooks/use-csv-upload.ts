@@ -346,6 +346,23 @@ export function useCSVUpload() {
         )
       })
     },
+    updateCsvItemSku: (index: number, newSku: string) => {
+      setCsvPreview(prev => {
+        return prev.map((item, i) => (i === index ? { ...item, SKU: newSku } : item))
+      })
+    },
+    updateCsvItemProductName: (index: number, newProductName: string) => {
+      setCsvPreview(prev => {
+        return prev.map((item, i) =>
+          i === index ? { ...item, Product_Name: newProductName } : item,
+        )
+      })
+    },
+    updateCsvItemCategory: (index: number, newCategory: string) => {
+      setCsvPreview(prev => {
+        return prev.map((item, i) => (i === index ? { ...item, Category: newCategory } : item))
+      })
+    },
   }
 }
 

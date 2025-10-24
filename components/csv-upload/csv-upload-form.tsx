@@ -15,7 +15,6 @@ import { useTranslations } from 'next-intl'
 import { useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -50,6 +49,8 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
     columnMapping,
     updateCsvItemExpiry,
     updateCsvItemQuantity,
+    updateCsvItemSku,
+    updateCsvItemProductName,
   } = useCSVUpload()
 
   const handleDrag = (e: React.DragEvent) => {
@@ -173,6 +174,17 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
     if (currentPage > 0) {
       setCurrentPage(currentPage - 1)
     }
+  }
+
+  // Helper function to convert category codes to human-readable labels
+  const getCategoryLabel = (categoryCode: string): string => {
+    if (!categoryCode) return ''
+    // Convert snake_case to Title Case
+    // e.g., "fresh_meat" -> "Fresh Meat", "bakery_fresh" -> "Bakery Fresh"
+    return categoryCode
+      .split('_')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ')
   }
 
   return (
@@ -303,12 +315,24 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                     const actualIndex = startIndex + index
                     return (
                       <tr key={actualIndex} className="hover:bg-gray-50">
-                        <td className="border border-gray-200 p-2 font-mono text-xs">{item.SKU}</td>
-                        <td className="border border-gray-200 p-2">{item.Product_Name}</td>
                         <td className="border border-gray-200 p-2">
-                          <Badge variant="outline" className="text-xs">
-                            {item.Category}
-                          </Badge>
+                          <Input
+                            value={item.SKU}
+                            onChange={e => updateCsvItemSku(actualIndex, e.target.value)}
+                            className="font-mono text-xs h-7 min-w-[100px]"
+                          />
+                        </td>
+                        <td className="border border-gray-200 p-2">
+                          <Input
+                            value={item.Product_Name}
+                            onChange={e => updateCsvItemProductName(actualIndex, e.target.value)}
+                            className="text-sm h-7 min-w-[150px]"
+                          />
+                        </td>
+                        <td className="border border-gray-200 p-2">
+                          <div className="text-xs font-medium text-gray-700">
+                            {getCategoryLabel(item.Category)}
+                          </div>
                         </td>
                         <td className="border border-gray-200 p-2">
                           <div className="flex items-center justify-center gap-1">
@@ -375,13 +399,23 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                     className="border border-gray-200 rounded-2xl p-3 bg-white"
                   >
                     <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <span className="font-mono text-xs text-gray-500">{item.SKU}</span>
-                        <Badge variant="outline" className="text-xs">
-                          {item.Category}
-                        </Badge>
+                      <div className="flex items-center gap-2">
+                        <Input
+                          value={item.SKU}
+                          onChange={e => updateCsvItemSku(actualIndex, e.target.value)}
+                          className="font-mono text-xs h-7 flex-1"
+                          placeholder="SKU"
+                        />
                       </div>
-                      <div className="font-medium">{item.Product_Name}</div>
+                      <Input
+                        value={item.Product_Name}
+                        onChange={e => updateCsvItemProductName(actualIndex, e.target.value)}
+                        className="font-medium text-sm h-8"
+                        placeholder="Product Name"
+                      />
+                      <div className="text-xs font-medium text-gray-700 bg-gray-50 p-2 rounded-lg">
+                        Category: {getCategoryLabel(item.Category)}
+                      </div>
                       <div className="flex items-center gap-2">
                         <span className="text-sm text-gray-600">{t('preview.quantityLabel')}</span>
                         <div className="flex items-center gap-1">
