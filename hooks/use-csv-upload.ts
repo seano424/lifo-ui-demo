@@ -4,6 +4,7 @@ import Papa from 'papaparse'
 import { toast } from 'sonner'
 import { CSV_PROCESSING, PRICE_CONSTRAINTS, TOAST_DURATIONS } from '@/lib/constants/file-upload'
 import { convertToISODate } from '@/lib/utils/date-conversion'
+import { logger } from '@/lib/utils/logger'
 
 interface CSVUploadResponse {
   success: boolean
@@ -59,9 +60,14 @@ export function useCSVUpload() {
     hasExpiryColumn: false,
     itemsWithoutExpiry: 0,
   })
-  const [cachedFileName, setCachedFileName] = useState<string | null>(null)
+  const [cachedFileKey, setCachedFileKey] = useState<string | null>(null)
   const [cachedParsedData, setCachedParsedData] = useState<CsvRawRow[] | null>(null)
   const queryClient = useQueryClient()
+
+  // Generate composite cache key from file metadata
+  const generateCacheKey = (file: File): string => {
+    return `${file.name}-${file.size}-${file.lastModified}`
+  }
 
   // Validate and parse price values
   const parsePrice = (value: string): number | null => {
@@ -81,15 +87,16 @@ export function useCSVUpload() {
   // CSV preview using papaparse for proper parsing
   const previewCsvFile = async (file: File): Promise<CsvPreviewItem[]> => {
     try {
-      // Clear cache if different file
-      if (cachedFileName && cachedFileName !== file.name) {
-        setCachedFileName(null)
+      // Clear cache if different file (using composite key: name + size + lastModified)
+      const fileKey = generateCacheKey(file)
+      if (cachedFileKey && cachedFileKey !== fileKey) {
+        setCachedFileKey(null)
         setCachedParsedData(null)
       }
 
       // Read file content once
       const text = await file.text()
-      setCachedFileName(file.name)
+      setCachedFileKey(fileKey)
 
       return new Promise((resolve, reject) => {
         Papa.parse<CsvRawRow>(text, {
@@ -159,14 +166,14 @@ export function useCSVUpload() {
       })
     } catch (error) {
       if (process.env.NODE_ENV === 'development') {
-        console.error('[CSV] Preview parsing failed:', error)
+        logger.error('csv-upload', 'Preview parsing failed', { error })
       }
 
       // Reset state on error
       setCsvPreview([])
       setIsPreviewReady(false)
       setColumnMapping({ hasExpiryColumn: false, itemsWithoutExpiry: 0 })
-      setCachedFileName(null)
+      setCachedFileKey(null)
       setCachedParsedData(null)
 
       const errorMessage = error instanceof Error ? error.message : 'Failed to parse CSV file'
@@ -214,9 +221,11 @@ export function useCSVUpload() {
         values.push((previewData[index]?.Selling_Price || 0.01).toString())
       }
 
-      // Escape commas in values by quoting
+      // Escape special CSV characters: commas, quotes, newlines, carriage returns
       const escapedValues = values.map(v =>
-        v.includes(',') || v.includes('"') ? `"${v.replace(/"/g, '""')}"` : v,
+        v.includes(',') || v.includes('"') || v.includes('\n') || v.includes('\r')
+          ? `"${v.replace(/"/g, '""')}"`
+          : v,
       )
       csvRows.push(escapedValues.join(','))
     })
@@ -224,7 +233,7 @@ export function useCSVUpload() {
     const result = csvRows.join('\n')
 
     if (process.env.NODE_ENV === 'development') {
-      console.log('[CSV] Normalization complete (using cached parse):', {
+      logger.log('csv-upload', 'Normalization complete (using cached parse)', {
         originalHeaders,
         normalizedHeaders,
         totalRows: parsedData.length,
@@ -255,8 +264,8 @@ export function useCSVUpload() {
       if (dataToProcess && dataToProcess.length > 0) {
         const today = new Date()
         today.setHours(0, 0, 0, 0)
-        const sevenDaysAgo = new Date(today)
-        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
+        const maxPastExpiryDate = new Date(today)
+        maxPastExpiryDate.setDate(maxPastExpiryDate.getDate() - CSV_PROCESSING.MAX_DAYS_PAST_EXPIRY)
 
         // O(n) filtering with index tracking
         const validIndices = new Set<number>()
@@ -265,7 +274,7 @@ export function useCSVUpload() {
         dataToProcess.forEach((item, index) => {
           if (item.Expiry_Date) {
             const expiryDate = new Date(item.Expiry_Date)
-            if (expiryDate >= sevenDaysAgo) {
+            if (expiryDate >= maxPastExpiryDate) {
               validIndices.add(index)
               validItems.push(item)
             }
@@ -275,15 +284,33 @@ export function useCSVUpload() {
         const filteredCount = dataToProcess.length - validItems.length
 
         if (filteredCount > 0) {
-          toast.warning(`Filtered out ${filteredCount} expired items (>7 days past expiry)`, {
-            description: `Uploading ${validItems.length} valid items with current/future expiry dates`,
-            duration: 5000,
-          })
+          toast.warning(
+            `Filtered out ${filteredCount} expired items (>${CSV_PROCESSING.MAX_DAYS_PAST_EXPIRY} days past expiry)`,
+            {
+              description: `Uploading ${validItems.length} valid items with current/future expiry dates`,
+              duration: 5000,
+            },
+          )
         }
 
         if (validItems.length === 0) {
           throw new Error(
-            'All items have expired (>7 days past expiry). Please update expiry dates and try again.',
+            `All items have expired (>${CSV_PROCESSING.MAX_DAYS_PAST_EXPIRY} days past expiry). Please update expiry dates and try again.`,
+          )
+        }
+
+        // Validate pricing constraints before upload (prevent bypass via DevTools)
+        const invalidPriceItems = validItems.filter(
+          item =>
+            item.Cost_Price < PRICE_CONSTRAINTS.MIN_PRICE ||
+            item.Cost_Price > PRICE_CONSTRAINTS.MAX_PRICE ||
+            item.Selling_Price < PRICE_CONSTRAINTS.MIN_PRICE ||
+            item.Selling_Price > PRICE_CONSTRAINTS.MAX_PRICE,
+        )
+
+        if (invalidPriceItems.length > 0) {
+          throw new Error(
+            `${invalidPriceItems.length} items have invalid prices. All prices must be between ${PRICE_CONSTRAINTS.MIN_PRICE} and ${PRICE_CONSTRAINTS.MAX_PRICE}.`,
           )
         }
 
@@ -318,7 +345,7 @@ export function useCSVUpload() {
         const error = await response.json()
 
         if (process.env.NODE_ENV === 'development') {
-          console.error('[CSV] Upload failed:', error)
+          logger.error('csv-upload', 'Upload failed', { error })
         }
 
         // ✅ Enhanced error handling for validation failures
@@ -408,7 +435,7 @@ export function useCSVUpload() {
     },
     onError: (error: Error) => {
       if (process.env.NODE_ENV === 'development') {
-        console.error('[CSV] Upload mutation failed:', error)
+        logger.error('csv-upload', 'Upload mutation failed', { error })
       }
 
       const errorMessage = error?.message || 'Unknown error occurred'
@@ -432,7 +459,7 @@ export function useCSVUpload() {
       setCsvPreview([])
       setIsPreviewReady(false)
       setColumnMapping({ hasExpiryColumn: false, itemsWithoutExpiry: 0 })
-      setCachedFileName(null) // Clear cached filename
+      setCachedFileKey(null) // Clear cached file key (composite key)
       setCachedParsedData(null) // Clear cached parsed data
       mutation.reset() // Reset mutation state to clear uploadResult
     },
@@ -464,13 +491,17 @@ export function useCSVUpload() {
     },
     updateCsvItemSku: (index: number, newSku: string) => {
       setCsvPreview(prev => {
-        return prev.map((item, i) => (i === index ? { ...item, SKU: newSku } : item))
+        // Truncate to 100 characters (database constraint)
+        const truncatedSku = newSku.slice(0, 100)
+        return prev.map((item, i) => (i === index ? { ...item, SKU: truncatedSku } : item))
       })
     },
     updateCsvItemProductName: (index: number, newProductName: string) => {
       setCsvPreview(prev => {
+        // Truncate to 255 characters (database constraint)
+        const truncatedName = newProductName.slice(0, 255)
         return prev.map((item, i) =>
-          i === index ? { ...item, Product_Name: newProductName } : item,
+          i === index ? { ...item, Product_Name: truncatedName } : item,
         )
       })
     },

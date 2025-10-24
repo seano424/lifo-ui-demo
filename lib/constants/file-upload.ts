@@ -17,6 +17,9 @@ export const CSV_PROCESSING = {
   /** Default shelf life in days for products without expiry info */
   DEFAULT_SHELF_LIFE_DAYS: 30,
 
+  /** Maximum days past expiry to accept items (items older than this are filtered out) */
+  MAX_DAYS_PAST_EXPIRY: 7,
+
   /** Default category for products without category */
   DEFAULT_CATEGORY: 'dry_goods',
 

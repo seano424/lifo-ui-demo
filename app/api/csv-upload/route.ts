@@ -121,9 +121,19 @@ export async function POST(request: NextRequest) {
           errorMessage = errorJson.message
         } else if (typeof errorJson.detail === 'string') {
           errorMessage = errorJson.detail
-        } else if (errorJson.error && typeof errorJson.error === 'object') {
+        } else if (
+          errorJson.error &&
+          typeof errorJson.error === 'object' &&
+          errorJson.error !== null &&
+          !Array.isArray(errorJson.error)
+        ) {
           errorMessage = JSON.stringify(errorJson.error)
-        } else if (errorJson.detail && typeof errorJson.detail === 'object') {
+        } else if (
+          errorJson.detail &&
+          typeof errorJson.detail === 'object' &&
+          errorJson.detail !== null &&
+          !Array.isArray(errorJson.detail)
+        ) {
           errorMessage = JSON.stringify(errorJson.detail)
         }
 
@@ -131,10 +141,23 @@ export async function POST(request: NextRequest) {
         errorDetails = errorJson
 
         if (process.env.NODE_ENV === 'development') {
+          // Sanitize error details before logging (remove sensitive fields)
+          const sanitizedDetails =
+            errorDetails && typeof errorDetails === 'object'
+              ? Object.fromEntries(
+                  Object.entries(errorDetails).filter(
+                    ([key]) =>
+                      !['auth', 'authorization', 'credentials', 'password', 'token'].includes(
+                        key.toLowerCase(),
+                      ),
+                  ),
+                )
+              : errorDetails
+
           console.error('🔍 [CSV-API-ERROR] Parsed error:', {
             message: errorMessage,
-            hasDetails: !!errorDetails,
-            detailKeys: errorDetails ? Object.keys(errorDetails) : [],
+            hasDetails: !!sanitizedDetails,
+            detailKeys: sanitizedDetails ? Object.keys(sanitizedDetails) : [],
           })
         }
       } catch (parseError) {

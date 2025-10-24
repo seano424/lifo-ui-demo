@@ -12,7 +12,7 @@ import {
   Zap,
 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import { useEffect, useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -22,6 +22,7 @@ import { useCSVUpload } from '@/hooks/use-csv-upload'
 import { PRICE_CONSTRAINTS } from '@/lib/constants/file-upload'
 import { cn } from '@/lib/utils'
 import { validateUploadFile } from '@/lib/utils/file-validation'
+import { logger } from '@/lib/utils/logger'
 import { Typography } from '../ui/typography'
 
 interface CSVUploadFormProps {
@@ -34,7 +35,6 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
   const [dragActive, setDragActive] = useState(false)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [currentPage, setCurrentPage] = useState(0)
-  const [hasInvalidPricing, setHasInvalidPricing] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const itemsPerPage = 10
@@ -42,7 +42,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
   // Centralized error handler for consistent error messaging
   const handleError = (error: unknown, fallbackMessage: string) => {
     if (process.env.NODE_ENV === 'development') {
-      console.error('[CSV] Error:', error)
+      logger.error('csv-upload', 'Error occurred', { error })
     }
 
     const errorMessage = error instanceof Error ? error.message : 'Unknown error'
@@ -104,18 +104,15 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
     updateCsvItemSellingPrice,
   } = useCSVUpload()
 
-  // Validate prices on initial render and when preview changes
-  useEffect(() => {
-    if (csvPreview.length > 0) {
-      const invalidPricing = csvPreview.some(
-        item =>
-          item.Cost_Price < PRICE_CONSTRAINTS.MIN_PRICE ||
-          item.Selling_Price < PRICE_CONSTRAINTS.MIN_PRICE,
-      )
-      setHasInvalidPricing(invalidPricing)
-    } else {
-      setHasInvalidPricing(false)
-    }
+  // Memoize pricing validation to prevent unnecessary re-calculations
+  const hasInvalidPricing = useMemo(() => {
+    if (csvPreview.length === 0) return false
+
+    return csvPreview.some(
+      item =>
+        item.Cost_Price < PRICE_CONSTRAINTS.MIN_PRICE ||
+        item.Selling_Price < PRICE_CONSTRAINTS.MIN_PRICE,
+    )
   }, [csvPreview])
 
   const handleDrag = (e: React.DragEvent) => {
