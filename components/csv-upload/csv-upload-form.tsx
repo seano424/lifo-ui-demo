@@ -400,7 +400,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                         <td className="border border-gray-200 p-2">
                           <Input
                             type="number"
-                            value={item.Cost_Price}
+                            value={item.Cost_Price.toFixed(2)}
                             onChange={e =>
                               updateCsvItemCostPrice(
                                 actualIndex,
@@ -419,7 +419,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                         <td className="border border-gray-200 p-2">
                           <Input
                             type="number"
-                            value={item.Selling_Price}
+                            value={item.Selling_Price.toFixed(2)}
                             onChange={e =>
                               updateCsvItemSellingPrice(
                                 actualIndex,
@@ -527,7 +527,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                           </label>
                           <Input
                             type="number"
-                            value={item.Cost_Price}
+                            value={item.Cost_Price.toFixed(2)}
                             onChange={e =>
                               updateCsvItemCostPrice(
                                 actualIndex,
@@ -554,7 +554,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                           </label>
                           <Input
                             type="number"
-                            value={item.Selling_Price}
+                            value={item.Selling_Price.toFixed(2)}
                             onChange={e =>
                               updateCsvItemSellingPrice(
                                 actualIndex,
