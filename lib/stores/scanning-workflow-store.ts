@@ -170,7 +170,7 @@ export const useScanningWorkflowStore = create<ScanningWorkflowState>()(
             state.scannedProduct = {
               barcode,
               detection,
-              isManualEntry: !detection || detection.format === 'Manual Entry',
+              isManualEntry: detection?.format === 'Manual Entry',
             }
             state.currentStep = 'product'
             state.error = null
@@ -207,13 +207,11 @@ export const useScanningWorkflowStore = create<ScanningWorkflowState>()(
                   state.currentStep = 'ocr'
                 }
               } else {
-                // Product not found - leave productName empty so it can be filled manually
+                // Product not found - set to Unknown Product as placeholder
                 // User must manually enter product details or retry scanning
-                state.scannedProduct.productName = ''
-                // Keep user on barcode step - do NOT auto-advance
-                if (state.currentStep === 'product') {
-                  state.currentStep = 'barcode'
-                }
+                state.scannedProduct.productName = 'Unknown Product'
+                // Keep user on product step - do NOT auto-advance
+                // (User can manually edit the product name and confirm)
               }
 
               // Add to history for quick rescanning

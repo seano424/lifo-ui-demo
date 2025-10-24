@@ -110,7 +110,7 @@ describe('useCSVUpload - Analytics Bug Tests', () => {
       expect(scoringCalls.length).toBe(0)
     })
 
-    it('should only trigger scoring when processed > 0', async () => {
+    it('should successfully upload when rows have valid quantities', async () => {
       const mockResponse = {
         success: true,
         processed: 250,
@@ -124,15 +124,10 @@ describe('useCSVUpload - Analytics Bug Tests', () => {
         },
       }
 
-      ;(global.fetch as jest.Mock)
-        .mockResolvedValueOnce({
-          ok: true,
-          json: async () => mockResponse,
-        })
-        .mockResolvedValueOnce({
-          ok: true,
-          json: async () => ({ success: true }),
-        })
+      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockResponse,
+      })
 
       const { result } = renderHook(() => useCSVUpload(), {
         wrapper: createWrapper(),
@@ -160,14 +155,8 @@ describe('useCSVUpload - Analytics Bug Tests', () => {
       expect(result.current.data?.processed).toBe(250)
       expect(result.current.data?.skipped).toBe(250)
 
-      // Verify scoring trigger WAS called (since processed > 0)
-      const fetchCalls = (global.fetch as jest.Mock).mock.calls
-      const scoringCalls = fetchCalls.filter(call => call[0].includes('/api/scoring/trigger'))
-      expect(scoringCalls.length).toBe(1)
-
-      // Verify the scoring trigger was called with correct data
-      const scoringCallBody = JSON.parse(scoringCalls[0][1].body)
-      expect(scoringCallBody.metadata.itemsImported).toBe(250)
+      // NOTE: Scoring trigger is handled by backend automatically
+      // Frontend no longer needs to trigger scoring separately
     })
 
     it('should display correct metrics when all items are processed', async () => {
@@ -188,15 +177,10 @@ describe('useCSVUpload - Analytics Bug Tests', () => {
         },
       }
 
-      ;(global.fetch as jest.Mock)
-        .mockResolvedValueOnce({
-          ok: true,
-          json: async () => mockResponse,
-        })
-        .mockResolvedValueOnce({
-          ok: true,
-          json: async () => ({ success: true }),
-        })
+      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockResponse,
+      })
 
       const { result } = renderHook(() => useCSVUpload(), {
         wrapper: createWrapper(),
@@ -259,14 +243,14 @@ describe('useCSVUpload - Analytics Bug Tests', () => {
       })
 
       await waitFor(() => {
-        expect(result.current.isPending).toBe(false)
+        expect(result.current.isError).toBe(true)
       })
 
       // Verify error state
       expect(result.current.error).toBeDefined()
       expect(toast.error).toHaveBeenCalled()
 
-      // Verify scoring was NOT triggered
+      // Verify no scoring calls were made
       const fetchCalls = (global.fetch as jest.Mock).mock.calls
       const scoringCalls = fetchCalls.filter(call => call[0].includes('/api/scoring/trigger'))
       expect(scoringCalls.length).toBe(0)
