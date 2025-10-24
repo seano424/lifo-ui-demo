@@ -144,11 +144,11 @@ export async function POST(request: NextRequest) {
         }
       }
 
-      // Return both user-friendly message and full details for debugging
+      // Return error message, only include details in development
       return NextResponse.json(
         {
           error: errorMessage,
-          details: errorDetails,
+          ...(process.env.NODE_ENV === 'development' && { details: errorDetails }),
           status: response.status,
         },
         { status: response.status },

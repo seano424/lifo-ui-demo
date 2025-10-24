@@ -401,7 +401,11 @@
       "noFile": "Veuillez d'abord sélectionner un fichier",
       "noStore": "Informations du magasin manquantes. Actualisez et réessayez.",
       "uploadFailed": "Échec du téléchargement",
-      "startFailed": "Impossible de démarrer le téléchargement. Veuillez réessayer."
+      "startFailed": "Impossible de démarrer le téléchargement. Veuillez réessayer.",
+      "invalidPricing": "Prix non valides détectés",
+      "invalidPricingDescription": "Tous les prix de revient et de vente doivent être supérieurs à 0",
+      "priceTooLow": "Doit être supérieur à 0",
+      "databaseValidation": "Échec de la validation de la base de données. Vérifiez les prix (doivent être > 0)"
     },
     "performanceInfo": {
       "title": "Performances ultra-rapides optimisées en masse",

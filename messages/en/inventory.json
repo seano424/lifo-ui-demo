@@ -402,7 +402,11 @@
       "noFile": "Please select a file first",
       "noStore": "Store information is missing. Please refresh and try again.",
       "uploadFailed": "Upload Failed",
-      "startFailed": "Failed to start upload. Please try again."
+      "startFailed": "Failed to start upload. Please try again.",
+      "invalidPricing": "Invalid pricing detected",
+      "invalidPricingDescription": "All cost and selling prices must be greater than 0",
+      "priceTooLow": "Must be greater than 0",
+      "databaseValidation": "Database validation failed. Check pricing values (must be > 0)"
     },
     "performanceInfo": {
       "title": "Bulk-Optimized Ultra-Fast Performance",

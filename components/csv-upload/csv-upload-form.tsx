@@ -56,7 +56,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
       { keywords: ['too large', 'size'], message: t('errors.invalidFile') },
       {
         keywords: ['constraint', 'pricing'],
-        message: 'Database validation failed. Check pricing values (must be > 0)',
+        message: t('csvUpload.errors.databaseValidation'),
       },
     ]
 
@@ -151,8 +151,8 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
       )
 
       if (invalidPricing) {
-        toast.error('Invalid pricing detected', {
-          description: 'All cost and selling prices must be greater than 0',
+        toast.error(t('csvUpload.errors.invalidPricing'), {
+          description: t('csvUpload.errors.invalidPricingDescription'),
         })
         return
       }
@@ -397,6 +397,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                               item.Cost_Price <= 0 && 'border-red-500 focus:border-red-500',
                             )}
                             min="0.01"
+                            max="1000000"
                             step="0.01"
                           />
                         </td>
@@ -415,6 +416,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                               item.Selling_Price <= 0 && 'border-red-500 focus:border-red-500',
                             )}
                             min="0.01"
+                            max="1000000"
                             step="0.01"
                           />
                         </td>
@@ -520,10 +522,13 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                               item.Cost_Price <= 0 && 'border-red-500 focus:border-red-500',
                             )}
                             min="0.01"
+                            max="1000000"
                             step="0.01"
                           />
                           {item.Cost_Price <= 0 && (
-                            <span className="text-xs text-red-600">Must be greater than 0</span>
+                            <span className="text-xs text-red-600">
+                              {t('csvUpload.errors.priceTooLow')}
+                            </span>
                           )}
                         </div>
                         <div className="space-y-1">
@@ -544,10 +549,13 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                               item.Selling_Price <= 0 && 'border-red-500 focus:border-red-500',
                             )}
                             min="0.01"
+                            max="1000000"
                             step="0.01"
                           />
                           {item.Selling_Price <= 0 && (
-                            <span className="text-xs text-red-600">Must be greater than 0</span>
+                            <span className="text-xs text-red-600">
+                              {t('csvUpload.errors.priceTooLow')}
+                            </span>
                           )}
                         </div>
                       </div>

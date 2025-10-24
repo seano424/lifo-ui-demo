@@ -401,7 +401,11 @@
       "noFile": "Selecteer eerst een bestand",
       "noStore": "Winkelinformatie ontbreekt. Vernieuw en probeer opnieuw.",
       "uploadFailed": "Upload mislukt",
-      "startFailed": "Kan upload niet starten. Probeer het opnieuw."
+      "startFailed": "Kan upload niet starten. Probeer het opnieuw.",
+      "invalidPricing": "Ongeldige prijzen gedetecteerd",
+      "invalidPricingDescription": "Alle kosten en verkoopprijzen moeten groter zijn dan 0",
+      "priceTooLow": "Moet groter zijn dan 0",
+      "databaseValidation": "Database validatie mislukt. Controleer prijswaarden (moeten > 0 zijn)"
     },
     "performanceInfo": {
       "title": "Bulk-geoptimaliseerde Ultra-snelle Prestaties",
