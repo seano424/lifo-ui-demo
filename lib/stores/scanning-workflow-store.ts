@@ -179,6 +179,15 @@ export const useScanningWorkflowStore = create<ScanningWorkflowState>()(
         setProductLookupResult: (result: ProductLookupResult) =>
           set(state => {
             if (state.scannedProduct) {
+              // If product was manually entered, only update the lookupResult reference
+              // but preserve the manually entered fields
+              if (state.scannedProduct.isManualEntry) {
+                state.scannedProduct.lookupResult = result
+                // Don't change productName, brand, category, or imageUrl
+                // Don't change currentStep
+                return
+              }
+
               state.scannedProduct.lookupResult = result
 
               // Auto-fill from lookup result if found
@@ -198,9 +207,9 @@ export const useScanningWorkflowStore = create<ScanningWorkflowState>()(
                   state.currentStep = 'ocr'
                 }
               } else {
-                // Product not found - set Unknown Product and stay on current step
+                // Product not found - leave productName empty so it can be filled manually
                 // User must manually enter product details or retry scanning
-                state.scannedProduct.productName = 'Unknown Product'
+                state.scannedProduct.productName = ''
                 // Keep user on barcode step - do NOT auto-advance
                 if (state.currentStep === 'product') {
                   state.currentStep = 'barcode'
@@ -383,7 +392,9 @@ export const useScanningWorkflowStore = create<ScanningWorkflowState>()(
                     (item: ScannedProduct) => item.barcode === state.scannedProduct!.barcode,
                   )
                   if (existingIndex >= 0) {
-                    state.scanHistory[existingIndex] = { ...state.scannedProduct }
+                    state.scanHistory[existingIndex] = {
+                      ...state.scannedProduct,
+                    }
                   } else {
                     state.scanHistory = [
                       { ...state.scannedProduct },
@@ -403,7 +414,9 @@ export const useScanningWorkflowStore = create<ScanningWorkflowState>()(
                     (item: ScannedProduct) => item.barcode === state.scannedProduct!.barcode,
                   )
                   if (existingIndex >= 0) {
-                    state.scanHistory[existingIndex] = { ...state.scannedProduct }
+                    state.scanHistory[existingIndex] = {
+                      ...state.scannedProduct,
+                    }
                   } else {
                     state.scanHistory = [
                       { ...state.scannedProduct },

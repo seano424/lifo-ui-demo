@@ -349,11 +349,17 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
   }
 
   const handleBackToScanning = () => {
+    // 🎯 Simplified: Just show manual entry and go back to scanning
+    // The scannedProduct in the Zustand store will automatically pre-fill the form!
+    setShowManualEntry(true)
     setCurrentStep('scanning')
-    setCurrentProduct(null)
+
+    // Clear batch selection state
     setAvailableBatches([])
     setSelectedBatch(null)
     setQuantity(1)
+    // Note: We don't clear currentProduct or the store's scannedProduct
+    // This allows the form to be pre-filled with existing data
   }
 
   const handleOCRExpiryCapture = async () => {

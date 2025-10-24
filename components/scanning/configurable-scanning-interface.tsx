@@ -359,10 +359,16 @@ export function useBaseScanningLogic(
   const handleItemProcessed = useCallback(() => {
     if (!scannedProduct || !state.formData.expiryDate) return
 
+    // Validate that product name is filled (not empty or 'Unknown Product')
+    if (!scannedProduct.productName || scannedProduct.productName.trim() === '') {
+      console.error('Cannot process item: Product name is required')
+      return
+    }
+
     const newItem: ScannedItem = {
       id: Date.now().toString(),
       barcode: scannedProduct.barcode,
-      productName: scannedProduct.productName || 'Unknown Product',
+      productName: scannedProduct.productName,
       brand: scannedProduct.brand,
       expiryDate: state.formData.expiryDate,
       quantity: state.formData.quantity,

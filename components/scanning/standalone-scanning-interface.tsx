@@ -363,10 +363,16 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
   // Handle add to inventory
   const handleAddToInventory = () => {
     if (scannedProduct && inventoryData.expiryDate) {
+      // Validate that product name is filled (not empty)
+      if (!scannedProduct.productName || scannedProduct.productName.trim() === '') {
+        console.error('Cannot add to inventory: Product name is required')
+        return
+      }
+
       const newItem: ScannedItem = {
         id: Date.now().toString(),
         barcode: scannedProduct.barcode,
-        productName: scannedProduct.productName || 'Unknown Product',
+        productName: scannedProduct.productName,
         brand: scannedProduct.brand,
         expiryDate: inventoryData.expiryDate,
         quantity: inventoryData.quantity,
