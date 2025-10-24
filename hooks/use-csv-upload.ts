@@ -164,7 +164,9 @@ export function useCSVUpload() {
       setIsPreviewReady(true)
       return preview
     } catch (error) {
-      console.error('🔍 [CSV-PREVIEW-ERROR] Failed to parse CSV file:', error)
+      if (process.env.NODE_ENV === 'development') {
+        console.error('[CSV] Preview parsing failed:', error)
+      }
 
       // Reset state on error
       setCsvPreview([])
@@ -198,11 +200,9 @@ export function useCSVUpload() {
 
     if (!hasCostPrice) {
       headers.push('cost_price')
-      console.log('🔍 [CSV-NORMALIZE] Added missing cost_price column')
     }
     if (!hasSellingPrice) {
       headers.push('selling_price')
-      console.log('🔍 [CSV-NORMALIZE] Added missing selling_price column')
     }
 
     const normalizedHeader = headers.join(',')
@@ -228,14 +228,13 @@ export function useCSVUpload() {
 
     const result = [normalizedHeader, ...normalizedDataRows].join('\n')
 
-    // 🐛 DEBUG: Log transformation
-    console.log('🔍 [CSV-NORMALIZE] Original header:', originalHeader)
-    console.log('🔍 [CSV-NORMALIZE] Normalized header:', normalizedHeader)
-    console.log('🔍 [CSV-NORMALIZE] Total rows (including header):', lines.length)
-    console.log(
-      '🔍 [CSV-NORMALIZE] First 3 normalized data rows:',
-      normalizedDataRows.slice(0, 3).join('\n'),
-    )
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[CSV] Normalization complete:', {
+        originalHeader,
+        normalizedHeader,
+        totalRows: lines.length,
+      })
+    }
 
     return result
   }
@@ -287,20 +286,29 @@ export function useCSVUpload() {
         const allLines = originalText.trim().split('\n')
         const headerLine = allLines[0]
 
-        // Create a Set of valid SKUs for efficient lookup
-        const validSkus = new Set(validItems.map(item => item.SKU))
+        // Create a Set of valid row indices (0-based from data rows, matching csvPreview indices)
+        // csvData contains all rows, validItems is filtered subset
+        const validIndices = new Set<number>()
 
-        // Parse original CSV to find matching rows
-        const originalHeaders = headerLine.split(',').map(h => h.trim().replace(/"/g, ''))
-        const skuIndex = originalHeaders.findIndex(h => h.toLowerCase().includes('sku'))
+        // Map each validItem back to its original index in csvData
+        validItems.forEach(validItem => {
+          const originalIndex = csvData.findIndex(
+            dataItem =>
+              dataItem.SKU === validItem.SKU &&
+              dataItem.Product_Name === validItem.Product_Name &&
+              dataItem.Expiry_Date === validItem.Expiry_Date,
+          )
+          if (originalIndex !== -1) {
+            validIndices.add(originalIndex)
+          }
+        })
 
+        // Build list of valid row lines (header + data rows at valid indices)
         const validRowLines = [headerLine]
-        for (let i = 1; i < allLines.length; i++) {
-          const values = allLines[i].split(',').map(v => v.trim().replace(/"/g, ''))
-          const sku = values[skuIndex] || ''
-          // Include row if its SKU is in the validItems set
-          if (validSkus.has(sku)) {
-            validRowLines.push(allLines[i])
+        for (let i = 0; i < csvData.length; i++) {
+          if (validIndices.has(i)) {
+            // i+1 because allLines[0] is header, allLines[1] is first data row
+            validRowLines.push(allLines[i + 1])
           }
         }
 
@@ -333,8 +341,9 @@ export function useCSVUpload() {
       if (!response.ok) {
         const error = await response.json()
 
-        // 🐛 DEBUG: Log the full error to investigate 400 errors
-        console.error('🔍 [CSV-UPLOAD-ERROR] Full error response:', JSON.stringify(error, null, 2))
+        if (process.env.NODE_ENV === 'development') {
+          console.error('[CSV] Upload failed:', error)
+        }
 
         // ✅ Enhanced error handling for validation failures
         if (response.status === 422 && error.common_errors) {
@@ -422,8 +431,9 @@ export function useCSVUpload() {
       })
     },
     onError: (error: Error) => {
-      // Enhanced error handling to prevent app crashes
-      console.error('🔍 [CSV-UPLOAD-ERROR] Upload mutation failed:', error)
+      if (process.env.NODE_ENV === 'development') {
+        console.error('[CSV] Upload mutation failed:', error)
+      }
 
       const errorMessage = error?.message || 'Unknown error occurred'
       const errorDescription = errorMessage.includes('constraint')

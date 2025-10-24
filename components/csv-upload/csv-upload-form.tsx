@@ -37,6 +37,45 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
 
   const itemsPerPage = 10
 
+  // Centralized error handler for consistent error messaging
+  const handleError = (error: unknown, fallbackMessage: string) => {
+    if (process.env.NODE_ENV === 'development') {
+      console.error('[CSV] Error:', error)
+    }
+
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    const lowerMessage = errorMessage.toLowerCase()
+
+    const errorMappings = [
+      {
+        keywords: ['network', 'fetch', 'connection'],
+        message: t('errors.analysisFailure'),
+      },
+      { keywords: ['timeout'], message: `${fallbackMessage}: Request timeout` },
+      { keywords: ['invalid', 'malformed'], message: t('errors.invalidFile') },
+      { keywords: ['too large', 'size'], message: t('errors.invalidFile') },
+      {
+        keywords: ['constraint', 'pricing'],
+        message: 'Database validation failed. Check pricing values (must be > 0)',
+      },
+    ]
+
+    const matchedError = errorMappings.find(mapping =>
+      mapping.keywords.some(keyword => lowerMessage.includes(keyword)),
+    )
+
+    const userMessage =
+      matchedError?.message ||
+      (process.env.NODE_ENV === 'development'
+        ? `${fallbackMessage}: ${errorMessage}`
+        : fallbackMessage)
+
+    const description =
+      process.env.NODE_ENV === 'development' && !matchedError ? errorMessage : undefined
+
+    toast.error(userMessage, description ? { description } : undefined)
+  }
+
   const {
     csvPreview,
     isPreviewReady,
@@ -89,19 +128,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
 
       await previewCsvFile(file)
     } catch (error) {
-      console.error('💥 [CSV-UPLOAD-FORM] File analysis failed:', error)
-
-      // Enhanced error handling
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
-
-      toast.error(t('errors.analysisFailure'), {
-        description:
-          process.env.NODE_ENV === 'development'
-            ? errorMessage
-            : 'Failed to parse CSV file. Please check the file format.',
-      })
-
-      // Reset file selection on error
+      handleError(error, t('errors.analysisFailure'))
       setSelectedFile(null)
     }
   }
@@ -136,46 +163,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
         csvData: csvPreview,
       })
     } catch (error) {
-      console.error('CSV upload failed:', error)
-
-      // Enhanced error handling to prevent app crashes
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
-      const lowerMessage = errorMessage.toLowerCase()
-
-      const errorMappings = [
-        {
-          keywords: ['network', 'fetch', 'connection'],
-          message: t('errors.analysisFailure'),
-        },
-        {
-          keywords: ['timeout'],
-          message: `${t('errors.startFailed')}: Request timeout`,
-        },
-        {
-          keywords: ['invalid', 'malformed'],
-          message: t('errors.invalidFile'),
-        },
-        {
-          keywords: ['too large', 'size'],
-          message: t('errors.invalidFile'),
-        },
-        {
-          keywords: ['constraint', 'pricing'],
-          message: 'Database validation failed. Check pricing values (must be > 0)',
-        },
-      ]
-
-      const matchedError = errorMappings.find(mapping =>
-        mapping.keywords.some(keyword => lowerMessage.includes(keyword)),
-      )
-
-      const userMessage =
-        matchedError?.message ||
-        (process.env.NODE_ENV === 'development'
-          ? `${t('errors.startFailed')}: ${errorMessage}`
-          : t('errors.startFailed'))
-
-      toast.error(userMessage)
+      handleError(error, t('errors.startFailed'))
     }
   }
 
@@ -404,7 +392,10 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                                 parseFloat(e.target.value) || 0.01,
                               )
                             }
-                            className="font-mono text-xs h-7 min-w-[80px]"
+                            className={cn(
+                              'font-mono text-xs h-7 min-w-[80px]',
+                              item.Cost_Price <= 0 && 'border-red-500 focus:border-red-500',
+                            )}
                             min="0.01"
                             step="0.01"
                           />
@@ -419,7 +410,10 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                                 parseFloat(e.target.value) || 0.01,
                               )
                             }
-                            className="font-mono text-xs h-7 min-w-[80px]"
+                            className={cn(
+                              'font-mono text-xs h-7 min-w-[80px]',
+                              item.Selling_Price <= 0 && 'border-red-500 focus:border-red-500',
+                            )}
                             min="0.01"
                             step="0.01"
                           />
@@ -521,10 +515,16 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                                 parseFloat(e.target.value) || 0.01,
                               )
                             }
-                            className="text-sm h-8"
+                            className={cn(
+                              'text-sm h-8',
+                              item.Cost_Price <= 0 && 'border-red-500 focus:border-red-500',
+                            )}
                             min="0.01"
                             step="0.01"
                           />
+                          {item.Cost_Price <= 0 && (
+                            <span className="text-xs text-red-600">Must be greater than 0</span>
+                          )}
                         </div>
                         <div className="space-y-1">
                           <label className="text-xs font-medium text-gray-700">
@@ -539,10 +539,16 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                                 parseFloat(e.target.value) || 0.01,
                               )
                             }
-                            className="text-sm h-8"
+                            className={cn(
+                              'text-sm h-8',
+                              item.Selling_Price <= 0 && 'border-red-500 focus:border-red-500',
+                            )}
                             min="0.01"
                             step="0.01"
                           />
+                          {item.Selling_Price <= 0 && (
+                            <span className="text-xs text-red-600">Must be greater than 0</span>
+                          )}
                         </div>
                       </div>
                       <div className="space-y-1">
