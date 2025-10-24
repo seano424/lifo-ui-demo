@@ -17,6 +17,9 @@ export const CSV_PROCESSING = {
   /** Default shelf life in days for products without expiry info */
   DEFAULT_SHELF_LIFE_DAYS: 30,
 
+  /** Maximum days past expiry to accept items (items older than this are filtered out) */
+  MAX_DAYS_PAST_EXPIRY: 7,
+
   /** Default category for products without category */
   DEFAULT_CATEGORY: 'dry_goods',
 
@@ -25,6 +28,14 @@ export const CSV_PROCESSING = {
 
   /** Default unit type */
   DEFAULT_UNIT_TYPE: 'units',
+} as const
+
+export const PRICE_CONSTRAINTS = {
+  /** Minimum price for cost and selling prices (in currency units) */
+  MIN_PRICE: 0.01,
+
+  /** Maximum price for cost and selling prices (in currency units) */
+  MAX_PRICE: 1000000,
 } as const
 
 export const TOAST_DURATIONS = {

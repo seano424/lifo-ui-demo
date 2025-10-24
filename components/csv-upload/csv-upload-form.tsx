@@ -12,15 +12,17 @@ import {
   Zap,
 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import { useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { useCSVUpload } from '@/hooks/use-csv-upload'
+import { PRICE_CONSTRAINTS } from '@/lib/constants/file-upload'
 import { cn } from '@/lib/utils'
 import { validateUploadFile } from '@/lib/utils/file-validation'
+import { logger } from '@/lib/utils/logger'
 import { Typography } from '../ui/typography'
 
 interface CSVUploadFormProps {
@@ -37,6 +39,53 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
 
   const itemsPerPage = 10
 
+  // Centralized error handler for consistent error messaging
+  const handleError = (error: unknown, fallbackMessage: string) => {
+    if (process.env.NODE_ENV === 'development') {
+      logger.error('csv-upload', 'Error occurred', { error })
+    }
+
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    const lowerMessage = errorMessage.toLowerCase()
+
+    const errorMappings = [
+      {
+        keywords: ['network', 'fetch', 'connection'],
+        message: t('errors.analysisFailure'),
+      },
+      { keywords: ['timeout'], message: `${fallbackMessage}: Request timeout` },
+      { keywords: ['invalid', 'malformed'], message: t('errors.invalidFile') },
+      { keywords: ['too large', 'size'], message: t('errors.invalidFile') },
+      {
+        keywords: ['constraint', 'pricing'],
+        message: t('csvUpload.errors.databaseValidation'),
+      },
+      {
+        keywords: ['no cached data', 'preview the file first'],
+        message: t('csvUpload.errors.noCachedData'),
+      },
+      {
+        keywords: ['all items have expired', 'update expiry dates'],
+        message: t('csvUpload.errors.allItemsExpired'),
+      },
+    ]
+
+    const matchedError = errorMappings.find(mapping =>
+      mapping.keywords.some(keyword => lowerMessage.includes(keyword)),
+    )
+
+    const userMessage =
+      matchedError?.message ||
+      (process.env.NODE_ENV === 'development'
+        ? `${fallbackMessage}: ${errorMessage}`
+        : fallbackMessage)
+
+    const description =
+      process.env.NODE_ENV === 'development' && !matchedError ? errorMessage : undefined
+
+    toast.error(userMessage, description ? { description } : undefined)
+  }
+
   const {
     csvPreview,
     isPreviewReady,
@@ -51,7 +100,20 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
     updateCsvItemQuantity,
     updateCsvItemSku,
     updateCsvItemProductName,
+    updateCsvItemCostPrice,
+    updateCsvItemSellingPrice,
   } = useCSVUpload()
+
+  // Memoize pricing validation to prevent unnecessary re-calculations
+  const hasInvalidPricing = useMemo(() => {
+    if (csvPreview.length === 0) return false
+
+    return csvPreview.some(
+      item =>
+        item.Cost_Price < PRICE_CONSTRAINTS.MIN_PRICE ||
+        item.Selling_Price < PRICE_CONSTRAINTS.MIN_PRICE,
+    )
+  }, [csvPreview])
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault()
@@ -75,20 +137,20 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
   }
 
   const handleFileSelect = async (file: File) => {
-    // Comprehensive file validation
-    const validation = validateUploadFile(file)
-    if (!validation.isValid) {
-      toast.error(validation.error || t('errors.invalidFile'))
-      return
-    }
-
-    setSelectedFile(file)
-
     try {
+      // Comprehensive file validation
+      const validation = validateUploadFile(file)
+      if (!validation.isValid) {
+        toast.error(validation.error || t('errors.invalidFile'))
+        return
+      }
+
+      setSelectedFile(file)
+
       await previewCsvFile(file)
     } catch (error) {
-      console.error('💥 [CSV-UPLOAD-FORM] File analysis failed:', error)
-      toast.error(t('errors.analysisFailure'))
+      handleError(error, t('errors.analysisFailure'))
+      setSelectedFile(null)
     }
   }
 
@@ -104,48 +166,27 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
     }
 
     try {
+      // Validate pricing values before upload
+      const invalidPricing = csvPreview.some(
+        item =>
+          item.Cost_Price < PRICE_CONSTRAINTS.MIN_PRICE ||
+          item.Selling_Price < PRICE_CONSTRAINTS.MIN_PRICE,
+      )
+
+      if (invalidPricing) {
+        toast.error(t('csvUpload.errors.invalidPricing'), {
+          description: t('csvUpload.errors.invalidPricingDescription'),
+        })
+        return
+      }
+
       upload({
         file: selectedFile,
         storeId,
         csvData: csvPreview,
       })
     } catch (error) {
-      console.error('CSV upload failed:', error)
-
-      // Error mapping for better user feedback
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
-      const lowerMessage = errorMessage.toLowerCase()
-
-      const errorMappings = [
-        {
-          keywords: ['network', 'fetch'],
-          message: t('errors.analysisFailure'),
-        },
-        {
-          keywords: ['timeout'],
-          message: `${t('errors.startFailed')}: Request timeout`,
-        },
-        {
-          keywords: ['invalid', 'malformed'],
-          message: t('errors.invalidFile'),
-        },
-        {
-          keywords: ['too large', 'size'],
-          message: t('errors.invalidFile'),
-        },
-      ]
-
-      const matchedError = errorMappings.find(mapping =>
-        mapping.keywords.some(keyword => lowerMessage.includes(keyword)),
-      )
-
-      const userMessage =
-        matchedError?.message ||
-        (process.env.NODE_ENV === 'development'
-          ? `${t('errors.startFailed')}: ${errorMessage}`
-          : t('errors.startFailed'))
-
-      toast.error(userMessage)
+      handleError(error, t('errors.startFailed'))
     }
   }
 
@@ -306,6 +347,12 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                       {t('preview.table.quantity')}
                     </th>
                     <th className="border border-gray-200 p-2 text-left">
+                      {t('preview.table.costPrice')}
+                    </th>
+                    <th className="border border-gray-200 p-2 text-left">
+                      {t('preview.table.sellingPrice')}
+                    </th>
+                    <th className="border border-gray-200 p-2 text-left">
                       {t('preview.table.expiryDate')}
                     </th>
                   </tr>
@@ -320,6 +367,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                             value={item.SKU}
                             onChange={e => updateCsvItemSku(actualIndex, e.target.value)}
                             className="font-mono text-xs h-7 min-w-[100px]"
+                            maxLength={100}
                           />
                         </td>
                         <td className="border border-gray-200 p-2">
@@ -327,6 +375,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                             value={item.Product_Name}
                             onChange={e => updateCsvItemProductName(actualIndex, e.target.value)}
                             className="text-sm h-7 min-w-[150px]"
+                            maxLength={255}
                           />
                         </td>
                         <td className="border border-gray-200 p-2">
@@ -357,6 +406,46 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                               <Plus className="h-3 w-3" />
                             </Button>
                           </div>
+                        </td>
+                        <td className="border border-gray-200 p-2">
+                          <Input
+                            type="number"
+                            value={item.Cost_Price.toFixed(2)}
+                            onChange={e =>
+                              updateCsvItemCostPrice(
+                                actualIndex,
+                                parseFloat(e.target.value) || PRICE_CONSTRAINTS.MIN_PRICE,
+                              )
+                            }
+                            className={cn(
+                              'font-mono text-xs h-7 min-w-[80px]',
+                              item.Cost_Price < PRICE_CONSTRAINTS.MIN_PRICE &&
+                                'border-red-500 focus:border-red-500',
+                            )}
+                            min={PRICE_CONSTRAINTS.MIN_PRICE}
+                            max={PRICE_CONSTRAINTS.MAX_PRICE}
+                            step="0.01"
+                          />
+                        </td>
+                        <td className="border border-gray-200 p-2">
+                          <Input
+                            type="number"
+                            value={item.Selling_Price.toFixed(2)}
+                            onChange={e =>
+                              updateCsvItemSellingPrice(
+                                actualIndex,
+                                parseFloat(e.target.value) || PRICE_CONSTRAINTS.MIN_PRICE,
+                              )
+                            }
+                            className={cn(
+                              'font-mono text-xs h-7 min-w-[80px]',
+                              item.Selling_Price < PRICE_CONSTRAINTS.MIN_PRICE &&
+                                'border-red-500 focus:border-red-500',
+                            )}
+                            min={PRICE_CONSTRAINTS.MIN_PRICE}
+                            max={PRICE_CONSTRAINTS.MAX_PRICE}
+                            step="0.01"
+                          />
                         </td>
                         <td className="border border-gray-200 p-2">
                           {item.Expiry_Date ? (
@@ -405,6 +494,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                           onChange={e => updateCsvItemSku(actualIndex, e.target.value)}
                           className="font-mono text-xs h-7 flex-1"
                           placeholder="SKU"
+                          maxLength={100}
                         />
                       </div>
                       <Input
@@ -412,6 +502,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                         onChange={e => updateCsvItemProductName(actualIndex, e.target.value)}
                         className="font-medium text-sm h-8"
                         placeholder="Product Name"
+                        maxLength={255}
                       />
                       <div className="text-xs font-medium text-gray-700 bg-gray-50 p-2 rounded-lg">
                         Category: {getCategoryLabel(item.Category)}
@@ -439,6 +530,64 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                           >
                             <Plus className="h-3 w-3" />
                           </Button>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="space-y-1">
+                          <label className="text-xs font-medium text-gray-700">
+                            {t('preview.table.costPrice')}
+                          </label>
+                          <Input
+                            type="number"
+                            value={item.Cost_Price.toFixed(2)}
+                            onChange={e =>
+                              updateCsvItemCostPrice(
+                                actualIndex,
+                                parseFloat(e.target.value) || PRICE_CONSTRAINTS.MIN_PRICE,
+                              )
+                            }
+                            className={cn(
+                              'text-sm h-8',
+                              item.Cost_Price < PRICE_CONSTRAINTS.MIN_PRICE &&
+                                'border-red-500 focus:border-red-500',
+                            )}
+                            min={PRICE_CONSTRAINTS.MIN_PRICE}
+                            max={PRICE_CONSTRAINTS.MAX_PRICE}
+                            step="0.01"
+                          />
+                          {item.Cost_Price < PRICE_CONSTRAINTS.MIN_PRICE && (
+                            <span className="text-xs text-red-600">
+                              {t('csvUpload.errors.priceTooLow')}
+                            </span>
+                          )}
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-xs font-medium text-gray-700">
+                            {t('preview.table.sellingPrice')}
+                          </label>
+                          <Input
+                            type="number"
+                            value={item.Selling_Price.toFixed(2)}
+                            onChange={e =>
+                              updateCsvItemSellingPrice(
+                                actualIndex,
+                                parseFloat(e.target.value) || PRICE_CONSTRAINTS.MIN_PRICE,
+                              )
+                            }
+                            className={cn(
+                              'text-sm h-8',
+                              item.Selling_Price < PRICE_CONSTRAINTS.MIN_PRICE &&
+                                'border-red-500 focus:border-red-500',
+                            )}
+                            min={PRICE_CONSTRAINTS.MIN_PRICE}
+                            max={PRICE_CONSTRAINTS.MAX_PRICE}
+                            step="0.01"
+                          />
+                          {item.Selling_Price < PRICE_CONSTRAINTS.MIN_PRICE && (
+                            <span className="text-xs text-red-600">
+                              {t('csvUpload.errors.priceTooLow')}
+                            </span>
+                          )}
                         </div>
                       </div>
                       <div className="space-y-1">
@@ -479,9 +628,12 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
             <div className="flex gap-3">
               <Button
                 onClick={handleUpload}
-                disabled={isUploading || columnMapping.itemsWithoutExpiry > 0}
+                disabled={isUploading || columnMapping.itemsWithoutExpiry > 0 || hasInvalidPricing}
                 className="flex-1"
                 size="lg"
+                title={
+                  hasInvalidPricing ? t('csvUpload.errors.invalidPricingDescription') : undefined
+                }
               >
                 {isUploading ? (
                   <>
