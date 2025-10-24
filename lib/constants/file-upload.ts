@@ -27,6 +27,14 @@ export const CSV_PROCESSING = {
   DEFAULT_UNIT_TYPE: 'units',
 } as const
 
+export const PRICE_CONSTRAINTS = {
+  /** Minimum price for cost and selling prices (in currency units) */
+  MIN_PRICE: 0.01,
+
+  /** Maximum price for cost and selling prices (in currency units) */
+  MAX_PRICE: 1000000,
+} as const
+
 export const TOAST_DURATIONS = {
   /** Duration for success messages (7 seconds) */
   SUCCESS: 7000,

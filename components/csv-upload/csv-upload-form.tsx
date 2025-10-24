@@ -19,6 +19,7 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { useCSVUpload } from '@/hooks/use-csv-upload'
+import { PRICE_CONSTRAINTS } from '@/lib/constants/file-upload'
 import { cn } from '@/lib/utils'
 import { validateUploadFile } from '@/lib/utils/file-validation'
 import { Typography } from '../ui/typography'
@@ -58,6 +59,14 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
       {
         keywords: ['constraint', 'pricing'],
         message: t('csvUpload.errors.databaseValidation'),
+      },
+      {
+        keywords: ['no cached data', 'preview the file first'],
+        message: t('csvUpload.errors.noCachedData'),
+      },
+      {
+        keywords: ['all items have expired', 'update expiry dates'],
+        message: t('csvUpload.errors.allItemsExpired'),
       },
     ]
 
@@ -99,7 +108,9 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
   useEffect(() => {
     if (csvPreview.length > 0) {
       const invalidPricing = csvPreview.some(
-        item => item.Cost_Price < 0.01 || item.Selling_Price < 0.01,
+        item =>
+          item.Cost_Price < PRICE_CONSTRAINTS.MIN_PRICE ||
+          item.Selling_Price < PRICE_CONSTRAINTS.MIN_PRICE,
       )
       setHasInvalidPricing(invalidPricing)
     } else {
@@ -158,9 +169,11 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
     }
 
     try {
-      // Validate pricing values before upload (must be >= 0.01)
+      // Validate pricing values before upload
       const invalidPricing = csvPreview.some(
-        item => item.Cost_Price < 0.01 || item.Selling_Price < 0.01,
+        item =>
+          item.Cost_Price < PRICE_CONSTRAINTS.MIN_PRICE ||
+          item.Selling_Price < PRICE_CONSTRAINTS.MIN_PRICE,
       )
 
       if (invalidPricing) {
@@ -404,15 +417,16 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                             onChange={e =>
                               updateCsvItemCostPrice(
                                 actualIndex,
-                                parseFloat(e.target.value) || 0.01,
+                                parseFloat(e.target.value) || PRICE_CONSTRAINTS.MIN_PRICE,
                               )
                             }
                             className={cn(
                               'font-mono text-xs h-7 min-w-[80px]',
-                              item.Cost_Price < 0.01 && 'border-red-500 focus:border-red-500',
+                              item.Cost_Price < PRICE_CONSTRAINTS.MIN_PRICE &&
+                                'border-red-500 focus:border-red-500',
                             )}
-                            min="0.01"
-                            max="1000000"
+                            min={PRICE_CONSTRAINTS.MIN_PRICE}
+                            max={PRICE_CONSTRAINTS.MAX_PRICE}
                             step="0.01"
                           />
                         </td>
@@ -423,15 +437,16 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                             onChange={e =>
                               updateCsvItemSellingPrice(
                                 actualIndex,
-                                parseFloat(e.target.value) || 0.01,
+                                parseFloat(e.target.value) || PRICE_CONSTRAINTS.MIN_PRICE,
                               )
                             }
                             className={cn(
                               'font-mono text-xs h-7 min-w-[80px]',
-                              item.Selling_Price < 0.01 && 'border-red-500 focus:border-red-500',
+                              item.Selling_Price < PRICE_CONSTRAINTS.MIN_PRICE &&
+                                'border-red-500 focus:border-red-500',
                             )}
-                            min="0.01"
-                            max="1000000"
+                            min={PRICE_CONSTRAINTS.MIN_PRICE}
+                            max={PRICE_CONSTRAINTS.MAX_PRICE}
                             step="0.01"
                           />
                         </td>
@@ -531,18 +546,19 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                             onChange={e =>
                               updateCsvItemCostPrice(
                                 actualIndex,
-                                parseFloat(e.target.value) || 0.01,
+                                parseFloat(e.target.value) || PRICE_CONSTRAINTS.MIN_PRICE,
                               )
                             }
                             className={cn(
                               'text-sm h-8',
-                              item.Cost_Price < 0.01 && 'border-red-500 focus:border-red-500',
+                              item.Cost_Price < PRICE_CONSTRAINTS.MIN_PRICE &&
+                                'border-red-500 focus:border-red-500',
                             )}
-                            min="0.01"
-                            max="1000000"
+                            min={PRICE_CONSTRAINTS.MIN_PRICE}
+                            max={PRICE_CONSTRAINTS.MAX_PRICE}
                             step="0.01"
                           />
-                          {item.Cost_Price < 0.01 && (
+                          {item.Cost_Price < PRICE_CONSTRAINTS.MIN_PRICE && (
                             <span className="text-xs text-red-600">
                               {t('csvUpload.errors.priceTooLow')}
                             </span>
@@ -558,18 +574,19 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                             onChange={e =>
                               updateCsvItemSellingPrice(
                                 actualIndex,
-                                parseFloat(e.target.value) || 0.01,
+                                parseFloat(e.target.value) || PRICE_CONSTRAINTS.MIN_PRICE,
                               )
                             }
                             className={cn(
                               'text-sm h-8',
-                              item.Selling_Price < 0.01 && 'border-red-500 focus:border-red-500',
+                              item.Selling_Price < PRICE_CONSTRAINTS.MIN_PRICE &&
+                                'border-red-500 focus:border-red-500',
                             )}
-                            min="0.01"
-                            max="1000000"
+                            min={PRICE_CONSTRAINTS.MIN_PRICE}
+                            max={PRICE_CONSTRAINTS.MAX_PRICE}
                             step="0.01"
                           />
-                          {item.Selling_Price < 0.01 && (
+                          {item.Selling_Price < PRICE_CONSTRAINTS.MIN_PRICE && (
                             <span className="text-xs text-red-600">
                               {t('csvUpload.errors.priceTooLow')}
                             </span>

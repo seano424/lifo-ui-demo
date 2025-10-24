@@ -403,9 +403,11 @@
       "uploadFailed": "Upload mislukt",
       "startFailed": "Kan upload niet starten. Probeer het opnieuw.",
       "invalidPricing": "Ongeldige prijzen gedetecteerd",
-      "invalidPricingDescription": "Alle kosten en verkoopprijzen moeten groter zijn dan 0",
-      "priceTooLow": "Moet groter zijn dan 0",
-      "databaseValidation": "Database validatie mislukt. Controleer prijswaarden (moeten > 0 zijn)"
+      "invalidPricingDescription": "Alle kosten en verkoopprijzen moeten minstens 0,01 zijn",
+      "priceTooLow": "Moet minstens 0,01 zijn",
+      "databaseValidation": "Database validatie mislukt. Controleer prijswaarden (moeten >= 0,01 zijn)",
+      "noCachedData": "Geen gecachte gegevens beschikbaar. Bekijk eerst het bestand.",
+      "allItemsExpired": "Alle items zijn verlopen (>7 dagen na vervaldatum). Update de vervaldatums en probeer opnieuw."
     },
     "performanceInfo": {
       "title": "Bulk-geoptimaliseerde Ultra-snelle Prestaties",

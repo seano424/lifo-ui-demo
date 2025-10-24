@@ -2,7 +2,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import Papa from 'papaparse'
 import { toast } from 'sonner'
-import { CSV_PROCESSING, TOAST_DURATIONS } from '@/lib/constants/file-upload'
+import { CSV_PROCESSING, PRICE_CONSTRAINTS, TOAST_DURATIONS } from '@/lib/constants/file-upload'
+import { convertToISODate } from '@/lib/utils/date-conversion'
 
 interface CSVUploadResponse {
   success: boolean
@@ -45,6 +46,12 @@ interface CsvColumnMapping {
   itemsWithoutExpiry: number
 }
 
+// Raw CSV row data as parsed by PapaParse
+// Values are always strings when parsed from CSV, converted to proper types later
+interface CsvRawRow {
+  [key: string]: string
+}
+
 export function useCSVUpload() {
   const [csvPreview, setCsvPreview] = useState<CsvPreviewItem[]>([])
   const [isPreviewReady, setIsPreviewReady] = useState(false)
@@ -53,42 +60,8 @@ export function useCSVUpload() {
     itemsWithoutExpiry: 0,
   })
   const [cachedFileName, setCachedFileName] = useState<string | null>(null)
-  const [cachedParsedData, setCachedParsedData] = useState<Record<string, string>[] | null>(null)
+  const [cachedParsedData, setCachedParsedData] = useState<CsvRawRow[] | null>(null)
   const queryClient = useQueryClient()
-
-  // Helper: convert common date formats to ISO yyyy-MM-dd
-  const convertToISODate = (raw: string): string => {
-    if (!raw) return ''
-    const s = raw.trim()
-
-    // Already ISO-like: 2025-10-18
-    if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s
-
-    // dd/mm/yyyy or dd-mm-yyyy
-    const dmY = s.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{2,4})$/)
-    if (dmY) {
-      const day = dmY[1].padStart(2, '0')
-      const month = dmY[2].padStart(2, '0')
-      let year = dmY[3]
-      if (year.length === 2) {
-        year = `20${year}`
-      }
-      if (+month >= 1 && +month <= 12 && +day >= 1 && +day <= 31) {
-        return `${year}-${month}-${day}`
-      }
-    }
-
-    // Fallback: try Date parse
-    const parsed = new Date(s)
-    if (!Number.isNaN(parsed.getTime())) {
-      const y = parsed.getFullYear()
-      const m = String(parsed.getMonth() + 1).padStart(2, '0')
-      const d = String(parsed.getDate()).padStart(2, '0')
-      return `${y}-${m}-${d}`
-    }
-
-    return ''
-  }
 
   // Validate and parse price values
   const parsePrice = (value: string): number | null => {
@@ -96,10 +69,11 @@ export function useCSVUpload() {
     if (!trimmed) return null
 
     const parsed = parseFloat(trimmed)
-    if (Number.isNaN(parsed) || parsed <= 0) return null
+    // Enforce minimum price (consistent with UI validation)
+    if (Number.isNaN(parsed) || parsed < PRICE_CONSTRAINTS.MIN_PRICE) return null
 
-    // Reject absurd values (max $1 million)
-    if (parsed > 1000000) return null
+    // Reject absurd values
+    if (parsed > PRICE_CONSTRAINTS.MAX_PRICE) return null
 
     return parsed
   }
@@ -118,7 +92,7 @@ export function useCSVUpload() {
       setCachedFileName(file.name)
 
       return new Promise((resolve, reject) => {
-        Papa.parse<Record<string, string>>(text, {
+        Papa.parse<CsvRawRow>(text, {
           header: true,
           skipEmptyLines: true,
           transformHeader: (header: string) => header.trim(),
@@ -202,10 +176,7 @@ export function useCSVUpload() {
 
   // Pure function to normalize CSV: lowercase headers + add pricing columns
   // Uses cached parsed data to avoid re-parsing
-  const normalizeCsvHeaders = (
-    parsedData: Record<string, string>[],
-    previewData: CsvPreviewItem[],
-  ): string => {
+  const normalizeCsvHeaders = (parsedData: CsvRawRow[], previewData: CsvPreviewItem[]): string => {
     if (!parsedData || parsedData.length === 0) {
       return ''
     }
@@ -510,15 +481,21 @@ export function useCSVUpload() {
     },
     updateCsvItemCostPrice: (index: number, newCostPrice: number) => {
       setCsvPreview(prev => {
-        // Validate: price must be between 0.01 and 1,000,000
-        const validatedPrice = Math.max(0.01, Math.min(1000000, newCostPrice))
+        // Validate: price must be within defined constraints
+        const validatedPrice = Math.max(
+          PRICE_CONSTRAINTS.MIN_PRICE,
+          Math.min(PRICE_CONSTRAINTS.MAX_PRICE, newCostPrice),
+        )
         return prev.map((item, i) => (i === index ? { ...item, Cost_Price: validatedPrice } : item))
       })
     },
     updateCsvItemSellingPrice: (index: number, newSellingPrice: number) => {
       setCsvPreview(prev => {
-        // Validate: price must be between 0.01 and 1,000,000
-        const validatedPrice = Math.max(0.01, Math.min(1000000, newSellingPrice))
+        // Validate: price must be within defined constraints
+        const validatedPrice = Math.max(
+          PRICE_CONSTRAINTS.MIN_PRICE,
+          Math.min(PRICE_CONSTRAINTS.MAX_PRICE, newSellingPrice),
+        )
         return prev.map((item, i) =>
           i === index ? { ...item, Selling_Price: validatedPrice } : item,
         )

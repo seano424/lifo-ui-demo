@@ -404,9 +404,11 @@
       "uploadFailed": "Upload Failed",
       "startFailed": "Failed to start upload. Please try again.",
       "invalidPricing": "Invalid pricing detected",
-      "invalidPricingDescription": "All cost and selling prices must be greater than 0",
-      "priceTooLow": "Must be greater than 0",
-      "databaseValidation": "Database validation failed. Check pricing values (must be > 0)"
+      "invalidPricingDescription": "All cost and selling prices must be at least 0.01",
+      "priceTooLow": "Must be at least 0.01",
+      "databaseValidation": "Database validation failed. Check pricing values (must be >= 0.01)",
+      "noCachedData": "No cached data available. Please preview the file first.",
+      "allItemsExpired": "All items have expired (>7 days past expiry). Please update expiry dates and try again."
     },
     "performanceInfo": {
       "title": "Bulk-Optimized Ultra-Fast Performance",
