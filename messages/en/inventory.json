@@ -356,6 +356,8 @@
         "productName": "Product Name",
         "category": "Category",
         "quantity": "Qty",
+        "costPrice": "Cost Price",
+        "sellingPrice": "Selling Price",
         "expiryDate": "Expiry Date"
       },
       "selectDate": "Select date",

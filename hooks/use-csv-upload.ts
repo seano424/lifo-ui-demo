@@ -34,6 +34,8 @@ interface CsvPreviewItem {
   Category: string
   Quantity: number
   Expiry_Date: string
+  Cost_Price: number
+  Selling_Price: number
   [key: string]: string | number // Allow additional columns
 }
 
@@ -53,101 +55,189 @@ export function useCSVUpload() {
 
   // Simple CSV preview (first 10 rows)
   const previewCsvFile = async (file: File): Promise<CsvPreviewItem[]> => {
-    const text = await file.text()
-    const lines = text.trim().split('\n')
+    try {
+      const text = await file.text()
+      const lines = text.trim().split('\n')
 
-    if (lines.length < 2) {
-      return []
-    }
+      if (lines.length < 2) {
+        throw new Error('CSV file is empty or has no data rows')
+      }
 
-    const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''))
+      const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''))
 
-    const preview: CsvPreviewItem[] = []
+      const preview: CsvPreviewItem[] = []
 
-    // Helper: convert common date formats (dd/mm/yyyy, dd-mm-yyyy, yyyy-mm-dd) to ISO yyyy-MM-dd
-    const convertToISODate = (raw: string): string => {
-      if (!raw) return ''
-      const s = raw.trim()
+      // Helper: convert common date formats (dd/mm/yyyy, dd-mm-yyyy, yyyy-mm-dd) to ISO yyyy-MM-dd
+      const convertToISODate = (raw: string): string => {
+        if (!raw) return ''
+        const s = raw.trim()
 
-      // Already ISO-like: 2025-10-18
-      if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s
+        // Already ISO-like: 2025-10-18
+        if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s
 
-      // dd/mm/yyyy or dd-mm-yyyy
-      const dmY = s.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{2,4})$/)
-      if (dmY) {
-        const day = dmY[1].padStart(2, '0')
-        const month = dmY[2].padStart(2, '0')
-        let year = dmY[3]
-        if (year.length === 2) {
-          // Assume 20xx for two-digit years
-          year = `20${year}`
+        // dd/mm/yyyy or dd-mm-yyyy
+        const dmY = s.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{2,4})$/)
+        if (dmY) {
+          const day = dmY[1].padStart(2, '0')
+          const month = dmY[2].padStart(2, '0')
+          let year = dmY[3]
+          if (year.length === 2) {
+            // Assume 20xx for two-digit years
+            year = `20${year}`
+          }
+          // Basic validation
+          if (+month >= 1 && +month <= 12 && +day >= 1 && +day <= 31) {
+            return `${year}-${month}-${day}`
+          }
         }
-        // Basic validation
-        if (+month >= 1 && +month <= 12 && +day >= 1 && +day <= 31) {
-          return `${year}-${month}-${day}`
+
+        // Fallback: try Date parse, then format
+        const parsed = new Date(s)
+        if (!Number.isNaN(parsed.getTime())) {
+          const y = parsed.getFullYear()
+          const m = String(parsed.getMonth() + 1).padStart(2, '0')
+          const d = String(parsed.getDate()).padStart(2, '0')
+          return `${y}-${m}-${d}`
         }
+
+        return ''
       }
 
-      // Fallback: try Date parse, then format
-      const parsed = new Date(s)
-      if (!Number.isNaN(parsed.getTime())) {
-        const y = parsed.getFullYear()
-        const m = String(parsed.getMonth() + 1).padStart(2, '0')
-        const d = String(parsed.getDate()).padStart(2, '0')
-        return `${y}-${m}-${d}`
-      }
+      const skuIndex = headers.findIndex(h => h.toLowerCase().includes('sku'))
+      const nameIndex = headers.findIndex(h => h.toLowerCase().includes('name'))
+      const categoryIndex = headers.findIndex(h => h.toLowerCase().includes('category'))
+      const qtyIndex = headers.findIndex(h => h.toLowerCase().includes('quantity'))
+      const expiryIndex = headers.findIndex(h => h.toLowerCase().includes('expiry'))
+      const costPriceIndex = headers.findIndex(
+        h => h.toLowerCase().includes('cost') && h.toLowerCase().includes('price'),
+      )
+      const sellingPriceIndex = headers.findIndex(
+        h => h.toLowerCase().includes('selling') && h.toLowerCase().includes('price'),
+      )
 
-      return ''
-    }
+      const hasExpiryColumn = expiryIndex >= 0
+      let _itemsWithoutExpiry = 0
 
-    const skuIndex = headers.findIndex(h => h.toLowerCase().includes('sku'))
-    const nameIndex = headers.findIndex(h => h.toLowerCase().includes('name'))
-    const categoryIndex = headers.findIndex(h => h.toLowerCase().includes('category'))
-    const qtyIndex = headers.findIndex(h => h.toLowerCase().includes('quantity'))
-    const expiryIndex = headers.findIndex(h => h.toLowerCase().includes('expiry'))
-
-    const hasExpiryColumn = expiryIndex >= 0
-    let _itemsWithoutExpiry = 0
-
-    for (let i = 1; i < lines.length; i++) {
-      const values = lines[i].split(',').map(v => v.trim().replace(/"/g, ''))
-      const rawExpiry = values[expiryIndex] || ''
-      const expiryValue = convertToISODate(rawExpiry)
-      if (!expiryValue) {
-        _itemsWithoutExpiry++
-      }
-
-      const previewItem = {
-        SKU: values[skuIndex] || `AUTO-${i}`,
-        Product_Name: values[nameIndex] || 'Unknown Product',
-        Category: values[categoryIndex] || CSV_PROCESSING.DEFAULT_CATEGORY,
-        Quantity: parseInt(values[qtyIndex] || '1', 10) || 1,
-        Expiry_Date: expiryValue,
-      }
-
-      preview.push(previewItem)
-    }
-
-    // Count total items without expiry in the entire file (not just preview)
-    let totalItemsWithoutExpiry = 0
-    if (!hasExpiryColumn) {
-      totalItemsWithoutExpiry = lines.length - 1 // All data rows
-    } else {
-      // Count empty expiry dates in the entire file (use normalized ISO)
       for (let i = 1; i < lines.length; i++) {
         const values = lines[i].split(',').map(v => v.trim().replace(/"/g, ''))
         const rawExpiry = values[expiryIndex] || ''
         const expiryValue = convertToISODate(rawExpiry)
         if (!expiryValue) {
-          totalItemsWithoutExpiry++
+          _itemsWithoutExpiry++
+        }
+
+        // Parse pricing values with defaults (0.01 to satisfy DB constraint > 0)
+        const costPrice = parseFloat(values[costPriceIndex] || '') || 0.01
+        const sellingPrice = parseFloat(values[sellingPriceIndex] || '') || 0.01
+
+        const previewItem = {
+          SKU: values[skuIndex] || `AUTO-${i}`,
+          Product_Name: values[nameIndex] || 'Unknown Product',
+          Category: values[categoryIndex] || CSV_PROCESSING.DEFAULT_CATEGORY,
+          Quantity: parseInt(values[qtyIndex] || '1', 10) || 1,
+          Expiry_Date: expiryValue,
+          Cost_Price: costPrice,
+          Selling_Price: sellingPrice,
+        }
+
+        preview.push(previewItem)
+      }
+
+      // Count total items without expiry in the entire file (not just preview)
+      let totalItemsWithoutExpiry = 0
+      if (!hasExpiryColumn) {
+        totalItemsWithoutExpiry = lines.length - 1 // All data rows
+      } else {
+        // Count empty expiry dates in the entire file (use normalized ISO)
+        for (let i = 1; i < lines.length; i++) {
+          const values = lines[i].split(',').map(v => v.trim().replace(/"/g, ''))
+          const rawExpiry = values[expiryIndex] || ''
+          const expiryValue = convertToISODate(rawExpiry)
+          if (!expiryValue) {
+            totalItemsWithoutExpiry++
+          }
         }
       }
+
+      setColumnMapping({ hasExpiryColumn, itemsWithoutExpiry: totalItemsWithoutExpiry })
+      setCsvPreview(preview)
+      setIsPreviewReady(true)
+      return preview
+    } catch (error) {
+      console.error('🔍 [CSV-PREVIEW-ERROR] Failed to parse CSV file:', error)
+
+      // Reset state on error
+      setCsvPreview([])
+      setIsPreviewReady(false)
+      setColumnMapping({ hasExpiryColumn: false, itemsWithoutExpiry: 0 })
+
+      // Re-throw error with user-friendly message
+      const errorMessage = error instanceof Error ? error.message : 'Failed to parse CSV file'
+      throw new Error(`CSV parsing failed: ${errorMessage}`)
+    }
+  }
+
+  // Helper function to normalize CSV: lowercase headers + remove ALL quotes + add pricing columns
+  const normalizeCsvHeaders = (csvContent: string): string => {
+    const lines = csvContent.trim().split('\n')
+    if (lines.length === 0) return csvContent
+
+    const originalHeader = lines[0]
+
+    // Parse and normalize the header line (NO quotes)
+    const headers = lines[0].split(',').map(h => {
+      const cleaned = h.trim().replace(/"/g, '')
+      return cleaned.toLowerCase().replace(/\s+/g, '_')
+    })
+
+    // ✅ Add pricing columns if missing (to satisfy database constraints)
+    // Database requires: cost_price IS NULL OR cost_price > 0
+    // Backend bug: defaults to 0 instead of NULL, which violates constraint
+    const hasCostPrice = headers.some(h => h.includes('cost') && h.includes('price'))
+    const hasSellingPrice = headers.some(h => h.includes('selling') && h.includes('price'))
+
+    if (!hasCostPrice) {
+      headers.push('cost_price')
+      console.log('🔍 [CSV-NORMALIZE] Added missing cost_price column')
+    }
+    if (!hasSellingPrice) {
+      headers.push('selling_price')
+      console.log('🔍 [CSV-NORMALIZE] Added missing selling_price column')
     }
 
-    setColumnMapping({ hasExpiryColumn, itemsWithoutExpiry: totalItemsWithoutExpiry })
-    setCsvPreview(preview)
-    setIsPreviewReady(true)
-    return preview
+    const normalizedHeader = headers.join(',')
+
+    // ✅ Remove quotes from ALL data rows + add pricing values from csvPreview
+    const normalizedDataRows = lines.slice(1).map((line, index) => {
+      // Split by comma, remove quotes from each value
+      const values = line.split(',').map(v => v.trim().replace(/"/g, ''))
+
+      // Add pricing values from preview (or defaults if not in preview yet)
+      // Index matches data row index in csvPreview
+      if (!hasCostPrice) {
+        const costPrice = csvPreview[index]?.Cost_Price || 0.01
+        values.push(costPrice.toString())
+      }
+      if (!hasSellingPrice) {
+        const sellingPrice = csvPreview[index]?.Selling_Price || 0.01
+        values.push(sellingPrice.toString())
+      }
+
+      return values.join(',')
+    })
+
+    const result = [normalizedHeader, ...normalizedDataRows].join('\n')
+
+    // 🐛 DEBUG: Log transformation
+    console.log('🔍 [CSV-NORMALIZE] Original header:', originalHeader)
+    console.log('🔍 [CSV-NORMALIZE] Normalized header:', normalizedHeader)
+    console.log('🔍 [CSV-NORMALIZE] Total rows (including header):', lines.length)
+    console.log(
+      '🔍 [CSV-NORMALIZE] First 3 normalized data rows:',
+      normalizedDataRows.slice(0, 3).join('\n'),
+    )
+
+    return result
   }
 
   const mutation = useMutation({
@@ -191,29 +281,41 @@ export function useCSVUpload() {
           )
         }
 
-        // Rebuild CSV with only valid items, preserving all original columns
+        // ✅ Rebuild CSV using validItems (which already have parsed dates)
+        // This avoids re-parsing dates which can fail with DD-MM-YYYY format
         const originalText = await file.text()
         const allLines = originalText.trim().split('\n')
         const headerLine = allLines[0]
-        const originalHeaders = headerLine.split(',').map(h => h.trim().replace(/"/g, ''))
 
-        const expiryIndex = originalHeaders.findIndex(h => h.toLowerCase().includes('expiry'))
+        // Create a Set of valid SKUs for efficient lookup
+        const validSkus = new Set(validItems.map(item => item.SKU))
+
+        // Parse original CSV to find matching rows
+        const originalHeaders = headerLine.split(',').map(h => h.trim().replace(/"/g, ''))
+        const skuIndex = originalHeaders.findIndex(h => h.toLowerCase().includes('sku'))
 
         const validRowLines = [headerLine]
         for (let i = 1; i < allLines.length; i++) {
           const values = allLines[i].split(',').map(v => v.trim().replace(/"/g, ''))
-          const expiryDateStr = values[expiryIndex] || ''
-          if (expiryDateStr) {
-            const expiryDate = new Date(expiryDateStr)
-            if (expiryDate >= sevenDaysAgo) {
-              validRowLines.push(allLines[i])
-            }
+          const sku = values[skuIndex] || ''
+          // Include row if its SKU is in the validItems set
+          if (validSkus.has(sku)) {
+            validRowLines.push(allLines[i])
           }
         }
 
         const csvContent = validRowLines.join('\n')
+        // ✅ Normalize headers to lowercase before uploading
+        const normalizedContent = normalizeCsvHeaders(csvContent)
 
-        fileToUpload = new File([csvContent], file.name, {
+        fileToUpload = new File([normalizedContent], file.name, {
+          type: 'text/csv',
+        })
+      } else {
+        // ✅ No filtering needed, but still normalize headers
+        const originalText = await file.text()
+        const normalizedContent = normalizeCsvHeaders(originalText)
+        fileToUpload = new File([normalizedContent], file.name, {
           type: 'text/csv',
         })
       }
@@ -230,6 +332,9 @@ export function useCSVUpload() {
 
       if (!response.ok) {
         const error = await response.json()
+
+        // 🐛 DEBUG: Log the full error to investigate 400 errors
+        console.error('🔍 [CSV-UPLOAD-ERROR] Full error response:', JSON.stringify(error, null, 2))
 
         // ✅ Enhanced error handling for validation failures
         if (response.status === 422 && error.common_errors) {
@@ -249,7 +354,20 @@ export function useCSVUpload() {
           throw new Error(errorMessage)
         }
 
-        throw new Error(error.error || `Upload failed: ${response.statusText}`)
+        // ✅ FIX: Properly stringify error messages (handle objects)
+        let errorMessage = 'Upload failed'
+        if (error.error) {
+          errorMessage = typeof error.error === 'string' ? error.error : JSON.stringify(error.error)
+        } else if (error.message) {
+          errorMessage = error.message
+        } else if (error.detail) {
+          errorMessage =
+            typeof error.detail === 'string' ? error.detail : JSON.stringify(error.detail)
+        } else {
+          errorMessage = `Upload failed: ${response.statusText}`
+        }
+
+        throw new Error(errorMessage)
       }
 
       const result = await response.json()
@@ -304,8 +422,16 @@ export function useCSVUpload() {
       })
     },
     onError: (error: Error) => {
-      toast.error(`Upload failed: ${error.message}`, {
-        description: 'Please check your CSV format and try again',
+      // Enhanced error handling to prevent app crashes
+      console.error('🔍 [CSV-UPLOAD-ERROR] Upload mutation failed:', error)
+
+      const errorMessage = error?.message || 'Unknown error occurred'
+      const errorDescription = errorMessage.includes('constraint')
+        ? 'Database validation failed. Please check your pricing values (must be greater than 0).'
+        : 'Please check your CSV format and try again'
+
+      toast.error(`Upload failed: ${errorMessage}`, {
+        description: errorDescription,
         duration: TOAST_DURATIONS.ERROR,
       })
     },
@@ -361,6 +487,20 @@ export function useCSVUpload() {
     updateCsvItemCategory: (index: number, newCategory: string) => {
       setCsvPreview(prev => {
         return prev.map((item, i) => (i === index ? { ...item, Category: newCategory } : item))
+      })
+    },
+    updateCsvItemCostPrice: (index: number, newCostPrice: number) => {
+      setCsvPreview(prev => {
+        return prev.map((item, i) =>
+          i === index ? { ...item, Cost_Price: Math.max(0.01, newCostPrice) } : item,
+        )
+      })
+    },
+    updateCsvItemSellingPrice: (index: number, newSellingPrice: number) => {
+      setCsvPreview(prev => {
+        return prev.map((item, i) =>
+          i === index ? { ...item, Selling_Price: Math.max(0.01, newSellingPrice) } : item,
+        )
       })
     },
   }

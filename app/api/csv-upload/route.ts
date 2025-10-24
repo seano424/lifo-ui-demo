@@ -63,9 +63,21 @@ export async function POST(request: NextRequest) {
     // The /upload endpoint only validates, /upload-and-create-batches actually persists data
     const uploadUrl = `${fastapiUrl}/api/v1/csv-upload/upload-and-create-batches`
 
-    // Create new FormData for FastAPI
+    // 🐛 DEBUG: Log the actual file contents being sent to backend
+    const fileContent = await file.text()
+    const firstLines = fileContent.split('\n').slice(0, 3).join('\n')
+    console.log('🔍 [CSV-API-DEBUG] File being sent to backend:', {
+      fileName: file.name,
+      fileSize: file.size,
+      firstLines,
+    })
+
+    // Create new FormData for FastAPI (need to recreate file since we read it)
+    const fileBlob = new Blob([fileContent], { type: 'text/csv' })
+    const fileToSend = new File([fileBlob], file.name, { type: 'text/csv' })
+
     const fastApiFormData = new FormData()
-    fastApiFormData.append('file', file)
+    fastApiFormData.append('file', fileToSend)
     fastApiFormData.append('store_id', storeId)
 
     const startTime = Date.now()
@@ -90,15 +102,49 @@ export async function POST(request: NextRequest) {
         processingTime,
       })
 
+      // 🐛 DEBUG: Log the full error response for investigation
+      console.error('🔍 [CSV-API-ERROR] Backend error response:', {
+        status: response.status,
+        errorText: errorText.substring(0, 500), // Log first 500 chars
+        fullLength: errorText.length,
+      })
+
       let errorMessage = 'Upload failed'
+      let errorDetails = null
+
       try {
         const errorJson = JSON.parse(errorText)
-        errorMessage = errorJson.error || errorJson.detail || errorMessage
-      } catch {
+
+        // Extract error message from various possible fields
+        errorMessage = errorJson.error || errorJson.message || errorJson.detail || errorMessage
+
+        // If error message is still an object, stringify it
+        if (typeof errorMessage === 'object') {
+          errorMessage = JSON.stringify(errorMessage)
+        }
+
+        // Preserve full error details for debugging
+        errorDetails = errorJson
+
+        console.error('🔍 [CSV-API-ERROR] Parsed error:', {
+          message: errorMessage,
+          hasDetails: !!errorDetails,
+          detailKeys: errorDetails ? Object.keys(errorDetails) : [],
+        })
+      } catch (parseError) {
         errorMessage = errorText || errorMessage
+        console.error('🔍 [CSV-API-ERROR] Failed to parse error JSON:', parseError)
       }
 
-      return NextResponse.json({ error: errorMessage }, { status: response.status })
+      // Return both user-friendly message and full details for debugging
+      return NextResponse.json(
+        {
+          error: errorMessage,
+          details: errorDetails,
+          status: response.status,
+        },
+        { status: response.status },
+      )
     }
 
     const result = await response.json()

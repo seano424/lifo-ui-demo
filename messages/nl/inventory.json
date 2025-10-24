@@ -355,6 +355,8 @@
         "productName": "Productnaam",
         "category": "Categorie",
         "quantity": "Aantal",
+        "costPrice": "Kostprijs",
+        "sellingPrice": "Verkoopprijs",
         "expiryDate": "Vervaldatum"
       },
       "selectDate": "Selecteer datum",

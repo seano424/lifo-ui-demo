@@ -51,6 +51,8 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
     updateCsvItemQuantity,
     updateCsvItemSku,
     updateCsvItemProductName,
+    updateCsvItemCostPrice,
+    updateCsvItemSellingPrice,
   } = useCSVUpload()
 
   const handleDrag = (e: React.DragEvent) => {
@@ -75,20 +77,32 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
   }
 
   const handleFileSelect = async (file: File) => {
-    // Comprehensive file validation
-    const validation = validateUploadFile(file)
-    if (!validation.isValid) {
-      toast.error(validation.error || t('errors.invalidFile'))
-      return
-    }
-
-    setSelectedFile(file)
-
     try {
+      // Comprehensive file validation
+      const validation = validateUploadFile(file)
+      if (!validation.isValid) {
+        toast.error(validation.error || t('errors.invalidFile'))
+        return
+      }
+
+      setSelectedFile(file)
+
       await previewCsvFile(file)
     } catch (error) {
       console.error('💥 [CSV-UPLOAD-FORM] File analysis failed:', error)
-      toast.error(t('errors.analysisFailure'))
+
+      // Enhanced error handling
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+
+      toast.error(t('errors.analysisFailure'), {
+        description:
+          process.env.NODE_ENV === 'development'
+            ? errorMessage
+            : 'Failed to parse CSV file. Please check the file format.',
+      })
+
+      // Reset file selection on error
+      setSelectedFile(null)
     }
   }
 
@@ -104,6 +118,18 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
     }
 
     try {
+      // Validate pricing values before upload
+      const invalidPricing = csvPreview.some(
+        item => item.Cost_Price <= 0 || item.Selling_Price <= 0,
+      )
+
+      if (invalidPricing) {
+        toast.error('Invalid pricing detected', {
+          description: 'All cost and selling prices must be greater than 0',
+        })
+        return
+      }
+
       upload({
         file: selectedFile,
         storeId,
@@ -112,13 +138,13 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
     } catch (error) {
       console.error('CSV upload failed:', error)
 
-      // Error mapping for better user feedback
+      // Enhanced error handling to prevent app crashes
       const errorMessage = error instanceof Error ? error.message : 'Unknown error'
       const lowerMessage = errorMessage.toLowerCase()
 
       const errorMappings = [
         {
-          keywords: ['network', 'fetch'],
+          keywords: ['network', 'fetch', 'connection'],
           message: t('errors.analysisFailure'),
         },
         {
@@ -132,6 +158,10 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
         {
           keywords: ['too large', 'size'],
           message: t('errors.invalidFile'),
+        },
+        {
+          keywords: ['constraint', 'pricing'],
+          message: 'Database validation failed. Check pricing values (must be > 0)',
         },
       ]
 
@@ -306,6 +336,12 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                       {t('preview.table.quantity')}
                     </th>
                     <th className="border border-gray-200 p-2 text-left">
+                      {t('preview.table.costPrice')}
+                    </th>
+                    <th className="border border-gray-200 p-2 text-left">
+                      {t('preview.table.sellingPrice')}
+                    </th>
+                    <th className="border border-gray-200 p-2 text-left">
                       {t('preview.table.expiryDate')}
                     </th>
                   </tr>
@@ -357,6 +393,36 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                               <Plus className="h-3 w-3" />
                             </Button>
                           </div>
+                        </td>
+                        <td className="border border-gray-200 p-2">
+                          <Input
+                            type="number"
+                            value={item.Cost_Price}
+                            onChange={e =>
+                              updateCsvItemCostPrice(
+                                actualIndex,
+                                parseFloat(e.target.value) || 0.01,
+                              )
+                            }
+                            className="font-mono text-xs h-7 min-w-[80px]"
+                            min="0.01"
+                            step="0.01"
+                          />
+                        </td>
+                        <td className="border border-gray-200 p-2">
+                          <Input
+                            type="number"
+                            value={item.Selling_Price}
+                            onChange={e =>
+                              updateCsvItemSellingPrice(
+                                actualIndex,
+                                parseFloat(e.target.value) || 0.01,
+                              )
+                            }
+                            className="font-mono text-xs h-7 min-w-[80px]"
+                            min="0.01"
+                            step="0.01"
+                          />
                         </td>
                         <td className="border border-gray-200 p-2">
                           {item.Expiry_Date ? (
@@ -439,6 +505,44 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                           >
                             <Plus className="h-3 w-3" />
                           </Button>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="space-y-1">
+                          <label className="text-xs font-medium text-gray-700">
+                            {t('preview.table.costPrice')}
+                          </label>
+                          <Input
+                            type="number"
+                            value={item.Cost_Price}
+                            onChange={e =>
+                              updateCsvItemCostPrice(
+                                actualIndex,
+                                parseFloat(e.target.value) || 0.01,
+                              )
+                            }
+                            className="text-sm h-8"
+                            min="0.01"
+                            step="0.01"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-xs font-medium text-gray-700">
+                            {t('preview.table.sellingPrice')}
+                          </label>
+                          <Input
+                            type="number"
+                            value={item.Selling_Price}
+                            onChange={e =>
+                              updateCsvItemSellingPrice(
+                                actualIndex,
+                                parseFloat(e.target.value) || 0.01,
+                              )
+                            }
+                            className="text-sm h-8"
+                            min="0.01"
+                            step="0.01"
+                          />
                         </div>
                       </div>
                       <div className="space-y-1">

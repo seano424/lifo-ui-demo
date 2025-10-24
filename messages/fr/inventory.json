@@ -355,6 +355,8 @@
         "productName": "Nom du produit",
         "category": "Catégorie",
         "quantity": "Qté",
+        "costPrice": "Prix de revient",
+        "sellingPrice": "Prix de vente",
         "expiryDate": "Date d'expiration"
       },
       "selectDate": "Sélectionner une date",
