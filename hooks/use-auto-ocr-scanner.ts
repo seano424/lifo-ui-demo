@@ -178,23 +178,20 @@ export function useAutoOCRScanner(options: AutoOCRScannerOptions): AutoOCRScanne
       const duration = performance.now() - startTime
 
       // Calculate reason for OCR trigger decision
+      // NOTE: Text confidence is no longer a hard requirement (it's factored into overall score)
       const reason = analysis.shouldTriggerOCR
         ? 'All thresholds met'
-        : !analysis.hasTextLikeContent
-          ? `No text detected (edges: ${analysis.debugInfo?.edgePercentage.toFixed(1)}%)`
-          : analysis.textConfidence < minTextConfidence
-            ? `Text confidence too low (${(analysis.textConfidence * 100).toFixed(0)}% < ${(minTextConfidence * 100).toFixed(0)}%)`
-            : !analysis.hasDatePattern
-              ? 'No date pattern detected'
-              : analysis.datePatternConfidence < minDateConfidence
-                ? `Date pattern confidence too low (${(analysis.datePatternConfidence * 100).toFixed(0)}% < ${(minDateConfidence * 100).toFixed(0)}%)`
-                : analysis.brightness <= 0.2
-                  ? `Too dark (brightness: ${(analysis.brightness * 100).toFixed(0)}%)`
-                  : analysis.brightness >= 0.9
-                    ? `Overexposed (brightness: ${(analysis.brightness * 100).toFixed(0)}%)`
-                    : analysis.sharpness <= minSharpness
-                      ? `Too blurry (sharpness: ${(analysis.sharpness * 100).toFixed(0)}% < ${(minSharpness * 100).toFixed(0)}%)`
-                      : `Overall score too low (${(analysis.overallScore * 100).toFixed(0)}% < ${(minOverallScore * 100).toFixed(0)}%)`
+        : analysis.isBarcodeDetected
+          ? 'Barcode detected (wrong scanner mode)'
+          : analysis.datePatternConfidence < minDateConfidence
+            ? `Date pattern confidence too low (${(analysis.datePatternConfidence * 100).toFixed(0)}% < ${(minDateConfidence * 100).toFixed(0)}%)`
+            : analysis.brightness <= 0.2
+              ? `Too dark (brightness: ${(analysis.brightness * 100).toFixed(0)}%)`
+              : analysis.brightness >= 0.9
+                ? `Overexposed (brightness: ${(analysis.brightness * 100).toFixed(0)}%)`
+                : analysis.sharpness <= minSharpness
+                  ? `Too blurry (sharpness: ${(analysis.sharpness * 100).toFixed(0)}% < ${(minSharpness * 100).toFixed(0)}%)`
+                  : `Overall score too low (${(analysis.overallScore * 100).toFixed(0)}% < ${(minOverallScore * 100).toFixed(0)}%) - text: ${(analysis.textConfidence * 100).toFixed(0)}%, date: ${(analysis.datePatternConfidence * 100).toFixed(0)}%`
 
       // Store the reason in state
       setLastReason(reason)
