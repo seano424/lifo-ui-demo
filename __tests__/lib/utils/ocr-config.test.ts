@@ -79,10 +79,10 @@ describe('ocr-config', () => {
     it('should have scanning behavior constants', () => {
       expect(OCR_DEFAULTS.SCANNING.PRE_CHECK_INTERVAL_MS).toBe(500)
       expect(OCR_DEFAULTS.SCANNING.MAX_ATTEMPTS).toBe(10)
-      expect(OCR_DEFAULTS.SCANNING.MIN_TEXT_CONFIDENCE).toBe(0.05)
-      expect(OCR_DEFAULTS.SCANNING.MIN_DATE_CONFIDENCE).toBe(0.4)
-      expect(OCR_DEFAULTS.SCANNING.MIN_OVERALL_SCORE).toBe(0.5)
-      expect(OCR_DEFAULTS.SCANNING.MIN_SHARPNESS).toBe(0.01)
+      expect(OCR_DEFAULTS.SCANNING.MIN_TEXT_CONFIDENCE).toBe(0.05) // Not a hard requirement - used in scoring only
+      expect(OCR_DEFAULTS.SCANNING.MIN_DATE_CONFIDENCE).toBe(0.35) // HARD requirement
+      expect(OCR_DEFAULTS.SCANNING.MIN_OVERALL_SCORE).toBe(0.3) // HARD requirement
+      expect(OCR_DEFAULTS.SCANNING.MIN_SHARPNESS).toBe(0.005) // HARD requirement
     })
 
     it('should have rate limiting constants', () => {
