@@ -277,7 +277,9 @@
       "donate": "Donate",
       "donatePrepared": "Donate Prepared",
       "dispose": "Dispose",
-      "maintain": "Maintain"
+      "maintain": "Maintain",
+      "sold": "Sold",
+      "ignored": "Ignored"
     },
     "status": {
       "all": "All Status",

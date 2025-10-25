@@ -247,7 +247,9 @@
       "donate": "Don",
       "donatePrepared": "Don préparé",
       "dispose": "Éliminer",
-      "maintain": "Maintenir"
+      "maintain": "Maintenir",
+      "sold": "Vendu",
+      "ignored": "Ignoré"
     },
     "status": {
       "all": "Tous les statuts",

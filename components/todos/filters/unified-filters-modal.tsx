@@ -46,6 +46,8 @@ const ACTION_OPTIONS: {
   },
   { value: 'maintain', translationKey: 'filters.action.maintain', color: 'secondary', emoji: '🔧' },
   { value: 'dispose', translationKey: 'filters.action.dispose', color: 'destructive', emoji: '🗑️' },
+  { value: 'sold', translationKey: 'filters.action.sold', color: 'default', emoji: '💰' },
+  { value: 'ignored', translationKey: 'filters.action.ignored', color: 'outline', emoji: '👁️' },
 ]
 
 const BATCH_STATUS_OPTIONS: {

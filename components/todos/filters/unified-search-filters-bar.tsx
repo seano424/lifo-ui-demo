@@ -56,6 +56,8 @@ export function UnifiedSearchFiltersBar({
     { value: 'donate_prepared', label: t('filters.action.donatePrepared'), emoji: '📦' },
     { value: 'maintain', label: t('filters.action.maintain'), emoji: '🔧' },
     { value: 'dispose', label: t('filters.action.dispose'), emoji: '🗑️' },
+    { value: 'sold', label: t('filters.action.sold'), emoji: '💰' },
+    { value: 'ignored', label: t('filters.action.ignored'), emoji: '👁️' },
   ]
 
   const BATCH_STATUS_OPTIONS = [

@@ -252,7 +252,9 @@
       "donate": "Doneren",
       "donatePrepared": "Doneren voorbereid",
       "maintain": "Onderhouden",
-      "dispose": "Wegdoen"
+      "dispose": "Wegdoen",
+      "sold": "Verkocht",
+      "ignored": "Genegeerd"
     },
     "batchStatus": {
       "title": "Batchstatus",
