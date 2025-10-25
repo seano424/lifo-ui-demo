@@ -1,59 +1,159 @@
-# Translation Tests
+# Translation Testing & Maintenance
 
-This folder contains tests specifically for validating the internationalization (i18n) system.
+This directory contains tools to ensure translation consistency and quality across all language files.
 
-## Test Files
+## 🧪 Tests Available
 
-### `translation-missing-keys.test.ts`
+### 1. Translation Consistency Test
 
-Tests for missing translation keys across all supported languages.
+**File:** `translation-consistency.test.ts`
 
-**What it checks:**
+**Purpose:** Ensures all translation files have:
 
-- ✅ All languages have the same translation keys
-- ❌ Missing keys in any language
-- ⚠️ Extra keys in any language (warnings)
+- ✅ Identical key structure across languages
+- ✅ Consistent key ordering (uses English as reference)
+- ✅ No missing or extra keys
 
-**Usage:**
+**Run:**
 
 ```bash
-# Run translation tests
-npm run test:translations
-
-# Run all tests including translations
-npm test
+npm run test:translation-order
 ```
 
-## Supported Languages
+### 2. Missing Translation Keys Test
 
-- 🇬🇧 English (en) - Base language
-- 🇫🇷 French (fr) - Complete translations
-- 🇳🇱 Dutch (nl) - Complete translations
+**File:** `translation-missing-keys.test.ts`
 
-## Translation Files Covered
+**Purpose:** Finds hardcoded text that should be translated
 
-- `auth.json` - Authentication forms and errors
-- `common.json` - Shared UI elements and actions
-- `dashboard.json` - Dashboard, KPIs, and analytics
-- `inventory.json` - Product and inventory management
-- `marketing.json` - Landing pages and public content
-- `onboarding.json` - User onboarding flow
-- `settings.json` - User settings and preferences
-- `todos.json` - Todo management
-- `ocr.json` - OCR scanning features
-- `donation.json` - Donation workflows
-- `terms.json` - Terms of service
-- `privacy.json` - Privacy policy
+**Run:**
 
-## Adding New Translation Tests
+```bash
+npm run test:translations
+```
 
-When adding new translation tests:
+### 3. Hardcoded Text Test
 
-1. Place them in this `__tests__/translations/` folder
-2. Follow the naming convention: `*.test.ts`
-3. Update this README to document the new test
-4. Consider adding a new npm script if needed
+**File:** `hardcoded-text.test.ts`
 
-## Integration
+**Purpose:** Detects hardcoded English text in components
 
-These tests are designed to run in CI/CD pipelines to catch translation issues before deployment.
+**Run:**
+
+```bash
+npm run test:hardcoded-text
+```
+
+## 🔧 Maintenance Tools
+
+### Fix Translation Order
+
+**Script:** `scripts/fix-translation-order.js`
+
+**Purpose:** Automatically reorders translation keys to match English reference
+
+**Run:**
+
+```bash
+npm run fix-translation-order
+```
+
+**What it does:**
+
+- Uses English (`en`) as the reference language
+- Reorders French (`fr`) and Dutch (`nl`) files to match English key order
+- Preserves all translation values
+- Only reorders, never adds or removes keys
+
+## 📁 File Structure
+
+```
+messages/
+├── en/                    # English (reference language)
+│   ├── auth.json
+│   ├── common.json
+│   ├── dashboard.json
+│   ├── dashboard-admin.json
+│   ├── dashboard-data.json
+│   └── ...
+├── fr/                    # French
+│   └── (same structure)
+└── nl/                    # Dutch
+    └── (same structure)
+```
+
+## 🎯 Best Practices
+
+### 1. Always Use English as Reference
+
+- English files should be updated first
+- Other languages should follow English key order
+- New keys should be added in the same position across all languages
+
+### 2. Key Naming Convention
+
+- Use dot notation for nested keys: `dashboard.welcome.title`
+- Use camelCase for multi-word keys: `quickActions`
+- Be descriptive: `filters.action.sold` not `filters.a.s`
+
+### 3. Translation Workflow
+
+1. Add new keys to English files first
+2. Run `npm run test:translation-order` to check consistency
+3. Add translations to other languages
+4. Run `npm run fix-translation-order` if needed
+5. Verify all tests pass
+
+### 4. Quality Checks
+
+- Run all translation tests before committing
+- Ensure no hardcoded text in components
+- Verify all keys are translated in all languages
+
+## 🚨 Common Issues & Solutions
+
+### Issue: "Order mismatches" in test
+
+**Solution:** Run `npm run fix-translation-order`
+
+### Issue: "Missing keys" error
+
+**Solution:** Add the missing keys to the appropriate language files
+
+### Issue: "Extra keys" error
+
+**Solution:** Remove unused keys or add them to English reference
+
+### Issue: Hardcoded text detected
+
+**Solution:** Replace hardcoded text with translation keys using `useTranslations()`
+
+## 📊 Test Results
+
+When tests pass, you'll see:
+
+```
+✅ All translation files have consistent structure
+✅ All translation files have consistent key order
+✅ No missing translation keys detected
+✅ No hardcoded text found
+```
+
+When tests fail, you'll see detailed information about what needs to be fixed.
+
+## 🔄 CI/CD Integration
+
+Add these commands to your CI pipeline:
+
+```yaml
+- name: Test Translation Consistency
+  run: npm run test:translation-order
+
+- name: Test Missing Translations
+  run: npm run test:translations
+
+- name: Test Hardcoded Text
+  run: npm run test:hardcoded-text
+```
+
+This ensures translation quality is maintained across all deployments.

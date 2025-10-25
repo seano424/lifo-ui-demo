@@ -144,6 +144,43 @@
       "searchError": "Er is iets misgegaan tijdens het zoeken. Probeer het opnieuw."
     }
   },
+  "storeSettings": {
+    "addStoreDetails": {
+      "title": {
+        "manual": "Winkeldetails toevoegen",
+        "complete": "Winkelinformatie voltooien"
+      },
+      "subtitle": {
+        "manual": "Voer uw winkelinformatie in",
+        "complete": "Selecteer uw winkeltype en verifieer details"
+      },
+      "labels": {
+        "storeName": "Winkelnaam",
+        "businessName": "Bedrijfsnaam (optioneel)",
+        "address": "Adres",
+        "city": "Stad",
+        "postalCode": "Postcode",
+        "country": "Land",
+        "phone": "Telefoonnummer (optioneel)",
+        "storeType": "Winkeltype"
+      },
+      "placeholders": {
+        "storeName": "Uw winkelnaam",
+        "businessName": "Indien anders dan winkelnaam",
+        "address": "123 Hoofdstraat",
+        "city": "Amsterdam",
+        "postalCode": "1012 AB",
+        "country": "Nederland",
+        "phone": "020 123 4567",
+        "selectStoreType": "Selecteer winkeltype"
+      },
+      "buttons": {
+        "back": "Terug",
+        "creating": "Winkel aanmaken...",
+        "create": "Winkel aanmaken"
+      }
+    }
+  },
   "account": {
     "title": "Accountinformatie",
     "description": "Beheer uw accountinstellingen en voorkeuren.",
@@ -199,9 +236,9 @@
       "title": "Themavoorkeur",
       "description": "Kies uw voorkeursthema voor de interface",
       "currentTheme": "Huidig thema",
+      "system": "Systeem",
       "light": "Licht",
-      "dark": "Donker",
-      "system": "Systeem"
+      "dark": "Donker"
     },
     "status": {
       "title": "Accountstatus",
@@ -225,43 +262,6 @@
     },
     "security": {
       "notice": "Dit is uw persoonlijke account. U kunt uw wachtwoord wijzigen in de login pagina."
-    }
-  },
-  "storeSettings": {
-    "addStoreDetails": {
-      "title": {
-        "manual": "Winkeldetails toevoegen",
-        "complete": "Winkelinformatie voltooien"
-      },
-      "subtitle": {
-        "manual": "Voer uw winkelinformatie in",
-        "complete": "Selecteer uw winkeltype en verifieer details"
-      },
-      "labels": {
-        "storeName": "Winkelnaam",
-        "businessName": "Bedrijfsnaam (optioneel)",
-        "address": "Adres",
-        "city": "Stad",
-        "postalCode": "Postcode",
-        "country": "Land",
-        "phone": "Telefoonnummer (optioneel)",
-        "storeType": "Winkeltype"
-      },
-      "placeholders": {
-        "storeName": "Uw winkelnaam",
-        "businessName": "Indien anders dan winkelnaam",
-        "address": "123 Hoofdstraat",
-        "city": "Amsterdam",
-        "postalCode": "1012 AB",
-        "country": "Nederland",
-        "phone": "020 123 4567",
-        "selectStoreType": "Selecteer winkeltype"
-      },
-      "buttons": {
-        "back": "Terug",
-        "creating": "Winkel aanmaken...",
-        "create": "Winkel aanmaken"
-      }
     }
   }
 }

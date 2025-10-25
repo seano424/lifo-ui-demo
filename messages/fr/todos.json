@@ -225,12 +225,42 @@
     "filtersTitle": "Filtres",
     "sortTitle": "Trier",
     "searchPlaceholder": "Rechercher des produits...",
+    "activeFilters": "Filtres actifs",
     "clearAll": "Effacer tous les filtres",
     "apply": "Appliquer",
     "showFilters": "Afficher les filtres",
     "hideFilters": "Masquer les filtres",
     "currentSort": "Tri actuel",
     "resetSort": "Réinitialiser le tri",
+    "sortBy": "Trier par",
+    "sortDirection": "Direction du tri",
+    "ascending": "Croissant",
+    "descending": "Décroissant",
+    "expiry": {
+      "title": "Période d'expiration",
+      "all": "Tous les jours",
+      "expiringSoon": "Expire bientôt",
+      "recentlyExpired": "Récemment expiré",
+      "expiring": {
+        "all": "Tous expirants",
+        "3days": "3 jours",
+        "1week": "1 semaine",
+        "2weeks": "2 semaines",
+        "1month": "1 mois"
+      },
+      "expired": {
+        "all": "Tous expirés",
+        "3days": "Derniers 3 jours",
+        "1week": "Dernière semaine",
+        "2weeks": "Derniers 2 semaines",
+        "1month": "Dernier mois"
+      },
+      "general": {
+        "all": "Tous les dates",
+        "expiringSoon": "Expirant bientôt (7 jours)",
+        "recentlyExpired": "Expiré récemment (7 jours)"
+      }
+    },
     "urgency": {
       "title": "Niveau d'urgence",
       "all": "Tous les niveaux d'urgence",
@@ -264,31 +294,6 @@
       "completed": "Terminé",
       "title": "Statut du lot"
     },
-    "expiry": {
-      "title": "Période d'expiration",
-      "all": "Tous les jours",
-      "expiringSoon": "Expire bientôt",
-      "recentlyExpired": "Récemment expiré",
-      "expiring": {
-        "all": "Tous expirants",
-        "3days": "3 jours",
-        "1week": "1 semaine",
-        "2weeks": "2 semaines",
-        "1month": "1 mois"
-      },
-      "expired": {
-        "all": "Tous expirés",
-        "3days": "Derniers 3 jours",
-        "1week": "Dernière semaine",
-        "2weeks": "Derniers 2 semaines",
-        "1month": "Dernier mois"
-      },
-      "general": {
-        "all": "Tous les dates",
-        "expiringSoon": "Expirant bientôt (7 jours)",
-        "recentlyExpired": "Expiré récemment (7 jours)"
-      }
-    },
     "urgencyCount": "Urgence ({count})",
     "filterByUrgency": "Filtrer par urgence",
     "actionsCount": "Actions ({count})",
@@ -297,15 +302,7 @@
     "filterByStatus": "Filtrer par statut",
     "activeUrgency": "Urgence : {urgency}",
     "activeAction": "Action : {action}",
-    "activeStatus": "Statut : {status}",
-    "sortBy": "Trier par",
-    "sortDirection": "Direction du tri",
-    "ascending": "Croissant",
-    "descending": "Décroissant",
-    "activeFilters": "Filtres actifs"
-  },
-  "common": {
-    "cancel": "Annuler"
+    "activeStatus": "Statut : {status}"
   },
   "search": {
     "placeholder": "Rechercher des produits...",
@@ -364,5 +361,8 @@
     "loadingMore": "Chargement de plus de tâches...",
     "scrollToLoad": "Faites défiler pour charger plus ({count} chargés)",
     "updating": "Mise à jour..."
+  },
+  "common": {
+    "cancel": "Annuler"
   }
 }

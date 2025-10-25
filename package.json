@@ -14,6 +14,8 @@
     "test:coverage": "jest --coverage",
     "test:translations": "jest translation-missing-keys",
     "test:hardcoded-text": "jest hardcoded-text",
+    "test:translation-order": "jest translation-consistency",
+    "fix-translation-order": "node scripts/fix-translation-order.js",
     "supabase": "supabase",
     "supabase:login": "supabase login",
     "supabase:start": "supabase start",

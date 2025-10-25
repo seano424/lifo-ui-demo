@@ -242,8 +242,8 @@
     }
   },
   "pricingpage": {
-    "contactUs": "Contact us for questions",
     "title": "Choose Your Plan",
+    "contactUs": "Contact us for questions",
     "subtitle": "Start with our free trial and scale as you grow. No lock-in, full support included.",
     "badges": {
       "mostPopular": "Most Popular",

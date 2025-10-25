@@ -236,33 +236,6 @@
     "sortDirection": "Sorteerrichting",
     "ascending": "Oplopend",
     "descending": "Aflopend",
-    "urgency": {
-      "title": "Urgentieniveau",
-      "all": "Alle urgentieniveaus",
-      "critical": "Kritiek",
-      "high": "Hoog",
-      "medium": "Gemiddeld",
-      "low": "Laag",
-      "none": "Geen"
-    },
-    "action": {
-      "title": "Actietype",
-      "all": "Alle acties",
-      "discount": "Korting",
-      "donate": "Doneren",
-      "donatePrepared": "Doneren voorbereid",
-      "maintain": "Onderhouden",
-      "dispose": "Wegdoen",
-      "sold": "Verkocht",
-      "ignored": "Genegeerd"
-    },
-    "batchStatus": {
-      "title": "Batchstatus",
-      "all": "Alle statussen",
-      "active": "Actief",
-      "expired": "Verlopen",
-      "completed": "Voltooid"
-    },
     "expiry": {
       "title": "Vervalperiode",
       "all": "Alle dagen",
@@ -288,11 +261,38 @@
         "recentlyExpired": "Recent verlopen (7 dagen)"
       }
     },
+    "urgency": {
+      "title": "Urgentieniveau",
+      "all": "Alle urgentieniveaus",
+      "critical": "Kritiek",
+      "high": "Hoog",
+      "medium": "Gemiddeld",
+      "low": "Laag",
+      "none": "Geen"
+    },
+    "action": {
+      "title": "Actietype",
+      "all": "Alle acties",
+      "discount": "Korting",
+      "donate": "Doneren",
+      "donatePrepared": "Doneren voorbereid",
+      "dispose": "Wegdoen",
+      "maintain": "Onderhouden",
+      "sold": "Verkocht",
+      "ignored": "Genegeerd"
+    },
     "status": {
       "all": "Alle statussen",
       "active": "Actief",
       "expired": "Verlopen",
       "title": "Batch status"
+    },
+    "batchStatus": {
+      "all": "Alle statussen",
+      "active": "Actief",
+      "expired": "Verlopen",
+      "completed": "Voltooid",
+      "title": "Batchstatus"
     },
     "urgencyCount": "Urgentie ({count})",
     "filterByUrgency": "Filteren op urgentie",
@@ -303,9 +303,6 @@
     "activeUrgency": "Urgentie: {urgency}",
     "activeAction": "Actie: {action}",
     "activeStatus": "Status: {status}"
-  },
-  "common": {
-    "cancel": "Annuleren"
   },
   "search": {
     "placeholder": "Zoek producten...",
@@ -364,5 +361,8 @@
     "loadingMore": "Meer taken laden...",
     "scrollToLoad": "Scroll om meer te laden ({count} geladen)",
     "updating": "Bijwerken..."
+  },
+  "common": {
+    "cancel": "Annuleren"
   }
 }
