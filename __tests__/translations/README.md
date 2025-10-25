@@ -4,7 +4,26 @@ This directory contains tools to ensure translation consistency and quality acro
 
 ## 🧪 Tests Available
 
-### 1. Translation Consistency Test
+### Script Organization
+
+All translation tests are organized under the `test:translations:*` namespace:
+
+- `test:translations:all` - Run all translation tests
+- `test:translations:consistency` - Test key structure and ordering
+- `test:translations:missing` - Find missing translation keys
+- `test:translations:hardcoded` - Detect hardcoded text
+
+### Quick Start
+
+Run all translation tests at once:
+
+```bash
+npm run test:translations:all
+```
+
+### Individual Tests
+
+#### 1. Translation Consistency Test
 
 **File:** `translation-consistency.test.ts`
 
@@ -17,10 +36,10 @@ This directory contains tools to ensure translation consistency and quality acro
 **Run:**
 
 ```bash
-npm run test:translation-order
+npm run test:translations:consistency
 ```
 
-### 2. Missing Translation Keys Test
+#### 2. Missing Translation Keys Test
 
 **File:** `translation-missing-keys.test.ts`
 
@@ -29,10 +48,10 @@ npm run test:translation-order
 **Run:**
 
 ```bash
-npm run test:translations
+npm run test:translations:missing
 ```
 
-### 3. Hardcoded Text Test
+#### 3. Hardcoded Text Test
 
 **File:** `hardcoded-text.test.ts`
 
@@ -41,7 +60,7 @@ npm run test:translations
 **Run:**
 
 ```bash
-npm run test:hardcoded-text
+npm run test:translations:hardcoded
 ```
 
 ## 🔧 Maintenance Tools
@@ -99,10 +118,10 @@ messages/
 ### 3. Translation Workflow
 
 1. Add new keys to English files first
-2. Run `npm run test:translation-order` to check consistency
+2. Run `npm run test:translations:consistency` to check consistency
 3. Add translations to other languages
 4. Run `npm run fix-translation-order` if needed
-5. Verify all tests pass
+5. Verify all tests pass with `npm run test:translations:all`
 
 ### 4. Quality Checks
 
@@ -146,14 +165,19 @@ When tests fail, you'll see detailed information about what needs to be fixed.
 Add these commands to your CI pipeline:
 
 ```yaml
+# Run all translation tests
+- name: Test All Translations
+  run: npm run test:translations:all
+
+# Or run individual tests
 - name: Test Translation Consistency
-  run: npm run test:translation-order
+  run: npm run test:translations:consistency
 
 - name: Test Missing Translations
-  run: npm run test:translations
+  run: npm run test:translations:missing
 
 - name: Test Hardcoded Text
-  run: npm run test:hardcoded-text
+  run: npm run test:translations:hardcoded
 ```
 
 This ensures translation quality is maintained across all deployments.
