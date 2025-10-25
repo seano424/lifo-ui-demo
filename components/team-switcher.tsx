@@ -34,6 +34,7 @@ export function TeamSwitcher({ compact = false }: TeamSwitcherProps) {
   const { switchStore, isChangingStore } = useStoreActions()
   const { activeStore } = useStoreState()
   const t = useTranslations('teamSwitcher')
+  const tRoles = useTranslations('users.roles')
 
   const handleStoreSwitch = (store: Store, makePrimary: boolean = false) => {
     if (store.store_id !== activeStore?.store_id) {
@@ -149,7 +150,7 @@ export function TeamSwitcher({ compact = false }: TeamSwitcherProps) {
                           </Badge>
                         )}
                         <Badge variant="outline" className="text-xs capitalize">
-                          {userStore.role}
+                          {tRoles(userStore.role)}
                         </Badge>
                       </div>
                     </div>
