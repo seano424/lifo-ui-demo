@@ -278,8 +278,8 @@
       "donatePrepared": "Donate Prepared",
       "dispose": "Dispose",
       "maintain": "Maintain",
-      "ignored": "Ignored",
-      "sold": "Sold"
+      "sold": "Sold",
+      "ignored": "Ignored"
     },
     "status": {
       "all": "All Status",
@@ -293,19 +293,6 @@
       "expired": "Expired",
       "completed": "Completed",
       "title": "Batch Status"
-    },
-    "sort": {
-      "sortBy": "Sort by",
-      "direction": "Direction",
-      "urgency": "Urgency",
-      "expiryDate": "Expiry Date",
-      "currentQuantity": "Current Quantity",
-      "potentialLoss": "Potential Loss",
-      "alphabetical": "Alphabetical",
-      "actionDate": "Action Date",
-      "effectiveness": "Effectiveness",
-      "ascending": "Ascending",
-      "descending": "Descending"
     },
     "urgencyCount": "Urgency ({count})",
     "filterByUrgency": "Filter by urgency",

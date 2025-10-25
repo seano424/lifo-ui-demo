@@ -1,0 +1,196 @@
+{
+  "users": {
+    "title": "Gestion d'équipe",
+    "description": "Invitez de nouveaux membres d'équipe dans votre magasin et gérez leurs rôles et permissions.",
+    "addEmployee": "Inviter un membre d'équipe",
+    "showing": "Affichage de {current} sur {total} utilisateurs",
+    "noUsersFound": "Aucun utilisateur trouvé",
+    "name": "Nom",
+    "username": "Nom d'utilisateur",
+    "email": "E-mail",
+    "role": "Rôle",
+    "status": "Statut",
+    "passwordStatus": "Statut du mot de passe",
+    "actions": "Actions",
+    "active": "Actif",
+    "inactive": "Inactif",
+    "locked": "Verrouillé",
+    "passwordActive": "Mot de passe actif",
+    "noPassword": "Aucun mot de passe",
+    "loadMoreUsers": "Charger plus d'utilisateurs",
+    "loadingMore": "Chargement...",
+    "noUsersMessage": "Ce magasin n'a encore aucun utilisateur.",
+    "permissions": {
+      "ownerInfo": {
+        "title": "Permissions du Propriétaire",
+        "description": "En tant que propriétaire, vous pouvez gérer tous les membres de l'équipe, modifier les rôles (y compris nommer d'autres propriétaires), et accéder à toutes les fonctions du magasin. Vous pouvez gérer les propriétaires, managers et employés."
+      },
+      "managerInfo": {
+        "title": "Permissions du Manager",
+        "description": "En tant que manager, vous pouvez gérer les employés (activer/désactiver, supprimer du magasin), mais ne pouvez pas modifier les propriétaires ou autres managers. Seuls les propriétaires peuvent changer les rôles."
+      }
+    },
+    "errors": {
+      "mustHaveOwner": "Il doit toujours y avoir au moins un propriétaire."
+    },
+    "dropdown": {
+      "userActions": "Actions utilisateur",
+      "makeEmployee": "Nommer employé",
+      "makeManager": "Nommer gérant",
+      "makeOwner": "Nommer propriétaire",
+      "resetPassword": "Réinitialiser le mot de passe",
+      "unlockPassword": "Déverrouiller le mot de passe",
+      "deactivateUser": "Désactiver utilisateur",
+      "reactivateUser": "Réactiver utilisateur",
+      "removeFromStore": "Retirer du magasin"
+    },
+    "dialogs": {
+      "editRole": {
+        "title": "Modifier le rôle utilisateur",
+        "description": "{name} a actuellement le rôle de : {role}",
+        "roleLabel": "Rôle",
+        "selectPlaceholder": "Sélectionner un rôle",
+        "cancel": "Annuler",
+        "save": "Sauvegarder les modifications"
+      },
+      "removeUser": {
+        "title": "Retirer l'utilisateur du magasin",
+        "description": "Ceci retirera définitivement {name} de {store}. Il perdra tout accès à ce magasin, perdra son rôle et ses permissions actuels, et devra être ré-invité si vous voulez qu'il revienne. Son compte utilisateur restera actif pour les autres magasins.",
+        "cancel": "Annuler",
+        "confirm": "Retirer du magasin"
+      },
+      "resetPin": {
+        "title": "Réinitialiser le mot de passe pour {name}",
+        "description": "Ceci générera un nouveau mot de passe et l'enverra à l'employé par e-mail. Son mot de passe actuel ne fonctionnera plus.",
+        "employee": "Employé",
+        "username": "Nom d'utilisateur",
+        "email": "E-mail",
+        "currentStatus": "Statut actuel",
+        "statusLocked": "Verrouillé",
+        "statusActive": "Actif",
+        "cancel": "Annuler",
+        "confirm": "Réinitialiser le mot de passe"
+      },
+      "unlockPassword": {
+        "title": "Déverrouiller le mot de passe pour {name}",
+        "description": "Ceci déverrouillera immédiatement le mot de passe de l'employé et réinitialisera son compteur de tentatives échouées.",
+        "employee": "Employé",
+        "username": "Nom d'utilisateur",
+        "lockedMessage": "Le compte est actuellement verrouillé à cause de tentatives de mot de passe échouées",
+        "cancel": "Annuler",
+        "confirm": "Déverrouiller le mot de passe"
+      }
+    },
+    "roles": {
+      "owner": "Propriétaire",
+      "manager": "Gérant",
+      "employee": "Employé",
+      "staff": "Personnel",
+      "admin": "Administrateur",
+      "user": "Utilisateur",
+      "unknown": "Inconnu"
+    },
+    "card": {
+      "passwordStatus": {
+        "disabled": "Mot de passe désactivé",
+        "locked": "Mot de passe verrouillé",
+        "pending": "Mot de passe en attente",
+        "active": "Mot de passe actif"
+      },
+      "inactive": "Inactif",
+      "username": "Nom d'utilisateur",
+      "permissions": "Permissions",
+      "lastLogin": "Dernière connexion",
+      "enablePassword": "Activer le mot de passe",
+      "disablePassword": "Désactiver le mot de passe",
+      "removeDialog": {
+        "title": "Retirer l'utilisateur du magasin",
+        "description": "Êtes-vous sûr de vouloir retirer {name} de ce magasin ? Ceci désactivera son accès mais ne supprimera pas son compte.",
+        "cancel": "Annuler",
+        "confirm": "Retirer l'utilisateur"
+      }
+    }
+  },
+  "addEmployee": {
+    "title": "Ajouter un nouvel employé",
+    "description": "Créer un nouveau compte employé avec authentification par mot de passe. Les identifiants de connexion seront envoyés par e-mail.",
+    "form": {
+      "firstName": "Prénom",
+      "lastName": "Nom de famille",
+      "email": "Adresse e-mail",
+      "username": "Nom d'utilisateur",
+      "role": "Rôle",
+      "language": "Langue",
+      "firstNamePlaceholder": "Jean",
+      "lastNamePlaceholder": "Dupont",
+      "emailPlaceholder": "test@example.com (utiliser un faux e-mail pour les tests)",
+      "emailNote": "Utilisez test@example.com pour les tests. Les vrais e-mails recevront les identifiants de connexion.",
+      "usernamePlaceholder": "jean.dupont",
+      "usernameNote": "L'employé utilisera ce nom d'utilisateur pour se connecter",
+      "usernameAvailable": "Nom d'utilisateur disponible",
+      "usernameTaken": "Nom d'utilisateur déjà pris",
+      "reset": "Réinitialiser"
+    },
+    "roles": {
+      "employee": "Employé",
+      "manager": "Gestionnaire"
+    },
+    "languages": {
+      "fr": "Français",
+      "en": "English",
+      "nl": "Nederlands",
+      "de": "Deutsch",
+      "es": "Español"
+    },
+    "preview": {
+      "username": "Nom d'utilisateur:",
+      "password": "Mot de passe:",
+      "passwordNote": "Sera généré automatiquement (6 chiffres)",
+      "loginNote": "L'employé peut se connecter avec son nom d'utilisateur et son mot de passe"
+    },
+    "buttons": {
+      "cancel": "Annuler",
+      "create": "Créer un employé",
+      "creating": "Création...",
+      "done": "Terminé",
+      "retrySending": "Réessayer l'envoi"
+    },
+    "success": {
+      "title": "Employé créé avec succès!",
+      "description": "{name} a été ajouté à votre magasin. Sauvegardez ces identifiants et partagez-les avec l'employé.",
+      "emailSending": "Envoi de l'e-mail...",
+      "emailSent": "E-mail de bienvenue envoyé avec succès à {email}",
+      "emailPreparing": "Préparation de l'e-mail pour {email}",
+      "emailId": "ID: {messageId}",
+      "emailStatus": "Statut de l'e-mail: {error}"
+    },
+    "credentials": {
+      "email": "E-mail",
+      "username": "Nom d'utilisateur",
+      "password": "Mot de passe"
+    },
+    "nextSteps": {
+      "title": "Prochaines étapes:",
+      "loginTab": "• L'employé peut se connecter avec son nom d'utilisateur et son mot de passe",
+      "useCredentials": "• Utiliser le nom d'utilisateur: {username} et le mot de passe: {password}",
+      "resetPassword": "• Le mot de passe peut être réinitialisé à tout moment depuis la page de gestion d'équipe",
+      "permissions": "• L'employé peut scanner les produits et gérer l'inventaire de base"
+    },
+    "errors": {
+      "fillFields": "Veuillez remplir tous les champs obligatoires",
+      "usernameTaken": "Le nom d'utilisateur est déjà pris. Veuillez en choisir un autre.",
+      "noStore": "Aucun magasin sélectionné",
+      "checkUsername": "Échec de la vérification de la disponibilité du nom d'utilisateur",
+      "createFailed": "Échec de la création de l'employé",
+      "copyFailed": "Échec de la copie dans le presse-papiers"
+    },
+    "toast": {
+      "created": "Employé créé avec succès en utilisant l'API serveur!",
+      "emailSent": "E-mail de bienvenue envoyé avec succès!",
+      "emailFailed": "Échec de l'envoi de l'e-mail: {error}",
+      "emailError": "Erreur lors de l'envoi de l'e-mail: {error}",
+      "emailSkipped": "Employé créé! E-mail ignoré pour l'adresse de test.",
+      "copied": "{field} copié dans le presse-papiers"
+    }
+  }
+}

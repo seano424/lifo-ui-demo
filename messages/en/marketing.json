@@ -23,7 +23,8 @@
       "careers": "Careers",
       "careersDesc": "Browse job listing and discover our workspace",
       "support": "Support",
-      "supportDesc": "Get in touch with our support team or visit our community forums"
+      "supportDesc": "Get in touch with our support team or visit our community forums",
+      "language": "Language"
     },
     "auth": {
       "login": "Login",
@@ -241,8 +242,8 @@
     }
   },
   "pricingpage": {
-    "contactUs": "Contact us for questions",
     "title": "Choose Your Plan",
+    "contactUs": "Contact us for questions",
     "subtitle": "Start with our free trial and scale as you grow. No lock-in, full support included.",
     "badges": {
       "mostPopular": "Most Popular",

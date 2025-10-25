@@ -1,8 +1,5 @@
 'use client'
 
-import { Menu } from 'lucide-react'
-import Link from 'next/link'
-import { useTranslations } from 'next-intl'
 import {
   Accordion,
   AccordionContent,
@@ -22,6 +19,9 @@ import {
 } from '@/components/ui/navigation-menu'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import { hasEnvVars } from '@/lib/utils'
+import { Menu } from 'lucide-react'
+import { useTranslations } from 'next-intl'
+import Link from 'next/link'
 import { AuthButton } from '../auth-button'
 import { EnvVarWarning } from '../env-var-warning'
 
@@ -167,7 +167,7 @@ const MarketingNav = ({ menu }: MarketingNavProps) => {
                 <div className="flex flex-col gap-3">
                   <AuthButton isMobile />
                   <div className="flex items-center justify-between mt-4 pt-4 border-t">
-                    <span className="text-sm text-muted-foreground">Langue</span>
+                    <span className="text-sm text-muted-foreground">{t('language')}</span>
                     <CompactLanguageSwitcher />
                   </div>
                 </div>

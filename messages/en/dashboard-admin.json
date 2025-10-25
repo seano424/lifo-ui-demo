@@ -1,0 +1,196 @@
+{
+  "users": {
+    "title": "Team Management",
+    "description": "Invite new team members to your store and manage their roles and permissions.",
+    "addEmployee": "Invite team member",
+    "showing": "Showing {current} of {total} users",
+    "noUsersFound": "No users found",
+    "name": "Name",
+    "username": "Username",
+    "email": "Email",
+    "role": "Role",
+    "status": "Status",
+    "passwordStatus": "Password Status",
+    "actions": "Actions",
+    "active": "Active",
+    "inactive": "Inactive",
+    "locked": "Locked",
+    "passwordActive": "Password Active",
+    "noPassword": "No Password",
+    "loadMoreUsers": "Load More Users",
+    "loadingMore": "Loading more...",
+    "noUsersMessage": "This store doesn't have any users yet.",
+    "permissions": {
+      "ownerInfo": {
+        "title": "Owner Permissions",
+        "description": "As an owner, you can manage all team members, change roles (including making other owners), and access all store functions. You can manage owners, managers, and employees."
+      },
+      "managerInfo": {
+        "title": "Manager Permissions",
+        "description": "As a manager, you can manage employees (activate/deactivate, remove from store), but cannot modify owners or other managers. Only owners can change roles."
+      }
+    },
+    "errors": {
+      "mustHaveOwner": "There must always be at least one owner."
+    },
+    "dropdown": {
+      "userActions": "User Actions",
+      "makeEmployee": "Make Employee",
+      "makeManager": "Make Manager",
+      "makeOwner": "Make Owner",
+      "resetPassword": "Reset Password",
+      "unlockPassword": "Unlock Password",
+      "deactivateUser": "Deactivate User",
+      "reactivateUser": "Reactivate User",
+      "removeFromStore": "Remove from Store"
+    },
+    "dialogs": {
+      "editRole": {
+        "title": "Edit User Role",
+        "description": "{name} currently has the role of: {role}",
+        "roleLabel": "Role",
+        "selectPlaceholder": "Select a role",
+        "cancel": "Cancel",
+        "save": "Save changes"
+      },
+      "removeUser": {
+        "title": "Remove User from Store",
+        "description": "This will permanently remove {name} from {store}. They will lose all access to this store, lose their current role and permissions, and need to be re-invited if you want them back. Their user account will remain active for other stores.",
+        "cancel": "Cancel",
+        "confirm": "Remove from Store"
+      },
+      "resetPin": {
+        "title": "Reset Password for {name}",
+        "description": "This will generate a new password and send it to the employee by email. Their current password will no longer work.",
+        "employee": "Employee",
+        "username": "Username",
+        "email": "Email",
+        "currentStatus": "Current Status",
+        "statusLocked": "Locked",
+        "statusActive": "Active",
+        "cancel": "Cancel",
+        "confirm": "Reset Password"
+      },
+      "unlockPassword": {
+        "title": "Unlock Password for {name}",
+        "description": "This will immediately unlock the employee's password and reset their failed attempts counter.",
+        "employee": "Employee",
+        "username": "Username",
+        "lockedMessage": "The account is currently locked due to failed password attempts",
+        "cancel": "Cancel",
+        "confirm": "Unlock Password"
+      }
+    },
+    "roles": {
+      "owner": "Owner",
+      "manager": "Manager",
+      "employee": "Employee",
+      "staff": "Staff",
+      "admin": "Administrator",
+      "user": "User",
+      "unknown": "Unknown"
+    },
+    "card": {
+      "passwordStatus": {
+        "disabled": "Password Disabled",
+        "locked": "Password Locked",
+        "pending": "Password Pending",
+        "active": "Password Active"
+      },
+      "inactive": "Inactive",
+      "username": "Username",
+      "permissions": "Permissions",
+      "lastLogin": "Last login",
+      "enablePassword": "Enable Password",
+      "disablePassword": "Disable Password",
+      "removeDialog": {
+        "title": "Remove User from Store",
+        "description": "Are you sure you want to remove {name} from this store? This will deactivate their access but won't delete their account.",
+        "cancel": "Cancel",
+        "confirm": "Remove User"
+      }
+    }
+  },
+  "addEmployee": {
+    "title": "Add New Employee",
+    "description": "Create a new employee account with password authentication. Login credentials will be sent by email.",
+    "form": {
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email Address",
+      "username": "Username",
+      "role": "Role",
+      "language": "Language",
+      "firstNamePlaceholder": "John",
+      "lastNamePlaceholder": "Doe",
+      "emailPlaceholder": "test@example.com (use fake email for testing)",
+      "emailNote": "Use test@example.com for testing. Real emails will receive login credentials.",
+      "usernamePlaceholder": "john.doe",
+      "usernameNote": "Employee will use this username to log in",
+      "usernameAvailable": "Username is available",
+      "usernameTaken": "Username is already taken",
+      "reset": "Reset"
+    },
+    "roles": {
+      "employee": "Employee",
+      "manager": "Manager"
+    },
+    "languages": {
+      "fr": "Français",
+      "en": "English",
+      "nl": "Nederlands",
+      "de": "Deutsch",
+      "es": "Español"
+    },
+    "preview": {
+      "username": "Username:",
+      "password": "Password:",
+      "passwordNote": "Will be generated automatically (6 digits)",
+      "loginNote": "The employee can log in with their username and password"
+    },
+    "buttons": {
+      "cancel": "Cancel",
+      "create": "Create Employee",
+      "creating": "Creating...",
+      "done": "Done",
+      "retrySending": "Retry sending"
+    },
+    "success": {
+      "title": "Employee Created Successfully!",
+      "description": "{name} has been added to your store. Save these credentials and share them with the employee.",
+      "emailSending": "Sending email...",
+      "emailSent": "Welcome email sent successfully to {email}",
+      "emailPreparing": "Preparing email for {email}",
+      "emailId": "ID: {messageId}",
+      "emailStatus": "Email status: {error}"
+    },
+    "credentials": {
+      "email": "Email",
+      "username": "Username",
+      "password": "Password"
+    },
+    "nextSteps": {
+      "title": "Next Steps:",
+      "loginTab": "• The employee can log in with their username and password",
+      "useCredentials": "• Use username: {username} and password: {password}",
+      "resetPassword": "• The password can be reset at any time from the team management page",
+      "permissions": "• The employee can scan products and manage basic inventory"
+    },
+    "errors": {
+      "fillFields": "Please fill in all required fields",
+      "usernameTaken": "Username is already taken. Please choose a different one.",
+      "noStore": "No store selected",
+      "checkUsername": "Failed to check username availability",
+      "createFailed": "Failed to create employee",
+      "copyFailed": "Failed to copy to clipboard"
+    },
+    "toast": {
+      "created": "Employee created successfully using server API!",
+      "emailSent": "Welcome email sent successfully!",
+      "emailFailed": "Failed to send email: {error}",
+      "emailError": "Error sending email: {error}",
+      "emailSkipped": "Employee created! Email skipped for test address.",
+      "copied": "{field} copied to clipboard"
+    }
+  }
+}

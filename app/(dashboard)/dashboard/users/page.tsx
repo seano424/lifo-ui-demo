@@ -1,6 +1,5 @@
 // path: /dashboard/users/page.tsx
 
-import { dehydrate, HydrationBoundary } from '@tanstack/react-query'
 import DashboardInsetHeader from '@/components/dashboard/dashboard-inset-header'
 import { StoreUsersList } from '@/components/store-users/store-users-list'
 import { StoreUsersPrefetch } from '@/components/store-users/store-users-prefetch'
@@ -9,10 +8,13 @@ import { fetchStoreUsersPage } from '@/lib/queries/store-users'
 import { fetchUserStores } from '@/lib/queries/stores'
 import { createPrefetchedQuery } from '@/lib/react-query/prefetch'
 import { createClient as createServerClient } from '@/lib/supabase/server'
+import { dehydrate, HydrationBoundary } from '@tanstack/react-query'
+import { getTranslations } from 'next-intl/server'
 
 export default async function UsersPage() {
   const { queryClient } = await createPrefetchedQuery()
   const serverClient = await createServerClient()
+  const t = await getTranslations('common.pages.users')
 
   // Get the current user to determine their stores
   const {
@@ -23,7 +25,7 @@ export default async function UsersPage() {
     // Redirect to login or show error
     return (
       <div className="text-center py-12">
-        <p>Please log in to view users.</p>
+        <p>{t('loginRequired')}</p>
       </div>
     )
   }
@@ -35,8 +37,8 @@ export default async function UsersPage() {
   if (!primaryStore) {
     return (
       <div className="text-center py-12">
-        <h2 className="text-xl font-semibold mb-2">No Store Access</h2>
-        <p className="text-gray-600">You don&apos;t have access to any stores yet.</p>
+        <h2 className="text-xl font-semibold mb-2">{t('noStoreAccess')}</h2>
+        <p className="text-gray-600">{t('noStoreAccessDescription')}</p>
       </div>
     )
   }

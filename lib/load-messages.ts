@@ -3,13 +3,42 @@
  * Used by both server-side (i18n.ts) and client-side (intl-provider.tsx)
  */
 
+// Cache for loaded translation messages to avoid repeated file loading
+const messageCache = new Map<string, Record<string, unknown>>()
+
+/**
+ * Clear the message cache - useful for development or when translations are updated
+ */
+export function clearMessageCache(): void {
+  messageCache.clear()
+}
+
+/**
+ * Load and merge translation files for a given locale
+ *
+ * @param locale - The locale to load translations for (e.g., 'en', 'fr', 'nl')
+ * @returns Promise resolving to merged translation object
+ *
+ * Performance optimizations:
+ * - Uses in-memory cache to avoid repeated file loading
+ * - Loads all translation files in parallel
+ * - Caches result for subsequent calls
+ */
 export async function loadMessages(locale: string): Promise<Record<string, unknown>> {
+  const cacheKey = locale
+
+  // Return cached messages if available
+  if (messageCache.has(cacheKey)) {
+    return messageCache.get(cacheKey)!
+  }
   try {
     // Import all translation files for the locale and merge them
     const [
       auth,
       common,
       dashboard,
+      dashboardAdmin,
+      dashboardData,
       inventory,
       marketing,
       onboarding,
@@ -23,6 +52,8 @@ export async function loadMessages(locale: string): Promise<Record<string, unkno
       import(`../messages/${locale}/auth.json`).then(m => m.default).catch(() => ({})),
       import(`../messages/${locale}/common.json`).then(m => m.default).catch(() => ({})),
       import(`../messages/${locale}/dashboard.json`).then(m => m.default).catch(() => ({})),
+      import(`../messages/${locale}/dashboard-admin.json`).then(m => m.default).catch(() => ({})),
+      import(`../messages/${locale}/dashboard-data.json`).then(m => m.default).catch(() => ({})),
       import(`../messages/${locale}/inventory.json`).then(m => m.default).catch(() => ({})),
       import(`../messages/${locale}/marketing.json`).then(m => m.default).catch(() => ({})),
       import(`../messages/${locale}/onboarding.json`).then(m => m.default).catch(() => ({})),
@@ -34,11 +65,13 @@ export async function loadMessages(locale: string): Promise<Record<string, unkno
       import(`../messages/${locale}/privacy.json`).then(m => m.default).catch(() => ({})),
     ])
 
-    // Merge all messages into a single object
-    return {
+    // Merge all messages into a single object with proper namespacing
+    const messages = {
       ...auth,
       ...common,
       ...dashboard,
+      ...dashboardAdmin,
+      ...dashboardData,
       ...inventory,
       ...marketing,
       ...onboarding,
@@ -49,6 +82,10 @@ export async function loadMessages(locale: string): Promise<Record<string, unkno
       ...terms,
       ...privacy,
     }
+
+    // Cache the loaded messages
+    messageCache.set(cacheKey, messages)
+    return messages
   } catch (error) {
     console.error(`Failed to load messages for locale: ${locale}`, error)
 

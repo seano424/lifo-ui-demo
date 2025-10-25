@@ -101,7 +101,8 @@
         "label": "Coût des déchets",
         "subtitle": "articles"
       },
-      "errorMessage": "Certaines métriques n'ont pas pu être chargées. Veuillez actualiser."
+      "errorMessage": "Certaines métriques n'ont pas pu être chargées. Veuillez actualiser.",
+      "cancel": "Annuler"
     }
   },
   "alerts": {
@@ -285,13 +286,12 @@
     "batches": "Lots",
     "products": "Produits"
   },
-  "batchFilters": {
-    "expiryFilter": "Filtre d'expiration",
-    "allItems": "Tous les articles",
-    "expiringInDays": "Expire dans {days} jours",
-    "status": "Statut",
-    "allStatuses": "Tous les statuts",
+  "teamSwitcher": {
+    "noStoresAvailable": "Aucun magasin disponible",
+    "setAsPrimaryStore": "Définir comme magasin principal",
+    "yourStores": "Vos magasins",
     "active": "Actif",
+    "noStoreSelected": "Aucun magasin sélectionné",
     "expired": "Expiré",
     "damaged": "Endommagé",
     "soldOut": "Épuisé",
@@ -422,159 +422,11 @@
     "deleteProduct": "Supprimer le produit",
     "confirmDeleteProduct": "Êtes-vous sûr de vouloir supprimer ce produit ?"
   },
+
   "todos": {
     "pageDescription": "Suggestions personnalisées pour optimiser votre inventaire et réduire les déchets"
   },
-  "scanOut": {
-    "available": "Disponible",
-    "unknownProduct": "Produit inconnu",
-    "unknownBrand": "Marque inconnue",
-    "scanProductToRemove": "Scanner le produit à retirer",
-    "pointCameraAtBarcode": "Pointez la caméra vers le code-barres du produit",
-    "title": "Scanner pour sortir",
-    "description": "Scanner les articles lors de leur sortie d'inventaire",
-    "actions": {
-      "sold": "Vendu",
-      "sell": "Vendre",
-      "donate": "Don",
-      "dispose": "Jeter"
-    },
-    "donationRecipientPlaceholder": "Destinataire du don (optionnel)",
-    "disposalReasonPlaceholder": "Raison (ex: Expiré, Moisi, Endommagé)",
-    "scanning": {
-      "scanNextProduct": "Scanner le produit suivant",
-      "scanProductBarcode": "Scanner le code-barres du produit",
-      "pointAtBarcode": "Pointez vers le code-barres",
-      "productFound": "Produit trouvé !",
-      "notFoundInInventory": "Produit non trouvé dans l'inventaire",
-      "addToRemovalList": "Ajouter à la liste de retrait"
-    },
-    "productDetails": {
-      "title": "Détails du produit",
-      "brand": "Marque",
-      "category": "Catégorie",
-      "barcode": "Code-barres",
-      "availableStock": "Stock disponible",
-      "units": "unités",
-      "noBrand": "Aucune marque",
-      "uncategorized": "Non catégorisé",
-      "noBarcode": "Aucun code-barres"
-    },
-    "batchSelection": {
-      "title": "Sélectionner le lot",
-      "selectBatch": "Sélectionner un lot à retirer",
-      "expires": "Expire le",
-      "expired": "Expiré",
-      "available": "disponible",
-      "selectThisBatch": "Sélectionner ce lot"
-    },
-    "quantityInput": {
-      "title": "Quantité à retirer",
-      "quantity": "Quantité",
-      "maxAvailable": "Maximum disponible : {max} unités",
-      "enterQuantity": "Entrez la quantité à retirer"
-    },
-    "reasonSelection": {
-      "title": "Raison du retrait",
-      "selectReason": "Sélectionnez une raison pour ce retrait",
-      "reasons": {
-        "sale": "Vente",
-        "donation": "Don",
-        "waste": "Déchet",
-        "damaged": "Endommagé",
-        "expired": "Expiré",
-        "other": "Autre"
-      }
-    },
-    "itemsList": {
-      "title": "Articles à retirer",
-      "noItems": "Aucun article ajouté encore",
-      "itemCount": "{count, plural, one {# article} other {# articles}} à retirer",
-      "quantity": "Qté",
-      "reason": "Raison",
-      "remove": "Retirer"
-    },
-    "confirmation": {
-      "title": "Confirmer le retrait",
-      "description": "Vérifiez les articles ci-dessous avant de les retirer de l'inventaire.",
-      "submitText": "Vous êtes sur le point de retirer {count, plural, one {# article} other {# articles}} de l'inventaire :",
-      "itemDetails": {
-        "expires": "Expire :",
-        "reason": "Raison :",
-        "quantity": "Quantité :"
-      }
-    },
-    "success": {
-      "title": "Articles retirés avec succès !",
-      "description": "Retiré avec succès {count, plural, one {# article} other {# articles}} de votre inventaire.",
-      "summary": {
-        "totalItems": "Total des articles retirés :",
-        "byReason": "Par raison :",
-        "sales": "Ventes",
-        "donations": "Dons",
-        "waste": "Déchets"
-      }
-    },
-    "buttons": {
-      "scanProduct": "Scanner le produit",
-      "selectBatch": "Sélectionner le lot",
-      "addToList": "Ajouter à la liste",
-      "removeFromInventory": "Retirer de l'inventaire",
-      "cancel": "Annuler",
-      "confirm": "Confirmer",
-      "back": "Retour",
-      "continue": "Continuer",
-      "finish": "Terminer",
-      "scanNext": "Scanner le suivant",
-      "viewDashboard": "Voir le tableau de bord",
-      "submitting": "Soumission..."
-    },
-    "alerts": {
-      "maxQuantityExceeded": "La quantité ne peut pas dépasser le stock disponible",
-      "quantityRequired": "Veuillez entrer une quantité valide",
-      "reasonRequired": "Veuillez sélectionner une raison",
-      "noItemsToRemove": "Aucun article à retirer",
-      "scanError": "Erreur de scan : {error}",
-      "submissionError": "Erreur lors de la soumission : {error}"
-    },
-    "captureExpiryDate": "Capturer la date d'expiration",
-    "pointCameraAtExpiry": "Pointez la caméra vers la date d'expiration",
-    "backToChangeProduct": "Retour pour changer de produit",
-    "itemsToRemove": "Articles à retirer ({count})",
-    "total": "Total",
-    "expires": "Expire",
-    "remove": "Retirer",
-    "clearAll": "Tout effacer",
-    "submitAll": "Soumettre tout ({count} articles)",
-    "confirmCheckout": "Confirmer la sortie",
-    "confirmSale": "Confirmer la vente",
-    "confirmDonation": "Confirmer le don",
-    "confirmDisposal": "Confirmer l'élimination",
-    "reviewItemsBeforeRemoval": "Vérifiez les articles ci-dessous avant de les retirer de l'inventaire.",
-    "aboutToRemoveItems": "Vous êtes sur le point de retirer {count} articles de l'inventaire :",
-    "totalItemsRemoved": "Total des articles retirés",
-    "totalValueRemoved": "Valeur totale retirée",
-    "processing": "Traitement en cours...",
-    "confirmRemoval": "Confirmer le retrait",
-    "inventoryUpdatedSuccessfully": "Inventaire mis à jour avec succès !",
-    "successfullyRemoved": "Retiré avec succès {count} articles de l'inventaire.",
-    "partiallyRemoved": "Retiré {success} sur {total} articles de l'inventaire.",
-    "continueScanning": "Continuer le scan",
-    "viewInDashboard": "Voir dans le tableau de bord",
-    "noActiveStore": "Aucun magasin actif sélectionné",
-    "cameraNotReady": "Caméra non prête",
-    "noBatchFoundWithExpiry": "Aucun lot trouvé avec la date d'expiration : {date}",
-    "noInventoryAvailable": "Aucun inventaire disponible pour ce produit dans le magasin actuel.",
-    "ocrProcessingFailed": "Le traitement OCR a échoué",
-    "batchRemovalNote": "Retrait de lot : {productName} x{quantity}",
-    "recentlyRemoved": "Récemment retiré ({count} articles)",
-    "removedQuantityExpires": "Retiré {quantity}x • Expire le : {date}",
-    "andMoreItems": "... et {count} autres articles",
-    "donationRecipientRequired": "Veuillez sélectionner un destinataire de don pour : {itemNames}",
-    "disposalReasonRequired": "Veuillez fournir une raison d'élimination pour : {itemNames}",
-    "selectRecipientRequired": "Veuillez sélectionner un destinataire",
-    "cancel": "Annuler"
-  },
+
   "buttons": {
     "export": "Exporter",
     "addBatch": "Ajouter un lot",
@@ -620,201 +472,6 @@
       "batches": "Visualisez et gérez les lots d'inventaire de votre magasin",
       "products": "Visualisez et gérez l'inventaire des produits de votre magasin",
       "dashboard": "Surveillez les performances de votre magasin, suivez l'inventaire et optimisez les opérations avec des insights en temps réel et des recommandations alimentées par l'IA."
-    }
-  },
-  "users": {
-    "title": "Gestion d'équipe",
-    "description": "Invitez de nouveaux membres d'équipe dans votre magasin et gérez leurs rôles et permissions.",
-    "addEmployee": "Inviter un membre d'équipe",
-    "showing": "Affichage de {current} sur {total} utilisateurs",
-    "noUsersFound": "Aucun utilisateur trouvé",
-    "name": "Nom",
-    "username": "Nom d'utilisateur",
-    "email": "E-mail",
-    "role": "Rôle",
-    "status": "Statut",
-    "passwordStatus": "Statut du mot de passe",
-    "actions": "Actions",
-    "active": "Actif",
-    "inactive": "Inactif",
-    "locked": "Verrouillé",
-    "passwordActive": "Mot de passe actif",
-    "noPassword": "Aucun mot de passe",
-    "loadMoreUsers": "Charger plus d'utilisateurs",
-    "loadingMore": "Chargement...",
-    "noUsersMessage": "Ce magasin n'a encore aucun utilisateur.",
-    "permissions": {
-      "ownerInfo": {
-        "title": "Permissions du Propriétaire",
-        "description": "En tant que propriétaire, vous pouvez gérer tous les membres de l'équipe, modifier les rôles (y compris nommer d'autres propriétaires), et accéder à toutes les fonctions du magasin. Vous pouvez gérer les propriétaires, managers et employés."
-      },
-      "managerInfo": {
-        "title": "Permissions du Manager",
-        "description": "En tant que manager, vous pouvez gérer les employés (activer/désactiver, supprimer du magasin), mais ne pouvez pas modifier les propriétaires ou autres managers. Seuls les propriétaires peuvent changer les rôles."
-      }
-    },
-    "errors": {
-      "mustHaveOwner": "Il doit toujours y avoir au moins un propriétaire."
-    },
-    "dropdown": {
-      "userActions": "Actions utilisateur",
-      "makeEmployee": "Nommer employé",
-      "makeManager": "Nommer gérant",
-      "makeOwner": "Nommer propriétaire",
-      "resetPassword": "Réinitialiser le mot de passe",
-      "unlockPassword": "Déverrouiller le mot de passe",
-      "deactivateUser": "Désactiver utilisateur",
-      "reactivateUser": "Réactiver utilisateur",
-      "removeFromStore": "Retirer du magasin"
-    },
-    "dialogs": {
-      "editRole": {
-        "title": "Modifier le rôle utilisateur",
-        "description": "{name} a actuellement le rôle de : {role}",
-        "roleLabel": "Rôle",
-        "selectPlaceholder": "Sélectionner un rôle",
-        "cancel": "Annuler",
-        "save": "Sauvegarder les modifications"
-      },
-      "removeUser": {
-        "title": "Retirer l'utilisateur du magasin",
-        "description": "Ceci retirera définitivement {name} de {store}. Il perdra tout accès à ce magasin, perdra son rôle et ses permissions actuels, et devra être ré-invité si vous voulez qu'il revienne. Son compte utilisateur restera actif pour les autres magasins.",
-        "cancel": "Annuler",
-        "confirm": "Retirer du magasin"
-      },
-      "resetPin": {
-        "title": "Réinitialiser le mot de passe pour {name}",
-        "description": "Ceci générera un nouveau mot de passe et l'enverra à l'employé par e-mail. Son mot de passe actuel ne fonctionnera plus.",
-        "employee": "Employé",
-        "username": "Nom d'utilisateur",
-        "email": "E-mail",
-        "currentStatus": "Statut actuel",
-        "statusLocked": "Verrouillé",
-        "statusActive": "Actif",
-        "cancel": "Annuler",
-        "confirm": "Réinitialiser le mot de passe"
-      },
-      "unlockPassword": {
-        "title": "Déverrouiller le mot de passe pour {name}",
-        "description": "Ceci déverrouillera immédiatement le mot de passe de l'employé et réinitialisera son compteur de tentatives échouées.",
-        "employee": "Employé",
-        "username": "Nom d'utilisateur",
-        "lockedMessage": "Le compte est actuellement verrouillé à cause de tentatives de mot de passe échouées",
-        "cancel": "Annuler",
-        "confirm": "Déverrouiller le mot de passe"
-      }
-    },
-    "roles": {
-      "owner": "Propriétaire",
-      "manager": "Gérant",
-      "employee": "Employé",
-      "staff": "Personnel",
-      "admin": "Administrateur",
-      "user": "Utilisateur",
-      "unknown": "Inconnu"
-    },
-    "card": {
-      "passwordStatus": {
-        "disabled": "Mot de passe désactivé",
-        "locked": "Mot de passe verrouillé",
-        "pending": "Mot de passe en attente",
-        "active": "Mot de passe actif"
-      },
-      "inactive": "Inactif",
-      "username": "Nom d'utilisateur",
-      "permissions": "Permissions",
-      "lastLogin": "Dernière connexion",
-      "failedAttempts": "{count} tentative{plural} de mot de passe échouée{plural}",
-      "enablePassword": "Activer le mot de passe",
-      "disablePassword": "Désactiver le mot de passe",
-      "removeDialog": {
-        "title": "Retirer l'utilisateur du magasin",
-        "description": "Êtes-vous sûr de vouloir retirer {name} de ce magasin ? Ceci désactivera son accès mais ne supprimera pas son compte.",
-        "cancel": "Annuler",
-        "confirm": "Retirer l'utilisateur"
-      }
-    }
-  },
-  "addEmployee": {
-    "title": "Ajouter un nouvel employé",
-    "description": "Créer un nouveau compte employé avec authentification par mot de passe. Les identifiants de connexion seront envoyés par e-mail.",
-    "form": {
-      "firstName": "Prénom",
-      "lastName": "Nom de famille",
-      "email": "Adresse e-mail",
-      "username": "Nom d'utilisateur",
-      "role": "Rôle",
-      "language": "Langue",
-      "firstNamePlaceholder": "Jean",
-      "lastNamePlaceholder": "Dupont",
-      "emailPlaceholder": "test@example.com (utiliser un faux e-mail pour les tests)",
-      "emailNote": "Utilisez test@example.com pour les tests. Les vrais e-mails recevront les identifiants de connexion.",
-      "usernamePlaceholder": "jean.dupont",
-      "usernameNote": "L'employé utilisera ce nom d'utilisateur pour se connecter",
-      "usernameAvailable": "Nom d'utilisateur disponible",
-      "usernameTaken": "Nom d'utilisateur déjà pris",
-      "reset": "Réinitialiser"
-    },
-    "roles": {
-      "employee": "Employé",
-      "manager": "Gestionnaire"
-    },
-    "languages": {
-      "fr": "Français",
-      "en": "English",
-      "nl": "Nederlands",
-      "de": "Deutsch",
-      "es": "Español"
-    },
-    "preview": {
-      "username": "Nom d'utilisateur:",
-      "password": "Mot de passe:",
-      "passwordNote": "Sera généré automatiquement (6 chiffres)",
-      "loginNote": "L'employé peut se connecter avec son nom d'utilisateur et son mot de passe"
-    },
-    "buttons": {
-      "cancel": "Annuler",
-      "create": "Créer un employé",
-      "creating": "Création...",
-      "done": "Terminé",
-      "retrySending": "Réessayer l'envoi"
-    },
-    "success": {
-      "title": "Employé créé avec succès!",
-      "description": "{name} a été ajouté à votre magasin. Sauvegardez ces identifiants et partagez-les avec l'employé.",
-      "emailSending": "Envoi de l'e-mail...",
-      "emailSent": "E-mail de bienvenue envoyé avec succès à {email}",
-      "emailPreparing": "Préparation de l'e-mail pour {email}",
-      "emailId": "ID: {messageId}",
-      "emailStatus": "Statut de l'e-mail: {error}"
-    },
-    "credentials": {
-      "email": "E-mail",
-      "username": "Nom d'utilisateur",
-      "password": "Mot de passe"
-    },
-    "nextSteps": {
-      "title": "Prochaines étapes:",
-      "loginTab": "• L'employé peut se connecter avec son nom d'utilisateur et son mot de passe",
-      "useCredentials": "• Utiliser le nom d'utilisateur: {username} et le mot de passe: {password}",
-      "resetPassword": "• Le mot de passe peut être réinitialisé à tout moment depuis la page de gestion d'équipe",
-      "permissions": "• L'employé peut scanner les produits et gérer l'inventaire de base"
-    },
-    "errors": {
-      "fillFields": "Veuillez remplir tous les champs obligatoires",
-      "usernameTaken": "Le nom d'utilisateur est déjà pris. Veuillez en choisir un autre.",
-      "noStore": "Aucun magasin sélectionné",
-      "checkUsername": "Échec de la vérification de la disponibilité du nom d'utilisateur",
-      "createFailed": "Échec de la création de l'employé",
-      "copyFailed": "Échec de la copie dans le presse-papiers"
-    },
-    "toast": {
-      "created": "Employé créé avec succès en utilisant l'API serveur!",
-      "emailSent": "E-mail de bienvenue envoyé avec succès!",
-      "emailFailed": "Échec de l'envoi de l'e-mail: {error}",
-      "emailError": "Erreur lors de l'envoi de l'e-mail: {error}",
-      "emailSkipped": "Employé créé! E-mail ignoré pour l'adresse de test.",
-      "copied": "{field} copié dans le presse-papiers"
     }
   },
   "timeSelector": {

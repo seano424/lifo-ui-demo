@@ -1,8 +1,8 @@
 import { createClient } from '@/lib/supabase/client'
 import type { createClient as createServerClient } from '@/lib/supabase/server'
-import type { Database } from '@/types/supabase'
 import { logger } from '@/lib/utils/logger'
 import { withPerformanceTracking } from '@/lib/utils/performance'
+import type { Database } from '@/types/supabase'
 
 // Type for the server client (it's a Promise!)
 type ServerClient = Awaited<ReturnType<typeof createServerClient>>

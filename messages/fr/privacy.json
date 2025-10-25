@@ -34,7 +34,6 @@
       "title": "4. Base Juridique du Traitement (RGPD)",
       "legalBasis": {
         "title": "Nous traitons vos données sur la base de :",
-        "intro": "",
         "items": [
           "Exécution du contrat : Pour fournir le service auquel vous vous êtes inscrit",
           "Intérêts légitimes : Pour améliorer notre service, prévenir la fraude et assurer la sécurité",
@@ -45,13 +44,11 @@
     },
     "section5": {
       "title": "5. Stockage et Sécurité des Données",
-      "intro": "",
       "items": [
         "Où nous stockons vos données : Toutes les données sont stockées sur des serveurs sécurisés situés dans l'Union européenne. Nous utilisons Supabase (région UE) pour l'hébergement de bases de données. Les données sont cryptées en transit (TLS/SSL) et au repos.",
         "Comment nous protégeons vos données : Protocoles de cryptage standard de l'industrie, audits de sécurité réguliers et évaluations de vulnérabilité, contrôles d'accès et authentification multifactorielle, pratiques de développement sécurisées et révisions de code, formation des employés sur la protection des données.",
         "Conservation des données : Nous conservons vos données tant que votre compte reste actif. Lors de la suppression du compte, nous supprimons ou anonymisons vos données dans les 90 jours. Certaines données peuvent être conservées plus longtemps si la loi l'exige (par exemple, les registres comptables)."
-      ],
-      "outro": ""
+      ]
     },
     "section6": {
       "title": "6. Partage de Données et Tiers",

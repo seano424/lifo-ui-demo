@@ -2,6 +2,7 @@
 
 import { Logo } from '@/components/ui/logo'
 import { X } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
 
 interface BeforeInstallPromptEvent extends Event {
@@ -25,6 +26,7 @@ interface BeforeInstallPromptEvent extends Event {
  */
 
 export default function PWAInstallPrompt() {
+  const t = useTranslations('common.pwa.installPrompt')
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
   const [showInstallPrompt, setShowInstallPrompt] = useState(false)
   const [isInstalled, setIsInstalled] = useState(false)
@@ -119,8 +121,8 @@ export default function PWAInstallPrompt() {
               <Logo variant="icon-dark" size="sm" className="w-4 h-4" />
             </div>
             <div>
-              <p className="font-medium text-xs">Install LIFO</p>
-              <p className="text-blue-100 text-xs">Experimental PWA</p>
+              <p className="font-medium text-xs">{t('title')}</p>
+              <p className="text-blue-100 text-xs">{t('subtitle')}</p>
             </div>
           </div>
           <div className="flex items-center gap-1">
@@ -129,13 +131,13 @@ export default function PWAInstallPrompt() {
               onClick={handleInstallClick}
               className="bg-white text-blue-600 px-2 py-1 rounded text-xs font-medium hover:bg-blue-50 transition-colors"
             >
-              Install
+              {t('installButton')}
             </button>
             <button
               type="button"
               onClick={handleDismiss}
               className="p-1 hover:bg-blue-700 rounded"
-              aria-label="Dismiss"
+              aria-label={t('dismissAriaLabel')}
             >
               <X size={14} />
             </button>
@@ -151,8 +153,8 @@ export default function PWAInstallPrompt() {
               <Logo variant="icon-dark" size="sm" className="w-6 h-6" />
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="font-medium text-gray-900 text-xs">Install LIFO</h3>
-              <p className="text-gray-500 text-xs">Experimental PWA</p>
+              <h3 className="font-medium text-gray-900 text-xs">{t('title')}</h3>
+              <p className="text-gray-500 text-xs">{t('subtitle')}</p>
             </div>
             <div className="flex gap-1">
               <button
@@ -160,13 +162,13 @@ export default function PWAInstallPrompt() {
                 onClick={handleInstallClick}
                 className="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-xs font-medium transition-colors"
               >
-                Install
+                {t('installButton')}
               </button>
               <button
                 type="button"
                 onClick={handleDismiss}
                 className="text-gray-400 hover:text-gray-600 p-1"
-                aria-label="Close"
+                aria-label={t('closeAriaLabel')}
               >
                 <X size={12} />
               </button>

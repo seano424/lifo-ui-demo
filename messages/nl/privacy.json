@@ -34,7 +34,6 @@
       "title": "4. Juridische Basis voor Verwerking (AVG)",
       "legalBasis": {
         "title": "We verwerken uw gegevens op basis van:",
-        "intro": "",
         "items": [
           "Uitvoering van overeenkomst: Om de dienst te leveren waarvoor u zich hebt aangemeld",
           "Legitieme belangen: Om onze dienst te verbeteren, fraude te voorkomen en de beveiliging te waarborgen",
@@ -45,13 +44,11 @@
     },
     "section5": {
       "title": "5. Gegevensopslag en Beveiliging",
-      "intro": "",
       "items": [
         "Waar we uw gegevens opslaan: Alle gegevens worden opgeslagen op beveiligde servers in de Europese Unie. We gebruiken Supabase (EU-regio) voor database-hosting. Gegevens worden zowel in transit (TLS/SSL) als in rust versleuteld.",
         "Hoe we uw gegevens beschermen: Branchestandaard versleutelingsprotocollen, regelmatige beveiligingsaudits en kwetsbaarheidsbeoordelingen, toegangscontroles en multi-factor authenticatie, veilige ontwikkelingspraktijken en codebeoordelingen, training van medewerkers op het gebied van gegevensbescherming.",
         "Gegevensbewaring: We bewaren uw gegevens zolang uw account actief blijft. Bij verwijdering van het account verwijderen of anonimiseren we uw gegevens binnen 90 dagen. Sommige gegevens kunnen langer bewaard worden als de wet dit vereist (bijv. boekhoudkundige gegevens)."
-      ],
-      "outro": ""
+      ]
     },
     "section6": {
       "title": "6. Gegevensdeling en Derde Partijen",

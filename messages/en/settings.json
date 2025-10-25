@@ -5,7 +5,15 @@
     "language": {
       "title": "Language",
       "description": "Choose your preferred language for the interface",
-      "preferred": "Preferred Language"
+      "currentLanguage": "Current Language"
+    },
+    "theme": {
+      "title": "Theme",
+      "description": "Choose your preferred theme for the interface",
+      "currentTheme": "Current Theme",
+      "system": "System",
+      "light": "Light",
+      "dark": "Dark"
     },
     "tabs": {
       "store": "Store",
@@ -258,8 +266,7 @@
       "title": "Account Activity",
       "memberSince": "Member since {date}",
       "lastLogin": "Last login: {date}",
-      "neverLoggedIn": "Never logged in",
-      "failedAttempts": "{count} failed PIN attempt{plural}"
+      "neverLoggedIn": "Never logged in"
     },
     "security": {
       "notice": "This is your personal account. You can change your password in the login page."
