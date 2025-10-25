@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Typography } from '@/components/ui/typography'
 import { useBarcodeDetection } from '@/hooks/use-barcode-detection'
 import { cn } from '@/lib/utils'
+import { useTranslations } from 'next-intl'
 
 export interface BarcodeDetection {
   format: string
@@ -30,10 +31,12 @@ export default function BarcodeScanner({
   onError,
   autoStart = true,
   className = '',
-  title = 'Scan Product',
-  subtitle = 'Scan a barcode to add a product to your inventory',
-  permissionMessage = 'Camera access is required for scanning.',
+  title,
+  subtitle,
+  permissionMessage,
 }: BarcodeScannerProps): React.JSX.Element {
+  const t = useTranslations('ocr.barcodeScanner')
+
   const [isScanning, setIsScanning] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [hasPermission, setHasPermission] = useState<boolean | null>(null)
@@ -53,6 +56,11 @@ export default function BarcodeScanner({
     isInitialized,
     error: detectionError,
   } = useBarcodeDetection()
+
+  // Use translations as defaults if props not provided
+  const displayTitle = title ?? t('title')
+  const displaySubtitle = subtitle ?? t('subtitle')
+  const displayPermissionMessage = permissionMessage ?? t('permissionMessage')
 
   // Mark component as mounted
   useEffect(() => {
@@ -167,30 +175,26 @@ export default function BarcodeScanner({
       }
     } catch (err) {
       // Enhanced error reporting for debugging
-      let errorMessage = 'Failed to access camera'
+      let errorMessage = t('errors.failedToAccessCamera')
       if (err instanceof Error) {
         errorMessage = `${err.name}: ${err.message}`
 
         // Check if this is a simulator/no camera issue
         if (err.name === 'NotFoundError' || err.message.includes('not found')) {
-          errorMessage +=
-            '\n\n📱 No camera detected. If you are using a simulator, please test on a real device.'
+          errorMessage += t('errors.noCameraDetected')
         }
         // For constraint errors, provide more detail
         else if (err.name === 'OverconstrainedError' || err.message.includes('constraint')) {
-          errorMessage += '\n\n⚠️ Camera constraints not supported.'
+          errorMessage += t('errors.constraintsNotSupported')
           // Check if any cameras are available at all
           navigator.mediaDevices.enumerateDevices().then(devices => {
             const cameras = devices.filter(d => d.kind === 'videoinput')
             if (cameras.length === 0) {
-              setError(
-                prev =>
-                  `${prev}\n\n📱 No cameras found on this device. If using a simulator, test on a real iPad/iPhone.`,
-              )
+              setError(prev => `${prev}${t('errors.noCamerasFound')}`)
             } else {
               setError(
                 prev =>
-                  `${prev}\n\n📹 Found ${cameras.length} camera(s). This may be a simulator limitation.`,
+                  `${prev}${t('errors.cameraCountSimulatorLimitation', { count: cameras.length })}`,
               )
             }
           })
@@ -202,7 +206,7 @@ export default function BarcodeScanner({
     } finally {
       isStartingRef.current = false
     }
-  }, [onError, isScanning, isMounted, stopCamera, userStoppedCamera, isInitialized])
+  }, [onError, isScanning, isMounted, stopCamera, userStoppedCamera, isInitialized, t])
 
   // Scan for barcodes in video feed
   const scanForBarcode = useCallback(async () => {
@@ -325,10 +329,10 @@ export default function BarcodeScanner({
         <div className="flex items-center gap-2">
           <Scan className="w-6 h-6  text-secondary-900 stroke-5 border-2 border-secondary-900 rounded-full p-[3px] bg-primary-100" />
           <Typography variant="h3" className="text-primary-800 font-black">
-            {title}
+            {displayTitle}
           </Typography>
         </div>
-        <Typography variant="p">{subtitle}</Typography>
+        <Typography variant="p">{displaySubtitle}</Typography>
       </div>
 
       <div className="space-y-4">
@@ -344,7 +348,7 @@ export default function BarcodeScanner({
         {!isInitialized && !detectionError && (
           <Alert>
             <AlertCircle className="h-4 w-4" />
-            <AlertDescription>Initializing barcode detection...</AlertDescription>
+            <AlertDescription>{t('status.initializing')}</AlertDescription>
           </Alert>
         )}
 
@@ -356,14 +360,14 @@ export default function BarcodeScanner({
               <div className="text-center space-y-4">
                 <Alert className="border-none bg-transparent shadow-none">
                   <Camera className="h-4 w-4" />
-                  <AlertDescription>{permissionMessage}</AlertDescription>
+                  <AlertDescription>{displayPermissionMessage}</AlertDescription>
                 </Alert>
                 <Button
                   onClick={handleUserStart}
                   disabled={!isInitialized || isStartingRef.current}
                 >
                   <Camera className="w-4 h-4 mr-2" />
-                  {isStartingRef.current ? 'Starting...' : 'Enable Camera'}
+                  {isStartingRef.current ? t('status.starting') : t('buttons.enableCamera')}
                 </Button>
               </div>
             </div>
@@ -381,7 +385,7 @@ export default function BarcodeScanner({
 
               {!isScanning && (
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <Typography variant="p">Start scanning to see your camera</Typography>
+                  <Typography variant="p">{t('status.cameraViewMessage')}</Typography>
                 </div>
               )}
 
@@ -393,7 +397,7 @@ export default function BarcodeScanner({
                     {detectedBarcode && (
                       <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-primary-500 text-white px-2 py-1 rounded-2xl text-sm">
                         <CheckCircle className="w-3 h-3 inline mr-1" />
-                        Detected: {detectedBarcode}
+                        {t('status.detected')} {detectedBarcode}
                       </div>
                     )}
                   </div>
@@ -416,12 +420,12 @@ export default function BarcodeScanner({
                 disabled={!isInitialized || isStartingRef.current}
               >
                 <Camera className="w-4 h-4 mr-2" />
-                {isStartingRef.current ? 'Starting...' : 'Start Scanning'}
+                {isStartingRef.current ? t('status.starting') : t('buttons.startScanning')}
               </Button>
             ) : (
               <Button onClick={handleUserStop} variant="default" className="flex-1">
                 <StopCircle className="w-4 h-4 mr-2" />
-                Stop Scanning
+                {t('buttons.stopScanning')}
               </Button>
             )}
           </div>

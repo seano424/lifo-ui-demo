@@ -40,5 +40,28 @@
       "backendUnavailable": "Le service backend ne répond pas",
       "scanInstructions": "Positionnez le code-barres dans le cadre de la caméra. Le scanner le détectera automatiquement."
     }
+  },
+  "barcodeScanner": {
+    "title": "Scanner le produit",
+    "subtitle": "Scannez un code-barres pour ajouter un produit à votre inventaire",
+    "permissionMessage": "L'accès à la caméra est requis pour la numérisation.",
+    "status": {
+      "initializing": "Initialisation de la détection de code-barres...",
+      "starting": "Démarrage...",
+      "cameraViewMessage": "Démarrez la numérisation pour voir votre caméra",
+      "detected": "Détecté :"
+    },
+    "buttons": {
+      "enableCamera": "Activer la caméra",
+      "startScanning": "Démarrer la numérisation",
+      "stopScanning": "Arrêter la numérisation"
+    },
+    "errors": {
+      "failedToAccessCamera": "Échec de l'accès à la caméra",
+      "noCameraDetected": "\n\n📱 Aucune caméra détectée. Si vous utilisez un simulateur, veuillez tester sur un appareil réel.",
+      "constraintsNotSupported": "\n\n⚠️ Contraintes de caméra non prises en charge.",
+      "noCamerasFound": "\n\n📱 Aucune caméra trouvée sur cet appareil. Si vous utilisez un simulateur, testez sur un vrai iPad/iPhone.",
+      "cameraCountSimulatorLimitation": "\n\n📹 {count} caméra(s) trouvée(s). Cela peut être une limitation du simulateur."
+    }
   }
 }

@@ -2,6 +2,7 @@
 
 import { AlertTriangle } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useState } from 'react'
 import { ProductListFilters } from '@/components/products/product-list-filters'
 import { ProductListSortControls } from '@/components/products/product-list-sort-controls'
@@ -32,6 +33,7 @@ export function ProductsFilteredList({
   const router = useRouter()
   const searchParams = useSearchParams()
   const activeStoreId = useActiveStoreId()
+  const t = useTranslations('products.table')
 
   const [filters, setFilters] = useState<ProductFilters>(() => {
     const baseFilters: ProductFilters = {
@@ -154,7 +156,7 @@ export function ProductsFilteredList({
                 searchTerm={filters.search}
                 onSearchChange={handleSearchChange}
                 isLoading={false}
-                placeholder="Search products by name, brand, barcode, or SKU..."
+                placeholder={t('searchPlaceholder')}
                 size="large"
               />
             </div>

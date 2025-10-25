@@ -36,7 +36,8 @@
       "cost": "Cost",
       "batch": "batch",
       "batches": "batches",
-      "units": "units"
+      "units": "units",
+      "searchPlaceholder": "Search products by name, brand, barcode, or SKU..."
     },
     "catalog": {
       "title": "Products Catalog",
@@ -101,6 +102,7 @@
         "markAsDamaged": "Mark as Damaged",
         "deleteBatch": "Delete Batch"
       },
+      "searchPlaceholder": "Search batches by product name, brand, barcode, batch number, location...",
       "emptyState": {
         "title": "No batches found",
         "description": "Try adjusting your search or filters. ",

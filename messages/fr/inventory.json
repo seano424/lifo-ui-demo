@@ -36,7 +36,8 @@
       "cost": "Coût",
       "batch": "lot",
       "batches": "lots",
-      "units": "unités"
+      "units": "unités",
+      "searchPlaceholder": "Rechercher des produits par nom, marque, code-barres ou SKU..."
     },
     "catalog": {
       "title": "Catalogue des produits",
@@ -101,6 +102,7 @@
         "markAsDamaged": "Marquer comme endommagé",
         "deleteBatch": "Supprimer le lot"
       },
+      "searchPlaceholder": "Rechercher des lots par nom de produit, marque, code-barres, numéro de lot, emplacement...",
       "emptyState": {
         "title": "Aucun lot trouvé",
         "description": "Vous n'avez encore aucun lot dans votre inventaire. Commencez par ajouter votre premier lot pour suivre les dates d'expiration et gérer les niveaux de stock.",
