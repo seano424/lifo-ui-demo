@@ -77,7 +77,9 @@ describe('useCSVUpload - Analytics Bug Tests', () => {
         wrapper: createWrapper(),
       })
 
-      const testFile = createMockFile('test,csv,data', 'test.csv')
+      const validCsvContent = `SKU,Product_Name,Category,Quantity,Expiry_Date
+TEST001,Test Product,Test Category,10,2025-12-31`
+      const testFile = createMockFile(validCsvContent, 'test.csv')
 
       // Preview the file first
       await act(async () => {
@@ -133,7 +135,10 @@ describe('useCSVUpload - Analytics Bug Tests', () => {
         wrapper: createWrapper(),
       })
 
-      const testFile = createMockFile('test,csv,data', 'test.csv')
+      const validCsvContent = `SKU,Product_Name,Category,Quantity,Expiry_Date
+TEST001,Test Product 1,Test Category,50,2025-12-31
+TEST002,Test Product 2,Test Category,30,2025-11-15`
+      const testFile = createMockFile(validCsvContent, 'test.csv')
 
       await act(async () => {
         await result.current.previewCsvFile(testFile)
@@ -186,7 +191,11 @@ describe('useCSVUpload - Analytics Bug Tests', () => {
         wrapper: createWrapper(),
       })
 
-      const testFile = createMockFile('test,csv,data', 'test.csv')
+      const validCsvContent = `SKU,Product_Name,Category,Quantity,Expiry_Date
+TEST001,Test Product 1,Test Category,100,2025-12-31
+TEST002,Test Product 2,Test Category,200,2025-11-15
+TEST003,Test Product 3,Test Category,150,2025-10-20`
+      const testFile = createMockFile(validCsvContent, 'test.csv')
 
       await act(async () => {
         await result.current.previewCsvFile(testFile)
@@ -228,7 +237,9 @@ describe('useCSVUpload - Analytics Bug Tests', () => {
         wrapper: createWrapper(),
       })
 
-      const testFile = createMockFile('invalid data', 'test.csv')
+      const validCsvContent = `SKU,Product_Name,Category,Quantity,Expiry_Date
+TEST001,Invalid Product,Test,10,2025-12-31`
+      const testFile = createMockFile(validCsvContent, 'test.csv')
 
       await act(async () => {
         await result.current.previewCsvFile(testFile)
