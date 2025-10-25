@@ -34,7 +34,7 @@ export function TeamSwitcher({ compact = false }: TeamSwitcherProps) {
   const { switchStore, isChangingStore } = useStoreActions()
   const { activeStore } = useStoreState()
   const t = useTranslations('teamSwitcher')
-  const tRoles = useTranslations('dashboardAdmin.users.roles')
+  const tRoles = useTranslations('users.roles')
 
   const handleStoreSwitch = (store: Store, makePrimary: boolean = false) => {
     if (store.store_id !== activeStore?.store_id) {
