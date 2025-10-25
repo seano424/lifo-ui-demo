@@ -7,6 +7,14 @@
       "description": "Choose your preferred language for the interface",
       "currentLanguage": "Current Language"
     },
+    "theme": {
+      "title": "Theme",
+      "description": "Choose your preferred theme for the interface",
+      "currentTheme": "Current Theme",
+      "system": "System",
+      "light": "Light",
+      "dark": "Dark"
+    },
     "tabs": {
       "store": "Store",
       "notifications": "Notifications",

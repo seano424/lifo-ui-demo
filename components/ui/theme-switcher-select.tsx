@@ -13,15 +13,15 @@ import { useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
 
 const THEME_OPTIONS = {
-  light: { name: 'account.theme.light', icon: Sun },
-  dark: { name: 'account.theme.dark', icon: Moon },
-  system: { name: 'account.theme.system', icon: Laptop },
+  light: { name: 'light', icon: Sun },
+  dark: { name: 'dark', icon: Moon },
+  system: { name: 'system', icon: Laptop },
 } as const
 
 export function ThemeSwitcherSelect() {
   const { theme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
-  const t = useTranslations()
+  const t = useTranslations('settings.theme')
   // useEffect only runs on the client, so now we can safely show the UI
   useEffect(() => {
     setMounted(true)

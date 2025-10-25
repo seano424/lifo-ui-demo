@@ -38,13 +38,13 @@ export async function loadMessages(locale: string): Promise<Record<string, unkno
       import(`../messages/${locale}/privacy.json`).then(m => m.default).catch(() => ({})),
     ])
 
-    // Merge all messages into a single object
+    // Merge all messages into a single object with proper namespacing
     return {
       ...auth,
       ...common,
       ...dashboard,
-      ...dashboardAdmin,
-      ...dashboardData,
+      dashboardAdmin,
+      dashboardData,
       ...inventory,
       ...marketing,
       ...onboarding,

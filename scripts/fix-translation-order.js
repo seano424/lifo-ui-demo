@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
-const fs = require('fs')
-const path = require('path')
+const fs = require('node:fs')
+const path = require('node:path')
 
 // Helper function to get all keys from a nested object in order
 function getAllKeysInOrder(obj, prefix = '') {
@@ -149,7 +149,7 @@ function fixTranslationOrder() {
         const fullPath = path.join(process.cwd(), 'messages', filePath)
 
         // Write with proper formatting
-        fs.writeFileSync(fullPath, JSON.stringify(reorderedData, null, 2) + '\n')
+        fs.writeFileSync(fullPath, `${JSON.stringify(reorderedData, null, 2)}\n`)
         totalFixed++
 
         console.log(`   ✅ Fixed ${language}`)

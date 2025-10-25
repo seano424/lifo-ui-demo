@@ -1,8 +1,13 @@
-import fs from 'fs'
-import path from 'path'
+import fs from 'node:fs'
+import path from 'node:path'
+
+// Type for translation objects
+interface TranslationObject {
+  [key: string]: string | TranslationObject
+}
 
 // Helper function to get all keys from a nested object in order
-function getAllKeysInOrder(obj: any, prefix = ''): string[] {
+function getAllKeysInOrder(obj: TranslationObject, prefix = ''): string[] {
   const keys: string[] = []
 
   for (const [key, value] of Object.entries(obj)) {
@@ -165,7 +170,7 @@ describe('Translation Consistency', () => {
 })
 
 // Helper function to get object structure (keys only, no values)
-function getObjectStructure(obj: any, prefix = ''): string[] {
+function getObjectStructure(obj: TranslationObject, prefix = ''): string[] {
   const structure: string[] = []
 
   for (const [key, value] of Object.entries(obj)) {

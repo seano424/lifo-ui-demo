@@ -16,7 +16,7 @@ import { useEffect, useState } from 'react'
 const CompactThemeSwitcher = () => {
   const [mounted, setMounted] = useState(false)
   const { theme, setTheme } = useTheme()
-  const t = useTranslations('account.theme')
+  const t = useTranslations('settings.theme')
 
   // useEffect only runs on the client, so now we can safely show the UI
   useEffect(() => {

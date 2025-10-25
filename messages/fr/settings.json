@@ -7,6 +7,14 @@
       "description": "Choisissez votre langue préférée pour l'interface",
       "currentLanguage": "Langue actuelle"
     },
+    "theme": {
+      "title": "Thème",
+      "description": "Choisissez votre thème préféré pour l'interface",
+      "currentTheme": "Thème actuel",
+      "system": "Système",
+      "light": "Clair",
+      "dark": "Sombre"
+    },
     "tabs": {
       "store": "Magasin",
       "notifications": "Notifications",
