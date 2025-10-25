@@ -91,6 +91,7 @@
         "costPrice": "Cost Price",
         "sellPrice": "Sell Price",
         "status": "Status",
+        "createdAt": "Created At",
         "location": "Location"
       },
       "actions": {
@@ -355,6 +356,8 @@
         "productName": "Product Name",
         "category": "Category",
         "quantity": "Qty",
+        "costPrice": "Cost Price",
+        "sellingPrice": "Selling Price",
         "expiryDate": "Expiry Date"
       },
       "selectDate": "Select date",
@@ -399,7 +402,13 @@
       "noFile": "Please select a file first",
       "noStore": "Store information is missing. Please refresh and try again.",
       "uploadFailed": "Upload Failed",
-      "startFailed": "Failed to start upload. Please try again."
+      "startFailed": "Failed to start upload. Please try again.",
+      "invalidPricing": "Invalid pricing detected",
+      "invalidPricingDescription": "All cost and selling prices must be at least 0.01",
+      "priceTooLow": "Must be at least 0.01",
+      "databaseValidation": "Database validation failed. Check pricing values (must be >= 0.01)",
+      "noCachedData": "No cached data available. Please preview the file first.",
+      "allItemsExpired": "All items have expired (>7 days past expiry). Please update expiry dates and try again."
     },
     "performanceInfo": {
       "title": "Bulk-Optimized Ultra-Fast Performance",

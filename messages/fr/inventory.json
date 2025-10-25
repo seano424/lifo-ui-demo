@@ -91,6 +91,7 @@
         "costPrice": "Prix de revient",
         "sellPrice": "Prix de vente",
         "status": "Statut",
+        "createdAt": "Créé le",
         "location": "Emplacement"
       },
       "actions": {
@@ -354,6 +355,8 @@
         "productName": "Nom du produit",
         "category": "Catégorie",
         "quantity": "Qté",
+        "costPrice": "Prix de revient",
+        "sellingPrice": "Prix de vente",
         "expiryDate": "Date d'expiration"
       },
       "selectDate": "Sélectionner une date",
@@ -398,7 +401,13 @@
       "noFile": "Veuillez d'abord sélectionner un fichier",
       "noStore": "Informations du magasin manquantes. Actualisez et réessayez.",
       "uploadFailed": "Échec du téléchargement",
-      "startFailed": "Impossible de démarrer le téléchargement. Veuillez réessayer."
+      "startFailed": "Impossible de démarrer le téléchargement. Veuillez réessayer.",
+      "invalidPricing": "Prix non valides détectés",
+      "invalidPricingDescription": "Tous les prix de revient et de vente doivent être d'au moins 0,01",
+      "priceTooLow": "Doit être d'au moins 0,01",
+      "databaseValidation": "Échec de la validation de la base de données. Vérifiez les prix (doivent être >= 0,01)",
+      "noCachedData": "Aucune donnée en cache disponible. Veuillez d'abord prévisualiser le fichier.",
+      "allItemsExpired": "Tous les articles ont expiré (>7 jours après expiration). Veuillez mettre à jour les dates d'expiration et réessayer."
     },
     "performanceInfo": {
       "title": "Performances ultra-rapides optimisées en masse",

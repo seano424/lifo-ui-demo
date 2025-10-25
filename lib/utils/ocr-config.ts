@@ -76,10 +76,10 @@ export const OCR_DEFAULTS = {
   SCANNING: {
     PRE_CHECK_INTERVAL_MS: 500, // How often to analyze frames
     MAX_ATTEMPTS: 10, // Max OCR API calls before stopping
-    MIN_TEXT_CONFIDENCE: 0.05, // Low threshold for low-light handwritten text
-    MIN_DATE_CONFIDENCE: 0.4, // Minimum confidence for date pattern detection
-    MIN_OVERALL_SCORE: 0.5, // Minimum combined score to trigger OCR
-    MIN_SHARPNESS: 0.01, // Low threshold to support handwritten text on paper
+    MIN_TEXT_CONFIDENCE: 0.05, // Not a hard requirement - used in scoring only (30% weight)
+    MIN_DATE_CONFIDENCE: 0.35, // HARD requirement - minimum date pattern detection confidence
+    MIN_OVERALL_SCORE: 0.3, // HARD requirement - minimum combined score to trigger OCR
+    MIN_SHARPNESS: 0.005, // HARD requirement - minimum sharpness/focus level
     OCR_CONFIDENCE_THRESHOLD: 0.5, // Default confidence threshold for OCR API
   },
 

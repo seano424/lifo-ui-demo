@@ -25,10 +25,9 @@ export function BatchListSkeleton() {
                 <ArrowUpDown className="h-4 w-4" />
               </div>
             </TableHead>
-            <TableHead>{t('headers.product')}</TableHead>
             <TableHead>
               <div className="flex items-center gap-1">
-                {t('headers.supplier')}
+                {t('headers.product')}
                 <ArrowUpDown className="h-4 w-4" />
               </div>
             </TableHead>
@@ -62,7 +61,12 @@ export function BatchListSkeleton() {
                 <ArrowUpDown className="h-4 w-4" />
               </div>
             </TableHead>
-            <TableHead className="w-12"></TableHead>
+            <TableHead>
+              <div className="flex items-center gap-1">
+                {t('headers.createdAt')}
+                <ArrowUpDown className="h-4 w-4" />
+              </div>
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -83,16 +87,13 @@ export function BatchListSkeleton() {
               <TableCell className="border-r border-border/50">
                 <Skeleton className="h-12 w-32 rounded" />
               </TableCell>
-              <TableCell>
-                <Skeleton className="h-12 w-32 rounded" />
-              </TableCell>
               <TableCell className="border-r border-border/50">
                 <Skeleton className="h-12 w-32 rounded" />
               </TableCell>
               <TableCell className="border-r border-border/50">
                 <Skeleton className="h-12 w-32 rounded" />
               </TableCell>
-              <TableCell className="border-r border-border/50">
+              <TableCell className="border-r border-border/50 last:border-r-0">
                 <Skeleton className="h-12 w-32 rounded" />
               </TableCell>
             </TableRow>

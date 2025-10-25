@@ -61,6 +61,7 @@ export default async function RootLayout({
   children: React.ReactNode
 }>) {
   const messages = await getMessages()
+  const isDarkModeEnabled = process.env.NEXT_PUBLIC_ENABLE_DARK_MODE === 'true'
 
   return (
     <html
@@ -72,8 +73,8 @@ export default async function RootLayout({
       <body className={`font-sans antialiased`}>
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
-          enableSystem={true}
+          defaultTheme={isDarkModeEnabled ? 'system' : 'light'}
+          enableSystem={isDarkModeEnabled}
           disableTransitionOnChange
         >
           <ReactQueryProvider>

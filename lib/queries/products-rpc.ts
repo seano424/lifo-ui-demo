@@ -46,6 +46,7 @@ export async function fetchProductsPageRPC(
         p_store_id: filters.storeId,
         p_category_code: filters.category || null,
         p_brand: filters.brand || null,
+        p_search: filters.search || null,
         p_sort_field: filters.sort?.field || 'created_at',
         p_sort_direction: filters.sort?.direction || 'desc',
         p_page_size: pageSize,

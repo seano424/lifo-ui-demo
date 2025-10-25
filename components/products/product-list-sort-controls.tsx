@@ -33,17 +33,15 @@ export function ProductListSortControls({
   }
 
   const getSortLabel = (field: SortField) => {
-    const labels = {
+    const labels: Record<SortField, string> = {
       name: t('name'),
       category: t('category'),
       brand: t('brand'),
       total_stock: t('stock'),
-      base_selling_price: t('price'),
       active_batches_count: t('activeBatches'),
       created_at: t('dateAdded'),
-      updated_at: t('lastUpdated'),
     }
-    return labels[field] || field
+    return labels[field]
   }
 
   const getCurrentSortLabel = () => {
@@ -92,13 +90,6 @@ export function ProductListSortControls({
         >
           {t('stock')}
           {getSortIcon('total_stock')}
-        </DropdownMenuItem>
-        <DropdownMenuItem
-          onClick={() => updateSort('base_selling_price')}
-          className="justify-between text-nowrap"
-        >
-          {t('price')}
-          {getSortIcon('base_selling_price')}
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => updateSort('active_batches_count')}

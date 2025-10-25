@@ -2,6 +2,7 @@
 
 import { ArrowRight, Package } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import { memo } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Typography } from '@/components/ui/typography'
@@ -24,7 +25,7 @@ export interface ProductCardProps {
   className?: string
 }
 
-export default function ProductCard({
+function ProductCard({
   product,
   mode = 'display',
   showRemoveButton = false,
@@ -90,3 +91,7 @@ export default function ProductCard({
     </Card>
   )
 }
+
+// Export memoized version to prevent re-renders when props haven't changed
+// This is especially important during OCR scanning which causes frequent parent re-renders
+export default memo(ProductCard)

@@ -63,10 +63,25 @@ export async function POST(request: NextRequest) {
     // The /upload endpoint only validates, /upload-and-create-batches actually persists data
     const uploadUrl = `${fastapiUrl}/api/v1/csv-upload/upload-and-create-batches`
 
-    // Create new FormData for FastAPI
+    // Create FormData for FastAPI - file is already normalized by frontend
     const fastApiFormData = new FormData()
     fastApiFormData.append('file', file)
     fastApiFormData.append('store_id', storeId)
+
+    // Forward chunk_size if provided (optimal: 100)
+    const chunkSize = formData.get('chunk_size')
+    if (chunkSize && typeof chunkSize === 'string') {
+      fastApiFormData.append('chunk_size', chunkSize)
+    }
+
+    // Debug logging (without consuming file stream)
+    if (process.env.NODE_ENV === 'development') {
+      logger.log('csv-upload', 'Sending file to backend', {
+        fileName: file.name,
+        fileSize: file.size,
+        storeId,
+      })
+    }
 
     const startTime = Date.now()
 
@@ -90,22 +105,95 @@ export async function POST(request: NextRequest) {
         processingTime,
       })
 
-      let errorMessage = 'Upload failed'
-      try {
-        const errorJson = JSON.parse(errorText)
-        errorMessage = errorJson.error || errorJson.detail || errorMessage
-      } catch {
-        errorMessage = errorText || errorMessage
+      // Debug: Log error response in development
+      if (process.env.NODE_ENV === 'development') {
+        logger.error('csv-upload', 'Backend error response', {
+          status: response.status,
+          errorPreview: errorText.substring(0, 500),
+          fullLength: errorText.length,
+        })
       }
 
-      return NextResponse.json({ error: errorMessage }, { status: response.status })
+      let errorMessage = 'Upload failed'
+      let errorDetails: unknown = null
+
+      try {
+        const errorJson = JSON.parse(errorText) as Record<string, unknown>
+
+        // Type-safe error extraction
+        if (typeof errorJson.error === 'string') {
+          errorMessage = errorJson.error
+        } else if (typeof errorJson.message === 'string') {
+          errorMessage = errorJson.message
+        } else if (typeof errorJson.detail === 'string') {
+          errorMessage = errorJson.detail
+        } else if (
+          errorJson.error &&
+          typeof errorJson.error === 'object' &&
+          errorJson.error !== null &&
+          !Array.isArray(errorJson.error)
+        ) {
+          errorMessage = JSON.stringify(errorJson.error)
+        } else if (
+          errorJson.detail &&
+          typeof errorJson.detail === 'object' &&
+          errorJson.detail !== null &&
+          !Array.isArray(errorJson.detail)
+        ) {
+          errorMessage = JSON.stringify(errorJson.detail)
+        }
+
+        // Preserve full error details for debugging
+        errorDetails = errorJson
+
+        if (process.env.NODE_ENV === 'development') {
+          // Sanitize error details before logging (remove sensitive fields)
+          const sanitizedDetails =
+            errorDetails && typeof errorDetails === 'object'
+              ? Object.fromEntries(
+                  Object.entries(errorDetails).filter(
+                    ([key]) =>
+                      !['auth', 'authorization', 'credentials', 'password', 'token'].includes(
+                        key.toLowerCase(),
+                      ),
+                  ),
+                )
+              : errorDetails
+
+          console.error('🔍 [CSV-API-ERROR] Parsed error:', {
+            message: errorMessage,
+            hasDetails: !!sanitizedDetails,
+            detailKeys: sanitizedDetails ? Object.keys(sanitizedDetails) : [],
+          })
+        }
+      } catch (parseError) {
+        errorMessage = errorText || errorMessage
+        if (process.env.NODE_ENV === 'development') {
+          console.error('🔍 [CSV-API-ERROR] Failed to parse error JSON:', parseError)
+        }
+      }
+
+      // Return error message, only include details in development
+      return NextResponse.json(
+        {
+          error: errorMessage,
+          ...(process.env.NODE_ENV === 'development' && { details: errorDetails }),
+          status: response.status,
+        },
+        { status: response.status },
+      )
     }
 
     const result = await response.json()
 
-    // 🐛 DEBUG: Log the full response to investigate silent failures
-    console.log('🔍 [CSV-UPLOAD-DEBUG] Full backend response:', JSON.stringify(result, null, 2))
-    console.log('🔍 [CSV-UPLOAD-DEBUG] Response keys:', Object.keys(result))
+    // Debug logging for development
+    if (process.env.NODE_ENV === 'development') {
+      logger.log('csv-upload', 'Backend response received', {
+        success: result.success,
+        totalItems: result.data_summary?.total_items,
+        successfulBatches: result.batch_creation?.successful_batches,
+      })
+    }
 
     // ✅ FIX: Map backend response to frontend-expected format
     // Backend uses different field names than frontend expects
@@ -138,12 +226,6 @@ export async function POST(request: NextRequest) {
         updated_products: result.batch_creation?.product_statistics?.updated_products,
       },
     }
-
-    console.log('🔍 [CSV-UPLOAD-DEBUG] Normalized response:', {
-      processed: normalizedResponse.processed,
-      total: normalizedResponse.total_items,
-      failed: normalizedResponse.failed_items?.length,
-    })
 
     logger.log('csv-upload', 'CSV upload completed', {
       processed: normalizedResponse.processed,

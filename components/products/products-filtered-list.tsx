@@ -2,10 +2,11 @@
 
 import { AlertTriangle } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { ProductListFilters } from '@/components/products/product-list-filters'
 import { ProductListSortControls } from '@/components/products/product-list-sort-controls'
 import { ProductsTable } from '@/components/products/products-table'
+import { TodoSearchBar } from '@/components/todos/filters/todo-search-bar'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -17,13 +18,17 @@ interface ProductsFilteredListProps {
   initialFilters?: {
     category?: string
     status?: string
+    search?: string
     sort?: string
     direction?: string
   }
   pageSize?: number
 }
 
-export function ProductsFilteredList({ initialFilters, pageSize = 20 }: ProductsFilteredListProps) {
+export function ProductsFilteredList({
+  initialFilters,
+  pageSize = 100,
+}: ProductsFilteredListProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const activeStoreId = useActiveStoreId()
@@ -35,6 +40,10 @@ export function ProductsFilteredList({ initialFilters, pageSize = 20 }: Products
 
     if (initialFilters?.category) {
       baseFilters.category = initialFilters.category
+    }
+
+    if (initialFilters?.search) {
+      baseFilters.search = initialFilters.search
     }
 
     if (initialFilters?.sort) {
@@ -58,38 +67,72 @@ export function ProductsFilteredList({ initialFilters, pageSize = 20 }: Products
     setFilters(prev => ({ ...prev, storeId: activeStoreId || undefined }))
   }, [activeStoreId])
 
-  const updateFilters = (newFilters: Partial<ProductFilters>) => {
-    const updatedFilters = { ...filters, ...newFilters }
-    setFilters(updatedFilters)
+  const updateFilters = useCallback(
+    (newFilters: Partial<ProductFilters>) => {
+      let updatedFilters: ProductFilters = {} as ProductFilters
 
-    const params = new URLSearchParams(searchParams.toString())
+      setFilters(prev => {
+        updatedFilters = { ...prev, ...newFilters }
+        return updatedFilters
+      })
 
-    if (updatedFilters.category) {
-      params.set('category', updatedFilters.category)
-    } else {
-      params.delete('category')
-    }
+      // Update URL params after state update
+      // Use the updatedFilters from the closure
+      const params = new URLSearchParams(searchParams.toString())
 
-    if (updatedFilters.sort) {
-      params.set('sort', updatedFilters.sort.field)
-      params.set('direction', updatedFilters.sort.direction)
-    } else {
-      params.delete('sort')
-      params.delete('direction')
-    }
+      if (newFilters.category !== undefined) {
+        if (newFilters.category) {
+          params.set('category', newFilters.category)
+        } else {
+          params.delete('category')
+        }
+      }
 
-    router.replace(`?${params.toString()}`)
-  }
+      if (newFilters.search !== undefined) {
+        if (newFilters.search) {
+          params.set('search', newFilters.search)
+        } else {
+          params.delete('search')
+        }
+      }
 
-  const handleSortChange = (newSort: ProductSort) => {
-    updateFilters({ sort: newSort })
-  }
+      if (newFilters.sort !== undefined) {
+        if (newFilters.sort) {
+          params.set('sort', newFilters.sort.field)
+          params.set('direction', newFilters.sort.direction)
+        } else {
+          params.delete('sort')
+          params.delete('direction')
+        }
+      }
 
-  const handleFiltersChange = (newFilters: { category?: string }) => {
-    updateFilters({
-      category: newFilters.category,
-    })
-  }
+      router.replace(`?${params.toString()}`)
+    },
+    [searchParams, router],
+  )
+
+  const handleSortChange = useCallback(
+    (newSort: ProductSort) => {
+      updateFilters({ sort: newSort })
+    },
+    [updateFilters],
+  )
+
+  const handleFiltersChange = useCallback(
+    (newFilters: { category?: string }) => {
+      updateFilters({
+        category: newFilters.category,
+      })
+    },
+    [updateFilters],
+  )
+
+  const handleSearchChange = useCallback(
+    (searchTerm: string | undefined) => {
+      updateFilters({ search: searchTerm })
+    },
+    [updateFilters],
+  )
 
   if (error) {
     return (
@@ -105,6 +148,18 @@ export function ProductsFilteredList({ initialFilters, pageSize = 20 }: Products
       <Card>
         <div className="p-4">
           <div className="flex flex-col gap-4">
+            {/* Search Bar */}
+            <div className="flex justify-center">
+              <TodoSearchBar
+                searchTerm={filters.search}
+                onSearchChange={handleSearchChange}
+                isLoading={false}
+                placeholder="Search products by name, brand, barcode, or SKU..."
+                size="large"
+              />
+            </div>
+
+            {/* Filters and Sort Controls */}
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <ProductListFilters
                 filters={{

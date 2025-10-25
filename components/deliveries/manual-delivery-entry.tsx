@@ -121,10 +121,16 @@ export default function ManualDeliveryEntry({
       return
     }
 
+    // Validate product name
+    if (!selectedProduct.productName || selectedProduct.productName.trim() === '') {
+      console.error('Cannot add item: Product name is required')
+      return
+    }
+
     const newItem: ScannedItem = {
       id: Date.now().toString(),
       barcode: selectedProduct.barcode,
-      productName: selectedProduct.productName || 'Unknown Product',
+      productName: selectedProduct.productName,
       brand: selectedProduct.brand,
       expiryDate: inventoryData.expiryDate,
       quantity: inventoryData.quantity,

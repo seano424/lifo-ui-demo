@@ -80,9 +80,13 @@ export function createBatchTableColumns({
       enableResizing: true,
     },
     {
-      id: 'product',
+      id: 'product_name',
       accessorFn: row => row.products?.name || '',
-      header: t('headers.product'),
+      header: () => (
+        <SortableHeader field="product_name" currentSort={currentSort} updateSort={updateSort}>
+          {t('headers.product')}
+        </SortableHeader>
+      ),
       cell: ({ row }) => (
         <div>
           <div className="font-medium truncate" title={row.original.products?.name}>
@@ -96,7 +100,7 @@ export function createBatchTableColumns({
           </div>
         </div>
       ),
-      size: DEFAULT_COLUMN_WIDTHS.product,
+      size: DEFAULT_COLUMN_WIDTHS.product_name,
       minSize: 120,
       maxSize: calculateMaxWidth(data, item => item.products?.name || ''),
       enableResizing: true,
@@ -222,6 +226,32 @@ export function createBatchTableColumns({
       maxSize: Math.max(
         130,
         calculateMaxWidth(data, item => item.status || 'active'),
+      ),
+      enableResizing: true,
+    },
+    {
+      id: 'created_at',
+      accessorKey: 'created_at',
+      header: () => (
+        <SortableHeader field="created_at" currentSort={currentSort} updateSort={updateSort}>
+          {t('headers.createdAt')}
+        </SortableHeader>
+      ),
+      cell: ({ row }) => (
+        <div className="flex items-center gap-2">
+          <Calendar className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+          <span className="truncate">
+            {row.original.created_at ? new Date(row.original.created_at).toLocaleDateString() : '-'}
+          </span>
+        </div>
+      ),
+      size: DEFAULT_COLUMN_WIDTHS.created_at,
+      minSize: 100,
+      maxSize: Math.max(
+        180,
+        calculateMaxWidth(data, item =>
+          item.created_at ? new Date(item.created_at).toLocaleDateString() : '-',
+        ),
       ),
       enableResizing: true,
     },

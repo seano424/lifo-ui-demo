@@ -96,6 +96,47 @@ function validateOptions(options: AutoOCRScannerOptions): void {
 }
 
 /**
+ * Determines the reason for OCR trigger decision
+ * Returns a human-readable explanation of why OCR was or wasn't triggered
+ * NOTE: Text confidence is no longer a hard requirement (it's factored into overall score)
+ */
+function getOCRTriggerReason(
+  analysis: FrameAnalysis,
+  thresholds: {
+    minDateConfidence: number
+    minOverallScore: number
+    minSharpness: number
+  },
+): string {
+  if (analysis.shouldTriggerOCR) {
+    return 'All thresholds met'
+  }
+
+  if (analysis.isBarcodeDetected) {
+    return 'Barcode detected (wrong scanner mode)'
+  }
+
+  if (analysis.datePatternConfidence < thresholds.minDateConfidence) {
+    return `Date pattern confidence too low (${(analysis.datePatternConfidence * 100).toFixed(0)}% < ${(thresholds.minDateConfidence * 100).toFixed(0)}%)`
+  }
+
+  if (analysis.brightness <= 0.2) {
+    return `Too dark (brightness: ${(analysis.brightness * 100).toFixed(0)}%)`
+  }
+
+  if (analysis.brightness >= 0.9) {
+    return `Overexposed (brightness: ${(analysis.brightness * 100).toFixed(0)}%)`
+  }
+
+  if (analysis.sharpness <= thresholds.minSharpness) {
+    return `Too blurry (sharpness: ${(analysis.sharpness * 100).toFixed(0)}% < ${(thresholds.minSharpness * 100).toFixed(0)}%)`
+  }
+
+  // Default: overall score too low
+  return `Overall score too low (${(analysis.overallScore * 100).toFixed(0)}% < ${(thresholds.minOverallScore * 100).toFixed(0)}%) - text: ${(analysis.textConfidence * 100).toFixed(0)}%, date: ${(analysis.datePatternConfidence * 100).toFixed(0)}%`
+}
+
+/**
  * Hook for auto-OCR scanning with intelligent pre-checks
  */
 export function useAutoOCRScanner(options: AutoOCRScannerOptions): AutoOCRScannerState {
@@ -177,24 +218,12 @@ export function useAutoOCRScanner(options: AutoOCRScannerOptions): AutoOCRScanne
 
       const duration = performance.now() - startTime
 
-      // Calculate reason for OCR trigger decision
-      const reason = analysis.shouldTriggerOCR
-        ? 'All thresholds met'
-        : !analysis.hasTextLikeContent
-          ? `No text detected (edges: ${analysis.debugInfo?.edgePercentage.toFixed(1)}%)`
-          : analysis.textConfidence < minTextConfidence
-            ? `Text confidence too low (${(analysis.textConfidence * 100).toFixed(0)}% < ${(minTextConfidence * 100).toFixed(0)}%)`
-            : !analysis.hasDatePattern
-              ? 'No date pattern detected'
-              : analysis.datePatternConfidence < minDateConfidence
-                ? `Date pattern confidence too low (${(analysis.datePatternConfidence * 100).toFixed(0)}% < ${(minDateConfidence * 100).toFixed(0)}%)`
-                : analysis.brightness <= 0.2
-                  ? `Too dark (brightness: ${(analysis.brightness * 100).toFixed(0)}%)`
-                  : analysis.brightness >= 0.9
-                    ? `Overexposed (brightness: ${(analysis.brightness * 100).toFixed(0)}%)`
-                    : analysis.sharpness <= minSharpness
-                      ? `Too blurry (sharpness: ${(analysis.sharpness * 100).toFixed(0)}% < ${(minSharpness * 100).toFixed(0)}%)`
-                      : `Overall score too low (${(analysis.overallScore * 100).toFixed(0)}% < ${(minOverallScore * 100).toFixed(0)}%)`
+      // Calculate reason for OCR trigger decision using helper function
+      const reason = getOCRTriggerReason(analysis, {
+        minDateConfidence,
+        minOverallScore,
+        minSharpness,
+      })
 
       // Store the reason in state
       setLastReason(reason)

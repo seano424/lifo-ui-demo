@@ -47,7 +47,7 @@ import {
   useSupabaseProductSearch,
 } from '@/hooks/use-product-lookup'
 import type { OpenFoodFactsSearchResult, ProductLookupResult } from '@/lib/queries/open-food-facts'
-import { useScanningActions } from '@/lib/stores/scanning-workflow-store'
+import { useScanningActions, useScannedProduct } from '@/lib/stores/scanning-workflow-store'
 import { useStoreState } from '@/lib/stores/store-context'
 import { createClient } from '@/lib/supabase/client'
 import { Label } from '../ui/label'
@@ -85,18 +85,33 @@ export default function ManualBarcodeEntry({
 
   const { getCategoriesForDropdown, isLoading: categoriesLoading } = useCategories()
 
-  const [barcode, setBarcode] = useState(defaultBarcode)
+  // 🎯 Read from Zustand store for pre-filling
+  const scannedProduct = useScannedProduct()
+  const { setProductSelected } = useScanningActions()
+  const { activeStore } = useStoreState()
+
+  const [barcode, setBarcode] = useState(defaultBarcode || scannedProduct?.barcode || '')
   const [selectedProduct, setSelectedProduct] = useState<ProductData | null>(null)
   const [manualProductData, setManualProductData] = useState({
-    productName: '',
-    brand: '',
-    category: '',
-    imageUrl: '',
+    productName: scannedProduct?.productName || '',
+    brand: scannedProduct?.brand || '',
+    category: scannedProduct?.category || '',
+    imageUrl: scannedProduct?.imageUrl || '',
   })
   const [shouldLookup, setShouldLookup] = useState(false)
 
-  const { setProductSelected } = useScanningActions()
-  const { activeStore } = useStoreState()
+  // Update form state when scannedProduct from store changes (for pre-fill/editing)
+  useEffect(() => {
+    if (scannedProduct) {
+      setBarcode(scannedProduct.barcode)
+      setManualProductData({
+        productName: scannedProduct.productName || '',
+        brand: scannedProduct.brand || '',
+        category: scannedProduct.category || '',
+        imageUrl: scannedProduct.imageUrl || '',
+      })
+    }
+  }, [scannedProduct])
 
   const {
     data: lookupResult,

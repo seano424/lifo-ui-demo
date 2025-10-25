@@ -15,6 +15,7 @@ import type { OpenFoodFactsProduct } from '@/lib/queries/open-food-facts'
 // Mock logger to avoid console spam during tests
 jest.mock('@/lib/utils/logger', () => ({
   logger: {
+    log: jest.fn(),
     error: jest.fn(),
     info: jest.fn(),
     warn: jest.fn(),
