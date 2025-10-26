@@ -153,7 +153,7 @@ We performed a clean migration reset to fix schema drift and inconsistent migrat
 
 - **Current State**: Single migration file `20251026181700_001_complete_schema.sql` (14,257 lines)
 - **Backup**: Old migrations archived in `supabase/migrations_backup/` for reference
-- **Source**: Exported directly from production database (jrgmetdsohowtxickqij.supabase.co)
+- **Source**: Exported directly from production database
 - **Includes**: All 8 schemas (admin, analytics, business, inventory, sales, scoring, timeseries, user_mgmt)
 
 **Setup for New Team Members**:
@@ -179,6 +179,17 @@ npm run update-types      # Regenerate types
 - **Type Generation**: Run `npm run update-types` after schema changes
 - **Never skip migrations**: All schema changes must go through migration files
 - **Test locally first**: Always test migrations with `supabase db reset` before committing
+
+**Pre-Commit Migration Checklist**:
+Before committing any new migration, verify:
+- [ ] Migration tested locally with `supabase db reset`
+- [ ] TypeScript types regenerated with `npm run update-types`
+- [ ] No test data or sensitive information in migration
+- [ ] RLS policies tested (verify unauthorized access is blocked)
+- [ ] Migration is idempotent (safe to re-run without errors)
+- [ ] Performance indexes added for new tables/columns where needed
+- [ ] Foreign key constraints and cascades are correct
+- [ ] All schema changes use proper schema prefixes (e.g., `inventory.`, `business.`)
 
 ## Environment Setup
 
