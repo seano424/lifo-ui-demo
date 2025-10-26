@@ -84,6 +84,7 @@
     "kpis": {
       "title": "Overzicht belangrijke statistieken",
       "refresh": "Vernieuwen",
+      "lastUpdated": "Laatst bijgewerkt:",
       "inventory": {
         "label": "Totale voorraadwaarde",
         "subtitle": "batches",

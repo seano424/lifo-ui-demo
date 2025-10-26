@@ -84,6 +84,7 @@
     "kpis": {
       "title": "Aperçu des métriques clés",
       "refresh": "Actualiser",
+      "lastUpdated": "Dernière mise à jour :",
       "inventory": {
         "label": "Valeur totale du stock",
         "subtitle": "lots",

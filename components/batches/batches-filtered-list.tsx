@@ -182,7 +182,7 @@ export function BatchesFilteredList({ initialFilters, pageSize = 100 }: BatchesF
                 searchTerm={filters.search}
                 onSearchChange={handleSearchChange}
                 isLoading={false}
-                placeholder="Search batches by product name, brand, barcode, batch number, location..."
+                placeholder={t('searchPlaceholder')}
                 size="large"
               />
             </div>

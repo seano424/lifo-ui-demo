@@ -84,6 +84,7 @@
     "kpis": {
       "title": "Key Metrics Overview",
       "refresh": "Refresh",
+      "lastUpdated": "Last updated:",
       "inventory": {
         "label": "Total Inventory Value",
         "subtitle": "batches",

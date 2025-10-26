@@ -21,11 +21,12 @@ import { queryKeys } from '@/lib/queries/query-keys'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 import { useQueryClient } from '@tanstack/react-query'
 import { RefreshCw } from 'lucide-react'
-import { useTranslations } from 'next-intl'
+import { useFormatter, useTranslations } from 'next-intl'
 import { useState } from 'react'
 
 export function DashboardKPICards() {
   const t = useTranslations('dashboard.kpis')
+  const format = useFormatter()
   const queryClient = useQueryClient()
   const activeStoreId = useActiveStoreId()
   const [selectedPeriod, setSelectedPeriod] = useState<TimePeriod | null>(null)
@@ -110,7 +111,7 @@ export function DashboardKPICards() {
             {t('title')}
           </Typography>
           <Typography variant="p" className="text-muted-foreground dark:text-secondary-50">
-            Last updated: {new Date().toLocaleDateString()}
+            {t('lastUpdated')} {format.dateTime(new Date(), { dateStyle: 'short' })}
           </Typography>
         </div>
 

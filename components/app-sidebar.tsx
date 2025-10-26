@@ -100,11 +100,9 @@ function useNavigationData() {
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { data: user, isLoading, isError } = useCurrentUser()
+  const { data: user } = useCurrentUser()
   const navigationData = useNavigationData()
 
-  if (isLoading) return <div>Loading...</div>
-  if (isError) return <div>Error</div>
   if (!user) return
 
   return (

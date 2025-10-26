@@ -40,5 +40,28 @@
       "backendUnavailable": "Backend service is not responding",
       "scanInstructions": "Position the barcode within the camera frame. The scanner will detect it automatically."
     }
+  },
+  "barcodeScanner": {
+    "title": "Scan Product",
+    "subtitle": "Scan a barcode to add a product to your inventory",
+    "permissionMessage": "Camera access is required for scanning.",
+    "status": {
+      "initializing": "Initializing barcode detection...",
+      "starting": "Starting...",
+      "cameraViewMessage": "Start scanning to see your camera",
+      "detected": "Detected:"
+    },
+    "buttons": {
+      "enableCamera": "Enable Camera",
+      "startScanning": "Start Scanning",
+      "stopScanning": "Stop Scanning"
+    },
+    "errors": {
+      "failedToAccessCamera": "Failed to access camera",
+      "noCameraDetected": "\n\n📱 No camera detected. If you are using a simulator, please test on a real device.",
+      "constraintsNotSupported": "\n\n⚠️ Camera constraints not supported.",
+      "noCamerasFound": "\n\n📱 No cameras found on this device. If using a simulator, test on a real iPad/iPhone.",
+      "cameraCountSimulatorLimitation": "\n\n📹 Found {count} camera(s). This may be a simulator limitation."
+    }
   }
 }

@@ -40,5 +40,28 @@
       "backendUnavailable": "Backend-service reageert niet",
       "scanInstructions": "Plaats de barcode binnen het cameraframe. De scanner detecteert deze automatisch."
     }
+  },
+  "barcodeScanner": {
+    "title": "Product scannen",
+    "subtitle": "Scan een barcode om een product aan uw inventaris toe te voegen",
+    "permissionMessage": "Cameratoegang is vereist voor scannen.",
+    "status": {
+      "initializing": "Barcodedetectie initialiseren...",
+      "starting": "Starten...",
+      "cameraViewMessage": "Start scannen om uw camera te zien",
+      "detected": "Gedetecteerd:"
+    },
+    "buttons": {
+      "enableCamera": "Camera inschakelen",
+      "startScanning": "Scannen starten",
+      "stopScanning": "Scannen stoppen"
+    },
+    "errors": {
+      "failedToAccessCamera": "Geen toegang tot camera",
+      "noCameraDetected": "\n\n📱 Geen camera gedetecteerd. Als u een simulator gebruikt, test dan op een echt apparaat.",
+      "constraintsNotSupported": "\n\n⚠️ Camera-beperkingen worden niet ondersteund.",
+      "noCamerasFound": "\n\n📱 Geen camera's gevonden op dit apparaat. Als u een simulator gebruikt, test dan op een echte iPad/iPhone.",
+      "cameraCountSimulatorLimitation": "\n\n📹 {count} camera('s) gevonden. Dit kan een beperking van de simulator zijn."
+    }
   }
 }
