@@ -126,7 +126,7 @@ export function NavUser({ user }: { user: User }) {
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuGroup>
+            {/* <DropdownMenuGroup>
               <DropdownMenuItem className="flex-col items-start p-0 cursor-default hover:!bg-transparent">
                 <div className="flex items-center gap-2 px-2 py-1.5 w-full hover:text-black group-hover:text-black">
                   <Palette className="h-4 w-4" />
@@ -136,8 +136,8 @@ export function NavUser({ user }: { user: User }) {
                   <ThemeSwitcherSelect />
                 </div>
               </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
+            </DropdownMenuGroup> */}
+            {/* <DropdownMenuSeparator /> */}
             <DropdownMenuItem className="cursor-default hover:!bg-transparent">
               <LogoutButton className="w-full bg-transparent text-foreground" />
             </DropdownMenuItem>
