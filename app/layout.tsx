@@ -9,6 +9,7 @@ import type { Metadata } from 'next'
 import { getMessages } from 'next-intl/server'
 import { ThemeProvider } from 'next-themes'
 import { Montserrat, Raleway, Roboto_Mono } from 'next/font/google'
+import Script from 'next/script'
 import './globals.css'
 
 const defaultUrl = process.env.VERCEL_URL
@@ -70,6 +71,21 @@ export default async function RootLayout({
       data-scroll-behavior="smooth"
       className={`${raleway.variable} ${montserrat.variable} ${robotoMono.variable}`}
     >
+      <head>
+        {/* Google tag (gtag.js) */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-YHVT1GMCK8"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-YHVT1GMCK8');
+          `}
+        </Script>
+      </head>
       <body className={`font-sans antialiased`}>
         <ThemeProvider
           attribute="class"
