@@ -71,8 +71,10 @@
   },
   "recommendations": {
     "dispose": "Dispose immediately",
+    "donate": "Donate to charity",
     "discount_aggressive": "Apply heavy discount",
     "discount_moderate": "Apply moderate discount",
+    "discount_light": "Apply light discount",
     "alert": "Monitor closely",
     "monitor": "Routine monitoring",
     "maintain": "No action needed"

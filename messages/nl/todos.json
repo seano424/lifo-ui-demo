@@ -71,8 +71,10 @@
   },
   "recommendations": {
     "dispose": "Direct weggooien",
+    "donate": "Doneren aan een goed doel",
     "discount_aggressive": "Grote korting toepassen",
     "discount_moderate": "Matige korting toepassen",
+    "discount_light": "Lichte korting toepassen",
     "alert": "Nauwlettend monitoren",
     "monitor": "Routine monitoring",
     "maintain": "Geen actie nodig"
