@@ -147,12 +147,49 @@ lifo-app/
   ```
 
 ### Database Migrations
+
+**Migration Reset - October 26, 2025**
+We performed a clean migration reset to fix schema drift and inconsistent migration naming. All previous migrations (47 files) were consolidated into a single migration that captures the complete working schema from production.
+
+- **Current State**: Single migration file `20251026181700_001_complete_schema.sql` (14,257 lines)
+- **Backup**: Old migrations archived in `supabase/migrations_backup/` for reference
+- **Source**: Exported directly from production database
+- **Includes**: All 8 schemas (admin, analytics, business, inventory, sales, scoring, timeseries, user_mgmt)
+
+**Setup for New Team Members**:
+```bash
+git pull
+npm run supabase:start    # Start local Supabase
+npm run update-types      # Generate TypeScript types
+```
+
+**Existing Team Members** (after reset):
+```bash
+git pull
+supabase db reset         # Reset local database with new migration
+npm run update-types      # Regenerate types
+```
+
+**Migration Guidelines Going Forward**:
 - **Location**: `supabase/migrations/*.sql`
-- **Pattern**: Numbered SQL files (001_*, 002_*, etc.)
+- **Pattern**: Use timestamp-based naming (Supabase CLI auto-generates)
 - **Multi-Schema**: Changes span multiple schemas - always use schema prefixes in queries
 - **RLS**: Row Level Security policies are schema-specific
 - **Local Development**: Use `npm run supabase:start` for local Supabase instance
 - **Type Generation**: Run `npm run update-types` after schema changes
+- **Never skip migrations**: All schema changes must go through migration files
+- **Test locally first**: Always test migrations with `supabase db reset` before committing
+
+**Pre-Commit Migration Checklist**:
+Before committing any new migration, verify:
+- [ ] Migration tested locally with `supabase db reset`
+- [ ] TypeScript types regenerated with `npm run update-types`
+- [ ] No test data or sensitive information in migration
+- [ ] RLS policies tested (verify unauthorized access is blocked)
+- [ ] Migration is idempotent (safe to re-run without errors)
+- [ ] Performance indexes added for new tables/columns where needed
+- [ ] Foreign key constraints and cascades are correct
+- [ ] All schema changes use proper schema prefixes (e.g., `inventory.`, `business.`)
 
 ## Environment Setup
 

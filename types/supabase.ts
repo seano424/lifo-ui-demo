@@ -1545,6 +1545,7 @@ export type Database = {
           p_product_id?: string
           p_received_date_from?: string
           p_received_date_to?: string
+          p_search?: string
           p_sort_direction?: string
           p_sort_field?: string
           p_status?: string
@@ -1683,6 +1684,7 @@ export type Database = {
           p_category_code?: string
           p_page_offset?: number
           p_page_size?: number
+          p_search?: string
           p_sort_direction?: string
           p_sort_field?: string
           p_store_id: string

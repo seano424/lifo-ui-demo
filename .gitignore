@@ -134,6 +134,11 @@ logs/
 *.sqlite
 *.sqlite3
 
+# Supabase local development files
+supabase/.branches/
+supabase/.temp/
+schema_export.sql
+
 # Docker artifacts
 .dockerignore
 
@@ -181,7 +186,6 @@ certificates
 
 !dataset_tools/
 !test_data/
-CLAUDE.md
 
 # Exploration and brainstorming (future improvements, not for production)
 _exploration/
