@@ -69,20 +69,21 @@ export function CookieConsentBanner() {
 
   // Mobile UX: Use CSS transforms for smooth banner animation without CLS
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (showBanner && isMounted) {
+      // Set initial state (off-screen) and then animate in
       const banner = document.querySelector('[role="dialog"]') as HTMLElement
       if (banner) {
-        if (showBanner) {
-          // Slide banner in from bottom
-          banner.style.transform = 'translateY(0)'
-          banner.style.transition = 'transform 0.3s ease-in-out'
-        } else {
-          // Slide banner out to bottom
-          banner.style.transform = 'translateY(100%)'
-        }
+        // Set initial state
+        banner.style.transform = 'translateY(100%)'
+        banner.style.transition = 'none'
+
+        // Force a reflow, then animate in
+        banner.offsetHeight // Trigger reflow
+        banner.style.transition = 'transform 0.3s ease-in-out'
+        banner.style.transform = 'translateY(0)'
       }
     }
-  }, [showBanner])
+  }, [showBanner, isMounted])
 
   // Keyboard event handling for accessibility
   useEffect(() => {
@@ -126,7 +127,7 @@ export function CookieConsentBanner() {
       aria-live="polite"
       aria-labelledby="cookie-banner-title"
       aria-describedby="cookie-banner-description"
-      className="fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-t p-3 sm:p-4 shadow-lg transform translate-y-full transition-transform duration-300 ease-in-out"
+      className="fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-t p-3 sm:p-4 shadow-lg"
     >
       <p id="cookie-banner-title" className="sr-only">
         Cookie Consent
