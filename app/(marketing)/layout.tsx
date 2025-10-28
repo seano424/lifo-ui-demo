@@ -1,3 +1,4 @@
+import { CookieConsentBanner } from '@/components/cookie-consent-banner'
 import { GoogleAnalytics } from '@/components/google-analytics'
 import { MarketingFooter } from '@/components/marketing/marketing-footer'
 import { MarketingNav } from '@/components/marketing/marketing-nav'
@@ -7,6 +8,7 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
   return (
     <>
       <GoogleAnalytics />
+      <CookieConsentBanner />
       <div className="relative bg-gradient-to-r from-primary-100/30 to-secondary-100/50 dark:from-blue-950/20 dark:via-purple-950/20 dark:to-pink-950/20">
         <GridBackground gridSize={40} transparencyLevel="medium" dotSize={1.5} />
 

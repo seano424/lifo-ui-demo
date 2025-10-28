@@ -165,5 +165,12 @@
       "dismissAriaLabel": "Dismiss",
       "closeAriaLabel": "Close"
     }
+  },
+  "cookieConsent": {
+    "message": "We use cookies to enhance your experience and analyze site traffic. By accepting, you agree to our use of cookies.",
+    "accept": "Accept",
+    "decline": "Decline",
+    "learnMore": "Learn more",
+    "manageCookies": "Manage cookies"
   }
 }

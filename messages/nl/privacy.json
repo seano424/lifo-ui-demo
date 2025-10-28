@@ -79,13 +79,14 @@
     },
     "section8": {
       "title": "8. Cookies en Volgtechnologieën",
-      "intro": "We gebruiken momenteel essentiële cookies (vereist voor de dienst): authenticatietokens (houdt u ingelogd), sessiebeheer (houdt uw actieve sessie in stand), beveiligingscookies (voorkomt ongeautoriseerde toegang). We kunnen aanvullende cookies implementeren voor:",
+      "intro": "We gebruiken momenteel essentiële cookies (vereist voor de dienst): authenticatietokens (houdt u ingelogd), sessiebeheer (houdt uw actieve sessie in stand), beveiligingscookies (voorkomt ongeautoriseerde toegang). We gebruiken ook Google Analytics voor:",
       "items": [
-        "Prestatiebewaking en analytics",
+        "Prestatiebewaking en analytics om te begrijpen hoe gebruikers met onze website interageren",
+        "Google Analytics gebruikt cookies om anonieme gebruiksgegevens te verzamelen. U kunt zich afmelden door onze cookiebanner te weigeren",
         "Opslag van gebruikersvoorkeuren (bijv. taalinstellingen)",
         "Serviceverbetering en A/B-testen"
       ],
-      "outro": "U wordt op de hoogte gesteld voordat we nieuwe cookietypes introduceren. U kunt cookievoorkeuren beheren via uw browserinstellingen. Let op: Het uitschakelen van essentiële cookies kan de functionaliteit van de dienst beperken."
+      "outro": "U wordt op de hoogte gesteld voordat we nieuwe cookietypes introduceren. U kunt cookievoorkeuren beheren via de cookiebanner of uw browserinstellingen. Let op: Het uitschakelen van essentiële cookies kan de functionaliteit van de dienst beperken."
     },
     "section9": {
       "title": "9. Internationale Gegevensoverdrachten",

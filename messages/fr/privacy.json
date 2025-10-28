@@ -79,13 +79,14 @@
     },
     "section8": {
       "title": "8. Cookies et Technologies de Suivi",
-      "intro": "Nous utilisons actuellement des cookies essentiels (requis pour le service) : jetons d'authentification (vous garde connecté), gestion de session (maintient votre session active), cookies de sécurité (empêche l'accès non autorisé). Nous pouvons mettre en œuvre des cookies supplémentaires pour :",
+      "intro": "Nous utilisons actuellement des cookies essentiels (requis pour le service) : jetons d'authentification (vous garde connecté), gestion de session (maintient votre session active), cookies de sécurité (empêche l'accès non autorisé). Nous utilisons également Google Analytics pour :",
       "items": [
-        "Surveillance des performances et analytique",
+        "Surveillance des performances et analytique pour comprendre comment les utilisateurs interagissent avec notre site web",
+        "Google Analytics utilise des cookies pour collecter des données d'utilisation anonymes. Vous pouvez vous désinscrire en refusant notre bannière de consentement aux cookies",
         "Stockage des préférences utilisateur (par exemple, paramètres de langue)",
         "Amélioration du service et tests A/B"
       ],
-      "outro": "Vous serez informé avant que nous introduisions de nouveaux types de cookies. Vous pouvez contrôler les préférences de cookies via les paramètres de votre navigateur. Remarque : La désactivation des cookies essentiels peut limiter la fonctionnalité du service."
+      "outro": "Nous vous informerons avant d'introduire de nouveaux types de cookies. Vous pouvez contrôler les préférences de cookies via la bannière de consentement aux cookies ou les paramètres de votre navigateur. Remarque : La désactivation des cookies essentiels peut limiter la fonctionnalité du service."
     },
     "section9": {
       "title": "9. Transferts Internationaux de Données",

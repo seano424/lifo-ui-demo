@@ -79,13 +79,14 @@
     },
     "section8": {
       "title": "8. Cookies and Tracking Technologies",
-      "intro": "We currently use Essential Cookies (required for Service): authentication tokens (keeps you logged in), session management (maintains your active session), security cookies (prevents unauthorized access). We may implement additional cookies for:",
+      "intro": "We currently use Essential Cookies (required for Service): authentication tokens (keeps you logged in), session management (maintains your active session), security cookies (prevents unauthorized access). We also use Google Analytics for:",
       "items": [
-        "Performance monitoring and analytics",
+        "Performance monitoring and analytics to understand how users interact with our website",
+        "Google Analytics uses cookies to collect anonymous usage data. You can opt-out by declining our cookie consent banner",
         "User preference storage (e.g., language settings)",
         "Service improvement and A/B testing"
       ],
-      "outro": "You will be notified before we introduce new cookie types. You can control cookie preferences through your browser settings. Note: Disabling essential cookies may limit Service functionality."
+      "outro": "We will notify you before we introduce new cookie types. You can control cookie preferences through the cookie consent banner or your browser settings. Note: Disabling essential cookies may limit Service functionality."
     },
     "section9": {
       "title": "9. International Data Transfers",
