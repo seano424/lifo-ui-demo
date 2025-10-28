@@ -18,7 +18,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@/components/ui/sidebar'
-import { ThemeSwitcherSelect } from '@/components/ui/theme-switcher-select'
+// import { ThemeSwitcherSelect } from '@/components/ui/theme-switcher-select'
 import type { User } from '@/lib/types/user'
 import {
   BadgeCheck,
@@ -26,7 +26,7 @@ import {
   ChevronsUpDown,
   CreditCard,
   Globe,
-  Palette,
+  // Palette,
   Sparkles,
 } from 'lucide-react'
 import { useTranslations } from 'next-intl'

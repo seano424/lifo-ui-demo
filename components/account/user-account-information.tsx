@@ -7,14 +7,18 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { LanguageSwitcher } from '@/components/ui/language-switcher'
 import { Skeleton } from '@/components/ui/skeleton'
-import { ThemeSwitcherSelect } from '@/components/ui/theme-switcher-select'
+// Dark mode is currently disabled - controlled by NEXT_PUBLIC_ENABLE_DARK_MODE=false in .env
+// Uncomment when dark mode feature is re-enabled
+// import { ThemeSwitcherSelect } from '@/components/ui/theme-switcher-select'
 import { Typography } from '@/components/ui/typography'
 import { useCurrentUser, useUpdatePhone, useUserActions } from '@/hooks/use-users'
 import { formatPhoneNumber, isValidPhoneNumber } from '@/lib/types/user'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { AlertCircle, Check, Edit, Shield, X } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import { useTheme } from 'next-themes'
+// Dark mode is currently disabled - controlled by NEXT_PUBLIC_ENABLE_DARK_MODE=false in .env
+// Uncomment when dark mode feature is re-enabled
+// import { useTheme } from 'next-themes'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -37,7 +41,9 @@ type ProfileFormData = z.infer<ReturnType<typeof createProfileSchema>>
 
 export default function UserAccountInformation() {
   const t = useTranslations('account')
-  const { theme } = useTheme()
+  // Dark mode is currently disabled - controlled by NEXT_PUBLIC_ENABLE_DARK_MODE=false in .env
+  // Uncomment when dark mode feature is re-enabled
+  // const { theme } = useTheme()
   const { data: user, isLoading } = useCurrentUser()
 
   const updatePhone = useUpdatePhone()
@@ -119,16 +125,18 @@ export default function UserAccountInformation() {
     setIsEditingPhone(false)
   }
 
-  const getCurrentThemeDisplay = () => {
-    switch (theme) {
-      case 'light':
-        return t('theme.light')
-      case 'dark':
-        return t('theme.dark')
-      case 'system':
-        return t('theme.system')
-    }
-  }
+  // Dark mode is currently disabled - controlled by NEXT_PUBLIC_ENABLE_DARK_MODE=false in .env
+  // Uncomment when dark mode feature is re-enabled
+  // const getCurrentThemeDisplay = () => {
+  //   switch (theme) {
+  //     case 'light':
+  //       return t('theme.light')
+  //     case 'dark':
+  //       return t('theme.dark')
+  //     case 'system':
+  //       return t('theme.system')
+  //   }
+  // }
 
   if (isLoading) {
     return (
@@ -371,23 +379,28 @@ export default function UserAccountInformation() {
           </div>
         </div>
 
-        {/* <div className="space-y-4 pt-4 border-t">
-          <Typography variant="h4" className="font-black">
-            {t('theme.title')}
-          </Typography>
+        {/*
+          Dark mode is currently disabled - controlled by NEXT_PUBLIC_ENABLE_DARK_MODE=false in .env
+          Uncomment this section when dark mode feature is re-enabled
 
-          <div className="flex items-center justify-between mt-2">
-            <div className="flex flex-col gap-2">
-              <Typography variant="p">{t('theme.description')}</Typography>
-              <Typography variant="p">
-                {t('theme.currentTheme')}: {getCurrentThemeDisplay()}
-              </Typography>
-            </div>
-            <div className="flex items-center gap-2">
-              <ThemeSwitcherSelect />
+          <div className="space-y-4 pt-4 border-t">
+            <Typography variant="h4" className="font-black">
+              {t('theme.title')}
+            </Typography>
+
+            <div className="flex items-center justify-between mt-2">
+              <div className="flex flex-col gap-2">
+                <Typography variant="p">{t('theme.description')}</Typography>
+                <Typography variant="p">
+                  {t('theme.currentTheme')}: {getCurrentThemeDisplay()}
+                </Typography>
+              </div>
+              <div className="flex items-center gap-2">
+                <ThemeSwitcherSelect />
+              </div>
             </div>
           </div>
-        </div> */}
+        */}
 
         <div className="space-y-4 pt-4 border-t">
           <Typography variant="h4" className="font-black">
