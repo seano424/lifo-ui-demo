@@ -1859,6 +1859,42 @@ export type Database = {
         }
         Relationships: []
       }
+      webhook_logs: {
+        Row: {
+          created_at: string | null
+          error_message: string | null
+          log_id: string
+          payload: Json | null
+          processed_at: string | null
+          retry_count: number | null
+          status: string
+          store_id: string | null
+          webhook_type: string
+        }
+        Insert: {
+          created_at?: string | null
+          error_message?: string | null
+          log_id?: string
+          payload?: Json | null
+          processed_at?: string | null
+          retry_count?: number | null
+          status: string
+          store_id?: string | null
+          webhook_type: string
+        }
+        Update: {
+          created_at?: string | null
+          error_message?: string | null
+          log_id?: string
+          payload?: Json | null
+          processed_at?: string | null
+          retry_count?: number | null
+          status?: string
+          store_id?: string | null
+          webhook_type?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       inventory_view_for_scoring: {

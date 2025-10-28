@@ -51,11 +51,11 @@ CREATE POLICY "Store users can view their store webhook logs"
     )
   );
 
--- ADD THIS: Policy for webhooks to insert logs
+-- Policy for webhooks to insert logs (service role only for security)
 CREATE POLICY "Service role can insert webhook logs"
   ON public.webhook_logs
   FOR INSERT
-  TO authenticated, anon, service_role
+  TO service_role
   WITH CHECK (true);
 
 -- Comment on table
