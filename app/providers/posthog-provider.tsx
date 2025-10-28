@@ -2,36 +2,65 @@
 
 import posthog from 'posthog-js'
 import { PostHogProvider as PHProvider } from 'posthog-js/react'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 interface PostHogProviderProps {
   children: React.ReactNode
 }
 
 export function PostHogProvider({ children }: PostHogProviderProps) {
+  const [isInitialized, setIsInitialized] = useState(false)
+  const [hasError, setHasError] = useState(false)
+
   useEffect(() => {
+    // Skip if already initialized or has error
+    if (isInitialized || hasError) return
+
     const posthogKey = process.env.NEXT_PUBLIC_POSTHOG_KEY
-    const posthogHost = process.env.NEXT_PUBLIC_POSTHOG_HOST || 'https://app.posthog.com'
+    const posthogHost = process.env.NEXT_PUBLIC_POSTHOG_HOST || 'https://eu.i.posthog.com'
 
     if (!posthogKey) {
-      if (process.env.NODE_ENV === 'development') {
-        console.warn('NEXT_PUBLIC_POSTHOG_KEY is not set')
-      }
+      console.error('❌ PostHog: NEXT_PUBLIC_POSTHOG_KEY is not set')
+      setHasError(true)
       return
     }
 
-    // Initialize PostHog
-    posthog.init(posthogKey, {
-      api_host: posthogHost,
-      defaults: '2025-05-24',
+    if (!posthogHost) {
+      console.error('❌ PostHog: NEXT_PUBLIC_POSTHOG_HOST is not set')
+      setHasError(true)
+      return
+    }
+
+    console.log('✅ PostHog: Initializing...', {
+      posthogKey: `${posthogKey?.substring(0, 10)}...`,
+      posthogHost,
     })
+
+    try {
+      // Initialize PostHog with correct configuration
+      posthog.init(posthogKey, {
+        api_host: posthogHost,
+        autocapture: true,
+        capture_pageview: false,
+        capture_pageleave: false,
+        loaded: _posthog => {
+          console.log('✅ PostHog: Loaded successfully')
+        },
+      })
+    } catch (error) {
+      console.error('❌ PostHog: Initialization failed', error)
+      setHasError(true)
+      return
+    }
 
     // Listen for cookie consent changes
     const handleConsentAccepted = () => {
+      console.log('✅ PostHog: Consent accepted')
       posthog.opt_in_capturing()
     }
 
     const handleConsentRevoked = () => {
+      console.log('✅ PostHog: Consent revoked')
       posthog.opt_out_capturing()
     }
 
@@ -48,13 +77,20 @@ export function PostHogProvider({ children }: PostHogProviderProps) {
       }
     }
 
+    setIsInitialized(true)
+
     return () => {
       if (typeof window !== 'undefined') {
         window.removeEventListener('cookieConsentAccepted', handleConsentAccepted)
         window.removeEventListener('cookieConsentRevoked', handleConsentRevoked)
       }
     }
-  }, [])
+  }, [isInitialized, hasError])
+
+  // Only render PostHog provider after successful initialization
+  if (!isInitialized || hasError) {
+    return <>{children}</>
+  }
 
   return <PHProvider client={posthog}>{children}</PHProvider>
 }

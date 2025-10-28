@@ -112,9 +112,9 @@ NEXT_PUBLIC_AUTO_OCR_MIN_DATE_CONFIDENCE=0.35
 
 ### Analytics & Monitoring
 ```bash
-# PostHog Analytics
-NEXT_PUBLIC_POSTHOG_KEY=phx_XXXXXXXXXXXXXXXXX
-NEXT_PUBLIC_POSTHOG_HOST=https://app.posthog.com
+# PostHog Analytics (EU region for GDPR compliance)
+NEXT_PUBLIC_POSTHOG_KEY=phc_XXXXXXXXXXXXXXXXX
+NEXT_PUBLIC_POSTHOG_HOST=https://eu.i.posthog.com
 
 # Sentry Error Tracking
 NEXT_PUBLIC_SENTRY_DSN=your-sentry-dsn

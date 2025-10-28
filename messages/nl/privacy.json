@@ -111,20 +111,19 @@
       "dataStorage": {
         "title": "Gegevensopslag:",
         "items": [
-          "Analytics-gegevens worden opgeslagen door Google Analytics",
-          "Gegevens kunnen worden overgedragen naar de Amerikaanse servers van Google",
-          "We bewaren analytics-gegevens gedurende 26 maanden (Google's standaard)"
+          "Analytics-gegevens worden opgeslagen door PostHog in de EU-regio",
+          "Gegevens worden verwerkt binnen de Europese Unie voor AVG-naleving",
+          "We bewaren analytics-gegevens gedurende 12 maanden"
         ]
       },
       "cookiesSet": {
         "title": "Cookies die zijn ingesteld:",
         "items": [
-          "_ga (2 jaar) - Onderscheidt gebruikers",
-          "_gid (24 uur) - Onderscheidt gebruikers",
-          "_gat (1 minuut) - Beperkt verzoeken"
+          "phc_* (sessie) - PostHog sessie-tracking",
+          "ph_* (sessie) - PostHog functie-vlaggen"
         ]
       },
-      "outro": "Voor meer informatie, zie de [Privacybeleid van Google](https://policies.google.com/privacy). Essentiële cookies die nodig zijn voor de functionaliteit van de service (authenticatie, sessiebeheer, beveiliging) zijn verplicht en kunnen niet worden uitgeschakeld."
+      "outro": "Voor meer informatie, zie het [Privacybeleid van PostHog](https://posthog.com/privacy). Essentiële cookies die nodig zijn voor de functionaliteit van de service (authenticatie, sessiebeheer, beveiliging) zijn verplicht en kunnen niet worden uitgeschakeld."
     },
     "section9": {
       "title": "9. Internationale Gegevensoverdrachten",

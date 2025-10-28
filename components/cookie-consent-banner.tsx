@@ -8,15 +8,19 @@ import { useEffect, useState } from 'react'
 export function CookieConsentBanner() {
   const t = useTranslations('cookieConsent')
   const [showBanner, setShowBanner] = useState(false)
+  const [hasConsent, setHasConsent] = useState(false)
+  const [isMounted, setIsMounted] = useState(false)
 
   useEffect(() => {
     // Check if user has already made a choice
     if (typeof window !== 'undefined') {
       const consent = localStorage.getItem('cookie-consent')
+      setHasConsent(consent === 'accepted')
       if (!consent) {
         setShowBanner(true)
       }
     }
+    setIsMounted(true)
   }, [])
 
   const handleAccept = () => {
@@ -24,6 +28,7 @@ export function CookieConsentBanner() {
       localStorage.setItem('cookie-consent', 'accepted')
     }
     setShowBanner(false)
+    setHasConsent(true)
     // Dispatch event for PostHog to initialize
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new Event('cookieConsentAccepted'))
@@ -35,6 +40,7 @@ export function CookieConsentBanner() {
       localStorage.setItem('cookie-consent', 'declined')
     }
     setShowBanner(false)
+    setHasConsent(false)
   }
 
   const handleRevoke = () => {
@@ -43,20 +49,21 @@ export function CookieConsentBanner() {
     }
     // Re-show the banner so user can make a new choice
     setShowBanner(true)
+    setHasConsent(false)
     // Dispatch event for PostHog cleanup
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new Event('cookieConsentRevoked'))
     }
   }
 
-  const hasConsent = () => {
-    if (typeof window === 'undefined') return false
-    return localStorage.getItem('cookie-consent') === 'accepted'
+  // Don't render anything until mounted to prevent hydration issues
+  if (!isMounted) {
+    return null
   }
 
   if (!showBanner) {
     // Only show manage consent button if consent was given
-    if (hasConsent()) {
+    if (hasConsent) {
       return (
         <div className="fixed bottom-4 right-4 z-50">
           <Button variant="outline" size="sm" onClick={handleRevoke} className="text-xs">

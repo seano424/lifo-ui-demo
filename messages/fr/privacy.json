@@ -111,20 +111,19 @@
       "dataStorage": {
         "title": "Stockage des données :",
         "items": [
-          "Les données analytiques sont stockées par Google Analytics",
-          "Les données peuvent être transférées vers les serveurs américains de Google",
-          "Nous conservons les données analytiques pendant 26 mois (paramètre par défaut de Google)"
+          "Les données analytiques sont stockées par PostHog dans la région UE",
+          "Les données sont traitées au sein de l'Union européenne pour la conformité RGPD",
+          "Nous conservons les données analytiques pendant 12 mois"
         ]
       },
       "cookiesSet": {
         "title": "Cookies définis :",
         "items": [
-          "_ga (2 ans) - Distingue les utilisateurs",
-          "_gid (24 heures) - Distingue les utilisateurs",
-          "_gat (1 minute) - Limite les requêtes"
+          "phc_* (session) - Suivi de session PostHog",
+          "ph_* (session) - Drapeaux de fonctionnalités PostHog"
         ]
       },
-      "outro": "Pour plus d'informations, consultez la [Politique de confidentialité de Google](https://policies.google.com/privacy). Les cookies essentiels nécessaires au fonctionnement du service (authentification, gestion de session, sécurité) sont obligatoires et ne peuvent pas être désactivés."
+      "outro": "Pour plus d'informations, consultez la [Politique de confidentialité de PostHog](https://posthog.com/privacy). Les cookies essentiels nécessaires au fonctionnement du service (authentification, gestion de session, sécurité) sont obligatoires et ne peuvent pas être désactivés."
     },
     "section9": {
       "title": "9. Transferts Internationaux de Données",
