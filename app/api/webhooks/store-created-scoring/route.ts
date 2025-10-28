@@ -2,7 +2,6 @@
 import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { logger } from '@/lib/utils/logger'
 import { z } from 'zod'
 import crypto from 'node:crypto'
 
@@ -109,13 +108,13 @@ export async function POST(request: NextRequest) {
     const signature = request.headers.get('x-supabase-signature')
 
     if (!signature || !WEBHOOK_SECRET) {
-      logger.error('webhook:store-scoring', 'Missing webhook signature or secret')
+      console.error('[webhook:store-scoring] Missing webhook signature or secret')
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     // Check FastAPI key is configured
     if (!FASTAPI_API_KEY) {
-      logger.error('webhook:store-scoring', 'FASTAPI_API_KEY not configured')
+      console.error('[webhook:store-scoring] FASTAPI_API_KEY not configured')
       return NextResponse.json({ error: 'FastAPI authentication not configured' }, { status: 500 })
     }
 
@@ -126,7 +125,7 @@ export async function POST(request: NextRequest) {
     const isValidSignature = verifyWebhookSignature(rawBody, signature, WEBHOOK_SECRET)
 
     if (!isValidSignature) {
-      logger.error('webhook:store-scoring', 'Invalid webhook signature')
+      console.error('[webhook:store-scoring] Invalid webhook signature')
       return NextResponse.json({ error: 'Unauthorized - Invalid signature' }, { status: 401 })
     }
 
@@ -137,7 +136,7 @@ export async function POST(request: NextRequest) {
       const validationResult = StoreCreatedPayloadSchema.safeParse(parsedBody)
 
       if (!validationResult.success) {
-        logger.error('webhook:store-scoring', 'Invalid webhook payload structure', {
+        console.error('[webhook:store-scoring] Invalid webhook payload structure', {
           errors: validationResult.error.errors,
         })
         return NextResponse.json(
@@ -151,7 +150,7 @@ export async function POST(request: NextRequest) {
 
       payload = parsedBody
     } catch (parseError) {
-      logger.error('webhook:store-scoring', 'Failed to parse webhook payload', {
+      console.error('[webhook:store-scoring] Failed to parse webhook payload', {
         error: parseError instanceof Error ? parseError.message : 'Unknown error',
       })
       return NextResponse.json({ error: 'Invalid JSON payload' }, { status: 400 })
@@ -160,13 +159,55 @@ export async function POST(request: NextRequest) {
     storeId = payload.record.store_id
     const { timezone = 'UTC' } = payload.record
 
-    logger.log('webhook:store-scoring', 'Received store creation webhook', {
+    console.log('[webhook:store-scoring] Received store creation webhook', {
       store_id: storeId,
       store_name: payload.record.store_name,
       timezone,
     })
 
-    // 3. Prepare scoring schedule request
+    // 3. Validate store exists in database
+    const supabase = createAdminClient()
+
+    const { data: store, error: storeError } = await supabase
+      .from('stores')
+      .select('store_id, store_name')
+      .eq('store_id', storeId)
+      .single()
+
+    if (storeError || !store) {
+      console.error('[webhook:store-scoring] Store not found in database', {
+        store_id: storeId,
+        error: storeError?.message,
+      })
+      return NextResponse.json({ error: 'Store not found', store_id: storeId }, { status: 404 })
+    }
+
+    // 4. Check for idempotency - prevent duplicate processing
+    const { data: existingLog } = await supabase
+      .from('webhook_logs')
+      .select('webhook_log_id, status, created_at')
+      .eq('webhook_type', 'store_scoring_setup')
+      .eq('store_id', storeId)
+      .eq('status', 'success')
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+
+    if (existingLog) {
+      console.log('[webhook:store-scoring] Webhook already processed successfully', {
+        store_id: storeId,
+        existing_log_id: existingLog.webhook_log_id,
+        processed_at: existingLog.created_at,
+      })
+      return NextResponse.json({
+        success: true,
+        store_id: storeId,
+        message: 'Scoring schedule already exists (idempotent)',
+        webhook_log_id: existingLog.webhook_log_id,
+      })
+    }
+
+    // 5. Prepare scoring schedule request
     const scheduleRequest: ScoringScheduleRequest = {
       store_id: storeId,
       schedule_type: 'cron',
@@ -177,8 +218,8 @@ export async function POST(request: NextRequest) {
       enabled: true,
     }
 
-    // 4. Call FastAPI to set up scoring with timeout
-    logger.log('webhook:store-scoring', 'Calling FastAPI to setup scoring schedule', {
+    // 6. Call FastAPI to set up scoring with timeout
+    console.log('[webhook:store-scoring] Calling FastAPI to setup scoring schedule', {
       store_id: storeId,
       url: `${FASTAPI_BASE_URL}/api/v1/automated-scoring/schedules`,
     })
@@ -199,7 +240,7 @@ export async function POST(request: NextRequest) {
 
     if (!response.ok) {
       const errorText = await response.text()
-      logger.error('webhook:store-scoring', 'FastAPI scoring setup failed', {
+      console.error('[webhook:store-scoring] FastAPI scoring setup failed', {
         status: response.status,
         error: errorText,
         store_id: storeId,
@@ -218,23 +259,23 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // 5. Parse and validate API response
+    // 7. Parse and validate API response
     const rawResult = await response.json()
     const validationResult = ScoringScheduleResponseSchema.safeParse(rawResult)
 
     if (!validationResult.success) {
-      logger.error('webhook:store-scoring', 'Invalid API response format', {
+      console.error('[webhook:store-scoring] Invalid API response format', {
         errors: validationResult.error.errors,
         rawResult,
       })
       // Still log success since the API call worked, just warn about response format
       await logScoringSetupSuccess(storeId, rawResult)
     } else {
-      logger.log('webhook:store-scoring', 'Scoring setup successful', {
+      console.log('[webhook:store-scoring] Scoring setup successful', {
         store_id: storeId,
         schedule: validationResult.data,
       })
-      // 6. Log success
+      // 8. Log success
       await logScoringSetupSuccess(storeId, validationResult.data)
     }
 
@@ -245,7 +286,7 @@ export async function POST(request: NextRequest) {
       message: 'Automated scoring enabled successfully',
     })
   } catch (error) {
-    logger.error('webhook:store-scoring', 'Error in store-created-scoring webhook', {
+    console.error('[webhook:store-scoring] Error in store-created-scoring webhook', {
       error: error instanceof Error ? error.message : 'Unknown error',
       stack: error instanceof Error ? error.stack : undefined,
       store_id: storeId,
@@ -257,7 +298,7 @@ export async function POST(request: NextRequest) {
         storeId,
         error instanceof Error ? error.message : 'Unknown error',
       ).catch(logError => {
-        logger.error('webhook:store-scoring', 'Failed to log error to database', {
+        console.error('[webhook:store-scoring] Failed to log error to database', {
           error: logError instanceof Error ? logError.message : 'Unknown error',
         })
       })
@@ -289,13 +330,13 @@ async function logScoringSetupSuccess(storeId: string, scheduleData: ScoringSche
     })
 
     if (error) {
-      logger.error('webhook:store-scoring', 'Failed to insert success log to database', {
+      console.error('[webhook:store-scoring] Failed to insert success log to database', {
         error: error.message,
         store_id: storeId,
       })
     }
   } catch (error) {
-    logger.error('webhook:store-scoring', 'Failed to log scoring setup success', {
+    console.error('[webhook:store-scoring] Failed to log scoring setup success', {
       error: error instanceof Error ? error.message : 'Unknown error',
     })
     // Don't throw - logging failure shouldn't break the webhook
@@ -317,13 +358,13 @@ async function logScoringSetupFailure(storeId: string, errorMessage: string) {
     })
 
     if (error) {
-      logger.error('webhook:store-scoring', 'Failed to insert failure log to database', {
+      console.error('[webhook:store-scoring] Failed to insert failure log to database', {
         error: error.message,
         store_id: storeId,
       })
     }
   } catch (error) {
-    logger.error('webhook:store-scoring', 'Failed to log scoring setup failure', {
+    console.error('[webhook:store-scoring] Failed to log scoring setup failure', {
       error: error instanceof Error ? error.message : 'Unknown error',
     })
     // Don't throw - logging failure shouldn't break the webhook
