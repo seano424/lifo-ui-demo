@@ -2036,92 +2036,49 @@ export type Database = {
         }
         Returns: Json
       }
-      execute_discount_action:
-        | {
-            Args: {
-              p_batch_id: string
-              p_discount_percentage: number
-              p_notes?: string
-              p_quantity_affected: number
-              p_recommended_action?: string
-              p_user_id: string
-            }
-            Returns: Json
-          }
-        | {
-            Args: {
-              p_batch_id: string
-              p_discount_percentage: number
-              p_notes?: string
-              p_quantity_affected: number
-              p_user_id: string
-            }
-            Returns: Json
-          }
-      execute_dismiss_action:
-        | {
-            Args: {
-              p_batch_id: string
-              p_dismissal_reason: string
-              p_notes?: string
-              p_recommended_action?: string
-              p_user_id: string
-            }
-            Returns: Json
-          }
-        | {
-            Args: {
-              p_batch_id: string
-              p_dismissal_reason: string
-              p_notes?: string
-              p_user_id: string
-            }
-            Returns: Json
-          }
-      execute_dispose_action:
-        | {
-            Args: {
-              p_batch_id: string
-              p_disposal_reason: string
-              p_notes?: string
-              p_quantity_disposed: number
-              p_recommended_action?: string
-              p_user_id: string
-            }
-            Returns: Json
-          }
-        | {
-            Args: {
-              p_batch_id: string
-              p_disposal_reason: string
-              p_notes?: string
-              p_quantity_disposed: number
-              p_user_id: string
-            }
-            Returns: Json
-          }
-      execute_donate_action:
-        | {
-            Args: {
-              p_batch_id: string
-              p_donation_recipient_id: string
-              p_notes?: string
-              p_quantity_affected: number
-              p_recommended_action?: string
-              p_user_id: string
-            }
-            Returns: Json
-          }
-        | {
-            Args: {
-              p_batch_id: string
-              p_donation_recipient_id: string
-              p_notes?: string
-              p_quantity_affected: number
-              p_user_id: string
-            }
-            Returns: Json
-          }
+      execute_discount_action: {
+        Args: {
+          p_batch_id: string
+          p_discount_percentage: number
+          p_notes?: string
+          p_quantity_affected: number
+          p_recommended_action?: string
+          p_user_id: string
+        }
+        Returns: Json
+      }
+      execute_dismiss_action: {
+        Args: {
+          p_batch_id: string
+          p_dismissal_reason: string
+          p_notes?: string
+          p_recommended_action?: string
+          p_user_id: string
+        }
+        Returns: Json
+      }
+      execute_dispose_action: {
+        Args: {
+          p_batch_id: string
+          p_disposal_reason: string
+          p_notes?: string
+          p_quantity_disposed: number
+          p_recommended_action?: string
+          p_user_id: string
+        }
+        Returns: Json
+      }
+      execute_donate_action: {
+        Args: {
+          p_batch_id: string
+          p_donation_recipient_id: string
+          p_notes?: string
+          p_quantity_affected: number
+          p_recommended_action?: string
+          p_user_id: string
+        }
+        Returns: Json
+      }
       execute_donate_prepared_action: {
         Args: {
           p_batch_id: string
@@ -2135,26 +2092,16 @@ export type Database = {
         Args: { p_batch_id: string; p_notes?: string; p_user_id: string }
         Returns: Json
       }
-      execute_sold_action:
-        | {
-            Args: {
-              p_batch_id: string
-              p_notes?: string
-              p_quantity_sold: number
-              p_recommended_action?: string
-              p_user_id: string
-            }
-            Returns: Json
-          }
-        | {
-            Args: {
-              p_batch_id: string
-              p_notes?: string
-              p_quantity_sold: number
-              p_user_id: string
-            }
-            Returns: Json
-          }
+      execute_sold_action: {
+        Args: {
+          p_batch_id: string
+          p_notes?: string
+          p_quantity_sold: number
+          p_recommended_action?: string
+          p_user_id: string
+        }
+        Returns: Json
+      }
       fast_csv_import_skip_duplicates: {
         Args: { p_csv_data: Json; p_store_id: string; p_user_id: string }
         Returns: Json

@@ -70,6 +70,7 @@ interface DonateActionParams {
   p_donation_recipient_id: string
   p_user_id: string
   p_notes?: string | null
+  p_recommended_action?: string | null
 }
 
 interface DiscountActionParams {
@@ -103,6 +104,7 @@ interface DismissActionParams {
   p_dismissal_reason: string
   p_user_id: string
   p_notes?: string | null
+  p_recommended_action?: string | null
 }
 
 interface BulkActionParams {
@@ -142,6 +144,7 @@ interface DonateParams {
   quantity: number
   donationRecipientId: string
   notes?: string
+  recommendedAction?: string
 }
 
 interface DiscountParams {
@@ -171,6 +174,7 @@ interface DismissParams {
   batchId: string
   dismissalReason: string
   notes?: string
+  recommendedAction?: string
 }
 
 interface BulkParams {
@@ -500,11 +504,13 @@ export function useBatchActionRPC(providedStoreId?: string) {
             : null,
         p_user_id: userId,
         p_notes: params.notes || null,
+        p_recommended_action: params.recommendedAction || null,
       } as DonateActionParams
 
       logger.log('BatchActions', 'Starting donate RPC call', {
         batchId: params.batchId,
         quantity: params.quantity,
+        recommendedAction: params.recommendedAction,
       })
       const startTime = performance.now()
       const { data, error } = await supabase.rpc('execute_donate_action', rpcParams)
@@ -884,11 +890,18 @@ export function useBatchActionRPC(providedStoreId?: string) {
     mutationFn: async (params: DismissParams): Promise<ActionResult> => {
       const userId = await getCurrentUserId()
 
+      logger.log('BatchActions', 'Starting dismiss RPC call', {
+        batchId: params.batchId,
+        dismissalReason: params.dismissalReason,
+        recommendedAction: params.recommendedAction,
+      })
+
       const { data, error } = await supabase.rpc('execute_dismiss_action', {
         p_batch_id: params.batchId,
         p_dismissal_reason: params.dismissalReason,
         p_user_id: userId,
         p_notes: params.notes || null,
+        p_recommended_action: params.recommendedAction || null,
       } as DismissActionParams)
 
       if (error) throw error
