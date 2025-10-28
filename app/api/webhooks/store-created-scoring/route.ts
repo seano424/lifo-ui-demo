@@ -20,8 +20,7 @@ import crypto from 'node:crypto'
  * }
  */
 
-const FASTAPI_BASE_URL =
-  process.env.FASTAPI_URL || 'https://lifo-ai-api-staging-d5tjh.ondigitalocean.app'
+const FASTAPI_BASE_URL = process.env.FASTAPI_URL
 const FASTAPI_API_KEY = process.env.FASTAPI_API_KEY
 const WEBHOOK_SECRET = process.env.SUPABASE_WEBHOOK_SECRET
 
@@ -112,10 +111,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Check FastAPI key is configured
+    // Check FastAPI configuration
     if (!FASTAPI_API_KEY) {
       console.error('[webhook:store-scoring] FASTAPI_API_KEY not configured')
       return NextResponse.json({ error: 'FastAPI authentication not configured' }, { status: 500 })
+    }
+
+    if (!FASTAPI_BASE_URL) {
+      console.error('[webhook:store-scoring] FASTAPI_URL not configured')
+      return NextResponse.json({ error: 'FastAPI URL not configured' }, { status: 500 })
     }
 
     // Get raw request body for signature verification
@@ -185,7 +189,7 @@ export async function POST(request: NextRequest) {
     // 4. Check for idempotency - prevent duplicate processing
     const { data: existingLog } = await supabase
       .from('webhook_logs')
-      .select('webhook_log_id, status, created_at')
+      .select('log_id, status, created_at')
       .eq('webhook_type', 'store_scoring_setup')
       .eq('store_id', storeId)
       .eq('status', 'success')
@@ -196,14 +200,14 @@ export async function POST(request: NextRequest) {
     if (existingLog) {
       console.log('[webhook:store-scoring] Webhook already processed successfully', {
         store_id: storeId,
-        existing_log_id: existingLog.webhook_log_id,
+        existing_log_id: existingLog.log_id,
         processed_at: existingLog.created_at,
       })
       return NextResponse.json({
         success: true,
         store_id: storeId,
         message: 'Scoring schedule already exists (idempotent)',
-        webhook_log_id: existingLog.webhook_log_id,
+        log_id: existingLog.log_id,
       })
     }
 
