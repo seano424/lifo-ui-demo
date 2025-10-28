@@ -51,7 +51,7 @@ export function PostHogProvider({ children }: PostHogProviderProps) {
       // Use try-catch approach instead of accessing private property
       try {
         posthog.opt_in_capturing()
-      } catch (error) {
+      } catch (_error) {
         logger.warn('PostHog', 'Consent accepted but PostHog not yet loaded, will enable on load')
         // PostHog will automatically opt-in when loaded due to opt_out_capturing_by_default: false
       }
@@ -62,7 +62,7 @@ export function PostHogProvider({ children }: PostHogProviderProps) {
       // Use try-catch approach instead of accessing private property
       try {
         posthog.opt_out_capturing()
-      } catch (error) {
+      } catch (_error) {
         logger.warn('PostHog', 'Consent revoked but PostHog not yet loaded, will disable on load')
         // PostHog will automatically opt-out when loaded due to opt_out_capturing_by_default: true
       }
