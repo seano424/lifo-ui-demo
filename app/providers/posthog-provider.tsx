@@ -31,18 +31,24 @@ export function PostHogProvider({ children }: PostHogProviderProps) {
       return
     }
 
+    // Check consent BEFORE initializing PostHog
+    const consent = localStorage.getItem('cookie-consent')
+    const hasConsent = consent === 'accepted'
+
     console.log('✅ PostHog: Initializing...', {
       posthogKey: `${posthogKey?.substring(0, 10)}...`,
       posthogHost,
+      hasConsent,
     })
 
     try {
-      // Initialize PostHog with correct configuration
+      // Initialize PostHog with consent-aware configuration
       posthog.init(posthogKey, {
         api_host: posthogHost,
         autocapture: true,
         capture_pageview: false,
         capture_pageleave: false,
+        opt_out_capturing_by_default: !hasConsent, // Start opted-out unless accepted
         loaded: _posthog => {
           console.log('✅ PostHog: Loaded successfully')
         },
@@ -55,26 +61,18 @@ export function PostHogProvider({ children }: PostHogProviderProps) {
 
     // Listen for cookie consent changes
     const handleConsentAccepted = () => {
-      console.log('✅ PostHog: Consent accepted')
+      console.log('✅ PostHog: Consent accepted, enabling tracking')
       posthog.opt_in_capturing()
     }
 
     const handleConsentRevoked = () => {
-      console.log('✅ PostHog: Consent revoked')
+      console.log('❌ PostHog: Consent revoked, disabling tracking')
       posthog.opt_out_capturing()
     }
 
     if (typeof window !== 'undefined') {
       window.addEventListener('cookieConsentAccepted', handleConsentAccepted)
       window.addEventListener('cookieConsentRevoked', handleConsentRevoked)
-
-      // Check initial consent state
-      const consent = localStorage.getItem('cookie-consent')
-      if (consent === 'accepted') {
-        posthog.opt_in_capturing()
-      } else {
-        posthog.opt_out_capturing()
-      }
     }
 
     setIsInitialized(true)
