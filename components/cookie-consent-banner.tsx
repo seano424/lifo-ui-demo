@@ -11,34 +11,47 @@ export function CookieConsentBanner() {
 
   useEffect(() => {
     // Check if user has already made a choice
-    const consent = localStorage.getItem('cookie-consent')
-    if (!consent) {
-      setShowBanner(true)
+    if (typeof window !== 'undefined') {
+      const consent = localStorage.getItem('cookie-consent')
+      if (!consent) {
+        setShowBanner(true)
+      }
     }
   }, [])
 
   const handleAccept = () => {
-    localStorage.setItem('cookie-consent', 'accepted')
-    localStorage.setItem('cookie-consent-date', new Date().toISOString())
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('cookie-consent', 'accepted')
+      localStorage.setItem('cookie-consent-date', new Date().toISOString())
+    }
     setShowBanner(false)
     // Dispatch event for Google Analytics to initialize
-    window.dispatchEvent(new Event('cookieConsentAccepted'))
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('cookieConsentAccepted'))
+    }
   }
 
   const handleDecline = () => {
-    localStorage.setItem('cookie-consent', 'declined')
-    localStorage.setItem('cookie-consent-date', new Date().toISOString())
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('cookie-consent', 'declined')
+      localStorage.setItem('cookie-consent-date', new Date().toISOString())
+    }
     setShowBanner(false)
   }
 
   const getConsentStatus = () => {
-    return localStorage.getItem('cookie-consent')
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('cookie-consent')
+    }
+    return null
   }
 
   const handleRevoke = () => {
-    localStorage.removeItem('cookie-consent')
-    localStorage.removeItem('cookie-consent-date')
-    window.dispatchEvent(new Event('cookieConsentRevoked'))
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('cookie-consent')
+      localStorage.removeItem('cookie-consent-date')
+      window.dispatchEvent(new Event('cookieConsentRevoked'))
+    }
     // Re-show the banner so user can make a new choice
     setShowBanner(true)
   }
