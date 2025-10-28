@@ -19,10 +19,10 @@ const LEGACY_TO_FASTAPI_MAP: Record<string, string> = {
 
   // Keep existing FastAPI standards as-is
   dispose: 'dispose',
-  donate: 'donate',  // NEW: AI scoring donation recommendation
+  donate: 'donate', // NEW: AI scoring donation recommendation
   discount_aggressive: 'discount_aggressive',
   discount_moderate: 'discount_moderate',
-  discount_light: 'discount_light',  // NEW: AI scoring light discount
+  discount_light: 'discount_light', // NEW: AI scoring light discount
   alert: 'alert',
   monitor: 'monitor',
   maintain: 'maintain',
@@ -31,10 +31,10 @@ const LEGACY_TO_FASTAPI_MAP: Record<string, string> = {
 // Display text mapping
 const FASTAPI_TO_DISPLAY_MAP: Record<string, string> = {
   dispose: 'Dispose Immediately',
-  donate: 'Donate to Charity',  // NEW: AI scoring donation recommendation
+  donate: 'Donate to Charity', // NEW: AI scoring donation recommendation
   discount_aggressive: 'Apply Heavy Discount',
   discount_moderate: 'Apply Moderate Discount',
-  discount_light: 'Apply Light Discount',  // NEW: AI scoring light discount
+  discount_light: 'Apply Light Discount', // NEW: AI scoring light discount
   alert: 'Monitor Closely',
   monitor: 'Routine Monitoring',
   maintain: 'No Action Needed',
@@ -43,10 +43,10 @@ const FASTAPI_TO_DISPLAY_MAP: Record<string, string> = {
 // Priority mapping for sorting (lower = higher priority)
 const PRIORITY_ORDER: Record<string, number> = {
   dispose: 1,
-  donate: 2,  // NEW: High priority for donation
+  donate: 2, // NEW: High priority for donation
   discount_aggressive: 3,
   discount_moderate: 4,
-  discount_light: 5,  // NEW: Lower priority for light discounts
+  discount_light: 5, // NEW: Lower priority for light discounts
   alert: 6,
   monitor: 7,
   maintain: 8,
@@ -55,10 +55,10 @@ const PRIORITY_ORDER: Record<string, number> = {
 // Color mapping for UI
 const COLOR_MAP: Record<string, string> = {
   dispose: 'destructive',
-  donate: 'default',  // NEW: Neutral color for donation (positive action)
+  donate: 'default', // NEW: Neutral color for donation (positive action)
   discount_aggressive: 'destructive',
   discount_moderate: 'secondary',
-  discount_light: 'secondary',  // NEW: Same as moderate discount
+  discount_light: 'secondary', // NEW: Same as moderate discount
   alert: 'secondary',
   monitor: 'outline',
   maintain: 'outline',
