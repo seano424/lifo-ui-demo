@@ -1,5 +1,6 @@
 'use client'
 
+import { logger } from '@/lib/utils/logger'
 import posthog from 'posthog-js'
 import { PostHogProvider as PHProvider } from 'posthog-js/react'
 import { useEffect, useState } from 'react'
@@ -20,13 +21,13 @@ export function PostHogProvider({ children }: PostHogProviderProps) {
     const posthogHost = process.env.NEXT_PUBLIC_POSTHOG_HOST || 'https://eu.i.posthog.com'
 
     if (!posthogKey) {
-      console.error('❌ PostHog: NEXT_PUBLIC_POSTHOG_KEY is not set')
+      logger.error('PostHog', 'NEXT_PUBLIC_POSTHOG_KEY is not set')
       setHasError(true)
       return
     }
 
     if (!posthogHost) {
-      console.error('❌ PostHog: NEXT_PUBLIC_POSTHOG_HOST is not set')
+      logger.error('PostHog', 'NEXT_PUBLIC_POSTHOG_HOST is not set')
       setHasError(true)
       return
     }
@@ -35,11 +36,28 @@ export function PostHogProvider({ children }: PostHogProviderProps) {
     const consent = localStorage.getItem('cookie-consent')
     const hasConsent = consent === 'accepted'
 
-    console.log('✅ PostHog: Initializing...', {
+    logger.log('PostHog', 'Initializing...', {
       posthogKey: `${posthogKey?.substring(0, 10)}...`,
       posthogHost,
       hasConsent,
     })
+
+    // Define event handlers BEFORE attaching listeners to prevent race conditions
+    const handleConsentAccepted = () => {
+      logger.log('PostHog', 'Consent accepted, enabling tracking')
+      posthog.opt_in_capturing()
+    }
+
+    const handleConsentRevoked = () => {
+      logger.log('PostHog', 'Consent revoked, disabling tracking')
+      posthog.opt_out_capturing()
+    }
+
+    // Attach event listeners IMMEDIATELY to prevent race conditions
+    if (typeof window !== 'undefined') {
+      window.addEventListener('cookieConsentAccepted', handleConsentAccepted)
+      window.addEventListener('cookieConsentRevoked', handleConsentRevoked)
+    }
 
     try {
       // Initialize PostHog with consent-aware configuration
@@ -50,29 +68,13 @@ export function PostHogProvider({ children }: PostHogProviderProps) {
         capture_pageleave: false,
         opt_out_capturing_by_default: !hasConsent, // Start opted-out unless accepted
         loaded: _posthog => {
-          console.log('✅ PostHog: Loaded successfully')
+          logger.log('PostHog', 'Loaded successfully')
         },
       })
     } catch (error) {
-      console.error('❌ PostHog: Initialization failed', error)
+      logger.error('PostHog', 'Initialization failed', error)
       setHasError(true)
       return
-    }
-
-    // Listen for cookie consent changes
-    const handleConsentAccepted = () => {
-      console.log('✅ PostHog: Consent accepted, enabling tracking')
-      posthog.opt_in_capturing()
-    }
-
-    const handleConsentRevoked = () => {
-      console.log('❌ PostHog: Consent revoked, disabling tracking')
-      posthog.opt_out_capturing()
-    }
-
-    if (typeof window !== 'undefined') {
-      window.addEventListener('cookieConsentAccepted', handleConsentAccepted)
-      window.addEventListener('cookieConsentRevoked', handleConsentRevoked)
     }
 
     setIsInitialized(true)

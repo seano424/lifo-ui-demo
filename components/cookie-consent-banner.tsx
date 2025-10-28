@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button'
 import { useTranslations } from 'next-intl'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 export function CookieConsentBanner() {
   const t = useTranslations('cookieConsent')
@@ -23,7 +23,7 @@ export function CookieConsentBanner() {
     setIsMounted(true)
   }, [])
 
-  const handleAccept = () => {
+  const handleAccept = useCallback(() => {
     if (typeof window !== 'undefined') {
       localStorage.setItem('cookie-consent', 'accepted')
     }
@@ -33,17 +33,17 @@ export function CookieConsentBanner() {
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new Event('cookieConsentAccepted'))
     }
-  }
+  }, [])
 
-  const handleDecline = () => {
+  const handleDecline = useCallback(() => {
     if (typeof window !== 'undefined') {
       localStorage.setItem('cookie-consent', 'declined')
     }
     setShowBanner(false)
     setHasConsent(false)
-  }
+  }, [])
 
-  const handleRevoke = () => {
+  const handleRevoke = useCallback(() => {
     if (typeof window !== 'undefined') {
       localStorage.removeItem('cookie-consent')
     }
@@ -54,7 +54,58 @@ export function CookieConsentBanner() {
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new Event('cookieConsentRevoked'))
     }
-  }
+  }, [])
+
+  // Focus management for accessibility
+  useEffect(() => {
+    if (showBanner && isMounted) {
+      // Focus the banner when it appears for keyboard navigation
+      const banner = document.querySelector('[role="dialog"]') as HTMLElement
+      if (banner) {
+        banner.focus()
+      }
+    }
+  }, [showBanner, isMounted])
+
+  // Mobile UX: Add padding to body when banner is shown to prevent content overlap
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const body = document.body
+      if (showBanner) {
+        // Add responsive padding to prevent content from being hidden behind the banner
+        // Mobile: p-3 (12px) + banner content height ≈ 100px
+        // Desktop: p-4 (16px) + banner content height ≈ 120px
+        const isMobile = window.innerWidth < 640 // sm breakpoint
+        body.style.paddingBottom = isMobile ? '100px' : '120px'
+      } else {
+        // Remove padding when banner is hidden
+        body.style.paddingBottom = ''
+      }
+    }
+
+    // Cleanup: remove padding when component unmounts
+    return () => {
+      if (typeof window !== 'undefined') {
+        document.body.style.paddingBottom = ''
+      }
+    }
+  }, [showBanner])
+
+  // Keyboard event handling for accessibility
+  useEffect(() => {
+    if (showBanner && isMounted) {
+      const handleKeyDown = (event: KeyboardEvent) => {
+        if (event.key === 'Escape') {
+          handleDecline()
+        }
+      }
+
+      document.addEventListener('keydown', handleKeyDown)
+      return () => {
+        document.removeEventListener('keydown', handleKeyDown)
+      }
+    }
+  }, [showBanner, isMounted, handleDecline])
 
   // Don't render anything until mounted to prevent hydration issues
   if (!isMounted) {
@@ -76,10 +127,19 @@ export function CookieConsentBanner() {
   }
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-t p-4 shadow-lg">
+    <div
+      role="dialog"
+      aria-live="polite"
+      aria-labelledby="cookie-banner-title"
+      aria-describedby="cookie-banner-description"
+      className="fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-t p-3 sm:p-4 shadow-lg"
+    >
+      <p id="cookie-banner-title" className="sr-only">
+        Cookie Consent
+      </p>
       <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="flex-1">
-          <p className="text-sm">
+          <p id="cookie-banner-description" className="text-sm">
             {t('message')}{' '}
             <Link href="/privacy" className="underline hover:text-primary">
               {t('learnMore')}
