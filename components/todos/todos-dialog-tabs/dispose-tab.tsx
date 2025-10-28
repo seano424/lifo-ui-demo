@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { InputSlider } from '@/components/ui/input-slider'
 import { Typography } from '@/components/ui/typography'
 import type { TodoItem } from '@/lib/queries/todos-rpc'
-import { useBatchActionRPC, type RecommendedAction } from '@/hooks/use-batch-actions-rpc'
+import { useBatchActionRPC, isValidRecommendedAction } from '@/hooks/use-batch-actions-rpc'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 import { useEffect, useState } from 'react'
 import { useMediaQuery } from '@/hooks/use-mobile'
@@ -89,7 +89,9 @@ export function DisposeTab({ selectedBatch, onClose }: DisposeTabProps) {
         quantity: disposeQuantity,
         disposalReason,
         notes: `Disposed ${disposeQuantity} units (${disposalReason}) - ${selectedBatch.ai_recommendation || ''}${improveAlerts ? ' - User requested alert improvements' : ''}`,
-        recommendedAction: (selectedBatch.ai_recommendation as RecommendedAction) || undefined,
+        recommendedAction: isValidRecommendedAction(selectedBatch.ai_recommendation)
+          ? selectedBatch.ai_recommendation
+          : undefined,
       }
 
       await executeDispose(params)

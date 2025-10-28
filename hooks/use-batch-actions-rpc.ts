@@ -19,6 +19,21 @@ export type RecommendedAction =
   | 'monitor'
   | null
 
+// Runtime type guard for RecommendedAction validation
+export function isValidRecommendedAction(value: unknown): value is RecommendedAction {
+  const validActions: RecommendedAction[] = [
+    'dispose',
+    'discount_moderate',
+    'discount_aggressive',
+    'donate',
+    'maintain',
+    'alert',
+    'monitor',
+    null,
+  ]
+  return validActions.includes(value as RecommendedAction)
+}
+
 export interface ActionableBatch {
   batch_id: string
   batch_number: string

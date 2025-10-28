@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { InputSlider } from '@/components/ui/input-slider'
 import { Typography } from '@/components/ui/typography'
 import type { TodoItem } from '@/lib/queries/todos-rpc'
-import { useBatchActionRPC, type RecommendedAction } from '@/hooks/use-batch-actions-rpc'
+import { useBatchActionRPC, isValidRecommendedAction } from '@/hooks/use-batch-actions-rpc'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 import { useState } from 'react'
 import { useMediaQuery } from '@/hooks/use-mobile'
@@ -94,7 +94,9 @@ export function DiscountTab({ selectedBatch, onClose }: DiscountTabProps) {
         notes: useCustomPrice
           ? `Set price to €${priceMetrics.newPrice.toFixed(2)} (${priceMetrics.actualDiscountPercentage}% discount) - ${selectedBatch.ai_recommendation || ''}`
           : `Applied ${priceMetrics.actualDiscountPercentage}% discount - ${selectedBatch.ai_recommendation || ''}`,
-        recommendedAction: (selectedBatch.ai_recommendation as RecommendedAction) || undefined,
+        recommendedAction: isValidRecommendedAction(selectedBatch.ai_recommendation)
+          ? selectedBatch.ai_recommendation
+          : undefined,
       }
 
       await executeDiscount(params)
