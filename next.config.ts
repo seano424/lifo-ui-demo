@@ -50,10 +50,10 @@ const nextConfig: NextConfig = {
           },
           {
             // Implements strict Content Security Policy for service worker
-            // Allows connections to Supabase, OpenFoodFacts, DigitalOcean API, and Google Fonts
+            // Allows connections to Supabase, OpenFoodFacts, DigitalOcean API, Google Fonts, and Google Analytics
             key: 'Content-Security-Policy',
             value:
-              "default-src 'self'; script-src 'self'; connect-src 'self' https://jrgmetdsohowtxickqij.supabase.co https://world.openfoodfacts.org https://*.ondigitalocean.app https://fonts.googleapis.com https://fonts.gstatic.com; font-src 'self' https://fonts.gstatic.com data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+              "default-src 'self'; script-src 'self' https://www.googletagmanager.com https://*.google-analytics.com; connect-src 'self' https://jrgmetdsohowtxickqij.supabase.co https://world.openfoodfacts.org https://*.ondigitalocean.app https://fonts.googleapis.com https://fonts.gstatic.com https://www.google-analytics.com https://www.googletagmanager.com; font-src 'self' https://fonts.gstatic.com data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
           },
         ],
       },
