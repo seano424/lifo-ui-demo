@@ -41,7 +41,7 @@ export function CompletedTab({ filters, pageSize = 20 }: CompletedTabProps) {
           {t('completed.errorLoading')}
         </Typography>
         <Typography variant="p" color="muted">
-          {error?.message || tErrors('common.somethingWrong')}
+          {error?.message || tErrors('somethingWrong')}
         </Typography>
       </div>
     )

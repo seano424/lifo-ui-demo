@@ -39,7 +39,7 @@ export function PendingTab({ filters, pageSize = 20 }: PendingTabProps) {
       <div className="text-center py-8">
         <p className="text-destructive">{t('pending.errorLoading')}</p>
         <p className="text-sm text-muted-foreground mt-2">
-          {error?.message || tErrors('common.somethingWrong')}
+          {error?.message || tErrors('somethingWrong')}
         </p>
       </div>
     )

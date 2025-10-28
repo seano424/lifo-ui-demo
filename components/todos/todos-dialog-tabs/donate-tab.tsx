@@ -87,7 +87,7 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
       })
 
       // Show user-facing error message
-      const errorMessage = error instanceof Error ? error.message : tErrors('common.unexpected')
+      const errorMessage = error instanceof Error ? error.message : tErrors('unexpected')
       toast.error(t('donate.error', { error: errorMessage }))
     }
   }

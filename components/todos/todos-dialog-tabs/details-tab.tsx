@@ -172,14 +172,14 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
         if (error.message.includes('constraint') || error.message.includes('duplicate')) {
           toast.error(t('details.error.invalidData'))
         } else if (error.message.includes('network') || error.message.includes('fetch')) {
-          toast.error(tErrors('common.networkError'))
+          toast.error(tErrors('networkError'))
         } else if (error.message.includes('permission') || error.message.includes('unauthorized')) {
-          toast.error(tErrors('common.permissionDenied'))
+          toast.error(tErrors('permissionDenied'))
         } else {
           toast.error(t('details.error.updateFailed', { error: error.message }))
         }
       } else {
-        toast.error(tErrors('common.unexpected'))
+        toast.error(tErrors('unexpected'))
       }
     }
   }
