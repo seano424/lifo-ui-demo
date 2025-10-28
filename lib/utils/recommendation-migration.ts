@@ -19,8 +19,10 @@ const LEGACY_TO_FASTAPI_MAP: Record<string, string> = {
 
   // Keep existing FastAPI standards as-is
   dispose: 'dispose',
+  donate: 'donate',  // NEW: AI scoring donation recommendation
   discount_aggressive: 'discount_aggressive',
   discount_moderate: 'discount_moderate',
+  discount_light: 'discount_light',  // NEW: AI scoring light discount
   alert: 'alert',
   monitor: 'monitor',
   maintain: 'maintain',
@@ -29,8 +31,10 @@ const LEGACY_TO_FASTAPI_MAP: Record<string, string> = {
 // Display text mapping
 const FASTAPI_TO_DISPLAY_MAP: Record<string, string> = {
   dispose: 'Dispose Immediately',
+  donate: 'Donate to Charity',  // NEW: AI scoring donation recommendation
   discount_aggressive: 'Apply Heavy Discount',
   discount_moderate: 'Apply Moderate Discount',
+  discount_light: 'Apply Light Discount',  // NEW: AI scoring light discount
   alert: 'Monitor Closely',
   monitor: 'Routine Monitoring',
   maintain: 'No Action Needed',
@@ -39,18 +43,22 @@ const FASTAPI_TO_DISPLAY_MAP: Record<string, string> = {
 // Priority mapping for sorting (lower = higher priority)
 const PRIORITY_ORDER: Record<string, number> = {
   dispose: 1,
-  discount_aggressive: 2,
-  discount_moderate: 3,
-  alert: 4,
-  monitor: 5,
-  maintain: 6,
+  donate: 2,  // NEW: High priority for donation
+  discount_aggressive: 3,
+  discount_moderate: 4,
+  discount_light: 5,  // NEW: Lower priority for light discounts
+  alert: 6,
+  monitor: 7,
+  maintain: 8,
 }
 
 // Color mapping for UI
 const COLOR_MAP: Record<string, string> = {
   dispose: 'destructive',
+  donate: 'default',  // NEW: Neutral color for donation (positive action)
   discount_aggressive: 'destructive',
   discount_moderate: 'secondary',
+  discount_light: 'secondary',  // NEW: Same as moderate discount
   alert: 'secondary',
   monitor: 'outline',
   maintain: 'outline',
@@ -81,19 +89,23 @@ export function migrateRecommendation(legacyRecommendation: string | null | unde
     return 'discount_moderate'
   } else if (
     cleaned.includes('discount') &&
-    (cleaned.includes('heavy') || cleaned.includes('heavily'))
+    (cleaned.includes('heavy') || cleaned.includes('heavily') || cleaned.includes('aggressive'))
   ) {
     return 'discount_aggressive'
   } else if (cleaned.includes('discount') && cleaned.includes('moderate')) {
     return 'discount_moderate'
+  } else if (cleaned.includes('discount') && cleaned.includes('light')) {
+    return 'discount_light'
+  } else if (cleaned.includes('donate') || cleaned.includes('donation')) {
+    return 'donate'
+  } else if (cleaned.includes('dispose') || cleaned.includes('disposal')) {
+    return 'dispose'
   } else if (cleaned.includes('normal') || cleaned.includes('maintain')) {
     return 'maintain'
   } else if (cleaned.includes('monitor')) {
     return 'monitor'
   } else if (cleaned.includes('alert')) {
     return 'alert'
-  } else if (cleaned.includes('dispose')) {
-    return 'dispose'
   }
 
   // Default fallback
@@ -139,9 +151,9 @@ export function getActionCategory(
 
   if (standardRecommendation === 'dispose') {
     return 'critical'
-  } else if (standardRecommendation === 'discount_aggressive') {
+  } else if (['donate', 'discount_aggressive'].includes(standardRecommendation)) {
     return 'action_needed'
-  } else if (['discount_moderate', 'alert'].includes(standardRecommendation)) {
+  } else if (['discount_moderate', 'discount_light', 'alert'].includes(standardRecommendation)) {
     return 'monitor'
   } else {
     return 'normal'
@@ -199,6 +211,12 @@ export function getActionSuggestions(recommendation: string | null | undefined):
       'Check for similar expired batches',
       'Review disposal procedures',
     ],
+    donate: [
+      'Contact donation recipient',
+      'Prepare for donation pickup',
+      'Ensure food safety compliance',
+      'Document donation for tax benefits',
+    ],
     discount_aggressive: [
       'Apply 25-50% discount',
       'Move to prominent display area',
@@ -209,6 +227,11 @@ export function getActionSuggestions(recommendation: string | null | undefined):
       'Apply 10-25% discount',
       'Feature in promotional materials',
       'Monitor daily for changes',
+    ],
+    discount_light: [
+      'Apply 5-15% discount',
+      'Feature in regular promotions',
+      'Monitor for changes',
     ],
     alert: [
       'Monitor closely for next 24-48 hours',

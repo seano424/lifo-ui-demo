@@ -71,8 +71,10 @@
   },
   "recommendations": {
     "dispose": "Éliminer immédiatement",
+    "donate": "Donner à une association",
     "discount_aggressive": "Appliquer une remise importante",
     "discount_moderate": "Appliquer une remise modérée",
+    "discount_light": "Appliquer une remise légère",
     "alert": "Surveiller de près",
     "monitor": "Surveillance de routine",
     "maintain": "Aucune action nécessaire"
