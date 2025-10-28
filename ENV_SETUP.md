@@ -112,8 +112,9 @@ NEXT_PUBLIC_AUTO_OCR_MIN_DATE_CONFIDENCE=0.35
 
 ### Analytics & Monitoring
 ```bash
-# Google Analytics
-NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
+# PostHog Analytics
+NEXT_PUBLIC_POSTHOG_KEY=phx_XXXXXXXXXXXXXXXXX
+NEXT_PUBLIC_POSTHOG_HOST=https://app.posthog.com
 
 # Sentry Error Tracking
 NEXT_PUBLIC_SENTRY_DSN=your-sentry-dsn

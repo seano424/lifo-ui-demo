@@ -24,7 +24,7 @@ export function CookieConsentBanner() {
       localStorage.setItem('cookie-consent', 'accepted')
     }
     setShowBanner(false)
-    // Dispatch event for Google Analytics to initialize
+    // Dispatch event for PostHog to initialize
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new Event('cookieConsentAccepted'))
     }
@@ -43,7 +43,7 @@ export function CookieConsentBanner() {
     }
     // Re-show the banner so user can make a new choice
     setShowBanner(true)
-    // Dispatch event for Google Analytics cleanup
+    // Dispatch event for PostHog cleanup
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new Event('cookieConsentRevoked'))
     }
