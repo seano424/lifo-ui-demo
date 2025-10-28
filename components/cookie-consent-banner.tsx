@@ -67,26 +67,19 @@ export function CookieConsentBanner() {
     }
   }, [showBanner, isMounted])
 
-  // Mobile UX: Add padding to body when banner is shown to prevent content overlap
+  // Mobile UX: Use CSS transforms for smooth banner animation without CLS
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const body = document.body
-      if (showBanner) {
-        // Add responsive padding to prevent content from being hidden behind the banner
-        // Mobile: p-3 (12px) + banner content height ≈ 100px
-        // Desktop: p-4 (16px) + banner content height ≈ 120px
-        const isMobile = window.innerWidth < 640 // sm breakpoint
-        body.style.paddingBottom = isMobile ? '100px' : '120px'
-      } else {
-        // Remove padding when banner is hidden
-        body.style.paddingBottom = ''
-      }
-    }
-
-    // Cleanup: remove padding when component unmounts
-    return () => {
-      if (typeof window !== 'undefined') {
-        document.body.style.paddingBottom = ''
+      const banner = document.querySelector('[role="dialog"]') as HTMLElement
+      if (banner) {
+        if (showBanner) {
+          // Slide banner in from bottom
+          banner.style.transform = 'translateY(0)'
+          banner.style.transition = 'transform 0.3s ease-in-out'
+        } else {
+          // Slide banner out to bottom
+          banner.style.transform = 'translateY(100%)'
+        }
       }
     }
   }, [showBanner])
@@ -133,7 +126,7 @@ export function CookieConsentBanner() {
       aria-live="polite"
       aria-labelledby="cookie-banner-title"
       aria-describedby="cookie-banner-description"
-      className="fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-t p-3 sm:p-4 shadow-lg"
+      className="fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-t p-3 sm:p-4 shadow-lg transform translate-y-full transition-transform duration-300 ease-in-out"
     >
       <p id="cookie-banner-title" className="sr-only">
         Cookie Consent

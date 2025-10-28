@@ -1,8 +1,8 @@
 // Global type definitions for custom events and window extensions
 
 interface WindowEventMap {
-  cookieConsentAccepted: CustomEvent
-  cookieConsentRevoked: CustomEvent
+  cookieConsentAccepted: Event
+  cookieConsentRevoked: Event
 }
 
 // Extend the Window interface to include our custom events
