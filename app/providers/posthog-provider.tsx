@@ -45,10 +45,10 @@ export function PostHogProvider({ children }: PostHogProviderProps) {
     // Define event handlers BEFORE attaching listeners to prevent race conditions
     const handleConsentAccepted = () => {
       logger.log('PostHog', 'Consent accepted, enabling tracking')
-      // Guard against calling methods before PostHog is initialized
-      if (posthog.__loaded) {
+      // Use try-catch approach instead of accessing private property
+      try {
         posthog.opt_in_capturing()
-      } else {
+      } catch (error) {
         logger.warn('PostHog', 'Consent accepted but PostHog not yet loaded, will enable on load')
         // PostHog will automatically opt-in when loaded due to opt_out_capturing_by_default: false
       }
@@ -56,10 +56,10 @@ export function PostHogProvider({ children }: PostHogProviderProps) {
 
     const handleConsentRevoked = () => {
       logger.log('PostHog', 'Consent revoked, disabling tracking')
-      // Guard against calling methods before PostHog is initialized
-      if (posthog.__loaded) {
+      // Use try-catch approach instead of accessing private property
+      try {
         posthog.opt_out_capturing()
-      } else {
+      } catch (error) {
         logger.warn('PostHog', 'Consent revoked but PostHog not yet loaded, will disable on load')
         // PostHog will automatically opt-out when loaded due to opt_out_capturing_by_default: true
       }
