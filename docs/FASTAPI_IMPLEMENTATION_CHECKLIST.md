@@ -15,6 +15,7 @@ Use this checklist to track implementation progress across all phases.
 ### Core Infrastructure
 
 - [ ] **Create base client** (`lib/api/fastapi/core/base-client.ts`)
+
   - [ ] `BaseFastAPIClient` class with HTTP methods (GET, POST, PUT, DELETE)
   - [ ] Authentication handling (JWT + service role)
   - [ ] Error handling and transformation
@@ -23,6 +24,7 @@ Use this checklist to track implementation progress across all phases.
   - [ ] Health check method
 
 - [ ] **Create types file** (`lib/api/fastapi/core/types.ts`)
+
   - [ ] Common request/response interfaces
   - [ ] Error types
   - [ ] Configuration types
@@ -69,6 +71,7 @@ Use this checklist to track implementation progress across all phases.
 ### Testing
 
 - [ ] **Unit tests for base client**
+
   - [ ] Test GET/POST/PUT/DELETE methods
   - [ ] Test authentication header generation
   - [ ] Test error handling
@@ -76,6 +79,7 @@ Use this checklist to track implementation progress across all phases.
   - [ ] Mock fetch with MSW
 
 - [ ] **Unit tests for scoring client**
+
   - [ ] Test all methods with mock responses
   - [ ] Test error scenarios
   - [ ] Test parameter passing
@@ -88,6 +92,7 @@ Use this checklist to track implementation progress across all phases.
 ### Documentation
 
 - [ ] **Update CLAUDE.md**
+
   - [ ] Document new file structure
   - [ ] Add usage examples
   - [ ] Update command reference
@@ -114,6 +119,7 @@ Use this checklist to track implementation progress across all phases.
 ### Donation Client
 
 - [ ] **Create donation client** (`lib/api/fastapi/clients/donation-client.ts`)
+
   - [ ] Type definitions (DonationRecipient, DonationSuitableItem, DonationAction)
   - [ ] `getRecipients()` / `createRecipient()` / `updateRecipient()` / `deleteRecipient()`
   - [ ] `querySuitableItems()` with filters
@@ -123,6 +129,7 @@ Use this checklist to track implementation progress across all phases.
   - [ ] Export singleton instance
 
 - [ ] **Create donation hooks** (`lib/hooks/fastapi/use-donations.ts`)
+
   - [ ] `useDonationRecipients()` - query hook
   - [ ] `useSuitableDonationItems()` - query hook with filters
   - [ ] `useDonationHistory()` - query hook
@@ -131,6 +138,7 @@ Use this checklist to track implementation progress across all phases.
   - [ ] Optimistic updates for `recordDonation()`
 
 - [ ] **Create donation workflow store** (`lib/stores/donation-workflow-store.ts`)
+
   - [ ] State: currentStep, selectedRecipient, selectedItems, scheduledPickup, notes
   - [ ] Actions: selectRecipient, addItem, removeItem, updateItemQuantity
   - [ ] Actions: setScheduledPickup, setNotes, completeWorkflow, resetWorkflow
@@ -144,6 +152,7 @@ Use this checklist to track implementation progress across all phases.
 ### Scanning Client
 
 - [ ] **Create scanning client** (`lib/api/fastapi/clients/scanning-client.ts`)
+
   - [ ] Type definitions (BarcodeResult, OCRExpiryResult, ProductRecognitionResult)
   - [ ] `scanBarcode()` method
   - [ ] `extractExpiry()` method (wrapper for OCR client)
@@ -152,11 +161,13 @@ Use this checklist to track implementation progress across all phases.
   - [ ] Export singleton instance
 
 - [ ] **Create scanning hooks** (`lib/hooks/fastapi/use-scanning.ts`)
+
   - [ ] `useBarcodeScan()` - mutation hook
   - [ ] `useSessionStats()` - query hook
   - [ ] Proper error handling for OCR failures
 
 - [ ] **Integrate with existing scanning store**
+
   - [ ] Update `scanning-workflow-store.ts` to use new client
   - [ ] Ensure backward compatibility
   - [ ] Test existing scanning flow still works
@@ -168,6 +179,7 @@ Use this checklist to track implementation progress across all phases.
 ### Batch Operations Client
 
 - [ ] **Create batch client** (`lib/api/fastapi/clients/batch-client.ts`)
+
   - [ ] Type definitions (BatchCreateRequest, BatchActionRequest, BulkBatchCreateResponse)
   - [ ] `createBatch()` method
   - [ ] `createBatches()` bulk method
@@ -177,6 +189,7 @@ Use this checklist to track implementation progress across all phases.
   - [ ] Export singleton instance
 
 - [ ] **Create batch operations hooks** (`lib/hooks/fastapi/use-batch-operations.ts`)
+
   - [ ] `useBatchCreate()` - mutation hook
   - [ ] `useBulkBatchCreate()` - mutation hook with progress
   - [ ] `useBatchAction()` - mutation hook
@@ -185,6 +198,7 @@ Use this checklist to track implementation progress across all phases.
   - [ ] Cache invalidation for batches queries
 
 - [ ] **Create batch operation store** (`lib/stores/batch-operation-store.ts`)
+
   - [ ] State: selectedBatches, bulkActionType, confirmationState
   - [ ] Actions: selectBatch, deselectBatch, clearSelection
   - [ ] Actions: setBulkActionType, confirmBulkAction
@@ -197,6 +211,7 @@ Use this checklist to track implementation progress across all phases.
 ### CSV Operations Client
 
 - [ ] **Create CSV client** (`lib/api/fastapi/clients/csv-client.ts`)
+
   - [ ] Type definitions (CSVUploadResponse, CSVDuplicateCheckResponse, CSVProcessingStatus)
   - [ ] `uploadCSV()` method
   - [ ] `checkDuplicates()` method
@@ -206,6 +221,7 @@ Use this checklist to track implementation progress across all phases.
   - [ ] Export singleton instance
 
 - [ ] **Create CSV operations hooks** (`lib/hooks/fastapi/use-csv-operations.ts`)
+
   - [ ] `useCSVUpload()` - mutation hook with progress
   - [ ] `useCSVDuplicateCheck()` - mutation hook
   - [ ] `useCSVProcessingStatus()` - query hook with polling
@@ -227,12 +243,14 @@ Use this checklist to track implementation progress across all phases.
 ### Testing
 
 - [ ] **Unit tests for all clients**
+
   - [ ] Donation client tests
   - [ ] Scanning client tests
   - [ ] Batch client tests
   - [ ] CSV client tests
 
 - [ ] **Integration tests for hooks**
+
   - [ ] Test all query hooks
   - [ ] Test all mutation hooks
   - [ ] Test optimistic updates
@@ -259,6 +277,7 @@ Use this checklist to track implementation progress across all phases.
 ### Update Existing Components
 
 - [ ] **Dashboard components**
+
   - [ ] Update alerts section to use `useAlerts()`
   - [ ] Update analytics section to use `useAnalytics()`
   - [ ] Update recommendations to use `useRecommendations()`
@@ -278,6 +297,7 @@ Use this checklist to track implementation progress across all phases.
 ### Build New Features
 
 - [ ] **Donation workflow UI**
+
   - [ ] Create `DonationWizard` component
   - [ ] Step 1: Recipient selection
     - [ ] List recipients with `useDonationRecipients()`
@@ -300,18 +320,21 @@ Use this checklist to track implementation progress across all phases.
     - [ ] Start new donation button
 
 - [ ] **Donation impact dashboard**
+
   - [ ] Show impact metrics with `useDonationImpact()`
   - [ ] Charts for donation trends
   - [ ] Recipient breakdown
   - [ ] Category breakdown
 
 - [ ] **Donation history view**
+
   - [ ] List donations with `useDonationHistory()`
   - [ ] Filter by recipient
   - [ ] Filter by date range
   - [ ] Export to CSV
 
 - [ ] **Batch operation bulk actions**
+
   - [ ] Batch selection UI (checkboxes)
   - [ ] Bulk action dropdown (discount, donate, dispose)
   - [ ] Confirmation modal
@@ -319,12 +342,14 @@ Use this checklist to track implementation progress across all phases.
   - [ ] Use `useBulkBatchActions()`
 
 - [ ] **Batch action history**
+
   - [ ] List batch actions with `useBatchActionHistory()`
   - [ ] Filter by action type
   - [ ] Filter by date range
   - [ ] Show action details
 
 - [ ] **CSV upload interface**
+
   - [ ] File picker with drag & drop
   - [ ] Upload with `useCSVUpload()`
   - [ ] Progress bar
@@ -334,12 +359,14 @@ Use this checklist to track implementation progress across all phases.
   - [ ] Cancel upload button
 
 - [ ] **CSV upload history**
+
   - [ ] List uploads with `useCSVUploadHistory()`
   - [ ] Show status (pending, processing, completed, failed)
   - [ ] View details/errors
   - [ ] Retry failed uploads
 
 - [ ] **Scoring schedule manager**
+
   - [ ] List schedules with `useScoringSchedules()`
   - [ ] Add schedule form with cron expression builder
   - [ ] Enable/disable toggle
@@ -356,6 +383,7 @@ Use this checklist to track implementation progress across all phases.
 ### Mobile Optimization
 
 - [ ] **Performance testing**
+
   - [ ] Test all endpoints on mobile network (3G/4G)
   - [ ] Ensure <300ms response times (p95)
   - [ ] Optimize image uploads for mobile
@@ -394,12 +422,14 @@ Use this checklist to track implementation progress across all phases.
 ### Testing
 
 - [ ] **Unit tests**
+
   - [ ] All clients: 100% coverage
   - [ ] All hooks: 100% coverage
   - [ ] All stores: 100% coverage
   - [ ] Utilities and helpers
 
 - [ ] **Integration tests**
+
   - [ ] Complete donation workflow
   - [ ] Complete scanning workflow
   - [ ] Batch operations flow
@@ -407,6 +437,7 @@ Use this checklist to track implementation progress across all phases.
   - [ ] Cache invalidation scenarios
 
 - [ ] **E2E tests (Playwright)**
+
   - [ ] User can view alerts
   - [ ] User can record donation
   - [ ] User can scan product
@@ -414,6 +445,7 @@ Use this checklist to track implementation progress across all phases.
   - [ ] User can trigger scoring
 
 - [ ] **Performance tests**
+
   - [ ] Load testing (artillery/k6)
   - [ ] Response time benchmarks
   - [ ] Bundle size analysis
@@ -429,6 +461,7 @@ Use this checklist to track implementation progress across all phases.
 ### Code Quality
 
 - [ ] **Linting**
+
   - [ ] ESLint passes
   - [ ] Biome checks pass
   - [ ] No console.log statements in production
@@ -443,6 +476,7 @@ Use this checklist to track implementation progress across all phases.
 ### Error Handling
 
 - [ ] **Comprehensive error handling**
+
   - [ ] Network errors
   - [ ] Auth errors
   - [ ] Validation errors
@@ -450,6 +484,7 @@ Use this checklist to track implementation progress across all phases.
   - [ ] Timeout errors
 
 - [ ] **Error boundaries**
+
   - [ ] Component-level error boundaries
   - [ ] Page-level error boundaries
   - [ ] Global error boundary
@@ -463,12 +498,14 @@ Use this checklist to track implementation progress across all phases.
 ### Documentation
 
 - [ ] **API documentation**
+
   - [ ] JSDoc for all public methods
   - [ ] Type documentation
   - [ ] Usage examples
   - [ ] Migration guide
 
 - [ ] **Component documentation**
+
   - [ ] Storybook stories for new components
   - [ ] Props documentation
   - [ ] Accessibility notes
@@ -482,19 +519,21 @@ Use this checklist to track implementation progress across all phases.
 ### Monitoring Setup
 
 - [ ] **Error tracking**
+
   - [ ] Sentry integration
   - [ ] Error reporting configured
   - [ ] Source maps uploaded
   - [ ] Alert rules configured
 
 - [ ] **Performance monitoring**
+
   - [ ] Vercel Analytics
   - [ ] Core Web Vitals tracking
   - [ ] API response time tracking
   - [ ] Custom metrics
 
 - [ ] **User analytics**
-  - [ ] Google Analytics 4
+  - [ ] PostHog analytics
   - [ ] Feature usage tracking
   - [ ] User flow analysis
 
@@ -516,12 +555,14 @@ Use this checklist to track implementation progress across all phases.
 ### Offline Support
 
 - [ ] **Offline mutation queue**
+
   - [ ] IndexedDB for offline storage
   - [ ] Queue mutations when offline
   - [ ] Auto-sync when back online
   - [ ] Conflict resolution
 
 - [ ] **Service worker**
+
   - [ ] Cache static assets
   - [ ] Cache API responses
   - [ ] Background sync
@@ -535,6 +576,7 @@ Use this checklist to track implementation progress across all phases.
 ### Type Generation
 
 - [ ] **OpenAPI type generation**
+
   - [ ] Script to generate types from /openapi.json
   - [ ] Automated in CI/CD
   - [ ] Version control for generated types
@@ -549,6 +591,7 @@ Use this checklist to track implementation progress across all phases.
 ### Advanced Caching
 
 - [ ] **Smart prefetching**
+
   - [ ] Prefetch on hover
   - [ ] Prefetch on route change
   - [ ] Predictive prefetching
@@ -562,12 +605,14 @@ Use this checklist to track implementation progress across all phases.
 ### Performance Optimization
 
 - [ ] **Bundle optimization**
+
   - [ ] Code splitting
   - [ ] Dynamic imports
   - [ ] Tree shaking
   - [ ] Minimize bundle size
 
 - [ ] **Image optimization**
+
   - [ ] Next.js Image component
   - [ ] WebP format
   - [ ] Lazy loading
@@ -582,6 +627,7 @@ Use this checklist to track implementation progress across all phases.
 ### Telemetry
 
 - [ ] **Custom events**
+
   - [ ] Track feature usage
   - [ ] Track errors by category
   - [ ] Track performance metrics
@@ -607,11 +653,13 @@ Use this checklist to track implementation progress across all phases.
 ### Deprecate Old Client
 
 - [ ] **Add deprecation warnings**
+
   - [ ] Console warnings in old client methods
   - [ ] JSDoc @deprecated tags
   - [ ] Migration guide link
 
 - [ ] **Update all components**
+
   - [ ] Search for `fastapi-client.ts` usage
   - [ ] Replace with new clients/hooks
   - [ ] Test each migrated component
@@ -635,11 +683,13 @@ Use this checklist to track implementation progress across all phases.
 ### Pre-Deployment
 
 - [ ] **Code freeze**
+
   - [ ] No new features
   - [ ] Bug fixes only
   - [ ] Final testing
 
 - [ ] **Staging deployment**
+
   - [ ] Deploy to staging
   - [ ] Full QA pass
   - [ ] Performance testing
@@ -654,6 +704,7 @@ Use this checklist to track implementation progress across all phases.
 ### Deployment
 
 - [ ] **Production deployment**
+
   - [ ] Deploy during low-traffic window
   - [ ] Monitor error rates
   - [ ] Monitor performance
@@ -668,6 +719,7 @@ Use this checklist to track implementation progress across all phases.
 ### Documentation
 
 - [ ] **Update README**
+
   - [ ] New architecture overview
   - [ ] Setup instructions
   - [ ] Usage examples
@@ -749,47 +801,54 @@ Track these metrics to measure success:
 ## Sign-Off
 
 ### Phase 1 ✅
-- [ ] Code review completed by: __________
-- [ ] Tested by: __________
-- [ ] Documentation reviewed by: __________
-- [ ] Approved by: __________
-- Date: __________
+
+- [ ] Code review completed by: \***\*\_\_\*\***
+- [ ] Tested by: \***\*\_\_\*\***
+- [ ] Documentation reviewed by: \***\*\_\_\*\***
+- [ ] Approved by: \***\*\_\_\*\***
+- Date: \***\*\_\_\*\***
 
 ### Phase 2 ✅
-- [ ] Code review completed by: __________
-- [ ] Tested by: __________
-- [ ] Documentation reviewed by: __________
-- [ ] Approved by: __________
-- Date: __________
+
+- [ ] Code review completed by: \***\*\_\_\*\***
+- [ ] Tested by: \***\*\_\_\*\***
+- [ ] Documentation reviewed by: \***\*\_\_\*\***
+- [ ] Approved by: \***\*\_\_\*\***
+- Date: \***\*\_\_\*\***
 
 ### Phase 3 ✅
-- [ ] Code review completed by: __________
-- [ ] Tested by: __________
-- [ ] Documentation reviewed by: __________
-- [ ] Approved by: __________
-- Date: __________
+
+- [ ] Code review completed by: \***\*\_\_\*\***
+- [ ] Tested by: \***\*\_\_\*\***
+- [ ] Documentation reviewed by: \***\*\_\_\*\***
+- [ ] Approved by: \***\*\_\_\*\***
+- Date: \***\*\_\_\*\***
 
 ### Phase 4 ✅
-- [ ] Code review completed by: __________
-- [ ] Tested by: __________
-- [ ] Security review by: __________
-- [ ] Approved by: __________
-- Date: __________
+
+- [ ] Code review completed by: \***\*\_\_\*\***
+- [ ] Tested by: \***\*\_\_\*\***
+- [ ] Security review by: \***\*\_\_\*\***
+- [ ] Approved by: \***\*\_\_\*\***
+- Date: \***\*\_\_\*\***
 
 ### Phase 5 ✅
-- [ ] Code review completed by: __________
-- [ ] Tested by: __________
-- [ ] Approved by: __________
-- Date: __________
+
+- [ ] Code review completed by: \***\*\_\_\*\***
+- [ ] Tested by: \***\*\_\_\*\***
+- [ ] Approved by: \***\*\_\_\*\***
+- Date: \***\*\_\_\*\***
 
 ### Production Deployment ✅
-- [ ] Deployed by: __________
-- [ ] Verified by: __________
-- [ ] Date: __________
+
+- [ ] Deployed by: \***\*\_\_\*\***
+- [ ] Verified by: \***\*\_\_\*\***
+- [ ] Date: \***\*\_\_\*\***
 
 ---
 
 **For questions or issues, refer to:**
+
 - Full documentation: `FASTAPI_FRONTEND_INTEGRATION_STRATEGY.md`
 - Quick reference: `FASTAPI_INTEGRATION_SUMMARY.md`
 - Architecture diagrams: `FASTAPI_ARCHITECTURE_DIAGRAM.md`

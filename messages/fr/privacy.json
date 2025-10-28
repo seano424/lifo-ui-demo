@@ -78,14 +78,52 @@
       "responseTime": "Nous répondrons à votre demande dans les 30 jours (ou 60 jours pour les demandes complexes, avec notification)."
     },
     "section8": {
-      "title": "8. Cookies et Technologies de Suivi",
-      "intro": "Nous utilisons actuellement des cookies essentiels (requis pour le service) : jetons d'authentification (vous garde connecté), gestion de session (maintient votre session active), cookies de sécurité (empêche l'accès non autorisé). Nous pouvons mettre en œuvre des cookies supplémentaires pour :",
-      "items": [
-        "Surveillance des performances et analytique",
-        "Stockage des préférences utilisateur (par exemple, paramètres de langue)",
-        "Amélioration du service et tests A/B"
-      ],
-      "outro": "Vous serez informé avant que nous introduisions de nouveaux types de cookies. Vous pouvez contrôler les préférences de cookies via les paramètres de votre navigateur. Remarque : La désactivation des cookies essentiels peut limiter la fonctionnalité du service."
+      "title": "8. Analytiques et Cookies",
+      "intro": "Nous utilisons Google Analytics pour comprendre comment les utilisateurs interagissent avec LIFO et améliorer notre service.",
+      "whatWeCollect": {
+        "title": "Ce que nous collectons :",
+        "items": [
+          "Pages que vous visitez dans le tableau de bord",
+          "Fonctionnalités que vous utilisez",
+          "Temps passé dans différentes sections",
+          "Informations techniques (navigateur, type d'appareil, résolution d'écran)"
+        ]
+      },
+      "whatWeDontCollect": {
+        "title": "Ce que nous NE collectons PAS :",
+        "items": [
+          "Données de produits personnelles",
+          "Détails d'inventaire spécifiques",
+          "Informations sur les clients",
+          "Données financières"
+        ]
+      },
+      "yourChoices": {
+        "title": "Vos choix :",
+        "items": [
+          "Vous pouvez vous désinscrire lors de l'intégration",
+          "Vous pouvez désactiver les analytiques à tout moment dans Paramètres > Préférences",
+          "Nous anonymisons les adresses IP",
+          "Nous n'utilisons pas les données à des fins publicitaires",
+          "Le paramètre \"Ne pas suivre\" de votre navigateur est respecté"
+        ]
+      },
+      "dataStorage": {
+        "title": "Stockage des données :",
+        "items": [
+          "Les données analytiques sont stockées par PostHog dans la région UE",
+          "Les données sont traitées au sein de l'Union européenne pour la conformité RGPD",
+          "Nous conservons les données analytiques pendant 12 mois"
+        ]
+      },
+      "cookiesSet": {
+        "title": "Cookies définis :",
+        "items": [
+          "phc_* (session) - Suivi de session PostHog",
+          "ph_* (session) - Drapeaux de fonctionnalités PostHog"
+        ]
+      },
+      "outro": "Pour plus d'informations, consultez la [Politique de confidentialité de PostHog](https://posthog.com/privacy). Les cookies essentiels nécessaires au fonctionnement du service (authentification, gestion de session, sécurité) sont obligatoires et ne peuvent pas être désactivés."
     },
     "section9": {
       "title": "9. Transferts Internationaux de Données",

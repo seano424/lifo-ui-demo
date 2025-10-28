@@ -78,14 +78,52 @@
       "responseTime": "We will respond to your request within 30 days (or 60 days for complex requests, with notification)."
     },
     "section8": {
-      "title": "8. Cookies and Tracking Technologies",
-      "intro": "We currently use Essential Cookies (required for Service): authentication tokens (keeps you logged in), session management (maintains your active session), security cookies (prevents unauthorized access). We may implement additional cookies for:",
-      "items": [
-        "Performance monitoring and analytics",
-        "User preference storage (e.g., language settings)",
-        "Service improvement and A/B testing"
-      ],
-      "outro": "You will be notified before we introduce new cookie types. You can control cookie preferences through your browser settings. Note: Disabling essential cookies may limit Service functionality."
+      "title": "8. Analytics & Cookies",
+      "intro": "We use Google Analytics to understand how users interact with LIFO and improve our service.",
+      "whatWeCollect": {
+        "title": "What we collect:",
+        "items": [
+          "Pages you visit within the dashboard",
+          "Features you use",
+          "Time spent in different sections",
+          "Technical information (browser, device type, screen resolution)"
+        ]
+      },
+      "whatWeDontCollect": {
+        "title": "What we DON'T collect:",
+        "items": [
+          "Personal product data",
+          "Specific inventory details",
+          "Customer information",
+          "Financial data"
+        ]
+      },
+      "yourChoices": {
+        "title": "Your choices:",
+        "items": [
+          "You can opt-out during onboarding",
+          "You can disable analytics anytime in Settings > Preferences",
+          "We anonymize IP addresses",
+          "We do not use data for advertising",
+          "Your browser's \"Do Not Track\" setting is respected"
+        ]
+      },
+      "dataStorage": {
+        "title": "Data storage:",
+        "items": [
+          "Analytics data is stored by PostHog in the EU region",
+          "Data is processed within the European Union for GDPR compliance",
+          "We retain analytics data for 12 months"
+        ]
+      },
+      "cookiesSet": {
+        "title": "Cookies set:",
+        "items": [
+          "phc_* (session) - PostHog session tracking",
+          "ph_* (session) - PostHog feature flags"
+        ]
+      },
+      "outro": "For more information, see [PostHog's Privacy Policy](https://posthog.com/privacy). Essential cookies for service functionality (authentication, session management, security) are required and cannot be disabled."
     },
     "section9": {
       "title": "9. International Data Transfers",
