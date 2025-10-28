@@ -160,12 +160,69 @@ export default function PrivacyPage() {
             <Typography variant="p" className="text-foreground/80 leading-relaxed">
               {t('section8.intro')}
             </Typography>
-            <ul className="list-disc list-inside space-y-2 ml-6 text-foreground/80 leading-relaxed">
-              <li>{t('section8.items.0')}</li>
-              <li>{t('section8.items.1')}</li>
-              <li>{t('section8.items.2')}</li>
-            </ul>
-            <Typography variant="p" className="text-foreground/80 leading-relaxed">
+
+            <div className="space-y-4 ml-6">
+              <div>
+                <Typography variant="h3" className="text-lg font-semibold text-foreground mb-2">
+                  {t('section8.whatWeCollect.title')}
+                </Typography>
+                <ul className="list-disc list-inside space-y-2 ml-4 text-foreground/80 leading-relaxed">
+                  <li>{t('section8.whatWeCollect.items.0')}</li>
+                  <li>{t('section8.whatWeCollect.items.1')}</li>
+                  <li>{t('section8.whatWeCollect.items.2')}</li>
+                  <li>{t('section8.whatWeCollect.items.3')}</li>
+                </ul>
+              </div>
+
+              <div>
+                <Typography variant="h3" className="text-lg font-semibold text-foreground mb-2">
+                  {t('section8.whatWeDontCollect.title')}
+                </Typography>
+                <ul className="list-disc list-inside space-y-2 ml-4 text-foreground/80 leading-relaxed">
+                  <li>{t('section8.whatWeDontCollect.items.0')}</li>
+                  <li>{t('section8.whatWeDontCollect.items.1')}</li>
+                  <li>{t('section8.whatWeDontCollect.items.2')}</li>
+                  <li>{t('section8.whatWeDontCollect.items.3')}</li>
+                </ul>
+              </div>
+
+              <div>
+                <Typography variant="h3" className="text-lg font-semibold text-foreground mb-2">
+                  {t('section8.yourChoices.title')}
+                </Typography>
+                <ul className="list-disc list-inside space-y-2 ml-4 text-foreground/80 leading-relaxed">
+                  <li>{t('section8.yourChoices.items.0')}</li>
+                  <li>{t('section8.yourChoices.items.1')}</li>
+                  <li>{t('section8.yourChoices.items.2')}</li>
+                  <li>{t('section8.yourChoices.items.3')}</li>
+                  <li>{t('section8.yourChoices.items.4')}</li>
+                </ul>
+              </div>
+
+              <div>
+                <Typography variant="h3" className="text-lg font-semibold text-foreground mb-2">
+                  {t('section8.dataStorage.title')}
+                </Typography>
+                <ul className="list-disc list-inside space-y-2 ml-4 text-foreground/80 leading-relaxed">
+                  <li>{t('section8.dataStorage.items.0')}</li>
+                  <li>{t('section8.dataStorage.items.1')}</li>
+                  <li>{t('section8.dataStorage.items.2')}</li>
+                </ul>
+              </div>
+
+              <div>
+                <Typography variant="h3" className="text-lg font-semibold text-foreground mb-2">
+                  {t('section8.cookiesSet.title')}
+                </Typography>
+                <ul className="list-disc list-inside space-y-2 ml-4 text-foreground/80 leading-relaxed">
+                  <li>{t('section8.cookiesSet.items.0')}</li>
+                  <li>{t('section8.cookiesSet.items.1')}</li>
+                  <li>{t('section8.cookiesSet.items.2')}</li>
+                </ul>
+              </div>
+            </div>
+
+            <Typography variant="p" className="text-foreground/80 leading-relaxed mt-4">
               {t('section8.outro')}
             </Typography>
           </section>

@@ -78,15 +78,53 @@
       "responseTime": "We zullen binnen 30 dagen op uw verzoek reageren (of 60 dagen voor complexe verzoeken, met kennisgeving)."
     },
     "section8": {
-      "title": "8. Cookies en Volgtechnologieën",
-      "intro": "We gebruiken momenteel essentiële cookies (vereist voor de dienst): authenticatietokens (houdt u ingelogd), sessiebeheer (houdt uw actieve sessie in stand), beveiligingscookies (voorkomt ongeautoriseerde toegang). We gebruiken ook Google Analytics voor:",
-      "items": [
-        "Prestatiebewaking en analytics om te begrijpen hoe gebruikers met onze website interageren",
-        "Google Analytics gebruikt cookies om anonieme gebruiksgegevens te verzamelen. U kunt zich afmelden door onze cookiebanner te weigeren",
-        "Opslag van gebruikersvoorkeuren (bijv. taalinstellingen)",
-        "Serviceverbetering en A/B-testen"
-      ],
-      "outro": "U wordt op de hoogte gesteld voordat we nieuwe cookietypes introduceren. U kunt cookievoorkeuren beheren via de cookiebanner of uw browserinstellingen. Let op: Het uitschakelen van essentiële cookies kan de functionaliteit van de dienst beperken."
+      "title": "8. Analytics en Cookies",
+      "intro": "We gebruiken Google Analytics om te begrijpen hoe gebruikers met LIFO interageren en onze service te verbeteren.",
+      "whatWeCollect": {
+        "title": "Wat we verzamelen:",
+        "items": [
+          "Pagina's die u bezoekt in het dashboard",
+          "Functies die u gebruikt",
+          "Tijd die u in verschillende secties doorbrengt",
+          "Technische informatie (browser, apparaattype, schermresolutie)"
+        ]
+      },
+      "whatWeDontCollect": {
+        "title": "Wat we NIET verzamelen:",
+        "items": [
+          "Persoonlijke productgegevens",
+          "Specifieke inventarisgegevens",
+          "Klantinformatie",
+          "Financiële gegevens"
+        ]
+      },
+      "yourChoices": {
+        "title": "Uw keuzes:",
+        "items": [
+          "U kunt zich afmelden tijdens de onboarding",
+          "U kunt analytics op elk moment uitschakelen in Instellingen > Voorkeuren",
+          "We anonimiseren IP-adressen",
+          "We gebruiken gegevens niet voor advertenties",
+          "De \"Niet volgen\"-instelling van uw browser wordt gerespecteerd"
+        ]
+      },
+      "dataStorage": {
+        "title": "Gegevensopslag:",
+        "items": [
+          "Analytics-gegevens worden opgeslagen door Google Analytics",
+          "Gegevens kunnen worden overgedragen naar de Amerikaanse servers van Google",
+          "We bewaren analytics-gegevens gedurende 26 maanden (Google's standaard)"
+        ]
+      },
+      "cookiesSet": {
+        "title": "Cookies die zijn ingesteld:",
+        "items": [
+          "_ga (2 jaar) - Onderscheidt gebruikers",
+          "_gid (24 uur) - Onderscheidt gebruikers",
+          "_gat (1 minuut) - Beperkt verzoeken"
+        ]
+      },
+      "outro": "Voor meer informatie, zie de [Privacybeleid van Google](https://policies.google.com/privacy). Essentiële cookies die nodig zijn voor de functionaliteit van de service (authenticatie, sessiebeheer, beveiliging) zijn verplicht en kunnen niet worden uitgeschakeld."
     },
     "section9": {
       "title": "9. Internationale Gegevensoverdrachten",
