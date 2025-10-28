@@ -107,7 +107,7 @@ export function DisposeTab({ selectedBatch, onClose }: DisposeTabProps) {
       })
 
       // Show user-facing error message
-      const errorMessage = error instanceof Error ? error.message : tErrors('common.unexpected')
+      const errorMessage = error instanceof Error ? error.message : tErrors('unexpected')
       toast.error(t('dispose.error', { error: errorMessage }))
     }
   }

@@ -93,6 +93,7 @@ interface DisposeActionParams {
   p_disposal_reason: string
   p_user_id: string
   p_notes?: string | null
+  p_recommended_action?: string | null
 }
 
 interface DismissActionParams {
@@ -159,6 +160,7 @@ interface DisposeParams {
   quantity: number
   disposalReason: string
   notes?: string
+  recommendedAction?: string
 }
 
 interface DismissParams {
@@ -790,6 +792,7 @@ export function useBatchActionRPC(providedStoreId?: string) {
         batchId: params.batchId,
         quantity: params.quantity,
         disposalReason: params.disposalReason,
+        recommendedAction: params.recommendedAction,
       })
       const startTime = performance.now()
       const { data, error } = await supabase.rpc('execute_dispose_action', {
@@ -798,6 +801,7 @@ export function useBatchActionRPC(providedStoreId?: string) {
         p_disposal_reason: params.disposalReason,
         p_user_id: userId,
         p_notes: params.notes || null,
+        p_recommended_action: params.recommendedAction || null,
       } as DisposeActionParams)
       const endTime = performance.now()
       logger.log('BatchActions', `Dispose RPC completed in ${(endTime - startTime).toFixed(2)}ms`, {
