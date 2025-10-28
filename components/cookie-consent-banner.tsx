@@ -3,13 +3,14 @@
 import { Button } from '@/components/ui/button'
 import { useTranslations } from 'next-intl'
 import Link from 'next/link'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 export function CookieConsentBanner() {
   const t = useTranslations('cookieConsent')
   const [showBanner, setShowBanner] = useState(false)
   const [hasConsent, setHasConsent] = useState(false)
   const [isMounted, setIsMounted] = useState(false)
+  const bannerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     // Check if user has already made a choice
@@ -41,6 +42,10 @@ export function CookieConsentBanner() {
     }
     setShowBanner(false)
     setHasConsent(false)
+    // Dispatch event for PostHog to disable tracking
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('cookieConsentRevoked'))
+    }
   }, [])
 
   const handleRevoke = useCallback(() => {
@@ -61,30 +66,9 @@ export function CookieConsentBanner() {
 
   // Focus management for accessibility
   useEffect(() => {
-    if (showBanner && isMounted) {
+    if (showBanner && isMounted && bannerRef.current) {
       // Focus the banner when it appears for keyboard navigation
-      const banner = document.querySelector('[role="dialog"]') as HTMLElement
-      if (banner) {
-        banner.focus()
-      }
-    }
-  }, [showBanner, isMounted])
-
-  // Mobile UX: Use CSS transforms for smooth banner animation without CLS
-  useEffect(() => {
-    if (showBanner && isMounted) {
-      // Set initial state (off-screen) and then animate in
-      const banner = document.querySelector('[role="dialog"]') as HTMLElement
-      if (banner) {
-        // Set initial state
-        banner.style.transform = 'translateY(100%)'
-        banner.style.transition = 'none'
-
-        // Force a reflow, then animate in
-        banner.offsetHeight // Trigger reflow
-        banner.style.transition = 'transform 0.3s ease-in-out'
-        banner.style.transform = 'translateY(0)'
-      }
+      bannerRef.current.focus()
     }
   }, [showBanner, isMounted])
 
@@ -125,12 +109,13 @@ export function CookieConsentBanner() {
 
   return (
     <div
+      ref={bannerRef}
       role="dialog"
       tabIndex={-1}
       aria-live="polite"
       aria-labelledby="cookie-banner-title"
       aria-describedby="cookie-banner-description"
-      className="fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-t p-3 sm:p-4 shadow-lg"
+      className="fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-t p-3 sm:p-4 shadow-lg animate-in slide-in-from-bottom duration-300"
     >
       <p id="cookie-banner-title" className="sr-only">
         Cookie Consent

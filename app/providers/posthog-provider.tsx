@@ -32,9 +32,12 @@ export function PostHogProvider({ children }: PostHogProviderProps) {
       return
     }
 
-    // Check consent BEFORE initializing PostHog
-    const consent = localStorage.getItem('cookie-consent')
-    const hasConsent = consent === 'accepted'
+    // Check consent AFTER environment variable validation
+    let hasConsent = false
+    if (typeof window !== 'undefined') {
+      const consent = localStorage.getItem('cookie-consent')
+      hasConsent = consent === 'accepted'
+    }
 
     logger.log('PostHog', 'Initializing...', {
       posthogKey: `${posthogKey?.substring(0, 10)}...`,
@@ -111,6 +114,12 @@ export function PostHogProvider({ children }: PostHogProviderProps) {
       if (typeof window !== 'undefined') {
         window.removeEventListener('cookieConsentAccepted', handleConsentAccepted)
         window.removeEventListener('cookieConsentRevoked', handleConsentRevoked)
+      }
+      // Clean up PostHog instance to prevent memory leaks
+      try {
+        posthog.reset()
+      } catch (error) {
+        logger.warn('PostHog', 'Failed to reset PostHog during cleanup', error)
       }
     }
   }, [isInitialized, hasError])
