@@ -22,7 +22,6 @@ export function CookieConsentBanner() {
   const handleAccept = () => {
     if (typeof window !== 'undefined') {
       localStorage.setItem('cookie-consent', 'accepted')
-      localStorage.setItem('cookie-consent-date', new Date().toISOString())
     }
     setShowBanner(false)
     // Dispatch event for Google Analytics to initialize
@@ -34,32 +33,30 @@ export function CookieConsentBanner() {
   const handleDecline = () => {
     if (typeof window !== 'undefined') {
       localStorage.setItem('cookie-consent', 'declined')
-      localStorage.setItem('cookie-consent-date', new Date().toISOString())
     }
     setShowBanner(false)
-  }
-
-  const getConsentStatus = () => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('cookie-consent')
-    }
-    return null
   }
 
   const handleRevoke = () => {
     if (typeof window !== 'undefined') {
       localStorage.removeItem('cookie-consent')
-      localStorage.removeItem('cookie-consent-date')
-      window.dispatchEvent(new Event('cookieConsentRevoked'))
     }
     // Re-show the banner so user can make a new choice
     setShowBanner(true)
+    // Dispatch event for Google Analytics cleanup
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('cookieConsentRevoked'))
+    }
+  }
+
+  const hasConsent = () => {
+    if (typeof window === 'undefined') return false
+    return localStorage.getItem('cookie-consent') === 'accepted'
   }
 
   if (!showBanner) {
-    const consent = getConsentStatus()
     // Only show manage consent button if consent was given
-    if (consent === 'accepted') {
+    if (hasConsent()) {
       return (
         <div className="fixed bottom-4 right-4 z-50">
           <Button variant="outline" size="sm" onClick={handleRevoke} className="text-xs">
