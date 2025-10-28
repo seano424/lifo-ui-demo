@@ -8,6 +8,17 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { ADHOC_RECIPIENT_UUID } from '@/hooks/use-donation-recipients'
 
+// Type-safe action recommendation values (matches database enum)
+export type RecommendedAction =
+  | 'dispose'
+  | 'discount_moderate'
+  | 'discount_aggressive'
+  | 'donate'
+  | 'maintain'
+  | 'alert'
+  | 'monitor'
+  | null
+
 export interface ActionableBatch {
   batch_id: string
   batch_number: string
@@ -144,7 +155,7 @@ interface DonateParams {
   quantity: number
   donationRecipientId: string
   notes?: string
-  recommendedAction?: string
+  recommendedAction?: RecommendedAction
 }
 
 interface DiscountParams {
@@ -152,14 +163,14 @@ interface DiscountParams {
   quantity: number
   discountPercentage: number
   notes?: string
-  recommendedAction?: string
+  recommendedAction?: RecommendedAction
 }
 
 interface SoldParams {
   batchId: string
   quantity: number
   notes?: string
-  recommendedAction?: string
+  recommendedAction?: RecommendedAction
 }
 
 interface DisposeParams {
@@ -167,14 +178,14 @@ interface DisposeParams {
   quantity: number
   disposalReason: string
   notes?: string
-  recommendedAction?: string
+  recommendedAction?: RecommendedAction
 }
 
 interface DismissParams {
   batchId: string
   dismissalReason: string
   notes?: string
-  recommendedAction?: string
+  recommendedAction?: RecommendedAction
 }
 
 interface BulkParams {

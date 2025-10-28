@@ -6,6 +6,7 @@ import type { TodoItem } from '@/lib/queries/todos-rpc'
 
 import { cn } from '@/lib/utils'
 import { migrateRecommendation } from '@/lib/utils/recommendation-migration'
+import { logger } from '@/lib/utils/logger'
 import { Calendar, Package, PenLine, CheckIcon } from 'lucide-react'
 import { startOfDay, isToday, differenceInDays, addDays, isBefore } from 'date-fns'
 import { useTranslations } from 'next-intl'
@@ -91,6 +92,13 @@ export function TodoCard({ todo, onClick }: TodoCardProps) {
   const getRecommendationText = (recommendation: string | null | undefined): string => {
     // Frontend safeguard: Override bad recommendations for expired items
     if (isExpiring && recommendation !== 'dispose') {
+      logger.warn('TodoCard', 'Overriding AI recommendation for expired item', {
+        batchId: todo.batch_id,
+        originalRecommendation: recommendation,
+        overriddenTo: 'dispose',
+        expiryDate: todo.expiry_date,
+        daysOverdue: differenceInDays(todayStartOfDay, expiryStartOfDay),
+      })
       return t('recommendations.dispose')
     }
 

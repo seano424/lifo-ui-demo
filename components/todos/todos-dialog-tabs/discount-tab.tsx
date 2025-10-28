@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { InputSlider } from '@/components/ui/input-slider'
 import { Typography } from '@/components/ui/typography'
 import type { TodoItem } from '@/lib/queries/todos-rpc'
-import { useBatchActionRPC } from '@/hooks/use-batch-actions-rpc'
+import { useBatchActionRPC, type RecommendedAction } from '@/hooks/use-batch-actions-rpc'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 import { useState } from 'react'
 import { useMediaQuery } from '@/hooks/use-mobile'
@@ -94,6 +94,7 @@ export function DiscountTab({ selectedBatch, onClose }: DiscountTabProps) {
         notes: useCustomPrice
           ? `Set price to €${priceMetrics.newPrice.toFixed(2)} (${priceMetrics.actualDiscountPercentage}% discount) - ${selectedBatch.ai_recommendation || ''}`
           : `Applied ${priceMetrics.actualDiscountPercentage}% discount - ${selectedBatch.ai_recommendation || ''}`,
+        recommendedAction: (selectedBatch.ai_recommendation as RecommendedAction) || undefined,
       }
 
       await executeDiscount(params)
@@ -127,9 +128,15 @@ export function DiscountTab({ selectedBatch, onClose }: DiscountTabProps) {
       <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-primary-100 scrollbar-track-transparent flex flex-col divide-y-4 divide-white dark:divide-gray-800">
         {/* Discount Preset Options */}
         <div className="flex flex-col gap-4 px-8 py-4 flex-1 justify-center">
-          <Typography variant="p" className="xs:text-lg">
-            {t('discount.selectPercentage')}
-          </Typography>
+          <div className="flex flex-col gap-2">
+            <Typography variant="p" className="xs:text-lg">
+              {t('discount.selectPercentage')}
+            </Typography>
+            <Typography variant="small" className="text-muted-foreground text-xs">
+              Note: Discount applies to all {selectedBatch.current_quantity || 0} units in this
+              batch
+            </Typography>
+          </div>
           <div className="grid grid-cols-2 gap-2 bg-white dark:bg-brand-dark rounded-2xl p-4">
             {[10, 20, 25, 50].map(preset => (
               <Button

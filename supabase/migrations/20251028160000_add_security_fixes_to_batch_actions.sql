@@ -38,6 +38,7 @@ DECLARE
   v_batch inventory.batches%ROWTYPE;
   v_entry_id UUID;
   v_loss_value DECIMAL;
+  v_new_quantity NUMERIC;
 BEGIN
   -- Get batch with row-level lock to prevent race conditions
   SELECT * INTO v_batch
@@ -46,7 +47,7 @@ BEGIN
   FOR UPDATE;  -- ADDED: Prevent concurrent modifications
 
   IF NOT FOUND THEN
-    RETURN jsonb_build_object('success', false, 'error', 'Batch not found');
+    RAISE EXCEPTION 'Batch % not found', p_batch_id;
   END IF;
 
   -- SECURITY: Verify user has access to this store
@@ -56,14 +57,11 @@ BEGIN
     AND store_id = v_batch.store_id
     AND is_active = true
   ) THEN
-    RETURN jsonb_build_object(
-      'success', false,
-      'error', 'Unauthorized: User does not have access to this store'
-    );
+    RAISE EXCEPTION 'Unauthorized: User % does not have access to store %', p_user_id, v_batch.store_id;
   END IF;
 
   IF p_quantity_disposed > v_batch.current_quantity THEN
-    RETURN jsonb_build_object('success', false, 'error', 'Insufficient quantity');
+    RAISE EXCEPTION 'Cannot dispose % units when only % available', p_quantity_disposed, v_batch.current_quantity;
   END IF;
 
   v_loss_value := p_quantity_disposed * COALESCE(v_batch.cost_price, v_batch.selling_price);
@@ -80,7 +78,7 @@ BEGIN
     p_disposal_reason, p_user_id, v_batch.initial_quantity, p_notes
   ) RETURNING entry_id INTO v_entry_id;
 
-  -- Update batch state
+  -- Update batch state and get new quantity
   UPDATE inventory.batches
   SET current_quantity = current_quantity - p_quantity_disposed,
       status = CASE
@@ -88,12 +86,13 @@ BEGIN
         ELSE status
       END,
       updated_at = NOW()
-  WHERE batch_id = p_batch_id;
+  WHERE batch_id = p_batch_id
+  RETURNING current_quantity INTO v_new_quantity;
 
   RETURN jsonb_build_object(
     'success', true,
     'action_id', v_entry_id,
-    'remaining_quantity', v_batch.current_quantity - p_quantity_disposed,
+    'remaining_quantity', v_new_quantity,
     'total_loss_value', v_loss_value
   );
 END;
@@ -232,6 +231,7 @@ DECLARE
   v_batch inventory.batches%ROWTYPE;
   v_entry_id UUID;
   v_revenue_recovered DECIMAL;
+  v_new_quantity NUMERIC;
 BEGIN
   -- Get batch with row-level lock
   SELECT * INTO v_batch
@@ -240,7 +240,7 @@ BEGIN
   FOR UPDATE;  -- ADDED: Prevent concurrent modifications
 
   IF NOT FOUND THEN
-    RETURN jsonb_build_object('success', false, 'error', 'Batch not found');
+    RAISE EXCEPTION 'Batch % not found', p_batch_id;
   END IF;
 
   -- SECURITY: Verify user has access to this store
@@ -250,14 +250,11 @@ BEGIN
     AND store_id = v_batch.store_id
     AND is_active = true
   ) THEN
-    RETURN jsonb_build_object(
-      'success', false,
-      'error', 'Unauthorized: User does not have access to this store'
-    );
+    RAISE EXCEPTION 'Unauthorized: User % does not have access to store %', p_user_id, v_batch.store_id;
   END IF;
 
   IF p_quantity_sold > v_batch.current_quantity THEN
-    RETURN jsonb_build_object('success', false, 'error', 'Insufficient quantity');
+    RAISE EXCEPTION 'Cannot sell % units when only % available', p_quantity_sold, v_batch.current_quantity;
   END IF;
 
   v_revenue_recovered := p_quantity_sold * v_batch.selling_price;
@@ -274,7 +271,7 @@ BEGIN
     p_user_id, v_batch.initial_quantity, p_notes
   ) RETURNING entry_id INTO v_entry_id;
 
-  -- Update inventory
+  -- Update inventory and get new quantity
   UPDATE inventory.batches
   SET current_quantity = current_quantity - p_quantity_sold,
       status = CASE
@@ -282,7 +279,8 @@ BEGIN
         ELSE status
       END,
       updated_at = NOW()
-  WHERE batch_id = p_batch_id;
+  WHERE batch_id = p_batch_id
+  RETURNING current_quantity INTO v_new_quantity;
 
   -- Mark as resolved in scoring (if exists)
   IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'scoring' AND table_name = 'product_scores') THEN
@@ -310,7 +308,7 @@ BEGIN
   RETURN jsonb_build_object(
     'success', true,
     'action_id', v_entry_id,
-    'remaining_quantity', v_batch.current_quantity - p_quantity_sold,
+    'remaining_quantity', v_new_quantity,
     'revenue_recovered', v_revenue_recovered
   );
 END;
@@ -339,6 +337,7 @@ DECLARE
   v_batch inventory.batches%ROWTYPE;
   v_entry_id UUID;
   v_total_value DECIMAL;
+  v_new_quantity NUMERIC;
 BEGIN
   -- Get batch with row-level lock
   SELECT * INTO v_batch
@@ -347,7 +346,7 @@ BEGIN
   FOR UPDATE;  -- ADDED: Prevent concurrent modifications
 
   IF NOT FOUND THEN
-    RETURN jsonb_build_object('success', false, 'error', 'Batch not found');
+    RAISE EXCEPTION 'Batch % not found', p_batch_id;
   END IF;
 
   -- SECURITY: Verify user has access to this store
@@ -357,14 +356,11 @@ BEGIN
     AND store_id = v_batch.store_id
     AND is_active = true
   ) THEN
-    RETURN jsonb_build_object(
-      'success', false,
-      'error', 'Unauthorized: User does not have access to this store'
-    );
+    RAISE EXCEPTION 'Unauthorized: User % does not have access to store %', p_user_id, v_batch.store_id;
   END IF;
 
   IF p_quantity_affected > v_batch.current_quantity THEN
-    RETURN jsonb_build_object('success', false, 'error', 'Insufficient quantity');
+    RAISE EXCEPTION 'Cannot donate % units when only % available', p_quantity_affected, v_batch.current_quantity;
   END IF;
 
   v_total_value := p_quantity_affected * COALESCE(v_batch.cost_price, v_batch.selling_price);
@@ -381,7 +377,7 @@ BEGIN
     p_donation_recipient_id, p_user_id, v_batch.initial_quantity, p_notes
   ) RETURNING entry_id INTO v_entry_id;
 
-  -- Update batch state
+  -- Update batch state and get new quantity
   UPDATE inventory.batches
   SET current_quantity = current_quantity - p_quantity_affected,
       status = CASE
@@ -389,12 +385,13 @@ BEGIN
         ELSE status
       END,
       updated_at = NOW()
-  WHERE batch_id = p_batch_id;
+  WHERE batch_id = p_batch_id
+  RETURNING current_quantity INTO v_new_quantity;
 
   RETURN jsonb_build_object(
     'success', true,
     'action_id', v_entry_id,
-    'remaining_quantity', v_batch.current_quantity - p_quantity_affected,
+    'remaining_quantity', v_new_quantity,
     'total_value_donated', v_total_value
   );
 END;
@@ -429,7 +426,7 @@ BEGIN
   FOR UPDATE;  -- ADDED: Prevent concurrent modifications
 
   IF NOT FOUND THEN
-    RETURN jsonb_build_object('success', false, 'error', 'Batch not found');
+    RAISE EXCEPTION 'Batch % not found', p_batch_id;
   END IF;
 
   -- SECURITY: Verify user has access to this store
@@ -439,10 +436,7 @@ BEGIN
     AND store_id = v_batch.store_id
     AND is_active = true
   ) THEN
-    RETURN jsonb_build_object(
-      'success', false,
-      'error', 'Unauthorized: User does not have access to this store'
-    );
+    RAISE EXCEPTION 'Unauthorized: User % does not have access to store %', p_user_id, v_batch.store_id;
   END IF;
 
   -- Record dismissal with AI recommendation

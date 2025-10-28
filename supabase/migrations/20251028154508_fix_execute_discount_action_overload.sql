@@ -33,7 +33,7 @@ CREATE OR REPLACE FUNCTION public.execute_discount_action(
 ) RETURNS jsonb
     LANGUAGE plpgsql
     SECURITY DEFINER
-    SET search_path TO 'public', 'inventory'
+    SET search_path TO ''  -- Empty for security (will be enhanced with authorization checks in later migration)
 AS $$
 DECLARE
   v_store_id UUID;
