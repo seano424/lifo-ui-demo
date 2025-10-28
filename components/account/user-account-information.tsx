@@ -7,14 +7,14 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { LanguageSwitcher } from '@/components/ui/language-switcher'
 import { Skeleton } from '@/components/ui/skeleton'
-import { ThemeSwitcherSelect } from '@/components/ui/theme-switcher-select'
+// import { ThemeSwitcherSelect } from '@/components/ui/theme-switcher-select'
 import { Typography } from '@/components/ui/typography'
 import { useCurrentUser, useUpdatePhone, useUserActions } from '@/hooks/use-users'
 import { formatPhoneNumber, isValidPhoneNumber } from '@/lib/types/user'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { AlertCircle, Check, Edit, Shield, X } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import { useTheme } from 'next-themes'
+// import { useTheme } from 'next-themes'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -37,7 +37,7 @@ type ProfileFormData = z.infer<ReturnType<typeof createProfileSchema>>
 
 export default function UserAccountInformation() {
   const t = useTranslations('account')
-  const { theme } = useTheme()
+  // const { theme } = useTheme()
   const { data: user, isLoading } = useCurrentUser()
 
   const updatePhone = useUpdatePhone()
@@ -119,16 +119,16 @@ export default function UserAccountInformation() {
     setIsEditingPhone(false)
   }
 
-  const getCurrentThemeDisplay = () => {
-    switch (theme) {
-      case 'light':
-        return t('theme.light')
-      case 'dark':
-        return t('theme.dark')
-      case 'system':
-        return t('theme.system')
-    }
-  }
+  // const getCurrentThemeDisplay = () => {
+  //   switch (theme) {
+  //     case 'light':
+  //       return t('theme.light')
+  //     case 'dark':
+  //       return t('theme.dark')
+  //     case 'system':
+  //       return t('theme.system')
+  //   }
+  // }
 
   if (isLoading) {
     return (

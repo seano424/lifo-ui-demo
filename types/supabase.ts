@@ -2042,6 +2042,7 @@ export type Database = {
           p_discount_percentage: number
           p_notes?: string
           p_quantity_affected: number
+          p_recommended_action?: string
           p_user_id: string
         }
         Returns: Json
@@ -2051,6 +2052,7 @@ export type Database = {
           p_batch_id: string
           p_dismissal_reason: string
           p_notes?: string
+          p_recommended_action?: string
           p_user_id: string
         }
         Returns: Json
@@ -2061,6 +2063,7 @@ export type Database = {
           p_disposal_reason: string
           p_notes?: string
           p_quantity_disposed: number
+          p_recommended_action?: string
           p_user_id: string
         }
         Returns: Json
@@ -2071,6 +2074,7 @@ export type Database = {
           p_donation_recipient_id: string
           p_notes?: string
           p_quantity_affected: number
+          p_recommended_action?: string
           p_user_id: string
         }
         Returns: Json
@@ -2093,6 +2097,7 @@ export type Database = {
           p_batch_id: string
           p_notes?: string
           p_quantity_sold: number
+          p_recommended_action?: string
           p_user_id: string
         }
         Returns: Json
