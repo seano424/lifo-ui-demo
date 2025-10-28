@@ -32,6 +32,13 @@ const nextConfig: NextConfig = {
             key: 'Referrer-Policy',
             value: 'strict-origin-when-cross-origin',
           },
+          {
+            // Global Content Security Policy for main application
+            // Allows PostHog EU endpoint and other necessary domains
+            key: 'Content-Security-Policy',
+            value:
+              "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://app.posthog.com https://*.posthog.com https://eu.i.posthog.com; connect-src 'self' https://jrgmetdsohowtxickqij.supabase.co https://world.openfoodfacts.org https://*.ondigitalocean.app https://fonts.googleapis.com https://fonts.gstatic.com https://app.posthog.com https://*.posthog.com https://eu.i.posthog.com; font-src 'self' https://fonts.gstatic.com data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:;",
+          },
         ],
       },
       {
@@ -53,7 +60,7 @@ const nextConfig: NextConfig = {
             // Allows connections to Supabase, OpenFoodFacts, DigitalOcean API, Google Fonts, and PostHog
             key: 'Content-Security-Policy',
             value:
-              "default-src 'self'; script-src 'self' https://app.posthog.com https://*.posthog.com; connect-src 'self' https://jrgmetdsohowtxickqij.supabase.co https://world.openfoodfacts.org https://*.ondigitalocean.app https://fonts.googleapis.com https://fonts.gstatic.com https://app.posthog.com https://*.posthog.com; font-src 'self' https://fonts.gstatic.com data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+              "default-src 'self'; script-src 'self' https://app.posthog.com https://*.posthog.com https://eu.i.posthog.com; connect-src 'self' https://jrgmetdsohowtxickqij.supabase.co https://world.openfoodfacts.org https://*.ondigitalocean.app https://fonts.googleapis.com https://fonts.gstatic.com https://app.posthog.com https://*.posthog.com https://eu.i.posthog.com; font-src 'self' https://fonts.gstatic.com data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
           },
         ],
       },

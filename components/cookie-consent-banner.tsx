@@ -50,10 +50,13 @@ export function CookieConsentBanner() {
     // Re-show the banner so user can make a new choice
     setShowBanner(true)
     setHasConsent(false)
-    // Dispatch event for PostHog cleanup
-    if (typeof window !== 'undefined') {
-      window.dispatchEvent(new Event('cookieConsentRevoked'))
-    }
+
+    // Dispatch event after state update using setTimeout to avoid race condition
+    setTimeout(() => {
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new Event('cookieConsentRevoked'))
+      }
+    }, 0)
   }, [])
 
   // Focus management for accessibility

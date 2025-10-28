@@ -98,6 +98,10 @@ export function PostHogProvider({ children }: PostHogProviderProps) {
     } catch (error) {
       logger.error('PostHog', 'Initialization failed', error)
       setHasError(true)
+
+      // Optionally report to monitoring service here
+      // Example: Sentry.captureException(error, { tags: { component: 'PostHog' } })
+
       return
     }
 
