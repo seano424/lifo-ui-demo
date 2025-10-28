@@ -371,7 +371,7 @@ export default function UserAccountInformation() {
           </div>
         </div>
 
-        <div className="space-y-4 pt-4 border-t">
+        {/* <div className="space-y-4 pt-4 border-t">
           <Typography variant="h4" className="font-black">
             {t('theme.title')}
           </Typography>
@@ -387,7 +387,7 @@ export default function UserAccountInformation() {
               <ThemeSwitcherSelect />
             </div>
           </div>
-        </div>
+        </div> */}
 
         <div className="space-y-4 pt-4 border-t">
           <Typography variant="h4" className="font-black">
