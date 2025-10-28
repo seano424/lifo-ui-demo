@@ -8,6 +8,32 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { ADHOC_RECIPIENT_UUID } from '@/hooks/use-donation-recipients'
 
+// Type-safe action recommendation values (matches database enum)
+export type RecommendedAction =
+  | 'dispose'
+  | 'discount_moderate'
+  | 'discount_aggressive'
+  | 'donate'
+  | 'maintain'
+  | 'alert'
+  | 'monitor'
+  | null
+
+// Runtime type guard for RecommendedAction validation
+export function isValidRecommendedAction(value: unknown): value is RecommendedAction {
+  const validActions: RecommendedAction[] = [
+    'dispose',
+    'discount_moderate',
+    'discount_aggressive',
+    'donate',
+    'maintain',
+    'alert',
+    'monitor',
+    null,
+  ]
+  return validActions.includes(value as RecommendedAction)
+}
+
 export interface ActionableBatch {
   batch_id: string
   batch_number: string
@@ -70,6 +96,7 @@ interface DonateActionParams {
   p_donation_recipient_id: string
   p_user_id: string
   p_notes?: string | null
+  p_recommended_action?: string | null
 }
 
 interface DiscountActionParams {
@@ -78,6 +105,7 @@ interface DiscountActionParams {
   p_discount_percentage: number
   p_user_id: string
   p_notes?: string | null
+  p_recommended_action?: string | null
 }
 
 interface SoldActionParams {
@@ -85,6 +113,7 @@ interface SoldActionParams {
   p_quantity_sold: number
   p_user_id: string
   p_notes?: string | null
+  p_recommended_action?: string | null
 }
 
 interface DisposeActionParams {
@@ -93,6 +122,7 @@ interface DisposeActionParams {
   p_disposal_reason: string
   p_user_id: string
   p_notes?: string | null
+  p_recommended_action?: string | null
 }
 
 interface DismissActionParams {
@@ -100,6 +130,7 @@ interface DismissActionParams {
   p_dismissal_reason: string
   p_user_id: string
   p_notes?: string | null
+  p_recommended_action?: string | null
 }
 
 interface BulkActionParams {
@@ -139,6 +170,7 @@ interface DonateParams {
   quantity: number
   donationRecipientId: string
   notes?: string
+  recommendedAction?: RecommendedAction
 }
 
 interface DiscountParams {
@@ -146,12 +178,14 @@ interface DiscountParams {
   quantity: number
   discountPercentage: number
   notes?: string
+  recommendedAction?: RecommendedAction
 }
 
 interface SoldParams {
   batchId: string
   quantity: number
   notes?: string
+  recommendedAction?: RecommendedAction
 }
 
 interface DisposeParams {
@@ -159,12 +193,14 @@ interface DisposeParams {
   quantity: number
   disposalReason: string
   notes?: string
+  recommendedAction?: RecommendedAction
 }
 
 interface DismissParams {
   batchId: string
   dismissalReason: string
   notes?: string
+  recommendedAction?: RecommendedAction
 }
 
 interface BulkParams {
@@ -494,11 +530,13 @@ export function useBatchActionRPC(providedStoreId?: string) {
             : null,
         p_user_id: userId,
         p_notes: params.notes || null,
+        p_recommended_action: params.recommendedAction || null,
       } as DonateActionParams
 
       logger.log('BatchActions', 'Starting donate RPC call', {
         batchId: params.batchId,
         quantity: params.quantity,
+        recommendedAction: params.recommendedAction,
       })
       const startTime = performance.now()
       const { data, error } = await supabase.rpc('execute_donate_action', rpcParams)
@@ -600,12 +638,14 @@ export function useBatchActionRPC(providedStoreId?: string) {
         p_discount_percentage: params.discountPercentage,
         p_user_id: userId,
         p_notes: params.notes || null,
+        p_recommended_action: params.recommendedAction || null,
       } as DiscountActionParams
 
       logger.log('BatchActions', 'Starting discount RPC call', {
         batchId: params.batchId,
         quantity: params.quantity,
         discountPercentage: params.discountPercentage,
+        recommendedAction: params.recommendedAction,
       })
       const startTime = performance.now()
       const { data, error } = await supabase.rpc('execute_discount_action', rpcParams)
@@ -697,6 +737,7 @@ export function useBatchActionRPC(providedStoreId?: string) {
       logger.log('BatchActions', 'Starting sold RPC call', {
         batchId: params.batchId,
         quantity: params.quantity,
+        recommendedAction: params.recommendedAction,
       })
       const startTime = performance.now()
       const { data, error } = await supabase.rpc('execute_sold_action', {
@@ -704,6 +745,7 @@ export function useBatchActionRPC(providedStoreId?: string) {
         p_quantity_sold: params.quantity,
         p_user_id: userId,
         p_notes: params.notes || null,
+        p_recommended_action: params.recommendedAction || null,
       } as SoldActionParams)
       const endTime = performance.now()
       logger.log('BatchActions', `Sold RPC completed in ${(endTime - startTime).toFixed(2)}ms`, {
@@ -790,6 +832,7 @@ export function useBatchActionRPC(providedStoreId?: string) {
         batchId: params.batchId,
         quantity: params.quantity,
         disposalReason: params.disposalReason,
+        recommendedAction: params.recommendedAction,
       })
       const startTime = performance.now()
       const { data, error } = await supabase.rpc('execute_dispose_action', {
@@ -798,6 +841,7 @@ export function useBatchActionRPC(providedStoreId?: string) {
         p_disposal_reason: params.disposalReason,
         p_user_id: userId,
         p_notes: params.notes || null,
+        p_recommended_action: params.recommendedAction || null,
       } as DisposeActionParams)
       const endTime = performance.now()
       logger.log('BatchActions', `Dispose RPC completed in ${(endTime - startTime).toFixed(2)}ms`, {
@@ -872,11 +916,18 @@ export function useBatchActionRPC(providedStoreId?: string) {
     mutationFn: async (params: DismissParams): Promise<ActionResult> => {
       const userId = await getCurrentUserId()
 
+      logger.log('BatchActions', 'Starting dismiss RPC call', {
+        batchId: params.batchId,
+        dismissalReason: params.dismissalReason,
+        recommendedAction: params.recommendedAction,
+      })
+
       const { data, error } = await supabase.rpc('execute_dismiss_action', {
         p_batch_id: params.batchId,
         p_dismissal_reason: params.dismissalReason,
         p_user_id: userId,
         p_notes: params.notes || null,
+        p_recommended_action: params.recommendedAction || null,
       } as DismissActionParams)
 
       if (error) throw error

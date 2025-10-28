@@ -107,7 +107,7 @@ export function SimpleErrorFallback({
   error: Error
   resetError: () => void
 }) {
-  const t = useTranslations('common.errors.common')
+  const t = useTranslations('errors.common')
 
   return (
     <div className="text-center py-8">
@@ -124,7 +124,7 @@ export function SimpleErrorFallback({
 
 // Specific error boundary for infinite scroll components
 export function InfiniteScrollErrorBoundary({ children }: { children: ReactNode }) {
-  const t = useTranslations('common.errors.common')
+  const t = useTranslations('errors.common')
 
   return (
     <ErrorBoundary

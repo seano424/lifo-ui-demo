@@ -15,6 +15,7 @@ const LEGACY_TO_FASTAPI_MAP: Record<string, string> = {
   high_priority: 'discount_aggressive',
   medium_priority: 'discount_moderate',
   discount_heavily: 'discount_aggressive',
+  discount: 'discount_moderate', // Generic "discount" defaults to moderate
   normal: 'maintain',
 
   // Keep existing FastAPI standards as-is

@@ -6,6 +6,7 @@ import type { TodoItem } from '@/lib/queries/todos-rpc'
 
 import { cn } from '@/lib/utils'
 import { migrateRecommendation } from '@/lib/utils/recommendation-migration'
+import { logger } from '@/lib/utils/logger'
 import { Calendar, Package, PenLine, CheckIcon } from 'lucide-react'
 import { startOfDay, isToday, differenceInDays, addDays, isBefore } from 'date-fns'
 import { useTranslations } from 'next-intl'
@@ -74,8 +75,33 @@ export function TodoCard({ todo, onClick }: TodoCardProps) {
     onClick?.()
   }
 
+  // Format expiry date with reliable timezone handling using date-fns
+  const expiryDate = todo.expiry_date ? new Date(todo.expiry_date) : new Date()
+  const today = new Date()
+
+  // Use date-fns for reliable date comparisons
+  const expiryStartOfDay = startOfDay(expiryDate)
+  const todayStartOfDay = startOfDay(today)
+  const tomorrowStartOfDay = addDays(todayStartOfDay, 1)
+
+  const isExpiringSoon = isBefore(expiryStartOfDay, tomorrowStartOfDay) || isToday(expiryDate)
+  const isExpiring = isBefore(expiryStartOfDay, todayStartOfDay)
+  const isExpiringToday = isToday(expiryDate)
+
   // Get standardized recommendation and translate it
   const getRecommendationText = (recommendation: string | null | undefined): string => {
+    // Frontend safeguard: Override bad recommendations for expired items
+    if (isExpiring && recommendation !== 'dispose') {
+      logger.warn('TodoCard', 'Overriding AI recommendation for expired item', {
+        batchId: todo.batch_id,
+        originalRecommendation: recommendation,
+        overriddenTo: 'dispose',
+        expiryDate: todo.expiry_date,
+        daysOverdue: differenceInDays(todayStartOfDay, expiryStartOfDay),
+      })
+      return t('recommendations.dispose')
+    }
+
     if (!recommendation) return t('card.noRecommendation')
 
     // Migrate legacy recommendations to standard format
@@ -90,19 +116,6 @@ export function TodoCard({ todo, onClick }: TodoCardProps) {
     }
   }
 
-  // Format expiry date with reliable timezone handling using date-fns
-  const expiryDate = todo.expiry_date ? new Date(todo.expiry_date) : new Date()
-  const today = new Date()
-
-  // Use date-fns for reliable date comparisons
-  const expiryStartOfDay = startOfDay(expiryDate)
-  const todayStartOfDay = startOfDay(today)
-  const tomorrowStartOfDay = addDays(todayStartOfDay, 1)
-
-  const isExpiringSoon = isBefore(expiryStartOfDay, tomorrowStartOfDay) || isToday(expiryDate)
-  const isExpiring = isBefore(expiryStartOfDay, todayStartOfDay)
-  const isExpiringToday = isToday(expiryDate)
-
   // Calculate days since expiry for expiring items using date-fns
   const getExpiringText = () => {
     if (!isExpiring) return ''
@@ -116,6 +129,12 @@ export function TodoCard({ todo, onClick }: TodoCardProps) {
   // Simple lookup for urgency configuration - no memoization needed since config is static
   const urgencyConfig =
     URGENCY_CONFIG[todo.urgency_level as keyof typeof URGENCY_CONFIG] || URGENCY_CONFIG.default
+
+  // Get standardized recommendation for badge display
+  // Frontend safeguard: Override bad recommendations for expired items
+  const standardRecommendation = isExpiring
+    ? 'dispose'
+    : migrateRecommendation(todo.ai_recommendation)
 
   const wasDiscounted = todo.last_discount_percent != null && todo.last_discount_percent > 0
   const wasDonated = todo.last_action_type === 'donate'
@@ -167,15 +186,6 @@ export function TodoCard({ todo, onClick }: TodoCardProps) {
             <Typography variant="h4" className="truncate w-full pb-1">
               {todo.product_name}
             </Typography>
-
-            <div className="flex-1 w-full">
-              <Typography className="flex gap-1 sm:w-8/12">
-                <span className="flex-shrink-0">{t('card.suggestion')}</span>
-                <span className="truncate lowercase">
-                  {getRecommendationText(todo.ai_recommendation)}
-                </span>
-              </Typography>
-            </div>
           </div>
 
           {/* Details */}
@@ -217,6 +227,13 @@ export function TodoCard({ todo, onClick }: TodoCardProps) {
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
+              {/* AI Recommendation Badge */}
+              {!isCompleted && (
+                <Badge variant={urgencyConfig.badgeVariant}>
+                  {getRecommendationText(todo.ai_recommendation)}
+                </Badge>
+              )}
+
               {isCompleted && wasDisposed && (
                 <Badge variant={'default'}>{t('card.disposed')}</Badge>
               )}
@@ -240,8 +257,13 @@ export function TodoCard({ todo, onClick }: TodoCardProps) {
                 </Badge>
               )}
 
-              {(todo.last_discount_percent == null || todo.last_discount_percent === 0) &&
-                !isCompleted && (
+              {/* Only show "Healthy & Maintain" if not expired/expiring and no discount */}
+              {standardRecommendation === 'maintain' &&
+                (todo.last_discount_percent == null || todo.last_discount_percent === 0) &&
+                !isCompleted &&
+                !isExpiring &&
+                !isExpiringToday &&
+                !isExpiringSoon && (
                   <Badge variant={urgencyConfig.badgeVariant}>{t('card.healthyMaintain')}</Badge>
                 )}
 

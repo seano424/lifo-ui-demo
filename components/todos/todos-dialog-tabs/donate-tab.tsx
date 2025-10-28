@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { InputSlider } from '@/components/ui/input-slider'
 import { Typography } from '@/components/ui/typography'
 import type { TodoItem } from '@/lib/queries/todos-rpc'
-import { useBatchActionRPC } from '@/hooks/use-batch-actions-rpc'
+import { useBatchActionRPC, isValidRecommendedAction } from '@/hooks/use-batch-actions-rpc'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 import { useEffect, useState } from 'react'
 import { useMediaQuery } from '@/hooks/use-mobile'
@@ -60,6 +60,9 @@ export function DonateTab({ selectedBatch, onClose }: DonateTabProps) {
         quantity: donateQuantity,
         donationRecipientId: selectedRecipient,
         notes: `Donated ${donateQuantity} units of ${selectedBatch.product_name || ''} to ${selectedRecipientName} - ${selectedBatch.ai_recommendation || ''}`,
+        recommendedAction: isValidRecommendedAction(selectedBatch.ai_recommendation)
+          ? selectedBatch.ai_recommendation
+          : undefined,
       }
 
       await executeDonate(params)
