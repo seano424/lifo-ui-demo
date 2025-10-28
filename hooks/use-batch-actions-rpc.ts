@@ -78,6 +78,7 @@ interface DiscountActionParams {
   p_discount_percentage: number
   p_user_id: string
   p_notes?: string | null
+  p_recommended_action?: string | null
 }
 
 interface SoldActionParams {
@@ -85,6 +86,7 @@ interface SoldActionParams {
   p_quantity_sold: number
   p_user_id: string
   p_notes?: string | null
+  p_recommended_action?: string | null
 }
 
 interface DisposeActionParams {
@@ -147,12 +149,14 @@ interface DiscountParams {
   quantity: number
   discountPercentage: number
   notes?: string
+  recommendedAction?: string
 }
 
 interface SoldParams {
   batchId: string
   quantity: number
   notes?: string
+  recommendedAction?: string
 }
 
 interface DisposeParams {
@@ -602,12 +606,14 @@ export function useBatchActionRPC(providedStoreId?: string) {
         p_discount_percentage: params.discountPercentage,
         p_user_id: userId,
         p_notes: params.notes || null,
+        p_recommended_action: params.recommendedAction || null,
       } as DiscountActionParams
 
       logger.log('BatchActions', 'Starting discount RPC call', {
         batchId: params.batchId,
         quantity: params.quantity,
         discountPercentage: params.discountPercentage,
+        recommendedAction: params.recommendedAction,
       })
       const startTime = performance.now()
       const { data, error } = await supabase.rpc('execute_discount_action', rpcParams)
@@ -699,6 +705,7 @@ export function useBatchActionRPC(providedStoreId?: string) {
       logger.log('BatchActions', 'Starting sold RPC call', {
         batchId: params.batchId,
         quantity: params.quantity,
+        recommendedAction: params.recommendedAction,
       })
       const startTime = performance.now()
       const { data, error } = await supabase.rpc('execute_sold_action', {
@@ -706,6 +713,7 @@ export function useBatchActionRPC(providedStoreId?: string) {
         p_quantity_sold: params.quantity,
         p_user_id: userId,
         p_notes: params.notes || null,
+        p_recommended_action: params.recommendedAction || null,
       } as SoldActionParams)
       const endTime = performance.now()
       logger.log('BatchActions', `Sold RPC completed in ${(endTime - startTime).toFixed(2)}ms`, {
