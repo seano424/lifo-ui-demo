@@ -40,7 +40,7 @@ export function ExpiringTab({ filters, pageSize = 20 }: ExpiringTabProps) {
       <div className="text-center py-8">
         <p className="text-destructive">{t('expiring.errorLoading')}</p>
         <p className="text-sm text-muted-foreground mt-2">
-          {error?.message || tErrors('common.somethingWrong')}
+          {error?.message || tErrors('somethingWrong')}
         </p>
       </div>
     )

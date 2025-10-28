@@ -83,7 +83,7 @@ export function SoldTab({ selectedBatch, onClose }: SoldTabProps) {
       })
 
       // Show user-facing error message
-      const errorMessage = error instanceof Error ? error.message : tErrors('common.unexpected')
+      const errorMessage = error instanceof Error ? error.message : tErrors('unexpected')
       toast.error(t('sold.error', { error: errorMessage }))
     }
   }
