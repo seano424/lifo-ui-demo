@@ -9,7 +9,6 @@ import { migrateRecommendation } from '@/lib/utils/recommendation-migration'
 import { Calendar, Package, PenLine, CheckIcon } from 'lucide-react'
 import { startOfDay, isToday, differenceInDays, addDays, isBefore } from 'date-fns'
 import { useTranslations } from 'next-intl'
-import { useEffect } from 'react'
 
 interface TodoCardProps {
   todo: TodoItem
@@ -149,14 +148,6 @@ export function TodoCard({ todo, onClick }: TodoCardProps) {
         return t('card.completedOn', { date })
     }
   }
-
-  // Debug logging - logs when batch_number matches
-  useEffect(() => {
-    const batchNumToCheck = '17215fdb_URGENT-004_20251021_004'
-    if (todo.batch_number === batchNumToCheck) {
-      console.log('todo', todo)
-    }
-  }, [todo.batch_number, todo])
 
   return (
     <button
