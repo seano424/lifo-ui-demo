@@ -129,6 +129,7 @@ export function CookieConsentBanner() {
   return (
     <div
       role="dialog"
+      tabIndex={-1}
       aria-live="polite"
       aria-labelledby="cookie-banner-title"
       aria-describedby="cookie-banner-description"

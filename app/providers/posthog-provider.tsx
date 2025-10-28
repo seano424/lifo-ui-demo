@@ -45,12 +45,24 @@ export function PostHogProvider({ children }: PostHogProviderProps) {
     // Define event handlers BEFORE attaching listeners to prevent race conditions
     const handleConsentAccepted = () => {
       logger.log('PostHog', 'Consent accepted, enabling tracking')
-      posthog.opt_in_capturing()
+      // Guard against calling methods before PostHog is initialized
+      if (posthog.__loaded) {
+        posthog.opt_in_capturing()
+      } else {
+        logger.warn('PostHog', 'Consent accepted but PostHog not yet loaded, will enable on load')
+        // PostHog will automatically opt-in when loaded due to opt_out_capturing_by_default: false
+      }
     }
 
     const handleConsentRevoked = () => {
       logger.log('PostHog', 'Consent revoked, disabling tracking')
-      posthog.opt_out_capturing()
+      // Guard against calling methods before PostHog is initialized
+      if (posthog.__loaded) {
+        posthog.opt_out_capturing()
+      } else {
+        logger.warn('PostHog', 'Consent revoked but PostHog not yet loaded, will disable on load')
+        // PostHog will automatically opt-out when loaded due to opt_out_capturing_by_default: true
+      }
     }
 
     // Attach event listeners IMMEDIATELY to prevent race conditions
@@ -69,6 +81,18 @@ export function PostHogProvider({ children }: PostHogProviderProps) {
         opt_out_capturing_by_default: !hasConsent, // Start opted-out unless accepted
         loaded: _posthog => {
           logger.log('PostHog', 'Loaded successfully')
+          // Check if consent state changed during initialization
+          const currentConsent = localStorage.getItem('cookie-consent')
+          const currentHasConsent = currentConsent === 'accepted'
+
+          if (currentHasConsent !== hasConsent) {
+            logger.log('PostHog', 'Consent state changed during initialization, updating...')
+            if (currentHasConsent) {
+              posthog.opt_in_capturing()
+            } else {
+              posthog.opt_out_capturing()
+            }
+          }
         },
       })
     } catch (error) {
