@@ -110,7 +110,7 @@ async function handleOnboarding(userId: string, store: StoreFormData) {
       )
     }
 
-    console.log('✅ User verified in auth.users:', userData.user.email)
+    console.log('✅ User verified in auth.users:', userId)
 
     // Convert form data to database insert format
     const storeInsert = convertFormDataToStoreInsert(
@@ -129,7 +129,7 @@ async function handleOnboarding(userId: string, store: StoreFormData) {
     )
 
     // Create store record
-    console.log('🏪 Creating store with data:', JSON.stringify(storeInsert, null, 2))
+    console.log('🏪 Creating store:', storeCode)
     const { data: storeData, error: storeError } = await supabase
       .schema('business')
       .from('stores')
@@ -174,10 +174,7 @@ async function handleOnboarding(userId: string, store: StoreFormData) {
       assigned_by: userId,
     }
 
-    console.log(
-      '👤 Creating store-user relationship with data:',
-      JSON.stringify(storeUserData, null, 2),
-    )
+    console.log('👤 Creating store-user relationship:', storeData.store_id)
     const { error: storeUserError } = await supabase
       .schema('business')
       .from('store_users')
