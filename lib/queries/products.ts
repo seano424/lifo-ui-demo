@@ -390,15 +390,13 @@ export async function fetchProductsPage(
         let filteredStoreProductsData = storeProductsData
 
         if (filters.category) {
-          if (storeProductsData.length > 0) {
-            const _categoriesFound = storeProductsData
-              .map(sp => ({
-                product_id: sp.product_id,
+          if (process.env.NODE_ENV === 'development' && storeProductsData.length > 0) {
+            logger.log(context, 'Category filtering debug', {
+              categories: storeProductsData.slice(0, 3).map(sp => ({
                 category_code: sp.products?.categories?.category_code,
-                display_name: sp.products?.categories?.display_name_en,
                 name: sp.products?.name,
-              }))
-              .slice(0, 3)
+              })),
+            })
           }
 
           filteredStoreProductsData = filteredStoreProductsData.filter(
