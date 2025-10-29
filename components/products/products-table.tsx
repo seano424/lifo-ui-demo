@@ -28,7 +28,7 @@ import {
 } from '@tanstack/react-table'
 import { Package } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 const VALID_COLUMN_IDS = [
   'name',
@@ -81,17 +81,31 @@ export function ProductsTable({ data, currentSort, updateSort, isLoading }: Prod
     }
   }, [currentSort])
 
-  const columns = createProductTableColumns({
-    data,
-    currentSort,
-    updateSort,
-    updateProductPrice,
-    deleteProduct,
-    isUpdating,
-    DEFAULT_COLUMN_WIDTHS,
-    t: tTable,
-    getCategoryName,
-  })
+  const columns = useMemo(
+    () =>
+      createProductTableColumns({
+        data,
+        currentSort,
+        updateSort,
+        updateProductPrice,
+        deleteProduct,
+        isUpdating,
+        DEFAULT_COLUMN_WIDTHS,
+        t: tTable,
+        getCategoryName,
+      }),
+    [
+      data,
+      currentSort,
+      updateSort,
+      updateProductPrice,
+      deleteProduct,
+      isUpdating,
+      DEFAULT_COLUMN_WIDTHS,
+      tTable,
+      getCategoryName,
+    ],
+  )
 
   const table = useReactTable({
     data,
