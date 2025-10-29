@@ -234,7 +234,7 @@ export function ConfirmDetailsStep() {
                     </AlertDescription>
                   </Alert>
                 ) : (
-                  <Alert>
+                  <Alert variant="success">
                     <CheckCircle className="h-4 w-4" />
                     <AlertDescription>
                       <strong>{t('businessCheck.businessVerified')}</strong>{' '}
