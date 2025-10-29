@@ -4,7 +4,7 @@ import { logger } from '@/lib/utils/logger'
 import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
 
-export async function middleware(request: NextRequest) {
+export default async function proxy(request: NextRequest) {
   const { searchParams, pathname } = new URL(request.url)
   const code = searchParams.get('code')
 
@@ -41,7 +41,7 @@ export async function middleware(request: NextRequest) {
 
       if (error) {
         const errorMessage = error.message || ''
-        logger.error('middleware', 'Code exchange failed', {
+        logger.error('proxy', 'Code exchange failed', {
           error: errorMessage,
           code: error.name,
         })
@@ -74,7 +74,7 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(redirectUrl)
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error)
-      logger.error('middleware', 'Unexpected error during code exchange', {
+      logger.error('proxy', 'Unexpected error during code exchange', {
         error: errorMessage,
       })
 
