@@ -1,4 +1,4 @@
-import type { ContactEmailTemplatePropsSchema } from '@/app/api/contact/route'
+import type { ContactEmailTemplatePropsSchema } from '@/lib/schemas/contact-email-schemas'
 import {
   Body,
   Column,

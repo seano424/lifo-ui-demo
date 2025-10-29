@@ -40,15 +40,6 @@ const ContactFormSchema = z.object({
     .max(5000, 'Message must be less than 5000 characters'),
 })
 
-// Zod schema for template props (after sanitization)
-// This ensures type safety and validation at the template level
-export const ContactEmailTemplatePropsSchema = z.object({
-  name: z.string().min(1).max(100),
-  email: z.string().email().max(255),
-  subject: z.string().min(1).max(200),
-  message: z.string().min(1).max(5000),
-})
-
 /**
  * Sanitize input by removing potentially dangerous HTML-like characters
  * React-email handles escaping, but this provides defense in depth
