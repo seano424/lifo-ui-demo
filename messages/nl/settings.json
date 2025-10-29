@@ -140,6 +140,24 @@
       "manageMultipleStores": "Meerdere winkels beheren",
       "addStoreDescription": "Maak extra winkels aan om verschillende locaties vanaf één account te beheren"
     },
+    "deactivateStore": {
+      "button": "Winkel deactiveren",
+      "title": "Winkel deactiveren",
+      "description": "Deze actie zal \"{storeName}\" deactiveren en kan niet gemakkelijk ongedaan worden gemaakt.",
+      "whatWillHappen": "Wat er zal gebeuren:",
+      "storeInactive": "Winkel wordt gemarkeerd als inactief",
+      "accountsAnonymized": "Werknemersaccounts worden geanonimiseerd (GDPR-naleving)",
+      "usersLoseAccess": "Alle winkelgebruikers verliezen toegang",
+      "dataPreserved": "Voorraad- en batchgegevens worden bewaard",
+      "contactSupport": "U kunt contact opnemen met ondersteuning om te reactiveren indien nodig",
+      "confirmLabelPrefix": "Type",
+      "confirmLabelSuffix": "om te bevestigen:",
+      "cancel": "Annuleren",
+      "deactivating": "Deactiveren...",
+      "deactivate": "Winkel deactiveren",
+      "dangerZoneTitle": "Gevaarzone",
+      "dangerZoneDescription": "Deactiveer uw winkel en anonymiseer werknemersgegevens."
+    },
     "addStoreSearch": {
       "title": "Voeg uw winkel toe",
       "subtitle": "Zoek naar uw bedrijf of voeg het handmatig toe",

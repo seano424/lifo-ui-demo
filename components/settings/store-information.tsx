@@ -814,13 +814,13 @@ export default function StoreInformation({
         <Card className="border-destructive">
           <CardHeader>
             <Typography variant="h3" className="font-black text-destructive">
-              Danger Zone
+              {t('deactivateStore.dangerZoneTitle')}
             </Typography>
           </CardHeader>
           <CardContent>
             <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-2">
               <Typography variant="p" color="muted">
-                Deactivate your store and anonymize employee data.
+                {t('deactivateStore.dangerZoneDescription')}
               </Typography>
 
               <DeactivateStoreDialog

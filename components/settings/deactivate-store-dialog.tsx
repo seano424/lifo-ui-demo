@@ -1,7 +1,5 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { AlertTriangle } from 'lucide-react'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,6 +18,9 @@ import { Typography } from '@/components/ui/typography'
 import { useDeactivateStore } from '@/hooks/use-store-settings'
 import type { StoreBasicInfo } from '@/lib/queries/store-settings'
 import { logger } from '@/lib/utils/logger'
+import { AlertTriangle } from 'lucide-react'
+import { useTranslations } from 'next-intl'
+import { useEffect, useState } from 'react'
 
 interface DeactivateStoreDialogProps {
   store: StoreBasicInfo
@@ -27,6 +28,7 @@ interface DeactivateStoreDialogProps {
 }
 
 export function DeactivateStoreDialog({ store, canDeactivate }: DeactivateStoreDialogProps) {
+  const t = useTranslations('settings.deactivateStore')
   const [confirmText, setConfirmText] = useState('')
   const [isOpen, setIsOpen] = useState(false)
   const { deactivateStore, isDeactivating } = useDeactivateStore()
@@ -89,46 +91,48 @@ export function DeactivateStoreDialog({ store, canDeactivate }: DeactivateStoreD
           onClick={handleButtonClick}
         >
           <AlertTriangle className="mr-2 h-4 w-4" />
-          Deactivate Store
+          {t('button')}
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle className="flex items-center gap-2">
             <AlertTriangle className="h-5 w-5 text-destructive" />
-            Deactivate Store
+            {t('title')}
           </AlertDialogTitle>
           <AlertDialogDescription>
-            This action will deactivate &quot;{store.store_name}&quot; and cannot be easily undone.
+            {t('description', { storeName: store.store_name })}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <div className="flex flex-col gap-4 text-left text-sm text-muted-foreground">
           <div className="rounded-lg bg-destructive p-4 flex flex-col gap-2">
             <Typography className="text-white" variant="p">
-              What will happen:
+              {t('whatWillHappen')}
             </Typography>
             <div className="flex flex-col gap-1">
               <Typography className="text-white" variant="small">
-                Store will be marked as inactive
+                {t('storeInactive')}
               </Typography>
               <Typography className="text-white" variant="small">
-                Employee accounts will be anonymized (GDPR compliance)
+                {t('accountsAnonymized')}
               </Typography>
               <Typography className="text-white" variant="small">
-                All store users will lose access
+                {t('usersLoseAccess')}
               </Typography>
               <Typography className="text-white" variant="small">
-                Inventory and batch data will be preserved
+                {t('dataPreserved')}
               </Typography>
               <Typography className="text-white" variant="small">
-                You can contact support to reactivate if needed
+                {t('contactSupport')}
               </Typography>
             </div>
           </div>
 
           <div className="flex flex-col gap-2">
             <Label htmlFor="confirm-store-name">
-              Type <span className="font-mono font-bold">{store.store_name}</span> to confirm:
+              {t('confirmLabelPrefix')}{' '}
+              <span className="font-mono font-bold">{store.store_name}</span>{' '}
+              {t('confirmLabelSuffix')}
             </Label>
             <Input
               id="confirm-store-name"
@@ -141,13 +145,13 @@ export function DeactivateStoreDialog({ store, canDeactivate }: DeactivateStoreD
           </div>
         </div>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isDeactivating}>Cancel</AlertDialogCancel>
+          <AlertDialogCancel disabled={isDeactivating}>{t('cancel')}</AlertDialogCancel>
           <AlertDialogAction
             onClick={handleDeactivate}
             disabled={!isConfirmed || isDeactivating}
             className="bg-destructive hover:bg-destructive/90"
           >
-            {isDeactivating ? 'Deactivating...' : 'Deactivate Store'}
+            {isDeactivating ? t('deactivating') : t('deactivate')}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

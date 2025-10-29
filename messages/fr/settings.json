@@ -140,6 +140,24 @@
       "manageMultipleStores": "Gérer plusieurs magasins",
       "addStoreDescription": "Créez des magasins supplémentaires pour gérer différents emplacements à partir d'un seul compte"
     },
+    "deactivateStore": {
+      "button": "Désactiver le magasin",
+      "title": "Désactiver le magasin",
+      "description": "Cette action désactivera \"{storeName}\" et ne peut pas être facilement annulée.",
+      "whatWillHappen": "Ce qui se passera:",
+      "storeInactive": "Le magasin sera marqué comme inactif",
+      "accountsAnonymized": "Les comptes des employés seront anonymisés (conformité RGPD)",
+      "usersLoseAccess": "Tous les utilisateurs du magasin perdront l'accès",
+      "dataPreserved": "Les données d'inventaire et de lots seront préservées",
+      "contactSupport": "Vous pouvez contacter le support pour réactiver si nécessaire",
+      "confirmLabelPrefix": "Tapez",
+      "confirmLabelSuffix": "pour confirmer:",
+      "cancel": "Annuler",
+      "deactivating": "Désactivation...",
+      "deactivate": "Désactiver le magasin",
+      "dangerZoneTitle": "Zone de danger",
+      "dangerZoneDescription": "Désactivez votre magasin et anonymisez les données des employés."
+    },
     "addStoreSearch": {
       "title": "Ajouter votre magasin",
       "subtitle": "Recherchez votre entreprise ou ajoutez-la manuellement",

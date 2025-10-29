@@ -140,6 +140,24 @@
       "manageMultipleStores": "Manage Multiple Stores",
       "addStoreDescription": "Create additional stores to manage different locations from a single account"
     },
+    "deactivateStore": {
+      "button": "Deactivate Store",
+      "title": "Deactivate Store",
+      "description": "This action will deactivate \"{storeName}\" and cannot be easily undone.",
+      "whatWillHappen": "What will happen:",
+      "storeInactive": "Store will be marked as inactive",
+      "accountsAnonymized": "Employee accounts will be anonymized (GDPR compliance)",
+      "usersLoseAccess": "All store users will lose access",
+      "dataPreserved": "Inventory and batch data will be preserved",
+      "contactSupport": "You can contact support to reactivate if needed",
+      "confirmLabelPrefix": "Type",
+      "confirmLabelSuffix": "to confirm:",
+      "cancel": "Cancel",
+      "deactivating": "Deactivating...",
+      "deactivate": "Deactivate Store",
+      "dangerZoneTitle": "Danger Zone",
+      "dangerZoneDescription": "Deactivate your store and anonymize employee data."
+    },
     "addStoreSearch": {
       "title": "Add Your Store",
       "subtitle": "Search for your business or add it manually",
