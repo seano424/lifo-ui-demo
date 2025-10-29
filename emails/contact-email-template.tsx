@@ -21,18 +21,12 @@ interface ContactEmailTemplateProps {
 }
 
 /**
- * Escape HTML entities to prevent XSS attacks
- * React-email components handle escaping, but this provides an additional layer of security
+ * Validate email format and prevent injection attacks
+ * Checks for valid email format and blocks newline/carriage return characters
  */
-function escapeHtml(text: string): string {
-  const map: Record<string, string> = {
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#039;',
-  }
-  return text.replace(/[&<>"']/g, m => map[m])
+function isValidEmail(email: string): boolean {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  return emailRegex.test(email) && !email.includes('%0A') && !email.includes('%0D')
 }
 
 export default function ContactEmailTemplate({
@@ -43,15 +37,14 @@ export default function ContactEmailTemplate({
 }: ContactEmailTemplateProps) {
   const logoUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://lifo-app.com'}/logos/lifo-logo-vertical-light.png`
 
-  // Sanitize user inputs (react-email handles escaping, but adding explicit sanitization for security)
-  const sanitizedName = escapeHtml(name)
-  const sanitizedSubject = escapeHtml(subject)
-  const sanitizedMessage = escapeHtml(message)
+  // Validate email to prevent injection attacks
+  // Note: Ideally, email validation should happen at the API level before reaching this template
+  const safeEmail = isValidEmail(email) ? email : 'noreply@lifo.ai'
 
   return (
     <Html>
       <Head />
-      <Preview>New contact message from {sanitizedName}</Preview>
+      <Preview>New contact message from {name}</Preview>
       <Body
         style={{
           margin: '0',
@@ -96,6 +89,8 @@ export default function ContactEmailTemplate({
 
               {/* Icon Circle */}
               <Text
+                role="img"
+                aria-label="Email icon"
                 style={{
                   width: '80px',
                   height: '80px',
@@ -170,7 +165,7 @@ export default function ContactEmailTemplate({
                         margin: '0',
                       }}
                     >
-                      {sanitizedName}
+                      {name}
                     </Text>
                   </Column>
                 </Row>
@@ -195,7 +190,7 @@ export default function ContactEmailTemplate({
                       }}
                     >
                       <Link
-                        href={`mailto:${email}`}
+                        href={`mailto:${safeEmail}`}
                         style={{
                           color: '#5721C5',
                           textDecoration: 'none',
@@ -226,7 +221,7 @@ export default function ContactEmailTemplate({
                         margin: '0',
                       }}
                     >
-                      {sanitizedSubject}
+                      {subject}
                     </Text>
                   </Column>
                 </Row>
@@ -262,7 +257,7 @@ export default function ContactEmailTemplate({
                       wordBreak: 'break-word' as const,
                     }}
                   >
-                    {sanitizedMessage}
+                    {message}
                   </Text>
                 </Section>
               </Section>
@@ -275,7 +270,7 @@ export default function ContactEmailTemplate({
                 }}
               >
                 <Link
-                  href={`mailto:${email}?subject=${encodeURIComponent(`Re: ${sanitizedSubject}`)}`}
+                  href={`mailto:${safeEmail}?subject=${encodeURIComponent(`Re: ${subject}`)}`}
                   style={{
                     display: 'inline-block',
                     background: 'linear-gradient(135deg, #5721C5 0%, #228CEE 100%)',
@@ -288,7 +283,7 @@ export default function ContactEmailTemplate({
                     boxShadow: '0 4px 12px rgba(87, 33, 197, 0.3)',
                   }}
                 >
-                  ✉️ Reply to {sanitizedName}
+                  ✉️ Reply to {name}
                 </Link>
               </Section>
             </Section>
