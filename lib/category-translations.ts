@@ -1,52 +1,20 @@
 /**
- * Category translations for languages not supported in the database
- * Maps category codes to translated display names
+ * Legacy category translations - DEPRECATED
+ * Use i18n translations in dashboard-data.json instead
+ * This file is kept for backward compatibility only
  */
 
-// Common food category translations
-export const categoryTranslations = {
-  nl: {
-    // Basic food categories
-    dry_goods: 'Droge waren',
-    dairy: 'Zuivel',
-    meat: 'Vlees',
-    fruits: 'Fruit',
-    vegetables: 'Groenten',
-    bakery: 'Bakkerij',
-    frozen: 'Diepvries',
-    beverages: 'Dranken',
-    snacks: 'Snacks',
-    condiments: 'Kruiden en sauzen',
-    canned: 'Conserven',
-    seafood: 'Zeevruchten',
-    poultry: 'Gevogelte',
-    spices: 'Kruiden',
-    oils: 'Oliën',
-    grains: 'Granen',
-    legumes: 'Peulvruchten',
-    herbs: 'Kruiden',
-    nuts: 'Noten',
-    sweets: 'Snoep',
-    alcohol: 'Alcohol',
-    tea_coffee: 'Thee en koffie',
-    breakfast: 'Ontbijt',
-    lunch: 'Lunch',
-    dinner: 'Diner',
-    desserts: 'Nagerechten',
-    baby_food: 'Babyvoeding',
-    organic: 'Biologisch',
-    gluten_free: 'Glutenvrij',
-    vegan: 'Veganistisch',
-    vegetarian: 'Vegetarisch',
-  },
-} as const
+// This file is deprecated. Use the i18n system with dashboard-data.productCategories instead.
+// The translations are now managed in:
+// - messages/en/dashboard-data.json
+// - messages/fr/dashboard-data.json
+// - messages/nl/dashboard-data.json
 
-export type SupportedLanguage = keyof typeof categoryTranslations
-export type CategoryCode = keyof typeof categoryTranslations.nl
+export type CategoryCode = string
 
 /**
- * Get localized category display name
- * Falls back to database fields, then translation mapping, then English
+ * @deprecated Use useCategoryTranslation hook instead
+ * Legacy function for backward compatibility
  */
 export function getLocalizedCategoryName(
   category: {
@@ -57,25 +25,12 @@ export function getLocalizedCategoryName(
   },
   locale: string,
 ): string {
-  // Use database field if available
+  // Fallback to database field based on locale
   switch (locale) {
     case 'fr':
       return category.display_name_fr || category.display_name_en
-
-    case 'nl': {
-      // Try database field first (future-ready)
-      if (category.display_name_nl) {
-        return category.display_name_nl
-      }
-      // Try translation mapping
-      const nlTranslation = categoryTranslations.nl[category.category_code as CategoryCode]
-      if (nlTranslation) {
-        return nlTranslation
-      }
-      // Fall back to English
-      return category.display_name_en
-    }
-
+    case 'nl':
+      return category.display_name_nl || category.display_name_en
     default:
       return category.display_name_en
   }

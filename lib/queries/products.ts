@@ -1,8 +1,8 @@
 import { createClient } from '@/lib/supabase/client'
 import type { createClient as createServerClient } from '@/lib/supabase/server'
-import type { Database } from '@/types/supabase'
 import { logger } from '@/lib/utils/logger'
 import { withPerformanceTracking } from '@/lib/utils/performance'
+import type { Database } from '@/types/supabase'
 
 type ServerClient = Awaited<ReturnType<typeof createServerClient>>
 
@@ -44,6 +44,7 @@ type StoreProductWithProduct = {
           category_code: string
           display_name_en: string
           display_name_fr: string
+          display_name_nl?: string | null
           typical_shelf_life_days?: number | null
         } | null
       })
@@ -59,6 +60,7 @@ export type Product = BaseProduct & {
   category_code?: string
   category_display_name?: string
   category_display_name_fr?: string
+  category_display_name_nl?: string
   // Aggregated batch data (from RPC or client-side calculation)
   total_stock?: number
   active_batches_count?: number
@@ -130,6 +132,7 @@ export async function fetchProducts(
             category_code,
             display_name_en,
             display_name_fr,
+            display_name_nl,
             typical_shelf_life_days
           )
         )
@@ -210,6 +213,7 @@ export async function fetchProducts(
         category_code: categoryData?.category_code,
         category_display_name: categoryData?.display_name_en,
         category_display_name_fr: categoryData?.display_name_fr,
+        category_display_name_nl: categoryData?.display_name_nl,
         store_cost_price: storeProduct.cost_price,
         store_selling_price: storeProduct.selling_price,
         store_is_active: storeProduct.is_active,
@@ -281,6 +285,7 @@ export async function fetchProductsPage(
             category_code,
             display_name_en,
             display_name_fr,
+            display_name_nl,
             typical_shelf_life_days
           )
         )
@@ -385,15 +390,13 @@ export async function fetchProductsPage(
         let filteredStoreProductsData = storeProductsData
 
         if (filters.category) {
-          if (storeProductsData.length > 0) {
-            const _categoriesFound = storeProductsData
-              .map(sp => ({
-                product_id: sp.product_id,
+          if (process.env.NODE_ENV === 'development' && storeProductsData.length > 0) {
+            logger.log(context, 'Category filtering debug', {
+              categories: storeProductsData.slice(0, 3).map(sp => ({
                 category_code: sp.products?.categories?.category_code,
-                display_name: sp.products?.categories?.display_name_en,
                 name: sp.products?.name,
-              }))
-              .slice(0, 3)
+              })),
+            })
           }
 
           filteredStoreProductsData = filteredStoreProductsData.filter(
@@ -467,6 +470,7 @@ export async function fetchProductsPage(
               category_code: categoryData?.category_code,
               category_display_name: categoryData?.display_name_en,
               category_display_name_fr: categoryData?.display_name_fr,
+              category_display_name_nl: categoryData?.display_name_nl,
               category_id: categoryData?.category_id || (productData as BaseProduct)?.category_id,
               store_cost_price: storeProduct.cost_price, // Store-specific pricing
               store_selling_price: storeProduct.selling_price,
@@ -905,6 +909,7 @@ export async function fetchProductById(
             category_code,
             display_name_en,
             display_name_fr,
+            display_name_nl,
             typical_shelf_life_days
           )
         )
@@ -972,6 +977,7 @@ export async function fetchProductById(
           category_code: categoryData?.category_code,
           category_display_name: categoryData?.display_name_en,
           category_display_name_fr: categoryData?.display_name_fr,
+          category_display_name_nl: categoryData?.display_name_nl,
           store_cost_price: data.cost_price,
           store_selling_price: data.selling_price,
           store_is_active: data.is_active,

@@ -1,8 +1,8 @@
-import { useQuery } from '@tanstack/react-query'
-import { useLocale } from 'next-intl'
 import { getLocalizedCategoryName } from '@/lib/category-translations'
 import { type Category, fetchCategories } from '@/lib/queries/products'
 import { queryKeys } from '@/lib/queries/query-keys'
+import { useQuery } from '@tanstack/react-query'
+import { useLocale } from 'next-intl'
 
 /**
  * Reusable hook for fetching and accessing standardized product categories

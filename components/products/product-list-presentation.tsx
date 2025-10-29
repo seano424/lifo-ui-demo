@@ -1,17 +1,5 @@
 'use client'
 
-import {
-  ArrowDown,
-  ArrowUp,
-  ArrowUpDown,
-  Edit,
-  Euro,
-  MoreHorizontal,
-  Package,
-  Trash2,
-} from 'lucide-react'
-import { useTranslations } from 'next-intl'
-import { useCallback, useMemo } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -30,8 +18,21 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Typography } from '@/components/ui/typography'
+import { useCategoryTranslation } from '@/hooks/use-category-translation'
 import { useProductActions } from '@/hooks/use-products'
 import type { Product, ProductSort, SortField } from '@/lib/queries/products'
+import {
+  ArrowDown,
+  ArrowUp,
+  ArrowUpDown,
+  Edit,
+  Euro,
+  MoreHorizontal,
+  Package,
+  Trash2,
+} from 'lucide-react'
+import { useTranslations } from 'next-intl'
+import { useCallback, useMemo } from 'react'
 
 const getCategoryBadgeColor = (category: string) => {
   const colors = {
@@ -116,6 +117,7 @@ export function ProductsListPresentation({
 }: ProductsListPresentationProps) {
   const t = useTranslations('products')
   const tButtons = useTranslations('buttons')
+  const { getCategoryName } = useCategoryTranslation()
 
   const { deleteProduct, updateProductPrice, isDeleting, isUpdating } = useProductActions()
 
@@ -254,12 +256,12 @@ export function ProductsListPresentation({
                       </div>
                     </TableCell>
                     <TableCell>
-                      {product.category ? (
+                      {product.category_code ? (
                         <Badge
                           variant="outline"
-                          className={getCategoryBadgeColor(product.category)}
+                          className={getCategoryBadgeColor(product.category_code)}
                         >
-                          {product.category_display_name || product.category}
+                          {getCategoryName(product)}
                         </Badge>
                       ) : (
                         <span className="text-muted-foreground text-sm">
