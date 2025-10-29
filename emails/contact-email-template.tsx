@@ -1,3 +1,4 @@
+import type { ContactEmailTemplatePropsSchema } from '@/app/api/contact/route'
 import {
   Body,
   Column,
@@ -5,19 +6,20 @@ import {
   Head,
   Heading,
   Html,
+  Img,
   Link,
   Preview,
   Row,
   Section,
   Text,
 } from '@react-email/components'
+import type { z } from 'zod'
 
-interface ContactEmailTemplateProps {
-  name: string
-  email: string
-  subject: string
-  message: string
-}
+// Type-safe props inferred from Zod schema
+// This ensures props match validation constraints (min/max length, email format)
+// XSS protection: React-email's Text, Heading, and Link components automatically escape HTML
+// API route sanitizes inputs as defense in depth before passing to template
+type ContactEmailTemplateProps = z.infer<typeof ContactEmailTemplatePropsSchema>
 
 export default function ContactEmailTemplate({
   name,
@@ -25,311 +27,283 @@ export default function ContactEmailTemplate({
   subject,
   message,
 }: ContactEmailTemplateProps) {
+  const logoUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://lifo-app.com'}/logos/lifo-logo-vertical-light.png`
+
   return (
     <Html>
       <Head />
       <Preview>New contact message from {name}</Preview>
       <Body
         style={{
-          backgroundColor: '#f6f9fc',
-          fontFamily:
-            '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-          WebkitFontSmoothing: 'antialiased',
-          fontSize: '14px',
-          lineHeight: '1.5',
           margin: '0',
           padding: '0',
+          backgroundColor: '#f8fafc',
+          fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
         }}
       >
         <Container
           style={{
-            backgroundColor: '#ffffff',
-            border: '1px solid #f0f0f0',
-            borderRadius: '5px',
-            boxShadow: '0 5px 10px rgba(20, 50, 70, 0.2)',
-            marginTop: '20px',
-            marginBottom: '20px',
-            maxWidth: '600px',
-            width: '100%',
+            backgroundColor: '#f8fafc',
+            padding: '40px 20px',
           }}
         >
-          {/* Header with Title */}
           <Section
             style={{
-              backgroundColor: '#2563eb',
-              backgroundImage: 'linear-gradient(to right, #2563eb, #9333ea, #ec4899)',
-              borderRadius: '5px 5px 0 0',
-              padding: '30px 0',
-              textAlign: 'center' as const,
+              maxWidth: '600px',
+              width: '100%',
+              backgroundColor: '#ffffff',
+              borderRadius: '12px',
+              boxShadow: '0 4px 6px rgba(9, 13, 26, 0.1)',
             }}
           >
-            <Text
-              style={{
-                color: '#ffffff',
-                fontSize: '48px',
-                fontWeight: 'bold',
-                margin: '0',
-                fontFamily:
-                  '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-              }}
-            >
-              LIFO AI
-            </Text>
-          </Section>
-
-          {/* Title Section */}
-          <Section style={{ padding: '30px 40px 0 40px' }}>
-            <Heading
-              style={{
-                color: '#1d1c1d',
-                fontSize: '24px',
-                fontWeight: '700',
-                lineHeight: '1.3',
-                margin: '0',
-                padding: '0',
-                textAlign: 'center' as const,
-              }}
-            >
-              New Contact Message
-            </Heading>
-            <Text
-              style={{
-                color: '#6a7280',
-                fontSize: '16px',
-                fontWeight: 'normal',
-                margin: '10px 0 24px',
-                textAlign: 'center' as const,
-              }}
-            >
-              From the website contact form
-            </Text>
-          </Section>
-
-          {/* Information Section */}
-          <Section
-            style={{
-              padding: '0 40px',
-            }}
-          >
-            <Row
-              style={{
-                borderTop: '1px solid #e5e7eb',
-                margin: '0',
-                padding: '16px 0',
-              }}
-            >
-              <Column style={{ width: '30%' }}>
-                <Text
-                  style={{
-                    color: '#4b5563',
-                    fontSize: '15px',
-                    fontWeight: '600',
-                    margin: '0',
-                  }}
-                >
-                  From:
-                </Text>
-              </Column>
-              <Column style={{ width: '70%' }}>
-                <Text
-                  style={{
-                    color: '#111827',
-                    fontSize: '15px',
-                    fontWeight: 'normal',
-                    margin: '0',
-                  }}
-                >
-                  {name}
-                </Text>
-              </Column>
-            </Row>
-            <Row
-              style={{
-                borderTop: '1px solid #e5e7eb',
-                margin: '0',
-                padding: '16px 0',
-              }}
-            >
-              <Column style={{ width: '30%' }}>
-                <Text
-                  style={{
-                    color: '#4b5563',
-                    fontSize: '15px',
-                    fontWeight: '600',
-                    margin: '0',
-                  }}
-                >
-                  Email:
-                </Text>
-              </Column>
-              <Column style={{ width: '70%' }}>
-                <Text
-                  style={{
-                    color: '#111827',
-                    fontSize: '15px',
-                    fontWeight: 'normal',
-                    margin: '0',
-                  }}
-                >
-                  <Link
-                    href={`mailto:${email}`}
-                    style={{
-                      color: '#2563eb',
-                      textDecoration: 'none',
-                    }}
-                  >
-                    {email}
-                  </Link>
-                </Text>
-              </Column>
-            </Row>
-            <Row
-              style={{
-                borderTop: '1px solid #e5e7eb',
-                margin: '0',
-                padding: '16px 0',
-              }}
-            >
-              <Column style={{ width: '30%' }}>
-                <Text
-                  style={{
-                    color: '#4b5563',
-                    fontSize: '15px',
-                    fontWeight: '600',
-                    margin: '0',
-                  }}
-                >
-                  Subject:
-                </Text>
-              </Column>
-              <Column style={{ width: '70%' }}>
-                <Text
-                  style={{
-                    color: '#111827',
-                    fontSize: '15px',
-                    fontWeight: 'normal',
-                    margin: '0',
-                  }}
-                >
-                  {subject}
-                </Text>
-              </Column>
-            </Row>
-          </Section>
-
-          {/* Message Section */}
-          <Section
-            style={{
-              padding: '24px 40px',
-            }}
-          >
-            <Text
-              style={{
-                color: '#4b5563',
-                fontSize: '16px',
-                fontWeight: '600',
-                margin: '0 0 10px 0',
-              }}
-            >
-              Message:
-            </Text>
+            {/* Header */}
             <Section
               style={{
-                backgroundColor: '#f9fafb',
-                border: '1px solid #e5e7eb',
-                borderRadius: '6px',
-                padding: '20px',
+                padding: '40px 40px 20px 40px',
+                textAlign: 'center',
+              }}
+            >
+              <Img
+                src={logoUrl}
+                alt="LIFO.AI - Smart Food Management System Logo"
+                width="120"
+                height="120"
+                style={{
+                  display: 'block',
+                  margin: '0 auto',
+                  marginBottom: '16px',
+                }}
+              />
+
+              {/* Icon Circle */}
+              <Text
+                role="img"
+                aria-label="Email icon"
+                style={{
+                  width: '80px',
+                  height: '80px',
+                  background: 'linear-gradient(135deg, #5721C5 0%, #228CEE 100%)',
+                  borderRadius: '50%',
+                  margin: '0 auto 24px auto',
+                  textAlign: 'center',
+                  fontSize: '32px',
+                  lineHeight: '80px',
+                  display: 'block',
+                }}
+              >
+                ✉️
+              </Text>
+
+              <Heading
+                style={{
+                  color: '#090D1A',
+                  fontSize: '28px',
+                  fontWeight: '700',
+                  margin: '0',
+                  letterSpacing: '-0.5px',
+                }}
+              >
+                New Contact Message
+              </Heading>
+            </Section>
+
+            {/* Content */}
+            <Section
+              style={{
+                padding: '0 40px 40px 40px',
               }}
             >
               <Text
                 style={{
-                  color: '#1f2937',
-                  fontSize: '14px',
-                  margin: '0',
-                  whiteSpace: 'pre-wrap' as const,
-                  wordBreak: 'break-word' as const,
+                  color: '#374151',
+                  fontSize: '16px',
+                  lineHeight: '24px',
+                  margin: '0 0 24px 0',
                 }}
               >
-                {message}
+                You have received a new message from the contact form on your website.
               </Text>
-            </Section>
-          </Section>
 
-          {/* Call to Action */}
-          <Section
-            style={{
-              padding: '0 40px 32px 40px',
-            }}
-          >
-            <Text
-              style={{
-                color: '#4b5563',
-                fontSize: '14px',
-                margin: '0 0 16px 0',
-                textAlign: 'center' as const,
-              }}
-            >
-              Want to respond to this message?
-            </Text>
+              {/* Information Section */}
+              <Section
+                style={{
+                  backgroundColor: '#f8fafc',
+                  borderRadius: '8px',
+                  padding: '24px',
+                  margin: '0 0 24px 0',
+                }}
+              >
+                <Row style={{ margin: '0 0 16px 0' }}>
+                  <Column style={{ width: '100%' }}>
+                    <Text
+                      style={{
+                        color: '#6b7280',
+                        fontSize: '14px',
+                        fontWeight: '600',
+                        margin: '0 0 4px 0',
+                      }}
+                    >
+                      From:
+                    </Text>
+                    <Text
+                      style={{
+                        color: '#111827',
+                        fontSize: '16px',
+                        fontWeight: 'normal',
+                        margin: '0',
+                      }}
+                    >
+                      {name}
+                    </Text>
+                  </Column>
+                </Row>
+                <Row style={{ margin: '0 0 16px 0' }}>
+                  <Column style={{ width: '100%' }}>
+                    <Text
+                      style={{
+                        color: '#6b7280',
+                        fontSize: '14px',
+                        fontWeight: '600',
+                        margin: '0 0 4px 0',
+                      }}
+                    >
+                      Email:
+                    </Text>
+                    <Text
+                      style={{
+                        color: '#5721C5',
+                        fontSize: '16px',
+                        fontWeight: 'normal',
+                        margin: '0',
+                      }}
+                    >
+                      <Link
+                        href={`mailto:${email}`}
+                        style={{
+                          color: '#5721C5',
+                          textDecoration: 'none',
+                        }}
+                      >
+                        {email}
+                      </Link>
+                    </Text>
+                  </Column>
+                </Row>
+                <Row style={{ margin: '0' }}>
+                  <Column style={{ width: '100%' }}>
+                    <Text
+                      style={{
+                        color: '#6b7280',
+                        fontSize: '14px',
+                        fontWeight: '600',
+                        margin: '0 0 4px 0',
+                      }}
+                    >
+                      Subject:
+                    </Text>
+                    <Text
+                      style={{
+                        color: '#111827',
+                        fontSize: '16px',
+                        fontWeight: 'normal',
+                        margin: '0',
+                      }}
+                    >
+                      {subject}
+                    </Text>
+                  </Column>
+                </Row>
+              </Section>
+
+              {/* Message Section */}
+              <Section style={{ margin: '0 0 32px 0' }}>
+                <Text
+                  style={{
+                    color: '#374151',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    margin: '0 0 12px 0',
+                  }}
+                >
+                  Message:
+                </Text>
+                <Section
+                  style={{
+                    backgroundColor: '#f8fafc',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '8px',
+                    padding: '20px',
+                  }}
+                >
+                  <Text
+                    style={{
+                      color: '#1f2937',
+                      fontSize: '14px',
+                      lineHeight: '24px',
+                      margin: '0',
+                      whiteSpace: 'pre-wrap' as const,
+                      wordBreak: 'break-word' as const,
+                    }}
+                  >
+                    {message}
+                  </Text>
+                </Section>
+              </Section>
+
+              {/* CTA Button */}
+              <Section
+                style={{
+                  textAlign: 'center',
+                  padding: '0 0 32px 0',
+                }}
+              >
+                <Link
+                  href={`mailto:${email}?subject=${encodeURIComponent(`Re: ${subject}`)}`}
+                  style={{
+                    display: 'inline-block',
+                    background: 'linear-gradient(135deg, #5721C5 0%, #228CEE 100%)',
+                    color: '#ffffff',
+                    textDecoration: 'none',
+                    padding: '16px 32px',
+                    borderRadius: '8px',
+                    fontWeight: '600',
+                    fontSize: '16px',
+                    boxShadow: '0 4px 12px rgba(87, 33, 197, 0.3)',
+                  }}
+                >
+                  ✉️ Reply to {name}
+                </Link>
+              </Section>
+            </Section>
+
+            {/* Footer */}
             <Section
               style={{
-                textAlign: 'center' as const,
+                padding: '24px 40px',
+                backgroundColor: '#090D1A',
+                borderRadius: '0 0 12px 12px',
+                textAlign: 'center',
               }}
             >
-              <Link
-                href={`mailto:${email}?subject=Re: ${subject}`}
+              <Text
                 style={{
-                  background: 'linear-gradient(to right, #2563eb, #9333ea, #ec4899)',
-                  borderRadius: '4px',
-                  color: '#fff',
-                  display: 'inline-block',
+                  color: '#9ca3af',
                   fontSize: '14px',
-                  fontWeight: '600',
-                  padding: '12px 24px',
-                  textDecoration: 'none',
+                  margin: '0 0 8px 0',
                 }}
               >
-                Reply to {name}
-              </Link>
-            </Section>
-          </Section>
-
-          {/* Footer */}
-          <Section
-            style={{
-              borderTop: '1px solid #e5e7eb',
-              padding: '24px 40px',
-              textAlign: 'center' as const,
-            }}
-          >
-            <Text
-              style={{
-                color: '#6b7280',
-                fontSize: '12px',
-                fontWeight: 'normal',
-                margin: '0',
-              }}
-            >
-              © {new Date().getFullYear()} LIFO - Smart food waste reduction
-            </Text>
-            <Text
-              style={{
-                color: '#6b7280',
-                fontSize: '12px',
-                fontWeight: 'normal',
-                margin: '8px 0 0 0',
-              }}
-            >
-              <Link
-                href="https://LIFO"
+                Reducing food waste, one store at a time 🌱
+              </Text>
+              <Text
                 style={{
-                  color: '#2563eb',
-                  textDecoration: 'none',
+                  color: '#6b7280',
+                  fontSize: '12px',
+                  margin: '0',
                 }}
               >
-                LIFO
-              </Link>
-            </Text>
+                © {new Date().getFullYear()} LIFO.AI - Smart Food Surplus Management
+              </Text>
+            </Section>
           </Section>
         </Container>
       </Body>
