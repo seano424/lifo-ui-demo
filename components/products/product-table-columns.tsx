@@ -1,12 +1,13 @@
 'use client'
 
-import type { useTranslations } from 'next-intl'
-import { Building2, Tag } from 'lucide-react'
 import type { ColumnDef, Header } from '@tanstack/react-table'
+import { Building2, Tag } from 'lucide-react'
+import type { useTranslations } from 'next-intl'
 
-import { Badge } from '@/components/ui/badge'
 import { SortableHeader } from '@/components/products/sortable-header'
+import { Badge } from '@/components/ui/badge'
 import { Typography } from '@/components/ui/typography'
+import { useCategoryTranslation } from '@/hooks/use-category-translation'
 import type { Product, ProductSort, SortField } from '@/lib/queries/products'
 
 interface ColumnResizerProps {
@@ -72,6 +73,7 @@ export function createProductTableColumns({
   DEFAULT_COLUMN_WIDTHS: Record<string, number>
   t: ReturnType<typeof useTranslations>
 }): ColumnDef<Product>[] {
+  const { getCategoryName } = useCategoryTranslation()
   return [
     {
       id: 'name',
@@ -110,12 +112,12 @@ export function createProductTableColumns({
       cell: ({ row }) => (
         <div className="flex items-center gap-2">
           <Tag className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-          {row.original.category_display_name ? (
+          {row.original.category_code ? (
             <Badge
               variant="outline"
-              className={`${getCategoryBadgeColor(row.original.category_display_name)}`}
+              className={`${getCategoryBadgeColor(row.original.category_code)}`}
             >
-              {row.original.category_display_name}
+              {getCategoryName(row.original)}
             </Badge>
           ) : (
             <span className="text-muted-foreground text-sm">{t('uncategorized')}</span>

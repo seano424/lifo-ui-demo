@@ -11,6 +11,7 @@ const messageCache = new Map<string, Record<string, unknown>>()
  */
 export function clearMessageCache(): void {
   messageCache.clear()
+  console.log('Message cache cleared - translations will be reloaded')
 }
 
 /**
