@@ -1,5 +1,5 @@
 import type { Product } from '@/lib/queries/products'
-import { useTranslations } from 'next-intl'
+import { useTranslations, useLocale } from 'next-intl'
 
 /**
  * Custom hook for translating product categories using i18n
@@ -7,39 +7,45 @@ import { useTranslations } from 'next-intl'
  */
 export function useCategoryTranslation() {
   const t = useTranslations()
+  const locale = useLocale()
 
   const getCategoryName = (product: Product) => {
     if (!product.category_code) {
-      return product.category_display_name || ''
+      // Locale-aware fallback when no category_code
+      switch (locale) {
+        case 'fr':
+          return product.category_display_name_fr || product.category_display_name || ''
+        case 'nl':
+          return product.category_display_name_nl || product.category_display_name || ''
+        default:
+          return product.category_display_name || ''
+      }
     }
 
     try {
       const i18nKey = `productCategories.${product.category_code}`
       const translation = t(i18nKey)
 
-      // Debug logging
-      console.log('Category translation debug:', {
-        category_code: product.category_code,
-        i18nKey,
-        translation,
-        isKeySame: translation === i18nKey,
-        translationLength: translation?.length,
-        productData: {
-          category_display_name: product.category_display_name,
-          category_display_name_fr: product.category_display_name_fr,
-        },
-      })
-
       // If translation exists and is not the key itself, use it
       if (translation && translation !== i18nKey && translation.length > 0) {
         return translation
       }
     } catch (error) {
-      console.warn('Translation error for category:', product.category_code, error)
+      // Only warn in development
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Translation error for category:', product.category_code, error)
+      }
     }
 
-    // Fallback to database field based on locale
-    return product.category_display_name_fr || product.category_display_name || ''
+    // Locale-aware fallback to database fields
+    switch (locale) {
+      case 'fr':
+        return product.category_display_name_fr || product.category_display_name || ''
+      case 'nl':
+        return product.category_display_name_nl || product.category_display_name || ''
+      default:
+        return product.category_display_name || ''
+    }
   }
 
   return { getCategoryName }
