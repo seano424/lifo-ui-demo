@@ -103,12 +103,14 @@ export async function POST(request: NextRequest) {
   let storeId: string | undefined
 
   try {
-    // 1. Verify webhook signature
+    // 1. Verify webhook authentication
+    // Support both HMAC signature (for manual calls) and Bearer token (for Supabase webhooks)
     const signature = request.headers.get('x-supabase-signature')
+    const authHeader = request.headers.get('authorization')
 
-    if (!signature || !WEBHOOK_SECRET) {
-      console.error('[webhook:store-scoring] Missing webhook signature or secret')
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    if (!WEBHOOK_SECRET) {
+      console.error('[webhook:store-scoring] WEBHOOK_SECRET not configured')
+      return NextResponse.json({ error: 'Server configuration error' }, { status: 500 })
     }
 
     // Check FastAPI configuration
@@ -122,15 +124,30 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'FastAPI URL not configured' }, { status: 500 })
     }
 
-    // Get raw request body for signature verification
+    // Get raw request body for authentication and parsing
     const rawBody = await request.text()
 
-    // Verify webhook signature using HMAC
-    const isValidSignature = verifyWebhookSignature(rawBody, signature, WEBHOOK_SECRET)
+    // Method 1: Bearer Token Authentication (for Supabase Database Webhooks)
+    if (authHeader) {
+      const expectedAuth = `Bearer ${WEBHOOK_SECRET}`
+      if (authHeader !== expectedAuth) {
+        console.error('[webhook:store-scoring] Invalid bearer token')
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      }
+    }
+    // Method 2: HMAC Signature Authentication (for manual calls or Edge Functions)
+    else if (signature) {
+      const isValidSignature = verifyWebhookSignature(rawBody, signature, WEBHOOK_SECRET)
 
-    if (!isValidSignature) {
-      console.error('[webhook:store-scoring] Invalid webhook signature')
-      return NextResponse.json({ error: 'Unauthorized - Invalid signature' }, { status: 401 })
+      if (!isValidSignature) {
+        console.error('[webhook:store-scoring] Invalid webhook signature')
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      }
+    }
+    // Method 3: No authentication provided
+    else {
+      console.error('[webhook:store-scoring] No authentication provided')
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     // 2. Parse and validate webhook payload
