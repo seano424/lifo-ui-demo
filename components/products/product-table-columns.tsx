@@ -7,7 +7,6 @@ import type { useTranslations } from 'next-intl'
 import { SortableHeader } from '@/components/products/sortable-header'
 import { Badge } from '@/components/ui/badge'
 import { Typography } from '@/components/ui/typography'
-import { useCategoryTranslation } from '@/hooks/use-category-translation'
 import type { Product, ProductSort, SortField } from '@/lib/queries/products'
 
 interface ColumnResizerProps {
@@ -63,6 +62,7 @@ export function createProductTableColumns({
   updateSort,
   DEFAULT_COLUMN_WIDTHS,
   t,
+  getCategoryName,
 }: {
   data: Product[]
   currentSort: ProductSort
@@ -72,8 +72,8 @@ export function createProductTableColumns({
   isUpdating: boolean
   DEFAULT_COLUMN_WIDTHS: Record<string, number>
   t: ReturnType<typeof useTranslations>
+  getCategoryName: (product: Product) => string
 }): ColumnDef<Product>[] {
-  const { getCategoryName } = useCategoryTranslation()
   return [
     {
       id: 'name',

@@ -15,6 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { useCategoryTranslation } from '@/hooks/use-category-translation'
 import { useProductColumnSizing } from '@/hooks/use-product-column-sizing'
 import { useProductActions } from '@/hooks/use-products'
 import type { Product, ProductSort, SortField } from '@/lib/queries/products'
@@ -51,6 +52,7 @@ export function ProductsTable({ data, currentSort, updateSort, isLoading }: Prod
   const tTable = useTranslations('productTable')
 
   const { updateProductPrice, deleteProduct, isUpdating } = useProductActions()
+  const { getCategoryName } = useCategoryTranslation()
 
   const { columnSizing, setColumnSizing, DEFAULT_COLUMN_WIDTHS } = useProductColumnSizing()
 
@@ -88,6 +90,7 @@ export function ProductsTable({ data, currentSort, updateSort, isLoading }: Prod
     isUpdating,
     DEFAULT_COLUMN_WIDTHS,
     t: tTable,
+    getCategoryName,
   })
 
   const table = useReactTable({
