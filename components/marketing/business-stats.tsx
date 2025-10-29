@@ -118,14 +118,14 @@ export function BusinessStats() {
           />
         </div>
 
-        {/* Bottom CTA */}
+        {/* Bottom CTA
         <div className="text-center mt-16">
           <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary-100/50 border border-primary-200/90">
             <Typography variant="p" className="text-sm text-foreground/70">
               💡 <strong>{t('disclaimer').split('.')[0]}.</strong> {t('disclaimer').split('. ')[1]}.
             </Typography>
           </div>
-        </div>
+        </div> */}
       </div>
     </section>
   )
