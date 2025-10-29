@@ -26,24 +26,18 @@ export default function ContactEmailTemplate({
   subject,
   message,
 }: ContactEmailTemplateProps) {
-  const logoUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://lifo-app.com'}/logos/lifo-logo-vertical-light.svg`
+  const logoUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://lifo-app.com'}/logos/lifo-logo-vertical-light.png`
 
   return (
     <Html>
-      <Head>
-        <link
-          href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;600;700&family=Montserrat:wght@400;500;600&display=swap"
-          rel="stylesheet"
-        />
-      </Head>
+      <Head />
       <Preview>New contact message from {name}</Preview>
       <Body
         style={{
           margin: '0',
           padding: '0',
           backgroundColor: '#f8fafc',
-          fontFamily:
-            "'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+          fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
         }}
       >
         <Container
@@ -65,7 +59,7 @@ export default function ContactEmailTemplate({
             <Section
               style={{
                 padding: '40px 40px 20px 40px',
-                textAlign: 'center' as const,
+                textAlign: 'center',
               }}
             >
               <Img
@@ -88,7 +82,7 @@ export default function ContactEmailTemplate({
                   background: 'linear-gradient(135deg, #5721C5 0%, #228CEE 100%)',
                   borderRadius: '50%',
                   margin: '0 auto 24px auto',
-                  textAlign: 'center' as const,
+                  textAlign: 'center',
                   fontSize: '32px',
                   lineHeight: '80px',
                 }}
@@ -103,7 +97,6 @@ export default function ContactEmailTemplate({
                   fontWeight: '700',
                   margin: '0',
                   letterSpacing: '-0.5px',
-                  fontFamily: "'Raleway', sans-serif",
                 }}
               >
                 New Contact Message
@@ -256,12 +249,12 @@ export default function ContactEmailTemplate({
               {/* CTA Button */}
               <Section
                 style={{
-                  textAlign: 'center' as const,
+                  textAlign: 'center',
                   padding: '0 0 32px 0',
                 }}
               >
                 <Link
-                  href={`mailto:${email}?subject=Re: ${subject}`}
+                  href={`mailto:${email}?subject=${encodeURIComponent(`Re: ${subject}`)}`}
                   style={{
                     display: 'inline-block',
                     background: 'linear-gradient(135deg, #5721C5 0%, #228CEE 100%)',
@@ -285,7 +278,7 @@ export default function ContactEmailTemplate({
                 padding: '24px 40px',
                 backgroundColor: '#090D1A',
                 borderRadius: '0 0 12px 12px',
-                textAlign: 'center' as const,
+                textAlign: 'center',
               }}
             >
               <Text
