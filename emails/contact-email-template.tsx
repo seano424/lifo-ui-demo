@@ -1,3 +1,4 @@
+import type { ContactEmailTemplatePropsSchema } from '@/app/api/contact/route'
 import {
   Body,
   Column,
@@ -12,22 +13,13 @@ import {
   Section,
   Text,
 } from '@react-email/components'
+import type { z } from 'zod'
 
-interface ContactEmailTemplateProps {
-  name: string
-  email: string
-  subject: string
-  message: string
-}
-
-/**
- * Validate email format and prevent injection attacks
- * Checks for valid email format and blocks newline/carriage return characters
- */
-function isValidEmail(email: string): boolean {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  return emailRegex.test(email) && !email.includes('%0A') && !email.includes('%0D')
-}
+// Type-safe props inferred from Zod schema
+// This ensures props match validation constraints (min/max length, email format)
+// XSS protection: React-email's Text, Heading, and Link components automatically escape HTML
+// API route sanitizes inputs as defense in depth before passing to template
+type ContactEmailTemplateProps = z.infer<typeof ContactEmailTemplatePropsSchema>
 
 export default function ContactEmailTemplate({
   name,
@@ -36,10 +28,6 @@ export default function ContactEmailTemplate({
   message,
 }: ContactEmailTemplateProps) {
   const logoUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://lifo-app.com'}/logos/lifo-logo-vertical-light.png`
-
-  // Validate email to prevent injection attacks
-  // Note: Ideally, email validation should happen at the API level before reaching this template
-  const safeEmail = isValidEmail(email) ? email : 'noreply@lifo.ai'
 
   return (
     <Html>
@@ -190,7 +178,7 @@ export default function ContactEmailTemplate({
                       }}
                     >
                       <Link
-                        href={`mailto:${safeEmail}`}
+                        href={`mailto:${email}`}
                         style={{
                           color: '#5721C5',
                           textDecoration: 'none',
@@ -270,7 +258,7 @@ export default function ContactEmailTemplate({
                 }}
               >
                 <Link
-                  href={`mailto:${safeEmail}?subject=${encodeURIComponent(`Re: ${subject}`)}`}
+                  href={`mailto:${email}?subject=${encodeURIComponent(`Re: ${subject}`)}`}
                   style={{
                     display: 'inline-block',
                     background: 'linear-gradient(135deg, #5721C5 0%, #228CEE 100%)',
