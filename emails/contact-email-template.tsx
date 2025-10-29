@@ -20,6 +20,21 @@ interface ContactEmailTemplateProps {
   message: string
 }
 
+/**
+ * Escape HTML entities to prevent XSS attacks
+ * React-email components handle escaping, but this provides an additional layer of security
+ */
+function escapeHtml(text: string): string {
+  const map: Record<string, string> = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;',
+  }
+  return text.replace(/[&<>"']/g, m => map[m])
+}
+
 export default function ContactEmailTemplate({
   name,
   email,
@@ -28,10 +43,15 @@ export default function ContactEmailTemplate({
 }: ContactEmailTemplateProps) {
   const logoUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://lifo-app.com'}/logos/lifo-logo-vertical-light.png`
 
+  // Sanitize user inputs (react-email handles escaping, but adding explicit sanitization for security)
+  const sanitizedName = escapeHtml(name)
+  const sanitizedSubject = escapeHtml(subject)
+  const sanitizedMessage = escapeHtml(message)
+
   return (
     <Html>
       <Head />
-      <Preview>New contact message from {name}</Preview>
+      <Preview>New contact message from {sanitizedName}</Preview>
       <Body
         style={{
           margin: '0',
@@ -64,7 +84,7 @@ export default function ContactEmailTemplate({
             >
               <Img
                 src={logoUrl}
-                alt="LIFO AI Logo"
+                alt="LIFO.AI - Smart Food Management System Logo"
                 width="120"
                 height="120"
                 style={{
@@ -74,8 +94,8 @@ export default function ContactEmailTemplate({
                 }}
               />
 
-              {/* Icon Circle - using Section with specific styling */}
-              <Section
+              {/* Icon Circle */}
+              <Text
                 style={{
                   width: '80px',
                   height: '80px',
@@ -85,10 +105,11 @@ export default function ContactEmailTemplate({
                   textAlign: 'center',
                   fontSize: '32px',
                   lineHeight: '80px',
+                  display: 'block',
                 }}
               >
                 ✉️
-              </Section>
+              </Text>
 
               <Heading
                 style={{
@@ -149,7 +170,7 @@ export default function ContactEmailTemplate({
                         margin: '0',
                       }}
                     >
-                      {name}
+                      {sanitizedName}
                     </Text>
                   </Column>
                 </Row>
@@ -205,7 +226,7 @@ export default function ContactEmailTemplate({
                         margin: '0',
                       }}
                     >
-                      {subject}
+                      {sanitizedSubject}
                     </Text>
                   </Column>
                 </Row>
@@ -241,7 +262,7 @@ export default function ContactEmailTemplate({
                       wordBreak: 'break-word' as const,
                     }}
                   >
-                    {message}
+                    {sanitizedMessage}
                   </Text>
                 </Section>
               </Section>
@@ -254,7 +275,7 @@ export default function ContactEmailTemplate({
                 }}
               >
                 <Link
-                  href={`mailto:${email}?subject=${encodeURIComponent(`Re: ${subject}`)}`}
+                  href={`mailto:${email}?subject=${encodeURIComponent(`Re: ${sanitizedSubject}`)}`}
                   style={{
                     display: 'inline-block',
                     background: 'linear-gradient(135deg, #5721C5 0%, #228CEE 100%)',
@@ -267,7 +288,7 @@ export default function ContactEmailTemplate({
                     boxShadow: '0 4px 12px rgba(87, 33, 197, 0.3)',
                   }}
                 >
-                  ✉️ Reply to {name}
+                  ✉️ Reply to {sanitizedName}
                 </Link>
               </Section>
             </Section>
