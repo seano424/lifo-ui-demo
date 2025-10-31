@@ -279,9 +279,7 @@ export function TodoCard({ todo, onClick }: TodoCardProps) {
                 <Badge className="hidden" variant="primary">
                   {t('card.donated')}
                 </Badge>
-              ) : (
-                <Badge variant="primary">{t('card.activeHealthy')}</Badge>
-              )}
+              ) : null}
             </div>
           </div>
         </div>
