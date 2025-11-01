@@ -24,7 +24,7 @@ export function DashboardContent() {
         <BatchStatusSummary />
 
         {/* Quick Actions */}
-        <div className="border border-border p-8 rounded-3xl bg-background">
+        <div className="border border-border p-4 md:p-6 lg:p-8 rounded-3xl bg-background">
           <QuickActionCards />
         </div>
 
@@ -33,7 +33,7 @@ export function DashboardContent() {
 
       {/* KPI Cards Section */}
       <div className="relative animate-in fade-in-0 slide-in-from-bottom-4 duration-700 delay-300">
-        <div className="border border-border/50 p-8 rounded-3xl bg-background">
+        <div className="border border-border/50 p-4 md:p-6 lg:p-8 rounded-3xl bg-background">
           <DashboardKPICards />
         </div>
       </div>

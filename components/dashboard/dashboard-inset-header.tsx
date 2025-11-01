@@ -66,7 +66,7 @@ export default function DashboardInsetHeader({
 
       <div
         className={cn(
-          'relative flex flex-col lg:flex-row gap-6 justify-between items-start lg:items-center p-8 rounded-3xl border border-border/50 bg-background/80 shadow-sm backdrop-blur-sm transition-all duration-300 ',
+          'relative flex flex-col lg:flex-row gap-4 md:gap-6 justify-between items-start lg:items-center p-4 md:p-6 lg:p-8 rounded-3xl border border-border/50 bg-background/80 shadow-sm backdrop-blur-sm transition-all duration-300 ',
           className,
         )}
       >

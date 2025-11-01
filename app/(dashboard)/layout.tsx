@@ -11,10 +11,12 @@ export default async function DashboardLayout({ children }: { children: React.Re
     <HydrationBoundary state={dashboardData.dehydratedState}>
       <SidebarProvider>
         <AppSidebar />
-        <SidebarInset className="overflow-scroll">
+        <SidebarInset className="overflow-y-auto">
           <DashboardNav />
-          <div className="flex flex-1 flex-col gap-4 px-4 py-8 overflow-auto items-center">
-            <div className="w-full max-w-5xl">{children}</div>
+          <div className="flex flex-1 flex-col gap-4 px-2 md:px-4 lg:px-8 py-4 md:py-6 lg:py-8 items-center">
+            <div className="w-full max-w-full md:max-w-full lg:max-w-full xl:max-w-5xl px-2 md:px-0">
+              {children}
+            </div>
           </div>
         </SidebarInset>
       </SidebarProvider>
