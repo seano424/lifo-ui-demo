@@ -117,7 +117,7 @@ export default function UnifiedSettingsPage() {
           </div>
         ) : (
           <TabsList
-            className="grid w-full overflow-x-auto"
+            className="grid w-full"
             style={{
               gridTemplateColumns: `repeat(${visibleTabs()?.length}, minmax(min-content, 1fr))`,
             }}
