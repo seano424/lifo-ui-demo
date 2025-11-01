@@ -39,7 +39,7 @@ export function QuickActionCard({
       : 'group-hover:border-secondary/30 group-hover:shadow-sm'
 
   return (
-    <Link href={link} className="block h-full">
+    <Link href={link} className="block">
       <Card
         className={cn(
           'transition-all h-full overflow-hidden group rounded-xl border',
