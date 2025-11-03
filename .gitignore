@@ -32,7 +32,7 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env.local
-.env
+.env.local.testing
 
 credentials/
 # *.json
@@ -59,18 +59,7 @@ next-env.d.ts
 test-images/
 public/test-images/
 
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
+
 # lib/  # Commented out - we need our TypeScript lib folder
 lib64/
 parts/
@@ -81,21 +70,12 @@ wheels/
 .installed.cfg
 *.egg
 
-# Virtual environments
-venv/
-ENV/
-env/
-.venv/
 
 # Development logs and temporary files
 *.log
 *.tmp
 *.bak
 *~
-.pytest_cache/
-.coverage
-htmlcov/
-
 # Manual test artifacts and reports
 /tests/manual/*.json
 /comprehensive_api_test_report_*.json
@@ -106,10 +86,6 @@ report_*
 # Test data and debug files
 # test_data/
 test_archive/
-
-
-
-test_*.py
 
 # Environment backups
 *.env.backup
@@ -157,35 +133,7 @@ schema_export.sql
 ehthumbs.db
 Thumbs.db
 
-# PyInstaller
-*.manifest
-*.spec
-
-# Jupyter Notebook
-.ipynb_checkpoints
-
-# IPython
-profile_default/
-ipython_config.py
-
-
 
 # mkdocs documentation
 /site
 
-# mypy
-.mypy_cache/
-.dmypy.json
-dmypy.json
-
-# Deployment app IDs (keep these local)
-.do/*_app_id.txt
-.do/ENVIRONMENT_VARIABLES_CHECKLIST.md
-
-certificates
-
-!dataset_tools/
-!test_data/
-
-# Exploration and brainstorming (future improvements, not for production)
-_exploration/
