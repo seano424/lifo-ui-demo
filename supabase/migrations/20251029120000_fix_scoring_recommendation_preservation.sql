@@ -608,8 +608,7 @@ WHERE ps.status IN ('completed', 'dismissed')
 ORDER BY ps.completed_at DESC;
 
 COMMENT ON VIEW scoring.recommendation_accuracy IS
-  'Analyzes AI recommendation accuracy by comparing AI suggestions with actual user actions. ' ||
-  'Use this for AI model feedback and improvement.';
+  'Analyzes AI recommendation accuracy by comparing AI suggestions with actual user actions. '
 
 -- ============================================================================
 -- Migration Complete!
