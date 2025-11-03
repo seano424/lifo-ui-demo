@@ -203,10 +203,14 @@ export class FastAPIClient {
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), this.timeout)
 
+    // Get publishable key from environment
+    const publishableKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
     // Debug logging (can be removed in production)
     if (process.env.NODE_ENV === 'development') {
       console.log(`[FastAPI] Request URL: ${url.toString()}`)
       console.log(`[FastAPI] Using user JWT token (length: ${userToken.length})`)
+      console.log(`[FastAPI] Publishable key present: ${!!publishableKey}`)
     }
 
     try {
@@ -215,6 +219,7 @@ export class FastAPIClient {
         headers: {
           Authorization: `Bearer ${userToken}`, // Use Authorization header for user tokens
           'Content-Type': 'application/json',
+          ...(publishableKey && { apikey: publishableKey }), // Add apikey header for new Supabase API keys
         },
         signal: controller.signal,
       })
@@ -477,12 +482,16 @@ export class FastAPIClient {
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), this.timeout)
 
+    // Get publishable key from environment
+    const publishableKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
     try {
       const response = await fetch(url.toString(), {
         method: 'GET',
         headers: {
           Authorization: `Bearer ${userToken}`,
           'Content-Type': 'application/json',
+          ...(publishableKey && { apikey: publishableKey }), // Add apikey header for new Supabase API keys
         },
         signal: controller.signal,
       })
@@ -579,12 +588,16 @@ export class FastAPIClient {
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), this.timeout)
 
+    // Get publishable key from environment
+    const publishableKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
     try {
       const response = await fetch(url.toString(), {
         method: 'GET',
         headers: {
           Authorization: `Bearer ${userToken}`,
           'Content-Type': 'application/json',
+          ...(publishableKey && { apikey: publishableKey }), // Add apikey header for new Supabase API keys
         },
         signal: controller.signal,
       })

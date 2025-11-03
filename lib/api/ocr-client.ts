@@ -34,8 +34,12 @@ async function getAuthHeaders(): Promise<Record<string, string>> {
     throw new Error('Not authenticated - please log in')
   }
 
+  // Get publishable key from environment
+  const publishableKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
   return {
     Authorization: `Bearer ${session.access_token}`,
+    ...(publishableKey && { apikey: publishableKey }), // Add apikey header for new Supabase API keys
   }
 }
 
