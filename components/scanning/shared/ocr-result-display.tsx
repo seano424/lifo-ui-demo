@@ -17,6 +17,9 @@ export interface OCRResultDisplayProps {
   extractedDate?: string // ISO format from backend
   confidence?: number // 0-1 confidence score from OCR
   rawOcrText?: string // Raw text detected by OCR
+  batchNumber?: string // Batch/Lot number (NEW)
+  batchConfidence?: number // Batch detection confidence (NEW)
+  batchFormat?: string // Batch format detected (NEW)
   className?: string
   showRawText?: boolean // Whether to display the raw OCR text
   showValidation?: boolean // Whether to show validation status
@@ -26,6 +29,9 @@ export default function OCRResultDisplay({
   extractedDate,
   confidence,
   rawOcrText,
+  batchNumber,
+  batchConfidence,
+  batchFormat,
   className,
   showRawText = true,
   showValidation = true,
@@ -87,6 +93,30 @@ export default function OCRResultDisplay({
           </div>
           <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
             {europeanDate}
+          </div>
+        </div>
+      )}
+
+      {/* Batch Number (NEW) */}
+      {batchNumber && (
+        <div>
+          <div className="text-xs text-gray-600 dark:text-gray-400 mb-1">
+            {t('result.batchNumber', { defaultValue: 'Batch/Lot Number' })}
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-lg font-mono font-semibold text-gray-900 dark:text-gray-100">
+              {batchNumber}
+            </span>
+            {batchConfidence !== undefined && (
+              <span className="text-xs text-gray-500 dark:text-gray-400">
+                ({Math.round(batchConfidence * 100)}%)
+              </span>
+            )}
+            {batchFormat && (
+              <span className="text-xs px-2 py-0.5 rounded bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300">
+                {batchFormat.replace('_', ' ')}
+              </span>
+            )}
           </div>
         </div>
       )}

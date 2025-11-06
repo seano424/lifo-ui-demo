@@ -60,6 +60,15 @@ export interface OCRFullAnalysisResponse {
   suggested_name?: string
   expiry_date?: string
   manufacture_date?: string
+  // Batch number detection (NEW)
+  batch_number?: string
+  batch_confidence?: number
+  batch_metadata?: {
+    format_detected?: string
+    proximity_to_expiry_px?: number
+    bounding_box?: Record<string, number>
+    total_candidates?: number
+  }
   raw_text_blocks: string[]
   confidence_scores: {
     overall: number
@@ -358,6 +367,10 @@ export async function performFullOCRAnalysis(
       isManual: false,
       rawOcrText: data.raw_text_blocks.join(' '),
       processingTime,
+      // Batch number fields (NEW)
+      batchNumber: data.batch_number,
+      batchConfidence: data.batch_confidence,
+      batchFormat: data.batch_metadata?.format_detected,
     }
 
     const additionalData = {
