@@ -50,37 +50,55 @@ export function useMediaQuery() {
   const [windowWidth, setWindowWidth] = React.useState<number | undefined>(undefined)
 
   React.useEffect(() => {
+    let timeoutId: NodeJS.Timeout | null = null
+
     const handleResize = () => {
-      setWindowWidth(window.innerWidth)
+      // Debounce resize events to prevent rapid re-renders
+      if (timeoutId) {
+        clearTimeout(timeoutId)
+      }
+      timeoutId = setTimeout(() => {
+        setWindowWidth(window.innerWidth)
+      }, 150) // 150ms debounce
     }
 
-    handleResize()
+    // Set initial width immediately
+    setWindowWidth(window.innerWidth)
     window.addEventListener('resize', handleResize)
 
-    return () => window.removeEventListener('resize', handleResize)
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId)
+      }
+      window.removeEventListener('resize', handleResize)
+    }
   }, [])
 
-  return {
-    isMobile: windowWidth !== undefined && windowWidth < BREAKPOINTS.md,
-    isTablet:
-      windowWidth !== undefined && windowWidth >= BREAKPOINTS.md && windowWidth < BREAKPOINTS.lg,
-    isDesktop: windowWidth !== undefined && windowWidth >= BREAKPOINTS.lg,
-    isXs: windowWidth !== undefined && windowWidth < BREAKPOINTS.xs,
-    isSm:
-      windowWidth !== undefined && windowWidth >= BREAKPOINTS.sm && windowWidth < BREAKPOINTS.md,
-    isMd:
-      windowWidth !== undefined && windowWidth >= BREAKPOINTS.md && windowWidth < BREAKPOINTS.lg,
-    isLg:
-      windowWidth !== undefined && windowWidth >= BREAKPOINTS.lg && windowWidth < BREAKPOINTS.xl,
-    isXl:
-      windowWidth !== undefined &&
-      windowWidth >= BREAKPOINTS.xl &&
-      windowWidth < BREAKPOINTS['2xl'],
-    is2xl:
-      windowWidth !== undefined &&
-      windowWidth >= BREAKPOINTS['2xl'] &&
-      windowWidth < BREAKPOINTS['3xl'],
-    is3xl: windowWidth !== undefined && windowWidth >= BREAKPOINTS['3xl'],
-    width: windowWidth,
-  }
+  // Memoize the return value to prevent unnecessary re-renders
+  return React.useMemo(
+    () => ({
+      isMobile: windowWidth !== undefined && windowWidth < BREAKPOINTS.md,
+      isTablet:
+        windowWidth !== undefined && windowWidth >= BREAKPOINTS.md && windowWidth < BREAKPOINTS.lg,
+      isDesktop: windowWidth !== undefined && windowWidth >= BREAKPOINTS.lg,
+      isXs: windowWidth !== undefined && windowWidth < BREAKPOINTS.xs,
+      isSm:
+        windowWidth !== undefined && windowWidth >= BREAKPOINTS.sm && windowWidth < BREAKPOINTS.md,
+      isMd:
+        windowWidth !== undefined && windowWidth >= BREAKPOINTS.md && windowWidth < BREAKPOINTS.lg,
+      isLg:
+        windowWidth !== undefined && windowWidth >= BREAKPOINTS.lg && windowWidth < BREAKPOINTS.xl,
+      isXl:
+        windowWidth !== undefined &&
+        windowWidth >= BREAKPOINTS.xl &&
+        windowWidth < BREAKPOINTS['2xl'],
+      is2xl:
+        windowWidth !== undefined &&
+        windowWidth >= BREAKPOINTS['2xl'] &&
+        windowWidth < BREAKPOINTS['3xl'],
+      is3xl: windowWidth !== undefined && windowWidth >= BREAKPOINTS['3xl'],
+      width: windowWidth,
+    }),
+    [windowWidth],
+  )
 }
