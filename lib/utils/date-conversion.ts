@@ -55,3 +55,171 @@ export function convertToISODate(raw: string): string {
   // If the date doesn't match expected formats, return empty string
   return ''
 }
+
+/**
+ * Format an ISO date (yyyy-MM-dd) to European display format (dd/mm/yyyy)
+ * @param isoDate - ISO formatted date string (yyyy-MM-dd)
+ * @param separator - Separator to use (default: '/')
+ * @returns European formatted date string (dd/mm/yyyy) or empty string if invalid
+ */
+export function formatToEuropeanDate(isoDate: string, separator: string = '/'): string {
+  if (!isoDate) return ''
+
+  // Validate ISO format
+  const match = isoDate.match(/^(\d{4})-(\d{2})-(\d{2})$/)
+  if (!match) return ''
+
+  const [, year, month, day] = match
+
+  // Remove leading zeros for day and month (European convention)
+  const displayDay = Number.parseInt(day, 10).toString()
+  const displayMonth = Number.parseInt(month, 10).toString()
+
+  return `${displayDay}${separator}${displayMonth}${separator}${year}`
+}
+
+/**
+ * Parse raw OCR text that might contain a date
+ * Handles various separators and formats commonly seen in OCR
+ * @param rawText - Raw text from OCR (e.g., "EXP 31.12.2025" or "31/12/25")
+ * @returns ISO formatted date string (yyyy-MM-dd) or null if no date found
+ */
+export function parseOCRDate(rawText: string): string | null {
+  if (!rawText) return null
+
+  const text = rawText.trim()
+
+  // Try to extract date patterns from text
+  // Supports: dd/mm/yyyy, dd.mm.yyyy, dd-mm-yyyy, dd mm yyyy
+  // Also supports: dd/mm/yy, dd.mm.yy, etc.
+  const datePattern = /(\d{1,2})[\s./-](\d{1,2})[\s./-](\d{2,4})/
+
+  const match = text.match(datePattern)
+  if (!match) return null
+
+  const day = Number.parseInt(match[1], 10)
+  const month = Number.parseInt(match[2], 10)
+  let year = Number.parseInt(match[3], 10)
+
+  // Handle 2-digit years: 24 → 2024, 99 → 2099
+  if (match[3].length === 2) {
+    year = year + 2000
+  }
+
+  // Validate date components
+  if (month < 1 || month > 12 || day < 1 || day > 31) {
+    return null
+  }
+
+  // Additional validation: check if date is actually valid (e.g., no Feb 31st)
+  const testDate = new Date(year, month - 1, day)
+  if (
+    testDate.getFullYear() !== year ||
+    testDate.getMonth() !== month - 1 ||
+    testDate.getDate() !== day
+  ) {
+    return null
+  }
+
+  const paddedMonth = String(month).padStart(2, '0')
+  const paddedDay = String(day).padStart(2, '0')
+  return `${year}-${paddedMonth}-${paddedDay}`
+}
+
+/**
+ * Validate that a date is realistic for a product expiry date
+ * Rejects dates that are:
+ * - In the past (expired)
+ * - Too far in the future (>10 years)
+ * - Invalid dates
+ * @param isoDate - ISO formatted date string (yyyy-MM-dd)
+ * @returns { valid: boolean, reason?: string }
+ */
+export function validateExpiryDate(isoDate: string): {
+  valid: boolean
+  reason?: string
+} {
+  if (!isoDate) {
+    return { valid: false, reason: 'Empty date' }
+  }
+
+  // Validate ISO format
+  const match = isoDate.match(/^(\d{4})-(\d{2})-(\d{2})$/)
+  if (!match) {
+    return { valid: false, reason: 'Invalid date format' }
+  }
+
+  const dateObj = new Date(isoDate)
+  if (Number.isNaN(dateObj.getTime())) {
+    return { valid: false, reason: 'Invalid date' }
+  }
+
+  const now = new Date()
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  const tenYearsFromNow = new Date(today)
+  tenYearsFromNow.setFullYear(today.getFullYear() + 10)
+
+  // Check if date is in the past
+  if (dateObj < today) {
+    return { valid: false, reason: 'Date is in the past' }
+  }
+
+  // Check if date is too far in the future (likely OCR error)
+  if (dateObj > tenYearsFromNow) {
+    return { valid: false, reason: 'Date is more than 10 years in the future' }
+  }
+
+  return { valid: true }
+}
+
+/**
+ * Parse and validate a date from OCR with confidence assessment
+ * Combines parsing, validation, and provides a confidence score
+ * @param rawText - Raw text from OCR
+ * @param ocrConfidence - Confidence score from OCR API (0-1)
+ * @returns Object with parsed date, validation status, and adjusted confidence
+ */
+export function parseAndValidateOCRDate(
+  rawText: string,
+  ocrConfidence: number,
+): {
+  isoDate: string | null
+  europeanDate: string | null
+  valid: boolean
+  confidence: number
+  validationError?: string
+} {
+  // Try to parse the date
+  const isoDate = parseOCRDate(rawText)
+
+  if (!isoDate) {
+    return {
+      isoDate: null,
+      europeanDate: null,
+      valid: false,
+      confidence: 0,
+      validationError: 'No date pattern found in OCR text',
+    }
+  }
+
+  // Validate the parsed date
+  const validation = validateExpiryDate(isoDate)
+
+  if (!validation.valid) {
+    return {
+      isoDate,
+      europeanDate: formatToEuropeanDate(isoDate),
+      valid: false,
+      confidence: ocrConfidence * 0.5, // Reduce confidence for invalid dates
+      validationError: validation.reason,
+    }
+  }
+
+  // Date is valid - return with full confidence
+  return {
+    isoDate,
+    europeanDate: formatToEuropeanDate(isoDate),
+    valid: true,
+    confidence: ocrConfidence,
+  }
+}
