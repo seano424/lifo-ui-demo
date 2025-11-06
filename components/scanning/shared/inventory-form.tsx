@@ -12,6 +12,7 @@ export interface InventoryFormData {
   expiryDate: string
   quantity: number
   price: number
+  batchNumber?: string // Optional batch/lot number
 }
 
 export interface InventoryFormProps {
@@ -27,6 +28,7 @@ export interface InventoryFormProps {
   showExpiryDate?: boolean
   showQuantity?: boolean
   showPrice?: boolean
+  showBatchNumber?: boolean
   showSubmitButton?: boolean
 
   // Labels and text
@@ -35,6 +37,7 @@ export interface InventoryFormProps {
   expiryDateLabel?: string
   quantityLabel?: string
   priceLabel?: string
+  batchNumberLabel?: string
 
   // Form mode
   mode?: 'edit' | 'confirm'
@@ -51,12 +54,14 @@ export default function InventoryForm({
   showExpiryDate = true,
   showQuantity = true,
   showPrice = true,
+  showBatchNumber = true,
   showSubmitButton = true,
   title,
   submitButtonText,
   expiryDateLabel,
   quantityLabel,
   priceLabel,
+  batchNumberLabel,
   mode = 'edit',
   className = '',
 }: InventoryFormProps) {
@@ -68,6 +73,7 @@ export default function InventoryForm({
   const finalExpiryDateLabel = expiryDateLabel || t('labels.expiryDate')
   const finalQuantityLabel = quantityLabel || t('labels.quantity')
   const finalPriceLabel = priceLabel || t('labels.pricePerUnit')
+  const finalBatchNumberLabel = batchNumberLabel || t('labels.batchNumber', { defaultValue: 'Batch/Lot Number' })
   const handleChange = (field: keyof InventoryFormData) => (value: string | number) => {
     onChange({
       ...data,
@@ -140,6 +146,20 @@ export default function InventoryForm({
               </div>
             </div>
           )}
+
+          {showBatchNumber && (
+            <div className="mt-3">
+              <Label className="text-xs">{finalBatchNumberLabel}</Label>
+              <Input
+                type="text"
+                value={data.batchNumber || ''}
+                onChange={e => handleChange('batchNumber')(e.target.value)}
+                className="text-sm font-mono"
+                placeholder="L12345, LOT ABC123..."
+                disabled={disabled}
+              />
+            </div>
+          )}
         </CardContent>
       </Card>
     )
@@ -200,6 +220,23 @@ export default function InventoryForm({
                 disabled={disabled}
               />
             </div>
+          </div>
+        )}
+
+        {showBatchNumber && (
+          <div>
+            <Label htmlFor="batchNumber" className="text-xs">
+              {finalBatchNumberLabel}
+            </Label>
+            <Input
+              id="batchNumber"
+              type="text"
+              value={data.batchNumber || ''}
+              onChange={e => handleChange('batchNumber')(e.target.value)}
+              className="font-mono"
+              placeholder="L12345, LOT ABC123..."
+              disabled={disabled}
+            />
           </div>
         )}
 
