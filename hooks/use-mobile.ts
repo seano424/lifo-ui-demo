@@ -47,9 +47,14 @@ export function useIsTablet() {
 }
 
 export function useMediaQuery() {
+  // Use a flag to track if we're mounted (client-side)
+  const [isMounted, setIsMounted] = React.useState(false)
   const [windowWidth, setWindowWidth] = React.useState<number | undefined>(undefined)
 
   React.useEffect(() => {
+    // Mark as mounted to avoid SSR hydration mismatch
+    setIsMounted(true)
+
     let timeoutId: NodeJS.Timeout | null = null
 
     const handleResize = () => {
@@ -75,30 +80,45 @@ export function useMediaQuery() {
   }, [])
 
   // Memoize the return value to prevent unnecessary re-renders
+  // Return false for all breakpoints during SSR to avoid hydration mismatch
   return React.useMemo(
     () => ({
-      isMobile: windowWidth !== undefined && windowWidth < BREAKPOINTS.md,
+      isMobile: isMounted && windowWidth !== undefined && windowWidth < BREAKPOINTS.md,
       isTablet:
-        windowWidth !== undefined && windowWidth >= BREAKPOINTS.md && windowWidth < BREAKPOINTS.lg,
-      isDesktop: windowWidth !== undefined && windowWidth >= BREAKPOINTS.lg,
-      isXs: windowWidth !== undefined && windowWidth < BREAKPOINTS.xs,
+        isMounted &&
+        windowWidth !== undefined &&
+        windowWidth >= BREAKPOINTS.md &&
+        windowWidth < BREAKPOINTS.lg,
+      isDesktop: isMounted && windowWidth !== undefined && windowWidth >= BREAKPOINTS.lg,
+      isXs: isMounted && windowWidth !== undefined && windowWidth < BREAKPOINTS.xs,
       isSm:
-        windowWidth !== undefined && windowWidth >= BREAKPOINTS.sm && windowWidth < BREAKPOINTS.md,
+        isMounted &&
+        windowWidth !== undefined &&
+        windowWidth >= BREAKPOINTS.sm &&
+        windowWidth < BREAKPOINTS.md,
       isMd:
-        windowWidth !== undefined && windowWidth >= BREAKPOINTS.md && windowWidth < BREAKPOINTS.lg,
+        isMounted &&
+        windowWidth !== undefined &&
+        windowWidth >= BREAKPOINTS.md &&
+        windowWidth < BREAKPOINTS.lg,
       isLg:
-        windowWidth !== undefined && windowWidth >= BREAKPOINTS.lg && windowWidth < BREAKPOINTS.xl,
+        isMounted &&
+        windowWidth !== undefined &&
+        windowWidth >= BREAKPOINTS.lg &&
+        windowWidth < BREAKPOINTS.xl,
       isXl:
+        isMounted &&
         windowWidth !== undefined &&
         windowWidth >= BREAKPOINTS.xl &&
         windowWidth < BREAKPOINTS['2xl'],
       is2xl:
+        isMounted &&
         windowWidth !== undefined &&
         windowWidth >= BREAKPOINTS['2xl'] &&
         windowWidth < BREAKPOINTS['3xl'],
-      is3xl: windowWidth !== undefined && windowWidth >= BREAKPOINTS['3xl'],
+      is3xl: isMounted && windowWidth !== undefined && windowWidth >= BREAKPOINTS['3xl'],
       width: windowWidth,
     }),
-    [windowWidth],
+    [isMounted, windowWidth],
   )
 }
