@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label'
 import { Typography } from '@/components/ui/typography'
 import { Check, Euro } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import { useCallback } from 'react'
 
 export interface InventoryFormData {
   expiryDate: string
@@ -74,12 +75,16 @@ export default function InventoryForm({
   const finalQuantityLabel = quantityLabel || t('labels.quantity')
   const finalPriceLabel = priceLabel || t('labels.pricePerUnit')
   const finalBatchNumberLabel = batchNumberLabel || t('labels.batchNumber', { defaultValue: 'Batch/Lot Number' })
-  const handleChange = (field: keyof InventoryFormData) => (value: string | number) => {
-    onChange({
-      ...data,
-      [field]: value,
-    })
-  }
+
+  const handleChange = useCallback(
+    (field: keyof InventoryFormData) => (value: string | number) => {
+      onChange({
+        ...data,
+        [field]: value,
+      })
+    },
+    [data, onChange],
+  )
 
   const canSubmit = data.expiryDate && data.quantity > 0 && data.price > 0
 
