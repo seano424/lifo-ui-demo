@@ -74,16 +74,19 @@ export default function InventoryForm({
   const finalExpiryDateLabel = expiryDateLabel || t('labels.expiryDate')
   const finalQuantityLabel = quantityLabel || t('labels.quantity')
   const finalPriceLabel = priceLabel || t('labels.pricePerUnit')
-  const finalBatchNumberLabel = batchNumberLabel || t('labels.batchNumber', { defaultValue: 'Batch/Lot Number' })
+  const finalBatchNumberLabel =
+    batchNumberLabel || t('labels.batchNumber', { defaultValue: 'Batch/Lot Number' })
 
   const handleChange = useCallback(
     (field: keyof InventoryFormData) => (value: string | number) => {
-      onChange(prevData => ({
-        ...prevData,
+      // Don't use functional update pattern - just pass the updated data directly
+      // The parent component's setState will handle the merging
+      onChange({
+        ...data,
         [field]: value,
-      }))
+      })
     },
-    [onChange],
+    [onChange, data],
   )
 
   const canSubmit = data.expiryDate && data.quantity > 0 && data.price > 0

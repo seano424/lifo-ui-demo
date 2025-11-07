@@ -19,9 +19,17 @@ export function useIsMobile() {
     const onChange = () => {
       setIsMobile(window.innerWidth < BREAKPOINTS.md)
     }
-    mql.addEventListener('change', onChange)
+
+    // Set initial value
     setIsMobile(window.innerWidth < BREAKPOINTS.md)
-    return () => mql.removeEventListener('change', onChange)
+
+    // Add listener
+    mql.addEventListener('change', onChange)
+
+    // Cleanup function - ensure listener is removed
+    return () => {
+      mql.removeEventListener('change', onChange)
+    }
   }, [])
 
   return !!isMobile
@@ -38,9 +46,17 @@ export function useIsTablet() {
       const width = window.innerWidth
       setIsTablet(width >= BREAKPOINTS.md && width < BREAKPOINTS.lg)
     }
-    mql.addEventListener('change', onChange)
+
+    // Set initial value
     onChange()
-    return () => mql.removeEventListener('change', onChange)
+
+    // Add listener
+    mql.addEventListener('change', onChange)
+
+    // Cleanup function - ensure listener is removed
+    return () => {
+      mql.removeEventListener('change', onChange)
+    }
   }, [])
 
   return !!isTablet
@@ -95,6 +111,7 @@ export function useMediaQuery() {
     tabletQuery.addEventListener('change', onChange)
     desktopQuery.addEventListener('change', onChange)
 
+    // Cleanup function - ensure all listeners are removed
     return () => {
       mobileQuery.removeEventListener('change', onChange)
       tabletQuery.removeEventListener('change', onChange)
