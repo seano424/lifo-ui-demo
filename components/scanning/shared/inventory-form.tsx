@@ -79,14 +79,13 @@ export default function InventoryForm({
 
   const handleChange = useCallback(
     (field: keyof InventoryFormData) => (value: string | number) => {
-      // Don't use functional update pattern - just pass the updated data directly
-      // The parent component's setState will handle the merging
-      onChange({
-        ...data,
+      // Use functional update to avoid dependency on data
+      onChange(prevData => ({
+        ...prevData,
         [field]: value,
-      })
+      }))
     },
-    [onChange, data],
+    [onChange],
   )
 
   const canSubmit = data.expiryDate && data.quantity > 0 && data.price > 0
