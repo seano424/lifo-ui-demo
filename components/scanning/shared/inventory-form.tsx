@@ -79,13 +79,12 @@ export default function InventoryForm({
 
   const handleChange = useCallback(
     (field: keyof InventoryFormData) => (value: string | number) => {
-      // Use functional update to avoid dependency on data
-      onChange(prevData => ({
-        ...prevData,
+      onChange({
+        ...data,
         [field]: value,
-      }))
+      })
     },
-    [onChange],
+    [onChange, data],
   )
 
   const canSubmit = data.expiryDate && data.quantity > 0 && data.price > 0
