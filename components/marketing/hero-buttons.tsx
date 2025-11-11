@@ -25,7 +25,8 @@ export function HeroButtons() {
       {!currentUser && (
         <Button
           asLink
-          href="/pricing"
+          // Todo : Change to pricing page when it's ready
+          href="/contact"
           size="lg"
           variant="outline"
           className="w-full sm:w-auto px-5 sm:px-6 py-3 rounded-2xl border-foreground/20 hover:border-foreground/40 transition-colors flex items-center justify-center gap-2"

@@ -1,8 +1,8 @@
 'use client'
-import { ArrowRight, Calendar, Check, Clock, Shield, Zap } from 'lucide-react'
-import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Typography } from '@/components/ui/typography'
+import { ArrowRight, Calendar, Check, Clock, Shield, Zap } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 interface CtaFeatureProps {
   icon: React.ReactNode
@@ -113,9 +113,10 @@ export function CtaSection() {
               asLink
               href="/contact"
               size="lg"
-              className="w-full py-4 text-lg font-medium rounded-2xl bg-gradient-to-r from-primary-900 to-secondary-800 text-white hover:opacity-90 transition-opacity shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2"
+              className="w-full py-4 text-sm sm:text-base md:text-lg font-medium rounded-2xl bg-gradient-to-r from-primary-900 to-secondary-800 text-white hover:opacity-90 transition-opacity shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2 whitespace-normal sm:whitespace-nowrap px-4"
             >
-              {t('card.button')} <ArrowRight size={18} />
+              <span className="text-center">{t('card.button')}</span>{' '}
+              <ArrowRight size={18} className="shrink-0" />
             </Button>
 
             <Typography variant="p" className="text-sm text-center text-secondary-900">
