@@ -41,6 +41,7 @@ export default function DashboardInsetHeader({
   title,
   description,
   rightContent,
+  showIcon = true,
   isLoading,
   className,
 }: {
@@ -48,17 +49,12 @@ export default function DashboardInsetHeader({
   title?: string
   description?: string
   rightContent?: React.ReactNode
+  showIcon?: boolean
   isLoading?: boolean
   className?: string
 }) {
   const pathname = usePathname()
   const PageIcon = useMemo(() => getPageIcon(pathname), [pathname])
-
-  // Check if this is a support sub-page (not the main support page)
-  const cleanPath = pathname.split('?')[0]
-  const isSupportSubPage =
-    cleanPath.startsWith('/dashboard/support/') && cleanPath !== '/dashboard/support'
-  const showIcon = !isSupportSubPage
 
   // Always call hook unconditionally, use fallback page key if not provided
   const t = useTranslations(page || 'dashboard')

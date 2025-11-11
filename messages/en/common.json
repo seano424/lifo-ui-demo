@@ -42,7 +42,8 @@
       "edit": "Edit",
       "processing": "Processing...",
       "verifyFirst": "Verify First",
-      "createAccount": "Create Account"
+      "createAccount": "Create Account",
+      "backToSupportCenter": "Back to Support Center"
     }
   },
   "breadcrumbs": {
