@@ -739,11 +739,7 @@ function detectDateContextKeywords(
   // Filter for letter-like shapes (wider than tall, unlike numbers)
   const letterLikeShapes = components.filter(c => {
     const ratio = c.width / c.height
-    const isLetterSized =
-      c.width >= 5 &&
-      c.height >= 8 &&
-      c.width <= 100 &&
-      c.height <= 60
+    const isLetterSized = c.width >= 5 && c.height >= 8 && c.width <= 100 && c.height <= 60
     const isLetterRatio = ratio >= 0.4 && ratio <= 2.5 // Letters can be wide (M, W) or tall (I, l)
     const isSaneSize = c.pixelCount >= 30 && c.pixelCount <= 3000
     return isLetterSized && isLetterRatio && isSaneSize
