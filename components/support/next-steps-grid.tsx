@@ -1,4 +1,4 @@
-import { ArrowRight, ExternalLink } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import { Card, CardContent } from '@/components/ui/card'
 import { Typography } from '@/components/ui/typography'
@@ -17,7 +17,7 @@ interface NextStepsGridProps {
 
 export function NextStepsGrid({ title, items }: NextStepsGridProps) {
   return (
-    <div className="space-y-6 pt-8 mt-8 border-t border-border/50">
+    <div className="space-y-6 pt-8 my-8 border-t border-border/50">
       {/* Section Header */}
       <div className="text-center space-y-2">
         <Typography
@@ -56,10 +56,6 @@ export function NextStepsGrid({ title, items }: NextStepsGridProps) {
                     </Typography>
 
                     {/* Link text with hover effect */}
-                    <div className="inline-flex items-center gap-2 text-primary font-medium group-hover:gap-3 transition-all duration-200 group-hover:text-primary-700">
-                      <span>{item.linkText}</span>
-                      <ExternalLink className="h-4 w-4" />
-                    </div>
                   </div>
                 </div>
               </CardContent>

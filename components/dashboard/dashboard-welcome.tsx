@@ -83,7 +83,7 @@ export function DashboardWelcome() {
 
               <Button
                 asLink
-                href="/support"
+                href="/dashboard/support"
                 target="blank"
                 variant="outline"
                 className="w-[90%] sm:w-fit mt-2 group text-secondary text-xs sm:text-sm"

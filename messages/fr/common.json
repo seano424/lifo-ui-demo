@@ -70,6 +70,9 @@
     "profile": "Profil",
     "help": "Aide",
     "support": "Support",
+    "quickStartGuide": "Guide de démarrage rapide",
+    "scanIn": "Scanner l'entrée",
+    "inventoryManagement": "Gestion des stocks",
     "addStore": "Ajouter un magasin"
   },
   "navUser": {

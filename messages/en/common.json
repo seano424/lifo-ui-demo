@@ -70,6 +70,9 @@
     "profile": "Profile",
     "help": "Help",
     "support": "Support",
+    "quickStartGuide": "Quick Start Guide",
+    "scanIn": "Scan In",
+    "inventoryManagement": "Inventory Management",
     "addStore": "Add Store"
   },
   "navUser": {

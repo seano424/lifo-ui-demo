@@ -70,6 +70,9 @@
     "profile": "Profiel",
     "help": "Help",
     "support": "Ondersteuning",
+    "quickStartGuide": "Snelstartgids",
+    "scanIn": "Scan In",
+    "inventoryManagement": "Voorraadbeheer",
     "addStore": "Winkel toevoegen"
   },
   "navUser": {

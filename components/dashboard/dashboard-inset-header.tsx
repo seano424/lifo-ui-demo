@@ -5,6 +5,7 @@ import { Typography } from '@/components/ui/typography'
 import { cn } from '@/lib/utils'
 import {
   ChartNoAxesCombined,
+  HelpCircle,
   Layers,
   ListTodo,
   Package,
@@ -29,6 +30,7 @@ function getPageIcon(pathname: string) {
   if (cleanPath.startsWith('/dashboard/inventory/products')) return Package
   if (cleanPath.startsWith('/dashboard/inventory/batches')) return Layers
   if (cleanPath.startsWith('/dashboard/settings')) return SettingsIcon
+  if (cleanPath.startsWith('/dashboard/support')) return HelpCircle
 
   // Default fallback
   return ChartNoAxesCombined
@@ -51,6 +53,12 @@ export default function DashboardInsetHeader({
 }) {
   const pathname = usePathname()
   const PageIcon = useMemo(() => getPageIcon(pathname), [pathname])
+
+  // Check if this is a support sub-page (not the main support page)
+  const cleanPath = pathname.split('?')[0]
+  const isSupportSubPage =
+    cleanPath.startsWith('/dashboard/support/') && cleanPath !== '/dashboard/support'
+  const showIcon = !isSupportSubPage
 
   // Always call hook unconditionally, use fallback page key if not provided
   const t = useTranslations(page || 'dashboard')
@@ -88,9 +96,11 @@ export default function DashboardInsetHeader({
             <>
               {/* Main title with dynamic icon */}
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-xl bg-primary/10 text-primary items-center">
-                  <PageIcon className="h-6 w-6" />
-                </div>
+                {showIcon && (
+                  <div className="p-2 rounded-xl bg-primary/10 text-primary items-center">
+                    <PageIcon className="h-6 w-6" />
+                  </div>
+                )}
                 <Typography
                   variant="h1"
                   className="font-black bg-gradient-to-r from-gray-900 to-gray-600 dark:from-gray-100 dark:to-gray-400 bg-clip-text text-transparent capitalize pb-1"

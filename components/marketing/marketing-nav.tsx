@@ -115,10 +115,10 @@ const MarketingNav = ({ menu }: MarketingNavProps) => {
     //   title: t('pricing'),
     //   url: '/pricing',
     // },
-    {
-      title: t('support'),
-      url: '/support',
-    },
+    // {
+    //   title: t('support'),
+    //   url: '/support',
+    // },
     {
       title: t('contactUs'),
       url: '/contact',

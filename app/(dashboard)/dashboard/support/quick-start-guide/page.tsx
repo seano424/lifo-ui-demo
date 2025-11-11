@@ -29,13 +29,13 @@ const getNextSteps = (t: ReturnType<typeof useTranslations<'marketing'>>) => [
     title: t('nextSteps.items.0.title'),
     description: t('nextSteps.items.0.description'),
     linkText: t('nextSteps.items.0.linkText'),
-    linkHref: '/support/scan-in',
+    linkHref: '/dashboard/support/scan-in',
   },
   {
     title: t('nextSteps.items.1.title'),
     description: t('nextSteps.items.1.description'),
     linkText: t('nextSteps.items.1.linkText'),
-    linkHref: '/support/inventory-management',
+    linkHref: '/dashboard/support/inventory-management',
   },
 ]
 
