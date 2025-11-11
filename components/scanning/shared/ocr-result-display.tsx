@@ -51,9 +51,7 @@ export default function OCRResultDisplay({
 
   // Parse and validate raw OCR text if date extraction failed
   const rawParsed =
-    !extractedDate && rawOcrText
-      ? parseAndValidateOCRDate(rawOcrText, confidence || 0)
-      : null
+    !extractedDate && rawOcrText ? parseAndValidateOCRDate(rawOcrText, confidence || 0) : null
 
   // Determine overall status
   const isSuccess = validation?.valid || false
@@ -91,9 +89,7 @@ export default function OCRResultDisplay({
           <div className="text-xs text-gray-600 dark:text-gray-400 mb-1">
             {t('result.expiryDate', { defaultValue: 'Expiry Date' })}
           </div>
-          <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-            {europeanDate}
-          </div>
+          <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">{europeanDate}</div>
         </div>
       )}
 
