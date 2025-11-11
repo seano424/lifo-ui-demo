@@ -2,6 +2,7 @@
 
 import {
   ChartNoAxesCombined,
+  HelpCircle,
   Layers,
   ListTodo,
   Package,
@@ -90,6 +91,11 @@ function useNavigationData() {
               title: t('settings'),
               url: '/dashboard/settings',
               icon: SettingsIcon,
+            },
+            {
+              title: t('support'),
+              url: '/dashboard/support',
+              icon: HelpCircle,
             },
           ],
         },

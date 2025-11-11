@@ -42,7 +42,8 @@
       "edit": "Edit",
       "processing": "Processing...",
       "verifyFirst": "Verify First",
-      "createAccount": "Create Account"
+      "createAccount": "Create Account",
+      "backToSupportCenter": "Back to Support Center"
     }
   },
   "breadcrumbs": {
@@ -70,6 +71,9 @@
     "profile": "Profile",
     "help": "Help",
     "support": "Support",
+    "quickStartGuide": "Quick Start Guide",
+    "scanIn": "Scan In",
+    "inventoryManagement": "Inventory Management",
     "addStore": "Add Store"
   },
   "navUser": {

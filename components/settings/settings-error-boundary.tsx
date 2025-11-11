@@ -1,7 +1,7 @@
-import { AlertCircle, ArrowLeft, RefreshCw } from 'lucide-react'
-import Link from 'next/link'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
+import { AlertCircle, ArrowLeft, RefreshCw } from 'lucide-react'
+import Link from 'next/link'
 
 interface SettingsErrorProps {
   errorType: 'unauthorized' | 'forbidden' | 'not-found' | 'server-error'
@@ -117,7 +117,7 @@ export function NoStoreAccess() {
       showRefreshButton={false}
       customAction={{
         label: 'Contact Support',
-        href: '/support',
+        href: '/dashboard/support',
       }}
     />
   )
