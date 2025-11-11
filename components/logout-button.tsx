@@ -2,10 +2,9 @@
 
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { createClient } from '@/lib/supabase/client'
-import { setUserInitiatedLogout } from '@/hooks/use-auth-state-monitor'
-import { logger } from '@/lib/utils/logger'
 
 interface LogoutButtonProps {
   className?: string
@@ -29,53 +28,35 @@ interface LogoutButtonProps {
 export function LogoutButton({ className, variant = 'gray' }: LogoutButtonProps) {
   const t = useTranslations('marketing.auth')
   const router = useRouter()
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
 
   const logout = async () => {
-    // Mark this as a user-initiated logout to prevent showing security warning
-    setUserInitiatedLogout(true)
+    if (isLoggingOut) return // Prevent double-clicks
+
+    setIsLoggingOut(true)
+
+    const supabase = createClient()
 
     try {
-      logger.log('LogoutButton', 'Starting logout process')
-
-      const supabase = createClient()
-      logger.log('LogoutButton', 'Calling supabase.auth.signOut()')
-      const { error } = await supabase.auth.signOut()
-
-      if (error) {
-        logger.error('LogoutButton', 'Logout error:', error)
-
-        // Handle rate limiting gracefully
-        // Check for common rate limit error codes/statuses
-        const isRateLimitError =
-          error.status === 429 || // Standard HTTP rate limit status
-          error.code === 'rate_limit_exceeded' ||
-          error.message?.toLowerCase().includes('rate limit') ||
-          error.message?.toLowerCase().includes('too many')
-
-        if (isRateLimitError) {
-          logger.log('LogoutButton', 'Rate limited - clearing local state anyway')
-          // Continue with logout flow even if Supabase request failed
-        } else {
-          throw error
-        }
-      }
-
-      logger.log(
-        'LogoutButton',
-        'Logout successful - auth state monitor will handle redirect and cache clearing',
-      )
-
-      // Don't manipulate cache or redirect here - let useAuthStateMonitor handle it
-      // This prevents race conditions and ensures consistent state management
+      await supabase.auth.signOut()
     } catch (error) {
-      logger.error('LogoutButton', 'Logout failed:', error)
-      // Only redirect on error to show error state
-      router.push('/')
+      // Log but continue - local cleanup happens via navigation
+      console.error('Logout API error:', error)
     }
+
+    // Navigate and refresh - hooks will naturally clear state
+    router.push('/')
+    router.refresh()
   }
 
   return (
-    <Button variant={variant} size="default" onClick={logout} className={className}>
+    <Button
+      variant={variant}
+      size="default"
+      onClick={logout}
+      disabled={isLoggingOut}
+      className={className}
+    >
       {t('logout')}
     </Button>
   )

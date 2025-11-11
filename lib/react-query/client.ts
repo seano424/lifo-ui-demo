@@ -2,7 +2,6 @@
 
 import { QueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { isLogoutUserInitiated } from '@/hooks/use-auth-state-monitor'
 import { logger } from '@/lib/utils/logger'
 
 type StatusError = { status: number; message?: string }
@@ -56,11 +55,10 @@ export function createQueryClient() {
         },
         // Global error handler for queries
         throwOnError: error => {
-          // Only throw auth errors if they're not user-initiated logouts
-          if (isAuthError(error) && !isLogoutUserInitiated()) {
+          if (isAuthError(error)) {
             logger.log('QueryClient', 'Authentication error in query:', error)
 
-            // Show a toast for auth errors if not already logging out
+            // Show a toast for auth errors
             if (hasStatus(error) && error.status === 401) {
               toast.error('Authentication error. Please log in again.', {
                 duration: 4000,
@@ -84,7 +82,7 @@ export function createQueryClient() {
         },
         // Global error handler for mutations
         throwOnError: error => {
-          if (isAuthError(error) && !isLogoutUserInitiated()) {
+          if (isAuthError(error)) {
             logger.log('QueryClient', 'Authentication error in mutation:', error)
 
             if (hasStatus(error) && error.status === 401) {
