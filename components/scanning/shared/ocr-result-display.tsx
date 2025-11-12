@@ -195,8 +195,6 @@ export function OCRResultCompact({
   confidence,
   className,
 }: Pick<OCRResultDisplayProps, 'extractedDate' | 'confidence' | 'className'>) {
-  const t = useTranslations('ocr')
-
   if (!extractedDate) return null
 
   const europeanDate = formatToEuropeanDate(extractedDate)

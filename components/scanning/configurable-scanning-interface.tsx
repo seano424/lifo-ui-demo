@@ -632,7 +632,16 @@ export default function BaseScanningInterface({ config, callbacks, className }: 
               {/* Form */}
               <InventoryForm
                 data={logic.state.formData}
-                onChange={data => logic.setState(prev => ({ ...prev, formData: data }))}
+                onChange={dataOrUpdater => {
+                  if (typeof dataOrUpdater === 'function') {
+                    logic.setState(prev => ({
+                      ...prev,
+                      formData: dataOrUpdater(prev.formData),
+                    }))
+                  } else {
+                    logic.setState(prev => ({ ...prev, formData: dataOrUpdater }))
+                  }
+                }}
                 onSubmit={logic.handleFormSubmit}
                 showExpiryDate={config.showExpiryField}
                 showQuantity={config.showQuantityField}

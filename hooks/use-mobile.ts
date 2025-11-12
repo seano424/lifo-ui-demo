@@ -1,6 +1,5 @@
 import * as React from 'react'
 
-// Breakpoints matching globals.css
 const BREAKPOINTS = {
   xs: 360,
   sm: 640,
@@ -12,7 +11,7 @@ const BREAKPOINTS = {
 } as const
 
 export function useIsMobile() {
-  const [isMobile, setIsMobile] = React.useState<boolean | undefined>(undefined)
+  const [isMobile, setIsMobile] = React.useState<boolean>(false)
 
   React.useEffect(() => {
     const mql = window.matchMedia(`(max-width: ${BREAKPOINTS.md - 1}px)`)
@@ -24,11 +23,11 @@ export function useIsMobile() {
     return () => mql.removeEventListener('change', onChange)
   }, [])
 
-  return !!isMobile
+  return isMobile
 }
 
 export function useIsTablet() {
-  const [isTablet, setIsTablet] = React.useState<boolean | undefined>(undefined)
+  const [isTablet, setIsTablet] = React.useState<boolean>(false)
 
   React.useEffect(() => {
     const mql = window.matchMedia(
@@ -43,13 +42,15 @@ export function useIsTablet() {
     return () => mql.removeEventListener('change', onChange)
   }, [])
 
-  return !!isTablet
+  return isTablet
 }
 
 export function useMediaQuery() {
   const [windowWidth, setWindowWidth] = React.useState<number | undefined>(undefined)
+  const [mounted, setMounted] = React.useState(false)
 
   React.useEffect(() => {
+    setMounted(true)
     const handleResize = () => {
       setWindowWidth(window.innerWidth)
     }
@@ -59,6 +60,22 @@ export function useMediaQuery() {
 
     return () => window.removeEventListener('resize', handleResize)
   }, [])
+
+  if (!mounted) {
+    return {
+      isMobile: false,
+      isTablet: false,
+      isDesktop: false,
+      isXs: false,
+      isSm: false,
+      isMd: false,
+      isLg: false,
+      isXl: false,
+      is2xl: false,
+      is3xl: false,
+      width: undefined,
+    }
+  }
 
   return {
     isMobile: windowWidth !== undefined && windowWidth < BREAKPOINTS.md,

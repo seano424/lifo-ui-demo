@@ -7,18 +7,19 @@ import { Label } from '@/components/ui/label'
 import { Typography } from '@/components/ui/typography'
 import { Check, Euro } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import type React from 'react'
 import { useCallback } from 'react'
 
 export interface InventoryFormData {
   expiryDate: string
   quantity: number
   price: number
-  batchNumber?: string // Optional batch/lot number
+  batchNumber?: string
 }
 
 export interface InventoryFormProps {
   data: InventoryFormData
-  onChange: (data: InventoryFormData) => void
+  onChange: React.Dispatch<React.SetStateAction<InventoryFormData>>
   onSubmit?: () => void
 
   // Form state
@@ -77,14 +78,16 @@ export default function InventoryForm({
   const finalBatchNumberLabel =
     batchNumberLabel || t('labels.batchNumber', { defaultValue: 'Batch/Lot Number' })
 
+  // Handle field changes without data dependency to prevent re-render loops
   const handleChange = useCallback(
     (field: keyof InventoryFormData) => (value: string | number) => {
-      onChange({
-        ...data,
+      // Use functional update pattern to avoid data dependency
+      onChange(prev => ({
+        ...prev,
         [field]: value,
-      })
+      }))
     },
-    [onChange, data],
+    [onChange],
   )
 
   const canSubmit = data.expiryDate && data.quantity > 0 && data.price > 0

@@ -6,14 +6,12 @@ import ManualDeliveryEntry from '@/components/deliveries/manual-delivery-entry'
 import ScanningInterface from '@/components/scanning/standalone-scanning-interface'
 import { Card } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { useMediaQuery } from '@/hooks/use-mobile'
 import { useStoreState } from '@/lib/stores/store-context'
 import { Keyboard, Scan, Upload } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
 export default function DeliveriesPage() {
   const { activeStore: currentStore } = useStoreState()
-  const { isTablet, isMobile } = useMediaQuery()
   const t = useTranslations('dashboard.deliveries')
 
   return (
@@ -33,7 +31,9 @@ export default function DeliveriesPage() {
         </TabsList>
 
         <TabsContent value="scan" className="mt-6">
-          <div className="max-w-2xl mx-auto">{(isMobile || isTablet) && <ScanningInterface />}</div>
+          <div className="max-w-2xl mx-auto">
+            <ScanningInterface />
+          </div>
         </TabsContent>
 
         <TabsContent value="csv" className="mt-6">
