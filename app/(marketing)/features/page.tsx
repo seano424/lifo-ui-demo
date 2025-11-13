@@ -125,20 +125,60 @@ function MockScanning() {
             {t('scanningActive')}
           </Typography>
         </div>
-        <div className="flex flex-col gap-1">
-          <Typography
-            variant="h3"
-            className="text-xl sm:text-2xl font-bold text-secondary-900 mb-2"
-          >
-            {t('productScanned')}
-          </Typography>
-          <Typography variant="p" className="text-sm sm:text-base text-secondary-700">
-            {t('organicMilk')}
-          </Typography>
-        </div>
-        <Typography variant="p" className="text-xs sm:text-sm text-secondary-600">
-          {t('expDate')}
+
+        <Typography variant="h3" className="text-xl sm:text-2xl font-bold text-secondary-900 mb-2">
+          {t('productScanned')}
         </Typography>
+        <div className="flex flex-col gap-4">
+          <div>
+            <Typography variant="p" className="text-sm sm:text-base text-secondary-700">
+              {t('productOne')}
+            </Typography>
+            <Typography variant="p" className="text-xs sm:text-sm text-secondary-600">
+              {t('expDateOne')}
+            </Typography>
+          </div>
+          <div>
+            <Typography variant="p" className="text-sm sm:text-base text-secondary-700">
+              {t('productTwo')}
+            </Typography>
+            <Typography variant="p" className="text-xs sm:text-sm text-secondary-600">
+              {t('expDateTwo')}
+            </Typography>
+          </div>
+          <div>
+            <Typography variant="p" className="text-sm sm:text-base text-secondary-700">
+              {t('productThree')}
+            </Typography>
+            <Typography variant="p" className="text-xs sm:text-sm text-secondary-600">
+              {t('expDateThree')}
+            </Typography>
+          </div>
+          <div>
+            <Typography variant="p" className="text-sm sm:text-base text-secondary-700">
+              {t('productOne')}
+            </Typography>
+            <Typography variant="p" className="text-xs sm:text-sm text-secondary-600">
+              {t('expDateOne')}
+            </Typography>
+          </div>
+          <div>
+            <Typography variant="p" className="text-sm sm:text-base text-secondary-700">
+              {t('productFour')}
+            </Typography>
+            <Typography variant="p" className="text-xs sm:text-sm text-secondary-600">
+              {t('expDateFour')}
+            </Typography>
+          </div>
+          <div>
+            <Typography variant="p" className="text-sm sm:text-base text-secondary-700">
+              {t('productFive')}
+            </Typography>
+            <Typography variant="p" className="text-xs sm:text-sm text-secondary-600">
+              {t('expDateFive')}
+            </Typography>
+          </div>
+        </div>
       </div>
       <div className="flex items-center justify-center">
         <Smartphone size={48} className="text-primary-400" />

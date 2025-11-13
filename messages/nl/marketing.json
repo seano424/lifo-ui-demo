@@ -75,7 +75,7 @@
   "landingpage": {
     "hero": {
       "title": "Slimmere voorraad beslissingen Batch per batch",
-      "subtitle": "Verminder verspilling, optimaliseer bestellingen en verhoog uw marges met AI-gestuurde inzichten ontwikkeld voor winkelmanagers",
+      "subtitle": "Ontvang waarschuwingen over verlopen voorraad op het juiste moment, en verbind u met voedselbanken",
       "buttons": {
         "freeTrial": "Start mijn gratis proefperiode",
         "explore": "Verken het platform",
@@ -100,9 +100,9 @@
         "title": "Tijdsbesparing",
         "description": "Enorme vermindering van de tijd die wordt besteed aan handmatig ontvangstbeheer en dagelijkse voorraden."
       },
-      "errorFree": {
-        "title": "Foutloze operaties",
-        "description": "Eliminatie van menselijke fouten en administratief papierwerk."
+      "compatibility": {
+        "title": "Maximale compatibiliteit",
+        "description": "Verbind u met uw bestaande POS-systeem en ERP in enkele minuten"
       },
       "discoverButton": "Ontdek LIFO",
       "noCommitment": "Geen verplichtingen!"
@@ -114,7 +114,7 @@
       "revenue": {
         "label": "Omzetstijging",
         "description": "Gemiddelde toename in bedrijfsomzet",
-        "subtext": "Automatische kortingssuggesties om producten snel te verplaatsen voordat ze verlopen."
+        "subtext": "Kortingen en klanten aantrekken om producten snel te verplaatsen voordat ze verlopen."
       },
       "lossReduction": {
         "label": "Verliesreductie",
@@ -132,7 +132,7 @@
       "features": {
         "quickSetup": {
           "title": "Snelle installatie",
-          "description": "Direct te gebruiken oplossing binnen minuten. Geen complexe configuratie vereist."
+          "description": "Direct te gebruiken oplossing binnen minuten. We nemen de configuratie voor u over."
         },
         "freeTrial": {
           "title": "30 dagen gratis proefperiode",
@@ -149,13 +149,13 @@
       },
       "card": {
         "title": "Klaar om uw voorraadbeheer te transformeren?",
-        "description": "Word lid van LIFO om uw inventaris te optimaliseren en de winst te maximaliseren.",
+        "description": "Word lid van LIFO om uw voorraad te optimaliseren en de winst te maximaliseren.",
         "benefits": {
           "noCommitment": "Geen verplichtingen",
           "instantSetup": "Directe installatie",
           "support": "24/7 Ondersteuning"
         },
-        "button": "Meld u aan voor de wachtlijst",
+        "button": "Neem contact op met ons",
         "noCreditCard": "Geen creditcard vereist"
       }
     }
@@ -170,7 +170,7 @@
       },
       "scanning": {
         "title": "Slimme scanning",
-        "description": "Beheer moeiteloos uw voorraad met onze geavanceerde scantechnologie. Scan eenvoudig producten om voorraadniveaus bij te werken, vervaldatums te volgen en nauwkeurige records bij te houden. Werkt naadloos op elk mobiel apparaat."
+        "description": "Beheer moeiteloos uw voorraad met onze geavanceerde scantechnologie. Scan eenvoudig om voorraadniveaus bij te werken, vervaldatums te volgen en nauwkeurige records bij te houden. Werkt naadloos op elk mobiel apparaat."
       },
       "analytics": {
         "title": "Prestatie analyses",
@@ -196,8 +196,8 @@
         "description": "Bliksemsnelle verwerking en realtime updates voor naadloze operaties."
       },
       "tracking": {
-        "title": "Nauwkeurige tracking",
-        "description": "Precieze voorraadtracking met barcodescanning en geautomatiseerde updates."
+        "title": "Simpele integratie",
+        "description": "Verbind u met uw bestaande POS-systeem en ERP in enkele minuten"
       },
       "timeSaving": {
         "title": "Tijdsbesparing",
@@ -223,9 +223,17 @@
       },
       "scanning": {
         "scanningActive": "Scannen actief",
-        "productScanned": "Product gescand",
-        "organicMilk": "Biologische melk - 1L",
-        "expDate": "Verv: 15-01-2024 | Voorraad: 24 stuks"
+        "productScanned": "Gescand",
+        "productOne": "Biologische melk - 1L",
+        "expDateOne": "Verv: 15-01-2024 | Voorraad: 24 stuks",
+        "productTwo": "Vers brood - 12 stuks",
+        "expDateTwo": "Verv: 01-01-2024 | Voorraad: 12 stuks",
+        "productThree": "Griekse jogurt - 500g",
+        "expDateThree": "Verv: 05-01-2024 | Voorraad: 20 stuks",
+        "productFour": "Kipfilet - 1kg",
+        "expDateFour": "Verv: 03-01-2024 | Voorraad: 10 stuks",
+        "productFive": "Bananen - 1kg",
+        "expDateFive": "Verv: 04-01-2024 | Voorraad: 25 stuks"
       },
       "ai": {
         "title": "AI Aanbevelingen",
