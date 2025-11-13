@@ -8,6 +8,8 @@ import { logger } from '@/lib/utils/logger'
 
 interface CSVUploadResponse {
   success: boolean
+  batches_created: number
+  store_products_created: number
   processed: number
   skipped: number
   errors: string[]
@@ -262,42 +264,28 @@ export function useCSVUpload() {
       }
 
       if (dataToProcess && dataToProcess.length > 0) {
-        const today = new Date()
-        today.setHours(0, 0, 0, 0)
-        const maxPastExpiryDate = new Date(today)
-        maxPastExpiryDate.setDate(maxPastExpiryDate.getDate() - CSV_PROCESSING.MAX_DAYS_PAST_EXPIRY)
+        // Count items with/without dates (no filtering - accept all dates)
+        let itemsWithoutDates = 0
 
-        // O(n) filtering with index tracking
-        const validIndices = new Set<number>()
-        const validItems: CsvPreviewItem[] = []
-
-        dataToProcess.forEach((item, index) => {
-          if (item.Expiry_Date) {
-            const expiryDate = new Date(item.Expiry_Date)
-            if (expiryDate >= maxPastExpiryDate) {
-              validIndices.add(index)
-              validItems.push(item)
-            }
+        dataToProcess.forEach(item => {
+          if (!item.Expiry_Date || item.Expiry_Date.trim() === '') {
+            itemsWithoutDates++
           }
         })
 
-        const filteredCount = dataToProcess.length - validItems.length
-
-        if (filteredCount > 0) {
-          toast.warning(
-            `Filtered out ${filteredCount} expired items (>${CSV_PROCESSING.MAX_DAYS_PAST_EXPIRY} days past expiry)`,
-            {
-              description: `Uploading ${validItems.length} valid items with current/future expiry dates`,
-              duration: 5000,
-            },
-          )
+        // Show info about upload composition
+        if (itemsWithoutDates > 0) {
+          toast.info(`Uploading ${dataToProcess.length} items`, {
+            description: `${itemsWithoutDates} items without dates will create store products only (no batches)`,
+            duration: 4000,
+          })
         }
 
-        if (validItems.length === 0) {
-          throw new Error(
-            `All items have expired (>${CSV_PROCESSING.MAX_DAYS_PAST_EXPIRY} days past expiry). Please update expiry dates and try again.`,
-          )
-        }
+        // Use all items - no filtering based on expiry dates
+        const validItems = dataToProcess
+        const validIndices = new Set<number>(
+          Array.from({ length: dataToProcess.length }, (_, i) => i),
+        )
 
         // Validate pricing constraints before upload (prevent bypass via DevTools)
         const invalidPriceItems = validItems.filter(
@@ -426,7 +414,20 @@ export function useCSVUpload() {
       const performanceSummary =
         performanceDetails.length > 0 ? ` (${performanceDetails.join(', ')})` : ''
 
-      toast.success(`🚀 Successfully imported ${data.processed} of ${data.total_items} products`, {
+      // Build success message based on what was created
+      const batchesCreated = data.batches_created || 0
+      const storeProductsCreated = data.store_products_created || 0
+
+      let successTitle = '🚀 Successfully imported items'
+      if (batchesCreated > 0 && storeProductsCreated > 0) {
+        successTitle = `🚀 Successfully imported ${batchesCreated} batches + ${storeProductsCreated} products`
+      } else if (batchesCreated > 0) {
+        successTitle = `🚀 Successfully imported ${batchesCreated} batches`
+      } else if (storeProductsCreated > 0) {
+        successTitle = `🚀 Successfully imported ${storeProductsCreated} products`
+      }
+
+      toast.success(successTitle, {
         description:
           data.skipped > 0
             ? `${data.skipped} duplicates auto-skipped • ${speed} items/sec • ${totalTime}ms total${performanceSummary}`
@@ -436,7 +437,13 @@ export function useCSVUpload() {
     },
     onError: (error: Error) => {
       if (process.env.NODE_ENV === 'development') {
-        logger.error('csv-upload', 'Upload mutation failed', { error })
+        logger.error('csv-upload', 'Upload mutation failed', {
+          error,
+          errorMessage: error?.message,
+          errorStack: error?.stack,
+          errorType: typeof error,
+          errorKeys: error ? Object.keys(error) : [],
+        })
       }
 
       const errorMessage = error?.message || 'Unknown error occurred'

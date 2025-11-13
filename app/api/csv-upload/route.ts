@@ -190,32 +190,42 @@ export async function POST(request: NextRequest) {
     if (process.env.NODE_ENV === 'development') {
       logger.log('csv-upload', 'Backend response received', {
         success: result.success,
-        totalItems: result.data_summary?.total_items,
+        totalCsvRows: result.csv_processing?.total_csv_items,
         successfulBatches: result.batch_creation?.successful_batches,
+        successfulStoreProducts: result.store_product_creation?.successful,
+        totalItemsCreated: result.total_items_created,
       })
     }
 
     // ✅ FIX: Map backend response to frontend-expected format
-    // Backend uses different field names than frontend expects
-    const totalItems = result.data_summary?.total_items || 0
+    // Backend separates batches (with expiry) and store products (without expiry)
+    const totalCsvRows = result.csv_processing?.total_csv_items || 0
     const successfulBatches = result.batch_creation?.successful_batches || 0
+    const successfulStoreProducts = result.store_product_creation?.successful || 0
     const failedBatches = result.batch_creation?.failed_batches || 0
+    const failedStoreProducts = result.store_product_creation?.failed || 0
+
+    // Total successfully created items (batches + store products)
+    const totalProcessed = successfulBatches + successfulStoreProducts
+    const totalFailed = failedBatches + failedStoreProducts
 
     // Calculate skipped: items that weren't processed (likely duplicates)
-    // skipped = total - (successful + failed)
-    const skippedCount = Math.max(0, totalItems - successfulBatches - failedBatches)
+    const skippedCount = Math.max(0, totalCsvRows - totalProcessed - totalFailed)
 
     const normalizedResponse = {
       success: result.success,
       message: result.message,
-      processed: successfulBatches,
-      skipped: skippedCount, // ✅ Fixed: Calculate actual skipped items (duplicates)
-      total_items: totalItems,
+      processed: totalProcessed, // ✅ Total items created (batches + store products)
+      skipped: skippedCount, // ✅ Items skipped (duplicates, etc.)
+      total_items: totalCsvRows, // ✅ Total rows in CSV
       processing_time_ms: result.performance_metrics?.total_processing_ms || 0,
       errors: result.failed_items?.map((item: { error: string }) => item.error) || [],
       failed_items: result.failed_items || [],
       csv_warnings: result.csv_processing?.csv_warnings || [],
       duplicates_skipped: result.duplicates_skipped || [], // Pass through duplicate details if backend provides them
+      // ✅ NEW: Separate batch vs store product counts
+      batches_created: successfulBatches,
+      store_products_created: successfulStoreProducts,
       performance_metrics: {
         items_per_second: result.performance_metrics?.items_per_second || 0,
         duplicate_detection_ms: result.performance_metrics?.duplicate_detection_ms || 0,
@@ -229,7 +239,10 @@ export async function POST(request: NextRequest) {
 
     logger.log('csv-upload', 'CSV upload completed', {
       processed: normalizedResponse.processed,
-      failed: normalizedResponse.skipped,
+      batches: normalizedResponse.batches_created,
+      storeProducts: normalizedResponse.store_products_created,
+      failed: totalFailed,
+      skipped: normalizedResponse.skipped,
       total: normalizedResponse.total_items,
       processingTime,
     })
