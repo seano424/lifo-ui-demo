@@ -111,6 +111,34 @@ function MockDashboard() {
   )
 }
 
+// Product translation keys for type safety
+type ProductTranslationKey =
+  | 'productOne'
+  | 'productTwo'
+  | 'productThree'
+  | 'productFour'
+  | 'productFive'
+
+// Mock product data - moved outside component for performance
+const PRODUCT_MOCK_DATA: ReadonlyArray<{
+  name: ProductTranslationKey
+  daysUntilExpiry: number
+  stock: number
+}> = [
+  { name: 'productOne', daysUntilExpiry: 32, stock: 24 },
+  { name: 'productTwo', daysUntilExpiry: 7, stock: 12 },
+  { name: 'productThree', daysUntilExpiry: 22, stock: 20 },
+  { name: 'productFour', daysUntilExpiry: 12, stock: 10 },
+  { name: 'productFive', daysUntilExpiry: 18, stock: 25 },
+]
+
+// Generate dynamic expiry dates relative to today - moved outside component for performance
+const generateExpiryDate = (daysFromNow: number): string => {
+  const date = new Date()
+  date.setDate(date.getDate() + daysFromNow)
+  return date.toISOString().split('T')[0] // YYYY-MM-DD format
+}
+
 function MockScanning() {
   const t = useTranslations('featurespage.mockData.scanning')
 
@@ -125,20 +153,25 @@ function MockScanning() {
             {t('scanningActive')}
           </Typography>
         </div>
-        <div className="flex flex-col gap-1">
-          <Typography
-            variant="h3"
-            className="text-xl sm:text-2xl font-bold text-secondary-900 mb-2"
-          >
-            {t('productScanned')}
-          </Typography>
-          <Typography variant="p" className="text-sm sm:text-base text-secondary-700">
-            {t('organicMilk')}
-          </Typography>
-        </div>
-        <Typography variant="p" className="text-xs sm:text-sm text-secondary-600">
-          {t('expDate')}
+
+        <Typography variant="h3" className="text-xl sm:text-2xl font-bold text-secondary-900 mb-2">
+          {t('productScanned')}
         </Typography>
+        <ul className="flex flex-col gap-4 max-h-80 overflow-y-auto list-none p-0">
+          {PRODUCT_MOCK_DATA.map(({ name, daysUntilExpiry, stock }) => (
+            <li key={name}>
+              <Typography variant="p" className="text-sm sm:text-base text-secondary-700">
+                {t(name)}
+              </Typography>
+              <Typography variant="p" className="text-xs sm:text-sm text-secondary-600">
+                {t('expiryInfo', {
+                  date: generateExpiryDate(daysUntilExpiry),
+                  stock,
+                })}
+              </Typography>
+            </li>
+          ))}
+        </ul>
       </div>
       <div className="flex items-center justify-center">
         <Smartphone size={48} className="text-primary-400" />

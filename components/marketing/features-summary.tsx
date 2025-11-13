@@ -61,8 +61,8 @@ export function FeaturesSummary() {
 
           <Feature
             icon={<Tablet size={28} className="text-primary-900" strokeWidth={1.5} />}
-            title={t('errorFree.title')}
-            description={t('errorFree.description')}
+            title={t('compatibility.title')}
+            description={t('compatibility.description')}
           />
         </div>
 

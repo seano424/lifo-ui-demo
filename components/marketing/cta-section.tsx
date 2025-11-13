@@ -118,10 +118,6 @@ export function CtaSection() {
               <span className="text-center">{t('card.button')}</span>{' '}
               <ArrowRight size={18} className="shrink-0" />
             </Button>
-
-            <Typography variant="p" className="text-sm text-center text-secondary-900">
-              {t('card.noCreditCard')}
-            </Typography>
           </div>
         </div>
       </div>

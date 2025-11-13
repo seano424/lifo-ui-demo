@@ -75,7 +75,7 @@
   "landingpage": {
     "hero": {
       "title": "Smarter Inventory Decisions Batch by Batch",
-      "subtitle": "Reduce waste, optimize ordering, and boost your margins with AI-driven insights designed for store managers",
+      "subtitle": "Get alerts on expiring stock at the smart time, and connect with food banks",
       "buttons": {
         "freeTrial": "Start my free trial",
         "explore": "Explore the platform",
@@ -100,9 +100,9 @@
         "title": "Time Saving",
         "description": "Huge reduction in time spent on manual receipt management and daily inventories."
       },
-      "errorFree": {
-        "title": "Error-Free Operations",
-        "description": "Elimination of human errors and administrative paperwork."
+      "compatibility": {
+        "title": "Maximal Compatibility",
+        "description": "Connect with your existing POS system and ERP in minutes"
       },
       "discoverButton": "Discover LIFO",
       "noCommitment": "No commitment!"
@@ -114,7 +114,7 @@
       "revenue": {
         "label": "Revenue Increase",
         "description": "Average increase in business revenue",
-        "subtext": "Automatic discount suggestions to help move products quickly before they expire."
+        "subtext": "Discount and attract customers to help move products quickly before they expire."
       },
       "lossReduction": {
         "label": "Loss Reduction",
@@ -132,7 +132,7 @@
       "features": {
         "quickSetup": {
           "title": "Quick Setup",
-          "description": "Ready-to-use solution in minutes. No complex configuration required."
+          "description": "Ready-to-use solution in minutes. We take care of the configuration for you."
         },
         "freeTrial": {
           "title": "30-day Free Trial",
@@ -149,14 +149,13 @@
       },
       "card": {
         "title": "Ready to transform your inventory management?",
-        "description": "Join LIFO to optimize your inventory and maximize profits.",
+        "description": "Join LIFO to become more resilient and join other stores implementing smart inventory management practices.",
         "benefits": {
           "noCommitment": "No commitment",
           "instantSetup": "Instant setup",
           "support": "24/7 Support"
         },
-        "button": "Join the waitlist",
-        "noCreditCard": "No credit card required"
+        "button": "Contact us now"
       }
     }
   },
@@ -170,7 +169,7 @@
       },
       "scanning": {
         "title": "Smart Scanning",
-        "description": "Effortlessly manage your inventory with our advanced scanning technology. Simply scan products to update stock levels, track expiration dates, and maintain accurate records. Works seamlessly on any mobile device."
+        "description": "Effortlessly manage your inventory with our advanced scanning technology. Simply scan to update stock levels, track expiration dates, and maintain accurate records. Works seamlessly on any mobile device."
       },
       "analytics": {
         "title": "Performance Analytics",
@@ -196,8 +195,8 @@
         "description": "Lightning-fast processing and real-time updates for seamless operations."
       },
       "tracking": {
-        "title": "Accurate Tracking",
-        "description": "Precise inventory tracking with barcode scanning and automated updates."
+        "title": "Simple Integration",
+        "description": "Connect with your existing POS system and ERP in minutes"
       },
       "timeSaving": {
         "title": "Time Savings",
@@ -223,9 +222,13 @@
       },
       "scanning": {
         "scanningActive": "Scanning Active",
-        "productScanned": "Product Scanned",
-        "organicMilk": "Organic Milk - 1L",
-        "expDate": "Exp: 2024-01-15 | Stock: 24 units"
+        "productScanned": "Scanned",
+        "productOne": "Organic Milk - 1L",
+        "productTwo": "Fresh Bread Loaf",
+        "productThree": "Greek Yogurt - 500g",
+        "productFour": "Chicken Breast - 1kg",
+        "productFive": "Bananas - 1kg",
+        "expiryInfo": "Exp: {date} | Stock: {stock} units"
       },
       "ai": {
         "title": "AI Recommendations",

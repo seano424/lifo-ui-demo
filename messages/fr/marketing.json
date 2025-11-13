@@ -75,7 +75,7 @@
   "landingpage": {
     "hero": {
       "title": "La gestion de stocks plus intelligente Lot par lot",
-      "subtitle": "Réduisez le gaspillage, optimisez vos commandes et augmentez vos marges grâce aux aperçus IA pour la gestion de stocks",
+      "subtitle": "Obtenez des alertes sur les stocks expirents au bon moment, et connectez-vous avec des banques alimentaires",
       "buttons": {
         "freeTrial": "Démarrer mon essai gratuit",
         "explore": "Explorer la plateforme",
@@ -100,9 +100,9 @@
         "title": "Gain de temps",
         "description": "Réduction énorme du temps consacré à la gestion manuelle des reçus et aux inventaires quotidiens."
       },
-      "errorFree": {
-        "title": "Opérations sans erreur",
-        "description": "Élimination des erreurs humaines et des tâches administratives."
+      "compatibility": {
+        "title": "Compatibilité maximale",
+        "description": "Connectez-vous avec votre système de point de vente et votre ERP en quelques minutes"
       },
       "discoverButton": "Découvrir LIFO",
       "noCommitment": "Sans engagement !"
@@ -114,7 +114,7 @@
       "revenue": {
         "label": "Augmentation des revenus",
         "description": "Augmentation moyenne des revenus commerciaux",
-        "subtext": "Suggestions automatiques de remises pour écouler rapidement les produits avant leur expiration."
+        "subtext": "Remises et attirance des clients pour écouler rapidement les produits avant leur expiration."
       },
       "lossReduction": {
         "label": "Réduction des pertes",
@@ -132,7 +132,7 @@
       "features": {
         "quickSetup": {
           "title": "Installation rapide",
-          "description": "Solution prête à l'emploi en quelques minutes. Aucune configuration complexe requise."
+          "description": "Solution prête à l'emploi en quelques minutes. Nous nous occupons de la configuration pour vous."
         },
         "freeTrial": {
           "title": "Essai gratuit de 30 jours",
@@ -149,14 +149,13 @@
       },
       "card": {
         "title": "Prêt à transformer votre gestion de stock ?",
-        "description": "Rejoignez LIFO pour optimiser votre inventaire et maximiser vos profits.",
+        "description": "Rejoignez LIFO pour devenir plus résilient et rejoindre d'autres magasins implémentant des pratiques de gestion de stock intelligentes.",
         "benefits": {
           "noCommitment": "Sans engagement",
           "instantSetup": "Installation instantanée",
           "support": "Support 24/7"
         },
-        "button": "Rejoindre la liste d'attente",
-        "noCreditCard": "Aucune carte de crédit requise"
+        "button": "Contactez-nous maintenant"
       }
     }
   },
@@ -170,7 +169,7 @@
       },
       "scanning": {
         "title": "Scan intelligent",
-        "description": "Gérez facilement votre inventaire avec notre technologie de scan avancée. Scannez simplement les produits pour mettre à jour les niveaux de stock, suivre les dates d'expiration et maintenir des enregistrements précis. Fonctionne parfaitement sur tout appareil mobile."
+        "description": "Gérez facilement votre inventaire avec notre technologie de scan avancée. Scannez simplement pour mettre à jour les niveaux de stock, suivre les dates d'expiration et maintenir des enregistrements précis. Fonctionne parfaitement sur tout appareil mobile."
       },
       "analytics": {
         "title": "Analyses de performance",
@@ -196,8 +195,8 @@
         "description": "Traitement ultra-rapide et mises à jour en temps réel pour des opérations fluides."
       },
       "tracking": {
-        "title": "Suivi précis",
-        "description": "Suivi d'inventaire précis avec scan de codes-barres et mises à jour automatisées."
+        "title": "Intégration simple",
+        "description": "Connectez-vous avec votre système de point de vente et votre ERP en quelques minutes"
       },
       "timeSaving": {
         "title": "Gain de temps",
@@ -223,9 +222,13 @@
       },
       "scanning": {
         "scanningActive": "Scan actif",
-        "productScanned": "Produit scanné",
-        "organicMilk": "Lait bio - 1L",
-        "expDate": "Exp: 15/01/2024 | Stock: 24 unités"
+        "productScanned": "Scanné",
+        "productOne": "Lait bio - 1L",
+        "productTwo": "Pain frais",
+        "productThree": "Yaourt grec - 500g",
+        "productFour": "Blanc de poulet - 1kg",
+        "productFive": "Bananes - 1kg",
+        "expiryInfo": "Exp: {date} | Stock: {stock} unités"
       },
       "ai": {
         "title": "Recommandations IA",
