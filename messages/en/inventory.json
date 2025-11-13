@@ -81,6 +81,32 @@
       "enterNewPrice": "Enter new price:"
     }
   },
+  "batchSort": {
+    "sortBy": "Sort by",
+    "createdDate": "Created Date",
+    "expiryDate": "Expiry Date",
+    "batchNumber": "Batch Number",
+    "productName": "Product Name",
+    "stockLevel": "Stock Level",
+    "costPrice": "Cost Price",
+    "sellingPrice": "Selling Price",
+    "status": "Status",
+    "asc": "Ascending",
+    "desc": "Descending"
+  },
+  "batchFilters": {
+    "expiryFilter": "Expiry Filter",
+    "allItems": "All Items",
+    "expiringInDays": "Expiring in {days} days",
+    "status": "Status",
+    "allStatuses": "All Statuses",
+    "active": "Active",
+    "expired": "Expired",
+    "damaged": "Damaged",
+    "soldOut": "Sold Out",
+    "reserved": "Reserved",
+    "itemCount": "{count} items"
+  },
   "batches": {
     "table": {
       "headers": {
