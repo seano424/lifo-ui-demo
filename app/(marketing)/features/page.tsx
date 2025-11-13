@@ -114,12 +114,19 @@ function MockDashboard() {
 function MockScanning() {
   const t = useTranslations('featurespage.mockData.scanning')
 
+  // Generate dynamic expiry dates relative to today
+  const generateExpiryDate = (daysFromNow: number) => {
+    const date = new Date()
+    date.setDate(date.getDate() + daysFromNow)
+    return date.toISOString().split('T')[0] // YYYY-MM-DD format
+  }
+
   const products = [
-    { name: 'productOne', expDate: 'expDateOne' },
-    { name: 'productTwo', expDate: 'expDateTwo' },
-    { name: 'productThree', expDate: 'expDateThree' },
-    { name: 'productFour', expDate: 'expDateFour' },
-    { name: 'productFive', expDate: 'expDateFive' },
+    { name: 'productOne', daysUntilExpiry: 32, stock: 24 },
+    { name: 'productTwo', daysUntilExpiry: 7, stock: 12 },
+    { name: 'productThree', daysUntilExpiry: 22, stock: 20 },
+    { name: 'productFour', daysUntilExpiry: 12, stock: 10 },
+    { name: 'productFive', daysUntilExpiry: 18, stock: 25 },
   ] as const
 
   return (
@@ -138,13 +145,16 @@ function MockScanning() {
           {t('productScanned')}
         </Typography>
         <div className="flex flex-col gap-4 max-h-80 overflow-y-auto">
-          {products.map(({ name, expDate }) => (
+          {products.map(({ name, daysUntilExpiry, stock }) => (
             <div key={name}>
               <Typography variant="p" className="text-sm sm:text-base text-secondary-700">
                 {t(name)}
               </Typography>
               <Typography variant="p" className="text-xs sm:text-sm text-secondary-600">
-                {t(expDate)}
+                {t('expiryInfo', {
+                  date: generateExpiryDate(daysUntilExpiry),
+                  stock,
+                })}
               </Typography>
             </div>
           ))}

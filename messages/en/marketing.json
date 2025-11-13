@@ -224,15 +224,11 @@
         "scanningActive": "Scanning Active",
         "productScanned": "Scanned",
         "productOne": "Organic Milk - 1L",
-        "expDateOne": "Exp: 2025-12-15 | Stock: 24 units",
         "productTwo": "Fresh Bread Loaf",
-        "expDateTwo": "Exp: 2025-11-20 | Stock: 12 units",
         "productThree": "Greek Yogurt - 500g",
-        "expDateThree": "Exp: 2025-12-05 | Stock: 20 units",
         "productFour": "Chicken Breast - 1kg",
-        "expDateFour": "Exp: 2025-11-25 | Stock: 10 units",
         "productFive": "Bananas - 1kg",
-        "expDateFive": "Exp: 2025-12-01 | Stock: 25 units"
+        "expiryInfo": "Exp: {date} | Stock: {stock} units"
       },
       "ai": {
         "title": "AI Recommendations",

@@ -224,15 +224,11 @@
         "scanningActive": "Scan actif",
         "productScanned": "Scanné",
         "productOne": "Lait bio - 1L",
-        "expDateOne": "Exp: 15/12/2025 | Stock: 24 unités",
-        "productTwo": "Pain frais - 12 unités",
-        "expDateTwo": "Exp: 20/11/2025 | Stock: 12 unités",
+        "productTwo": "Pain frais",
         "productThree": "Yaourt grec - 500g",
-        "expDateThree": "Exp: 05/12/2025 | Stock: 20 unités",
         "productFour": "Cordon bleu - 1kg",
-        "expDateFour": "Exp: 25/11/2025 | Stock: 10 unités",
         "productFive": "Bananes - 1kg",
-        "expDateFive": "Exp: 01/12/2025 | Stock: 25 unités"
+        "expiryInfo": "Exp: {date} | Stock: {stock} unités"
       },
       "ai": {
         "title": "Recommandations IA",

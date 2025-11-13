@@ -224,15 +224,11 @@
         "scanningActive": "Scannen actief",
         "productScanned": "Gescand",
         "productOne": "Biologische melk - 1L",
-        "expDateOne": "Verv: 15-12-2025 | Voorraad: 24 stuks",
-        "productTwo": "Vers brood - 12 stuks",
-        "expDateTwo": "Verv: 20-11-2025 | Voorraad: 12 stuks",
+        "productTwo": "Vers brood",
         "productThree": "Griekse jogurt - 500g",
-        "expDateThree": "Verv: 05-12-2025 | Voorraad: 20 stuks",
         "productFour": "Kipfilet - 1kg",
-        "expDateFour": "Verv: 25-11-2025 | Voorraad: 10 stuks",
         "productFive": "Bananen - 1kg",
-        "expDateFive": "Verv: 01-12-2025 | Voorraad: 25 stuks"
+        "expiryInfo": "Verv: {date} | Voorraad: {stock} stuks"
       },
       "ai": {
         "title": "AI Aanbevelingen",
