@@ -16,6 +16,7 @@ export interface FrameAnalysis {
   // Date-specific detection
   hasDatePattern: boolean
   datePatternConfidence: number
+  hasDateContext: boolean // New: detects date-related keywords
 
   // Barcode detection
   isBarcodeDetected: boolean
@@ -37,6 +38,7 @@ export interface FrameAnalysis {
     edgePercentage: number
     numberLikeShapes: number
     hasSeparators: boolean
+    dateContextDetected: boolean // New: date keyword detection
     horizontalPatterns: boolean
     verticalLineCount: number
     hasVerticalPattern: boolean
@@ -96,18 +98,30 @@ export function analyzeFrame(
 
   const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
 
+  // Convert to binary for date context detection
+  const binary = toBinaryImage(imageData, OCR_DEFAULTS.FRAME_ANALYSIS.BINARY_THRESHOLD)
+
   // Run all detections
   const textDetection = detectTextLikeContent(imageData)
   const barcodeDetection = detectBarcode(imageData)
-  const dateDetection = detectDatePattern(imageData, barcodeDetection.isBarcode)
+  const dateContextDetection = detectDateContextKeywords(binary, imageData)
+  const dateDetection = detectDatePattern(
+    imageData,
+    barcodeDetection.isBarcode,
+    dateContextDetection,
+  )
   const quality = analyzeImageQuality(imageData)
 
   // Calculate overall score (weighted combination)
+  // Date context boosts overall score when detected
+  const dateContextBoost = dateContextDetection.hasDateContext ? 0.1 : 0
   const overallScore =
-    textDetection.confidence * 0.3 + // 30% weight on text
+    textDetection.confidence * 0.25 + // 25% weight on text
     dateDetection.confidence * 0.4 + // 40% weight on date patterns
     quality.sharpness * 0.15 + // 15% weight on sharpness
-    quality.contrast * 0.15 // 15% weight on contrast
+    quality.contrast * 0.1 + // 10% weight on contrast
+    dateContextDetection.confidence * 0.1 + // 10% weight on date context
+    dateContextBoost // Bonus when date context detected
 
   // Determine if we should trigger OCR
   // IMPORTANT: Skip OCR if barcode is detected (wrong scanner mode!)
@@ -126,6 +140,7 @@ export function analyzeFrame(
     textConfidence: textDetection.confidence,
     hasDatePattern: dateDetection.hasDatePattern,
     datePatternConfidence: dateDetection.confidence,
+    hasDateContext: dateContextDetection.hasDateContext,
     isBarcodeDetected: barcodeDetection.isBarcode,
     barcodeConfidence: barcodeDetection.confidence,
     brightness: quality.brightness,
@@ -142,6 +157,7 @@ export function analyzeFrame(
       edgePercentage: textDetection.debugInfo?.edgePercentage || 0,
       numberLikeShapes: dateDetection.debugInfo?.numberLikeShapes || 0,
       hasSeparators: dateDetection.debugInfo?.hasSeparators || false,
+      dateContextDetected: dateContextDetection.hasDateContext,
       horizontalPatterns: textDetection.debugInfo?.horizontalPatterns || false,
       verticalLineCount: barcodeDetection.debugInfo?.verticalLineCount || 0,
       hasVerticalPattern: barcodeDetection.debugInfo?.hasVerticalPattern || false,
@@ -266,11 +282,12 @@ function detectBarcode(imageData: ImageData): {
 
 /**
  * Detect date-like patterns in the image
- * Now with barcode filtering - if barcode detected, reduce date confidence
+ * Now with barcode filtering and date context boosting
  */
 function detectDatePattern(
   imageData: ImageData,
   isBarcodeDetected: boolean,
+  dateContextDetection: { hasDateContext: boolean; confidence: number },
 ): {
   hasDatePattern: boolean
   confidence: number
@@ -352,6 +369,20 @@ function detectDatePattern(
   // Barcode digits at bottom are NOT expiry dates!
   if (isBarcodeDetected) {
     confidence *= 0.1 // Reduce to 10% if barcode detected
+  }
+
+  // BOOST: If date context keywords detected (EXP, BBD, etc.), boost confidence
+  // This helps catch dates that might be missed due to poor quality
+  if (dateContextDetection.hasDateContext && confidence > 0) {
+    // Boost by 20-40% depending on date context confidence
+    const boost = dateContextDetection.confidence * 0.4
+    confidence = Math.min(confidence + boost, 1.0)
+
+    logger.log('FrameAnalyzer', 'Date context boost applied', {
+      originalConfidence: (confidence - boost).toFixed(3),
+      boost: boost.toFixed(3),
+      finalConfidence: confidence.toFixed(3),
+    })
   }
 
   return {
@@ -683,6 +714,101 @@ function detectSeparatorPatterns(
 }
 
 /**
+ * Detect date-related context keywords (EXP, BBD, Best Before, etc.)
+ * This helps boost confidence when date-related text is detected near numbers
+ * Supports multiple European languages
+ */
+function detectDateContextKeywords(
+  binary: Uint8ClampedArray,
+  imageData: ImageData,
+): {
+  hasDateContext: boolean
+  confidence: number
+} {
+  const { width, height } = imageData
+
+  // Find connected components (potential letters/words)
+  const components = findConnectedComponents(binary, width, height)
+
+  // Look for patterns that might indicate date keywords
+  // Date keywords are typically:
+  // - Wider than tall (letters like E, X, P are wider than numbers)
+  // - Clustered horizontally (words)
+  // - Medium sized (not tiny noise, not huge logos)
+
+  // Filter for letter-like shapes (wider than tall, unlike numbers)
+  const letterLikeShapes = components.filter(c => {
+    const ratio = c.width / c.height
+    const isLetterSized = c.width >= 5 && c.height >= 8 && c.width <= 100 && c.height <= 60
+    const isLetterRatio = ratio >= 0.4 && ratio <= 2.5 // Letters can be wide (M, W) or tall (I, l)
+    const isSaneSize = c.pixelCount >= 30 && c.pixelCount <= 3000
+    return isLetterSized && isLetterRatio && isSaneSize
+  })
+
+  if (letterLikeShapes.length === 0) {
+    return { hasDateContext: false, confidence: 0 }
+  }
+
+  // Look for horizontal clusters of letters (words)
+  // Date keywords like "EXP", "BBD", "BEST BEFORE" appear as horizontal clusters
+  let horizontalClusters = 0
+  let dateKeywordPatterns = 0
+
+  for (let i = 0; i < letterLikeShapes.length; i++) {
+    const shape1 = letterLikeShapes[i]
+
+    // Look for nearby shapes on the same horizontal line
+    const nearbyShapes = letterLikeShapes.filter((shape2, j) => {
+      if (i === j) return false
+
+      // Check if shapes are on similar Y position (same line)
+      const yDiff = Math.abs(shape1.y - shape2.y)
+      const avgHeight = (shape1.height + shape2.height) / 2
+      const onSameLine = yDiff < avgHeight * 0.5
+
+      // Check if shapes are horizontally close
+      const xDist = Math.abs(shape1.x - shape2.x)
+      const isNearby = xDist < width * 0.2 // Within 20% of image width
+
+      return onSameLine && isNearby
+    })
+
+    if (nearbyShapes.length >= 2) {
+      horizontalClusters++
+
+      // Check if this cluster might be a date keyword
+      // EXP: 3 shapes (E, X, P)
+      // BBD: 3 shapes (B, B, D)
+      // Common pattern: 2-6 letters in a row
+      if (nearbyShapes.length >= 1 && nearbyShapes.length <= 5) {
+        dateKeywordPatterns++
+      }
+    }
+  }
+
+  // Detect specific patterns that indicate date context
+  // Look for:
+  // 1. Small clusters of wide shapes (EXP, BBD)
+  // 2. Longer words near numbers (BEST BEFORE, USE BY)
+  const hasDateContext = horizontalClusters >= 1 || dateKeywordPatterns >= 1
+
+  // Calculate confidence based on patterns found
+  let confidence = 0
+  if (dateKeywordPatterns > 0) {
+    // Strong signal: specific patterns detected
+    confidence = Math.min(dateKeywordPatterns * 0.4 + 0.2, 1.0)
+  } else if (horizontalClusters > 0) {
+    // Moderate signal: horizontal text clusters (might be date context)
+    confidence = Math.min(horizontalClusters * 0.3, 0.6)
+  }
+
+  return {
+    hasDateContext,
+    confidence,
+  }
+}
+
+/**
  * Calculate Laplacian variance (blur detection)
  * Higher variance = sharper image
  */
@@ -732,6 +858,7 @@ function createEmptyAnalysis(): FrameAnalysis {
     textConfidence: 0,
     hasDatePattern: false,
     datePatternConfidence: 0,
+    hasDateContext: false,
     isBarcodeDetected: false,
     barcodeConfidence: 0,
     brightness: 0,

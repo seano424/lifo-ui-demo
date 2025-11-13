@@ -103,7 +103,12 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
 
       if (expiryInfo.extractedDate) {
         const formattedDate = expiryInfo.extractedDate.split('T')[0]
-        setInventoryData(prev => ({ ...prev, expiryDate: formattedDate }))
+        setInventoryData(prev => ({
+          ...prev,
+          expiryDate: formattedDate,
+          // Set batch number if detected
+          ...(expiryInfo?.batchNumber && { batchNumber: expiryInfo?.batchNumber }),
+        }))
         setOcrError(null)
       }
     },
@@ -180,7 +185,12 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
         setUIStep('camera-expiry')
         if (expiryInfo?.extractedDate) {
           const formattedDate = expiryInfo.extractedDate.split('T')[0]
-          setInventoryData(prev => ({ ...prev, expiryDate: formattedDate }))
+          setInventoryData(prev => ({
+            ...prev,
+            expiryDate: formattedDate,
+            // Set batch number if detected
+            ...(expiryInfo?.batchNumber && { batchNumber: expiryInfo?.batchNumber }),
+          }))
         }
         break
       case 'complete':
@@ -303,8 +313,16 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
           logger.log('StandaloneScanningInterface', 'Formatted expiry date', {
             original: result.expiryDateInfo.extractedDate,
             formatted: formattedDate,
+            batchNumber: result.expiryDateInfo.batchNumber,
           })
-          setInventoryData(prev => ({ ...prev, expiryDate: formattedDate }))
+          setInventoryData(prev => ({
+            ...prev,
+            expiryDate: formattedDate,
+            // Set batch number if detected
+            ...(result.expiryDateInfo?.batchNumber && {
+              batchNumber: result.expiryDateInfo?.batchNumber,
+            }),
+          }))
           setDetectedText(null)
           setOcrError(null)
         } else if (

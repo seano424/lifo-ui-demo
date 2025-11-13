@@ -323,16 +323,17 @@ export function useAutoOCRScanner(options: AutoOCRScannerOptions): AutoOCRScanne
       const imageBlob = await captureImageFromVideo(videoElement)
 
       // Log API call
-      ocrDebugLogger.logAPICall('/api/v1/ocr/scan/ocr-expiry', 'POST', {
+      ocrDebugLogger.logAPICall('/api/v1/ocr/scan/full-ocr', 'POST', {
         imageSizeKB: (imageBlob.size / 1024).toFixed(1),
         confidenceThreshold: ocrConfidenceThreshold,
         attemptNumber: currentAttempt,
       })
 
-      // Process with OCR
+      // Process with OCR (use full analysis to get batch numbers)
       const result = await processExpiryDate(imageBlob, storeId, {
         confidenceThreshold: ocrConfidenceThreshold,
         maxProcessingTimeMs: 5000,
+        useFullAnalysis: true, // Enable batch number detection
       })
 
       const apiDuration = performance.now() - apiStartTime
@@ -352,7 +353,7 @@ export function useAutoOCRScanner(options: AutoOCRScannerOptions): AutoOCRScanne
         rateLimitPausedUntilRef.current = 0
 
         ocrDebugLogger.logAPISuccess(
-          '/api/v1/ocr/scan/ocr-expiry',
+          '/api/v1/ocr/scan/full-ocr',
           {
             extractedDate: result.expiryDateInfo.extractedDate,
             confidence: result.expiryDateInfo.confidence,
@@ -380,7 +381,7 @@ export function useAutoOCRScanner(options: AutoOCRScannerOptions): AutoOCRScanne
       } else {
         // OCR didn't find a date
         ocrDebugLogger.logAPISuccess(
-          '/api/v1/ocr/scan/ocr-expiry',
+          '/api/v1/ocr/scan/full-ocr',
           {
             noDateFound: true,
             rawOcrText: result.expiryDateInfo?.rawOcrText || 'none',

@@ -4,44 +4,7 @@
  */
 
 import type { ExpiryDateInfo } from '@/lib/stores/scanning-workflow-store'
-import { createClient } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
-
-// Environment variables
-const FASTAPI_URL = process.env.NEXT_PUBLIC_FASTAPI_URL
-
-/**
- * Validate that the FastAPI URL is configured
- */
-function validateFastApiUrl(): string {
-  if (!FASTAPI_URL) {
-    throw new Error('NEXT_PUBLIC_FASTAPI_URL is not configured. Please check your .env.local file.')
-  }
-  return FASTAPI_URL
-}
-
-/**
- * Get authentication headers for FastAPI requests
- */
-async function getAuthHeaders(): Promise<Record<string, string>> {
-  const supabase = createClient()
-  const {
-    data: { session },
-    error,
-  } = await supabase.auth.getSession()
-
-  if (error || !session?.access_token) {
-    throw new Error('Not authenticated - please log in')
-  }
-
-  // Get publishable key from environment
-  const publishableKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-  return {
-    Authorization: `Bearer ${session.access_token}`,
-    ...(publishableKey && { apikey: publishableKey }), // Add apikey header for new Supabase API keys
-  }
-}
 
 export interface OCRUploadResponse {
   success: boolean
@@ -60,6 +23,15 @@ export interface OCRFullAnalysisResponse {
   suggested_name?: string
   expiry_date?: string
   manufacture_date?: string
+  // Batch number detection (NEW)
+  batch_number?: string
+  batch_confidence?: number
+  batch_metadata?: {
+    format_detected?: string
+    proximity_to_expiry_px?: number
+    bounding_box?: Record<string, number>
+    total_candidates?: number
+  }
   raw_text_blocks: string[]
   confidence_scores: {
     overall: number
@@ -145,10 +117,6 @@ export async function extractExpiryDate(
   })
 
   try {
-    // Validate API URL is configured
-    const apiUrl = validateFastApiUrl()
-    logger.log('OCRClient', 'FastAPI URL validated', { apiUrl })
-
     // Prepare form data
     const formData = new FormData()
     formData.append('image', imageBlob, 'expiry-scan.jpg')
@@ -167,16 +135,9 @@ export async function extractExpiryDate(
       maxProcessingTimeMs: options?.maxProcessingTimeMs,
     })
 
-    // Get auth headers
-    logger.log('OCRClient', 'Getting auth headers...')
-    const authHeaders = await getAuthHeaders()
-    logger.log('OCRClient', 'Auth headers obtained', {
-      hasAuthorization: !!authHeaders.Authorization,
-    })
-
-    // Make API call
-    const endpoint = `${apiUrl}/api/v1/ocr/scan/ocr-expiry/${storeId}`
-    logger.log('OCRClient', 'Making API call to FastAPI', {
+    // Make API call via Next.js proxy route (handles auth and CSP)
+    const endpoint = `/api/ocr/scan/ocr-expiry/${storeId}`
+    logger.log('OCRClient', 'Making API call to Next.js proxy', {
       endpoint,
       method: 'POST',
     })
@@ -184,10 +145,7 @@ export async function extractExpiryDate(
     const response = await fetch(endpoint, {
       method: 'POST',
       body: formData,
-      headers: {
-        ...authHeaders,
-        // Don't set Content-Type - let browser set it with boundary for FormData
-      },
+      // Don't set Content-Type - let browser set it with boundary for FormData
     })
 
     logger.log('OCRClient', 'API response received', {
@@ -316,9 +274,6 @@ export async function performFullOCRAnalysis(
   const startTime = Date.now()
 
   try {
-    // Validate API URL is configured
-    const apiUrl = validateFastApiUrl()
-
     // Prepare form data
     const formData = new FormData()
     formData.append('image', imageBlob, 'full-ocr-scan.jpg')
@@ -331,16 +286,10 @@ export async function performFullOCRAnalysis(
       formData.append('max_processing_time_ms', options.maxProcessingTimeMs.toString())
     }
 
-    // Get auth headers
-    const authHeaders = await getAuthHeaders()
-
-    // Make API call
-    const response = await fetch(`${apiUrl}/api/v1/ocr/scan/full-ocr/${storeId}`, {
+    // Make API call via Next.js proxy route (handles auth and CSP)
+    const response = await fetch(`/api/ocr/scan/full-ocr/${storeId}`, {
       method: 'POST',
       body: formData,
-      headers: {
-        ...authHeaders,
-      },
     })
 
     if (!response.ok) {
@@ -358,6 +307,10 @@ export async function performFullOCRAnalysis(
       isManual: false,
       rawOcrText: data.raw_text_blocks.join(' '),
       processingTime,
+      // Batch number fields (NEW)
+      batchNumber: data.batch_number,
+      batchConfidence: data.batch_confidence,
+      batchFormat: data.batch_metadata?.format_detected,
     }
 
     const additionalData = {
@@ -411,22 +364,14 @@ export async function extractTextOnly(
   const startTime = Date.now()
 
   try {
-    // Validate API URL is configured
-    const apiUrl = validateFastApiUrl()
-
     const formData = new FormData()
     formData.append('image', imageBlob, 'text-extraction.jpg')
     formData.append('confidence_threshold', confidenceThreshold.toString())
 
-    // Get auth headers
-    const authHeaders = await getAuthHeaders()
-
-    const response = await fetch(`${apiUrl}/api/v1/ocr/scan/text-extraction/${storeId}`, {
+    // Make API call via Next.js proxy route (handles auth and CSP)
+    const response = await fetch(`/api/ocr/scan/text-extraction/${storeId}`, {
       method: 'POST',
       body: formData,
-      headers: {
-        ...authHeaders,
-      },
     })
 
     if (!response.ok) {

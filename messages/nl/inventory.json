@@ -288,6 +288,7 @@
       "expiryDate": "Vervaldatum",
       "quantity": "Hoeveelheid",
       "pricePerUnit": "Prijs per eenheid (€)",
+      "batchNumber": "Batch/Lotnummer",
       "editableNote": "(bewerkbaar)"
     },
     "buttons": {

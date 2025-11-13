@@ -55,6 +55,10 @@ export interface ExpiryDateInfo {
   isManual?: boolean
   rawOcrText?: string
   processingTime?: number
+  // Batch number detection (NEW)
+  batchNumber?: string
+  batchConfidence?: number
+  batchFormat?: string // Pattern format detected (e.g., 'lot_prefix', 'l_prefix')
 }
 
 export interface BatchData {

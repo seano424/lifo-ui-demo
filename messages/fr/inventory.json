@@ -288,6 +288,7 @@
       "expiryDate": "Date d'expiration",
       "quantity": "Quantité",
       "pricePerUnit": "Prix par unité (€)",
+      "batchNumber": "Numéro de lot",
       "editableNote": "(modifiable)"
     },
     "buttons": {

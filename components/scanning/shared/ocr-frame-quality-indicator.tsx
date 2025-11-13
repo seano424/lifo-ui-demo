@@ -81,6 +81,17 @@ export default function OCRFrameQualityIndicator({
           confidence={analysis.datePatternConfidence}
         />
 
+        {/* Date Context (EXP, BBD keywords) */}
+        {analysis.hasDateContext && (
+          <QualityIndicator
+            label={t('ocrFrameQuality.dateContext', {
+              defaultValue: 'Date label found',
+            })}
+            isGood={analysis.hasDateContext}
+            confidence={1.0}
+          />
+        )}
+
         {/* Lighting */}
         <QualityIndicator
           label={t('ocrFrameQuality.lighting', {
@@ -112,6 +123,7 @@ export default function OCRFrameQualityIndicator({
         <div className="font-semibold opacity-80 mb-1">Frame Analysis:</div>
         <div>textConfidence: {analysis.textConfidence.toFixed(4)}</div>
         <div>datePatternConfidence: {analysis.datePatternConfidence.toFixed(4)}</div>
+        <div>hasDateContext: {analysis.hasDateContext ? 'true' : 'false'}</div>
         <div>overallScore: {analysis.overallScore.toFixed(4)}</div>
         <div>shouldTriggerOCR: {analysis.shouldTriggerOCR ? 'true' : 'false'}</div>
       </div>
