@@ -114,6 +114,14 @@ function MockDashboard() {
 function MockScanning() {
   const t = useTranslations('featurespage.mockData.scanning')
 
+  const products = [
+    { name: 'productOne', expDate: 'expDateOne' },
+    { name: 'productTwo', expDate: 'expDateTwo' },
+    { name: 'productThree', expDate: 'expDateThree' },
+    { name: 'productFour', expDate: 'expDateFour' },
+    { name: 'productFive', expDate: 'expDateFive' },
+  ] as const
+
   return (
     <div className="w-full space-y-4 flex flex-col items-center">
       <div className="bg-gradient-to-br from-secondary-50 to-primary-50 rounded-2xl p-4 sm:p-6 border border-secondary-100 w-full max-w-sm">
@@ -130,54 +138,16 @@ function MockScanning() {
           {t('productScanned')}
         </Typography>
         <div className="flex flex-col gap-4">
-          <div>
-            <Typography variant="p" className="text-sm sm:text-base text-secondary-700">
-              {t('productOne')}
-            </Typography>
-            <Typography variant="p" className="text-xs sm:text-sm text-secondary-600">
-              {t('expDateOne')}
-            </Typography>
-          </div>
-          <div>
-            <Typography variant="p" className="text-sm sm:text-base text-secondary-700">
-              {t('productTwo')}
-            </Typography>
-            <Typography variant="p" className="text-xs sm:text-sm text-secondary-600">
-              {t('expDateTwo')}
-            </Typography>
-          </div>
-          <div>
-            <Typography variant="p" className="text-sm sm:text-base text-secondary-700">
-              {t('productThree')}
-            </Typography>
-            <Typography variant="p" className="text-xs sm:text-sm text-secondary-600">
-              {t('expDateThree')}
-            </Typography>
-          </div>
-          <div>
-            <Typography variant="p" className="text-sm sm:text-base text-secondary-700">
-              {t('productOne')}
-            </Typography>
-            <Typography variant="p" className="text-xs sm:text-sm text-secondary-600">
-              {t('expDateOne')}
-            </Typography>
-          </div>
-          <div>
-            <Typography variant="p" className="text-sm sm:text-base text-secondary-700">
-              {t('productFour')}
-            </Typography>
-            <Typography variant="p" className="text-xs sm:text-sm text-secondary-600">
-              {t('expDateFour')}
-            </Typography>
-          </div>
-          <div>
-            <Typography variant="p" className="text-sm sm:text-base text-secondary-700">
-              {t('productFive')}
-            </Typography>
-            <Typography variant="p" className="text-xs sm:text-sm text-secondary-600">
-              {t('expDateFive')}
-            </Typography>
-          </div>
+          {products.map(({ name, expDate }) => (
+            <div key={name}>
+              <Typography variant="p" className="text-sm sm:text-base text-secondary-700">
+                {t(name)}
+              </Typography>
+              <Typography variant="p" className="text-xs sm:text-sm text-secondary-600">
+                {t(expDate)}
+              </Typography>
+            </div>
+          ))}
         </div>
       </div>
       <div className="flex items-center justify-center">
