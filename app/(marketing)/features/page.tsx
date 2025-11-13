@@ -137,7 +137,7 @@ function MockScanning() {
         <Typography variant="h3" className="text-xl sm:text-2xl font-bold text-secondary-900 mb-2">
           {t('productScanned')}
         </Typography>
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 max-h-80 overflow-y-auto">
           {products.map(({ name, expDate }) => (
             <div key={name}>
               <Typography variant="p" className="text-sm sm:text-base text-secondary-700">

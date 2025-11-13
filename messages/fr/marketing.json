@@ -155,8 +155,7 @@
           "instantSetup": "Installation instantanée",
           "support": "Support 24/7"
         },
-        "button": "Contactez-nous maintenant",
-        "noCreditCard": "Aucune carte de crédit requise"
+        "button": "Contactez-nous maintenant"
       }
     }
   },
@@ -225,15 +224,15 @@
         "scanningActive": "Scan actif",
         "productScanned": "Scanné",
         "productOne": "Lait bio - 1L",
-        "expDateOne": "Exp: 15/01/2024 | Stock: 24 unités",
+        "expDateOne": "Exp: 15/12/2025 | Stock: 24 unités",
         "productTwo": "Pain frais - 12 unités",
-        "expDateTwo": "Exp: 01/01/2024 | Stock: 12 unités",
+        "expDateTwo": "Exp: 20/11/2025 | Stock: 12 unités",
         "productThree": "Yaourt grec - 500g",
-        "expDateThree": "Exp: 05/01/2024 | Stock: 20 unités",
+        "expDateThree": "Exp: 05/12/2025 | Stock: 20 unités",
         "productFour": "Cordon bleu - 1kg",
-        "expDateFour": "Exp: 03/01/2024 | Stock: 10 unités",
+        "expDateFour": "Exp: 25/11/2025 | Stock: 10 unités",
         "productFive": "Bananes - 1kg",
-        "expDateFive": "Exp: 04/01/2024 | Stock: 25 unités"
+        "expDateFive": "Exp: 01/12/2025 | Stock: 25 unités"
       },
       "ai": {
         "title": "Recommandations IA",
