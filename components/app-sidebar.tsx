@@ -62,7 +62,7 @@ function useNavigationData() {
             },
             {
               title: t('todos'),
-              url: '/dashboard/todos?sort=urgency&direction=desc&urgency=critical%2Chigh', // this is to get the todos sorted by urgency by default -> high and critical
+              url: '/dashboard/todos?tab=expiring&urgency=critical%2Chigh&sort=urgency&direction=desc',
               icon: ListTodo,
               badge: urgentTodosCount > 0 ? urgentTodosCount : undefined,
             },
