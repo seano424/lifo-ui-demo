@@ -81,6 +81,32 @@
       "enterNewPrice": "Entrez le nouveau prix :"
     }
   },
+  "batchSort": {
+    "sortBy": "Trier par",
+    "createdDate": "Date de création",
+    "expiryDate": "Date d'expiration",
+    "batchNumber": "Numéro de lot",
+    "productName": "Nom du produit",
+    "stockLevel": "Niveau de stock",
+    "costPrice": "Prix de revient",
+    "sellingPrice": "Prix de vente",
+    "status": "Statut",
+    "asc": "Croissant",
+    "desc": "Décroissant"
+  },
+  "batchFilters": {
+    "expiryFilter": "Filtre d'expiration",
+    "allItems": "Tous les articles",
+    "expiringInDays": "Expire dans {days} jours",
+    "status": "Statut",
+    "allStatuses": "Tous les statuts",
+    "active": "Actif",
+    "expired": "Expiré",
+    "damaged": "Endommagé",
+    "soldOut": "Épuisé",
+    "reserved": "Réservé",
+    "itemCount": "{count} articles"
+  },
   "batches": {
     "table": {
       "headers": {

@@ -1,7 +1,7 @@
 'use client'
 
 import { AlertTriangle } from 'lucide-react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useState } from 'react'
 import { BatchListFilters } from '@/components/batches/batch-list-filters'
@@ -29,7 +29,6 @@ interface BatchesFilteredListProps {
 
 export function BatchesFilteredList({ initialFilters, pageSize = 100 }: BatchesFilteredListProps) {
   const router = useRouter()
-  const searchParams = useSearchParams()
   const activeStoreId = useActiveStoreId()
   const t = useTranslations('batches.table')
 
@@ -89,7 +88,7 @@ export function BatchesFilteredList({ initialFilters, pageSize = 100 }: BatchesF
       })
 
       // Update URL params after state update
-      const params = new URLSearchParams(searchParams.toString())
+      const params = new URLSearchParams(window.location.search)
 
       if (newFilters.expiringInDays !== undefined) {
         if (newFilters.expiringInDays) {
@@ -129,7 +128,7 @@ export function BatchesFilteredList({ initialFilters, pageSize = 100 }: BatchesF
 
       router.replace(`?${params.toString()}`)
     },
-    [searchParams, router],
+    [router],
   )
 
   const handleSortChange = useCallback(

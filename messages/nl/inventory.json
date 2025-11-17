@@ -81,6 +81,32 @@
       "enterNewPrice": "Voer nieuwe prijs in:"
     }
   },
+  "batchSort": {
+    "sortBy": "Sorteren op",
+    "createdDate": "Aanmaakdatum",
+    "expiryDate": "Vervaldatum",
+    "batchNumber": "Batchnummer",
+    "productName": "Productnaam",
+    "stockLevel": "Voorraadniveau",
+    "costPrice": "Kostprijs",
+    "sellingPrice": "Verkoopprijs",
+    "status": "Status",
+    "asc": "Oplopend",
+    "desc": "Aflopend"
+  },
+  "batchFilters": {
+    "expiryFilter": "Vervalfilter",
+    "allItems": "Alle artikelen",
+    "expiringInDays": "Verloopt over {days} dagen",
+    "status": "Status",
+    "allStatuses": "Alle statussen",
+    "active": "Actief",
+    "expired": "Verlopen",
+    "damaged": "Beschadigd",
+    "soldOut": "Uitverkocht",
+    "reserved": "Gereserveerd",
+    "itemCount": "{count} artikelen"
+  },
   "batches": {
     "table": {
       "headers": {
