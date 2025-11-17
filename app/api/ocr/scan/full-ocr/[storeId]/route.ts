@@ -23,7 +23,7 @@ export async function POST(
     const formData = await request.formData()
 
     // Forward request to FastAPI backend
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+    const apiUrl = process.env.NEXT_PUBLIC_FASTAPI_URL || 'http://localhost:8000'
     const response = await fetch(`${apiUrl}/api/v1/ocr/scan/full-ocr/${storeId}`, {
       method: 'POST',
       headers: {
