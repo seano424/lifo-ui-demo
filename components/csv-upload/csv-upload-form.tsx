@@ -95,7 +95,6 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
     data: uploadResult,
     error,
     resetPreview,
-    columnMapping,
     updateCsvItemExpiry,
     updateCsvItemQuantity,
     updateCsvItemSku,
@@ -465,7 +464,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                                 value=""
                                 onChange={e => updateCsvItemExpiry(actualIndex, e.target.value)}
                                 placeholder={t('preview.selectDate')}
-                                className="text-xs h-7 min-w-[120px] border-red-300 focus:border-red-500"
+                                className="text-xs h-7 min-w-[120px]"
                                 min={new Date().toISOString().split('T')[0]}
                               />
                             </div>
@@ -603,19 +602,14 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                             min={new Date().toISOString().split('T')[0]}
                           />
                         ) : (
-                          <div className="space-y-1">
-                            <Input
-                              type="date"
-                              value=""
-                              onChange={e => updateCsvItemExpiry(actualIndex, e.target.value)}
-                              placeholder={t('preview.selectDate')}
-                              className="text-sm h-8 border-yellow-300 focus:border-yellow-500"
-                              min={new Date().toISOString().split('T')[0]}
-                            />
-                            <span className="text-xs text-yellow-600">
-                              {t('preview.missingExpiryDate')}
-                            </span>
-                          </div>
+                          <Input
+                            type="date"
+                            value=""
+                            onChange={e => updateCsvItemExpiry(actualIndex, e.target.value)}
+                            placeholder={t('preview.selectDate')}
+                            className="text-sm h-8"
+                            min={new Date().toISOString().split('T')[0]}
+                          />
                         )}
                       </div>
                     </div>
@@ -628,7 +622,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
             <div className="flex gap-3">
               <Button
                 onClick={handleUpload}
-                disabled={isUploading || columnMapping.itemsWithoutExpiry > 0 || hasInvalidPricing}
+                disabled={isUploading || hasInvalidPricing}
                 className="flex-1"
                 size="lg"
                 title={
