@@ -16,6 +16,7 @@ interface LogoProps {
   className?: string
   darkMode?: boolean // Force dark/light mode
   href?: string // Make it clickable
+  priority?: boolean // Image loading priority (default: false)
 }
 
 const sizeMapVertical = {
@@ -32,7 +33,14 @@ const sizeMapHorizontal = {
   xl: 'h-16',
 }
 
-export function Logo({ variant = 'vertical', size = 'md', className, href, darkMode }: LogoProps) {
+export function Logo({
+  variant = 'vertical',
+  size = 'md',
+  className,
+  href,
+  darkMode,
+  priority = false,
+}: LogoProps) {
   const { resolvedTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
 
@@ -128,7 +136,7 @@ export function Logo({ variant = 'vertical', size = 'md', className, href, darkM
           width={600}
           height={280}
           sizes="(max-width: 640px) 64px, (max-width: 768px) 80px, 96px"
-          priority
+          priority={priority}
         />
         <Typography className="font-black text-3xl lg:text-4xl" variant="h2">
           LIFO
@@ -150,7 +158,7 @@ export function Logo({ variant = 'vertical', size = 'md', className, href, darkM
         src={getImageSrc()}
         alt="LIFO"
         className={cn(sizeClass, 'w-auto', className)}
-        priority
+        priority={priority}
         width={dimensions.width}
         height={dimensions.height}
         sizes={sizes}
@@ -175,7 +183,7 @@ export function Logo({ variant = 'vertical', size = 'md', className, href, darkM
         src="/logos/lifo-logo-icon-white.svg"
         alt="LIFO"
         className={cn(sizeClass, 'w-auto', className)}
-        priority
+        priority={priority}
         width={dimensions.width}
         height={dimensions.height}
         sizes={sizes}
@@ -200,7 +208,7 @@ export function Logo({ variant = 'vertical', size = 'md', className, href, darkM
         src={getImageSrc()}
         alt="LIFO"
         className={cn(sizeClass, 'w-auto', className)}
-        priority
+        priority={priority}
         width={dimensions.width}
         height={dimensions.height}
         sizes={sizes}
@@ -225,7 +233,7 @@ export function Logo({ variant = 'vertical', size = 'md', className, href, darkM
         src={getImageSrc()}
         alt="LIFO"
         className={cn(sizeClass, 'w-auto', className)}
-        priority
+        priority={priority}
         width={dimensions.width}
         height={dimensions.height}
         sizes={sizes}
@@ -249,7 +257,7 @@ export function Logo({ variant = 'vertical', size = 'md', className, href, darkM
       src={getImageSrc()}
       alt="LIFO"
       className={cn(sizeClass, 'w-auto', className)}
-      priority
+      priority={priority}
       width={dimensions.width}
       height={dimensions.height}
       sizes={sizes}

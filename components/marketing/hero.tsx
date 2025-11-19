@@ -7,14 +7,18 @@ import { Logo } from '../ui/logo'
 
 export function Hero() {
   return (
-    <section className="flex flex-col gap-4 items-center py-2 px-3 sm:py-12 sm:px-6 overflow-hidden w-full min-h-[calc(100vh-10rem)] justify-center">
-      {/* Main content */}
+    <section
+      aria-label="Hero section with LIFO introduction"
+      className="flex flex-col gap-4 items-center py-2 px-3 sm:py-12 sm:px-6 overflow-hidden w-full min-h-[calc(100vh-10rem)] justify-center"
+    >
+      {/* Main content - min-h ensures hero takes up most of viewport (100vh - 10rem for header/footer) */}
       <div className="text-center w-full max-w-4xl mx-auto flex flex-col gap-6 items-center">
-        <Logo size="xl" />
+        <Logo size="xl" priority />
         <a
           href="https://www.producthunt.com/products/lifo-mvp-v1?embed=true&utm_source=badge-featured&utm_medium=badge"
           target="_blank"
           rel="noopener noreferrer"
+          aria-label="View LIFO on Product Hunt"
         >
           <Image
             src="/badges/product-hunt-featured.svg"
@@ -22,7 +26,6 @@ export function Hero() {
             width={250}
             height={54}
             loading="lazy"
-            priority={false}
           />
         </a>
 
