@@ -14,15 +14,6 @@ export function Hero() {
       {/* Main content - min-h ensures hero takes up most of viewport (100vh - 10rem for header/footer) */}
       <div className="text-center w-full max-w-4xl mx-auto flex flex-col gap-6 items-center">
         <Logo size="xl" priority />
-
-        <div className="flex flex-col gap-6 items-center">
-          <HeroHeading />
-          <HeroDescription />
-        </div>
-
-        <HeroButtons />
-
-        <HeroBadge />
         <a
           href="https://www.producthunt.com/products/lifo-mvp-v1?embed=true&utm_source=badge-featured&utm_medium=badge"
           target="_blank"
@@ -37,6 +28,15 @@ export function Hero() {
             loading="lazy"
           />
         </a>
+
+        <div className="flex flex-col gap-6 items-center">
+          <HeroHeading />
+          <HeroDescription />
+        </div>
+
+        <HeroButtons />
+
+        <HeroBadge />
       </div>
     </section>
   )
