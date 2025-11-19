@@ -3,6 +3,7 @@ import { HeroButtons } from '@/components/marketing/hero-buttons'
 import { HeroDescription } from '@/components/marketing/hero-description'
 import { HeroHeading } from '@/components/marketing/hero-heading'
 import Image from 'next/image'
+import { Logo } from '../ui/logo'
 
 export function Hero() {
   return (
@@ -12,6 +13,7 @@ export function Hero() {
     >
       {/* Main content */}
       <div className="text-center w-full max-w-4xl mx-auto flex flex-col gap-6 items-center">
+        <Logo size="xl" />
         <a
           href="https://www.producthunt.com/products/lifo-mvp-v1?embed=true&utm_source=badge-featured&utm_medium=badge&utm_source=badge-lifo&#0045;mvp&#0045;v1"
           target="_blank"
