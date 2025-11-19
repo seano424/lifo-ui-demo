@@ -106,8 +106,8 @@ export function CtaSection() {
             <Button
               asLink
               href="/contact"
-              size="lg"
-              className="bg-gradient-to-r from-primary-900 to-secondary-800 text-white hover:opacity-90 transition-opacity shadow-lg shadow-blue-500/20"
+              size="xl"
+              className="w-full bg-gradient-to-r from-primary-900 to-secondary-800 text-white hover:opacity-90 transition-opacity shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2 whitespace-normal sm:whitespace-nowrap"
             >
               <span className="text-center">{t('card.button')}</span>{' '}
               <ArrowRight size={18} className="shrink-0" />

@@ -66,7 +66,7 @@ export function FeaturesSummary() {
           <Button
             asLink
             href="/features"
-            size="lg"
+            size="xl"
             className="bg-gradient-to-r from-primary-900 to-secondary-800 text-white hover:opacity-90 transition-opacity shadow-lg shadow-blue-500/20"
           >
             {t('discoverButton')}
