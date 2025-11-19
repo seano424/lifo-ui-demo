@@ -101,6 +101,7 @@
     "status": "Status",
     "allStatuses": "All Statuses",
     "active": "Active",
+    "draft": "Draft",
     "expired": "Expired",
     "damaged": "Damaged",
     "soldOut": "Sold Out",
@@ -139,6 +140,7 @@
     },
     "status": {
       "active": "Active",
+      "draft": "Draft",
       "expired": "Expired",
       "damaged": "Damaged",
       "soldOut": "Sold Out",
@@ -146,7 +148,16 @@
     },
     "expiry": {
       "expired": "Expired",
-      "daysLeft": "{days}d left"
+      "daysLeft": "{days}d left",
+      "noExpiryDate": "No expiry date"
+    },
+    "draftBatches": {
+      "addExpiryDate": "Add Expiry Date",
+      "completeBatch": "Complete Batch",
+      "incompleteBatch": "Incomplete - Add Expiry Date",
+      "needsExpiryDate": "{count} products need expiry dates to enable AI scoring",
+      "completeNow": "Complete Now",
+      "draftBatchWarning": "This batch needs an expiry date before it can be scored by AI"
     }
   },
   "deliveries": {
