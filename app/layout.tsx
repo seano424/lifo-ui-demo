@@ -55,6 +55,8 @@ const robotoMono = Roboto_Mono({
   preload: true,
 })
 
+const debugScreens = process.env.NODE_ENV === 'development' ? 'debug-screens' : ''
+
 export default async function RootLayout({
   children,
 }: Readonly<{
@@ -68,7 +70,7 @@ export default async function RootLayout({
       lang="fr"
       suppressHydrationWarning
       data-scroll-behavior="smooth"
-      className={`${raleway.variable} ${montserrat.variable} ${robotoMono.variable}`}
+      className={`${raleway.variable} ${montserrat.variable} ${robotoMono.variable} ${debugScreens}`}
     >
       <body className={`font-sans antialiased`}>
         <ThemeProvider
