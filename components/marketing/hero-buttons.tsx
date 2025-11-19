@@ -23,7 +23,7 @@ export function HeroButtons() {
           href="/onboarding/create-account"
           size="lg"
           variant="outline"
-          className="w-full sm:w-auto px-5 sm:px-6 py-3 rounded-2xl border-foreground/20 hover:border-foreground/40 transition-colors flex items-center justify-center gap-2"
+          className="border-foreground/20 hover:border-foreground/40 transition-colors"
         >
           <Sparkles size={18} />
           {t('freeTrial')}

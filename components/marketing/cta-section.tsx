@@ -107,7 +107,7 @@ export function CtaSection() {
               asLink
               href="/contact"
               size="lg"
-              className="w-full py-4 text-sm sm:text-base md:text-lg font-medium rounded-2xl bg-gradient-to-r from-primary-900 to-secondary-800 text-white hover:opacity-90 transition-opacity shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2 whitespace-normal sm:whitespace-nowrap px-4"
+              className="bg-gradient-to-r from-primary-900 to-secondary-800 text-white hover:opacity-90 transition-opacity shadow-lg shadow-blue-500/20"
             >
               <span className="text-center">{t('card.button')}</span>{' '}
               <ArrowRight size={18} className="shrink-0" />
