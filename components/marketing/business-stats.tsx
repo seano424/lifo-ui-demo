@@ -63,33 +63,13 @@ export function BusinessStats() {
 
   return (
     <section className="w-full py-20 px-4 relative overflow-hidden">
-      <div className="sm:max-w-7xl mx-auto relative z-10">
-        {/* Enhanced Header */}
-        <div className="text-center mb-20">
-          {/* <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-primary-100/50 to-secondary-100/50 border border-primary-200/50 mb-6">
-            <Target size={16} className="text-primary-600" />
-            <Typography
-              variant="p"
-              className="text-sm font-medium text-primary-800"
-            >
-              Business Impact
-            </Typography>
-          </div> */}
-
-          <Typography
-            variant="h2"
-            as={'h2'}
-            className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary-800 via-primary-700 to-secondary-900 mb-6"
-          >
+      <div className="sm:max-w-7xl mx-auto relative z-10 flex flex-col gap-10">
+        <div className="text-center items-center justify-center flex flex-col gap-6 mx-auto">
+          <Typography variant="h2" color="primary" className="text-center">
             {t('title')}
           </Typography>
 
-          <Typography
-            variant="p"
-            className="text-xl text-foreground/70 max-w-3xl mx-auto leading-relaxed"
-          >
-            {t('subtitle')}
-          </Typography>
+          <Typography variant="h5">{t('subtitle')}</Typography>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto">
@@ -117,15 +97,6 @@ export function BusinessStats() {
             accentColor="text-primary-800"
           />
         </div>
-
-        {/* Bottom CTA
-        <div className="text-center mt-16">
-          <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary-100/50 border border-primary-200/90">
-            <Typography variant="p" className="text-sm text-foreground/70">
-              💡 <strong>{t('disclaimer').split('.')[0]}.</strong> {t('disclaimer').split('. ')[1]}.
-            </Typography>
-          </div>
-        </div> */}
       </div>
     </section>
   )

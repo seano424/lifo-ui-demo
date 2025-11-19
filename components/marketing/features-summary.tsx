@@ -30,13 +30,9 @@ export function FeaturesSummary() {
   const t = useTranslations('landingpage.features')
 
   return (
-    <section className="w-full px-4 rounded-2xl mb-10">
-      <div className="max-w-5xl mx-auto">
-        <Typography
-          variant="h2"
-          as={'h2'}
-          className="text-center mb-16 pb-4 text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary-800 via-primary-700 to-secondary-900"
-        >
+    <section className="w-full px-4 rounded-2xl">
+      <div className="max-w-5xl mx-auto flex flex-col gap-10">
+        <Typography variant="h2" color="primary" className="text-center">
           {t('title')}
         </Typography>
 
@@ -66,7 +62,7 @@ export function FeaturesSummary() {
           />
         </div>
 
-        <div className="flex flex-col items-center justify-center mt-16">
+        <div className="flex flex-col gap-4 items-center justify-center">
           <Button
             asLink
             href="/features"
@@ -75,7 +71,7 @@ export function FeaturesSummary() {
           >
             {t('discoverButton')}
           </Button>
-          <p className="mt-4 text-sm text-primary-700 opacity-80">{t('noCommitment')}</p>
+          <Typography variant="muted">{t('noCommitment')}</Typography>
         </div>
       </div>
     </section>

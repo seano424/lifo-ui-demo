@@ -1,6 +1,7 @@
 'use client'
 import { useCurrentUser } from '@/hooks/use-users'
 import { useTranslations } from 'next-intl'
+import { Badge } from '@/components/ui/badge'
 
 type AnimatedBadgeProps = {
   icon: React.ReactNode
@@ -11,7 +12,7 @@ type AnimatedBadgeProps = {
 export function HeroBadge({
   icon = <span className="mr-2 text-primary text-lg">✨</span>,
   borderColor = 'via-indigo-100',
-  className = 'mt-6',
+  className = '',
 }: Partial<AnimatedBadgeProps>) {
   const t = useTranslations('landingpage.hero.badge')
   const { data: currentUser } = useCurrentUser()
@@ -48,10 +49,10 @@ export function HeroBadge({
               }
         }
       >
-        <div className="flex items-center gap-2 rounded-full bg-gradient-to-r from-primary/5 to-secondary/10 border border-primary/10 px-3 sm:px-4 py-1 text-xs sm:text-sm">
+        <Badge variant="primary">
           {iconToShow}
           <span className="font-medium text-primary truncate">{text}</span>
-        </div>
+        </Badge>
       </div>
     </div>
   )

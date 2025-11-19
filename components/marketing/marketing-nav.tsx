@@ -8,7 +8,7 @@ import {
 } from '@/components/ui/accordion'
 import { Button } from '@/components/ui/button'
 import { CompactLanguageSwitcher } from '@/components/ui/compact-language-switcher'
-import { NavbarLogo } from '@/components/ui/logo'
+import { Logo } from '@/components/ui/logo'
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -130,7 +130,10 @@ const MarketingNav = ({ menu }: MarketingNavProps) => {
     <section>
       <nav className="hidden justify-between lg:flex container mx-auto">
         <div className="flex items-center gap-8">
-          <NavbarLogo variant="text" href="/" />
+          {/* <NavbarLogo variant="text" href="/" /> */}
+          <Link href="/">
+            <Logo variant="horizontal" size="sm" />
+          </Link>
 
           <NavigationMenu>
             <NavigationMenuList>{menuItems.map(item => renderMenuItem(item))}</NavigationMenuList>
@@ -146,7 +149,9 @@ const MarketingNav = ({ menu }: MarketingNavProps) => {
       {/* Mobile */}
       <div className="block lg:hidden container mx-auto">
         <div className="flex items-center justify-between">
-          <NavbarLogo variant="text" href="/" />
+          <Link href="/">
+            <Logo variant="horizontal" size="sm" />
+          </Link>
           <Sheet>
             <SheetTrigger asChild>
               <Button variant="outline" size="icon" aria-label={t('menuButton')}>
@@ -156,7 +161,9 @@ const MarketingNav = ({ menu }: MarketingNavProps) => {
             <SheetContent className="overflow-y-auto">
               <SheetHeader>
                 <SheetTitle>
-                  <NavbarLogo />
+                  <Link href="/">
+                    <Logo variant="horizontal" size="sm" />
+                  </Link>
                 </SheetTitle>
               </SheetHeader>
               <div className="flex flex-col h-full gap-10 p-4">

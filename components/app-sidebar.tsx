@@ -26,8 +26,8 @@ import {
 import { useUrgentTodosCount } from '@/hooks/use-urgent-todos-count'
 import { useCurrentUser } from '@/hooks/use-users'
 import { TeamSwitcher } from './team-switcher'
-import { NavbarLogo } from './ui/logo'
-import { Typography } from './ui/typography'
+
+import { Logo } from './ui/logo'
 
 function useNavigationData() {
   const t = useTranslations('navigation')
@@ -123,11 +123,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           href="/"
           className="group-data-[collapsible=icon]:hidden hidden sm:flex items-center gap-2 hover:opacity-80 transition-opacity duration-200 ease-in-out"
         >
-          <NavbarLogo variant="icon" size="sm" className="dark:hidden" />
-          <NavbarLogo variant="icon-dark" size="sm" className="dark:block hidden" />
-          <Typography variant="h2" className="font-black">
-            LIFO
-          </Typography>
+          <Logo variant="horizontal" size="sm" />
         </Link>
 
         {/* Mobile vertical logo */}
@@ -135,7 +131,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           href="/"
           className="group-data-[collapsible=icon]:hidden sm:hidden hover:opacity-80 transition-opacity duration-200 ease-in-out"
         >
-          <NavbarLogo variant="vertical" size="md" />
+          <Logo variant="horizontal" size="sm" />
         </Link>
 
         {/* Collapsed icon logo */}
@@ -143,7 +139,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           href="/"
           className="group-data-[collapsible=icon]:block hidden hover:opacity-80 transition-opacity duration-200 ease-in-out"
         >
-          <NavbarLogo variant="icon" size="sm" />
+          <Logo variant="icon" size="sm" />
         </Link>
       </SidebarHeader>
       <SidebarContent className="group-data-[collapsible=icon]:pt-4 pt-4">
