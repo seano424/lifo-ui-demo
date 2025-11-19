@@ -7,23 +7,22 @@ import { Logo } from '../ui/logo'
 
 export function Hero() {
   return (
-    <section
-      aria-labelledby="hero-heading"
-      className="flex flex-col gap-4 items-center py-2 px-3 sm:py-12 sm:px-6 overflow-hidden w-full min-h-[calc(100vh-10rem)] justify-center"
-    >
+    <section className="flex flex-col gap-4 items-center py-2 px-3 sm:py-12 sm:px-6 overflow-hidden w-full min-h-[calc(100vh-10rem)] justify-center">
       {/* Main content */}
       <div className="text-center w-full max-w-4xl mx-auto flex flex-col gap-6 items-center">
         <Logo size="xl" />
         <a
-          href="https://www.producthunt.com/products/lifo-mvp-v1?embed=true&utm_source=badge-featured&utm_medium=badge&utm_source=badge-lifo&#0045;mvp&#0045;v1"
+          href="https://www.producthunt.com/products/lifo-mvp-v1?embed=true&utm_source=badge-featured&utm_medium=badge"
           target="_blank"
           rel="noopener noreferrer"
         >
           <Image
-            src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1038801&theme=light&t=1763572828487"
-            alt="LIFO&#0032;MVP&#0032;v1 - Our&#0032;MVP&#0032;v1&#0032;launches&#0032;in&#0032;ENG&#0044;&#0032;FR&#0032;and&#0032;NL | Product Hunt"
-            width="250"
-            height="54"
+            src="/badges/product-hunt-featured.svg"
+            alt="LIFO MVP v1 - Our MVP v1 launches in ENG, FR and NL | Product Hunt"
+            width={250}
+            height={54}
+            loading="lazy"
+            priority={false}
           />
         </a>
 

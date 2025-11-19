@@ -55,7 +55,7 @@ const robotoMono = Roboto_Mono({
   preload: true,
 })
 
-const debugScreens = process.env.NODE_ENV === 'development' && 'debug-screens'
+const debugScreens = process.env.NODE_ENV === 'development' ? 'debug-screens' : ''
 
 export default async function RootLayout({
   children,

@@ -13,7 +13,7 @@ export function HeroButtons() {
     <div className="flex flex-col sm:flex-row gap-3">
       {currentUser && (
         <Button size="lg" asLink href="/dashboard">
-          <LayoutDashboard size={currentUser ? 24 : 18} />
+          <LayoutDashboard size={24} />
           {t('dashboard')}
         </Button>
       )}
