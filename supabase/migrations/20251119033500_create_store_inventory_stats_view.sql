@@ -33,7 +33,10 @@ SELECT
 
   -- Average days until expiry (only for active batches with expiry dates)
   AVG(
-    EXTRACT(DAY FROM (b.expiry_date - CURRENT_DATE))
+    CASE
+      WHEN b.expiry_date IS NOT NULL THEN (b.expiry_date::date - CURRENT_DATE::date)
+      ELSE NULL
+    END
   ) FILTER (
     WHERE b.status = 'active'
     AND b.expiry_date IS NOT NULL
