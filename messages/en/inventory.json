@@ -438,7 +438,8 @@
       "priceTooLow": "Must be at least 0.01",
       "databaseValidation": "Database validation failed. Check pricing values (must be >= 0.01)",
       "noCachedData": "No cached data available. Please preview the file first.",
-      "allItemsExpired": "All items have expired (>7 days past expiry). Please update expiry dates and try again."
+      "allItemsExpired": "All items have expired (>7 days past expiry). Please update expiry dates and try again.",
+      "emptyFile": "The CSV file is empty or contains no data rows. Please check the file and try again."
     },
     "performanceInfo": {
       "title": "Bulk-Optimized Ultra-Fast Performance",

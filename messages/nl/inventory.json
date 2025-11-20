@@ -437,7 +437,8 @@
       "priceTooLow": "Moet minstens 0,01 zijn",
       "databaseValidation": "Database validatie mislukt. Controleer prijswaarden (moeten >= 0,01 zijn)",
       "noCachedData": "Geen gecachte gegevens beschikbaar. Bekijk eerst het bestand.",
-      "allItemsExpired": "Alle items zijn verlopen (>7 dagen na vervaldatum). Update de vervaldatums en probeer opnieuw."
+      "allItemsExpired": "Alle items zijn verlopen (>7 dagen na vervaldatum). Update de vervaldatums en probeer opnieuw.",
+      "emptyFile": "Het CSV-bestand is leeg of bevat geen gegevensrijen. Controleer het bestand en probeer opnieuw."
     },
     "performanceInfo": {
       "title": "Bulk-geoptimaliseerde Ultra-snelle Prestaties",

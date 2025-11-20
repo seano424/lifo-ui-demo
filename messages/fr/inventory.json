@@ -437,7 +437,8 @@
       "priceTooLow": "Doit être d'au moins 0,01",
       "databaseValidation": "Échec de la validation de la base de données. Vérifiez les prix (doivent être >= 0,01)",
       "noCachedData": "Aucune donnée en cache disponible. Veuillez d'abord prévisualiser le fichier.",
-      "allItemsExpired": "Tous les articles ont expiré (>7 jours après expiration). Veuillez mettre à jour les dates d'expiration et réessayer."
+      "allItemsExpired": "Tous les articles ont expiré (>7 jours après expiration). Veuillez mettre à jour les dates d'expiration et réessayer.",
+      "emptyFile": "Le fichier CSV est vide ou ne contient aucune ligne de données. Veuillez vérifier le fichier et réessayer."
     },
     "performanceInfo": {
       "title": "Performances ultra-rapides optimisées en masse",

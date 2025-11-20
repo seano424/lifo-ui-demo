@@ -50,6 +50,10 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
 
     const errorMappings = [
       {
+        keywords: ['empty', 'no data rows'],
+        message: t('errors.emptyFile'),
+      },
+      {
         keywords: ['network', 'fetch', 'connection'],
         message: t('errors.analysisFailure'),
       },
@@ -58,15 +62,15 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
       { keywords: ['too large', 'size'], message: t('errors.invalidFile') },
       {
         keywords: ['constraint', 'pricing'],
-        message: t('csvUpload.errors.databaseValidation'),
+        message: t('errors.databaseValidation'),
       },
       {
         keywords: ['no cached data', 'preview the file first'],
-        message: t('csvUpload.errors.noCachedData'),
+        message: t('errors.noCachedData'),
       },
       {
         keywords: ['all items have expired', 'update expiry dates'],
-        message: t('csvUpload.errors.allItemsExpired'),
+        message: t('errors.allItemsExpired'),
       },
     ]
 
