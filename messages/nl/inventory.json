@@ -396,6 +396,7 @@
       "upload": "Uploaden (Auto-sla duplicaten over)",
       "processing": "Verwerken...",
       "reset": "Reset",
+      "cancel": "Annuleren",
       "uploadAnother": "Upload een ander bestand"
     },
     "results": {

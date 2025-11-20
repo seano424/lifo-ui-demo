@@ -396,6 +396,7 @@
       "upload": "Télécharger (Ignorer auto. les doublons)",
       "processing": "Traitement...",
       "reset": "Réinitialiser",
+      "cancel": "Annuler",
       "uploadAnother": "Télécharger un autre fichier"
     },
     "results": {

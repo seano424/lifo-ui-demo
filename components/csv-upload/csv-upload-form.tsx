@@ -643,7 +643,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
               </Button>
 
               <Button onClick={handleReset} variant="outline" disabled={isUploading}>
-                {t('buttons.reset')}
+                {t('buttons.cancel')}
               </Button>
             </div>
           </div>

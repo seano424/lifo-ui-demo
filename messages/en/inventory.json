@@ -397,6 +397,7 @@
       "upload": "Upload",
       "processing": "Processing...",
       "reset": "Reset",
+      "cancel": "Cancel",
       "uploadAnother": "Upload Another File"
     },
     "results": {
