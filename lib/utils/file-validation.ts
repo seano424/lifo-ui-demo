@@ -7,12 +7,14 @@ import { FILE_UPLOAD } from '@/lib/constants/file-upload'
  */
 export function validateCSVFile(file: File): boolean {
   // Check file extension
-  const hasValidExtension = FILE_UPLOAD.SUPPORTED_EXTENSIONS.some(ext =>
+  const hasValidExtension = FILE_UPLOAD.SUPPORTED_EXTENSIONS.csv.some((ext: string) =>
     file.name.toLowerCase().endsWith(ext),
   )
 
   // Check MIME type
-  const hasValidMimeType = FILE_UPLOAD.SUPPORTED_MIME_TYPES.some(mimeType => file.type === mimeType)
+  const hasValidMimeType = FILE_UPLOAD.SUPPORTED_MIME_TYPES.csv.some(
+    (mimeType: string) => file.type === mimeType,
+  )
 
   // Accept if either check passes (some systems don't set proper MIME types)
   return hasValidExtension || hasValidMimeType
