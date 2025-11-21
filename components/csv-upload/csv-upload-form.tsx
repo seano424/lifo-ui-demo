@@ -803,6 +803,32 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
               </Typography>
             </div>
 
+            {/* Draft Batches Info - products without expiry dates */}
+            {uploadResult.draft_batches_created && uploadResult.draft_batches_created > 0 && (
+              <Alert className="bg-amber-50 border-amber-200">
+                <AlertCircle className="h-4 w-4 text-amber-600" />
+                <AlertTitle className="text-amber-800 font-semibold">
+                  Draft Batches Created
+                </AlertTitle>
+                <AlertDescription className="space-y-2 mt-2">
+                  <p className="text-amber-700">
+                    {uploadResult.draft_batches_created} {uploadResult.draft_batches_created === 1 ? 'batch was' : 'batches were'} created as drafts because{' '}
+                    {uploadResult.draft_batches_created === 1 ? 'it has' : 'they have'} no expiry date.
+                  </p>
+                  <p className="text-amber-600 text-sm">
+                    Draft batches need expiry dates before they can be scored by AI. Visit the{' '}
+                    <a
+                      href="/dashboard/inventory/batches/drafts"
+                      className="font-medium underline hover:text-amber-800"
+                    >
+                      Draft Batches page
+                    </a>{' '}
+                    to complete them using manual entry or OCR scanning.
+                  </p>
+                </AlertDescription>
+              </Alert>
+            )}
+
             {/* Validation Warnings */}
             {uploadResult.warnings && uploadResult.warnings.length > 0 && (
               <Alert variant="destructive" className="bg-red-50 border-red-200">
