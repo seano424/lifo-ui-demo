@@ -134,21 +134,48 @@ export function useCSVUpload() {
   }
 
   /**
+   * Normalize a single column header
+   * Converts to lowercase with underscores and applies column mappings
+   * @param header - Raw CSV column header
+   * @returns Normalized column name
+   */
+  const normalizeColumnHeader = (header: string): string => {
+    const normalized = header.trim().toLowerCase().replace(/\s+/g, '_')
+    return normalized in COLUMN_MAPPINGS
+      ? COLUMN_MAPPINGS[normalized as keyof typeof COLUMN_MAPPINGS]
+      : normalized
+  }
+
+  /**
+   * Build a mapping from target column names to original CSV headers
+   * Optimized to iterate through headers only once (O(n) instead of O(n²))
+   * @param headers - Original CSV column headers
+   * @returns Map of target column names to original header names
+   */
+  const buildColumnMapping = (headers: string[]): Map<string, string> => {
+    const mapping = new Map<string, string>()
+    for (const header of headers) {
+      const normalized = normalizeColumnHeader(header)
+      // Store first occurrence only (prevents duplicates from overwriting)
+      if (!mapping.has(normalized)) {
+        mapping.set(normalized, header)
+      }
+    }
+    return mapping
+  }
+
+  /**
    * Find a column header that maps to the target column name
    * Uses same normalization logic as the main CSV processing
-   * Falls back to fuzzy matching if exact mapping not found
+   * @param columnMap - Pre-built mapping from buildColumnMapping
+   * @param targetColumn - Target column name to find
+   * @returns Original CSV header name or undefined
    */
-  const findMappedColumn = (headers: string[], targetColumn: string): string | undefined => {
-    // First, try exact mapping
-    const exactMatch = headers.find(h => {
-      const normalized = h.trim().toLowerCase().replace(/\s+/g, '_')
-      const mapped = COLUMN_MAPPINGS[normalized as keyof typeof COLUMN_MAPPINGS] || normalized
-      return mapped === targetColumn
-    })
-    if (exactMatch) return exactMatch
-
-    // Fallback to fuzzy matching for unmapped columns
-    return headers.find(h => h.toLowerCase().includes(targetColumn))
+  const findMappedColumn = (
+    columnMap: Map<string, string>,
+    targetColumn: string,
+  ): string | undefined => {
+    return columnMap.get(targetColumn)
   }
 
   // Validate and parse price values
@@ -197,14 +224,17 @@ export function useCSVUpload() {
             const firstRow = results.data[0]
             const headers = Object.keys(firstRow)
 
+            // Build column mapping once for O(n) performance
+            const columnMap = buildColumnMapping(headers)
+
             // Find column indices using consistent mapping logic
-            const skuCol = findMappedColumn(headers, 'sku')
-            const nameCol = findMappedColumn(headers, 'product_name')
-            const categoryCol = findMappedColumn(headers, 'category')
-            const qtyCol = findMappedColumn(headers, 'quantity')
-            const expiryCol = findMappedColumn(headers, 'expiry_date')
-            const costPriceCol = findMappedColumn(headers, 'cost_price')
-            const sellingPriceCol = findMappedColumn(headers, 'selling_price')
+            const skuCol = findMappedColumn(columnMap, 'sku')
+            const nameCol = findMappedColumn(columnMap, 'product_name')
+            const categoryCol = findMappedColumn(columnMap, 'category')
+            const qtyCol = findMappedColumn(columnMap, 'quantity')
+            const expiryCol = findMappedColumn(columnMap, 'expiry_date')
+            const costPriceCol = findMappedColumn(columnMap, 'cost_price')
+            const sellingPriceCol = findMappedColumn(columnMap, 'selling_price')
 
             const hasExpiryColumn = !!expiryCol
             let itemsWithoutExpiry = 0
@@ -279,12 +309,8 @@ export function useCSVUpload() {
     const firstRow = parsedData[0]
     const originalHeaders = Object.keys(firstRow)
 
-    // Normalize headers to lowercase with underscores, then apply mappings
-    const normalizedHeaders = originalHeaders.map(h => {
-      const normalized = h.trim().toLowerCase().replace(/\s+/g, '_')
-      // Apply column mappings for common variations
-      return (COLUMN_MAPPINGS as Record<string, string>)[normalized] || normalized
-    })
+    // Normalize headers using shared normalization logic
+    const normalizedHeaders = originalHeaders.map(h => normalizeColumnHeader(h))
 
     // Detect duplicate columns after mapping (critical for data integrity)
     const seen = new Set<string>()
