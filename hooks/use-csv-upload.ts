@@ -194,7 +194,14 @@ export function useCSVUpload() {
     const originalHeaders = Object.keys(firstRow)
 
     // Normalize headers to lowercase with underscores
-    const normalizedHeaders = originalHeaders.map(h => h.trim().toLowerCase().replace(/\s+/g, '_'))
+    const normalizedHeaders = originalHeaders.map(h => {
+      const normalized = h.trim().toLowerCase().replace(/\s+/g, '_')
+      // Map common variations to expected backend column names
+      if (normalized === 'stock_quantity') return 'quantity'
+      if (normalized === 'sell_price') return 'selling_price'
+      if (normalized === 'batch_lot') return 'batch_number'
+      return normalized
+    })
 
     // Check if pricing columns exist
     const hasCostPrice = normalizedHeaders.some(h => h.includes('cost') && h.includes('price'))
