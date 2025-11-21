@@ -59,26 +59,34 @@ interface CsvRawRow {
  * Column name mapping for CSV normalization
  * Maps common column name variations to backend-expected column names
  *
+ * ⚠️ WARNING: Avoid CSVs with multiple columns that map to the same target.
+ * For example, having both "Item Name" and "Product Name" may cause conflicts.
+ * The duplicate detection will catch these cases and provide a clear error.
+ *
  * Supported mappings:
- * - Quantity: stock_quantity, qty, stock, amount → quantity
- * - Selling Price: sell_price, sale_price, price, retail_price → selling_price
+ * - Quantity: stock_quantity, qty, stock → quantity
+ * - Selling Price: sell_price, sale_price, retail_price → selling_price
  * - Cost Price: purchase_price, buy_price, unit_cost → cost_price
  * - Batch Number: batch_lot, lot, lot_number, batch → batch_number
  * - Expiry Date: best_before, use_by, expiration_date, exp_date, expiry → expiry_date
- * - Product Name: item_name, description, title, name → product_name
+ * - Product Name: item_name, title → product_name
  * - SKU: product_code, item_code, barcode → sku
+ *
+ * Note: Removed ambiguous mappings to prevent data corruption:
+ * - "price" (ambiguous: could be cost or selling price)
+ * - "name" (too generic: conflicts with product_name)
+ * - "description" (usually means product description, not product name)
+ * - "amount" (ambiguous: could be monetary amount or quantity)
  */
-const COLUMN_MAPPINGS: Record<string, string> = {
+const COLUMN_MAPPINGS = {
   // Quantity variations
   stock_quantity: 'quantity',
   qty: 'quantity',
   stock: 'quantity',
-  amount: 'quantity',
 
   // Selling price variations
   sell_price: 'selling_price',
   sale_price: 'selling_price',
-  price: 'selling_price',
   retail_price: 'selling_price',
 
   // Cost price variations
@@ -99,17 +107,15 @@ const COLUMN_MAPPINGS: Record<string, string> = {
   exp_date: 'expiry_date',
   expiry: 'expiry_date',
 
-  // Product name variations
+  // Product name variations (reduced to avoid conflicts)
   item_name: 'product_name',
-  description: 'product_name',
   title: 'product_name',
-  name: 'product_name',
 
   // SKU variations
   product_code: 'sku',
   item_code: 'sku',
   barcode: 'sku',
-}
+} as const satisfies Record<string, string>
 
 export function useCSVUpload() {
   const [csvPreview, setCsvPreview] = useState<CsvPreviewItem[]>([])
@@ -125,6 +131,24 @@ export function useCSVUpload() {
   // Generate composite cache key from file metadata
   const generateCacheKey = (file: File): string => {
     return `${file.name}-${file.size}-${file.lastModified}`
+  }
+
+  /**
+   * Find a column header that maps to the target column name
+   * Uses same normalization logic as the main CSV processing
+   * Falls back to fuzzy matching if exact mapping not found
+   */
+  const findMappedColumn = (headers: string[], targetColumn: string): string | undefined => {
+    // First, try exact mapping
+    const exactMatch = headers.find(h => {
+      const normalized = h.trim().toLowerCase().replace(/\s+/g, '_')
+      const mapped = COLUMN_MAPPINGS[normalized as keyof typeof COLUMN_MAPPINGS] || normalized
+      return mapped === targetColumn
+    })
+    if (exactMatch) return exactMatch
+
+    // Fallback to fuzzy matching for unmapped columns
+    return headers.find(h => h.toLowerCase().includes(targetColumn))
   }
 
   // Validate and parse price values
@@ -173,18 +197,14 @@ export function useCSVUpload() {
             const firstRow = results.data[0]
             const headers = Object.keys(firstRow)
 
-            // Find column indices
-            const skuCol = headers.find(h => h.toLowerCase().includes('sku'))
-            const nameCol = headers.find(h => h.toLowerCase().includes('name'))
-            const categoryCol = headers.find(h => h.toLowerCase().includes('category'))
-            const qtyCol = headers.find(h => h.toLowerCase().includes('quantity'))
-            const expiryCol = headers.find(h => h.toLowerCase().includes('expiry'))
-            const costPriceCol = headers.find(
-              h => h.toLowerCase().includes('cost') && h.toLowerCase().includes('price'),
-            )
-            const sellingPriceCol = headers.find(
-              h => h.toLowerCase().includes('selling') && h.toLowerCase().includes('price'),
-            )
+            // Find column indices using consistent mapping logic
+            const skuCol = findMappedColumn(headers, 'sku')
+            const nameCol = findMappedColumn(headers, 'product_name')
+            const categoryCol = findMappedColumn(headers, 'category')
+            const qtyCol = findMappedColumn(headers, 'quantity')
+            const expiryCol = findMappedColumn(headers, 'expiry_date')
+            const costPriceCol = findMappedColumn(headers, 'cost_price')
+            const sellingPriceCol = findMappedColumn(headers, 'selling_price')
 
             const hasExpiryColumn = !!expiryCol
             let itemsWithoutExpiry = 0
@@ -263,14 +283,29 @@ export function useCSVUpload() {
     const normalizedHeaders = originalHeaders.map(h => {
       const normalized = h.trim().toLowerCase().replace(/\s+/g, '_')
       // Apply column mappings for common variations
-      return COLUMN_MAPPINGS[normalized] || normalized
+      return (COLUMN_MAPPINGS as Record<string, string>)[normalized] || normalized
     })
 
-    // Check if pricing columns exist
-    const hasCostPrice = normalizedHeaders.some(h => h.includes('cost') && h.includes('price'))
-    const hasSellingPrice = normalizedHeaders.some(
-      h => h.includes('selling') && h.includes('price'),
-    )
+    // Detect duplicate columns after mapping (critical for data integrity)
+    const seen = new Set<string>()
+    const duplicates: string[] = []
+    normalizedHeaders.forEach(h => {
+      if (seen.has(h)) {
+        duplicates.push(h)
+      }
+      seen.add(h)
+    })
+
+    if (duplicates.length > 0) {
+      const uniqueDuplicates = [...new Set(duplicates)]
+      throw new Error(
+        `Ambiguous column mapping detected: Multiple columns map to '${uniqueDuplicates.join("', '")}'. Please ensure unique column names in your CSV or contact support.`,
+      )
+    }
+
+    // Check if pricing columns exist (after mapping)
+    const hasCostPrice = normalizedHeaders.includes('cost_price')
+    const hasSellingPrice = normalizedHeaders.includes('selling_price')
 
     if (!hasCostPrice) {
       normalizedHeaders.push('cost_price')
