@@ -115,6 +115,7 @@
         "product": "Product",
         "supplier": "Supplier",
         "expiryDate": "Expiry Date",
+        "quantity": "Quantity",
         "stock": "Stock",
         "costPrice": "Cost Price",
         "sellPrice": "Sell Price",
