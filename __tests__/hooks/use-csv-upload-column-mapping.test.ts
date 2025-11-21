@@ -17,6 +17,24 @@
 
 import { describe, expect, test } from '@jest/globals'
 
+/**
+ * Maximum length for sanitized column headers
+ */
+const MAX_COLUMN_NAME_LENGTH = 100
+
+/**
+ * Valid target column names expected by the backend
+ */
+type ValidTargetColumn =
+  | 'sku'
+  | 'product_name'
+  | 'category'
+  | 'quantity'
+  | 'expiry_date'
+  | 'cost_price'
+  | 'selling_price'
+  | 'batch_number'
+
 // Mock column mappings for testing (matching the actual implementation)
 const COLUMN_MAPPINGS = {
   // Quantity variations
@@ -55,14 +73,34 @@ const COLUMN_MAPPINGS = {
   product_code: 'sku',
   item_code: 'sku',
   barcode: 'sku',
-} as const satisfies Record<string, string>
+} as const satisfies Record<string, ValidTargetColumn>
+
+/**
+ * Sanitize a column header by removing control characters and limiting length
+ */
+const sanitizeColumnHeader = (header: string): string => {
+  // Remove control characters (ASCII 0-31, 127, and common problematic Unicode)
+  // biome-ignore lint/suspicious/noControlCharactersInRegex: Intentionally removing control characters for testing
+  let sanitized = header.replace(/[\x00-\x1F\x7F\uFEFF\u200B-\u200D]/g, '')
+
+  // Trim whitespace
+  sanitized = sanitized.trim()
+
+  // Limit length to prevent issues
+  if (sanitized.length > MAX_COLUMN_NAME_LENGTH) {
+    sanitized = sanitized.slice(0, MAX_COLUMN_NAME_LENGTH)
+  }
+
+  return sanitized
+}
 
 /**
  * Normalize a single column header
  * Converts to lowercase with underscores and applies column mappings
  */
 const normalizeColumnHeader = (header: string): string => {
-  const normalized = header.trim().toLowerCase().replace(/\s+/g, '_')
+  const sanitized = sanitizeColumnHeader(header)
+  const normalized = sanitized.toLowerCase().replace(/\s+/g, '_')
   return normalized in COLUMN_MAPPINGS
     ? COLUMN_MAPPINGS[normalized as keyof typeof COLUMN_MAPPINGS]
     : normalized
@@ -415,6 +453,184 @@ describe('CSV Column Mapping', () => {
     test('should handle Unicode characters', () => {
       expect(normalizeColumnHeader('Productñame')).toBe('productñame')
       expect(normalizeColumnHeader('Prix de vente')).toBe('prix_de_vente')
+    })
+  })
+
+  describe('Input Sanitization (Code Review #4)', () => {
+    test('should remove control characters from headers', () => {
+      expect(sanitizeColumnHeader('Product\x00Name')).toBe('ProductName')
+      expect(sanitizeColumnHeader('SKU\x1F123')).toBe('SKU123')
+      expect(sanitizeColumnHeader('\x7FQuantity')).toBe('Quantity')
+    })
+
+    test('should remove zero-width Unicode characters', () => {
+      expect(sanitizeColumnHeader('Product\uFEFFName')).toBe('ProductName')
+      expect(sanitizeColumnHeader('SKU\u200BCode')).toBe('SKUCode')
+    })
+
+    test('should limit header length to MAX_COLUMN_NAME_LENGTH', () => {
+      const longHeader = 'A'.repeat(150)
+      const sanitized = sanitizeColumnHeader(longHeader)
+      expect(sanitized.length).toBe(MAX_COLUMN_NAME_LENGTH)
+      expect(sanitized).toBe('A'.repeat(MAX_COLUMN_NAME_LENGTH))
+    })
+
+    test('should trim whitespace before length check', () => {
+      const headerWithSpaces = '  Product Name  '
+      expect(sanitizeColumnHeader(headerWithSpaces)).toBe('Product Name')
+    })
+
+    test('should handle combination of control chars and long length', () => {
+      const problematicHeader = `\x00${'A'.repeat(150)}\x1F`
+      const sanitized = sanitizeColumnHeader(problematicHeader)
+      expect(sanitized.length).toBe(MAX_COLUMN_NAME_LENGTH)
+      expect(sanitized).not.toContain('\x00')
+      expect(sanitized).not.toContain('\x1F')
+    })
+  })
+
+  describe('Exact Duplicate Detection (Code Review #1)', () => {
+    test('should detect exact duplicate headers in original CSV', () => {
+      const headers = ['Quantity', 'SKU', 'Quantity']
+      const duplicates: string[] = []
+      const seen = new Map<string, number>()
+
+      headers.forEach(header => {
+        const sanitized = sanitizeColumnHeader(header)
+        const count = seen.get(sanitized) || 0
+        seen.set(sanitized, count + 1)
+        if (count > 0 && !duplicates.includes(sanitized)) {
+          duplicates.push(sanitized)
+        }
+      })
+
+      expect(duplicates).toContain('Quantity')
+    })
+
+    test('should detect case-insensitive duplicates after sanitization', () => {
+      const headers = ['Quantity', 'quantity', 'QUANTITY']
+      const sanitizedHeaders = headers.map(h => sanitizeColumnHeader(h))
+      const normalizedHeaders = sanitizedHeaders.map(h => h.toLowerCase())
+      const seen = new Set<string>()
+      const duplicates: string[] = []
+
+      normalizedHeaders.forEach(h => {
+        if (seen.has(h)) {
+          duplicates.push(h)
+        }
+        seen.add(h)
+      })
+
+      expect(duplicates.length).toBeGreaterThan(0)
+    })
+
+    test('should differentiate between exact duplicates and mapping conflicts', () => {
+      // Exact duplicates: [Quantity, Quantity]
+      const exactDuplicates = ['Quantity', 'Quantity', 'SKU']
+      const exactDuplicateCount = new Map<string, number>()
+
+      exactDuplicates.forEach(h => {
+        const count = exactDuplicateCount.get(h) || 0
+        exactDuplicateCount.set(h, count + 1)
+      })
+
+      expect(exactDuplicateCount.get('Quantity')).toBe(2)
+
+      // Mapping conflicts: [Qty, Stock Quantity] both map to 'quantity'
+      const mappingConflicts = ['Qty', 'Stock Quantity', 'SKU']
+      const normalizedConflicts = mappingConflicts.map(h => normalizeColumnHeader(h))
+      const duplicateNormalized = normalizedConflicts.filter(
+        (h, i) => normalizedConflicts.indexOf(h) !== i,
+      )
+
+      expect(duplicateNormalized).toContain('quantity')
+    })
+  })
+
+  describe('Enhanced Error Messages (Code Review #3)', () => {
+    test('should show original column names in ambiguous mapping errors', () => {
+      const headers = ['Item Name', 'Title', 'Qty']
+      const normalizedHeaders = headers.map(h => normalizeColumnHeader(h))
+      const seen = new Map<string, string[]>()
+
+      normalizedHeaders.forEach((normalized, index) => {
+        const original = headers[index]
+        if (!seen.has(normalized)) {
+          seen.set(normalized, [])
+        }
+        seen.get(normalized)?.push(original)
+      })
+
+      const ambiguous = Array.from(seen.entries())
+        .filter(([_, originals]) => originals.length > 1)
+        .map(([normalized, originals]) => ({
+          normalized,
+          originals,
+        }))
+
+      expect(ambiguous.length).toBeGreaterThan(0)
+      expect(ambiguous[0].normalized).toBe('product_name')
+      expect(ambiguous[0].originals).toEqual(['Item Name', 'Title'])
+    })
+
+    test('should provide detailed context for multiple ambiguous mappings', () => {
+      const headers = ['Item Name', 'Title', 'Qty', 'Stock', 'Product Code', 'Barcode']
+      const normalizedHeaders = headers.map(h => normalizeColumnHeader(h))
+      const seen = new Map<string, string[]>()
+
+      normalizedHeaders.forEach((normalized, index) => {
+        if (!seen.has(normalized)) {
+          seen.set(normalized, [])
+        }
+        seen.get(normalized)?.push(headers[index])
+      })
+
+      const ambiguous = Array.from(seen.entries())
+        .filter(([_, originals]) => originals.length > 1)
+        .map(([normalized, originals]) => ({
+          normalized,
+          originals: originals.join(', '),
+        }))
+
+      expect(ambiguous.length).toBe(3) // product_name, quantity, sku
+      expect(ambiguous.map(a => a.normalized)).toEqual(['product_name', 'quantity', 'sku'])
+    })
+  })
+
+  describe('Type Safety (Code Review #2)', () => {
+    test('ValidTargetColumn type should enforce valid column names', () => {
+      const validColumns: ValidTargetColumn[] = [
+        'sku',
+        'product_name',
+        'category',
+        'quantity',
+        'expiry_date',
+        'cost_price',
+        'selling_price',
+        'batch_number',
+      ]
+
+      expect(validColumns.length).toBe(8)
+      expect(validColumns).toContain('sku')
+      expect(validColumns).toContain('product_name')
+    })
+
+    test('COLUMN_MAPPINGS should only map to ValidTargetColumn values', () => {
+      const validTargets: ValidTargetColumn[] = [
+        'sku',
+        'product_name',
+        'category',
+        'quantity',
+        'expiry_date',
+        'cost_price',
+        'selling_price',
+        'batch_number',
+      ]
+
+      const mappingTargets = Object.values(COLUMN_MAPPINGS)
+      mappingTargets.forEach(target => {
+        expect(validTargets).toContain(target as ValidTargetColumn)
+      })
     })
   })
 })

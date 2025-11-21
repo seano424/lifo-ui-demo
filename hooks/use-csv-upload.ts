@@ -56,6 +56,38 @@ interface CsvRawRow {
 }
 
 /**
+ * Valid target column names expected by the backend
+ * Used for type safety and validation of column mappings
+ */
+type ValidTargetColumn =
+  | 'sku'
+  | 'product_name'
+  | 'category'
+  | 'quantity'
+  | 'expiry_date'
+  | 'cost_price'
+  | 'selling_price'
+  | 'batch_number'
+
+/**
+ * Backend-required columns that must be present or generated
+ * Used for validation before upload
+ */
+const REQUIRED_BACKEND_COLUMNS: ValidTargetColumn[] = [
+  'sku',
+  'product_name',
+  'quantity',
+  'cost_price',
+  'selling_price',
+]
+
+/**
+ * Maximum length for sanitized column headers
+ * Prevents excessively long header names from causing issues
+ */
+const MAX_COLUMN_NAME_LENGTH = 100
+
+/**
  * Column name mapping for CSV normalization
  * Maps common column name variations to backend-expected column names
  *
@@ -115,7 +147,7 @@ const COLUMN_MAPPINGS = {
   product_code: 'sku',
   item_code: 'sku',
   barcode: 'sku',
-} as const satisfies Record<string, string>
+} as const satisfies Record<string, ValidTargetColumn>
 
 export function useCSVUpload() {
   const [csvPreview, setCsvPreview] = useState<CsvPreviewItem[]>([])
@@ -134,13 +166,35 @@ export function useCSVUpload() {
   }
 
   /**
+   * Sanitize a column header by removing control characters and limiting length
+   * @param header - Raw CSV column header
+   * @returns Sanitized column header
+   */
+  const sanitizeColumnHeader = (header: string): string => {
+    // Remove control characters (ASCII 0-31, 127, and common problematic Unicode)
+    // biome-ignore lint/suspicious/noControlCharactersInRegex: Intentionally removing control characters for security
+    let sanitized = header.replace(/[\x00-\x1F\x7F\uFEFF\u200B-\u200D]/g, '')
+
+    // Trim whitespace
+    sanitized = sanitized.trim()
+
+    // Limit length to prevent issues
+    if (sanitized.length > MAX_COLUMN_NAME_LENGTH) {
+      sanitized = sanitized.slice(0, MAX_COLUMN_NAME_LENGTH)
+    }
+
+    return sanitized
+  }
+
+  /**
    * Normalize a single column header
    * Converts to lowercase with underscores and applies column mappings
    * @param header - Raw CSV column header
    * @returns Normalized column name
    */
   const normalizeColumnHeader = (header: string): string => {
-    const normalized = header.trim().toLowerCase().replace(/\s+/g, '_')
+    const sanitized = sanitizeColumnHeader(header)
+    const normalized = sanitized.toLowerCase().replace(/\s+/g, '_')
     return normalized in COLUMN_MAPPINGS
       ? COLUMN_MAPPINGS[normalized as keyof typeof COLUMN_MAPPINGS]
       : normalized
@@ -293,9 +347,11 @@ export function useCSVUpload() {
    * Normalize CSV headers and map common column name variations
    *
    * Transforms CSV headers to backend-expected format:
-   * 1. Lowercase with underscores (e.g., "Stock Quantity" → "stock_quantity")
-   * 2. Apply column mappings (e.g., "stock_quantity" → "quantity")
-   * 3. Add missing pricing columns if needed
+   * 1. Sanitize headers (remove control chars, limit length)
+   * 2. Lowercase with underscores (e.g., "Stock Quantity" → "stock_quantity")
+   * 3. Apply column mappings (e.g., "stock_quantity" → "quantity")
+   * 4. Validate for duplicates and required columns
+   * 5. Add missing pricing columns if needed
    *
    * @param parsedData - Raw CSV data from PapaParse
    * @param previewData - Preview data with validated values
@@ -309,39 +365,94 @@ export function useCSVUpload() {
     const firstRow = parsedData[0]
     const originalHeaders = Object.keys(firstRow)
 
-    // Normalize headers using shared normalization logic
-    const normalizedHeaders = originalHeaders.map(h => normalizeColumnHeader(h))
+    // Step 1: Check for exact duplicate headers in original CSV (before normalization)
+    const originalHeaderCounts = new Map<string, number>()
+    const exactDuplicates: string[] = []
 
-    // Detect duplicate columns after mapping (critical for data integrity)
-    const seen = new Set<string>()
-    const duplicates: string[] = []
-    normalizedHeaders.forEach(h => {
-      if (seen.has(h)) {
-        duplicates.push(h)
+    originalHeaders.forEach(header => {
+      const sanitized = sanitizeColumnHeader(header)
+      const count = originalHeaderCounts.get(sanitized) || 0
+      originalHeaderCounts.set(sanitized, count + 1)
+      if (count > 0) {
+        exactDuplicates.push(sanitized)
       }
-      seen.add(h)
     })
 
-    if (duplicates.length > 0) {
-      const uniqueDuplicates = [...new Set(duplicates)]
+    if (exactDuplicates.length > 0) {
+      const uniqueExactDuplicates = [...new Set(exactDuplicates)]
       throw new Error(
-        `Ambiguous column mapping detected: Multiple columns map to '${uniqueDuplicates.join("', '")}'. Please ensure unique column names in your CSV or contact support.`,
+        `Duplicate column names found in CSV: '${uniqueExactDuplicates.join("', '")}'. Each column must have a unique name. Please fix your CSV and try again.`,
       )
     }
 
-    // Check if pricing columns exist (after mapping)
+    // Step 2: Normalize headers using shared normalization logic
+    const normalizedHeaders = originalHeaders.map(h => normalizeColumnHeader(h))
+
+    // Step 3: Detect duplicate columns after mapping (critical for data integrity)
+    const seen = new Map<string, string[]>() // Maps normalized name to original headers
+    normalizedHeaders.forEach((normalized, index) => {
+      const original = originalHeaders[index]
+      if (!seen.has(normalized)) {
+        seen.set(normalized, [])
+      }
+      seen.get(normalized)?.push(original)
+    })
+
+    // Find columns that have multiple original headers mapping to them
+    const ambiguousMappings = Array.from(seen.entries())
+      .filter(([_, originals]) => originals.length > 1)
+      .map(([normalized, originals]) => ({
+        normalized,
+        originals,
+      }))
+
+    if (ambiguousMappings.length > 0) {
+      const errorDetails = ambiguousMappings
+        .map(
+          ({ normalized, originals }) => `'${normalized}' (from columns: ${originals.join(', ')})`,
+        )
+        .join('; ')
+
+      throw new Error(
+        `Ambiguous column mapping detected: Multiple columns map to the same target. ${errorDetails}. Please rename columns in your CSV to avoid conflicts.`,
+      )
+    }
+
+    // Step 4: Validate backend-required columns (with generation support)
+    const missingRequired: ValidTargetColumn[] = []
+    const finalHeaders = [...normalizedHeaders]
+
+    // Check if pricing columns exist (can be generated from preview data)
     const hasCostPrice = normalizedHeaders.includes('cost_price')
     const hasSellingPrice = normalizedHeaders.includes('selling_price')
 
+    // Add missing pricing columns (will be populated from preview data)
     if (!hasCostPrice) {
-      normalizedHeaders.push('cost_price')
+      finalHeaders.push('cost_price')
     }
     if (!hasSellingPrice) {
-      normalizedHeaders.push('selling_price')
+      finalHeaders.push('selling_price')
     }
 
-    // Rebuild CSV with normalized headers and pricing values from preview
-    const csvRows = [normalizedHeaders.join(',')]
+    // Validate other required columns that cannot be auto-generated
+    for (const required of REQUIRED_BACKEND_COLUMNS) {
+      if (
+        !finalHeaders.includes(required) &&
+        required !== 'cost_price' &&
+        required !== 'selling_price'
+      ) {
+        missingRequired.push(required)
+      }
+    }
+
+    if (missingRequired.length > 0) {
+      throw new Error(
+        `Required columns missing from CSV: ${missingRequired.join(', ')}. Your CSV must include columns that map to these fields. Please add them and try again.`,
+      )
+    }
+
+    // Step 5: Rebuild CSV with normalized headers and pricing values from preview
+    const csvRows = [finalHeaders.join(',')]
 
     parsedData.forEach((row, index) => {
       const values = originalHeaders.map(header => row[header] || '')
