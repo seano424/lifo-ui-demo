@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { DraftBatchesList } from '@/components/batches/draft-batches-list'
 import { CompleteDraftBatchDialog } from '@/components/batches/complete-draft-batch-dialog'
-import { Typography } from '@/components/ui/typography'
+import DraftBatchesHeader from '@/components/batches/draft-batches-header'
 import type { Batch } from '@/lib/queries/batches'
 
 export default function DraftBatchesPage() {
@@ -16,16 +16,9 @@ export default function DraftBatchesPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Page header */}
-      <div>
-        <Typography variant="h2" className="mb-2">
-          Draft Batches
-        </Typography>
-        <Typography variant="p" color="muted">
-          Complete batches by adding expiry dates to enable AI scoring and inventory management
-        </Typography>
-      </div>
+      <DraftBatchesHeader />
 
       {/* Draft batches list */}
       <DraftBatchesList onSelectBatch={handleSelectBatch} />
