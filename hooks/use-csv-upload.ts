@@ -55,6 +55,62 @@ interface CsvRawRow {
   [key: string]: string
 }
 
+/**
+ * Column name mapping for CSV normalization
+ * Maps common column name variations to backend-expected column names
+ *
+ * Supported mappings:
+ * - Quantity: stock_quantity, qty, stock, amount → quantity
+ * - Selling Price: sell_price, sale_price, price, retail_price → selling_price
+ * - Cost Price: purchase_price, buy_price, unit_cost → cost_price
+ * - Batch Number: batch_lot, lot, lot_number, batch → batch_number
+ * - Expiry Date: best_before, use_by, expiration_date, exp_date, expiry → expiry_date
+ * - Product Name: item_name, description, title, name → product_name
+ * - SKU: product_code, item_code, barcode → sku
+ */
+const COLUMN_MAPPINGS: Record<string, string> = {
+  // Quantity variations
+  stock_quantity: 'quantity',
+  qty: 'quantity',
+  stock: 'quantity',
+  amount: 'quantity',
+
+  // Selling price variations
+  sell_price: 'selling_price',
+  sale_price: 'selling_price',
+  price: 'selling_price',
+  retail_price: 'selling_price',
+
+  // Cost price variations
+  purchase_price: 'cost_price',
+  buy_price: 'cost_price',
+  unit_cost: 'cost_price',
+
+  // Batch number variations
+  batch_lot: 'batch_number',
+  lot: 'batch_number',
+  lot_number: 'batch_number',
+  batch: 'batch_number',
+
+  // Expiry date variations
+  best_before: 'expiry_date',
+  use_by: 'expiry_date',
+  expiration_date: 'expiry_date',
+  exp_date: 'expiry_date',
+  expiry: 'expiry_date',
+
+  // Product name variations
+  item_name: 'product_name',
+  description: 'product_name',
+  title: 'product_name',
+  name: 'product_name',
+
+  // SKU variations
+  product_code: 'sku',
+  item_code: 'sku',
+  barcode: 'sku',
+}
+
 export function useCSVUpload() {
   const [csvPreview, setCsvPreview] = useState<CsvPreviewItem[]>([])
   const [isPreviewReady, setIsPreviewReady] = useState(false)
@@ -183,8 +239,18 @@ export function useCSVUpload() {
     }
   }
 
-  // Pure function to normalize CSV: lowercase headers + add pricing columns
-  // Uses cached parsed data to avoid re-parsing
+  /**
+   * Normalize CSV headers and map common column name variations
+   *
+   * Transforms CSV headers to backend-expected format:
+   * 1. Lowercase with underscores (e.g., "Stock Quantity" → "stock_quantity")
+   * 2. Apply column mappings (e.g., "stock_quantity" → "quantity")
+   * 3. Add missing pricing columns if needed
+   *
+   * @param parsedData - Raw CSV data from PapaParse
+   * @param previewData - Preview data with validated values
+   * @returns Normalized CSV string with mapped headers
+   */
   const normalizeCsvHeaders = (parsedData: CsvRawRow[], previewData: CsvPreviewItem[]): string => {
     if (!parsedData || parsedData.length === 0) {
       return ''
@@ -193,14 +259,11 @@ export function useCSVUpload() {
     const firstRow = parsedData[0]
     const originalHeaders = Object.keys(firstRow)
 
-    // Normalize headers to lowercase with underscores
+    // Normalize headers to lowercase with underscores, then apply mappings
     const normalizedHeaders = originalHeaders.map(h => {
       const normalized = h.trim().toLowerCase().replace(/\s+/g, '_')
-      // Map common variations to expected backend column names
-      if (normalized === 'stock_quantity') return 'quantity'
-      if (normalized === 'sell_price') return 'selling_price'
-      if (normalized === 'batch_lot') return 'batch_number'
-      return normalized
+      // Apply column mappings for common variations
+      return COLUMN_MAPPINGS[normalized] || normalized
     })
 
     // Check if pricing columns exist
