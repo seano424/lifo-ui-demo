@@ -7,12 +7,15 @@ if (!process.env.RESEND_API) {
 
 const resend = new Resend(process.env.RESEND_API)
 
+export type SupportedLanguage = 'en' | 'fr' | 'nl'
+
 export interface EmailCredentials {
   username: string
   password: string
   email: string
   full_name: string
   store_name?: string
+  language?: SupportedLanguage // Language preference for email content
 }
 
 export interface EmailDeliveryResult {
@@ -21,6 +24,189 @@ export interface EmailDeliveryResult {
   error?: string
 }
 
+// ============================================================================
+// EMAIL CONTENT TRANSLATIONS
+// ============================================================================
+
+interface WelcomeEmailContent {
+  subject: (storeName: string) => string
+  title: (storeName: string) => string
+  subtitle: string
+  greeting: (fullName: string) => string
+  welcomeMessage: string
+  credentialsTitle: string
+  usernameLabel: string
+  passwordLabel: string
+  emailLabel: string
+  howToLoginTitle: string
+  steps: string[]
+  importantNote: string
+  footerHelp: string
+  footerCopyright: string
+}
+
+interface PasswordResetEmailContent {
+  subject: string
+  title: string
+  subtitle: string
+  greeting: (fullName: string) => string
+  resetMessage: (storeName: string) => string
+  newPasswordTitle: string
+  passwordActiveNote: string
+  credentialsSummaryTitle: string
+  usernameLabel: string
+  newPasswordLabel: string
+  emailLabel: string
+  importantNote: string
+  securityWarning: string
+  footerHelp: string
+  footerCopyright: string
+}
+
+const welcomeEmailTranslations: Record<SupportedLanguage, WelcomeEmailContent> = {
+  en: {
+    subject: (storeName: string) => `Welcome to ${storeName} - Your Login Credentials`,
+    title: (storeName: string) => `Welcome to ${storeName}`,
+    subtitle: 'Your employee account has been successfully created',
+    greeting: (fullName: string) => `Hello <strong>${fullName}</strong>,`,
+    welcomeMessage:
+      'Welcome to the team! Your LIFO account has been created and you can now access the inventory management system.',
+    credentialsTitle: 'Your login credentials:',
+    usernameLabel: 'Username:',
+    passwordLabel: 'Password:',
+    emailLabel: 'Email:',
+    howToLoginTitle: 'How to log in:',
+    steps: [
+      'Open the LIFO app on the store tablet',
+      'Select the <strong>"Employee"</strong> tab',
+      'Enter your username and password',
+      'Start scanning products and managing inventory',
+    ],
+    importantNote:
+      "<strong>Important:</strong> Keep your credentials secure and don't share them with anyone. Your password can be reset at any time by your manager.",
+    footerHelp:
+      'Need help? Contact your manager or <a href="mailto:support@lifo-app" class="support-link">our support</a>',
+    footerCopyright: '© 2025 LIFO - Smart Food Waste Reduction',
+  },
+  fr: {
+    subject: (storeName: string) => `Bienvenue chez ${storeName} - Vos identifiants de connexion`,
+    title: (storeName: string) => `Bienvenue chez ${storeName}`,
+    subtitle: 'Votre compte employé a été créé avec succès',
+    greeting: (fullName: string) => `Bonjour <strong>${fullName}</strong>,`,
+    welcomeMessage:
+      "Bienvenue dans l'équipe ! Votre compte LIFO a été créé et vous pouvez maintenant accéder au système de gestion des stocks.",
+    credentialsTitle: 'Vos identifiants de connexion :',
+    usernameLabel: "Nom d'utilisateur :",
+    passwordLabel: 'Mot de passe :',
+    emailLabel: 'Email :',
+    howToLoginTitle: 'Comment vous connecter :',
+    steps: [
+      "Ouvrez l'application LIFO sur la tablette du magasin",
+      'Sélectionnez l\'onglet <strong>"Employé"</strong>',
+      "Saisissez votre nom d'utilisateur et votre mot de passe",
+      "Commencez à scanner les produits et gérer l'inventaire",
+    ],
+    importantNote:
+      '<strong>Important :</strong> Gardez vos identifiants en sécurité et ne les partagez avec personne. Votre mot de passe peut être réinitialisé à tout moment par votre responsable.',
+    footerHelp:
+      'Besoin d\'aide ? Contactez votre responsable ou <a href="mailto:support@lifo-app" class="support-link">notre support</a>',
+    footerCopyright: '© 2025 LIFO - Réduction intelligente du gaspillage alimentaire',
+  },
+  nl: {
+    subject: (storeName: string) => `Welkom bij ${storeName} - Uw inloggegevens`,
+    title: (storeName: string) => `Welkom bij ${storeName}`,
+    subtitle: 'Uw werknemersaccount is succesvol aangemaakt',
+    greeting: (fullName: string) => `Hallo <strong>${fullName}</strong>,`,
+    welcomeMessage:
+      'Welkom bij het team! Uw LIFO-account is aangemaakt en u kunt nu toegang krijgen tot het voorraadbeheerssysteem.',
+    credentialsTitle: 'Uw inloggegevens:',
+    usernameLabel: 'Gebruikersnaam:',
+    passwordLabel: 'Wachtwoord:',
+    emailLabel: 'E-mail:',
+    howToLoginTitle: 'Hoe in te loggen:',
+    steps: [
+      'Open de LIFO-app op de winkeltablet',
+      'Selecteer het tabblad <strong>"Medewerker"</strong>',
+      'Voer uw gebruikersnaam en wachtwoord in',
+      'Begin met het scannen van producten en beheer van voorraad',
+    ],
+    importantNote:
+      '<strong>Belangrijk:</strong> Houd uw inloggegevens veilig en deel ze met niemand. Uw wachtwoord kan op elk moment door uw manager worden gereset.',
+    footerHelp:
+      'Hulp nodig? Neem contact op met uw manager of <a href="mailto:support@lifo-app" class="support-link">onze support</a>',
+    footerCopyright: '© 2025 LIFO - Slimme Voedselafvalvermindering',
+  },
+}
+
+const passwordResetEmailTranslations: Record<SupportedLanguage, PasswordResetEmailContent> = {
+  en: {
+    subject: 'LIFO - New Password Generated',
+    title: 'New Password Generated',
+    subtitle: 'Your password has been reset',
+    greeting: (fullName: string) => `Hello <strong>${fullName}</strong>,`,
+    resetMessage: (storeName: string) =>
+      `A new password has been generated for your LIFO account at ${storeName}.`,
+    newPasswordTitle: 'Your new password:',
+    passwordActiveNote: 'This password is active immediately',
+    credentialsSummaryTitle: 'Reminder of your credentials:',
+    usernameLabel: 'Username:',
+    newPasswordLabel: 'New password:',
+    emailLabel: 'Email:',
+    importantNote:
+      '<strong>Important:</strong> Your old password no longer works. Use only this new password to log in.',
+    securityWarning: 'If you did not request this reset, contact your manager immediately.',
+    footerHelp:
+      'Questions? Contact your manager or <a href="mailto:support@lifo-app" style="color: #3b82f6;">our support</a>',
+    footerCopyright: '© 2025 LIFO',
+  },
+  fr: {
+    subject: 'LIFO - Nouveau mot de passe généré',
+    title: 'Nouveau mot de passe généré',
+    subtitle: 'Votre mot de passe a été réinitialisé',
+    greeting: (fullName: string) => `Bonjour <strong>${fullName}</strong>,`,
+    resetMessage: (storeName: string) =>
+      `Un nouveau mot de passe a été généré pour votre compte LIFO chez ${storeName}.`,
+    newPasswordTitle: 'Votre nouveau mot de passe :',
+    passwordActiveNote: 'Ce mot de passe est actif immédiatement',
+    credentialsSummaryTitle: 'Rappel de vos identifiants :',
+    usernameLabel: "Nom d'utilisateur :",
+    newPasswordLabel: 'Nouveau mot de passe :',
+    emailLabel: 'Email :',
+    importantNote:
+      '<strong>Important :</strong> Votre ancien mot de passe ne fonctionne plus. Utilisez uniquement ce nouveau mot de passe pour vous connecter.',
+    securityWarning:
+      "Si vous n'avez pas demandé cette réinitialisation, contactez immédiatement votre responsable.",
+    footerHelp:
+      'Questions ? Contactez votre responsable ou <a href="mailto:support@lifo-app" style="color: #3b82f6;">notre support</a>',
+    footerCopyright: '© 2025 LIFO',
+  },
+  nl: {
+    subject: 'LIFO - Nieuw wachtwoord gegenereerd',
+    title: 'Nieuw wachtwoord gegenereerd',
+    subtitle: 'Uw wachtwoord is gereset',
+    greeting: (fullName: string) => `Hallo <strong>${fullName}</strong>,`,
+    resetMessage: (storeName: string) =>
+      `Er is een nieuw wachtwoord gegenereerd voor uw LIFO-account bij ${storeName}.`,
+    newPasswordTitle: 'Uw nieuwe wachtwoord:',
+    passwordActiveNote: 'Dit wachtwoord is onmiddellijk actief',
+    credentialsSummaryTitle: 'Herinnering van uw inloggegevens:',
+    usernameLabel: 'Gebruikersnaam:',
+    newPasswordLabel: 'Nieuw wachtwoord:',
+    emailLabel: 'E-mail:',
+    importantNote:
+      '<strong>Belangrijk:</strong> Uw oude wachtwoord werkt niet meer. Gebruik alleen dit nieuwe wachtwoord om in te loggen.',
+    securityWarning:
+      'Als u deze reset niet hebt aangevraagd, neem dan onmiddellijk contact op met uw manager.',
+    footerHelp:
+      'Vragen? Neem contact op met uw manager of <a href="mailto:support@lifo-app" style="color: #3b82f6;">onze support</a>',
+    footerCopyright: '© 2025 LIFO',
+  },
+}
+
+// ============================================================================
+// EMAIL SENDING FUNCTIONS
+// ============================================================================
+
 /**
  * Send welcome email with login credentials to new employee
  */
@@ -28,12 +214,16 @@ export async function sendWelcomeEmail(
   credentials: EmailCredentials,
 ): Promise<EmailDeliveryResult> {
   try {
+    const language = credentials.language || 'fr' // Default to French
+    const content = welcomeEmailTranslations[language]
+    const storeName = credentials.store_name || 'LIFO'
+
     const { data, error } = await resend.emails.send({
-      from: 'LIFO <noreply@lifo-app.com>', // Your verified domain
+      from: 'LIFO <noreply@lifo-app.com>',
       to: [credentials.email],
-      subject: `Bienvenue chez ${credentials.store_name || 'LIFO'} - Vos identifiants de connexion`,
-      html: generateWelcomeEmailHTML(credentials),
-      text: generateWelcomeEmailText(credentials),
+      subject: content.subject(storeName),
+      html: generateWelcomeEmailHTML(credentials, language, content),
+      text: generateWelcomeEmailText(credentials, language, content),
     })
 
     if (error) {
@@ -64,12 +254,15 @@ export async function sendPasswordResetEmail(
   credentials: EmailCredentials,
 ): Promise<EmailDeliveryResult> {
   try {
+    const language = credentials.language || 'fr' // Default to French
+    const content = passwordResetEmailTranslations[language]
+
     const { data, error } = await resend.emails.send({
-      from: 'LIFO <noreply@lifo-app.com>', // Your verified domain
+      from: 'LIFO <noreply@lifo-app.com>',
       to: [credentials.email],
-      subject: `LIFO - Nouveau mot de passe généré`,
-      html: generatePasswordResetEmailHTML(credentials),
-      text: generatePasswordResetEmailText(credentials),
+      subject: content.subject,
+      html: generatePasswordResetEmailHTML(credentials, language, content),
+      text: generatePasswordResetEmailText(credentials, language, content),
     })
 
     if (error) {
@@ -93,17 +286,27 @@ export async function sendPasswordResetEmail(
   }
 }
 
+// ============================================================================
+// HTML TEMPLATE GENERATORS
+// ============================================================================
+
 /**
  * Generate HTML content for welcome email
  */
-function generateWelcomeEmailHTML(credentials: EmailCredentials): string {
+function generateWelcomeEmailHTML(
+  credentials: EmailCredentials,
+  language: SupportedLanguage,
+  content: WelcomeEmailContent,
+): string {
+  const storeName = credentials.store_name || 'LIFO'
+
   return `
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="${language}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bienvenue chez LIFO</title>
+    <title>${content.title(storeName)}</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -205,48 +408,45 @@ function generateWelcomeEmailHTML(credentials: EmailCredentials): string {
     <div class="email-container">
         <div class="header">
             <div class="logo">L</div>
-            <h1 style="margin: 0; color: #1e293b;">Bienvenue chez ${credentials.store_name || 'LIFO'}</h1>
-            <p style="margin: 8px 0 0 0; color: #64748b;">Votre compte employé a été créé avec succès</p>
+            <h1 style="margin: 0; color: #1e293b;">${content.title(storeName)}</h1>
+            <p style="margin: 8px 0 0 0; color: #64748b;">${content.subtitle}</p>
         </div>
 
-        <p>Bonjour <strong>${credentials.full_name}</strong>,</p>
+        <p>${content.greeting(credentials.full_name)}</p>
 
-        <p>Bienvenue dans l'équipe ! Votre compte LIFO a été créé et vous pouvez maintenant accéder au système de gestion des stocks.</p>
+        <p>${content.welcomeMessage}</p>
 
         <div class="credentials-box">
-            <h3 style="margin: 0 0 16px 0; color: #1e293b;">Vos identifiants de connexion :</h3>
+            <h3 style="margin: 0 0 16px 0; color: #1e293b;">${content.credentialsTitle}</h3>
 
             <div class="credential-item">
-                <span class="credential-label">Nom d'utilisateur :</span>
+                <span class="credential-label">${content.usernameLabel}</span>
                 <span class="credential-value">${credentials.username}</span>
             </div>
 
             <div class="credential-item">
-                <span class="credential-label">Mot de passe :</span>
+                <span class="credential-label">${content.passwordLabel}</span>
                 <span class="credential-value password-value">${credentials.password}</span>
             </div>
 
             <div class="credential-item">
-                <span class="credential-label">Email :</span>
+                <span class="credential-label">${content.emailLabel}</span>
                 <span class="credential-value">${credentials.email}</span>
             </div>
         </div>
 
         <div class="instructions">
-            <h3>Comment vous connecter :</h3>
+            <h3>${content.howToLoginTitle}</h3>
             <ol class="steps">
-                <li>Ouvrez l'application LIFO sur la tablette du magasin</li>
-                <li>Sélectionnez l'onglet <strong>"Employé"</strong></li>
-                <li>Saisissez votre nom d'utilisateur et votre mot de passe</li>
-                <li>Commencez à scanner les produits et gérer l'inventaire</li>
+                ${content.steps.map(step => `<li>${step}</li>`).join('\n                ')}
             </ol>
         </div>
 
-        <p><strong>Important :</strong> Gardez vos identifiants en sécurité et ne les partagez avec personne. Votre mot de passe peut être réinitialisé à tout moment par votre responsable.</p>
+        <p>${content.importantNote}</p>
 
         <div class="footer">
-            <p>Besoin d'aide ? Contactez votre responsable ou <a href="mailto:support@lifo-app" class="support-link">notre support</a></p>
-            <p style="margin: 8px 0 0 0;">© 2025 LIFO - Réduction intelligente du gaspillage alimentaire</p>
+            <p>${content.footerHelp}</p>
+            <p style="margin: 8px 0 0 0;">${content.footerCopyright}</p>
         </div>
     </div>
 </body>
@@ -257,44 +457,56 @@ function generateWelcomeEmailHTML(credentials: EmailCredentials): string {
 /**
  * Generate plain text content for welcome email
  */
-function generateWelcomeEmailText(credentials: EmailCredentials): string {
+function generateWelcomeEmailText(
+  credentials: EmailCredentials,
+  _language: SupportedLanguage,
+  content: WelcomeEmailContent,
+): string {
+  const storeName = credentials.store_name || 'LIFO'
+  const stepsText = content.steps
+    .map((step, index) => `${index + 1}. ${step.replace(/<\/?strong>/g, '')}`)
+    .join('\n')
+
   return `
-Bienvenue chez ${credentials.store_name || 'LIFO'}
+${content.title(storeName)}
 
-Bonjour ${credentials.full_name},
+${content.greeting(credentials.full_name).replace(/<\/?strong>/g, '')}
 
-Bienvenue dans l'équipe ! Votre compte LIFO a été créé avec succès.
+${content.welcomeMessage}
 
-VOS IDENTIFIANTS DE CONNEXION :
-• Nom d'utilisateur : ${credentials.username}
-• Mot de passe : ${credentials.password}
-• Email : ${credentials.email}
+${content.credentialsTitle.toUpperCase()}
+• ${content.usernameLabel} ${credentials.username}
+• ${content.passwordLabel} ${credentials.password}
+• ${content.emailLabel} ${credentials.email}
 
-COMMENT VOUS CONNECTER :
-1. Ouvrez l'application LIFO sur la tablette du magasin
-2. Sélectionnez l'onglet "Employé"
-3. Saisissez votre nom d'utilisateur et votre mot de passe
-4. Commencez à scanner les produits et gérer l'inventaire
+${content.howToLoginTitle.toUpperCase()}
+${stepsText}
 
-Important : Gardez vos identifiants en sécurité et ne les partagez avec personne. Votre mot de passe peut être réinitialisé à tout moment par votre responsable.
+${content.importantNote.replace(/<\/?strong>/g, '')}
 
-Besoin d'aide ? Contactez votre responsable ou notre support : support@lifo-app
+${content.footerHelp.replace(/<a [^>]*>|<\/a>/g, '')}
 
-© 2025 LIFO - Réduction intelligente du gaspillage alimentaire
+${content.footerCopyright}
   `
 }
 
 /**
  * Generate HTML content for password reset email
  */
-function generatePasswordResetEmailHTML(credentials: EmailCredentials): string {
+function generatePasswordResetEmailHTML(
+  credentials: EmailCredentials,
+  language: SupportedLanguage,
+  content: PasswordResetEmailContent,
+): string {
+  const storeName = credentials.store_name || 'your store'
+
   return `
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="${language}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nouveau mot de passe - LIFO</title>
+    <title>${content.title}</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -364,34 +576,34 @@ function generatePasswordResetEmailHTML(credentials: EmailCredentials): string {
     <div class="email-container">
         <div class="header">
             <div class="logo">🔑</div>
-            <h1 style="margin: 0; color: #1e293b;">Nouveau mot de passe généré</h1>
-            <p style="margin: 8px 0 0 0; color: #64748b;">Votre mot de passe a été réinitialisé</p>
+            <h1 style="margin: 0; color: #1e293b;">${content.title}</h1>
+            <p style="margin: 8px 0 0 0; color: #64748b;">${content.subtitle}</p>
         </div>
 
-        <p>Bonjour <strong>${credentials.full_name}</strong>,</p>
+        <p>${content.greeting(credentials.full_name)}</p>
 
-        <p>Un nouveau mot de passe a été généré pour votre compte LIFO chez ${credentials.store_name || 'votre magasin'}.</p>
+        <p>${content.resetMessage(storeName)}</p>
 
         <div class="alert-box">
-            <h3 style="margin: 0 0 8px 0; color: #92400e;">Votre nouveau mot de passe :</h3>
+            <h3 style="margin: 0 0 8px 0; color: #92400e;">${content.newPasswordTitle}</h3>
             <div class="new-pin">${credentials.password}</div>
-            <p style="margin: 8px 0 0 0; color: #92400e; font-size: 14px;">Ce mot de passe est actif immédiatement</p>
+            <p style="margin: 8px 0 0 0; color: #92400e; font-size: 14px;">${content.passwordActiveNote}</p>
         </div>
 
         <div class="credentials-summary">
-            <h4 style="margin: 0 0 12px 0; color: #1e293b;">Rappel de vos identifiants :</h4>
-            <p style="margin: 4px 0;"><strong>Nom d'utilisateur :</strong> <code>${credentials.username}</code></p>
-            <p style="margin: 4px 0;"><strong>Nouveau mot de passe :</strong> <code>${credentials.password}</code></p>
-            <p style="margin: 4px 0;"><strong>Email :</strong> ${credentials.email}</p>
+            <h4 style="margin: 0 0 12px 0; color: #1e293b;">${content.credentialsSummaryTitle}</h4>
+            <p style="margin: 4px 0;"><strong>${content.usernameLabel}</strong> <code>${credentials.username}</code></p>
+            <p style="margin: 4px 0;"><strong>${content.newPasswordLabel}</strong> <code>${credentials.password}</code></p>
+            <p style="margin: 4px 0;"><strong>${content.emailLabel}</strong> ${credentials.email}</p>
         </div>
 
-        <p><strong>Important :</strong> Votre ancien mot de passe ne fonctionne plus. Utilisez uniquement ce nouveau mot de passe pour vous connecter.</p>
+        <p>${content.importantNote}</p>
 
-        <p>Si vous n'avez pas demandé cette réinitialisation, contactez immédiatement votre responsable.</p>
+        <p>${content.securityWarning}</p>
 
         <div class="footer">
-            <p>Questions ? Contactez votre responsable ou <a href="mailto:support@lifo-app" style="color: #3b82f6;">notre support</a></p>
-            <p style="margin: 8px 0 0 0;">© 2025 LIFO</p>
+            <p>${content.footerHelp}</p>
+            <p style="margin: 8px 0 0 0;">${content.footerCopyright}</p>
         </div>
     </div>
 </body>
@@ -402,27 +614,33 @@ function generatePasswordResetEmailHTML(credentials: EmailCredentials): string {
 /**
  * Generate plain text content for password reset email
  */
-function generatePasswordResetEmailText(credentials: EmailCredentials): string {
+function generatePasswordResetEmailText(
+  credentials: EmailCredentials,
+  _language: SupportedLanguage,
+  content: PasswordResetEmailContent,
+): string {
+  const storeName = credentials.store_name || 'your store'
+
   return `
-LIFO - Nouveau mot de passe généré
+LIFO - ${content.title}
 
-Bonjour ${credentials.full_name},
+${content.greeting(credentials.full_name).replace(/<\/?strong>/g, '')}
 
-Un nouveau mot de passe a été généré pour votre compte LIFO.
+${content.resetMessage(storeName)}
 
-VOTRE NOUVEAU MOT DE PASSE : ${credentials.password}
+${content.newPasswordTitle.toUpperCase()} ${credentials.password}
 
-RAPPEL DE VOS IDENTIFIANTS :
-• Nom d'utilisateur : ${credentials.username}
-• Nouveau mot de passe : ${credentials.password}
-• Email : ${credentials.email}
+${content.credentialsSummaryTitle.toUpperCase()}
+• ${content.usernameLabel} ${credentials.username}
+• ${content.newPasswordLabel} ${credentials.password}
+• ${content.emailLabel} ${credentials.email}
 
-Important : Votre ancien mot de passe ne fonctionne plus. Utilisez uniquement ce nouveau mot de passe pour vous connecter.
+${content.importantNote.replace(/<\/?strong>/g, '')}
 
-Si vous n'avez pas demandé cette réinitialisation, contactez immédiatement votre responsable.
+${content.securityWarning}
 
-Questions ? Contactez votre responsable ou notre support : support@lifo-app
+${content.footerHelp.replace(/<a [^>]*>|<\/a>/g, '')}
 
-© 2025 LIFO
+${content.footerCopyright}
   `
 }
