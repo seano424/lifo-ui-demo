@@ -8,52 +8,43 @@ import { Label } from '@/components/ui/label'
 import { Typography } from '@/components/ui/typography'
 import { cn } from '@/lib/utils'
 import { createClient } from '@/lib/supabase/client'
+import { signUpSchema, type SignUpFormData } from '@/lib/schemas/auth-schemas'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { Building2 } from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
+import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
 export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
   const t = useTranslations('auth.signUpForm')
   const tErrors = useTranslations('auth.errors')
   const locale = useLocale()
-
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [repeatPassword, setRepeatPassword] = useState('')
-  const [error, setError] = useState<string | null>(null)
-  const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
+  const supabase = useMemo(() => createClient(), [])
 
-  const handleSignUp = async (e: React.FormEvent) => {
-    e.preventDefault()
-    const supabase = createClient()
+  const [isLoading, setIsLoading] = useState(false)
+
+  // Initialize React Hook Form with Zod validation
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<SignUpFormData>({
+    resolver: zodResolver(signUpSchema),
+    mode: 'onBlur',
+  })
+
+  const onSubmit = async (data: SignUpFormData) => {
     setIsLoading(true)
-    setError(null)
-
-    if (password.length < 6) {
-      const errorMsg = tErrors('passwordTooShort')
-      setError(errorMsg)
-      toast.error(errorMsg)
-      setIsLoading(false)
-      return
-    }
-
-    if (password !== repeatPassword) {
-      const errorMsg = tErrors('passwordsNoMatch')
-      setError(errorMsg)
-      toast.error(errorMsg)
-      setIsLoading(false)
-      return
-    }
 
     try {
       // Sign up with Supabase and pass language preference in user metadata
       const { error } = await supabase.auth.signUp({
-        email,
-        password,
+        email: data.email,
+        password: data.password,
         options: {
           emailRedirectTo: `${window.location.origin}/dashboard`,
           data: {
@@ -64,10 +55,9 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
 
       if (error) throw error
 
-      router.push(`/auth/sign-up-success?email=${encodeURIComponent(email)}`)
+      router.push(`/auth/sign-up-success?email=${encodeURIComponent(data.email)}`)
     } catch (error: unknown) {
       const errorMsg = error instanceof Error ? error.message : tErrors('genericError')
-      setError(errorMsg)
       toast.error(errorMsg)
     } finally {
       setIsLoading(false)
@@ -91,59 +81,56 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
         </CardHeader>
 
         <CardContent>
-          <form onSubmit={handleSignUp} className="space-y-4 font-mono uppercase">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 font-mono uppercase">
             <div className="space-y-2">
               <Label htmlFor="email">{t('email')}</Label>
               <Input
                 id="email"
-                name="email"
                 type="email"
                 placeholder={t('emailPlaceholder')}
-                required
-                value={email}
-                onChange={e => setEmail(e.target.value)}
                 autoComplete="email"
+                {...register('email')}
               />
+              {errors.email && (
+                <Typography variant="extraSmall" color="destructive" className="mt-1">
+                  {errors.email.message}
+                </Typography>
+              )}
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="password">{t('password')}</Label>
               <Input
                 id="password"
-                name="password"
                 type="password"
                 showPasswordToggle
                 placeholder={t('passwordPlaceholder')}
-                required
-                minLength={6}
-                value={password}
-                onChange={e => setPassword(e.target.value)}
                 autoComplete="new-password"
+                {...register('password')}
               />
+              {errors.password && (
+                <Typography variant="extraSmall" color="destructive" className="mt-1">
+                  {errors.password.message}
+                </Typography>
+              )}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="repeat-password">{t('repeatPassword')}</Label>
+              <Label htmlFor="repeatPassword">{t('repeatPassword')}</Label>
               <Input
-                id="repeat-password"
-                name="repeat-password"
+                id="repeatPassword"
                 type="password"
                 showPasswordToggle
                 placeholder={t('repeatPasswordPlaceholder')}
-                required
-                value={repeatPassword}
-                onChange={e => setRepeatPassword(e.target.value)}
                 autoComplete="new-password"
+                {...register('repeatPassword')}
               />
-            </div>
-
-            {error && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-2xl">
-                <Typography variant="p" color="destructive" className="text-sm">
-                  {error}
+              {errors.repeatPassword && (
+                <Typography variant="extraSmall" color="destructive" className="mt-1">
+                  {errors.repeatPassword.message}
                 </Typography>
-              </div>
-            )}
+              )}
+            </div>
 
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? t('creatingAccount') : t('signUpButton')}

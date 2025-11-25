@@ -7,14 +7,55 @@ import { createClient } from '@/lib/supabase/client'
 import { Mail, HelpCircle, RefreshCw } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useSearchParams } from 'next/navigation'
-import { useState } from 'react'
+import { useMemo, useState, useEffect, Suspense } from 'react'
 import { toast } from 'sonner'
+import { z } from 'zod'
 
-export default function Page() {
+// Email validation schema
+const emailSchema = z.string().email()
+
+function SignUpSuccessContent() {
   const t = useTranslations('auth.signUpSuccess')
+  const tErrors = useTranslations('auth.errors')
   const searchParams = useSearchParams()
-  const email = searchParams.get('email') || 'your email'
+  const rawEmail = searchParams.get('email') || ''
+
+  // Validate email from URL parameter
+  const email = useMemo(() => {
+    const result = emailSchema.safeParse(rawEmail)
+    return result.success ? result.data : null
+  }, [rawEmail])
+
   const [isResending, setIsResending] = useState(false)
+  const [lastResendTime, setLastResendTime] = useState<number>(0)
+  const [cooldownRemaining, setCooldownRemaining] = useState<number>(0)
+  const supabase = useMemo(() => createClient(), [])
+
+  // Cooldown timer - 60 seconds between resend attempts
+  const RESEND_COOLDOWN_MS = 60000
+
+  useEffect(() => {
+    if (lastResendTime === 0) return
+
+    const updateCooldown = () => {
+      const elapsed = Date.now() - lastResendTime
+      const remaining = Math.max(0, RESEND_COOLDOWN_MS - elapsed)
+      setCooldownRemaining(Math.ceil(remaining / 1000))
+
+      if (remaining > 0) {
+        requestAnimationFrame(updateCooldown)
+      }
+    }
+
+    updateCooldown()
+  }, [lastResendTime])
+
+  // Show error if email is invalid
+  useEffect(() => {
+    if (!email && rawEmail) {
+      toast.error(tErrors('invalidEmail'))
+    }
+  }, [email, rawEmail, tErrors])
 
   // Detect email provider for "Open Email" button
   const getEmailProvider = (emailAddress: string) => {
@@ -35,18 +76,35 @@ export default function Page() {
   }
 
   const handleOpenEmail = () => {
+    if (!email) {
+      toast.error(tErrors('invalidEmail'))
+      return
+    }
+
     const providerUrl = getEmailProvider(email)
     if (providerUrl) {
       window.open(providerUrl, '_blank')
     } else {
-      // Fallback to mailto protocol
+      // Fallback to mailto protocol - email is validated so safe to use
       window.location.href = `mailto:${email}`
     }
   }
 
   const handleResendVerification = async () => {
+    if (!email) {
+      toast.error(tErrors('invalidEmail'))
+      return
+    }
+
+    // Check cooldown
+    const timeSinceLastResend = Date.now() - lastResendTime
+    if (timeSinceLastResend < RESEND_COOLDOWN_MS) {
+      const secondsRemaining = Math.ceil((RESEND_COOLDOWN_MS - timeSinceLastResend) / 1000)
+      toast.error(`Please wait ${secondsRemaining} seconds before resending`)
+      return
+    }
+
     setIsResending(true)
-    const supabase = createClient()
 
     try {
       const { error } = await supabase.auth.resend({
@@ -59,6 +117,7 @@ export default function Page() {
 
       if (error) throw error
 
+      setLastResendTime(Date.now())
       toast.success(t('resendSuccess'))
     } catch (error) {
       console.error('Error resending verification email:', error)
@@ -69,8 +128,8 @@ export default function Page() {
   }
 
   const handleGetHelp = () => {
-    // You can customize this to link to your support page or open a chat widget
-    window.open('mailto:support@lifo.ai', '_blank')
+    const supportEmail = process.env.NEXT_PUBLIC_SUPPORT_EMAIL || 'support@lifo.ai'
+    window.open(`mailto:${supportEmail}`, '_blank')
   }
 
   return (
@@ -90,11 +149,13 @@ export default function Page() {
               {/* Email display with subtle styling */}
               <div className="pt-2">
                 <Typography variant="p" className="text-base text-muted-foreground">
-                  {t.rich('checkEmail', {
-                    email: chunks => (
-                      <span className="font-semibold text-foreground">{chunks}</span>
-                    ),
-                  })}
+                  {email ? (
+                    t.rich('checkEmail', {
+                      email: () => <span className="font-semibold text-foreground">{email}</span>,
+                    })
+                  ) : (
+                    <span className="text-destructive">{tErrors('invalidEmail')}</span>
+                  )}
                 </Typography>
               </div>
             </CardHeader>
@@ -119,10 +180,14 @@ export default function Page() {
                   variant="outline"
                   className="w-full"
                   size="lg"
-                  disabled={isResending}
+                  disabled={isResending || !email || cooldownRemaining > 0}
                 >
                   <RefreshCw className={`w-4 h-4 mr-2 ${isResending ? 'animate-spin' : ''}`} />
-                  {isResending ? t('resending') : t('resendVerification')}
+                  {isResending
+                    ? t('resending')
+                    : cooldownRemaining > 0
+                      ? `Wait ${cooldownRemaining}s`
+                      : t('resendVerification')}
                 </Button>
 
                 {/* Get Help Button - Tertiary action */}
@@ -136,5 +201,32 @@ export default function Page() {
         </div>
       </div>
     </div>
+  )
+}
+
+// Loading fallback component
+function LoadingFallback() {
+  return (
+    <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
+      <div className="w-full max-w-md">
+        <Card shadow="primary">
+          <CardHeader className="text-center space-y-4">
+            <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
+              <Mail className="w-8 h-8 text-primary animate-pulse" />
+            </div>
+            <CardTitle className="text-2xl">Loading...</CardTitle>
+          </CardHeader>
+        </Card>
+      </div>
+    </div>
+  )
+}
+
+// Main page component with Suspense boundary
+export default function Page() {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <SignUpSuccessContent />
+    </Suspense>
   )
 }
