@@ -115,6 +115,7 @@
         "product": "Produit",
         "supplier": "Fournisseur",
         "expiryDate": "Date d'expiration",
+        "quantity": "Quantité",
         "stock": "Stock",
         "costPrice": "Prix de revient",
         "sellPrice": "Prix de vente",

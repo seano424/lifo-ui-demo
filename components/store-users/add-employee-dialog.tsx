@@ -97,6 +97,7 @@ export function AddEmployeeDialog({
   onEmployeeCreated,
 }: AddEmployeeDialogProps) {
   const t = useTranslations('addEmployee')
+  const tc = useTranslations('common.scanning')
   const [isLoading, setIsLoading] = useState(false)
   const [isCheckingEmail, setIsCheckingEmail] = useState(false)
   const [isCheckingUsername, setIsCheckingUsername] = useState(false)
@@ -1017,7 +1018,7 @@ export function AddEmployeeDialog({
               </Alert>
 
               <div className="bg-blue-50 p-4 rounded-2xl">
-                <h4 className="font-medium text-blue-900 mb-2">What happens next?</h4>
+                <h4 className="font-medium text-blue-900 mb-2">{tc('whatHappensNext')}</h4>
                 <ul className="text-sm text-blue-800 space-y-1">
                   <li>• User receives an email notification about the invitation</li>
                   <li>• They can login with their existing LIFO credentials</li>

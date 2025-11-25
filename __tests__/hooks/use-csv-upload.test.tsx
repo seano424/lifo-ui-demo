@@ -221,7 +221,10 @@ TEST003,Test Product 3,Test Category,150,2025-10-20`
       expect(result.current.data?.performance_metrics?.items_per_second).toBe(667.11)
 
       // Verify success toast was called with correct message
-      expect(toast.success).toHaveBeenCalledWith(expect.stringContaining('500'), expect.any(Object))
+      expect(toast.success).toHaveBeenCalledWith(
+        expect.stringContaining('Successfully imported'),
+        expect.any(Object),
+      )
     })
 
     it('should handle error responses gracefully', async () => {

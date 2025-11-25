@@ -9,10 +9,5 @@ export default function DraftBatchesHeader() {
   const pageTitle = 'Draft Batches'
   const pageDescription = t('draftBatchWarning')
 
-  return (
-    <DashboardInsetHeader
-      title={pageTitle}
-      description={pageDescription}
-    />
-  )
+  return <DashboardInsetHeader title={pageTitle} description={pageDescription} />
 }

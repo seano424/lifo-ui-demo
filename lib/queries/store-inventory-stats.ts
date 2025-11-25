@@ -26,7 +26,7 @@ type StoreInventoryStats = Database['inventory']['Views']['store_inventory_stats
  */
 export async function fetchStoreInventoryStats(
   storeId: string,
-  productId?: string
+  productId?: string,
 ): Promise<StoreInventoryStats[] | null> {
   const supabase = createClient()
 
@@ -55,7 +55,7 @@ export async function fetchStoreInventoryStats(
  */
 export async function fetchProductInventoryStats(
   storeId: string,
-  productId: string
+  productId: string,
 ): Promise<StoreInventoryStats | null> {
   const stats = await fetchStoreInventoryStats(storeId, productId)
   return stats && stats.length > 0 ? stats[0] : null
@@ -65,9 +65,7 @@ export async function fetchProductInventoryStats(
  * Fetch count of incomplete batches (draft batches needing expiry dates)
  * across all products in a store
  */
-export async function fetchIncompleteBatchesCount(
-  storeId: string
-): Promise<number> {
+export async function fetchIncompleteBatchesCount(storeId: string): Promise<number> {
   const supabase = createClient()
 
   const { data, error } = await supabase
@@ -82,10 +80,8 @@ export async function fetchIncompleteBatchesCount(
   }
 
   // Sum up all incomplete batches across all products
-  const totalIncomplete = data?.reduce(
-    (sum, row) => sum + (row.incomplete_batches_count || 0),
-    0
-  ) || 0
+  const totalIncomplete =
+    data?.reduce((sum, row) => sum + (row.incomplete_batches_count || 0), 0) || 0
 
   return totalIncomplete
 }
@@ -99,8 +95,8 @@ export async function fetchProductsWithStats(
   options?: {
     hasIncompleteBatches?: boolean
     hasStock?: boolean
-  }
-): Promise<any[] | null> {
+  },
+): Promise<unknown[] | null> {
   const supabase = createClient()
 
   let query = supabase
@@ -149,9 +145,7 @@ export async function fetchProductsWithStats(
 /**
  * Fetch products that need expiry dates (have draft batches)
  */
-export async function fetchProductsNeedingExpiryDates(
-  storeId: string
-): Promise<any[] | null> {
+export async function fetchProductsNeedingExpiryDates(storeId: string): Promise<unknown[] | null> {
   return fetchProductsWithStats(storeId, { hasIncompleteBatches: true })
 }
 

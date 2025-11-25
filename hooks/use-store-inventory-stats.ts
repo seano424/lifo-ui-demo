@@ -5,7 +5,7 @@
  * with automatic caching, refetching, and state management via TanStack Query
  */
 
-import { useQuery, UseQueryResult } from '@tanstack/react-query'
+import { useQuery, type UseQueryResult } from '@tanstack/react-query'
 import {
   fetchStoreInventoryStats,
   fetchProductInventoryStats,
@@ -24,7 +24,7 @@ type StoreInventoryStats = Database['inventory']['Views']['store_inventory_stats
 export function useStoreInventoryStats(
   storeId: string,
   productId?: string,
-  options?: { enabled?: boolean }
+  options?: { enabled?: boolean },
 ) {
   return useQuery({
     queryKey: ['store-inventory-stats', storeId, productId],
@@ -41,7 +41,7 @@ export function useStoreInventoryStats(
 export function useProductInventoryStats(
   storeId: string,
   productId: string,
-  options?: { enabled?: boolean }
+  options?: { enabled?: boolean },
 ): UseQueryResult<StoreInventoryStats | null, Error> {
   return useQuery({
     queryKey: ['product-inventory-stats', storeId, productId],
@@ -58,7 +58,7 @@ export function useProductInventoryStats(
  */
 export function useIncompleteBatchesCount(
   storeId: string,
-  options?: { enabled?: boolean }
+  options?: { enabled?: boolean },
 ): UseQueryResult<number, Error> {
   return useQuery({
     queryKey: ['incomplete-batches-count', storeId],
@@ -74,10 +74,7 @@ export function useIncompleteBatchesCount(
  * Hook to fetch products that need expiry dates (have draft batches)
  * Used for incomplete batches list/workflow
  */
-export function useProductsNeedingExpiryDates(
-  storeId: string,
-  options?: { enabled?: boolean }
-) {
+export function useProductsNeedingExpiryDates(storeId: string, options?: { enabled?: boolean }) {
   return useQuery({
     queryKey: ['products-needing-expiry-dates', storeId],
     queryFn: () => fetchProductsNeedingExpiryDates(storeId),
@@ -91,10 +88,7 @@ export function useProductsNeedingExpiryDates(
  * Hook to fetch summary stats for a store
  * Used for dashboard overview
  */
-export function useStoreSummaryStats(
-  storeId: string,
-  options?: { enabled?: boolean }
-) {
+export function useStoreSummaryStats(storeId: string, options?: { enabled?: boolean }) {
   return useQuery({
     queryKey: ['store-summary-stats', storeId],
     queryFn: () => fetchStoreSummaryStats(storeId),

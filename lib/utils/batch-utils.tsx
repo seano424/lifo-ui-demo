@@ -19,7 +19,9 @@ export const getStatusBadge = (status: string, tStatus: (key: string) => string)
   }
   const translationKey = statusMap[status] || 'active'
   const translatedStatus =
-    tStatus(translationKey as 'active' | 'draft' | 'expired' | 'damaged' | 'soldOut' | 'reserved') || status
+    tStatus(
+      translationKey as 'active' | 'draft' | 'expired' | 'damaged' | 'soldOut' | 'reserved',
+    ) || status
   return (
     <Badge variant={variants[status as keyof typeof variants] || 'outline'}>
       {translatedStatus}

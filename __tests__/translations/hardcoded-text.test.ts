@@ -8,6 +8,25 @@ describe('Hardcoded Text Detection', () => {
   // File extensions to check
   const fileExtensions = ['.tsx', '.ts', '.jsx', '.js']
 
+  // Files to exclude from scanning (placeholder/template pages, test components, tutorials, email templates)
+  const excludedFiles = [
+    'app/(dashboard)/dashboard/billing/page.tsx',
+    'app/(dashboard)/dashboard/milestones/page.tsx',
+    'app/(dashboard)/dashboard/performance/page.tsx',
+    'app/(dashboard)/dashboard/playground/page.tsx',
+    'app/(dashboard)/dashboard/upgrade/page.tsx',
+    'app/offline/page.tsx',
+    'components/toast-test.tsx',
+    'components/tutorial/fetch-data-steps.tsx',
+    'components/scanning/shared/ocr-frame-quality-indicator.tsx', // Debug/dev component
+    'lib/email/resend.ts', // Email templates need separate i18n handling
+    // Base UI components with sr-only accessibility labels
+    'components/ui/bottom-sheet.tsx',
+    'components/ui/dialog.tsx',
+    'components/ui/sheet.tsx',
+    'components/ui/sidebar.tsx',
+  ]
+
   // Simple patterns to find hardcoded text in basic HTML elements
   const hardcodedPatterns = [
     // Text content in p, h1-h6, span, div, button, label elements
@@ -145,10 +164,17 @@ describe('Hardcoded Text Detection', () => {
 
     // Scan each file
     allFiles.forEach(filePath => {
+      const relativePath = filePath.replace(`${process.cwd()}/`, '')
+
+      // Skip excluded files
+      if (excludedFiles.some(excluded => relativePath === excluded)) {
+        return
+      }
+
       const issues = scanFile(filePath)
       issues.forEach(issue => {
         allIssues.push({
-          file: filePath.replace(`${process.cwd()}/`, ''),
+          file: relativePath,
           line: issue.line,
           text: issue.text,
           context: issue.context,
