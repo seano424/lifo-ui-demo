@@ -31,6 +31,63 @@ interface CSVUploadResponse {
     products_created?: number
     database_processing_time_ms?: number
   }
+  warnings?: Array<{
+    type: string
+    severity: string
+    message: string
+    affected_items: Array<{
+      product_name: string
+      sku?: string
+      error: string
+    }>
+    total_affected: number
+    suggestion?: string
+  }>
+  has_validation_errors?: boolean
+}
+
+interface CSVValidationResponse {
+  success: boolean
+  partial_success?: boolean
+  message: string
+  validation_results: {
+    status: string
+    valid_items: number
+    invalid_items: number
+    total_items: number
+    errors: string[]
+    warnings: Array<{
+      type: string
+      severity: string
+      message: string
+      affected_items: Array<{
+        product_name: string
+        sku?: string
+        error: string
+      }>
+      total_affected: number
+      suggestion?: string
+    }>
+  }
+  warnings?: Array<{
+    type: string
+    severity: string
+    message: string
+    affected_items: Array<{
+      product_name: string
+      sku?: string
+      error: string
+    }>
+    total_affected: number
+    suggestion?: string
+  }>
+  has_validation_errors?: boolean
+  failed_items?: Array<{
+    index: number
+    product_name: string
+    sku?: string
+    error: string
+  }>
 }
 
 interface CsvPreviewItem {
@@ -158,6 +215,7 @@ export function useCSVUpload() {
   })
   const [cachedFileKey, setCachedFileKey] = useState<string | null>(null)
   const [cachedParsedData, setCachedParsedData] = useState<CsvRawRow[] | null>(null)
+  const [validationResult, setValidationResult] = useState<CSVValidationResponse | null>(null)
   const queryClient = useQueryClient()
 
   // Generate composite cache key from file metadata
@@ -165,6 +223,7 @@ export function useCSVUpload() {
     return `${file.name}-${file.size}-${file.lastModified}`
   }
 
+  // Parse price values for preview (accepts all valid numbers including 0)
   /**
    * Sanitize a column header by removing control characters and limiting length
    * @param header - Raw CSV column header
@@ -238,11 +297,11 @@ export function useCSVUpload() {
     if (!trimmed) return null
 
     const parsed = parseFloat(trimmed)
-    // Enforce minimum price (consistent with UI validation)
-    if (Number.isNaN(parsed) || parsed < PRICE_CONSTRAINTS.MIN_PRICE) return null
-
-    // Reject absurd values
-    if (parsed > PRICE_CONSTRAINTS.MAX_PRICE) return null
+    // Only reject NaN and absurd values
+    // Note: We allow 0 and negative values for preview display
+    // Validation happens during validate/upload, not during preview
+    if (Number.isNaN(parsed)) return null
+    if (parsed < 0 || parsed > PRICE_CONSTRAINTS.MAX_PRICE) return null
 
     return parsed
   }
@@ -301,7 +360,7 @@ export function useCSVUpload() {
                 itemsWithoutExpiry++
               }
 
-              // Parse prices with validation
+              // Parse prices (allow 0 for preview, validation happens later)
               const costPrice = costPriceCol ? parsePrice(row[costPriceCol]) : null
               const sellingPrice = sellingPriceCol ? parsePrice(row[sellingPriceCol]) : null
 
@@ -311,8 +370,8 @@ export function useCSVUpload() {
                 Category: categoryCol ? row[categoryCol] : CSV_PROCESSING.DEFAULT_CATEGORY,
                 Quantity: qtyCol ? parseInt(row[qtyCol], 10) || 1 : 1,
                 Expiry_Date: expiryValue,
-                Cost_Price: costPrice ?? 0.01,
-                Selling_Price: sellingPrice ?? 0.01,
+                Cost_Price: costPrice !== null ? costPrice : 0.01,
+                Selling_Price: sellingPrice !== null ? sellingPrice : 0.01,
               }
             })
 
@@ -358,10 +417,23 @@ export function useCSVUpload() {
    * @returns Normalized CSV string with mapped headers
    */
   const normalizeCsvHeaders = (parsedData: CsvRawRow[], previewData: CsvPreviewItem[]): string => {
-    if (!parsedData || parsedData.length === 0) {
+    if (!previewData || previewData.length === 0) {
       return ''
     }
 
+    // Use preview data as source of truth (includes all user edits)
+    // Build CSV with standard headers expected by backend
+    const normalizedHeaders = [
+      'sku',
+      'product_name',
+      'category',
+      'quantity',
+      'expiry_date',
+      'cost_price',
+      'selling_price',
+    ]
+
+    const csvRows = [normalizedHeaders.join(',')]
     const firstRow = parsedData[0]
     const originalHeaders = Object.keys(firstRow)
 
@@ -454,16 +526,16 @@ export function useCSVUpload() {
     // Step 5: Rebuild CSV with normalized headers and pricing values from preview
     const csvRows = [finalHeaders.join(',')]
 
-    parsedData.forEach((row, index) => {
-      const values = originalHeaders.map(header => row[header] || '')
-
-      // Add pricing values from preview data
-      if (!hasCostPrice) {
-        values.push((previewData[index]?.Cost_Price || 0.01).toString())
-      }
-      if (!hasSellingPrice) {
-        values.push((previewData[index]?.Selling_Price || 0.01).toString())
-      }
+    previewData.forEach(item => {
+      const values = [
+        item.SKU || '',
+        item.Product_Name || '',
+        item.Category || CSV_PROCESSING.DEFAULT_CATEGORY,
+        item.Quantity?.toString() || '1',
+        item.Expiry_Date || '',
+        item.Cost_Price?.toString() || '0.01',
+        item.Selling_Price?.toString() || '0.01',
+      ]
 
       // Escape special CSV characters: commas, quotes, newlines, carriage returns
       const escapedValues = values.map(v =>
@@ -477,15 +549,111 @@ export function useCSVUpload() {
     const result = csvRows.join('\n')
 
     if (process.env.NODE_ENV === 'development') {
-      logger.log('csv-upload', 'Normalization complete (using cached parse)', {
-        originalHeaders,
+      logger.log('csv-upload', 'Normalization complete (using edited preview data)', {
         normalizedHeaders,
-        totalRows: parsedData.length,
+        totalRows: previewData.length,
       })
     }
 
     return result
   }
+
+  // Validation mutation - validates CSV without uploading
+  const validateMutation = useMutation({
+    mutationFn: async ({
+      file,
+      storeId,
+      csvData,
+    }: {
+      file: File
+      storeId: string
+      csvData?: CsvPreviewItem[]
+    }): Promise<CSVValidationResponse> => {
+      let fileToValidate = file
+      const dataToProcess = csvData || csvPreview
+
+      // Use cached parsed data to avoid re-parsing
+      if (!cachedParsedData) {
+        throw new Error('No cached data available. Please preview the file first.')
+      }
+
+      if (dataToProcess && dataToProcess.length > 0) {
+        // Normalize CSV for validation (same as upload)
+        const normalizedContent = normalizeCsvHeaders(cachedParsedData, dataToProcess)
+        fileToValidate = new File([normalizedContent], file.name, {
+          type: 'text/csv',
+        })
+      } else {
+        const normalizedContent = normalizeCsvHeaders(cachedParsedData, dataToProcess)
+        fileToValidate = new File([normalizedContent], file.name, {
+          type: 'text/csv',
+        })
+      }
+
+      const formData = new FormData()
+      formData.append('file', fileToValidate)
+      formData.append('store_id', storeId)
+
+      // Call validation endpoint (Next.js proxy)
+      const response = await fetch('/api/csv-validate', {
+        method: 'POST',
+        body: formData,
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+
+        if (process.env.NODE_ENV === 'development') {
+          logger.error('csv-validate', 'Validation failed', { error })
+        }
+
+        let errorMessage = 'Validation failed'
+        if (error.error) {
+          errorMessage = typeof error.error === 'string' ? error.error : JSON.stringify(error.error)
+        } else if (error.message) {
+          errorMessage = error.message
+        } else if (error.detail) {
+          errorMessage =
+            typeof error.detail === 'string' ? error.detail : JSON.stringify(error.detail)
+        } else {
+          errorMessage = `Validation failed: ${response.statusText}`
+        }
+
+        throw new Error(errorMessage)
+      }
+
+      const result = await response.json()
+      return result
+    },
+    onSuccess: (data) => {
+      setValidationResult(data)
+
+      // Show appropriate toast based on validation results
+      if (data.has_validation_errors) {
+        toast.warning(`Validation complete: ${data.message}`, {
+          description: 'Review warnings below before uploading',
+          duration: 5000,
+        })
+      } else {
+        toast.success('✅ All items valid!', {
+          description: `${data.validation_results.valid_items} items ready to upload`,
+          duration: 3000,
+        })
+      }
+    },
+    onError: (error: Error) => {
+      if (process.env.NODE_ENV === 'development') {
+        logger.error('csv-validate', 'Validation mutation failed', { error })
+      }
+
+      setValidationResult(null)
+
+      toast.error(`Validation failed: ${error?.message || 'Unknown error'}`, {
+        description: 'Please check your CSV file and try again',
+        duration: TOAST_DURATIONS.ERROR,
+      })
+    },
+  })
 
   const mutation = useMutation({
     mutationFn: async ({
@@ -702,6 +870,11 @@ export function useCSVUpload() {
 
   return {
     ...mutation,
+    validate: validateMutation.mutate,
+    validateAsync: validateMutation.mutateAsync,
+    isValidating: validateMutation.isPending,
+    validationResult,
+    validationError: validateMutation.error,
     previewCsvFile,
     csvPreview,
     isPreviewReady,
@@ -711,7 +884,9 @@ export function useCSVUpload() {
       setColumnMapping({ hasExpiryColumn: false, itemsWithoutExpiry: 0 })
       setCachedFileKey(null) // Clear cached file key (composite key)
       setCachedParsedData(null) // Clear cached parsed data
+      setValidationResult(null) // Clear validation result
       mutation.reset() // Reset mutation state to clear uploadResult
+      validateMutation.reset() // Reset validation mutation state
     },
     columnMapping,
     updateCsvItemExpiry: (index: number, newExpiryDate: string) => {

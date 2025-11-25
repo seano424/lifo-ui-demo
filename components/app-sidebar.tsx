@@ -2,6 +2,7 @@
 
 import {
   ChartNoAxesCombined,
+  FileEdit,
   HelpCircle,
   Layers,
   ListTodo,
@@ -79,8 +80,13 @@ function useNavigationData() {
             },
             {
               title: t('batches'),
-              url: '/dashboard/inventory/batches?sort=expiry_date&direction=asc&status=active',
+              url: '/dashboard/inventory/batches',
               icon: Layers,
+            },
+            {
+              title: t('draftBatches'),
+              url: '/dashboard/inventory/batches/drafts',
+              icon: FileEdit,
             },
           ],
         },

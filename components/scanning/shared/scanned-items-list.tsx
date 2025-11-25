@@ -21,7 +21,7 @@ export interface ScannedItem {
   barcode: string
   productName: string
   brand?: string
-  expiryDate: string
+  expiryDate: string | null // Nullable for draft batches without expiry dates
   quantity: number
   price: number
   timestamp: Date
@@ -50,8 +50,15 @@ export default function ScannedItemsList({
   const finalTitle = title || t('title')
   const [isEditingItem, setIsEditingItem] = useState(false)
   const [editingItem, setEditingItem] = useState<ScannedItem | null>(null)
-  const [editForm, setEditForm] = useState({
-    expiryDate: '',
+  const [editForm, setEditForm] = useState<{
+    expiryDate: string | null
+    quantity: number
+    price: number
+    productName: string
+    brand: string
+    barcode: string
+  }>({
+    expiryDate: null,
     quantity: 1,
     price: 0,
     productName: '',
@@ -63,7 +70,10 @@ export default function ScannedItemsList({
   const formatPrice = (price: number) => `€${price.toFixed(2)}`
 
   // Helper function to format date consistently
-  const formatExpiryDate = (dateString: string) => {
+  const formatExpiryDate = (dateString: string | null) => {
+    if (!dateString) {
+      return t('noExpiryDate') || 'No expiry date'
+    }
     // Ensure we treat the date as local time to avoid timezone shifts
     const date = new Date(`${dateString}T00:00:00`)
     return date.toLocaleDateString()
@@ -107,7 +117,7 @@ export default function ScannedItemsList({
     setEditingItem(null)
     setShowAdvancedEdit(false)
     setEditForm({
-      expiryDate: '',
+      expiryDate: null,
       quantity: 1,
       price: 0,
       productName: '',
@@ -305,14 +315,15 @@ export default function ScannedItemsList({
                   <Input
                     id="edit-expiry"
                     type="date"
-                    value={editForm.expiryDate}
+                    value={editForm.expiryDate || ''}
                     onChange={e =>
                       setEditForm(prev => ({
                         ...prev,
-                        expiryDate: e.target.value,
+                        expiryDate: e.target.value || null,
                       }))
                     }
                     className="mt-1"
+                    placeholder={t('editDialog.placeholders.expiryDate') || 'Optional'}
                   />
                 </div>
 

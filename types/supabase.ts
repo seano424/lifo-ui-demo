@@ -4172,6 +4172,10 @@ export type Database = {
           product_id: string
         }[]
       }
+      rls_check_store_access: {
+        Args: { check_store_id: string }
+        Returns: boolean
+      }
       search_products_with_stock: {
         Args: {
           max_results?: number
