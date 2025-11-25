@@ -6,6 +6,7 @@ export interface EmailCredentials {
   email: string
   full_name: string
   store_name?: string
+  language?: 'en' | 'fr' | 'nl'
 }
 
 export interface EmailSendResult {

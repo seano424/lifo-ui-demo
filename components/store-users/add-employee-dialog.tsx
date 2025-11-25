@@ -329,6 +329,7 @@ export function AddEmployeeDialog({
           password: credentials.password,
           email: credentials.email,
           full_name: credentials.full_name,
+          language: formData.languagePreference as 'en' | 'fr' | 'nl',
         },
         storeId,
       })

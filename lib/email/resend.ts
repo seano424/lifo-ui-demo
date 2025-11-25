@@ -193,7 +193,12 @@ export async function sendWelcomeEmail(
   credentials: EmailCredentials,
 ): Promise<EmailDeliveryResult> {
   try {
-    const language = credentials.language || 'fr' // Default to French
+    // Validate and default language
+    const validLanguages: SupportedLanguage[] = ['en', 'fr', 'nl']
+    const language: SupportedLanguage =
+      credentials.language && validLanguages.includes(credentials.language)
+        ? credentials.language
+        : 'fr' // Default to French
     const content = welcomeEmailTranslations[language]
     const storeName = credentials.store_name || 'LIFO'
 
@@ -202,7 +207,7 @@ export async function sendWelcomeEmail(
       to: [credentials.email],
       subject: content.subject(storeName),
       html: generateWelcomeEmailHTML(credentials, language, content),
-      text: generateWelcomeEmailText(credentials, language, content),
+      text: generateWelcomeEmailText(credentials, content),
     })
 
     if (error) {
@@ -233,7 +238,12 @@ export async function sendPasswordResetEmail(
   credentials: EmailCredentials,
 ): Promise<EmailDeliveryResult> {
   try {
-    const language = credentials.language || 'fr' // Default to French
+    // Validate and default language
+    const validLanguages: SupportedLanguage[] = ['en', 'fr', 'nl']
+    const language: SupportedLanguage =
+      credentials.language && validLanguages.includes(credentials.language)
+        ? credentials.language
+        : 'fr' // Default to French
     const content = passwordResetEmailTranslations[language]
 
     const { data, error } = await resend.emails.send({
@@ -241,7 +251,7 @@ export async function sendPasswordResetEmail(
       to: [credentials.email],
       subject: content.subject,
       html: generatePasswordResetEmailHTML(credentials, language, content),
-      text: generatePasswordResetEmailText(credentials, language, content),
+      text: generatePasswordResetEmailText(credentials, content),
     })
 
     if (error) {
@@ -368,7 +378,6 @@ function generateWelcomeEmailHTML(
  */
 function generateWelcomeEmailText(
   credentials: EmailCredentials,
-  _language: SupportedLanguage,
   content: WelcomeEmailContent,
 ): string {
   const storeName = credentials.store_name || 'LIFO'
@@ -406,7 +415,7 @@ function generatePasswordResetEmailHTML(
   language: SupportedLanguage,
   content: PasswordResetEmailContent,
 ): string {
-  const storeName = credentials.store_name || 'your store'
+  const storeName = credentials.store_name || 'LIFO'
 
   return `
 <!DOCTYPE html>
@@ -522,10 +531,9 @@ function generatePasswordResetEmailHTML(
  */
 function generatePasswordResetEmailText(
   credentials: EmailCredentials,
-  _language: SupportedLanguage,
   content: PasswordResetEmailContent,
 ): string {
-  const storeName = credentials.store_name || 'your store'
+  const storeName = credentials.store_name || 'LIFO'
 
   return `
 LIFO - ${content.title}
