@@ -51,6 +51,10 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
 
     const errorMappings = [
       {
+        keywords: ['empty', 'no data rows'],
+        message: t('errors.emptyFile'),
+      },
+      {
         keywords: ['network', 'fetch', 'connection'],
         message: t('errors.analysisFailure'),
       },
@@ -767,7 +771,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
               </Button>
 
               <Button onClick={handleReset} variant="outline" disabled={isUploading}>
-                {t('buttons.reset')}
+                {t('buttons.cancel')}
               </Button>
             </div>
           </div>

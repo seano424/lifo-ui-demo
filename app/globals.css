@@ -153,7 +153,7 @@
 
 @plugin 'tailwind-scrollbar';
 @plugin 'tailwindcss-debug-screens' {
-  classname: 'debug-screens';
+  className: 'debug-screens';
   position: 'bottom, left';
   prefix: 'screen: ';
 }
@@ -238,8 +238,6 @@
     Consolas, 'Liberation Mono', 'Courier New', monospace;
 
   /* Breakpoints */
-  /* --breakpoint-*: initial; */
-  --breakpoint-xs: 360px;
   --breakpoint-sm: 640px;
   --breakpoint-md: 768px;
   --breakpoint-lg: 1024px;

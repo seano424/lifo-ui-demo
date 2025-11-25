@@ -31,17 +31,11 @@ export function CtaSection() {
 
   return (
     <section className="w-full px-4 my-8 relative overflow-hidden mb-20">
-      {/* Background decorative elements */}
-
-      <div className="max-w-7xl mx-auto relative z-10">
-        <Typography
-          as={'h2'}
-          variant="h2"
-          className="text-center mb-16 pb-4 text-4xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary-800 via-primary-700 to-secondary-900"
-        >
+      <div className="max-w-7xl mx-auto relative z-10 flex flex-col gap-10">
+        <Typography variant="h2" color="primary" className="text-center">
           {t('title')}
         </Typography>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center max-w-3xl mx-auto">
           {/* Left column - Features */}
           <div className="space-y-8">
             <div className="space-y-6">
@@ -112,8 +106,8 @@ export function CtaSection() {
             <Button
               asLink
               href="/contact"
-              size="lg"
-              className="w-full py-4 text-sm sm:text-base md:text-lg font-medium rounded-2xl bg-gradient-to-r from-primary-900 to-secondary-800 text-white hover:opacity-90 transition-opacity shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2 whitespace-normal sm:whitespace-nowrap px-4"
+              size="xl"
+              className="w-full bg-gradient-to-r from-primary-900 to-secondary-800 text-white hover:opacity-90 transition-opacity shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2 whitespace-normal sm:whitespace-nowrap"
             >
               <span className="text-center">{t('card.button')}</span>{' '}
               <ArrowRight size={18} className="shrink-0" />
