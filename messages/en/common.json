@@ -48,6 +48,8 @@
   },
   "breadcrumbs": {
     "batches": "Batches",
+    "draftBatches": "Draft Batches",
+    "drafts": "Drafts",
     "billing": "Billings",
     "dashboard": "Dashboard",
     "inventory": "Inventory",

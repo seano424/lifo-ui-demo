@@ -89,12 +89,18 @@ export default async function InventoryBatchesPage({ searchParams }: InventoryBa
       filters.search = params.search
     }
 
-    // Handle sorting
+    // Handle sorting - set defaults if not provided to match client-side defaults
     if (params.sort) {
       filters.sort = {
         field: params.sort as BatchSortField,
         direction: (params.direction || 'asc') as 'asc' | 'desc',
       }
+    } else {
+      // Set default sort to match client-side behavior in batches-filtered-list.tsx
+      filters.sort =
+        params.filter === 'expiring'
+          ? { field: 'expiry_date', direction: 'asc' }
+          : { field: 'created_at', direction: 'desc' }
     }
 
     // Prefetch the first page of batches with filters

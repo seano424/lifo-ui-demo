@@ -1,6 +1,7 @@
 'use client'
 
 import {
+  AlertCircle,
   Check,
   ChevronLeft,
   ChevronRight,
@@ -98,6 +99,10 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
     isPending: isUploading,
     data: uploadResult,
     error,
+    validate,
+    isValidating,
+    validationResult,
+    validationError,
     resetPreview,
     updateCsvItemExpiry,
     updateCsvItemQuantity,
@@ -157,6 +162,28 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
     }
   }
 
+  const handleValidate = () => {
+    if (!selectedFile) {
+      toast.error(t('errors.noFile'))
+      return
+    }
+
+    if (!storeId) {
+      toast.error(t('errors.noStore'))
+      return
+    }
+
+    try {
+      validate({
+        file: selectedFile,
+        storeId,
+        csvData: csvPreview,
+      })
+    } catch (error) {
+      handleError(error, 'Validation failed')
+    }
+  }
+
   const handleUpload = () => {
     if (!selectedFile) {
       toast.error(t('errors.noFile'))
@@ -177,8 +204,8 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
       )
 
       if (invalidPricing) {
-        toast.error(t('csvUpload.errors.invalidPricing'), {
-          description: t('csvUpload.errors.invalidPricingDescription'),
+        toast.error(t('errors.invalidPricing'), {
+          description: t('errors.invalidPricingDescription'),
         })
         return
       }
@@ -560,7 +587,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                           />
                           {item.Cost_Price < PRICE_CONSTRAINTS.MIN_PRICE && (
                             <span className="text-xs text-red-600">
-                              {t('csvUpload.errors.priceTooLow')}
+                              {t('errors.priceTooLow')}
                             </span>
                           )}
                         </div>
@@ -588,7 +615,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                           />
                           {item.Selling_Price < PRICE_CONSTRAINTS.MIN_PRICE && (
                             <span className="text-xs text-red-600">
-                              {t('csvUpload.errors.priceTooLow')}
+                              {t('errors.priceTooLow')}
                             </span>
                           )}
                         </div>
@@ -622,15 +649,112 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
               })}
             </div>
 
+            {/* Validation Results */}
+            {validationResult && (
+              <Alert
+                variant={validationResult.has_validation_errors ? 'destructive' : 'default'}
+                className={
+                  validationResult.has_validation_errors
+                    ? 'bg-red-50 border-red-200'
+                    : 'bg-green-50 border-green-200'
+                }
+              >
+                <AlertCircle className="h-4 w-4" />
+                <AlertTitle
+                  className={
+                    validationResult.has_validation_errors
+                      ? 'text-red-800 font-semibold'
+                      : 'text-green-800 font-semibold'
+                  }
+                >
+                  {validationResult.has_validation_errors
+                    ? 'Validation Errors Found'
+                    : 'Validation Successful'}
+                </AlertTitle>
+                <AlertDescription className="space-y-3 mt-2">
+                  <p
+                    className={
+                      validationResult.has_validation_errors ? 'text-red-700' : 'text-green-700'
+                    }
+                  >
+                    {validationResult.message}
+                  </p>
+
+                  {validationResult.has_validation_errors &&
+                    validationResult.warnings &&
+                    validationResult.warnings.length > 0 && (
+                      <div className="space-y-3">
+                        {validationResult.warnings.map((warning: any, idx: number) => (
+                          <div key={idx} className="space-y-2 border-t border-red-200 pt-2">
+                            <p className="text-red-700 font-medium">{warning.message}</p>
+                            {warning.suggestion && (
+                              <p className="text-red-600 text-sm italic">{warning.suggestion}</p>
+                            )}
+                            {warning.affected_items && warning.affected_items.length > 0 && (
+                              <details className="text-sm">
+                                <summary className="cursor-pointer text-red-600 hover:text-red-800">
+                                  View affected items ({warning.total_affected} total, showing first{' '}
+                                  {Math.min(5, warning.affected_items.length)})
+                                </summary>
+                                <ul className="mt-2 space-y-1 list-disc list-inside text-red-700">
+                                  {warning.affected_items.slice(0, 5).map((item: any, i: number) => (
+                                    <li key={i}>
+                                      {item.product_name}
+                                      {item.sku && ` (SKU: ${item.sku})`}
+                                      {item.error && (
+                                        <span className="block ml-6 text-xs text-red-600">
+                                          {item.error}
+                                        </span>
+                                      )}
+                                    </li>
+                                  ))}
+                                </ul>
+                              </details>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                  {!validationResult.has_validation_errors && (
+                    <p className="text-green-600 text-sm">
+                      All {validationResult.validation_results.valid_items} items passed validation.
+                      Ready to upload!
+                    </p>
+                  )}
+                </AlertDescription>
+              </Alert>
+            )}
+
             {/* Upload Actions */}
             <div className="flex gap-3">
+              <Button
+                onClick={handleValidate}
+                disabled={isValidating || isUploading}
+                variant="secondary"
+                className="flex-1"
+                size="lg"
+              >
+                {isValidating ? (
+                  <>
+                    <Clock className="h-4 w-4 mr-2 animate-spin" />
+                    Validating...
+                  </>
+                ) : (
+                  <>
+                    <FileCheck className="h-4 w-4 mr-2" />
+                    Validate
+                  </>
+                )}
+              </Button>
+
               <Button
                 onClick={handleUpload}
                 disabled={isUploading || hasInvalidPricing}
                 className="flex-1"
                 size="lg"
                 title={
-                  hasInvalidPricing ? t('csvUpload.errors.invalidPricingDescription') : undefined
+                  hasInvalidPricing ? t('errors.invalidPricingDescription') : undefined
                 }
               >
                 {isUploading ? (
@@ -661,7 +785,10 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
             <div className="flex items-center gap-2 justify-center">
               <div className="text-center flex items-center gap-2">
                 <Check className="w-6 h-6 text-secondary-900 stroke-5 border-2 border-secondary-900 rounded-full p-[3px] bg-primary-100" />
-                <Typography variant="h4">{uploadResult.processed || 0} items imported!</Typography>
+                <Typography variant="h4">
+                  {uploadResult.processed || 0} items imported
+                  {uploadResult.has_validation_errors && ' (with warnings)'}!
+                </Typography>
               </div>
             </div>
 
@@ -679,6 +806,69 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                   })}
               </Typography>
             </div>
+
+            {/* Draft Batches Info - products without expiry dates */}
+            {uploadResult.draft_batches_created && uploadResult.draft_batches_created > 0 && (
+              <Alert className="bg-amber-50 border-amber-200">
+                <AlertCircle className="h-4 w-4 text-amber-600" />
+                <AlertTitle className="text-amber-800 font-semibold">
+                  Draft Batches Created
+                </AlertTitle>
+                <AlertDescription className="space-y-2 mt-2">
+                  <p className="text-amber-700">
+                    {uploadResult.draft_batches_created} {uploadResult.draft_batches_created === 1 ? 'batch was' : 'batches were'} created as drafts because{' '}
+                    {uploadResult.draft_batches_created === 1 ? 'it has' : 'they have'} no expiry date.
+                  </p>
+                  <p className="text-amber-600 text-sm">
+                    Draft batches need expiry dates before they can be scored by AI. Visit the{' '}
+                    <a
+                      href="/dashboard/inventory/batches/drafts"
+                      className="font-medium underline hover:text-amber-800"
+                    >
+                      Draft Batches page
+                    </a>{' '}
+                    to complete them using manual entry or OCR scanning.
+                  </p>
+                </AlertDescription>
+              </Alert>
+            )}
+
+            {/* Validation Warnings */}
+            {uploadResult.warnings && uploadResult.warnings.length > 0 && (
+              <Alert variant="destructive" className="bg-red-50 border-red-200">
+                <AlertTitle className="text-red-800 font-semibold">
+                  Validation Errors Found
+                </AlertTitle>
+                <AlertDescription className="space-y-3 mt-2">
+                  {uploadResult.warnings.map((warning: any, idx: number) => (
+                    <div key={idx} className="space-y-2">
+                      <p className="text-red-700 font-medium">{warning.message}</p>
+                      {warning.suggestion && (
+                        <p className="text-red-600 text-sm italic">{warning.suggestion}</p>
+                      )}
+                      {warning.affected_items && warning.affected_items.length > 0 && (
+                        <details className="text-sm">
+                          <summary className="cursor-pointer text-red-600 hover:text-red-700">
+                            View affected items ({warning.total_affected} total,
+                            showing first {Math.min(warning.affected_items.length, 5)})
+                          </summary>
+                          <ul className="mt-2 space-y-1 list-disc list-inside text-red-600">
+                            {warning.affected_items.map((item: any, itemIdx: number) => (
+                              <li key={itemIdx}>
+                                <strong>{item.product_name}</strong>
+                                {item.sku && <span className="text-red-500"> (SKU: {item.sku})</span>}
+                                <br />
+                                <span className="ml-6 text-red-500 text-xs">{item.error}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </details>
+                      )}
+                    </div>
+                  ))}
+                </AlertDescription>
+              </Alert>
+            )}
 
             {/* Performance Metrics */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

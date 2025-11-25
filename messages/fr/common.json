@@ -48,6 +48,8 @@
   },
   "breadcrumbs": {
     "batches": "Lots",
+    "draftBatches": "Lots Brouillons",
+    "drafts": "Brouillons",
     "billing": "Facturations",
     "dashboard": "Tableau de bord",
     "inventory": "Inventaire",
