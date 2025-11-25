@@ -38,8 +38,8 @@ export function AuthButton({ isMobile }: AuthButtonProps) {
     <>
       {/* Desktop */}
       <div className={cn('flex gap-2 items-center', isMobile && 'hidden')}>
-        <Button asChild variant={'secondary'}>
-          <Link href="/onboarding/create-account">{t('signup')}</Link>
+        <Button asChild variant={'secondary'} className="w-full">
+          <Link href="/auth/sign-up">{t('signup')}</Link>
         </Button>
         <Button asChild variant={'gray'}>
           <Link href="/auth/login">{t('login')}</Link>
@@ -57,7 +57,10 @@ export function AuthButton({ isMobile }: AuthButtonProps) {
           <Link href="/auth/login">{t('login')}</Link>
         </Button>
         <Button asChild variant={'secondary'} className="uppercase w-full">
-          <Link href="/onboarding/create-account">{t('signup')}</Link>
+          <Link href="/onboarding/create-account">{t('businessSignup')}</Link>
+        </Button>
+        <Button asChild variant={'secondary'} className="uppercase w-full">
+          <Link href="/auth/sign-up">{t('signup')}</Link>
         </Button>
       </div>
     </>

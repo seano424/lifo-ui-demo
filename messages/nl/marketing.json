@@ -28,7 +28,8 @@
     },
     "auth": {
       "login": "Inloggen",
-      "signup": "Bedrijfsregistratie",
+      "businessSignup": "Bedrijfsregistratie",
+      "signup": "Registreren",
       "logout": "Uitloggen",
       "goToDashboard": "Dashboard",
       "signUpForm": {
