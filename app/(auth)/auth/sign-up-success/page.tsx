@@ -90,8 +90,11 @@ export default function Page() {
               {/* Email display with subtle styling */}
               <div className="pt-2">
                 <Typography variant="p" className="text-base text-muted-foreground">
-                  Check your <span className="font-semibold text-foreground">{email}</span> inbox
-                  for an email verification link
+                  {t.rich('checkEmail', {
+                    email: chunks => (
+                      <span className="font-semibold text-foreground">{chunks}</span>
+                    ),
+                  })}
                 </Typography>
               </div>
             </CardHeader>

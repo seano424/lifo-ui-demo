@@ -9,7 +9,7 @@ import { Typography } from '@/components/ui/typography'
 import { cn } from '@/lib/utils'
 import { createClient } from '@/lib/supabase/client'
 import { Building2 } from 'lucide-react'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
@@ -18,6 +18,7 @@ import { toast } from 'sonner'
 export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
   const t = useTranslations('auth.signUpForm')
   const tErrors = useTranslations('auth.errors')
+  const locale = useLocale()
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -49,14 +50,20 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
     }
 
     try {
+      // Sign up with Supabase and pass language preference in user metadata
       const { error } = await supabase.auth.signUp({
         email,
         password,
         options: {
           emailRedirectTo: `${window.location.origin}/dashboard`,
+          data: {
+            language_preference: locale,
+          },
         },
       })
+
       if (error) throw error
+
       router.push(`/auth/sign-up-success?email=${encodeURIComponent(email)}`)
     } catch (error: unknown) {
       const errorMsg = error instanceof Error ? error.message : tErrors('genericError')
