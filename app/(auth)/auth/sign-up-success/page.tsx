@@ -148,15 +148,17 @@ function SignUpSuccessContent() {
 
               {/* Email display with subtle styling */}
               <div className="pt-2">
-                <Typography variant="p" className="text-base text-muted-foreground">
-                  {email ? (
-                    t.rich('checkEmail', {
-                      email: () => <span className="font-semibold text-foreground">{email}</span>,
-                    })
-                  ) : (
-                    <span className="text-destructive">{tErrors('invalidEmail')}</span>
-                  )}
-                </Typography>
+                {email ? (
+                  <Typography variant="p" className="text-base text-muted-foreground">
+                    {t.rich('checkEmail', {
+                      email: _ => <span className="font-semibold text-foreground">{email}</span>,
+                    })}
+                  </Typography>
+                ) : (
+                  <Typography variant="p" className="text-base text-destructive">
+                    {tErrors('invalidEmail')}
+                  </Typography>
+                )}
               </div>
             </CardHeader>
 
