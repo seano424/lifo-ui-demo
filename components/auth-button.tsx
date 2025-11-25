@@ -56,9 +56,7 @@ export function AuthButton({ isMobile }: AuthButtonProps) {
         <Button asChild variant={'gray'} className="uppercase w-full">
           <Link href="/auth/login">{t('login')}</Link>
         </Button>
-        <Button asChild variant={'secondary'} className="uppercase w-full">
-          <Link href="/onboarding/create-account">{t('businessSignup')}</Link>
-        </Button>
+
         <Button asChild variant={'secondary'} className="uppercase w-full">
           <Link href="/auth/sign-up">{t('signup')}</Link>
         </Button>
