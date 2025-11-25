@@ -695,6 +695,13 @@ export type Database = {
             foreignKeyName: "batches_store_product_fkey"
             columns: ["store_id", "product_id"]
             isOneToOne: false
+            referencedRelation: "store_inventory_stats"
+            referencedColumns: ["store_id", "product_id"]
+          },
+          {
+            foreignKeyName: "batches_store_product_fkey"
+            columns: ["store_id", "product_id"]
+            isOneToOne: false
             referencedRelation: "store_products"
             referencedColumns: ["store_id", "product_id"]
           },
@@ -1097,6 +1104,13 @@ export type Database = {
             foreignKeyName: "batches_store_product_fkey"
             columns: ["store_id", "product_id"]
             isOneToOne: false
+            referencedRelation: "store_inventory_stats"
+            referencedColumns: ["store_id", "product_id"]
+          },
+          {
+            foreignKeyName: "batches_store_product_fkey"
+            columns: ["store_id", "product_id"]
+            isOneToOne: false
             referencedRelation: "store_products"
             referencedColumns: ["store_id", "product_id"]
           },
@@ -1469,6 +1483,57 @@ export type Database = {
           },
         ]
       }
+      store_inventory_stats: {
+        Row: {
+          active_batches_count: number | null
+          available_quantity: number | null
+          avg_days_to_expiry: number | null
+          earliest_expiry_date: string | null
+          incomplete_batches_count: number | null
+          latest_expiry_date: string | null
+          product_id: string | null
+          store_id: string | null
+          total_reserved_quantity: number | null
+          total_stock: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "store_products_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "expiring_products"
+            referencedColumns: ["product_id"]
+          },
+          {
+            foreignKeyName: "store_products_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "my_store_products"
+            referencedColumns: ["product_id"]
+          },
+          {
+            foreignKeyName: "store_products_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["product_id"]
+          },
+          {
+            foreignKeyName: "store_products_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products_needing_barcodes"
+            referencedColumns: ["product_id"]
+          },
+          {
+            foreignKeyName: "store_products_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products_with_categories"
+            referencedColumns: ["product_id"]
+          },
+        ]
+      }
     }
     Functions: {
       auto_expire_batches: { Args: never; Returns: number }
@@ -1535,6 +1600,7 @@ export type Database = {
       }
       get_batches_paginated: {
         Args: {
+          p_exclude_drafts?: boolean
           p_expiring_in_days?: number
           p_expiry_date_from?: string
           p_expiry_date_to?: string
@@ -1787,69 +1853,6 @@ export type Database = {
   }
   public: {
     Tables: {
-      actions: {
-        Row: {
-          action_id: string
-          action_type: string | null
-          batch_id: string | null
-          discount_percent: number | null
-          effectiveness_score: number | null
-          executed_at: string | null
-          executed_by: string | null
-          new_price: number | null
-          original_price: number | null
-          quantity_sold_24h: number | null
-          quantity_sold_48h: number | null
-          revenue_recovered: number | null
-          store_id: string | null
-        }
-        Insert: {
-          action_id: string
-          action_type?: string | null
-          batch_id?: string | null
-          discount_percent?: number | null
-          effectiveness_score?: number | null
-          executed_at?: string | null
-          executed_by?: string | null
-          new_price?: number | null
-          original_price?: number | null
-          quantity_sold_24h?: number | null
-          quantity_sold_48h?: number | null
-          revenue_recovered?: number | null
-          store_id?: string | null
-        }
-        Update: {
-          action_id?: string
-          action_type?: string | null
-          batch_id?: string | null
-          discount_percent?: number | null
-          effectiveness_score?: number | null
-          executed_at?: string | null
-          executed_by?: string | null
-          new_price?: number | null
-          original_price?: number | null
-          quantity_sold_24h?: number | null
-          quantity_sold_48h?: number | null
-          revenue_recovered?: number | null
-          store_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "actions_batch_id_fkey"
-            columns: ["batch_id"]
-            isOneToOne: false
-            referencedRelation: "batches"
-            referencedColumns: ["batch_id"]
-          },
-          {
-            foreignKeyName: "actions_store_id_fkey"
-            columns: ["store_id"]
-            isOneToOne: false
-            referencedRelation: "stores"
-            referencedColumns: ["store_id"]
-          },
-        ]
-      }
       batch_actions: {
         Row: {
           action_type: Database["public"]["Enums"]["action_type"]
@@ -3499,6 +3502,7 @@ export type Database = {
       }
       get_batches_paginated: {
         Args: {
+          p_exclude_drafts?: boolean
           p_expiring_in_days?: number
           p_expiry_date_from?: string
           p_expiry_date_to?: string

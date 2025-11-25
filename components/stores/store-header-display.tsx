@@ -1,6 +1,7 @@
 'use client'
 
 import { Building2, MapPin, Store } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { useStoreState } from '@/lib/stores/store-context'
@@ -50,6 +51,7 @@ export function StoreHeaderDisplay({
   showAddress = true,
   className = '',
 }: StoreHeaderDisplayProps) {
+  const t = useTranslations('common.scanning')
   const { activeStore, isLoadingStores } = useStoreState()
 
   if (isLoadingStores) {
@@ -79,8 +81,8 @@ export function StoreHeaderDisplay({
               <Store className="size-5" />
             </div>
             <div>
-              <p className="font-medium">No store selected</p>
-              <p className="text-sm">Please select a store to continue</p>
+              <p className="font-medium">{t('noStoreSelected')}</p>
+              <p className="text-sm">{t('pleaseSelectStore')}</p>
             </div>
           </div>
         </CardContent>

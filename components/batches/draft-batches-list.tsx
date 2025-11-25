@@ -18,18 +18,25 @@ import {
 } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
-import type { Batch } from '@/lib/queries/batches'
+import type { BatchWithProduct } from '@/lib/queries/batches'
 import { format } from 'date-fns'
 
 interface DraftBatchesListProps {
   className?: string
-  onSelectBatch?: (batch: Batch) => void
+  onSelectBatch?: (batch: BatchWithProduct) => void
 }
 
 export function DraftBatchesList({ className, onSelectBatch }: DraftBatchesListProps) {
   const t = useTranslations('inventory.batches.draftBatches')
   const tTable = useTranslations('batches.table.headers')
-  const { data: draftBatches, count, isLoading, hasMore, fetchNextPage, isFetchingNextPage } = useDraftBatches()
+  const {
+    data: draftBatches,
+    count,
+    isLoading,
+    hasMore,
+    fetchNextPage,
+    isFetchingNextPage,
+  } = useDraftBatches()
 
   const [searchTerm, setSearchTerm] = useState<string | undefined>(undefined)
 
@@ -61,7 +68,8 @@ export function DraftBatchesList({ className, onSelectBatch }: DraftBatchesListP
           <Package className="h-12 w-12 text-muted-foreground mb-4" />
           <CardTitle className="text-lg mb-2">No Draft Batches</CardTitle>
           <CardDescription className="text-center max-w-md">
-            All batches have expiry dates. Upload a CSV without expiry dates to create draft batches.
+            All batches have expiry dates. Upload a CSV without expiry dates to create draft
+            batches.
           </CardDescription>
         </CardContent>
       </Card>
@@ -136,7 +144,9 @@ export function DraftBatchesList({ className, onSelectBatch }: DraftBatchesListP
                     </TableCell>
                     <TableCell>
                       <div className="space-y-0.5">
-                        <div className="font-medium">{batch.products?.name || 'Unknown Product'}</div>
+                        <div className="font-medium">
+                          {batch.products?.name || 'Unknown Product'}
+                        </div>
                         {batch.products?.sku && (
                           <div className="text-xs text-muted-foreground font-mono">
                             SKU: {batch.products.sku}
@@ -155,13 +165,16 @@ export function DraftBatchesList({ className, onSelectBatch }: DraftBatchesListP
                       {batch.created_at ? format(new Date(batch.created_at), 'MMM d, yyyy') : '-'}
                     </TableCell>
                     <TableCell>
-                      <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-300 dark:bg-amber-950 dark:text-amber-300 dark:border-amber-700">
+                      <Badge
+                        variant="outline"
+                        className="bg-amber-50 text-amber-700 border-amber-300 dark:bg-amber-950 dark:text-amber-300 dark:border-amber-700"
+                      >
                         Draft
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
                       <Button
-                        onClick={(e) => {
+                        onClick={e => {
                           e.stopPropagation()
                           onSelectBatch?.(batch)
                         }}

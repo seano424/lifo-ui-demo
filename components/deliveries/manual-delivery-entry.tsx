@@ -214,7 +214,8 @@ export default function ManualDeliveryEntry({
   const formatPrice = (price: number) => `€${price.toFixed(2)}`
 
   // Helper function to format date consistently
-  const formatExpiryDate = (dateString: string) => {
+  const formatExpiryDate = (dateString: string | null) => {
+    if (!dateString) return 'No date set'
     // Ensure we treat the date as local time to avoid timezone shifts
     const date = new Date(`${dateString}T00:00:00`)
     return date.toLocaleDateString()

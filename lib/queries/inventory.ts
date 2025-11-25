@@ -21,7 +21,7 @@ export interface ScannedProductData {
   costPrice: number
   sellingPrice: number
   // Batch data
-  expiryDate: string
+  expiryDate: string | null // Nullable for draft batches without expiry dates
   quantity: number
   ocrExtractedDate?: string
   ocrConfidence?: number
@@ -373,7 +373,9 @@ async function createProductBatch(
       store_id: productData.storeId,
       supplier: 'Scanned Entry',
       manufacture_date: new Date().toISOString(), // Could be extracted from OCR in the future
-      expiry_date: productData.expiryDate,
+      expiry_date:
+        productData.expiryDate ||
+        new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // Use 30 days from now as placeholder for draft batches
       received_date: new Date().toISOString(), // Today
       initial_quantity: productData.quantity,
       current_quantity: productData.quantity,
@@ -381,7 +383,7 @@ async function createProductBatch(
       selling_price: productData.sellingPrice,
       location_code: 'DEFAULT',
       batch_source: BATCH_SOURCES.BARCODE,
-      status: 'active',
+      status: productData.expiryDate ? 'active' : 'draft', // Draft status if no expiry date provided
       scanned_barcode: productData.barcode || null,
       ocr_extracted_date: productData.ocrExtractedDate || null,
       ocr_confidence: productData.ocrConfidence || null,
@@ -769,7 +771,9 @@ async function bulkInsertBatches(
         store_id: productData.storeId,
         supplier: 'Scanned Entry',
         manufacture_date: new Date().toISOString(),
-        expiry_date: productData.expiryDate,
+        expiry_date:
+          productData.expiryDate ||
+          new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // Use 30 days from now as placeholder for draft batches
         received_date: new Date().toISOString(),
         initial_quantity: productData.quantity,
         current_quantity: productData.quantity,
@@ -777,7 +781,7 @@ async function bulkInsertBatches(
         selling_price: productData.sellingPrice,
         location_code: 'DEFAULT',
         batch_source: BATCH_SOURCES.BARCODE,
-        status: 'active',
+        status: productData.expiryDate ? 'active' : 'draft', // Draft status if no expiry date provided
         scanned_barcode: productData.barcode || null,
         ocr_extracted_date: productData.ocrExtractedDate || null,
         ocr_confidence: productData.ocrConfidence || null,

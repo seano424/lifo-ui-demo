@@ -422,18 +422,6 @@ export function useCSVUpload() {
     }
 
     // Use preview data as source of truth (includes all user edits)
-    // Build CSV with standard headers expected by backend
-    const normalizedHeaders = [
-      'sku',
-      'product_name',
-      'category',
-      'quantity',
-      'expiry_date',
-      'cost_price',
-      'selling_price',
-    ]
-
-    const csvRows = [normalizedHeaders.join(',')]
     const firstRow = parsedData[0]
     const originalHeaders = Object.keys(firstRow)
 
@@ -625,7 +613,7 @@ export function useCSVUpload() {
       const result = await response.json()
       return result
     },
-    onSuccess: (data) => {
+    onSuccess: data => {
       setValidationResult(data)
 
       // Show appropriate toast based on validation results

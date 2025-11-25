@@ -121,7 +121,7 @@ export async function POST(request: NextRequest) {
         }
 
         errorDetails = errorJson
-      } catch (parseError) {
+      } catch (_parseError) {
         errorMessage = errorText || errorMessage
       }
 

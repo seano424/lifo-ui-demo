@@ -37,7 +37,9 @@ export default function ScanOutPage() {
                   <Typography variant="p" className="text-sm text-white">
                     {t('removedQuantityExpires', {
                       quantity: item.quantity,
-                      date: new Date(item.expiryDate).toLocaleDateString(),
+                      date: item.expiryDate
+                        ? new Date(item.expiryDate).toLocaleDateString()
+                        : 'N/A',
                     })}
                   </Typography>
                 </div>

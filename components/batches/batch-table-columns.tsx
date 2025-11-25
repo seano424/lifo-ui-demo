@@ -140,7 +140,9 @@ export function createBatchTableColumns({
       maxSize: Math.max(
         180,
         calculateMaxWidth(data, item =>
-          item.expiry_date ? new Date(item.expiry_date).toLocaleDateString() : tExpiry('noExpiryDate')
+          item.expiry_date
+            ? new Date(item.expiry_date).toLocaleDateString()
+            : tExpiry('noExpiryDate'),
         ),
       ),
       enableResizing: true,

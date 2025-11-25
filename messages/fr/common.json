@@ -178,5 +178,19 @@
     "decline": "Refuser",
     "learnMore": "En savoir plus",
     "manageCookies": "Gérer les cookies"
+  },
+  "trendIndicator": {
+    "previous": "Précédent:",
+    "periodLow": "Période minimale:",
+    "periodHigh": "Période maximale:"
+  },
+  "scanning": {
+    "totalItems": "Total des articles:",
+    "totalValue": "Valeur totale:",
+    "noBatchesAvailable": "Aucun lot disponible",
+    "openMenu": "Ouvrir le menu",
+    "noStoreSelected": "Aucun magasin sélectionné",
+    "pleaseSelectStore": "Veuillez sélectionner un magasin pour continuer",
+    "whatHappensNext": "Que se passe-t-il ensuite?"
   }
 }

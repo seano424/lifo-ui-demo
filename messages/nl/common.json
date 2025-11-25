@@ -48,6 +48,8 @@
   },
   "breadcrumbs": {
     "batches": "Partijen",
+    "draftBatches": "Concept Partijen",
+    "drafts": "Concepten",
     "billing": "Facturering",
     "dashboard": "Dashboard",
     "inventory": "Voorraad",
@@ -176,5 +178,19 @@
     "decline": "Weigeren",
     "learnMore": "Meer informatie",
     "manageCookies": "Cookies beheren"
+  },
+  "trendIndicator": {
+    "previous": "Vorige:",
+    "periodLow": "Periode minimum:",
+    "periodHigh": "Periode maximum:"
+  },
+  "scanning": {
+    "totalItems": "Totaal artikelen:",
+    "totalValue": "Totale waarde:",
+    "noBatchesAvailable": "Geen batches beschikbaar",
+    "openMenu": "Menu openen",
+    "noStoreSelected": "Geen winkel geselecteerd",
+    "pleaseSelectStore": "Selecteer een winkel om door te gaan",
+    "whatHappensNext": "Wat gebeurt er hierna?"
   }
 }

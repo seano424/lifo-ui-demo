@@ -61,6 +61,7 @@ describe('frame-analyzer', () => {
         hasTextLikeContent: false,
         textConfidence: 0,
         hasDatePattern: false,
+        hasDateContext: false,
         datePatternConfidence: 0,
         isBarcodeDetected: false,
         barcodeConfidence: 0,

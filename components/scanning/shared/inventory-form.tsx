@@ -80,7 +80,7 @@ export default function InventoryForm({
 
   // Handle field changes without data dependency to prevent re-render loops
   const handleChange = useCallback(
-    (field: keyof InventoryFormData) => (value: string | number) => {
+    (field: keyof InventoryFormData) => (value: string | number | null) => {
       // Use functional update pattern to avoid data dependency
       onChange(prev => ({
         ...prev,
@@ -113,7 +113,10 @@ export default function InventoryForm({
             {showExpiryDate && (
               <div>
                 <Label className="text-xs">
-                  {finalExpiryDateLabel} {t('labels.editableNote')} <span className="text-gray-500">({t('labels.optional', { defaultValue: 'Optional' })})</span>
+                  {finalExpiryDateLabel} {t('labels.editableNote')}{' '}
+                  <span className="text-gray-500">
+                    ({t('labels.optional', { defaultValue: 'Optional' })})
+                  </span>
                 </Label>
                 <Input
                   type="date"
@@ -184,7 +187,10 @@ export default function InventoryForm({
           {showExpiryDate && (
             <div>
               <Label htmlFor="expiry" className="text-xs">
-                {finalExpiryDateLabel} <span className="text-gray-500">({t('labels.optional', { defaultValue: 'Optional' })})</span>
+                {finalExpiryDateLabel}{' '}
+                <span className="text-gray-500">
+                  ({t('labels.optional', { defaultValue: 'Optional' })})
+                </span>
               </Label>
               <Input
                 id="expiry"
