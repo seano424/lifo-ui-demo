@@ -4,7 +4,12 @@
  * Usage: npx tsx scripts/test-email-templates.ts
  */
 
+import { config } from 'dotenv'
+import { resolve } from 'path'
 import { sendWelcomeEmail, sendPasswordResetEmail } from '../lib/email/resend'
+
+// Load environment variables from .env.local
+config({ path: resolve(process.cwd(), '.env.local') })
 
 const testEmails = async () => {
   console.log('🧪 Testing Email Templates\n')
