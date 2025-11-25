@@ -34,10 +34,6 @@ interface WelcomeEmailContent {
   subtitle: string
   greeting: (fullName: string) => string
   welcomeMessage: string
-  credentialsTitle: string
-  usernameLabel: string
-  passwordLabel: string
-  emailLabel: string
   howToLoginTitle: string
   steps: string[]
   importantNote: string
@@ -65,76 +61,59 @@ interface PasswordResetEmailContent {
 
 const welcomeEmailTranslations: Record<SupportedLanguage, WelcomeEmailContent> = {
   en: {
-    subject: (storeName: string) => `Welcome to ${storeName} - Your Login Credentials`,
-    title: (storeName: string) => `Welcome to ${storeName}`,
-    subtitle: 'Your employee account has been successfully created',
-    greeting: (fullName: string) => `Hello <strong>${fullName}</strong>,`,
+    subject: (storeName: string) => `Welcome to ${storeName}!`,
+    title: (storeName: string) => `Welcome to ${storeName}!`,
+    subtitle: "Thanks for joining the team! We're excited to have you.",
+    greeting: (fullName: string) => `Hi ${fullName},`,
     welcomeMessage:
-      'Welcome to the team! Your LIFO account has been created and you can now access the inventory management system.',
-    credentialsTitle: 'Your login credentials:',
-    usernameLabel: 'Username:',
-    passwordLabel: 'Password:',
-    emailLabel: 'Email:',
-    howToLoginTitle: 'How to log in:',
+      "Your LIFO account is all set up. You can now start scanning products and helping reduce food waste. Let's make an impact together!",
+    howToLoginTitle: 'To get started:',
     steps: [
-      'Open the LIFO app on the store tablet',
-      'Select the <strong>"Employee"</strong> tab',
-      'Enter your username and password',
-      'Start scanning products and managing inventory',
+      'Open the LIFO app dashboard',
+      'Add your store',
+      'Add a delivery note, csv, or start scanning to create batches!',
     ],
     importantNote:
-      "<strong>Important:</strong> Keep your credentials secure and don't share them with anyone. Your password can be reset at any time by your manager.",
-    footerHelp:
-      'Need help? Contact your manager or <a href="mailto:support@lifo-app" class="support-link">our support</a>',
-    footerCopyright: '© 2025 LIFO - Smart Food Waste Reduction',
+      "Keep your login info safe and don't share it with anyone. If you forget your password, your manager can reset it for you anytime.",
+    footerHelp: 'Questions? Just ask your manager or reach out to us at support@lifo-app.com',
+    footerCopyright: '© 2025 LIFO',
   },
   fr: {
-    subject: (storeName: string) => `Bienvenue chez ${storeName} - Vos identifiants de connexion`,
-    title: (storeName: string) => `Bienvenue chez ${storeName}`,
-    subtitle: 'Votre compte employé a été créé avec succès',
-    greeting: (fullName: string) => `Bonjour <strong>${fullName}</strong>,`,
+    subject: (storeName: string) => `Bienvenue chez ${storeName} !`,
+    title: (storeName: string) => `Bienvenue chez ${storeName} !`,
+    subtitle: "Merci de rejoindre l'équipe ! Nous sommes ravis de vous accueillir.",
+    greeting: (fullName: string) => `Bonjour ${fullName},`,
     welcomeMessage:
-      "Bienvenue dans l'équipe ! Votre compte LIFO a été créé et vous pouvez maintenant accéder au système de gestion des stocks.",
-    credentialsTitle: 'Vos identifiants de connexion :',
-    usernameLabel: "Nom d'utilisateur :",
-    passwordLabel: 'Mot de passe :',
-    emailLabel: 'Email :',
-    howToLoginTitle: 'Comment vous connecter :',
+      'Votre compte LIFO est prêt. Vous pouvez maintenant commencer à scanner les produits et aider à réduire le gaspillage alimentaire. Faisons la différence ensemble !',
+    howToLoginTitle: 'Pour commencer :',
     steps: [
-      "Ouvrez l'application LIFO sur la tablette du magasin",
-      'Sélectionnez l\'onglet <strong>"Employé"</strong>',
-      "Saisissez votre nom d'utilisateur et votre mot de passe",
-      "Commencez à scanner les produits et gérer l'inventaire",
+      "Ouvrez le tableau de bord de l'application LIFO",
+      'Ajoutez votre magasin',
+      'Ajoutez un bon de livraison, un csv ou commencez à scanner pour créer des lots !',
     ],
     importantNote:
-      '<strong>Important :</strong> Gardez vos identifiants en sécurité et ne les partagez avec personne. Votre mot de passe peut être réinitialisé à tout moment par votre responsable.',
+      'Gardez vos identifiants en sécurité et ne les partagez avec personne. Si vous oubliez votre mot de passe, votre responsable peut le réinitialiser à tout moment.',
     footerHelp:
-      'Besoin d\'aide ? Contactez votre responsable ou <a href="mailto:support@lifo-app" class="support-link">notre support</a>',
-    footerCopyright: '© 2025 LIFO - Réduction intelligente du gaspillage alimentaire',
+      'Des questions ? Demandez à votre responsable ou contactez-nous à support@lifo-app.com',
+    footerCopyright: '© 2025 LIFO',
   },
   nl: {
-    subject: (storeName: string) => `Welkom bij ${storeName} - Uw inloggegevens`,
-    title: (storeName: string) => `Welkom bij ${storeName}`,
-    subtitle: 'Uw werknemersaccount is succesvol aangemaakt',
-    greeting: (fullName: string) => `Hallo <strong>${fullName}</strong>,`,
+    subject: (storeName: string) => `Welkom bij ${storeName}!`,
+    title: (storeName: string) => `Welkom bij ${storeName}!`,
+    subtitle: 'Bedankt voor het aansluiten bij het team! We zijn blij je te hebben.',
+    greeting: (fullName: string) => `Hallo ${fullName},`,
     welcomeMessage:
-      'Welkom bij het team! Uw LIFO-account is aangemaakt en u kunt nu toegang krijgen tot het voorraadbeheerssysteem.',
-    credentialsTitle: 'Uw inloggegevens:',
-    usernameLabel: 'Gebruikersnaam:',
-    passwordLabel: 'Wachtwoord:',
-    emailLabel: 'E-mail:',
-    howToLoginTitle: 'Hoe in te loggen:',
+      'Uw LIFO-account is klaar. U kunt nu beginnen met het scannen van producten en helpen voedselverspilling te verminderen. Laten we samen impact maken!',
+    howToLoginTitle: 'Om te beginnen:',
     steps: [
-      'Open de LIFO-app op de winkeltablet',
-      'Selecteer het tabblad <strong>"Medewerker"</strong>',
-      'Voer uw gebruikersnaam en wachtwoord in',
-      'Begin met het scannen van producten en beheer van voorraad',
+      'Open het LIFO-app dashboard',
+      'Voeg uw winkel toe',
+      'Voeg een leveringsbon, csv toe of begin met scannen om batches te maken!',
     ],
     importantNote:
-      '<strong>Belangrijk:</strong> Houd uw inloggegevens veilig en deel ze met niemand. Uw wachtwoord kan op elk moment door uw manager worden gereset.',
-    footerHelp:
-      'Hulp nodig? Neem contact op met uw manager of <a href="mailto:support@lifo-app" class="support-link">onze support</a>',
-    footerCopyright: '© 2025 LIFO - Slimme Voedselafvalvermindering',
+      'Houd uw inloggegevens veilig en deel ze met niemand. Als u uw wachtwoord vergeet, kan uw manager het op elk moment opnieuw instellen.',
+    footerHelp: 'Vragen? Vraag het uw manager of neem contact met ons op via support@lifo-app.com',
+    footerCopyright: '© 2025 LIFO',
   },
 }
 
@@ -315,137 +294,67 @@ function generateWelcomeEmailHTML(
             max-width: 600px;
             margin: 0 auto;
             padding: 20px;
-            background-color: #f8fafc;
+            background-color: #ffffff;
         }
         .email-container {
             background: white;
-            border-radius: 12px;
-            padding: 32px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        .header {
-            text-align: center;
-            margin-bottom: 32px;
+            padding: 20px;
         }
         .logo {
-            width: 64px;
-            height: 64px;
-            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-            border-radius: 12px;
-            margin: 0 auto 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 24px;
+            margin-bottom: 16px;
         }
-        .credentials-box {
-            background: #f1f5f9;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
-            padding: 24px;
-            margin: 24px 0;
+        .logo img {
+            max-width: 80px;
+            height: auto;
+            display: block;
         }
-        .credential-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid #e2e8f0;
-        }
-        .credential-item:last-child {
-            border-bottom: none;
-        }
-        .credential-label {
-            font-weight: 600;
-            color: #475569;
-        }
-        .credential-value {
-            font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
-            font-size: 16px;
-            font-weight: 600;
+        h1 {
             color: #1e293b;
+            font-size: 24px;
+            margin-bottom: 8px;
         }
-        .password-value {
-            font-size: 20px;
-            color: #3b82f6;
-            letter-spacing: 2px;
-        }
-        .instructions {
-            background: #dbeafe;
-            border-left: 4px solid #3b82f6;
-            padding: 16px;
-            margin: 24px 0;
-            border-radius: 0 8px 8px 0;
-        }
-        .instructions h3 {
-            margin: 0 0 12px 0;
-            color: #1e40af;
+        p {
+            margin: 12px 0;
+            color: #374151;
         }
         .steps {
-            margin: 0;
+            margin: 16px 0;
             padding-left: 20px;
         }
         .steps li {
-            margin: 8px 0;
+            margin: 6px 0;
         }
         .footer {
-            text-align: center;
             margin-top: 32px;
-            padding-top: 24px;
-            border-top: 1px solid #e2e8f0;
-            color: #64748b;
+            padding-top: 20px;
+            border-top: 1px solid #e5e7eb;
+            color: #6b7280;
             font-size: 14px;
-        }
-        .support-link {
-            color: #3b82f6;
-            text-decoration: none;
         }
     </style>
 </head>
 <body>
     <div class="email-container">
-        <div class="header">
-            <div class="logo">L</div>
-            <h1 style="margin: 0; color: #1e293b;">${content.title(storeName)}</h1>
-            <p style="margin: 8px 0 0 0; color: #64748b;">${content.subtitle}</p>
+        <div class="logo">
+            <img src="https://jrgmetdsohowtxickqij.supabase.co/storage/v1/object/public/brand-assets/LIFO%20Logo%20Light.png" alt="LIFO" />
         </div>
+
+        <h1>${content.title(storeName)}</h1>
+        <p style="color: #6b7280; margin-top: 0;">${content.subtitle}</p>
 
         <p>${content.greeting(credentials.full_name)}</p>
 
         <p>${content.welcomeMessage}</p>
 
-        <div class="credentials-box">
-            <h3 style="margin: 0 0 16px 0; color: #1e293b;">${content.credentialsTitle}</h3>
+        <p style="font-weight: 600; margin-bottom: 8px; margin-top: 24px;">${content.howToLoginTitle}</p>
+        <ol class="steps">
+            ${content.steps.map(step => `<li>${step}</li>`).join('\n            ')}
+        </ol>
 
-            <div class="credential-item">
-                <span class="credential-label">${content.usernameLabel}</span>
-                <span class="credential-value">${credentials.username}</span>
-            </div>
-
-            <div class="credential-item">
-                <span class="credential-label">${content.passwordLabel}</span>
-                <span class="credential-value password-value">${credentials.password}</span>
-            </div>
-
-            <div class="credential-item">
-                <span class="credential-label">${content.emailLabel}</span>
-                <span class="credential-value">${credentials.email}</span>
-            </div>
-        </div>
-
-        <div class="instructions">
-            <h3>${content.howToLoginTitle}</h3>
-            <ol class="steps">
-                ${content.steps.map(step => `<li>${step}</li>`).join('\n                ')}
-            </ol>
-        </div>
-
-        <p>${content.importantNote}</p>
+        <p style="font-size: 14px; color: #6b7280;">${content.importantNote}</p>
 
         <div class="footer">
-            <p>${content.footerHelp}</p>
+            <p style="margin: 0;">${content.footerHelp}</p>
             <p style="margin: 8px 0 0 0;">${content.footerCopyright}</p>
         </div>
     </div>
@@ -464,25 +373,24 @@ function generateWelcomeEmailText(
 ): string {
   const storeName = credentials.store_name || 'LIFO'
   const stepsText = content.steps
-    .map((step, index) => `${index + 1}. ${step.replace(/<\/?strong>/g, '')}`)
+    .map(
+      (step, index) =>
+        `${index + 1}. ${step.replace(/<\/?strong>/g, '').replace(/"Employee"/g, 'Employee')}`,
+    )
     .join('\n')
 
   return `
 ${content.title(storeName)}
+${content.subtitle}
 
-${content.greeting(credentials.full_name).replace(/<\/?strong>/g, '')}
+${content.greeting(credentials.full_name)}
 
 ${content.welcomeMessage}
 
-${content.credentialsTitle.toUpperCase()}
-• ${content.usernameLabel} ${credentials.username}
-• ${content.passwordLabel} ${credentials.password}
-• ${content.emailLabel} ${credentials.email}
-
-${content.howToLoginTitle.toUpperCase()}
+${content.howToLoginTitle}
 ${stepsText}
 
-${content.importantNote.replace(/<\/?strong>/g, '')}
+${content.importantNote}
 
 ${content.footerHelp.replace(/<a [^>]*>|<\/a>/g, '')}
 
@@ -528,17 +436,12 @@ function generatePasswordResetEmailHTML(
             margin-bottom: 32px;
         }
         .logo {
-            width: 64px;
-            height: 64px;
-            background: linear-gradient(135deg, #f59e0b, #d97706);
-            border-radius: 12px;
-            margin: 0 auto 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 24px;
+            margin-bottom: 16px;
+        }
+        .logo img {
+            max-width: 80px;
+            height: auto;
+            display: block;
         }
         .alert-box {
             background: #fef3c7;
@@ -574,8 +477,11 @@ function generatePasswordResetEmailHTML(
 </head>
 <body>
     <div class="email-container">
+        <div class="logo">
+            <img src="https://jrgmetdsohowtxickqij.supabase.co/storage/v1/object/public/brand-assets/LIFO%20Logo%20Light.png" alt="LIFO" />
+        </div>
+
         <div class="header">
-            <div class="logo">🔑</div>
             <h1 style="margin: 0; color: #1e293b;">${content.title}</h1>
             <p style="margin: 8px 0 0 0; color: #64748b;">${content.subtitle}</p>
         </div>
