@@ -121,7 +121,7 @@ export default function InventoryForm({
                 <Input
                   type="date"
                   value={data.expiryDate || ''}
-                  onChange={e => handleChange('expiryDate')(e.target.value || null)}
+                  onChange={e => handleChange('expiryDate')(e.target.value || '')}
                   className="text-sm"
                   disabled={disabled}
                 />
@@ -196,7 +196,7 @@ export default function InventoryForm({
                 id="expiry"
                 type="date"
                 value={data.expiryDate || ''}
-                onChange={e => handleChange('expiryDate')(e.target.value || null)}
+                onChange={e => handleChange('expiryDate')(e.target.value || '')}
                 disabled={disabled}
               />
             </div>

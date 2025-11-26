@@ -382,9 +382,11 @@ export default function ManualDeliveryEntry({
                     <div className="flex-1">
                       <Typography variant="p">{item.productName}</Typography>
                       {item.brand && <Typography variant="p">{item.brand}</Typography>}
-                      <Typography variant="p">
-                        {t('confirmation.itemDetails.expires')} {formatExpiryDate(item.expiryDate)}
-                      </Typography>
+                      {item.expiryDate && (
+                        <Typography variant="p">
+                          {t('confirmation.itemDetails.expires')} {formatExpiryDate(item.expiryDate)}
+                        </Typography>
+                      )}
                     </div>
                     <div className="text-right">
                       <Typography variant="p">

@@ -514,16 +514,40 @@ export function useCSVUpload() {
     // Step 5: Rebuild CSV with normalized headers and pricing values from preview
     const csvRows = [finalHeaders.join(',')]
 
-    previewData.forEach(item => {
-      const values = [
-        item.SKU || '',
-        item.Product_Name || '',
-        item.Category || CSV_PROCESSING.DEFAULT_CATEGORY,
-        item.Quantity?.toString() || '1',
-        item.Expiry_Date || '',
-        item.Cost_Price?.toString() || '0.01',
-        item.Selling_Price?.toString() || '0.01',
-      ]
+    previewData.forEach((item, index) => {
+      const originalRow = parsedData[index]
+
+      // Build a map from normalized headers to original CSV headers
+      const normalizedToOriginal = new Map<string, string>()
+      originalHeaders.forEach((origHeader, idx) => {
+        normalizedToOriginal.set(normalizedHeaders[idx], origHeader)
+      })
+
+      // Build values in the same order as finalHeaders
+      // Use preview data for editable columns, original data for others
+      const values = finalHeaders.map(header => {
+        // Use preview data for standard editable columns
+        switch (header) {
+          case 'sku':
+            return item.SKU || ''
+          case 'product_name':
+            return item.Product_Name || ''
+          case 'category':
+            return item.Category || CSV_PROCESSING.DEFAULT_CATEGORY
+          case 'quantity':
+            return item.Quantity?.toString() || '1'
+          case 'expiry_date':
+            return item.Expiry_Date || ''
+          case 'cost_price':
+            return item.Cost_Price?.toString() || '0.01'
+          case 'selling_price':
+            return item.Selling_Price?.toString() || '0.01'
+          default:
+            // For other columns (like brand, batch_number), use original data
+            const originalHeader = normalizedToOriginal.get(header)
+            return originalHeader && originalRow ? originalRow[originalHeader] || '' : ''
+        }
+      })
 
       // Escape special CSV characters: commas, quotes, newlines, carriage returns
       const escapedValues = values.map(v =>
@@ -538,7 +562,7 @@ export function useCSVUpload() {
 
     if (process.env.NODE_ENV === 'development') {
       logger.log('csv-upload', 'Normalization complete (using edited preview data)', {
-        normalizedHeaders,
+        finalHeaders,
         totalRows: previewData.length,
       })
     }
