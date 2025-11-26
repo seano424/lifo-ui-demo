@@ -18,12 +18,12 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { toast } from 'sonner'
-import type { BatchWithProduct } from '@/lib/queries/batches'
+import type { Batch } from '@/lib/queries/batches'
 import type { ExpiryDateInfo } from '@/lib/stores/scanning-workflow-store'
 import ScanningCamera from '@/components/scanning/shared/scanning-camera'
 
 interface CompleteDraftBatchDialogProps {
-  batch: BatchWithProduct | null
+  batch: Batch | null
   open: boolean
   onOpenChange: (open: boolean) => void
   onSuccess?: () => void
@@ -87,7 +87,7 @@ export function CompleteDraftBatchDialog({
 
       // Success feedback (mutation handles toast internally, but we add custom success handling)
       toast.success('Batch completed successfully!', {
-        description: `${batch.products?.name} is now active and will be included in AI scoring`,
+        description: `Batch ${batch.batch_number} is now active and will be included in AI scoring`,
       })
       setExpiryDate('')
       onOpenChange(false)
@@ -131,30 +131,14 @@ export function CompleteDraftBatchDialog({
         <div className="space-y-5 py-4">
           {/* Batch info */}
           <div className="rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 p-5 space-y-4 shadow-sm">
-            <div>
-              <Label className="text-xs uppercase tracking-wide text-muted-foreground font-semibold">
-                Product
-              </Label>
-              <p className="font-bold text-lg mt-1 text-slate-900 dark:text-slate-100">
-                {batch.products?.name || 'Unknown Product'}
-              </p>
-            </div>
             <div className="flex gap-4">
               <div className="flex-1 bg-white dark:bg-slate-950 rounded-lg p-3 border border-slate-200 dark:border-slate-700">
-                <Label className="text-xs uppercase tracking-wide text-muted-foreground font-semibold">
-                  Batch Number
-                </Label>
-                <p className="font-bold mt-1 font-mono text-slate-900 dark:text-slate-100">
-                  {batch.batch_number}
-                </p>
+                <Label className="text-xs uppercase tracking-wide text-muted-foreground font-semibold">Batch Number</Label>
+                <p className="font-bold mt-1 font-mono text-slate-900 dark:text-slate-100">{batch.batch_number}</p>
               </div>
               <div className="flex-1 bg-white dark:bg-slate-950 rounded-lg p-3 border border-slate-200 dark:border-slate-700">
-                <Label className="text-xs uppercase tracking-wide text-muted-foreground font-semibold">
-                  Quantity
-                </Label>
-                <p className="font-bold mt-1 text-slate-900 dark:text-slate-100">
-                  {batch.current_quantity} units
-                </p>
+                <Label className="text-xs uppercase tracking-wide text-muted-foreground font-semibold">Quantity</Label>
+                <p className="font-bold mt-1 text-slate-900 dark:text-slate-100">{batch.current_quantity} units</p>
               </div>
             </div>
           </div>
@@ -177,7 +161,7 @@ export function CompleteDraftBatchDialog({
                     id="expiry-date"
                     type="date"
                     value={expiryDate}
-                    onChange={e => setExpiryDate(e.target.value)}
+                    onChange={(e) => setExpiryDate(e.target.value)}
                     min={new Date().toISOString().split('T')[0]}
                     className="pl-11 h-12 text-base font-medium border-2 focus:border-primary-500 dark:focus:border-primary-400"
                     disabled={isPending}
@@ -208,11 +192,7 @@ export function CompleteDraftBatchDialog({
               {!expiryDate && (
                 <p className="text-sm text-muted-foreground flex items-center gap-2">
                   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path
-                      fillRule="evenodd"
-                      d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                      clipRule="evenodd"
-                    />
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                   </svg>
                   Use the calendar or click Scan to use OCR
                 </p>
@@ -251,9 +231,7 @@ export function CompleteDraftBatchDialog({
                     Analyzing frame... Attempt {autoOCRState.attemptCount} / 5
                   </p>
                   {autoOCRState.lastReason && (
-                    <p className="text-sm text-blue-700 dark:text-blue-300 mt-2">
-                      {autoOCRState.lastReason}
-                    </p>
+                    <p className="text-sm text-blue-700 dark:text-blue-300 mt-2">{autoOCRState.lastReason}</p>
                   )}
                 </div>
               )}

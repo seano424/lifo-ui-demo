@@ -674,10 +674,7 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
                   </div>
                   <Typography>{item.productName}</Typography>
                   <Typography>
-                    {item.brand} • {t('expires')}:{' '}
-                    {item.expiryDate
-                      ? new Date(item.expiryDate).toLocaleDateString()
-                      : 'No date set'}
+                    {item.brand} • {item.expiryDate && `${t('expires')}: ${new Date(item.expiryDate).toLocaleDateString()}`}
                   </Typography>
                   <Typography>
                     {formatPrice(item.price)} × {item.quantity} ={' '}
@@ -844,12 +841,11 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
                           </Typography>
                         </div>
                         {item.brand && <Typography variant="extraSmall">{item.brand}</Typography>}
-                        <Typography variant="extraSmall">
-                          {t('expires')}:{' '}
-                          {item.expiryDate
-                            ? new Date(item.expiryDate).toLocaleDateString()
-                            : 'No date set'}
-                        </Typography>
+                        {item.expiryDate && (
+                          <Typography variant="extraSmall">
+                            {t('expires')}: {new Date(item.expiryDate).toLocaleDateString()}
+                          </Typography>
+                        )}
                       </div>
                       <div className="text-right flex flex-col gap-1">
                         <Typography variant="extraSmall" className={`${actionColor}`}>

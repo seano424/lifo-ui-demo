@@ -31,19 +31,6 @@ interface CSVUploadFormProps {
   onUploadComplete?: (result: unknown) => void
 }
 
-interface ValidationWarning {
-  type: string
-  severity: string
-  message: string
-  affected_items: Array<{
-    product_name: string
-    sku?: string
-    error: string
-  }>
-  total_affected: number
-  suggestion?: string
-}
-
 export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
   const t = useTranslations('csvUpload')
   const [dragActive, setDragActive] = useState(false)
@@ -115,6 +102,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
     validate,
     isValidating,
     validationResult,
+    validationError,
     resetPreview,
     updateCsvItemExpiry,
     updateCsvItemQuantity,
@@ -598,7 +586,9 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                             step="0.01"
                           />
                           {item.Cost_Price < PRICE_CONSTRAINTS.MIN_PRICE && (
-                            <span className="text-xs text-red-600">{t('errors.priceTooLow')}</span>
+                            <span className="text-xs text-red-600">
+                              {t('errors.priceTooLow')}
+                            </span>
                           )}
                         </div>
                         <div className="space-y-1">
@@ -624,7 +614,9 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                             step="0.01"
                           />
                           {item.Selling_Price < PRICE_CONSTRAINTS.MIN_PRICE && (
-                            <span className="text-xs text-red-600">{t('errors.priceTooLow')}</span>
+                            <span className="text-xs text-red-600">
+                              {t('errors.priceTooLow')}
+                            </span>
                           )}
                         </div>
                       </div>
@@ -692,42 +684,35 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                     validationResult.warnings &&
                     validationResult.warnings.length > 0 && (
                       <div className="space-y-3">
-                        {validationResult.warnings.map(
-                          (warning: ValidationWarning, idx: number) => (
-                            <div
-                              key={`warning-${warning.type}-${idx}`}
-                              className="space-y-2 border-t border-red-200 pt-2"
-                            >
-                              <p className="text-red-700 font-medium">{warning.message}</p>
-                              {warning.suggestion && (
-                                <p className="text-red-600 text-sm italic">{warning.suggestion}</p>
-                              )}
-                              {warning.affected_items && warning.affected_items.length > 0 && (
-                                <details className="text-sm">
-                                  <summary className="cursor-pointer text-red-600 hover:text-red-800">
-                                    View affected items ({warning.total_affected} total, showing
-                                    first {Math.min(5, warning.affected_items.length)})
-                                  </summary>
-                                  <ul className="mt-2 space-y-1 list-disc list-inside text-red-700">
-                                    {warning.affected_items
-                                      .slice(0, 5)
-                                      .map((item, itemIndex: number) => (
-                                        <li key={`${item.sku || item.product_name}-${itemIndex}`}>
-                                          {item.product_name}
-                                          {item.sku && ` (SKU: ${item.sku})`}
-                                          {item.error && (
-                                            <span className="block ml-6 text-xs text-red-600">
-                                              {item.error}
-                                            </span>
-                                          )}
-                                        </li>
-                                      ))}
-                                  </ul>
-                                </details>
-                              )}
-                            </div>
-                          ),
-                        )}
+                        {validationResult.warnings.map((warning: any, idx: number) => (
+                          <div key={idx} className="space-y-2 border-t border-red-200 pt-2">
+                            <p className="text-red-700 font-medium">{warning.message}</p>
+                            {warning.suggestion && (
+                              <p className="text-red-600 text-sm italic">{warning.suggestion}</p>
+                            )}
+                            {warning.affected_items && warning.affected_items.length > 0 && (
+                              <details className="text-sm">
+                                <summary className="cursor-pointer text-red-600 hover:text-red-800">
+                                  View affected items ({warning.total_affected} total, showing first{' '}
+                                  {Math.min(5, warning.affected_items.length)})
+                                </summary>
+                                <ul className="mt-2 space-y-1 list-disc list-inside text-red-700">
+                                  {warning.affected_items.slice(0, 5).map((item: any, i: number) => (
+                                    <li key={i}>
+                                      {item.product_name}
+                                      {item.sku && ` (SKU: ${item.sku})`}
+                                      {item.error && (
+                                        <span className="block ml-6 text-xs text-red-600">
+                                          {item.error}
+                                        </span>
+                                      )}
+                                    </li>
+                                  ))}
+                                </ul>
+                              </details>
+                            )}
+                          </div>
+                        ))}
                       </div>
                     )}
 
@@ -768,7 +753,9 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                 disabled={isUploading || hasInvalidPricing}
                 className="flex-1"
                 size="lg"
-                title={hasInvalidPricing ? t('errors.invalidPricingDescription') : undefined}
+                title={
+                  hasInvalidPricing ? t('errors.invalidPricingDescription') : undefined
+                }
               >
                 {isUploading ? (
                   <>
@@ -820,18 +807,16 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
               </Typography>
             </div>
 
-            {/* Draft Batches Info - products without expiry dates */}
-            {uploadResult.batches_created && uploadResult.batches_created > 0 && (
+            {/* Store Products Info - products without expiry dates */}
+            {uploadResult.store_products_created && uploadResult.store_products_created > 0 && (
               <Alert className="bg-amber-50 border-amber-200">
                 <AlertCircle className="h-4 w-4 text-amber-600" />
                 <AlertTitle className="text-amber-800 font-semibold">
-                  Draft Batches Created
+                  Store Products Created
                 </AlertTitle>
                 <AlertDescription className="space-y-2 mt-2">
                   <p className="text-amber-700">
-                    {uploadResult.batches_created}{' '}
-                    {uploadResult.batches_created === 1 ? 'batch was' : 'batches were'} created.
-                    Complete any batches that need expiry dates.
+                    {uploadResult.store_products_created} {uploadResult.store_products_created === 1 ? 'product was' : 'products were'} created without expiry dates.
                   </p>
                   <p className="text-amber-600 text-sm">
                     Draft batches need expiry dates before they can be scored by AI. Visit the{' '}
@@ -854,8 +839,8 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                   Validation Errors Found
                 </AlertTitle>
                 <AlertDescription className="space-y-3 mt-2">
-                  {uploadResult.warnings.map((warning: ValidationWarning, idx: number) => (
-                    <div key={`upload-warning-${warning.type}-${idx}`} className="space-y-2">
+                  {uploadResult.warnings.map((warning: any, idx: number) => (
+                    <div key={idx} className="space-y-2">
                       <p className="text-red-700 font-medium">{warning.message}</p>
                       {warning.suggestion && (
                         <p className="text-red-600 text-sm italic">{warning.suggestion}</p>
@@ -863,16 +848,14 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                       {warning.affected_items && warning.affected_items.length > 0 && (
                         <details className="text-sm">
                           <summary className="cursor-pointer text-red-600 hover:text-red-700">
-                            View affected items ({warning.total_affected} total, showing first{' '}
-                            {Math.min(warning.affected_items.length, 5)})
+                            View affected items ({warning.total_affected} total,
+                            showing first {Math.min(warning.affected_items.length, 5)})
                           </summary>
                           <ul className="mt-2 space-y-1 list-disc list-inside text-red-600">
-                            {warning.affected_items.map((item, itemIdx: number) => (
-                              <li key={`${item.sku || item.product_name}-detail-${itemIdx}`}>
+                            {warning.affected_items.map((item: any, itemIdx: number) => (
+                              <li key={itemIdx}>
                                 <strong>{item.product_name}</strong>
-                                {item.sku && (
-                                  <span className="text-red-500"> (SKU: {item.sku})</span>
-                                )}
+                                {item.sku && <span className="text-red-500"> (SKU: {item.sku})</span>}
                                 <br />
                                 <span className="ml-6 text-red-500 text-xs">{item.error}</span>
                               </li>
