@@ -159,7 +159,7 @@ const MAX_COLUMN_NAME_LENGTH = 100
  * - Batch Number: batch_lot, lot, lot_number, batch → batch_number
  * - Expiry Date: best_before, use_by, expiration_date, exp_date, expiry → expiry_date
  * - Product Name: item_name, title → product_name
- * - SKU: product_code, item_code, barcode → sku
+ * - SKU: product_id, product_code, item_code, barcode → sku
  *
  * Note: Removed ambiguous mappings to prevent data corruption:
  * - "price" (ambiguous: could be cost or selling price)
@@ -201,6 +201,7 @@ const COLUMN_MAPPINGS = {
   title: 'product_name',
 
   // SKU variations
+  product_id: 'sku',  // Common in inventory exports
   product_code: 'sku',
   item_code: 'sku',
   barcode: 'sku',
