@@ -18,7 +18,7 @@ COMMENT ON SCHEMA integrations IS 'Third-party POS and service integrations';
 
 CREATE TABLE integrations.square_connections (
     connection_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    store_id UUID NOT NULL UNIQUE REFERENCES business.stores(store_id) ON DELETE CASCADE,
+    store_id UUID NOT NULL REFERENCES business.stores(store_id) ON DELETE CASCADE,
 
     -- Square OAuth details
     square_merchant_id VARCHAR(255) NOT NULL,
@@ -53,6 +53,8 @@ CREATE TABLE integrations.square_connections (
     disconnected_at TIMESTAMPTZ,
 
     -- Constraints
+    UNIQUE(store_id), -- One Square connection per store
+    UNIQUE(connection_id, store_id), -- Composite key for FK integrity
     CHECK (connection_status IN ('active', 'expired', 'revoked', 'error'))
 );
 
@@ -75,8 +77,8 @@ CREATE INDEX idx_square_connections_token_expiry ON integrations.square_connecti
 
 CREATE TABLE integrations.square_sync_history (
     sync_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    connection_id UUID NOT NULL REFERENCES integrations.square_connections(connection_id) ON DELETE CASCADE,
-    store_id UUID NOT NULL REFERENCES business.stores(store_id),
+    connection_id UUID NOT NULL,
+    store_id UUID NOT NULL,
 
     -- Sync details
     sync_type VARCHAR(50) NOT NULL,
@@ -101,11 +103,16 @@ CREATE TABLE integrations.square_sync_history (
     sync_metadata JSONB,
 
     -- Constraints
+    FOREIGN KEY (connection_id, store_id)
+        REFERENCES integrations.square_connections(connection_id, store_id)
+        ON DELETE CASCADE,
     CHECK (sync_type IN ('catalog', 'inventory', 'sales', 'token_refresh')),
     CHECK (sync_status IN ('started', 'completed', 'failed', 'partial'))
 );
 
 COMMENT ON TABLE integrations.square_sync_history IS 'Audit log of Square sync operations';
+COMMENT ON CONSTRAINT square_sync_history_connection_id_store_id_fkey ON integrations.square_sync_history
+    IS 'Composite FK ensures store_id matches the connection''s store - data integrity safeguard';
 
 -- Indexes
 CREATE INDEX idx_square_sync_history_connection ON integrations.square_sync_history(connection_id);
