@@ -201,7 +201,7 @@ const COLUMN_MAPPINGS = {
   title: 'product_name',
 
   // SKU variations
-  product_id: 'sku',  // Common in inventory exports
+  product_id: 'sku', // Common in inventory exports
   product_code: 'sku',
   item_code: 'sku',
   barcode: 'sku',
@@ -543,10 +543,11 @@ export function useCSVUpload() {
             return item.Cost_Price?.toString() || '0.01'
           case 'selling_price':
             return item.Selling_Price?.toString() || '0.01'
-          default:
+          default: {
             // For other columns (like brand, batch_number), use original data
             const originalHeader = normalizedToOriginal.get(header)
             return originalHeader && originalRow ? originalRow[originalHeader] || '' : ''
+          }
         }
       })
 

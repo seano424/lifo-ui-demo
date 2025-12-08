@@ -384,7 +384,8 @@ export default function ManualDeliveryEntry({
                       {item.brand && <Typography variant="p">{item.brand}</Typography>}
                       {item.expiryDate && (
                         <Typography variant="p">
-                          {t('confirmation.itemDetails.expires')} {formatExpiryDate(item.expiryDate)}
+                          {t('confirmation.itemDetails.expires')}{' '}
+                          {formatExpiryDate(item.expiryDate)}
                         </Typography>
                       )}
                     </div>

@@ -586,9 +586,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                             step="0.01"
                           />
                           {item.Cost_Price < PRICE_CONSTRAINTS.MIN_PRICE && (
-                            <span className="text-xs text-red-600">
-                              {t('errors.priceTooLow')}
-                            </span>
+                            <span className="text-xs text-red-600">{t('errors.priceTooLow')}</span>
                           )}
                         </div>
                         <div className="space-y-1">
@@ -614,9 +612,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                             step="0.01"
                           />
                           {item.Selling_Price < PRICE_CONSTRAINTS.MIN_PRICE && (
-                            <span className="text-xs text-red-600">
-                              {t('errors.priceTooLow')}
-                            </span>
+                            <span className="text-xs text-red-600">{t('errors.priceTooLow')}</span>
                           )}
                         </div>
                       </div>
@@ -697,17 +693,19 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                                   {Math.min(5, warning.affected_items.length)})
                                 </summary>
                                 <ul className="mt-2 space-y-1 list-disc list-inside text-red-700">
-                                  {warning.affected_items.slice(0, 5).map((item: any, i: number) => (
-                                    <li key={i}>
-                                      {item.product_name}
-                                      {item.sku && ` (SKU: ${item.sku})`}
-                                      {item.error && (
-                                        <span className="block ml-6 text-xs text-red-600">
-                                          {item.error}
-                                        </span>
-                                      )}
-                                    </li>
-                                  ))}
+                                  {warning.affected_items
+                                    .slice(0, 5)
+                                    .map((item: any, i: number) => (
+                                      <li key={i}>
+                                        {item.product_name}
+                                        {item.sku && ` (SKU: ${item.sku})`}
+                                        {item.error && (
+                                          <span className="block ml-6 text-xs text-red-600">
+                                            {item.error}
+                                          </span>
+                                        )}
+                                      </li>
+                                    ))}
                                 </ul>
                               </details>
                             )}
@@ -753,9 +751,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                 disabled={isUploading || hasInvalidPricing}
                 className="flex-1"
                 size="lg"
-                title={
-                  hasInvalidPricing ? t('errors.invalidPricingDescription') : undefined
-                }
+                title={hasInvalidPricing ? t('errors.invalidPricingDescription') : undefined}
               >
                 {isUploading ? (
                   <>
@@ -816,7 +812,9 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                 </AlertTitle>
                 <AlertDescription className="space-y-2 mt-2">
                   <p className="text-amber-700">
-                    {uploadResult.store_products_created} {uploadResult.store_products_created === 1 ? 'product was' : 'products were'} created without expiry dates.
+                    {uploadResult.store_products_created}{' '}
+                    {uploadResult.store_products_created === 1 ? 'product was' : 'products were'}{' '}
+                    created without expiry dates.
                   </p>
                   <p className="text-amber-600 text-sm">
                     Draft batches need expiry dates before they can be scored by AI. Visit the{' '}
@@ -848,14 +846,16 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                       {warning.affected_items && warning.affected_items.length > 0 && (
                         <details className="text-sm">
                           <summary className="cursor-pointer text-red-600 hover:text-red-700">
-                            View affected items ({warning.total_affected} total,
-                            showing first {Math.min(warning.affected_items.length, 5)})
+                            View affected items ({warning.total_affected} total, showing first{' '}
+                            {Math.min(warning.affected_items.length, 5)})
                           </summary>
                           <ul className="mt-2 space-y-1 list-disc list-inside text-red-600">
                             {warning.affected_items.map((item: any, itemIdx: number) => (
                               <li key={itemIdx}>
                                 <strong>{item.product_name}</strong>
-                                {item.sku && <span className="text-red-500"> (SKU: {item.sku})</span>}
+                                {item.sku && (
+                                  <span className="text-red-500"> (SKU: {item.sku})</span>
+                                )}
                                 <br />
                                 <span className="ml-6 text-red-500 text-xs">{item.error}</span>
                               </li>
