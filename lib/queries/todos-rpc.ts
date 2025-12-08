@@ -38,6 +38,7 @@ export interface TodoFilters {
   urgency_level?: TodoUrgencyLevel[]
   action_type?: TodoActionType[]
   batch_status?: BatchStatus[]
+  lifecycle_status?: ('active' | 'expired')[]
   product_name?: string
   days_to_expiry_max?: number
   days_to_expiry_min?: number

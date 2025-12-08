@@ -608,8 +608,9 @@ export type Database = {
           created_at: string | null
           created_by: string | null
           current_quantity: number
-          expiry_date: string
+          expiry_date: string | null
           initial_quantity: number
+          lifecycle_status: string | null
           location_code: string | null
           manufacture_date: string | null
           ocr_confidence: number | null
@@ -636,8 +637,9 @@ export type Database = {
           created_at?: string | null
           created_by?: string | null
           current_quantity: number
-          expiry_date: string
+          expiry_date?: string | null
           initial_quantity: number
+          lifecycle_status?: string | null
           location_code?: string | null
           manufacture_date?: string | null
           ocr_confidence?: number | null
@@ -664,8 +666,9 @@ export type Database = {
           created_at?: string | null
           created_by?: string | null
           current_quantity?: number
-          expiry_date?: string
+          expiry_date?: string | null
           initial_quantity?: number
+          lifecycle_status?: string | null
           location_code?: string | null
           manufacture_date?: string | null
           ocr_confidence?: number | null
@@ -1219,6 +1222,7 @@ export type Database = {
           last_action_time: string | null
           last_action_type: Database["public"]["Enums"]["action_type"] | null
           last_discount_percent: number | null
+          lifecycle_status: string | null
           potential_loss_value: number | null
           potential_revenue_value: number | null
           priority_order: number | null
@@ -4005,9 +4009,9 @@ export type Database = {
       }
       get_todos_with_filters: {
         Args: {
-          p_filters?: Json
-          p_limit?: number
-          p_offset?: number
+          p_filters: Json
+          p_limit: number
+          p_offset: number
           p_store_id: string
         }
         Returns: {
@@ -4030,6 +4034,7 @@ export type Database = {
           last_action_time: string
           last_action_type: Database["public"]["Enums"]["action_type"]
           last_discount_percent: number
+          lifecycle_status: string
           potential_loss_value: number
           potential_revenue_value: number
           priority_order: number
@@ -4260,7 +4265,7 @@ export type Database = {
           details: Json
           expired_count: number
           sold_out_count: number
-          updated_count: number
+          total_updated: number
         }[]
       }
       update_store_advanced_settings: {
