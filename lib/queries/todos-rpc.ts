@@ -261,7 +261,7 @@ export function createUrgentFilter(
 export function createExpiringFilter(daysMax: number = 3): TodoFilters {
   return {
     days_to_expiry_max: daysMax,
-    batch_status: ['active'],
+    lifecycle_status: ['active'],
   }
 }
 
