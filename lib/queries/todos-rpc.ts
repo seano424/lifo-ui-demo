@@ -269,6 +269,7 @@ export function createExpiringFilter(daysMax: number = 3): TodoFilters {
  * Counts for all todo tabs
  */
 export type TodoCounts = {
+  total: number
   pending: number
   in_progress: number
   completed: number
@@ -277,8 +278,77 @@ export type TodoCounts = {
 }
 
 /**
+ * Todo item with count metadata columns
+ */
+export interface TodoItemWithCounts extends TodoItem {
+  total_count: number
+  pending_count: number
+  in_progress_count: number
+  completed_count: number
+  expiring_count: number
+  expired_count: number
+}
+
+/**
+ * Response type for fetchTodosWithCounts
+ */
+export type TodosWithCountsResponse = {
+  data: TodoItem[]
+  counts: TodoCounts
+}
+
+/**
+ * NEW CONSOLIDATED FUNCTION: Fetch todos with counts in a single query
+ * This replaces the separate fetchTodosWithFilters and fetchTodosCounts calls
+ */
+export async function fetchTodosWithCounts(
+  storeId: string,
+  filters: TodoFilters,
+  { limit, offset }: { limit: number; offset: number },
+): Promise<TodosWithCountsResponse> {
+  const supabase = createClient()
+
+  const { data, error } = await supabase.rpc('get_todos_with_counts', {
+    p_store_id: storeId,
+    p_filters: filters,
+    p_limit: limit,
+    p_offset: offset,
+  })
+
+  if (error) throw error
+
+  if (!data || data.length === 0) {
+    return {
+      data: [],
+      counts: {
+        total: 0,
+        pending: 0,
+        in_progress: 0,
+        completed: 0,
+        expiring: 0,
+        expired: 0,
+      },
+    }
+  }
+
+  // Extract counts from first row (same on all rows due to window functions)
+  const firstRow = data[0] as TodoItemWithCounts
+  const counts: TodoCounts = {
+    total: firstRow.total_count,
+    pending: firstRow.pending_count,
+    in_progress: firstRow.in_progress_count,
+    completed: firstRow.completed_count,
+    expiring: firstRow.expiring_count,
+    expired: firstRow.expired_count,
+  }
+
+  return { data: data as TodoItem[], counts }
+}
+
+/**
+ * @deprecated Use fetchTodosWithCounts instead - this function will be removed in a future version
  * Fetch counts for all todo tabs with filters
- * This is more efficient than fetching full todo data just to get counts
+ * Note: The old RPC doesn't return 'total', so we calculate it from the other counts
  */
 export async function fetchTodosCounts(storeId: string, filters: TodoFilters): Promise<TodoCounts> {
   const supabase = createClient()
@@ -290,13 +360,17 @@ export async function fetchTodosCounts(storeId: string, filters: TodoFilters): P
 
   if (error) throw error
 
-  return (
-    data || {
-      pending: 0,
-      in_progress: 0,
-      completed: 0,
-      expiring: 0,
-      expired: 0,
-    }
-  )
+  // Old RPC returns: {pending, in_progress, completed, expiring, expired}
+  // But NOT 'total', so we calculate it
+  const counts = data || { pending: 0, in_progress: 0, completed: 0, expiring: 0, expired: 0 }
+
+  return {
+    // Calculate total from completion statuses (not including expiring/expired since those overlap)
+    total: (counts.pending || 0) + (counts.in_progress || 0) + (counts.completed || 0),
+    pending: counts.pending || 0,
+    in_progress: counts.in_progress || 0,
+    completed: counts.completed || 0,
+    expiring: counts.expiring || 0,
+    expired: counts.expired || 0,
+  }
 }

@@ -20,6 +20,10 @@ export const queryKeys = {
     withFilters: (storeId: string, filters: TodoFilters, pageSize: number) =>
       [...queryKeys.todos.all, 'filtered', { storeId, filters, pageSize }] as const,
 
+    // NEW CONSOLIDATED: Query key for todos with counts (single query for data + counts)
+    withCounts: (storeId: string, filters: TodoFilters, pageSize: number) =>
+      [...queryKeys.todos.all, 'with-counts', { storeId, filters, pageSize }] as const,
+
     // Convenience keys for common filter patterns
     byStatus: (storeId: string, status: TodoCompletionStatus, pageSize: number) =>
       [...queryKeys.todos.all, 'by-status', { storeId, status, pageSize }] as const,
