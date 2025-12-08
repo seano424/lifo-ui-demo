@@ -61,6 +61,7 @@ export function useScanOutActions() {
 
     // Find exact match first
     const exactMatch = batches.find(availableBatch => {
+      if (!availableBatch.batch.expiry_date) return false
       const batchDate = new Date(availableBatch.batch.expiry_date)
       return (
         batchDate.getFullYear() === targetDate.getFullYear() &&
@@ -79,6 +80,7 @@ export function useScanOutActions() {
     let smallestDifference = Infinity
 
     for (const availableBatch of batches) {
+      if (!availableBatch.batch.expiry_date) continue
       const batchDate = new Date(availableBatch.batch.expiry_date)
       const difference = Math.abs(batchDate.getTime() - targetDate.getTime())
 

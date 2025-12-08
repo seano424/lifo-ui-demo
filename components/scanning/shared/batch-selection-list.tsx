@@ -90,7 +90,9 @@ export default function BatchSelectionList({
                 <div className="flex-1 flex flex-col gap-1 pb-2">
                   <Typography variant="p">{products.product_name}</Typography>{' '}
                   {/* ← Use products */}
-                  <Typography variant="p">Expires: {formatDate(batch.expiry_date)}</Typography>{' '}
+                  <Typography variant="p">
+                    Expires: {batch.expiry_date ? formatDate(batch.expiry_date) : 'N/A'}
+                  </Typography>{' '}
                   {/* ← Use batch */}
                   <Typography variant="small" className="text-gray-600">
                     Available: {batch.available_quantity || batch.current_quantity} units{' '}
