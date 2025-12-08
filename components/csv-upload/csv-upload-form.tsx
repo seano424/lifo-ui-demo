@@ -26,6 +26,19 @@ import { validateUploadFile } from '@/lib/utils/file-validation'
 import { logger } from '@/lib/utils/logger'
 import { Typography } from '../ui/typography'
 
+interface AffectedItem {
+  product_name: string
+  sku?: string
+  error?: string
+}
+
+interface ValidationWarning {
+  message: string
+  suggestion?: string
+  affected_items?: AffectedItem[]
+  total_affected?: number
+}
+
 interface CSVUploadFormProps {
   storeId: string
   onUploadComplete?: (result: unknown) => void
@@ -102,7 +115,6 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
     validate,
     isValidating,
     validationResult,
-    validationError,
     resetPreview,
     updateCsvItemExpiry,
     updateCsvItemQuantity,
@@ -680,37 +692,44 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                     validationResult.warnings &&
                     validationResult.warnings.length > 0 && (
                       <div className="space-y-3">
-                        {validationResult.warnings.map((warning: any, idx: number) => (
-                          <div key={idx} className="space-y-2 border-t border-red-200 pt-2">
-                            <p className="text-red-700 font-medium">{warning.message}</p>
-                            {warning.suggestion && (
-                              <p className="text-red-600 text-sm italic">{warning.suggestion}</p>
-                            )}
-                            {warning.affected_items && warning.affected_items.length > 0 && (
-                              <details className="text-sm">
-                                <summary className="cursor-pointer text-red-600 hover:text-red-800">
-                                  View affected items ({warning.total_affected} total, showing first{' '}
-                                  {Math.min(5, warning.affected_items.length)})
-                                </summary>
-                                <ul className="mt-2 space-y-1 list-disc list-inside text-red-700">
-                                  {warning.affected_items
-                                    .slice(0, 5)
-                                    .map((item: any, i: number) => (
-                                      <li key={i}>
-                                        {item.product_name}
-                                        {item.sku && ` (SKU: ${item.sku})`}
-                                        {item.error && (
-                                          <span className="block ml-6 text-xs text-red-600">
-                                            {item.error}
-                                          </span>
-                                        )}
-                                      </li>
-                                    ))}
-                                </ul>
-                              </details>
-                            )}
-                          </div>
-                        ))}
+                        {validationResult.warnings.map(
+                          (warning: ValidationWarning, idx: number) => (
+                            <div
+                              key={`validation-warning-${idx}-${warning.message.slice(0, 20)}`}
+                              className="space-y-2 border-t border-red-200 pt-2"
+                            >
+                              <p className="text-red-700 font-medium">{warning.message}</p>
+                              {warning.suggestion && (
+                                <p className="text-red-600 text-sm italic">{warning.suggestion}</p>
+                              )}
+                              {warning.affected_items && warning.affected_items.length > 0 && (
+                                <details className="text-sm">
+                                  <summary className="cursor-pointer text-red-600 hover:text-red-800">
+                                    View affected items ({warning.total_affected} total, showing
+                                    first {Math.min(5, warning.affected_items.length)})
+                                  </summary>
+                                  <ul className="mt-2 space-y-1 list-disc list-inside text-red-700">
+                                    {warning.affected_items
+                                      .slice(0, 5)
+                                      .map((item: AffectedItem, i: number) => (
+                                        <li
+                                          key={`affected-item-${idx}-${item.sku || item.product_name}-${i}`}
+                                        >
+                                          {item.product_name}
+                                          {item.sku && ` (SKU: ${item.sku})`}
+                                          {item.error && (
+                                            <span className="block ml-6 text-xs text-red-600">
+                                              {item.error}
+                                            </span>
+                                          )}
+                                        </li>
+                                      ))}
+                                  </ul>
+                                </details>
+                              )}
+                            </div>
+                          ),
+                        )}
                       </div>
                     )}
 
@@ -837,8 +856,11 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                   Validation Errors Found
                 </AlertTitle>
                 <AlertDescription className="space-y-3 mt-2">
-                  {uploadResult.warnings.map((warning: any, idx: number) => (
-                    <div key={idx} className="space-y-2">
+                  {uploadResult.warnings.map((warning: ValidationWarning, idx: number) => (
+                    <div
+                      key={`upload-warning-${idx}-${warning.message.slice(0, 20)}`}
+                      className="space-y-2"
+                    >
                       <p className="text-red-700 font-medium">{warning.message}</p>
                       {warning.suggestion && (
                         <p className="text-red-600 text-sm italic">{warning.suggestion}</p>
@@ -850,8 +872,10 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                             {Math.min(warning.affected_items.length, 5)})
                           </summary>
                           <ul className="mt-2 space-y-1 list-disc list-inside text-red-600">
-                            {warning.affected_items.map((item: any, itemIdx: number) => (
-                              <li key={itemIdx}>
+                            {warning.affected_items.map((item: AffectedItem, itemIdx: number) => (
+                              <li
+                                key={`upload-affected-item-${idx}-${item.sku || item.product_name}-${itemIdx}`}
+                              >
                                 <strong>{item.product_name}</strong>
                                 {item.sku && (
                                   <span className="text-red-500"> (SKU: {item.sku})</span>
