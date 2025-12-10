@@ -61,9 +61,9 @@ export async function GET(request: NextRequest) {
 
     // Calculate additional metrics for each item
     const inventory = data.map((batch: BatchWithScores) => {
-      const daysToExpiry = Math.floor(
-        (new Date(batch.expiry_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24),
-      )
+      const daysToExpiry = batch.expiry_date
+        ? Math.floor((new Date(batch.expiry_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+        : 0
 
       type UrgencyLevel = 'critical' | 'high' | 'medium' | 'low'
       const urgencyLevel: UrgencyLevel =

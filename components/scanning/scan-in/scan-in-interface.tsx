@@ -1,6 +1,7 @@
 'use client'
 
 import { BarChart3, Check, RefreshCcw } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import {
@@ -25,6 +26,7 @@ interface ScanInInterfaceProps {
 }
 
 export default function ScanInInterface({ onItemAdded, className }: ScanInInterfaceProps) {
+  const t = useTranslations('common.scanning')
   const { activeStore } = useStoreState()
   const { submitBatch, isSubmittingBatch } = useInventoryActions()
   const { convertMultipleScannedItems } = useScannedItemConverter()
@@ -150,7 +152,10 @@ export default function ScanInInterface({ onItemAdded, className }: ScanInInterf
                         <div className="font-medium">{item.productName}</div>
                         {item.brand && <div className="text-xs text-gray-600">{item.brand}</div>}
                         <div className="text-xs text-gray-500">
-                          Expires: {new Date(item.expiryDate).toLocaleDateString()}
+                          Expires:{' '}
+                          {item.expiryDate
+                            ? new Date(item.expiryDate).toLocaleDateString()
+                            : 'No date set'}
                         </div>
                       </div>
                       <div className="text-right">
@@ -169,11 +174,11 @@ export default function ScanInInterface({ onItemAdded, className }: ScanInInterf
               {/* Total Summary */}
               <div className="border-t pt-3">
                 <div className="flex justify-between items-center font-medium">
-                  <span>Total Items:</span>
+                  <span>{t('totalItems')}</span>
                   <span>{pendingItems.reduce((sum, item) => sum + item.quantity, 0)}</span>
                 </div>
                 <div className="flex justify-between items-center font-medium">
-                  <span>Total Value:</span>
+                  <span>{t('totalValue')}</span>
                   <span>
                     {formatPrice(
                       pendingItems.reduce((sum, item) => sum + item.quantity * item.price, 0),

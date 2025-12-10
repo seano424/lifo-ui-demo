@@ -48,6 +48,8 @@
   },
   "breadcrumbs": {
     "batches": "Batches",
+    "draftBatches": "Draft Batches",
+    "drafts": "Drafts",
     "billing": "Billings",
     "dashboard": "Dashboard",
     "inventory": "Inventory",
@@ -176,5 +178,19 @@
     "decline": "Decline",
     "learnMore": "Learn more",
     "manageCookies": "Manage cookies"
+  },
+  "trendIndicator": {
+    "previous": "Previous:",
+    "periodLow": "Period Low:",
+    "periodHigh": "Period High:"
+  },
+  "scanning": {
+    "totalItems": "Total Items:",
+    "totalValue": "Total Value:",
+    "noBatchesAvailable": "No batches available",
+    "openMenu": "Open menu",
+    "noStoreSelected": "No store selected",
+    "pleaseSelectStore": "Please select a store to continue",
+    "whatHappensNext": "What happens next?"
   }
 }

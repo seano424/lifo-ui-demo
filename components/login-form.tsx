@@ -99,12 +99,9 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
           {/* Footer for new accounts */}
           <div className="mt-6 text-center text-sm text-muted-foreground">
             <Typography variant="p" color="muted">
-              {t('newStore')}{' '}
-              <Link
-                href="/onboarding/create-account"
-                className="text-primary hover:underline font-medium"
-              >
-                {t('createAccount')}
+              {t('noAccount')}{' '}
+              <Link href="/auth/sign-up" className="text-primary hover:underline font-medium">
+                {t('signUp')}
               </Link>
             </Typography>
           </div>

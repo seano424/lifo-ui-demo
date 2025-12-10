@@ -402,9 +402,9 @@ async function getCategoryAnalytics(supabase: SupabaseClient<Database>, storeId:
         }
       }
 
-      const daysToExpiry = Math.floor(
-        (new Date(b.expiry_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24),
-      )
+      const daysToExpiry = b.expiry_date
+        ? Math.floor((new Date(b.expiry_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+        : 0
 
       const scoreRecord = productScores?.find(ps => ps.batch_id === batch.batch_id)
       const score = scoreRecord?.composite_score || 0
@@ -572,6 +572,7 @@ async function addSupabaseInsightsFallback(
 
     if (detailedBatches) {
       for (const batch of detailedBatches) {
+        if (!batch.expiry_date) continue
         const expiryDate = new Date(batch.expiry_date)
         const daysToExpiry = Math.floor(
           (expiryDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),

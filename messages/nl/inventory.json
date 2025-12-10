@@ -101,6 +101,7 @@
     "status": "Status",
     "allStatuses": "Alle statussen",
     "active": "Actief",
+    "draft": "Concept",
     "expired": "Verlopen",
     "damaged": "Beschadigd",
     "soldOut": "Uitverkocht",
@@ -114,6 +115,7 @@
         "product": "Product",
         "supplier": "Leverancier",
         "expiryDate": "Vervaldatum",
+        "quantity": "Hoeveelheid",
         "stock": "Voorraad",
         "costPrice": "Kostprijs",
         "sellPrice": "Verkoopprijs",
@@ -139,6 +141,7 @@
     },
     "status": {
       "active": "Actief",
+      "draft": "Concept",
       "expired": "Verlopen",
       "damaged": "Beschadigd",
       "soldOut": "Uitverkocht",
@@ -146,7 +149,16 @@
     },
     "expiry": {
       "expired": "Verlopen",
-      "daysLeft": "{days}d over"
+      "daysLeft": "{days}d over",
+      "noExpiryDate": "Geen vervaldatum"
+    },
+    "draftBatches": {
+      "addExpiryDate": "Vervaldatum toevoegen",
+      "completeBatch": "Batch voltooien",
+      "incompleteBatch": "Incompleet - Voeg vervaldatum toe",
+      "needsExpiryDate": "{count} producten hebben vervaldatums nodig om AI-scoring mogelijk te maken",
+      "completeNow": "Nu voltooien",
+      "draftBatchWarning": "Deze batch heeft een vervaldatum nodig voordat deze door AI kan worden gescoord"
     }
   },
   "deliveries": {

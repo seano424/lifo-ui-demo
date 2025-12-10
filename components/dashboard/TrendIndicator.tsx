@@ -1,6 +1,7 @@
 'use client'
 
 import { Minus, TrendingDown, TrendingUp } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { cn } from '@/lib/utils'
 
 export type TrendDirection = 'up' | 'down' | 'stable'
@@ -34,6 +35,8 @@ export function TrendIndicator({
   minDate,
   maxDate,
 }: TrendIndicatorProps) {
+  const t = useTranslations('common.trendIndicator')
+
   const formatValue = (val: number) => {
     if (isCurrency) {
       return new Intl.NumberFormat('en-EU', {
@@ -122,21 +125,21 @@ export function TrendIndicator({
       {showDetails && (
         <div className="space-y-1">
           <div className="flex items-center justify-between text-xs text-gray-600">
-            <span>Previous:</span>
+            <span>{t('previous')}</span>
             <span className="font-medium">{formatValue(previous)}</span>
           </div>
 
           {periodMin !== undefined && periodMax !== undefined && (
             <>
               <div className="flex items-center justify-between text-xs text-gray-600">
-                <span>Period Low:</span>
+                <span>{t('periodLow')}</span>
                 <span className="font-medium">
                   {formatValue(periodMin)}
                   {minDate && ` (${formatDate(minDate)})`}
                 </span>
               </div>
               <div className="flex items-center justify-between text-xs text-gray-600">
-                <span>Period High:</span>
+                <span>{t('periodHigh')}</span>
                 <span className="font-medium">
                   {formatValue(periodMax)}
                   {maxDate && ` (${formatDate(maxDate)})`}

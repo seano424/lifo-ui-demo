@@ -214,7 +214,8 @@ export default function ManualDeliveryEntry({
   const formatPrice = (price: number) => `€${price.toFixed(2)}`
 
   // Helper function to format date consistently
-  const formatExpiryDate = (dateString: string) => {
+  const formatExpiryDate = (dateString: string | null) => {
+    if (!dateString) return 'No date set'
     // Ensure we treat the date as local time to avoid timezone shifts
     const date = new Date(`${dateString}T00:00:00`)
     return date.toLocaleDateString()
@@ -381,9 +382,12 @@ export default function ManualDeliveryEntry({
                     <div className="flex-1">
                       <Typography variant="p">{item.productName}</Typography>
                       {item.brand && <Typography variant="p">{item.brand}</Typography>}
-                      <Typography variant="p">
-                        {t('confirmation.itemDetails.expires')} {formatExpiryDate(item.expiryDate)}
-                      </Typography>
+                      {item.expiryDate && (
+                        <Typography variant="p">
+                          {t('confirmation.itemDetails.expires')}{' '}
+                          {formatExpiryDate(item.expiryDate)}
+                        </Typography>
+                      )}
                     </div>
                     <div className="text-right">
                       <Typography variant="p">

@@ -1,6 +1,7 @@
 'use client'
 
 import { Check } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Typography } from '@/components/ui/typography'
 import type { AvailableBatch } from '@/types/scanning'
@@ -18,6 +19,7 @@ export default function BatchSelectionList({
   selectedBatchId,
   className = '',
 }: BatchSelectionListProps) {
+  const t = useTranslations('common.scanning')
   const formatPrice = (price: number) => `€${price.toFixed(2)}`
 
   const formatDate = (dateString: string) => {
@@ -32,7 +34,7 @@ export default function BatchSelectionList({
     return (
       <div className={`text-center py-8 text-gray-500 ${className}`}>
         <div className="text-lg">📦</div>
-        <div className="mt-2">No batches available</div>
+        <div className="mt-2">{t('noBatchesAvailable')}</div>
       </div>
     )
   }
@@ -88,7 +90,9 @@ export default function BatchSelectionList({
                 <div className="flex-1 flex flex-col gap-1 pb-2">
                   <Typography variant="p">{products.product_name}</Typography>{' '}
                   {/* ← Use products */}
-                  <Typography variant="p">Expires: {formatDate(batch.expiry_date)}</Typography>{' '}
+                  <Typography variant="p">
+                    Expires: {batch.expiry_date ? formatDate(batch.expiry_date) : 'N/A'}
+                  </Typography>{' '}
                   {/* ← Use batch */}
                   <Typography variant="small" className="text-gray-600">
                     Available: {batch.available_quantity || batch.current_quantity} units{' '}

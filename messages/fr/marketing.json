@@ -28,7 +28,8 @@
     },
     "auth": {
       "login": "Connexion",
-      "signup": "Inscription entreprise",
+      "businessSignup": "Inscription entreprise",
+      "signup": "Inscription",
       "logout": "Déconnexion",
       "goToDashboard": "Tableau de bord",
       "signUpForm": {

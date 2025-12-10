@@ -1,6 +1,6 @@
 'use client'
 
-import { Clock, FileCheck, Upload, Zap } from 'lucide-react'
+import { AlertCircle, Clock, FileCheck, Upload, Zap } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -16,6 +16,19 @@ import { Typography } from '../ui/typography'
 import { BatchValidationTable } from '../batch-validation/batch-validation-table'
 import { UploadResultsDisplay } from '../batch-validation/upload-results-display'
 import type { CsvPreviewItem } from '../batch-validation'
+
+interface AffectedItem {
+  product_name: string
+  sku?: string
+  error?: string
+}
+
+interface ValidationWarning {
+  message: string
+  suggestion?: string
+  affected_items?: AffectedItem[]
+  total_affected?: number
+}
 
 interface CSVUploadFormProps {
   storeId: string
@@ -90,6 +103,9 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
     isPending: isUploading,
     data: uploadResult,
     error,
+    validate,
+    isValidating,
+    validationResult,
     resetPreview,
     updateCsvItemExpiry,
     updateCsvItemQuantity,
@@ -149,6 +165,28 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
     }
   }
 
+  const handleValidate = () => {
+    if (!selectedFile) {
+      toast.error(t('errors.noFile'))
+      return
+    }
+
+    if (!storeId) {
+      toast.error(t('errors.noStore'))
+      return
+    }
+
+    try {
+      validate({
+        file: selectedFile,
+        storeId,
+        csvData: csvPreview,
+      })
+    } catch (error) {
+      handleError(error, 'Validation failed')
+    }
+  }
+
   const handleUpload = () => {
     if (!selectedFile) {
       toast.error(t('errors.noFile'))
@@ -169,8 +207,8 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
       )
 
       if (invalidPricing) {
-        toast.error(t('csvUpload.errors.invalidPricing'), {
-          description: t('csvUpload.errors.invalidPricingDescription'),
+        toast.error(t('errors.invalidPricing'), {
+          description: t('errors.invalidPricingDescription'),
         })
         return
       }
@@ -299,16 +337,120 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
               itemsPerPage={itemsPerPage}
             />
 
+            {/* Validation Results */}
+            {validationResult && (
+              <Alert
+                variant={validationResult.has_validation_errors ? 'destructive' : 'default'}
+                className={
+                  validationResult.has_validation_errors
+                    ? 'bg-red-50 border-red-200'
+                    : 'bg-green-50 border-green-200'
+                }
+              >
+                <AlertCircle className="h-4 w-4" />
+                <AlertTitle
+                  className={
+                    validationResult.has_validation_errors
+                      ? 'text-red-800 font-semibold'
+                      : 'text-green-800 font-semibold'
+                  }
+                >
+                  {validationResult.has_validation_errors
+                    ? 'Validation Errors Found'
+                    : 'Validation Successful'}
+                </AlertTitle>
+                <AlertDescription className="space-y-3 mt-2">
+                  <p
+                    className={
+                      validationResult.has_validation_errors ? 'text-red-700' : 'text-green-700'
+                    }
+                  >
+                    {validationResult.message}
+                  </p>
+
+                  {validationResult.has_validation_errors &&
+                    validationResult.warnings &&
+                    validationResult.warnings.length > 0 && (
+                      <div className="space-y-3">
+                        {validationResult.warnings.map(
+                          (warning: ValidationWarning, idx: number) => (
+                            <div
+                              key={`validation-warning-${idx}-${warning.message.slice(0, 20)}`}
+                              className="space-y-2 border-t border-red-200 pt-2"
+                            >
+                              <p className="text-red-700 font-medium">{warning.message}</p>
+                              {warning.suggestion && (
+                                <p className="text-red-600 text-sm italic">{warning.suggestion}</p>
+                              )}
+                              {warning.affected_items && warning.affected_items.length > 0 && (
+                                <details className="text-sm">
+                                  <summary className="cursor-pointer text-red-600 hover:text-red-800">
+                                    View affected items ({warning.total_affected} total, showing
+                                    first {Math.min(5, warning.affected_items.length)})
+                                  </summary>
+                                  <ul className="mt-2 space-y-1 list-disc list-inside text-red-700">
+                                    {warning.affected_items
+                                      .slice(0, 5)
+                                      .map((item: AffectedItem, i: number) => (
+                                        <li
+                                          key={`affected-item-${idx}-${item.sku || item.product_name}-${i}`}
+                                        >
+                                          {item.product_name}
+                                          {item.sku && ` (SKU: ${item.sku})`}
+                                          {item.error && (
+                                            <span className="block ml-6 text-xs text-red-600">
+                                              {item.error}
+                                            </span>
+                                          )}
+                                        </li>
+                                      ))}
+                                  </ul>
+                                </details>
+                              )}
+                            </div>
+                          ),
+                        )}
+                      </div>
+                    )}
+
+                  {!validationResult.has_validation_errors && (
+                    <p className="text-green-600 text-sm">
+                      All {validationResult.validation_results.valid_items} items passed validation.
+                      Ready to upload!
+                    </p>
+                  )}
+                </AlertDescription>
+              </Alert>
+            )}
+
             {/* Upload Actions */}
             <div className="flex gap-3">
+              <Button
+                onClick={handleValidate}
+                disabled={isValidating || isUploading}
+                variant="secondary"
+                className="flex-1"
+                size="lg"
+              >
+                {isValidating ? (
+                  <>
+                    <Clock className="h-4 w-4 mr-2 animate-spin" />
+                    Validating...
+                  </>
+                ) : (
+                  <>
+                    <FileCheck className="h-4 w-4 mr-2" />
+                    Validate
+                  </>
+                )}
+              </Button>
+
               <Button
                 onClick={handleUpload}
                 disabled={isUploading || hasInvalidPricing}
                 className="flex-1"
                 size="lg"
-                title={
-                  hasInvalidPricing ? t('csvUpload.errors.invalidPricingDescription') : undefined
-                }
+                title={hasInvalidPricing ? t('errors.invalidPricingDescription') : undefined}
               >
                 {isUploading ? (
                   <>

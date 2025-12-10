@@ -79,6 +79,7 @@ interface StoreUsersListProps {
 
 export function StoreUsersList({ storeId: propStoreId, serverPermissions }: StoreUsersListProps) {
   const t = useTranslations('users')
+  const tc = useTranslations('common.scanning')
 
   // 🚀 CRITICAL FIX: Use prop storeId if available, fallback to context
   const contextStoreId = useActiveStoreId()
@@ -267,7 +268,7 @@ export function StoreUsersList({ storeId: propStoreId, serverPermissions }: Stor
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <Button variant="ghost" className="h-8 w-8 p-0">
-                                <span className="sr-only">Open menu</span>
+                                <span className="sr-only">{tc('openMenu')}</span>
                                 <MoreHorizontal className="h-4 w-4" />
                               </Button>
                             </DropdownMenuTrigger>

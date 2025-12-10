@@ -31,6 +31,63 @@ interface CSVUploadResponse {
     products_created?: number
     database_processing_time_ms?: number
   }
+  warnings?: Array<{
+    type: string
+    severity: string
+    message: string
+    affected_items: Array<{
+      product_name: string
+      sku?: string
+      error: string
+    }>
+    total_affected: number
+    suggestion?: string
+  }>
+  has_validation_errors?: boolean
+}
+
+interface CSVValidationResponse {
+  success: boolean
+  partial_success?: boolean
+  message: string
+  validation_results: {
+    status: string
+    valid_items: number
+    invalid_items: number
+    total_items: number
+    errors: string[]
+    warnings: Array<{
+      type: string
+      severity: string
+      message: string
+      affected_items: Array<{
+        product_name: string
+        sku?: string
+        error: string
+      }>
+      total_affected: number
+      suggestion?: string
+    }>
+  }
+  warnings?: Array<{
+    type: string
+    severity: string
+    message: string
+    affected_items: Array<{
+      product_name: string
+      sku?: string
+      error: string
+    }>
+    total_affected: number
+    suggestion?: string
+  }>
+  has_validation_errors?: boolean
+  failed_items?: Array<{
+    index: number
+    product_name: string
+    sku?: string
+    error: string
+  }>
 }
 
 interface CsvPreviewItem {
@@ -55,6 +112,101 @@ interface CsvRawRow {
   [key: string]: string
 }
 
+/**
+ * Valid target column names expected by the backend
+ * Used for type safety and validation of column mappings
+ */
+type ValidTargetColumn =
+  | 'sku'
+  | 'product_name'
+  | 'category'
+  | 'quantity'
+  | 'expiry_date'
+  | 'cost_price'
+  | 'selling_price'
+  | 'batch_number'
+
+/**
+ * Backend-required columns that must be present or generated
+ * Used for validation before upload
+ */
+const REQUIRED_BACKEND_COLUMNS: ValidTargetColumn[] = [
+  'sku',
+  'product_name',
+  'quantity',
+  'cost_price',
+  'selling_price',
+]
+
+/**
+ * Maximum length for sanitized column headers
+ * Prevents excessively long header names from causing issues
+ */
+const MAX_COLUMN_NAME_LENGTH = 100
+
+/**
+ * Column name mapping for CSV normalization
+ * Maps common column name variations to backend-expected column names
+ *
+ * ⚠️ WARNING: Avoid CSVs with multiple columns that map to the same target.
+ * For example, having both "Item Name" and "Product Name" may cause conflicts.
+ * The duplicate detection will catch these cases and provide a clear error.
+ *
+ * Supported mappings:
+ * - Quantity: stock_quantity, qty, stock → quantity
+ * - Selling Price: sell_price, sale_price, retail_price → selling_price
+ * - Cost Price: purchase_price, buy_price, unit_cost → cost_price
+ * - Batch Number: batch_lot, lot, lot_number, batch → batch_number
+ * - Expiry Date: best_before, use_by, expiration_date, exp_date, expiry → expiry_date
+ * - Product Name: item_name, title → product_name
+ * - SKU: product_id, product_code, item_code, barcode → sku
+ *
+ * Note: Removed ambiguous mappings to prevent data corruption:
+ * - "price" (ambiguous: could be cost or selling price)
+ * - "name" (too generic: conflicts with product_name)
+ * - "description" (usually means product description, not product name)
+ * - "amount" (ambiguous: could be monetary amount or quantity)
+ */
+const COLUMN_MAPPINGS = {
+  // Quantity variations
+  stock_quantity: 'quantity',
+  qty: 'quantity',
+  stock: 'quantity',
+
+  // Selling price variations
+  sell_price: 'selling_price',
+  sale_price: 'selling_price',
+  retail_price: 'selling_price',
+
+  // Cost price variations
+  purchase_price: 'cost_price',
+  buy_price: 'cost_price',
+  unit_cost: 'cost_price',
+
+  // Batch number variations
+  batch_lot: 'batch_number',
+  lot: 'batch_number',
+  lot_number: 'batch_number',
+  batch: 'batch_number',
+
+  // Expiry date variations
+  best_before: 'expiry_date',
+  use_by: 'expiry_date',
+  expiration_date: 'expiry_date',
+  exp_date: 'expiry_date',
+  expiry: 'expiry_date',
+
+  // Product name variations (reduced to avoid conflicts)
+  item_name: 'product_name',
+  title: 'product_name',
+
+  // SKU variations
+  product_id: 'sku', // Common in inventory exports
+  product_code: 'sku',
+  item_code: 'sku',
+  barcode: 'sku',
+} as const satisfies Record<string, ValidTargetColumn>
+
 export function useCSVUpload() {
   const [csvPreview, setCsvPreview] = useState<CsvPreviewItem[]>([])
   const [isPreviewReady, setIsPreviewReady] = useState(false)
@@ -64,11 +216,80 @@ export function useCSVUpload() {
   })
   const [cachedFileKey, setCachedFileKey] = useState<string | null>(null)
   const [cachedParsedData, setCachedParsedData] = useState<CsvRawRow[] | null>(null)
+  const [validationResult, setValidationResult] = useState<CSVValidationResponse | null>(null)
   const queryClient = useQueryClient()
 
   // Generate composite cache key from file metadata
   const generateCacheKey = (file: File): string => {
     return `${file.name}-${file.size}-${file.lastModified}`
+  }
+
+  // Parse price values for preview (accepts all valid numbers including 0)
+  /**
+   * Sanitize a column header by removing control characters and limiting length
+   * @param header - Raw CSV column header
+   * @returns Sanitized column header
+   */
+  const sanitizeColumnHeader = (header: string): string => {
+    // Remove control characters (ASCII 0-31, 127, and common problematic Unicode)
+    // biome-ignore lint/suspicious/noControlCharactersInRegex: Intentionally removing control characters for security
+    let sanitized = header.replace(/[\x00-\x1F\x7F\uFEFF\u200B-\u200D]/g, '')
+
+    // Trim whitespace
+    sanitized = sanitized.trim()
+
+    // Limit length to prevent issues
+    if (sanitized.length > MAX_COLUMN_NAME_LENGTH) {
+      sanitized = sanitized.slice(0, MAX_COLUMN_NAME_LENGTH)
+    }
+
+    return sanitized
+  }
+
+  /**
+   * Normalize a single column header
+   * Converts to lowercase with underscores and applies column mappings
+   * @param header - Raw CSV column header
+   * @returns Normalized column name
+   */
+  const normalizeColumnHeader = (header: string): string => {
+    const sanitized = sanitizeColumnHeader(header)
+    const normalized = sanitized.toLowerCase().replace(/\s+/g, '_')
+    return normalized in COLUMN_MAPPINGS
+      ? COLUMN_MAPPINGS[normalized as keyof typeof COLUMN_MAPPINGS]
+      : normalized
+  }
+
+  /**
+   * Build a mapping from target column names to original CSV headers
+   * Optimized to iterate through headers only once (O(n) instead of O(n²))
+   * @param headers - Original CSV column headers
+   * @returns Map of target column names to original header names
+   */
+  const buildColumnMapping = (headers: string[]): Map<string, string> => {
+    const mapping = new Map<string, string>()
+    for (const header of headers) {
+      const normalized = normalizeColumnHeader(header)
+      // Store first occurrence only (prevents duplicates from overwriting)
+      if (!mapping.has(normalized)) {
+        mapping.set(normalized, header)
+      }
+    }
+    return mapping
+  }
+
+  /**
+   * Find a column header that maps to the target column name
+   * Uses same normalization logic as the main CSV processing
+   * @param columnMap - Pre-built mapping from buildColumnMapping
+   * @param targetColumn - Target column name to find
+   * @returns Original CSV header name or undefined
+   */
+  const findMappedColumn = (
+    columnMap: Map<string, string>,
+    targetColumn: string,
+  ): string | undefined => {
+    return columnMap.get(targetColumn)
   }
 
   // Validate and parse price values
@@ -77,11 +298,11 @@ export function useCSVUpload() {
     if (!trimmed) return null
 
     const parsed = parseFloat(trimmed)
-    // Enforce minimum price (consistent with UI validation)
-    if (Number.isNaN(parsed) || parsed < PRICE_CONSTRAINTS.MIN_PRICE) return null
-
-    // Reject absurd values
-    if (parsed > PRICE_CONSTRAINTS.MAX_PRICE) return null
+    // Only reject NaN and absurd values
+    // Note: We allow 0 and negative values for preview display
+    // Validation happens during validate/upload, not during preview
+    if (Number.isNaN(parsed)) return null
+    if (parsed < 0 || parsed > PRICE_CONSTRAINTS.MAX_PRICE) return null
 
     return parsed
   }
@@ -117,18 +338,17 @@ export function useCSVUpload() {
             const firstRow = results.data[0]
             const headers = Object.keys(firstRow)
 
-            // Find column indices
-            const skuCol = headers.find(h => h.toLowerCase().includes('sku'))
-            const nameCol = headers.find(h => h.toLowerCase().includes('name'))
-            const categoryCol = headers.find(h => h.toLowerCase().includes('category'))
-            const qtyCol = headers.find(h => h.toLowerCase().includes('quantity'))
-            const expiryCol = headers.find(h => h.toLowerCase().includes('expiry'))
-            const costPriceCol = headers.find(
-              h => h.toLowerCase().includes('cost') && h.toLowerCase().includes('price'),
-            )
-            const sellingPriceCol = headers.find(
-              h => h.toLowerCase().includes('selling') && h.toLowerCase().includes('price'),
-            )
+            // Build column mapping once for O(n) performance
+            const columnMap = buildColumnMapping(headers)
+
+            // Find column indices using consistent mapping logic
+            const skuCol = findMappedColumn(columnMap, 'sku')
+            const nameCol = findMappedColumn(columnMap, 'product_name')
+            const categoryCol = findMappedColumn(columnMap, 'category')
+            const qtyCol = findMappedColumn(columnMap, 'quantity')
+            const expiryCol = findMappedColumn(columnMap, 'expiry_date')
+            const costPriceCol = findMappedColumn(columnMap, 'cost_price')
+            const sellingPriceCol = findMappedColumn(columnMap, 'selling_price')
 
             const hasExpiryColumn = !!expiryCol
             let itemsWithoutExpiry = 0
@@ -141,7 +361,7 @@ export function useCSVUpload() {
                 itemsWithoutExpiry++
               }
 
-              // Parse prices with validation
+              // Parse prices (allow 0 for preview, validation happens later)
               const costPrice = costPriceCol ? parsePrice(row[costPriceCol]) : null
               const sellingPrice = sellingPriceCol ? parsePrice(row[sellingPriceCol]) : null
 
@@ -151,8 +371,8 @@ export function useCSVUpload() {
                 Category: categoryCol ? row[categoryCol] : CSV_PROCESSING.DEFAULT_CATEGORY,
                 Quantity: qtyCol ? parseInt(row[qtyCol], 10) || 1 : 1,
                 Expiry_Date: expiryValue,
-                Cost_Price: costPrice ?? 0.01,
-                Selling_Price: sellingPrice ?? 0.01,
+                Cost_Price: costPrice !== null ? costPrice : 0.01,
+                Selling_Price: sellingPrice !== null ? sellingPrice : 0.01,
               }
             })
 
@@ -183,45 +403,153 @@ export function useCSVUpload() {
     }
   }
 
-  // Pure function to normalize CSV: lowercase headers + add pricing columns
-  // Uses cached parsed data to avoid re-parsing
+  /**
+   * Normalize CSV headers and map common column name variations
+   *
+   * Transforms CSV headers to backend-expected format:
+   * 1. Sanitize headers (remove control chars, limit length)
+   * 2. Lowercase with underscores (e.g., "Stock Quantity" → "stock_quantity")
+   * 3. Apply column mappings (e.g., "stock_quantity" → "quantity")
+   * 4. Validate for duplicates and required columns
+   * 5. Add missing pricing columns if needed
+   *
+   * @param parsedData - Raw CSV data from PapaParse
+   * @param previewData - Preview data with validated values
+   * @returns Normalized CSV string with mapped headers
+   */
   const normalizeCsvHeaders = (parsedData: CsvRawRow[], previewData: CsvPreviewItem[]): string => {
-    if (!parsedData || parsedData.length === 0) {
+    if (!previewData || previewData.length === 0) {
       return ''
     }
 
+    // Use preview data as source of truth (includes all user edits)
     const firstRow = parsedData[0]
     const originalHeaders = Object.keys(firstRow)
 
-    // Normalize headers to lowercase with underscores
-    const normalizedHeaders = originalHeaders.map(h => h.trim().toLowerCase().replace(/\s+/g, '_'))
+    // Step 1: Check for exact duplicate headers in original CSV (before normalization)
+    const originalHeaderCounts = new Map<string, number>()
+    const exactDuplicates: string[] = []
 
-    // Check if pricing columns exist
-    const hasCostPrice = normalizedHeaders.some(h => h.includes('cost') && h.includes('price'))
-    const hasSellingPrice = normalizedHeaders.some(
-      h => h.includes('selling') && h.includes('price'),
-    )
+    originalHeaders.forEach(header => {
+      const sanitized = sanitizeColumnHeader(header)
+      const count = originalHeaderCounts.get(sanitized) || 0
+      originalHeaderCounts.set(sanitized, count + 1)
+      if (count > 0) {
+        exactDuplicates.push(sanitized)
+      }
+    })
 
+    if (exactDuplicates.length > 0) {
+      const uniqueExactDuplicates = [...new Set(exactDuplicates)]
+      throw new Error(
+        `Duplicate column names found in CSV: '${uniqueExactDuplicates.join("', '")}'. Each column must have a unique name. Please fix your CSV and try again.`,
+      )
+    }
+
+    // Step 2: Normalize headers using shared normalization logic
+    const normalizedHeaders = originalHeaders.map(h => normalizeColumnHeader(h))
+
+    // Step 3: Detect duplicate columns after mapping (critical for data integrity)
+    const seen = new Map<string, string[]>() // Maps normalized name to original headers
+    normalizedHeaders.forEach((normalized, index) => {
+      const original = originalHeaders[index]
+      if (!seen.has(normalized)) {
+        seen.set(normalized, [])
+      }
+      seen.get(normalized)?.push(original)
+    })
+
+    // Find columns that have multiple original headers mapping to them
+    const ambiguousMappings = Array.from(seen.entries())
+      .filter(([_, originals]) => originals.length > 1)
+      .map(([normalized, originals]) => ({
+        normalized,
+        originals,
+      }))
+
+    if (ambiguousMappings.length > 0) {
+      const errorDetails = ambiguousMappings
+        .map(
+          ({ normalized, originals }) => `'${normalized}' (from columns: ${originals.join(', ')})`,
+        )
+        .join('; ')
+
+      throw new Error(
+        `Ambiguous column mapping detected: Multiple columns map to the same target. ${errorDetails}. Please rename columns in your CSV to avoid conflicts.`,
+      )
+    }
+
+    // Step 4: Validate backend-required columns (with generation support)
+    const missingRequired: ValidTargetColumn[] = []
+    const finalHeaders = [...normalizedHeaders]
+
+    // Check if pricing columns exist (can be generated from preview data)
+    const hasCostPrice = normalizedHeaders.includes('cost_price')
+    const hasSellingPrice = normalizedHeaders.includes('selling_price')
+
+    // Add missing pricing columns (will be populated from preview data)
     if (!hasCostPrice) {
-      normalizedHeaders.push('cost_price')
+      finalHeaders.push('cost_price')
     }
     if (!hasSellingPrice) {
-      normalizedHeaders.push('selling_price')
+      finalHeaders.push('selling_price')
     }
 
-    // Rebuild CSV with normalized headers and pricing values from preview
-    const csvRows = [normalizedHeaders.join(',')]
-
-    parsedData.forEach((row, index) => {
-      const values = originalHeaders.map(header => row[header] || '')
-
-      // Add pricing values from preview data
-      if (!hasCostPrice) {
-        values.push((previewData[index]?.Cost_Price || 0.01).toString())
+    // Validate other required columns that cannot be auto-generated
+    for (const required of REQUIRED_BACKEND_COLUMNS) {
+      if (
+        !finalHeaders.includes(required) &&
+        required !== 'cost_price' &&
+        required !== 'selling_price'
+      ) {
+        missingRequired.push(required)
       }
-      if (!hasSellingPrice) {
-        values.push((previewData[index]?.Selling_Price || 0.01).toString())
-      }
+    }
+
+    if (missingRequired.length > 0) {
+      throw new Error(
+        `Required columns missing from CSV: ${missingRequired.join(', ')}. Your CSV must include columns that map to these fields. Please add them and try again.`,
+      )
+    }
+
+    // Step 5: Rebuild CSV with normalized headers and pricing values from preview
+    const csvRows = [finalHeaders.join(',')]
+
+    previewData.forEach((item, index) => {
+      const originalRow = parsedData[index]
+
+      // Build a map from normalized headers to original CSV headers
+      const normalizedToOriginal = new Map<string, string>()
+      originalHeaders.forEach((origHeader, idx) => {
+        normalizedToOriginal.set(normalizedHeaders[idx], origHeader)
+      })
+
+      // Build values in the same order as finalHeaders
+      // Use preview data for editable columns, original data for others
+      const values = finalHeaders.map(header => {
+        // Use preview data for standard editable columns
+        switch (header) {
+          case 'sku':
+            return item.SKU || ''
+          case 'product_name':
+            return item.Product_Name || ''
+          case 'category':
+            return item.Category || CSV_PROCESSING.DEFAULT_CATEGORY
+          case 'quantity':
+            return item.Quantity?.toString() || '1'
+          case 'expiry_date':
+            return item.Expiry_Date || ''
+          case 'cost_price':
+            return item.Cost_Price?.toString() || '0.01'
+          case 'selling_price':
+            return item.Selling_Price?.toString() || '0.01'
+          default: {
+            // For other columns (like brand, batch_number), use original data
+            const originalHeader = normalizedToOriginal.get(header)
+            return originalHeader && originalRow ? originalRow[originalHeader] || '' : ''
+          }
+        }
+      })
 
       // Escape special CSV characters: commas, quotes, newlines, carriage returns
       const escapedValues = values.map(v =>
@@ -235,15 +563,111 @@ export function useCSVUpload() {
     const result = csvRows.join('\n')
 
     if (process.env.NODE_ENV === 'development') {
-      logger.log('csv-upload', 'Normalization complete (using cached parse)', {
-        originalHeaders,
-        normalizedHeaders,
-        totalRows: parsedData.length,
+      logger.log('csv-upload', 'Normalization complete (using edited preview data)', {
+        finalHeaders,
+        totalRows: previewData.length,
       })
     }
 
     return result
   }
+
+  // Validation mutation - validates CSV without uploading
+  const validateMutation = useMutation({
+    mutationFn: async ({
+      file,
+      storeId,
+      csvData,
+    }: {
+      file: File
+      storeId: string
+      csvData?: CsvPreviewItem[]
+    }): Promise<CSVValidationResponse> => {
+      let fileToValidate = file
+      const dataToProcess = csvData || csvPreview
+
+      // Use cached parsed data to avoid re-parsing
+      if (!cachedParsedData) {
+        throw new Error('No cached data available. Please preview the file first.')
+      }
+
+      if (dataToProcess && dataToProcess.length > 0) {
+        // Normalize CSV for validation (same as upload)
+        const normalizedContent = normalizeCsvHeaders(cachedParsedData, dataToProcess)
+        fileToValidate = new File([normalizedContent], file.name, {
+          type: 'text/csv',
+        })
+      } else {
+        const normalizedContent = normalizeCsvHeaders(cachedParsedData, dataToProcess)
+        fileToValidate = new File([normalizedContent], file.name, {
+          type: 'text/csv',
+        })
+      }
+
+      const formData = new FormData()
+      formData.append('file', fileToValidate)
+      formData.append('store_id', storeId)
+
+      // Call validation endpoint (Next.js proxy)
+      const response = await fetch('/api/csv-validate', {
+        method: 'POST',
+        body: formData,
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+
+        if (process.env.NODE_ENV === 'development') {
+          logger.error('csv-validate', 'Validation failed', { error })
+        }
+
+        let errorMessage = 'Validation failed'
+        if (error.error) {
+          errorMessage = typeof error.error === 'string' ? error.error : JSON.stringify(error.error)
+        } else if (error.message) {
+          errorMessage = error.message
+        } else if (error.detail) {
+          errorMessage =
+            typeof error.detail === 'string' ? error.detail : JSON.stringify(error.detail)
+        } else {
+          errorMessage = `Validation failed: ${response.statusText}`
+        }
+
+        throw new Error(errorMessage)
+      }
+
+      const result = await response.json()
+      return result
+    },
+    onSuccess: data => {
+      setValidationResult(data)
+
+      // Show appropriate toast based on validation results
+      if (data.has_validation_errors) {
+        toast.warning(`Validation complete: ${data.message}`, {
+          description: 'Review warnings below before uploading',
+          duration: 5000,
+        })
+      } else {
+        toast.success('✅ All items valid!', {
+          description: `${data.validation_results.valid_items} items ready to upload`,
+          duration: 3000,
+        })
+      }
+    },
+    onError: (error: Error) => {
+      if (process.env.NODE_ENV === 'development') {
+        logger.error('csv-validate', 'Validation mutation failed', { error })
+      }
+
+      setValidationResult(null)
+
+      toast.error(`Validation failed: ${error?.message || 'Unknown error'}`, {
+        description: 'Please check your CSV file and try again',
+        duration: TOAST_DURATIONS.ERROR,
+      })
+    },
+  })
 
   const mutation = useMutation({
     mutationFn: async ({
@@ -460,6 +884,11 @@ export function useCSVUpload() {
 
   return {
     ...mutation,
+    validate: validateMutation.mutate,
+    validateAsync: validateMutation.mutateAsync,
+    isValidating: validateMutation.isPending,
+    validationResult,
+    validationError: validateMutation.error,
     previewCsvFile,
     csvPreview,
     isPreviewReady,
@@ -469,7 +898,9 @@ export function useCSVUpload() {
       setColumnMapping({ hasExpiryColumn: false, itemsWithoutExpiry: 0 })
       setCachedFileKey(null) // Clear cached file key (composite key)
       setCachedParsedData(null) // Clear cached parsed data
+      setValidationResult(null) // Clear validation result
       mutation.reset() // Reset mutation state to clear uploadResult
+      validateMutation.reset() // Reset validation mutation state
     },
     columnMapping,
     updateCsvItemExpiry: (index: number, newExpiryDate: string) => {

@@ -698,7 +698,9 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
                         {item.brand && <div className="text-xs text-gray-600">{item.brand}</div>}
                         <div className="text-xs text-gray-500">
                           {t('submission.totals.expires')}{' '}
-                          {new Date(item.expiryDate).toLocaleDateString()}
+                          {item.expiryDate
+                            ? new Date(item.expiryDate).toLocaleDateString()
+                            : 'No date set'}
                         </div>
                       </div>
                       <div className="text-right">

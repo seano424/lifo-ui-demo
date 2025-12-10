@@ -11,7 +11,7 @@ import type React from 'react'
 import { useCallback } from 'react'
 
 export interface InventoryFormData {
-  expiryDate: string
+  expiryDate: string | null // Nullable for draft batches without expiry dates
   quantity: number
   price: number
   batchNumber?: string
@@ -80,7 +80,7 @@ export default function InventoryForm({
 
   // Handle field changes without data dependency to prevent re-render loops
   const handleChange = useCallback(
-    (field: keyof InventoryFormData) => (value: string | number) => {
+    (field: keyof InventoryFormData) => (value: string | number | null) => {
       // Use functional update pattern to avoid data dependency
       onChange(prev => ({
         ...prev,
@@ -90,7 +90,8 @@ export default function InventoryForm({
     [onChange],
   )
 
-  const canSubmit = data.expiryDate && data.quantity > 0 && data.price > 0
+  // Allow submission without expiry date (creates draft batch)
+  const canSubmit = data.quantity > 0 && data.price > 0
 
   if (mode === 'confirm') {
     return (
@@ -112,12 +113,15 @@ export default function InventoryForm({
             {showExpiryDate && (
               <div>
                 <Label className="text-xs">
-                  {finalExpiryDateLabel} {t('labels.editableNote')}
+                  {finalExpiryDateLabel} {t('labels.editableNote')}{' '}
+                  <span className="text-gray-500">
+                    ({t('labels.optional', { defaultValue: 'Optional' })})
+                  </span>
                 </Label>
                 <Input
                   type="date"
-                  value={data.expiryDate}
-                  onChange={e => handleChange('expiryDate')(e.target.value)}
+                  value={data.expiryDate || ''}
+                  onChange={e => handleChange('expiryDate')(e.target.value || '')}
                   className="text-sm"
                   disabled={disabled}
                 />
@@ -183,13 +187,16 @@ export default function InventoryForm({
           {showExpiryDate && (
             <div>
               <Label htmlFor="expiry" className="text-xs">
-                {finalExpiryDateLabel}
+                {finalExpiryDateLabel}{' '}
+                <span className="text-gray-500">
+                  ({t('labels.optional', { defaultValue: 'Optional' })})
+                </span>
               </Label>
               <Input
                 id="expiry"
                 type="date"
-                value={data.expiryDate}
-                onChange={e => handleChange('expiryDate')(e.target.value)}
+                value={data.expiryDate || ''}
+                onChange={e => handleChange('expiryDate')(e.target.value || '')}
                 disabled={disabled}
               />
             </div>

@@ -3,7 +3,6 @@
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { useMediaQuery } from '@/hooks/use-mobile'
-import { useTodosCounts } from '@/hooks/use-todos-with-filters'
 import type { BatchStatus, TodoActionType, TodoUrgencyLevel } from '@/lib/queries/todos-rpc'
 import { cn } from '@/lib/utils'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
@@ -14,11 +13,11 @@ import type { SortDirection, SortField, TodoFiltersState } from './filters/types
 import { UnifiedFiltersModal } from './filters/unified-filters-modal'
 import { UnifiedSearchFiltersBar } from './filters/unified-search-filters-bar'
 import { UnifiedSortModal } from './filters/unified-sort-modal'
-import { CompletedTab } from './todos-main-tabs/completed-tab'
-import { ExpiredTab } from './todos-main-tabs/expired-tab'
-import { ExpiringTab } from './todos-main-tabs/expiring-tab'
-import { InProgressTab } from './todos-main-tabs/in-progress-tab'
-import { PendingTab } from './todos-main-tabs/pending-tab'
+import { CompletedTabWithCounts } from './todos-main-tabs/completed-tab'
+import { ExpiredTabWithCounts } from './todos-main-tabs/expired-tab'
+import { ExpiringTabWithCounts } from './todos-main-tabs/expiring-tab'
+import { InProgressTabWithCounts } from './todos-main-tabs/in-progress-tab'
+import { PendingTabWithCounts } from './todos-main-tabs/pending-tab'
 
 export type TodoTabType = 'pending' | 'in_progress' | 'completed' | 'expiring' | 'expired'
 
@@ -82,8 +81,19 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
     }
   })
 
-  // Get counts for all tabs efficiently (without loading all todo data)
-  const { data: counts } = useTodosCounts(filters)
+  // Track counts from each tab component (they fetch data + counts together)
+  const [tabCounts, setTabCounts] = useState<Record<TodoTabType, number>>({
+    pending: 0,
+    in_progress: 0,
+    completed: 0,
+    expiring: 0,
+    expired: 0,
+  })
+
+  // Callback for tab components to report their counts
+  const handleCountUpdate = useCallback((tabId: TodoTabType, count: number) => {
+    setTabCounts(prev => ({ ...prev, [tabId]: count }))
+  }, [])
 
   // Tab configuration
   const tabs = useMemo(
@@ -91,35 +101,35 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
       {
         id: 'expiring' as TodoTabType,
         label: t('tabs.expiring'),
-        count: counts?.expiring || 0,
-        component: ExpiringTab,
+        count: tabCounts.expiring,
+        component: ExpiringTabWithCounts,
       },
       {
         id: 'pending' as TodoTabType,
         label: t('tabs.pending'),
-        count: counts?.pending || 0,
-        component: PendingTab,
+        count: tabCounts.pending,
+        component: PendingTabWithCounts,
       },
       {
         id: 'in_progress' as TodoTabType,
         label: t('tabs.inProgress'),
-        count: counts?.in_progress || 0,
-        component: InProgressTab,
+        count: tabCounts.in_progress,
+        component: InProgressTabWithCounts,
       },
       {
         id: 'completed' as TodoTabType,
         label: t('tabs.completed'),
-        count: counts?.completed || 0,
-        component: CompletedTab,
+        count: tabCounts.completed,
+        component: CompletedTabWithCounts,
       },
       {
         id: 'expired' as TodoTabType,
         label: t('tabs.expired'),
-        count: counts?.expired || 0,
-        component: ExpiredTab,
+        count: tabCounts.expired,
+        component: ExpiredTabWithCounts,
       },
     ],
-    [counts, t],
+    [tabCounts, t],
   )
 
   // Update tab indicator position and scroll indicators
@@ -463,7 +473,11 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
             display: activeTab === 'pending' ? 'block' : 'none',
           }}
         >
-          <PendingTab filters={filters} pageSize={pageSize} />
+          <PendingTabWithCounts
+            filters={filters}
+            pageSize={pageSize}
+            onCountUpdate={(count: number) => handleCountUpdate('pending', count)}
+          />
         </div>
 
         <div
@@ -471,7 +485,11 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
             display: activeTab === 'in_progress' ? 'block' : 'none',
           }}
         >
-          <InProgressTab filters={filters} pageSize={pageSize} />
+          <InProgressTabWithCounts
+            filters={filters}
+            pageSize={pageSize}
+            onCountUpdate={(count: number) => handleCountUpdate('in_progress', count)}
+          />
         </div>
 
         <div
@@ -479,7 +497,11 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
             display: activeTab === 'expiring' ? 'block' : 'none',
           }}
         >
-          <ExpiringTab filters={filters} pageSize={pageSize} />
+          <ExpiringTabWithCounts
+            filters={filters}
+            pageSize={pageSize}
+            onCountUpdate={(count: number) => handleCountUpdate('expiring', count)}
+          />
         </div>
 
         <div
@@ -487,7 +509,11 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
             display: activeTab === 'expired' ? 'block' : 'none',
           }}
         >
-          <ExpiredTab filters={filters} pageSize={pageSize} />
+          <ExpiredTabWithCounts
+            filters={filters}
+            pageSize={pageSize}
+            onCountUpdate={(count: number) => handleCountUpdate('expired', count)}
+          />
         </div>
 
         <div
@@ -495,7 +521,11 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
             display: activeTab === 'completed' ? 'block' : 'none',
           }}
         >
-          <CompletedTab filters={filters} pageSize={pageSize} />
+          <CompletedTabWithCounts
+            filters={filters}
+            pageSize={pageSize}
+            onCountUpdate={(count: number) => handleCountUpdate('completed', count)}
+          />
         </div>
       </div>
     </div>

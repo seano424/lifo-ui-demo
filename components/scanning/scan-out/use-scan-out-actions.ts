@@ -20,6 +20,7 @@ interface BatchRPCResult {
   selling_price: number
   location_code: string | null
   status: string
+  lifecycle_status: string | null
   verification_status: string | null
   created_at: string
   product_name: string
@@ -60,6 +61,7 @@ export function useScanOutActions() {
 
     // Find exact match first
     const exactMatch = batches.find(availableBatch => {
+      if (!availableBatch.batch.expiry_date) return false
       const batchDate = new Date(availableBatch.batch.expiry_date)
       return (
         batchDate.getFullYear() === targetDate.getFullYear() &&
@@ -78,6 +80,7 @@ export function useScanOutActions() {
     let smallestDifference = Infinity
 
     for (const availableBatch of batches) {
+      if (!availableBatch.batch.expiry_date) continue
       const batchDate = new Date(availableBatch.batch.expiry_date)
       const difference = Math.abs(batchDate.getTime() - targetDate.getTime())
 
@@ -137,6 +140,7 @@ export function useScanOutActions() {
             selling_price: Number(rpcResult.selling_price),
             location_code: rpcResult.location_code,
             status: rpcResult.status,
+            lifecycle_status: rpcResult.lifecycle_status || null,
             verification_status: rpcResult.verification_status,
             created_at: rpcResult.created_at,
             // Additional required fields not returned by RPC (for full BatchRow compliance)

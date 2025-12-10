@@ -274,7 +274,7 @@ export function useScannedItemConverter() {
         barcode: string
         productName: string
         brand?: string
-        expiryDate: string
+        expiryDate: string | null
         quantity: number
         price: number
       },
@@ -301,7 +301,7 @@ export function useScannedItemConverter() {
         barcode: string
         productName: string
         brand?: string
-        expiryDate: string
+        expiryDate: string | null
         quantity: number
         price: number
       }>,

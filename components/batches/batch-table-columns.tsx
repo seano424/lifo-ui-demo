@@ -115,20 +115,35 @@ export function createBatchTableColumns({
       ),
       cell: ({ row }) => (
         <div className="flex flex-col gap-1">
-          <div className="flex items-center gap-2">
-            <Calendar className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-            <span className="truncate">
-              {new Date(row.original.expiry_date).toLocaleDateString()}
-            </span>
-          </div>
-          {getExpiryBadge(row.original.expiry_date, tExpiry)}
+          {row.original.expiry_date ? (
+            <>
+              <div className="flex items-center gap-2">
+                <Calendar className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                <span className="truncate">
+                  {new Date(row.original.expiry_date).toLocaleDateString()}
+                </span>
+              </div>
+              {getExpiryBadge(row.original.expiry_date, tExpiry)}
+            </>
+          ) : (
+            <div className="flex items-center gap-2">
+              <Calendar className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+              <span className="text-muted-foreground italic truncate">
+                {tExpiry('noExpiryDate')}
+              </span>
+            </div>
+          )}
         </div>
       ),
       size: DEFAULT_COLUMN_WIDTHS.expiry_date,
       minSize: 100,
       maxSize: Math.max(
         180,
-        calculateMaxWidth(data, item => new Date(item.expiry_date).toLocaleDateString()),
+        calculateMaxWidth(data, item =>
+          item.expiry_date
+            ? new Date(item.expiry_date).toLocaleDateString()
+            : tExpiry('noExpiryDate'),
+        ),
       ),
       enableResizing: true,
     },

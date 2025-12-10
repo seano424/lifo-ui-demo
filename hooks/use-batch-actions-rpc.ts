@@ -351,6 +351,15 @@ export function useBatchActionRPC(providedStoreId?: string) {
             return params?.storeId === storeId
           },
         }),
+        // Invalidate todos with counts queries (used by todos-filtered-list tabs)
+        queryClient.invalidateQueries({
+          queryKey: [...queryKeys.todos.all, 'with-counts'],
+          predicate: query => {
+            const queryKey = query.queryKey as readonly unknown[]
+            const params = queryKey?.[2] as { storeId?: string } | undefined
+            return params?.storeId === storeId
+          },
+        }),
         // Invalidate todos counts (tab badges)
         queryClient.invalidateQueries({
           queryKey: [...queryKeys.todos.all, 'counts'],
@@ -419,7 +428,10 @@ export function useBatchActionRPC(providedStoreId?: string) {
       const filteredQueries = queryClient.getQueryCache().findAll({
         predicate: query => {
           const queryKey = query.queryKey as readonly unknown[]
-          if (queryKey[0] === 'todos' && queryKey[1] === 'filtered') {
+          if (
+            queryKey[0] === 'todos' &&
+            (queryKey[1] === 'filtered' || queryKey[1] === 'with-counts')
+          ) {
             const params = queryKey?.[2] as { storeId?: string } | undefined
             return params?.storeId === storeId
           }
@@ -429,7 +441,7 @@ export function useBatchActionRPC(providedStoreId?: string) {
 
       logger.log(
         'BatchActions',
-        `📋 Found ${filteredQueries.length} filtered todo queries to invalidate`,
+        `📋 Found ${filteredQueries.length} todo queries to invalidate (filtered + with-counts)`,
         {
           storeId,
           queries: filteredQueries.map(q => ({
@@ -447,7 +459,10 @@ export function useBatchActionRPC(providedStoreId?: string) {
       const queriesAfterInvalidation = queryClient.getQueryCache().findAll({
         predicate: query => {
           const queryKey = query.queryKey as readonly unknown[]
-          if (queryKey[0] === 'todos' && queryKey[1] === 'filtered') {
+          if (
+            queryKey[0] === 'todos' &&
+            (queryKey[1] === 'filtered' || queryKey[1] === 'with-counts')
+          ) {
             const params = queryKey?.[2] as { storeId?: string } | undefined
             return params?.storeId === storeId
           }

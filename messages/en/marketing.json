@@ -28,7 +28,8 @@
     },
     "auth": {
       "login": "Login",
-      "signup": "Business Signup",
+      "businessSignup": "Business Signup",
+      "signup": "Signup",
       "logout": "Logout",
       "goToDashboard": "Dashboard",
       "signUpForm": {

@@ -101,6 +101,7 @@
     "status": "Statut",
     "allStatuses": "Tous les statuts",
     "active": "Actif",
+    "draft": "Brouillon",
     "expired": "Expiré",
     "damaged": "Endommagé",
     "soldOut": "Épuisé",
@@ -114,6 +115,7 @@
         "product": "Produit",
         "supplier": "Fournisseur",
         "expiryDate": "Date d'expiration",
+        "quantity": "Quantité",
         "stock": "Stock",
         "costPrice": "Prix de revient",
         "sellPrice": "Prix de vente",
@@ -139,6 +141,7 @@
     },
     "status": {
       "active": "Actif",
+      "draft": "Brouillon",
       "expired": "Expiré",
       "damaged": "Endommagé",
       "soldOut": "Épuisé",
@@ -146,7 +149,16 @@
     },
     "expiry": {
       "expired": "Expiré",
-      "daysLeft": "{days}j restants"
+      "daysLeft": "{days}j restants",
+      "noExpiryDate": "Aucune date d'expiration"
+    },
+    "draftBatches": {
+      "addExpiryDate": "Ajouter une date d'expiration",
+      "completeBatch": "Compléter le lot",
+      "incompleteBatch": "Incomplet - Ajouter une date d'expiration",
+      "needsExpiryDate": "{count} produits nécessitent des dates d'expiration pour activer le scoring IA",
+      "completeNow": "Compléter maintenant",
+      "draftBatchWarning": "Ce lot nécessite une date d'expiration avant de pouvoir être évalué par l'IA"
     }
   },
   "deliveries": {

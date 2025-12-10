@@ -11,7 +11,7 @@ import { useOnboardingStore } from '@/lib/stores/onboarding-store'
 import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
 import { AlertTriangle } from 'lucide-react'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -21,6 +21,7 @@ export function OnboardingSignUpForm({
   ...props
 }: React.ComponentPropsWithoutRef<'div'>) {
   const t = useTranslations('onboarding.signupForm')
+  const locale = useLocale()
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -99,6 +100,7 @@ export function OnboardingSignUpForm({
           options: {
             emailRedirectTo: `${window.location.origin}/login`,
             data: {
+              language_preference: locale,
               store_name: selectedStoreForm?.store_name || 'Unknown Store',
               full_name: fullName,
             },
