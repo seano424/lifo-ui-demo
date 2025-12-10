@@ -1,19 +1,26 @@
 'use client'
 
-import { FileImage, Upload } from 'lucide-react'
+import { Camera, FileImage, Upload } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { OCR_CONFIG } from '@/lib/api/ocr-config'
 import { cn } from '@/lib/utils'
+import { useIsMobile } from '@/hooks/use-mobile'
 
 interface ImageUploadZoneProps {
   onImageSelected: (file: File) => void
+  onCameraOpen?: () => void
   disabled?: boolean
 }
 
-export function ImageUploadZone({ onImageSelected, disabled = false }: ImageUploadZoneProps) {
+export function ImageUploadZone({
+  onImageSelected,
+  onCameraOpen,
+  disabled = false,
+}: ImageUploadZoneProps) {
   const [dragActive, setDragActive] = useState(false)
+  const isMobile = useIsMobile()
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault()
@@ -95,6 +102,22 @@ export function ImageUploadZone({ onImageSelected, disabled = false }: ImageUplo
             <Upload className="h-4 w-4 mr-2" />
             Choose File
           </Button>
+
+          {/* Camera button - Mobile only */}
+          {isMobile && onCameraOpen && (
+            <Button
+              type="button"
+              onClick={e => {
+                e.stopPropagation()
+                onCameraOpen()
+              }}
+              variant="outline"
+              disabled={disabled}
+            >
+              <Camera className="h-4 w-4 mr-2" />
+              Take Photo
+            </Button>
+          )}
         </div>
       </div>
     </Card>

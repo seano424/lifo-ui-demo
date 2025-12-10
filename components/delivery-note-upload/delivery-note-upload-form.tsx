@@ -13,6 +13,7 @@ import { UploadResultsDisplay } from '@/components/batch-validation/upload-resul
 import type { CsvPreviewItem } from '@/components/batch-validation'
 import { ImageUploadZone } from './image-upload-zone'
 import { OCRProcessingState } from './ocr-processing-state'
+import { DeliveryNoteCameraModal } from './delivery-note-camera-modal'
 
 interface DeliveryNoteUploadFormProps {
   storeId: string
@@ -21,6 +22,7 @@ interface DeliveryNoteUploadFormProps {
 export function DeliveryNoteUploadForm({ storeId }: DeliveryNoteUploadFormProps) {
   const [uploadedImage, setUploadedImage] = useState<File | null>(null)
   const [currentPage, setCurrentPage] = useState(0)
+  const [showCameraModal, setShowCameraModal] = useState(false)
 
   const deliveryNoteUpload = useDeliveryNoteUpload()
   const itemsPerPage = 10
@@ -119,9 +121,17 @@ export function DeliveryNoteUploadForm({ storeId }: DeliveryNoteUploadFormProps)
       {!uploadedImage && (
         <ImageUploadZone
           onImageSelected={handleImageSelect}
+          onCameraOpen={() => setShowCameraModal(true)}
           disabled={deliveryNoteUpload.isPreviewLoading}
         />
       )}
+
+      {/* Camera Modal */}
+      <DeliveryNoteCameraModal
+        open={showCameraModal}
+        onClose={() => setShowCameraModal(false)}
+        onImageSelected={handleImageSelect}
+      />
 
       {/* Stage 2: OCR Processing */}
       {uploadedImage && deliveryNoteUpload.isPreviewLoading && (
