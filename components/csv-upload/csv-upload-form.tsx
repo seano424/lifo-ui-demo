@@ -1,30 +1,21 @@
 'use client'
 
-import {
-  AlertCircle,
-  Check,
-  ChevronLeft,
-  ChevronRight,
-  Clock,
-  FileCheck,
-  Minus,
-  Plus,
-  Upload,
-  Zap,
-} from 'lucide-react'
+import { AlertCircle, Clock, FileCheck, Upload, Zap } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
 import { useCSVUpload } from '@/hooks/use-csv-upload'
 import { PRICE_CONSTRAINTS } from '@/lib/constants/file-upload'
 import { cn } from '@/lib/utils'
 import { validateUploadFile } from '@/lib/utils/file-validation'
 import { logger } from '@/lib/utils/logger'
 import { Typography } from '../ui/typography'
+import { BatchValidationTable } from '../batch-validation/batch-validation-table'
+import { UploadResultsDisplay } from '../batch-validation/upload-results-display'
+import type { CsvPreviewItem } from '../batch-validation'
 
 interface AffectedItem {
   product_name: string
@@ -243,31 +234,31 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
 
   // Pagination calculations
   const totalPages = Math.ceil(csvPreview.length / itemsPerPage)
-  const startIndex = currentPage * itemsPerPage
-  const endIndex = Math.min(startIndex + itemsPerPage, csvPreview.length)
-  const currentItems = csvPreview.slice(startIndex, endIndex)
 
-  const goToNextPage = () => {
-    if (currentPage < totalPages - 1) {
-      setCurrentPage(currentPage + 1)
+  // Generic update handler for BatchValidationTable
+  const handleUpdateItem = (index: number, field: keyof CsvPreviewItem, value: string | number) => {
+    switch (field) {
+      case 'SKU':
+        updateCsvItemSku(index, value as string)
+        break
+      case 'Product_Name':
+        updateCsvItemProductName(index, value as string)
+        break
+      case 'Quantity':
+        updateCsvItemQuantity(index, value as number)
+        break
+      case 'Cost_Price':
+        updateCsvItemCostPrice(index, value as number)
+        break
+      case 'Selling_Price':
+        updateCsvItemSellingPrice(index, value as number)
+        break
+      case 'Expiry_Date':
+        updateCsvItemExpiry(index, value as string)
+        break
+      default:
+        break
     }
-  }
-
-  const goToPreviousPage = () => {
-    if (currentPage > 0) {
-      setCurrentPage(currentPage - 1)
-    }
-  }
-
-  // Helper function to convert category codes to human-readable labels
-  const getCategoryLabel = (categoryCode: string): string => {
-    if (!categoryCode) return ''
-    // Convert snake_case to Title Case
-    // e.g., "fresh_meat" -> "Fresh Meat", "bakery_fresh" -> "Bakery Fresh"
-    return categoryCode
-      .split('_')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ')
   }
 
   return (
@@ -336,326 +327,15 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
       {!uploadResult && isPreviewReady && csvPreview.length > 0 && (
         <Card className="p-6">
           <div className="space-y-4">
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
-              <div className="flex flex-col sm:flex-row items-center gap-2">
-                <Typography variant="h3">{t('preview.title')}</Typography>
-
-                <span className="text-sm text-gray-600">
-                  ({startIndex + 1}-{endIndex} of {csvPreview.length} items)
-                </span>
-              </div>
-              {totalPages > 1 && (
-                <div className="flex items-center gap-1">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={goToPreviousPage}
-                    disabled={currentPage === 0}
-                    className="h-8 w-8 p-0"
-                  >
-                    <ChevronLeft className="h-4 w-4" />
-                  </Button>
-                  <span className="text-xs text-gray-500 min-w-[60px] text-center">
-                    Page {currentPage + 1} of {totalPages}
-                  </span>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={goToNextPage}
-                    disabled={currentPage === totalPages - 1}
-                    className="h-8 w-8 p-0"
-                  >
-                    <ChevronRight className="h-4 w-4" />
-                  </Button>
-                </div>
-              )}
-            </div>
-
-            {/* Desktop table view */}
-            <div className="hidden md:block overflow-x-auto">
-              <table className="min-w-full border-collapse border border-gray-200 text-sm">
-                <thead>
-                  <tr className="bg-gray-50">
-                    <th className="border border-gray-200 p-2 text-left">
-                      {t('preview.table.sku')}
-                    </th>
-                    <th className="border border-gray-200 p-2 text-left">
-                      {t('preview.table.productName')}
-                    </th>
-                    <th className="border border-gray-200 p-2 text-left">
-                      {t('preview.table.category')}
-                    </th>
-                    <th className="border border-gray-200 p-2 text-left">
-                      {t('preview.table.quantity')}
-                    </th>
-                    <th className="border border-gray-200 p-2 text-left">
-                      {t('preview.table.costPrice')}
-                    </th>
-                    <th className="border border-gray-200 p-2 text-left">
-                      {t('preview.table.sellingPrice')}
-                    </th>
-                    <th className="border border-gray-200 p-2 text-left">
-                      {t('preview.table.expiryDate')}
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {currentItems.map((item, index) => {
-                    const actualIndex = startIndex + index
-                    return (
-                      <tr key={actualIndex} className="hover:bg-gray-50">
-                        <td className="border border-gray-200 p-2">
-                          <Input
-                            value={item.SKU}
-                            onChange={e => updateCsvItemSku(actualIndex, e.target.value)}
-                            className="font-mono text-xs h-7 min-w-[100px]"
-                            maxLength={100}
-                          />
-                        </td>
-                        <td className="border border-gray-200 p-2">
-                          <Input
-                            value={item.Product_Name}
-                            onChange={e => updateCsvItemProductName(actualIndex, e.target.value)}
-                            className="text-sm h-7 min-w-[150px]"
-                            maxLength={255}
-                          />
-                        </td>
-                        <td className="border border-gray-200 p-2">
-                          <div className="text-xs font-medium text-gray-700">
-                            {getCategoryLabel(item.Category)}
-                          </div>
-                        </td>
-                        <td className="border border-gray-200 p-2">
-                          <div className="flex items-center justify-center gap-1">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => updateCsvItemQuantity(actualIndex, item.Quantity - 1)}
-                              disabled={item.Quantity <= 1}
-                              className="h-6 w-6 p-0"
-                            >
-                              <Minus className="h-3 w-3" />
-                            </Button>
-                            <span className="min-w-[30px] text-center font-mono text-sm">
-                              {item.Quantity}
-                            </span>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => updateCsvItemQuantity(actualIndex, item.Quantity + 1)}
-                              className="h-6 w-6 p-0"
-                            >
-                              <Plus className="h-3 w-3" />
-                            </Button>
-                          </div>
-                        </td>
-                        <td className="border border-gray-200 p-2">
-                          <Input
-                            type="number"
-                            value={item.Cost_Price.toFixed(2)}
-                            onChange={e =>
-                              updateCsvItemCostPrice(
-                                actualIndex,
-                                parseFloat(e.target.value) || PRICE_CONSTRAINTS.MIN_PRICE,
-                              )
-                            }
-                            className={cn(
-                              'font-mono text-xs h-7 min-w-[80px]',
-                              item.Cost_Price < PRICE_CONSTRAINTS.MIN_PRICE &&
-                                'border-red-500 focus:border-red-500',
-                            )}
-                            min={PRICE_CONSTRAINTS.MIN_PRICE}
-                            max={PRICE_CONSTRAINTS.MAX_PRICE}
-                            step="0.01"
-                          />
-                        </td>
-                        <td className="border border-gray-200 p-2">
-                          <Input
-                            type="number"
-                            value={item.Selling_Price.toFixed(2)}
-                            onChange={e =>
-                              updateCsvItemSellingPrice(
-                                actualIndex,
-                                parseFloat(e.target.value) || PRICE_CONSTRAINTS.MIN_PRICE,
-                              )
-                            }
-                            className={cn(
-                              'font-mono text-xs h-7 min-w-[80px]',
-                              item.Selling_Price < PRICE_CONSTRAINTS.MIN_PRICE &&
-                                'border-red-500 focus:border-red-500',
-                            )}
-                            min={PRICE_CONSTRAINTS.MIN_PRICE}
-                            max={PRICE_CONSTRAINTS.MAX_PRICE}
-                            step="0.01"
-                          />
-                        </td>
-                        <td className="border border-gray-200 p-2">
-                          {item.Expiry_Date ? (
-                            <div className="flex items-center gap-2">
-                              <Input
-                                type="date"
-                                value={item.Expiry_Date}
-                                onChange={e => updateCsvItemExpiry(actualIndex, e.target.value)}
-                                className="text-xs h-7 min-w-[120px]"
-                                min={new Date().toISOString().split('T')[0]}
-                              />
-                            </div>
-                          ) : (
-                            <div className="flex items-center gap-2">
-                              <Input
-                                type="date"
-                                value=""
-                                onChange={e => updateCsvItemExpiry(actualIndex, e.target.value)}
-                                placeholder={t('preview.selectDate')}
-                                className="text-xs h-7 min-w-[120px]"
-                                min={new Date().toISOString().split('T')[0]}
-                              />
-                            </div>
-                          )}
-                        </td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
-            </div>
-
-            {/* Mobile card view */}
-            <div className="md:hidden space-y-3">
-              {currentItems.map((item, index) => {
-                const actualIndex = startIndex + index
-                return (
-                  <div
-                    key={actualIndex}
-                    className="border border-gray-200 rounded-2xl p-3 bg-white"
-                  >
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2">
-                        <Input
-                          value={item.SKU}
-                          onChange={e => updateCsvItemSku(actualIndex, e.target.value)}
-                          className="font-mono text-xs h-7 flex-1"
-                          placeholder="SKU"
-                          maxLength={100}
-                        />
-                      </div>
-                      <Input
-                        value={item.Product_Name}
-                        onChange={e => updateCsvItemProductName(actualIndex, e.target.value)}
-                        className="font-medium text-sm h-8"
-                        placeholder="Product Name"
-                        maxLength={255}
-                      />
-                      <div className="text-xs font-medium text-gray-700 bg-gray-50 p-2 rounded-lg">
-                        Category: {getCategoryLabel(item.Category)}
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm text-gray-600">{t('preview.quantityLabel')}</span>
-                        <div className="flex items-center gap-1">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => updateCsvItemQuantity(actualIndex, item.Quantity - 1)}
-                            disabled={item.Quantity <= 1}
-                            className="h-6 w-6 p-0"
-                          >
-                            <Minus className="h-3 w-3" />
-                          </Button>
-                          <span className="min-w-[30px] text-center font-mono text-sm">
-                            {item.Quantity}
-                          </span>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => updateCsvItemQuantity(actualIndex, item.Quantity + 1)}
-                            className="h-6 w-6 p-0"
-                          >
-                            <Plus className="h-3 w-3" />
-                          </Button>
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-2 gap-2">
-                        <div className="space-y-1">
-                          <label className="text-xs font-medium text-gray-700">
-                            {t('preview.table.costPrice')}
-                          </label>
-                          <Input
-                            type="number"
-                            value={item.Cost_Price.toFixed(2)}
-                            onChange={e =>
-                              updateCsvItemCostPrice(
-                                actualIndex,
-                                parseFloat(e.target.value) || PRICE_CONSTRAINTS.MIN_PRICE,
-                              )
-                            }
-                            className={cn(
-                              'text-sm h-8',
-                              item.Cost_Price < PRICE_CONSTRAINTS.MIN_PRICE &&
-                                'border-red-500 focus:border-red-500',
-                            )}
-                            min={PRICE_CONSTRAINTS.MIN_PRICE}
-                            max={PRICE_CONSTRAINTS.MAX_PRICE}
-                            step="0.01"
-                          />
-                          {item.Cost_Price < PRICE_CONSTRAINTS.MIN_PRICE && (
-                            <span className="text-xs text-red-600">{t('errors.priceTooLow')}</span>
-                          )}
-                        </div>
-                        <div className="space-y-1">
-                          <label className="text-xs font-medium text-gray-700">
-                            {t('preview.table.sellingPrice')}
-                          </label>
-                          <Input
-                            type="number"
-                            value={item.Selling_Price.toFixed(2)}
-                            onChange={e =>
-                              updateCsvItemSellingPrice(
-                                actualIndex,
-                                parseFloat(e.target.value) || PRICE_CONSTRAINTS.MIN_PRICE,
-                              )
-                            }
-                            className={cn(
-                              'text-sm h-8',
-                              item.Selling_Price < PRICE_CONSTRAINTS.MIN_PRICE &&
-                                'border-red-500 focus:border-red-500',
-                            )}
-                            min={PRICE_CONSTRAINTS.MIN_PRICE}
-                            max={PRICE_CONSTRAINTS.MAX_PRICE}
-                            step="0.01"
-                          />
-                          {item.Selling_Price < PRICE_CONSTRAINTS.MIN_PRICE && (
-                            <span className="text-xs text-red-600">{t('errors.priceTooLow')}</span>
-                          )}
-                        </div>
-                      </div>
-                      <div className="space-y-1">
-                        <label className="text-xs font-medium text-gray-700">
-                          {t('preview.table.expiryDate')}
-                        </label>
-                        {item.Expiry_Date ? (
-                          <Input
-                            type="date"
-                            value={item.Expiry_Date}
-                            onChange={e => updateCsvItemExpiry(actualIndex, e.target.value)}
-                            className="text-sm h-8"
-                            min={new Date().toISOString().split('T')[0]}
-                          />
-                        ) : (
-                          <Input
-                            type="date"
-                            value=""
-                            onChange={e => updateCsvItemExpiry(actualIndex, e.target.value)}
-                            placeholder={t('preview.selectDate')}
-                            className="text-sm h-8"
-                            min={new Date().toISOString().split('T')[0]}
-                          />
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
+            <BatchValidationTable
+              items={csvPreview}
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+              onUpdateItem={handleUpdateItem}
+              disabled={isUploading}
+              itemsPerPage={itemsPerPage}
+            />
 
             {/* Validation Results */}
             {validationResult && (
@@ -795,280 +475,11 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
 
       {/* Results Display */}
       {uploadResult && (
-        <Card className="p-6 bg-primary-50 border-none">
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 justify-center">
-              <div className="text-center flex items-center gap-2">
-                <Check className="w-6 h-6 text-secondary-900 stroke-5 border-2 border-secondary-900 rounded-full p-[3px] bg-primary-100" />
-                <Typography variant="h4">
-                  {uploadResult.processed || 0} items imported
-                  {uploadResult.has_validation_errors && ' (with warnings)'}!
-                </Typography>
-              </div>
-            </div>
-
-            {/* Success Summary */}
-            <div className="text-center p-3 bg-white rounded-2xl space-y-2">
-              <Typography variant="p" color="primary">
-                {(uploadResult.processed || 0) > 0
-                  ? t('results.successSummary', {
-                      processed: uploadResult.processed || 0,
-                    })
-                  : t('results.uploadCompleted')}
-                {(uploadResult.skipped || 0) > 0 &&
-                  t('results.duplicatesSkipped', {
-                    skipped: uploadResult.skipped,
-                  })}
-              </Typography>
-            </div>
-
-            {/* Store Products Info - products without expiry dates */}
-            {uploadResult.store_products_created && uploadResult.store_products_created > 0 && (
-              <Alert className="bg-amber-50 border-amber-200">
-                <AlertCircle className="h-4 w-4 text-amber-600" />
-                <AlertTitle className="text-amber-800 font-semibold">
-                  Store Products Created
-                </AlertTitle>
-                <AlertDescription className="space-y-2 mt-2">
-                  <p className="text-amber-700">
-                    {uploadResult.store_products_created}{' '}
-                    {uploadResult.store_products_created === 1 ? 'product was' : 'products were'}{' '}
-                    created without expiry dates.
-                  </p>
-                  <p className="text-amber-600 text-sm">
-                    Draft batches need expiry dates before they can be scored by AI. Visit the{' '}
-                    <a
-                      href="/dashboard/inventory/batches/drafts"
-                      className="font-medium underline hover:text-amber-800"
-                    >
-                      Draft Batches page
-                    </a>{' '}
-                    to complete them using manual entry or OCR scanning.
-                  </p>
-                </AlertDescription>
-              </Alert>
-            )}
-
-            {/* Validation Warnings */}
-            {uploadResult.warnings && uploadResult.warnings.length > 0 && (
-              <Alert variant="destructive" className="bg-red-50 border-red-200">
-                <AlertTitle className="text-red-800 font-semibold">
-                  Validation Errors Found
-                </AlertTitle>
-                <AlertDescription className="space-y-3 mt-2">
-                  {uploadResult.warnings.map((warning: ValidationWarning, idx: number) => (
-                    <div
-                      key={`upload-warning-${idx}-${warning.message.slice(0, 20)}`}
-                      className="space-y-2"
-                    >
-                      <p className="text-red-700 font-medium">{warning.message}</p>
-                      {warning.suggestion && (
-                        <p className="text-red-600 text-sm italic">{warning.suggestion}</p>
-                      )}
-                      {warning.affected_items && warning.affected_items.length > 0 && (
-                        <details className="text-sm">
-                          <summary className="cursor-pointer text-red-600 hover:text-red-700">
-                            View affected items ({warning.total_affected} total, showing first{' '}
-                            {Math.min(warning.affected_items.length, 5)})
-                          </summary>
-                          <ul className="mt-2 space-y-1 list-disc list-inside text-red-600">
-                            {warning.affected_items.map((item: AffectedItem, itemIdx: number) => (
-                              <li
-                                key={`upload-affected-item-${idx}-${item.sku || item.product_name}-${itemIdx}`}
-                              >
-                                <strong>{item.product_name}</strong>
-                                {item.sku && (
-                                  <span className="text-red-500"> (SKU: {item.sku})</span>
-                                )}
-                                <br />
-                                <span className="ml-6 text-red-500 text-xs">{item.error}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </details>
-                      )}
-                    </div>
-                  ))}
-                </AlertDescription>
-              </Alert>
-            )}
-
-            {/* Performance Metrics */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-primary-600">
-                  {uploadResult.processed || 0}
-                </div>
-                <Typography variant="p" color="muted">
-                  {t('results.metrics.processed')}
-                </Typography>
-              </div>
-
-              <div className="text-center">
-                <div className="text-2xl font-bold text-yellow-600">
-                  {uploadResult.skipped || 0}
-                </div>
-                <Typography variant="p" color="muted">
-                  {t('results.metrics.skipped')}
-                </Typography>
-              </div>
-
-              <div className="text-center">
-                <div className="text-2xl font-bold text-blue-600">
-                  {uploadResult.performance_metrics?.items_per_second || 0}
-                </div>
-                <Typography variant="p" color="muted">
-                  {t('results.metrics.itemsPerSec')}
-                </Typography>
-              </div>
-
-              <div className="text-center">
-                <div className="text-2xl font-bold text-purple-600">
-                  {uploadResult.processing_time_ms || 0}ms
-                </div>
-                <Typography variant="p" color="muted">
-                  {t('results.metrics.totalTime')}
-                </Typography>
-              </div>
-            </div>
-
-            {/* Detailed Performance Breakdown */}
-            {/* {uploadResult.performance_metrics && (
-              <div className="mt-4 p-4 bg-white rounded-2xl border border-primary-200 space-y-2 flex flex-col">
-                <Typography
-                  variant="h4"
-                  className="flex items-center gap-2"
-                >
-                  <Zap className="h-4 w-4 text-blue-500" />
-                  {t('results.performance.title')}
-                </Typography>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm">
-                  {uploadResult.performance_metrics.duplicate_detection_ms >
-                    0 && (
-                    <div className="text-center p-2 bg-gray-50 rounded">
-                      <div className="font-bold text-orange-600">
-                        {
-                          uploadResult.performance_metrics
-                            .duplicate_detection_ms
-                        }
-                        ms
-                      </div>
-                      <div className="text-gray-600">
-                        {t('results.performance.duplicateCheck')}
-                      </div>
-                    </div>
-                  )}
-                  {uploadResult.performance_metrics.product_resolution_ms >
-                    0 && (
-                    <div className="text-center p-2 bg-gray-50 rounded">
-                      <div className="font-bold text-cyan-600">
-                        {uploadResult.performance_metrics.product_resolution_ms}
-                        ms
-                      </div>
-                      <div className="text-gray-600">
-                        {t('results.performance.productResolution')}
-                      </div>
-                    </div>
-                  )}
-                  {uploadResult.performance_metrics.batch_insertion_ms > 0 && (
-                    <div className="text-center p-2 bg-gray-50 rounded">
-                      <div className="font-bold text-indigo-600">
-                        {uploadResult.performance_metrics.batch_insertion_ms}ms
-                      </div>
-                      <div className="text-gray-600">
-                        {t('results.performance.batchInsertion')}
-                      </div>
-                    </div>
-                  )}
-                  {uploadResult.performance_metrics.products_created &&
-                    uploadResult.performance_metrics.products_created > 0 && (
-                      <div className="text-center p-2 bg-gray-50 rounded">
-                        <div className="font-bold text-emerald-600">
-                          {uploadResult.performance_metrics.products_created}
-                        </div>
-                        <div className="text-gray-600">
-                          {t('results.performance.productsCreated')}
-                        </div>
-                      </div>
-                    )}
-                  {uploadResult.performance_metrics
-                    .database_processing_time_ms &&
-                    uploadResult.performance_metrics
-                      .database_processing_time_ms > 0 && (
-                      <div className="text-center p-2 bg-gray-50 rounded">
-                        <div className="font-bold text-purple-600">
-                          {
-                            uploadResult.performance_metrics
-                              .database_processing_time_ms
-                          }
-                          ms
-                        </div>
-                        <div className="text-gray-600">
-                          {t('results.performance.dbProcessing')}
-                        </div>
-                      </div>
-                    )}
-                </div>
-                <div className="mt-2 text-xs text-gray-500 text-center">
-                  {t('results.performance.optimization', {
-                    percentage: Math.max(
-                      0,
-                      Math.round(
-                        (1 -
-                          (uploadResult.processing_time_ms || 0) /
-                            (uploadResult.total_items * 50)) *
-                          100
-                      )
-                    ),
-                  })}
-                </div>
-              </div>
-            )} */}
-
-            {/* Duplicate Details */}
-            {/* {uploadResult.duplicates_skipped?.length > 0 && (
-              <details className="bg-white rounded-2xl p-4 border">
-                <summary className="cursor-pointer font-semibold text-gray-700 flex items-center gap-2">
-                  <SkipForward className="h-4 w-4" />
-                  {t('results.duplicates.viewSkipped', {
-                    count: uploadResult.duplicates_skipped.length,
-                  })}
-                </summary>
-                <div className="mt-3 space-y-2 max-h-40 overflow-y-auto">
-                  {uploadResult.duplicates_skipped.map(
-                    (
-                      dup: {
-                        sku: string
-                        product_name: string
-                        expiry_date: string
-                        reason: string
-                      },
-                      index: number
-                    ) => (
-                      <div
-                        key={`duplicate-${dup.sku || index}`}
-                        className="text-sm p-2 bg-gray-50 rounded-2xl border-l-4 border-yellow-400"
-                      >
-                        <div className="font-semibold">
-                          {dup.sku} - {dup.product_name}
-                        </div>
-                        <div className="text-gray-600">
-                          {t('results.duplicates.expiry')}: {dup.expiry_date} •{' '}
-                          {dup.reason}
-                        </div>
-                      </div>
-                    )
-                  )}
-                </div>
-              </details>
-            )} */}
-
-            {/* Action Button */}
-            <Button size="lg" onClick={handleReset} className="w-full mt-4">
-              {t('buttons.uploadAnother')}
-            </Button>
-          </div>
-        </Card>
+        <UploadResultsDisplay
+          result={uploadResult}
+          onUploadAnother={handleReset}
+          uploadType="csv"
+        />
       )}
 
       {/* Error Display */}

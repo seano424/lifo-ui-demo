@@ -6,11 +6,20 @@ export const FILE_UPLOAD = {
   /** Maximum file size for CSV uploads (10MB) */
   MAX_FILE_SIZE: 10 * 1024 * 1024,
 
+  /** Maximum file size for image uploads (5MB) */
+  MAX_IMAGE_SIZE: 5 * 1024 * 1024,
+
   /** Supported file extensions */
-  SUPPORTED_EXTENSIONS: ['.csv'],
+  SUPPORTED_EXTENSIONS: {
+    csv: ['.csv'],
+    images: ['.jpg', '.jpeg', '.png', '.pdf'],
+  },
 
   /** MIME types for validation */
-  SUPPORTED_MIME_TYPES: ['text/csv', 'application/csv', 'text/plain', 'application/vnd.ms-excel'],
+  SUPPORTED_MIME_TYPES: {
+    csv: ['text/csv', 'application/csv', 'text/plain', 'application/vnd.ms-excel'],
+    images: ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'],
+  },
 } as const
 
 export const CSV_PROCESSING = {

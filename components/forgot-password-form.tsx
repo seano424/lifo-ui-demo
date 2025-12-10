@@ -63,14 +63,8 @@ export function ForgotPasswordForm({ className, ...props }: React.ComponentProps
         {success ? (
           <Card>
             <CardHeader>
-              <CardTitle>
-                <Typography variant="h1">Check Your Email</Typography>
-              </CardTitle>
-              <CardDescription>
-                <Typography variant="p" color="muted">
-                  Password reset instructions sent
-                </Typography>
-              </CardDescription>
+              <CardTitle>Check Your Email</CardTitle>
+              <CardDescription>Password reset instructions sent</CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-4">
               <Typography variant="p" color="muted">
@@ -85,13 +79,9 @@ export function ForgotPasswordForm({ className, ...props }: React.ComponentProps
         ) : (
           <Card>
             <CardHeader>
-              <CardTitle>
-                <Typography variant="h1">Reset Your Password</Typography>
-              </CardTitle>
+              <CardTitle>Reset Your Password</CardTitle>
               <CardDescription>
-                <Typography variant="p" color="muted">
-                  Type in your email and we'll send you a link to reset your password
-                </Typography>
+                Type in your email and we'll send you a link to reset your password
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -138,14 +128,8 @@ export function ForgotPasswordForm({ className, ...props }: React.ComponentProps
       {success ? (
         <Card>
           <CardHeader>
-            <CardTitle>
-              <Typography variant="h1">{t('checkEmailTitle')}</Typography>
-            </CardTitle>
-            <CardDescription>
-              <Typography variant="p" color="muted">
-                {t('checkEmailDescription')}
-              </Typography>
-            </CardDescription>
+            <CardTitle>{t('checkEmailTitle')}</CardTitle>
+            <CardDescription>{t('checkEmailDescription')}</CardDescription>
           </CardHeader>
           <CardContent>
             <Typography variant="p" color="muted">
@@ -159,14 +143,8 @@ export function ForgotPasswordForm({ className, ...props }: React.ComponentProps
       ) : (
         <Card>
           <CardHeader>
-            <CardTitle>
-              <Typography variant="h1">{t('title')}</Typography>
-            </CardTitle>
-            <CardDescription>
-              <Typography variant="p" color="muted">
-                {t('description')}
-              </Typography>
-            </CardDescription>
+            <CardTitle>{t('title')}</CardTitle>
+            <CardDescription>{t('description')}</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleForgotPassword}>
