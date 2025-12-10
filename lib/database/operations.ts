@@ -1037,6 +1037,7 @@ export class InventoryOperations {
       threeDaysFromNow.setDate(threeDaysFromNow.getDate() + 3)
       const expiringItems =
         batches?.filter(batch => {
+          if (!batch.expiry_date) return false
           const expiryDate = new Date(batch.expiry_date)
           return expiryDate <= threeDaysFromNow
         }).length || 0

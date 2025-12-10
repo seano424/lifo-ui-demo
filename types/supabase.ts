@@ -608,8 +608,9 @@ export type Database = {
           created_at: string | null
           created_by: string | null
           current_quantity: number
-          expiry_date: string
+          expiry_date: string | null
           initial_quantity: number
+          lifecycle_status: string | null
           location_code: string | null
           manufacture_date: string | null
           ocr_confidence: number | null
@@ -636,8 +637,9 @@ export type Database = {
           created_at?: string | null
           created_by?: string | null
           current_quantity: number
-          expiry_date: string
+          expiry_date?: string | null
           initial_quantity: number
+          lifecycle_status?: string | null
           location_code?: string | null
           manufacture_date?: string | null
           ocr_confidence?: number | null
@@ -664,8 +666,9 @@ export type Database = {
           created_at?: string | null
           created_by?: string | null
           current_quantity?: number
-          expiry_date?: string
+          expiry_date?: string | null
           initial_quantity?: number
+          lifecycle_status?: string | null
           location_code?: string | null
           manufacture_date?: string | null
           ocr_confidence?: number | null
@@ -1219,6 +1222,7 @@ export type Database = {
           last_action_time: string | null
           last_action_type: Database["public"]["Enums"]["action_type"] | null
           last_discount_percent: number | null
+          lifecycle_status: string | null
           potential_loss_value: number | null
           potential_revenue_value: number | null
           priority_order: number | null
@@ -4003,11 +4007,66 @@ export type Database = {
           total_active_count: number
         }[]
       }
-      get_todos_with_filters: {
+      get_todos_with_counts: {
         Args: {
           p_filters?: Json
           p_limit?: number
           p_offset?: number
+          p_store_id: string
+        }
+        Returns: {
+          ai_calculated_at: string
+          ai_recommendation: string
+          available_quantity: number
+          batch_id: string
+          batch_number: string
+          batch_status: string
+          completed_count: number
+          completion_status: string
+          composite_score: number
+          cost_price: number
+          current_quantity: number
+          current_selling_price: number
+          current_total_value: number
+          days_to_expiry: number
+          expired_count: number
+          expiring_count: number
+          expiry_date: string
+          hours_since_last_action: number
+          in_progress_count: number
+          last_action_quantity: number
+          last_action_time: string
+          last_action_type: Database["public"]["Enums"]["action_type"]
+          last_discount_percent: number
+          lifecycle_status: string
+          pending_count: number
+          potential_loss_value: number
+          potential_revenue_value: number
+          priority_order: number
+          product_brand: string
+          product_name: string
+          profit_margin: number
+          profit_margin_percent: number
+          selling_price: number
+          store_id: string
+          todo_state: string
+          total_actions_ever: number
+          total_count: number
+          total_discounted_quantity: number
+          total_disposed_quantity: number
+          total_donated_quantity: number
+          total_ignored_quantity: number
+          total_sold_quantity: number
+          unit_price: number
+          urgency_level: string
+          view_refreshed_at: string
+        }[]
+      }
+      get_todos_with_filters: {
+        Args: {
+          p_filters: Json
+          p_limit: number
+          p_offset: number
           p_store_id: string
         }
         Returns: {
@@ -4030,6 +4089,7 @@ export type Database = {
           last_action_time: string
           last_action_type: Database["public"]["Enums"]["action_type"]
           last_discount_percent: number
+          lifecycle_status: string
           potential_loss_value: number
           potential_revenue_value: number
           priority_order: number
@@ -4260,7 +4320,7 @@ export type Database = {
           details: Json
           expired_count: number
           sold_out_count: number
-          updated_count: number
+          total_updated: number
         }[]
       }
       update_store_advanced_settings: {

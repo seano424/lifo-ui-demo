@@ -1,10 +1,12 @@
 import { queryKeys } from '@/lib/queries/query-keys'
 import {
   fetchTodosWithFilters,
+  fetchTodosWithCounts,
   fetchTodosCounts,
   type TodoActionType,
   type TodoFilters,
   type TodoUrgencyLevel,
+  type TodoCounts,
 } from '@/lib/queries/todos-rpc'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
@@ -132,13 +134,14 @@ export function useUrgentTodos(pageSize: number = 20) {
 
 // Items expiring soon (with configurable date range)
 // Shows items based purely on expiry timeline, regardless of action status
+// Now uses lifecycle_status to show only active items that haven't expired yet
 export function useExpiringTodos(
-  additionalFilters?: Omit<TodoFilters, 'batch_status'>,
+  additionalFilters?: Omit<TodoFilters, 'lifecycle_status'>,
   pageSize: number = 20,
 ) {
   return useTodosWithFilters(
     {
-      batch_status: ['active'],
+      lifecycle_status: ['active'],
       // Default to showing all expiring items (min: 0) if no filters provided
       days_to_expiry_min: additionalFilters?.days_to_expiry_min ?? 0,
       // DO NOT filter by completion_status - expiring items should show regardless of action status
@@ -149,13 +152,14 @@ export function useExpiringTodos(
 }
 
 // Expired items (already past expiry date)
+// Now uses lifecycle_status to capture ALL expired items regardless of disposition
 export function useExpiredTodos(
-  additionalFilters?: Omit<TodoFilters, 'batch_status'>,
+  additionalFilters?: Omit<TodoFilters, 'lifecycle_status'>,
   pageSize: number = 20,
 ) {
   return useTodosWithFilters(
     {
-      batch_status: ['expired'],
+      lifecycle_status: ['expired'],
       ...additionalFilters,
     },
     pageSize,
@@ -263,7 +267,160 @@ export function useCompletedTodosRecent(daysBack: number = 7, pageSize: number =
 }
 
 /**
+ * NEW: Hook for fetching todos with counts using the consolidated function
+ * This replaces separate useTodosWithFilters + useTodosCounts calls
+ */
+export function useTodosWithCountsInfinite(filters: TodoFilters = {}, pageSize: number = 20) {
+  const activeStoreId = useActiveStoreId()
+
+  const result = useInfiniteQuery({
+    queryKey: queryKeys.todos.withCounts(activeStoreId || '', filters, pageSize),
+    queryFn: ({ pageParam = 0 }) => {
+      if (!activeStoreId) throw new Error('No active store')
+
+      return fetchTodosWithCounts(activeStoreId, filters, {
+        limit: pageSize,
+        offset: pageParam * pageSize,
+      })
+    },
+    getNextPageParam: (lastPage, allPages) => {
+      // Check if we got fewer items than requested (end of data)
+      if (lastPage.data.length === 0 || lastPage.data.length < pageSize) {
+        return undefined
+      }
+      return allPages.length
+    },
+    initialPageParam: 0,
+    enabled: !!activeStoreId,
+    staleTime: 30 * 1000, // 30 seconds
+    gcTime: 3 * 60 * 1000, // 3 minutes
+  })
+
+  // Flatten pages into single array with deduplication
+  const data = useMemo(() => {
+    if (!result.data?.pages) return []
+
+    const flattened = result.data.pages.flatMap(page => page.data)
+
+    // Deduplicate by batch_id
+    const seen = new Set<string>()
+    return flattened.filter(todo => {
+      if (!todo.batch_id || seen.has(todo.batch_id)) {
+        return false
+      }
+      seen.add(todo.batch_id)
+      return true
+    })
+  }, [result.data?.pages])
+
+  // Get counts from the first page's first item (all rows have same counts)
+  const counts: TodoCounts | undefined = useMemo(() => {
+    const firstPage = result.data?.pages?.[0]
+    return firstPage?.counts
+  }, [result.data?.pages])
+
+  return {
+    data,
+    counts,
+    isLoading: result.isLoading,
+    isFetching: result.isFetching,
+    isError: result.isError,
+    error: result.error,
+    hasNextPage: result.hasNextPage,
+    fetchNextPage: result.fetchNextPage,
+    isFetchingNextPage: result.isFetchingNextPage,
+    refetch: result.refetch,
+  }
+}
+
+/**
+ * CONSOLIDATED HOOKS - Using fetchTodosWithCounts for data + counts in single query
+ */
+
+/**
+ * Pending todos with counts
+ */
+export function usePendingTodosWithCounts(
+  additionalFilters?: Omit<TodoFilters, 'completion_status'>,
+  pageSize: number = 20,
+) {
+  return useTodosWithCountsInfinite(
+    {
+      completion_status: 'pending',
+      ...additionalFilters,
+    },
+    pageSize,
+  )
+}
+
+/**
+ * In-progress todos with counts
+ */
+export function useInProgressTodosWithCounts(
+  additionalFilters?: Omit<TodoFilters, 'completion_status'>,
+  pageSize: number = 20,
+) {
+  return useTodosWithCountsInfinite(
+    {
+      completion_status: 'in_progress',
+      ...additionalFilters,
+    },
+    pageSize,
+  )
+}
+
+/**
+ * Completed todos with counts
+ */
+export function useCompletedTodosWithCounts(
+  additionalFilters?: Omit<TodoFilters, 'completion_status'>,
+  pageSize: number = 20,
+) {
+  return useTodosWithCountsInfinite(
+    {
+      completion_status: 'completed',
+      ...additionalFilters,
+    },
+    pageSize,
+  )
+}
+
+/**
+ * Expiring todos with counts
+ */
+export function useExpiringTodosWithCounts(
+  additionalFilters?: Omit<TodoFilters, 'lifecycle_status'>,
+  pageSize: number = 20,
+) {
+  return useTodosWithCountsInfinite(
+    {
+      lifecycle_status: ['active'],
+      days_to_expiry_min: additionalFilters?.days_to_expiry_min ?? 0,
+      ...additionalFilters,
+    },
+    pageSize,
+  )
+}
+
+/**
+ * Expired todos with counts
+ */
+export function useExpiredTodosWithCounts(
+  additionalFilters?: Omit<TodoFilters, 'lifecycle_status'>,
+  pageSize: number = 20,
+) {
+  return useTodosWithCountsInfinite(
+    {
+      lifecycle_status: ['expired'],
+      ...additionalFilters,
+    },
+    pageSize,
+  )
+}
+
+/**
  * Hook to fetch counts for all todo tabs
+ * @deprecated Use useTodosWithCountsInfinite instead for better performance (single query)
  * This is more efficient than loading all todos just to get counts
  */
 export function useTodosCounts(filters: TodoFilters = {}) {
