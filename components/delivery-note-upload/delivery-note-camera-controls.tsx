@@ -1,6 +1,6 @@
 'use client'
 
-import { Camera, Image as ImageIcon, X } from 'lucide-react'
+import { Image as ImageIcon, X } from 'lucide-react'
 import { useRef } from 'react'
 import { Button } from '@/components/ui/button'
 import { OCR_CONFIG } from '@/lib/api/ocr-config'
@@ -69,12 +69,12 @@ export function DeliveryNoteCameraControls({
             variant="ghost"
             size="icon"
             className={cn(
-              'text-white hover:bg-white/20 h-14 w-14 rounded-full',
+              'text-white bg-black rounded-full',
               disabled && 'opacity-50 cursor-not-allowed',
             )}
             disabled={disabled || isCapturing}
           >
-            <ImageIcon className="h-6 w-6" />
+            <ImageIcon className="size-16" />
             <span className="sr-only">Import from gallery</span>
           </Button>
 
@@ -84,8 +84,8 @@ export function DeliveryNoteCameraControls({
             variant="ghost"
             size="icon"
             className={cn(
-              'h-20 w-20 rounded-full bg-white hover:bg-gray-200 transition-all',
-              'border-4 border-white shadow-xl',
+              'size-12 rounded-full bg-white hover:bg-gray-200 transition-all',
+              'border-4 border-black/80 outline-4 outline-white/20',
               'disabled:opacity-50 disabled:cursor-not-allowed',
               isCapturing && 'scale-90',
             )}
@@ -93,12 +93,10 @@ export function DeliveryNoteCameraControls({
           >
             <div
               className={cn(
-                'h-16 w-16 rounded-full bg-gradient-to-b from-primary-500 to-primary-700',
+                'size-12 rounded-full bg-white flex items-center justify-center',
                 isCapturing && 'animate-pulse',
               )}
-            >
-              <Camera className="h-8 w-8 text-white m-auto translate-y-4" />
-            </div>
+            ></div>
             <span className="sr-only">Capture photo</span>
           </Button>
 

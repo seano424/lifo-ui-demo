@@ -90,34 +90,36 @@ export function ImageUploadZone({
             <p>Supported formats: {OCR_CONFIG.supportedExtensions.join(', ')}</p>
             <p>Maximum file size: {OCR_CONFIG.maxFileSize / 1024 / 1024}MB</p>
           </div>
-          <Button
-            type="button"
-            onClick={e => {
-              e.stopPropagation()
-              document.getElementById(fileInputId)?.click()
-            }}
-            variant="outline"
-            disabled={disabled}
-          >
-            <Upload className="h-4 w-4 mr-2" />
-            Choose File
-          </Button>
-
-          {/* Camera button - Mobile only */}
-          {isMobile && onCameraOpen && (
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 justify-center">
             <Button
               type="button"
               onClick={e => {
                 e.stopPropagation()
-                onCameraOpen()
+                document.getElementById(fileInputId)?.click()
               }}
               variant="outline"
               disabled={disabled}
             >
-              <Camera className="h-4 w-4 mr-2" />
-              Take Photo
+              <Upload className="h-4 w-4 mr-2" />
+              Choose File
             </Button>
-          )}
+
+            {/* Camera button - Mobile only */}
+            {isMobile && onCameraOpen && (
+              <Button
+                type="button"
+                onClick={e => {
+                  e.stopPropagation()
+                  onCameraOpen()
+                }}
+                variant="outline"
+                disabled={disabled}
+              >
+                <Camera className="h-4 w-4 mr-2" />
+                Take Photo
+              </Button>
+            )}
+          </div>
         </div>
       </div>
     </Card>
