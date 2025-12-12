@@ -497,5 +497,53 @@
       "previous30Days": "30 jours précédents",
       "previousYear": "Année précédente"
     }
+  },
+  "setupFlow": {
+    "welcome": {
+      "title": "Bienvenue sur LIFO AI, {name} !",
+      "subtitle": "Suivez les produits par dates d'expiration. Créez des lots, consultez les articles qui expirent et recevez des notifications sur les lots qui expirent."
+    },
+    "sidebar": {
+      "title": "Votre liste de configuration",
+      "subtitle": "Commencez avec votre gestion d'inventaire en ajoutant vos premiers produits. Voici quelques actions rapides pour vous aider à démarrer.",
+      "complete": "terminé",
+      "steps": {
+        "createAccount": "Créez votre compte",
+        "integrateData": "Intégrez vos données",
+        "createBatch": "Créez votre premier lot",
+        "setupNotifications": "Configurez les notifications"
+      }
+    },
+    "steps": {
+      "createAccount": {
+        "title": "Compte créé",
+        "success": "Votre compte a été créé avec succès !"
+      },
+      "integrateData": {
+        "title": "Choisissez comment intégrer vos données",
+        "description": "Suivez les produits par dates d'expiration. Créez des lots, consultez les articles qui expirent et recevez des notifications sur les lots qui expirent.",
+        "realTime": "Temps réel",
+        "recommended": "Recommandé",
+        "squareDescription": "Connectez votre compte Square pour configurer le suivi en temps réel des produits par dates d'expiration",
+        "connect": "Connecter",
+        "oneTime": "Ponctuel",
+        "csvDescription": "Les intégrations de données en temps réel sont les plus puissantes, mais les importations ponctuelles sont utiles pour compléter les données historiques ou enrichir vos données existantes. En savoir plus sur l'importation de personnes via CSV.",
+        "importCSV": "Importer un CSV"
+      },
+      "createBatch": {
+        "title": "Créez votre premier lot",
+        "description": "Commencez à suivre votre inventaire en créant votre premier lot de produits.",
+        "placeholder": "Création de lot bientôt disponible",
+        "placeholderDescription": "Nous développons l'assistant de création de lots. Cela vous permettra d'ajouter des produits, de définir des dates d'expiration et de gérer l'inventaire.",
+        "createButton": "Créer un nouveau lot"
+      },
+      "notifications": {
+        "title": "Configurez les notifications",
+        "description": "Restez informé des produits qui expirent avec les notifications par e-mail, push, SMS et plus encore !",
+        "placeholder": "Configuration des notifications bientôt disponible",
+        "placeholderDescription": "Configurez vos préférences de notification pour recevoir des alertes sur les produits qui expirent et les mises à jour importantes.",
+        "setupButton": "Configurer les notifications"
+      }
+    }
   }
 }

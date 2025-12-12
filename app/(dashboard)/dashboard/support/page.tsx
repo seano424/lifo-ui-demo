@@ -115,7 +115,7 @@ export default function SupportPage() {
   const sections = getSupportSections(t)
 
   return (
-    <div className="flex flex-col gap-12 w-full">
+    <div className="flex flex-col gap-12 w-full container md:py-6 lg:py-8">
       {/* Header */}
       <DashboardInsetHeader title={t('title')} description={t('subtitle')} />
 

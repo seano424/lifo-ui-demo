@@ -495,5 +495,53 @@
       "previous30Days": "Previous 30 Days",
       "previousYear": "Previous Year"
     }
+  },
+  "setupFlow": {
+    "welcome": {
+      "title": "Welcome to LIFO AI, {name}!",
+      "subtitle": "Track Product by Expiry Dates. Create batches, review expiring items, and receive notifications on expiring batches."
+    },
+    "sidebar": {
+      "title": "Your setup list",
+      "subtitle": "Get started with your inventory management by adding your first products. Here are some quick actions to help you get started.",
+      "complete": "complete",
+      "steps": {
+        "createAccount": "Create your account",
+        "integrateData": "Integrate your data",
+        "createBatch": "Create your first batch",
+        "setupNotifications": "Set up notifications"
+      }
+    },
+    "steps": {
+      "createAccount": {
+        "title": "Account Created",
+        "success": "Your account has been successfully created!"
+      },
+      "integrateData": {
+        "title": "Choose how to integrate your data",
+        "description": "Track Product by Expiry Dates. Create batches, review expiring items, and receive notifications on expiring batches.",
+        "realTime": "Real time",
+        "recommended": "Recommended",
+        "squareDescription": "Connect your square account to set up real time product tracking by expiration dates",
+        "connect": "Connect",
+        "oneTime": "One time",
+        "csvDescription": "Real-time data integrations are most powerful, but one-time imports are helpful to backfill historical data or augment your existing data. Learn more about importing People via CSV.",
+        "importCSV": "Import CSV"
+      },
+      "createBatch": {
+        "title": "Create your first batch",
+        "description": "Start tracking your inventory by creating your first product batch.",
+        "placeholder": "Batch Creation Coming Soon",
+        "placeholderDescription": "We're building the batch creation wizard. This will allow you to add products, set expiry dates, and manage inventory.",
+        "createButton": "Create New Batch"
+      },
+      "notifications": {
+        "title": "Set up notifications",
+        "description": "Stay informed about expiring products with email, push, SMS, and more!",
+        "placeholder": "Notification Setup Coming Soon",
+        "placeholderDescription": "Configure your notification preferences to receive alerts about expiring products and important updates.",
+        "setupButton": "Configure Notifications"
+      }
+    }
   }
 }

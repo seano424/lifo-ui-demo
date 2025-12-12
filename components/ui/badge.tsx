@@ -23,6 +23,8 @@ const badgeVariants = cva(
         blue: 'bg-blue-100/50 text-blue-800 border-blue-500 dark:bg-blue-700 dark:text-blue-100 dark:border-blue-500',
         green:
           'bg-primary-100/50 text-primary-800 border-primary-500 dark:bg-primary-700 dark:text-primary-100 dark:border-primary-500',
+        invertedSecondary:
+          'bg-sky-400 text-white border-sky-500 dark:bg-sky-700 dark:text-white dark:border-sky-500',
       },
     },
     defaultVariants: {

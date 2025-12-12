@@ -3,13 +3,16 @@
 import { useQuery } from '@tanstack/react-query'
 import { DashboardWelcome } from '@/components/dashboard/dashboard-welcome'
 import { DashboardContent } from '@/components/dashboard/dashboard-content'
+import { SettingUpFlow } from '@/components/dashboard/setting-up-flow'
 import { hasBatchesRPC } from '@/lib/queries/batches-rpc'
 import { useStoreState } from '@/lib/stores/store-context'
+import { useSetupFlowStore } from '@/lib/stores/setup-flow-store'
 import { Skeleton } from '@/components/ui/skeleton'
 import { queryKeys } from '@/lib/queries/query-keys'
 
 export function DashboardPageClient() {
   const { activeStore } = useStoreState()
+  const { isSetupComplete } = useSetupFlowStore()
 
   // Check if the active store has any batches
   const { data: hasBatches, isLoading } = useQuery({
@@ -34,6 +37,11 @@ export function DashboardPageClient() {
         <Skeleton className="h-64 w-full" />
       </div>
     )
+  }
+
+  // Show setup flow if setup is not complete
+  if (!isSetupComplete && (!activeStore || !hasBatches)) {
+    return <SettingUpFlow />
   }
 
   // Show welcome screen if no active store or no batches exist

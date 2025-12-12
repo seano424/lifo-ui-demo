@@ -65,7 +65,7 @@ export default async function TodosPage({ searchParams }: TodosPageProps) {
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-6 container md:py-6 lg:py-8">
         <DashboardInsetHeader page="todos" />
 
         <ErrorBoundary>

@@ -16,7 +16,7 @@ export default function DraftBatchesPage() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 container md:py-6 lg:py-8">
       {/* Page header */}
       <DraftBatchesHeader />
 

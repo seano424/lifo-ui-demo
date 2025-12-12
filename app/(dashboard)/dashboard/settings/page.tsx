@@ -36,7 +36,9 @@ export default async function SettingsPage() {
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <UnifiedSettingsPage />
+      <div className="container md:py-6 lg:py-8">
+        <UnifiedSettingsPage />
+      </div>
     </HydrationBoundary>
   )
 }
