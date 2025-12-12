@@ -9,6 +9,7 @@ import {
   Layers,
   ListTodo,
   Package,
+  Zap,
   ScanBarcode,
   ScanSearch,
   SettingsIcon,
@@ -29,6 +30,7 @@ function getPageIcon(pathname: string) {
   if (cleanPath.startsWith('/dashboard/todos')) return ListTodo
   if (cleanPath.startsWith('/dashboard/inventory/products')) return Package
   if (cleanPath.startsWith('/dashboard/inventory/batches')) return Layers
+  if (cleanPath.startsWith('/dashboard/integrations')) return Zap
   if (cleanPath.startsWith('/dashboard/settings')) return SettingsIcon
   if (cleanPath.startsWith('/dashboard/support')) return HelpCircle
 

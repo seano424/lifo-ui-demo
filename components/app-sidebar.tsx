@@ -10,6 +10,7 @@ import {
   ScanBarcode,
   ScanSearch,
   SettingsIcon,
+  Zap,
 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import Link from 'next/link'
@@ -93,6 +94,11 @@ function useNavigationData() {
         {
           title: t('settings'),
           items: [
+            {
+              title: t('integrations'),
+              url: '/dashboard/integrations',
+              icon: Zap,
+            },
             {
               title: t('settings'),
               url: '/dashboard/settings',
