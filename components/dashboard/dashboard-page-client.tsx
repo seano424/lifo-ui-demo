@@ -1,34 +1,15 @@
 'use client'
 
-import { useQuery } from '@tanstack/react-query'
-import { DashboardWelcome } from '@/components/dashboard/dashboard-welcome'
 import { DashboardContent } from '@/components/dashboard/dashboard-content'
 import { SettingUpFlow } from '@/components/dashboard/setting-up-flow'
-import { hasBatchesRPC } from '@/lib/queries/batches-rpc'
-import { useStoreState } from '@/lib/stores/store-context'
 import { Skeleton } from '@/components/ui/skeleton'
-import { queryKeys } from '@/lib/queries/query-keys'
+import { useSetupProgress } from '@/lib/hooks/use-setup-progress'
 
 export function DashboardPageClient() {
-  const { activeStore } = useStoreState()
+  const progress = useSetupProgress()
 
-  // Check if the active store has any batches
-  const { data: hasBatches, isLoading } = useQuery({
-    queryKey: activeStore?.store_id
-      ? queryKeys.batches.hasBatches(activeStore.store_id)
-      : ['hasBatches', 'no-store'],
-    queryFn: () => {
-      if (!activeStore?.store_id) return false
-      return hasBatchesRPC(activeStore.store_id)
-    },
-    enabled: !!activeStore?.store_id,
-    staleTime: 2 * 60 * 1000, // 2 minutes - batches don't change too frequently
-    gcTime: 5 * 60 * 1000, // 5 minutes
-    refetchOnMount: 'always', // Always refetch to prevent stale "no batches" state when user creates first batch
-  })
-
-  // Show loading skeleton while checking
-  if (isLoading) {
+  // Show loading skeleton while checking setup progress
+  if (progress.isLoading) {
     return (
       <div className="flex flex-col gap-4 w-full">
         <Skeleton className="h-8 w-64" />
@@ -37,25 +18,15 @@ export function DashboardPageClient() {
     )
   }
 
-  // Derive setup state from database instead of localStorage
-  // Minimum setup requirement: user needs a store
-  const hasMinimumSetup = !!activeStore
+  // Setup is complete when user has store, batches, and notifications configured
+  const isSetupComplete = progress.hasStore && progress.hasBatches && progress.hasNotifications
 
-  // Show setup flow if they don't have minimum setup (no store yet)
-  if (!hasMinimumSetup) {
+  // Show setup flow if not complete - the flow handles which step to show
+  if (!isSetupComplete) {
     return <SettingUpFlow />
   }
 
-  // Show welcome screen if they have a store but no batches
-  // (encouraging them to create their first batch)
-  if (!hasBatches) {
-    return (
-      <div className="container md:py-6 lg:py-8">
-        <DashboardWelcome />
-      </div>
-    )
-  }
-
+  // Show main dashboard once setup is complete
   return (
     <div className="container md:py-6 lg:py-8">
       <DashboardContent />
