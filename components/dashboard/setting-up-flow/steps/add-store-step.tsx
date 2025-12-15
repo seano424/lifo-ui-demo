@@ -37,7 +37,13 @@ export function AddStoreStep() {
             </Badge>
           </div>
 
-          <Card className="p-6 transition-colors cursor-pointer group">
+          <Card
+            className="p-6 transition-colors cursor-pointer group"
+            onClick={() => {
+              // TODO: Add Square integration handler
+              alert('Square integration clicked\nThis is in progress still...')
+            }}
+          >
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center justify-between">
               <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                 <Image src="/square/square-icon.svg" alt="Square" width={40} height={40} />
@@ -52,8 +58,7 @@ export function AddStoreStep() {
               </div>
               <Button
                 variant="outline"
-                // disabled
-                className="w-fit group-hover:bg-white group-hover:text-primary-900 hover:bg-white hover:text-primary-900"
+                className="w-fit group-hover:bg-white group-hover:text-primary-900 hover:bg-white hover:text-primary-900 pointer-events-none"
               >
                 <ExternalLink className="h-4 w-4" />
                 {t('steps.addStore.connect')}
@@ -68,7 +73,10 @@ export function AddStoreStep() {
             {t('steps.addStore.manual')}
           </Typography>
 
-          <Card className="p-6 border-dashed transition-colors cursor-pointer group">
+          <Card
+            className="p-6 border-dashed transition-colors cursor-pointer group"
+            onClick={() => setIsAddStoreOpen(true)}
+          >
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center justify-between">
               <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                 <Image src="/logos/lifo-logo-icon.svg" alt="Square" width={40} height={40} />
@@ -83,8 +91,7 @@ export function AddStoreStep() {
               </div>
               <Button
                 variant="outline"
-                onClick={() => setIsAddStoreOpen(true)}
-                className="w-fit group-hover:bg-white group-hover:text-primary-900 hover:bg-white hover:text-primary-900"
+                className="w-fit group-hover:bg-white group-hover:text-primary-900 hover:bg-white hover:text-primary-900 pointer-events-none"
               >
                 {t('steps.addStore.manualEntryButton')}
               </Button>
