@@ -521,12 +521,17 @@
         "title": "Choose how to integrate your data",
         "description": "Track Product by Expiry Dates. Create batches, review expiring items, and receive notifications on expiring batches.",
         "realTime": "Real time",
+        "integration": "Integration",
+        "manual": "Manual",
         "recommended": "Recommended",
         "squareDescription": "Connect your square account to set up real time product tracking by expiration dates",
         "connect": "Connect",
         "oneTime": "One time",
         "csvDescription": "Real-time data integrations are most powerful, but one-time imports are helpful to backfill historical data or augment your existing data. Learn more about importing People via CSV.",
-        "importCSV": "Import CSV"
+        "importCSV": "Import CSV",
+        "manualEntry": "Manually add your store information",
+        "manualEntryDescription": "Add your store information manually by entering the required fields below.",
+        "manualEntryButton": "Add Store"
       },
       "createBatch": {
         "title": "Create your first batch",

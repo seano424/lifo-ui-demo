@@ -527,8 +527,13 @@
         "squareDescription": "Connectez votre compte Square pour configurer le suivi en temps réel des produits par dates d'expiration",
         "connect": "Connecter",
         "oneTime": "Ponctuel",
+        "integration": "Integration",
+        "manual": "Manuel",
         "csvDescription": "Les intégrations de données en temps réel sont les plus puissantes, mais les importations ponctuelles sont utiles pour compléter les données historiques ou enrichir vos données existantes. En savoir plus sur l'importation de personnes via CSV.",
-        "importCSV": "Importer un CSV"
+        "importCSV": "Importer un CSV",
+        "manualEntry": "Ajouter manuellement vos informations de magasin",
+        "manualEntryDescription": "Ajoutez vos informations de magasin manuellement en entrant les champs requis ci-dessous.",
+        "manualEntryButton": "Ajouter le magasin"
       },
       "createBatch": {
         "title": "Créez votre premier lot",

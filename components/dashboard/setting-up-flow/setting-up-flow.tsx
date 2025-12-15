@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { SetupStepsSidebar } from './setup-steps-sidebar'
 import {
   // CreateAccountStep,
-  IntegrateDataStep,
+  AddStoreStep,
   CreateBatchStep,
   SetupNotificationsStep,
 } from './steps'
@@ -11,7 +11,7 @@ import { useSetupFlowStore, type SetupStep } from '@/lib/stores/setup-flow-store
 
 const STEP_COMPONENTS: Record<SetupStep, React.ComponentType> = {
   'create-account': DashboardWelcome,
-  'add-store': IntegrateDataStep,
+  'add-store': AddStoreStep,
   'create-first-batch': CreateBatchStep,
   'setup-notifications': SetupNotificationsStep,
 }

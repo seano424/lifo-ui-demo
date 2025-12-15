@@ -525,8 +525,13 @@
         "squareDescription": "Verbind uw Square-account om real-time product tracking op vervaldatum in te stellen",
         "connect": "Verbinden",
         "oneTime": "Eenmalig",
+        "integration": "Integratie",
+        "manual": "Handmatig",
         "csvDescription": "Real-time data integraties zijn het krachtigst, maar eenmalige imports zijn nuttig om historische gegevens aan te vullen of uw bestaande gegevens te verrijken. Lees meer over het importeren van personen via CSV.",
-        "importCSV": "CSV importeren"
+        "importCSV": "CSV importeren",
+        "manualEntry": "Voeg uw winkelinformatie handmatig toe",
+        "manualEntryDescription": "Voeg uw winkelinformatie handmatig toe door de vereiste velden hieronder in te voeren.",
+        "manualEntryButton": "Winkel toevoegen"
       },
       "createBatch": {
         "title": "Maak uw eerste batch aan",
