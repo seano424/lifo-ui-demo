@@ -134,7 +134,7 @@ export default async function InventoryBatchesPage({ searchParams }: InventoryBa
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-6 container md:py-6 lg:py-8">
         <BatchesHeader />
 
         <BatchesFilteredList

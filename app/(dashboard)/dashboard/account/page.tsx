@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button'
 
 export default function ProfilePage() {
   return (
-    <div>
+    <div className="container md:py-6 lg:py-8">
       <DashboardInsetHeader
         title="Account settings"
         description="Manage your account"

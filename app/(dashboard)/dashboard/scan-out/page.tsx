@@ -15,7 +15,7 @@ export default function ScanOutPage() {
   }
 
   return (
-    <div className="space-y-6 px-4">
+    <div className="space-y-6 px-4 container md:py-6 lg:py-8">
       <DashboardInsetHeader title={t('title')} description={t('description')} />
       <div className="lg:max-w-screen-sm lg:mx-auto pb-40 mt-8">
         <ScanOutInterface onItemRemoved={handleItemRemoved} />

@@ -476,8 +476,8 @@
               "description": "Stel meldingen, integraties en teamrechten in."
             },
             "inventory": {
-              "title": "Voeg uw eerste producten toe",
-              "description": "Upload uw inventaris via CSV of scan producten handmatig."
+              "title": "Voeg uw eerste batches toe",
+              "description": "Upload uw inventaris via CSV of scan batches handmatig."
             },
             "team": {
               "title": "Nodig teamleden uit",

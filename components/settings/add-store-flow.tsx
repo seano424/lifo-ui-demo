@@ -19,7 +19,11 @@ import { reportError } from '@/lib/utils/error-reporting'
 import { isGooglePlacesEnabled } from '@/lib/utils/google-places-config'
 import { generateUniqueStoreCode } from '@/lib/utils/store-utils'
 
-export function AddStoreFlow() {
+interface AddStoreFlowProps {
+  onSuccess?: () => void
+}
+
+export function AddStoreFlow({ onSuccess }: AddStoreFlowProps = {}) {
   const {
     currentStep,
     setCurrentStep,
@@ -139,7 +143,7 @@ export function AddStoreFlow() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="max-w-2xl mx-auto p-4">
       {googlePlacesEnabled && (
         <Button
           variant="ghost"
@@ -168,7 +172,11 @@ export function AddStoreFlow() {
               <AddStoreDetailsStep onSubmit={handleCreateStore} isSubmitting={isCreating} />
             )}
             {currentStep === STORE_FLOW_STEPS.SUCCESS && isComplete && selectedStoreForm && (
-              <AddStoreSuccess storeName={selectedStoreForm.store_name} storeId={createdStoreId} />
+              <AddStoreSuccess
+                storeName={selectedStoreForm.store_name}
+                storeId={createdStoreId}
+                onSuccess={onSuccess}
+              />
             )}
           </>
         ) : (
@@ -182,6 +190,7 @@ export function AddStoreFlow() {
                 <AddStoreSuccess
                   storeName={selectedStoreForm.store_name}
                   storeId={createdStoreId}
+                  onSuccess={onSuccess}
                 />
               )}
           </>

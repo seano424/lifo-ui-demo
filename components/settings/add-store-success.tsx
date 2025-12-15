@@ -15,9 +15,10 @@ import { setActiveStoreCookie } from '@/lib/actions/store-actions'
 interface AddStoreSuccessProps {
   storeName: string
   storeId?: string
+  onSuccess?: () => void
 }
 
-export function AddStoreSuccess({ storeName, storeId }: AddStoreSuccessProps) {
+export function AddStoreSuccess({ storeName, storeId, onSuccess }: AddStoreSuccessProps) {
   const router = useRouter()
   const t = useTranslations('store.creation.success')
   const { setActiveStore } = useStoreState()
@@ -65,7 +66,12 @@ export function AddStoreSuccess({ storeName, storeId }: AddStoreSuccessProps) {
     // Switch to new store before navigating
     const switched = await switchToNewStore()
     if (switched || !storeId) {
-      router.push('/dashboard')
+      // If onSuccess callback is provided (setup flow), call it instead of navigating
+      if (onSuccess) {
+        onSuccess()
+      } else {
+        router.push('/dashboard')
+      }
     }
   }
 

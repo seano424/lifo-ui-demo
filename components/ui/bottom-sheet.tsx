@@ -121,7 +121,7 @@ const BottomSheet = React.forwardRef<HTMLDivElement, BottomSheetProps>(
                 </div>
               )}
 
-              <div className="flex items-center justify-between px-6 py-4 border-b border-muted">
+              <div className="flex items-center justify-between px-6 py-2 border-b border-muted">
                 <DialogPrimitive.Title>{titleElement || title}</DialogPrimitive.Title>
                 <DialogPrimitive.Close
                   className={cn(

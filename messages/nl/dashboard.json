@@ -17,6 +17,10 @@
         "products": {
           "title": "Beheer Producten",
           "description": "Bekijk en beheer uw productcatalogus en voorraad instellingen."
+        },
+        "batches": {
+          "title": "Beheer Batches",
+          "description": "Bekijk en beheer uw batches en hun voorraad."
         }
       },
       "help": {
@@ -494,6 +498,59 @@
       "previous7Days": "Voorgaande 7 dagen",
       "previous30Days": "Voorgaande 30 dagen",
       "previousYear": "Vorig jaar"
+    }
+  },
+  "setupFlow": {
+    "welcome": {
+      "title": "Welkom bij LIFO AI, {name}!",
+      "subtitle": "Volg producten op vervaldatum. Maak batches aan, controleer verlopende artikelen en ontvang meldingen over verlopende batches."
+    },
+    "sidebar": {
+      "title": "Uw setup lijst",
+      "subtitle": "Begin met uw voorraadbeheer door uw eerste producten toe te voegen. Hier zijn enkele snelle acties om u op weg te helpen.",
+      "complete": "voltooid",
+      "steps": {
+        "createAccount": "Maak uw account aan",
+        "addStore": "Voeg uw winkel toe",
+        "createBatch": "Maak uw eerste batch aan",
+        "setupNotifications": "Stel meldingen in"
+      }
+    },
+    "steps": {
+      "createAccount": {
+        "title": "Account aangemaakt",
+        "success": "Uw account is succesvol aangemaakt!"
+      },
+      "addStore": {
+        "title": "Kies hoe u uw gegevens wilt integreren",
+        "description": "Volg producten op vervaldatum. Maak batches aan, controleer verlopende artikelen en ontvang meldingen over verlopende batches.",
+        "realTime": "Real-time",
+        "recommended": "Aanbevolen",
+        "squareDescription": "Verbind uw Square-account om real-time product tracking op vervaldatum in te stellen",
+        "connect": "Verbinden",
+        "oneTime": "Eenmalig",
+        "integration": "Integratie",
+        "manual": "Handmatig",
+        "csvDescription": "Real-time data integraties zijn het krachtigst, maar eenmalige imports zijn nuttig om historische gegevens aan te vullen of uw bestaande gegevens te verrijken. Lees meer over het importeren van personen via CSV.",
+        "importCSV": "CSV importeren",
+        "manualEntry": "Voeg uw winkelinformatie handmatig toe",
+        "manualEntryDescription": "Voeg uw winkelinformatie handmatig toe door de vereiste velden hieronder in te voeren.",
+        "manualEntryButton": "Winkel toevoegen"
+      },
+      "createBatch": {
+        "title": "Maak uw eerste batch aan",
+        "description": "Begin met het volgen van uw voorraad door uw eerste productbatch aan te maken.",
+        "placeholder": "Batch aanmaken binnenkort beschikbaar",
+        "placeholderDescription": "We bouwen de wizard voor het aanmaken van batches. Hiermee kunt u producten toevoegen, vervaldata instellen en voorraad beheren.",
+        "createButton": "Nieuwe batch aanmaken"
+      },
+      "notifications": {
+        "title": "Stel meldingen in",
+        "description": "Blijf op de hoogte van verlopende producten met e-mail, push, SMS en meer!",
+        "placeholder": "Meldingen instellen binnenkort beschikbaar",
+        "placeholderDescription": "Configureer uw meldingsvoorkeuren om waarschuwingen te ontvangen over verlopende producten en belangrijke updates.",
+        "setupButton": "Meldingen configureren"
+      }
     }
   }
 }

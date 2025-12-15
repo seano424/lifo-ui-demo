@@ -476,8 +476,8 @@
               "description": "Configurez les notifications, intégrations et permissions d'équipe."
             },
             "inventory": {
-              "title": "Ajoutez vos premiers produits",
-              "description": "Téléchargez votre inventaire via CSV ou scannez les produits manuellement."
+              "title": "Ajoutez vos premiers lots",
+              "description": "Téléchargez votre inventaire via CSV ou scannez les lots manuellement."
             },
             "team": {
               "title": "Invitez des membres de l'équipe",
