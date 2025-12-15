@@ -11,7 +11,7 @@ export function DashboardPageClient() {
   // Show loading skeleton while checking setup progress
   if (progress.isLoading) {
     return (
-      <div className="flex flex-col gap-4 w-full">
+      <div className="flex flex-col gap-4 w-full container py-6 lg:py-8">
         <Skeleton className="h-8 w-64" />
         <Skeleton className="h-64 w-full" />
       </div>
@@ -28,7 +28,7 @@ export function DashboardPageClient() {
 
   // Show main dashboard once setup is complete
   return (
-    <div className="container md:py-6 lg:py-8">
+    <div className="container py-6 lg:py-8">
       <DashboardContent />
     </div>
   )
