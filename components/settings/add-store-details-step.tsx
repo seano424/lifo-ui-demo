@@ -88,13 +88,10 @@ export function AddStoreDetailsStep({ onSubmit, isSubmitting = false }: AddStore
   }
 
   return (
-    <div className="mx-auto">
-      <div className="flex flex-col gap-2 mb-6">
-        <Typography variant="h1">
+    <div className="mx-auto flex flex-col gap-4">
+      <div className="flex flex-col gap-2">
+        <Typography variant="h2">
           {isManualEntry ? t('title.manual') : t('title.complete')}
-        </Typography>
-        <Typography variant="p" color="muted">
-          {isManualEntry ? t('subtitle.manual') : t('subtitle.complete')}
         </Typography>
       </div>
 

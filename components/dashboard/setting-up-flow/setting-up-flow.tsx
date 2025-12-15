@@ -35,14 +35,14 @@ export function SettingUpFlow() {
   }
 
   return (
-    <div className="flex flex-col lg:flex-row w-full h-full">
+    <div className="flex flex-col gap-4 lg:flex-row w-full h-full p-6 lg:p-0">
       {/* Sidebar */}
-      <aside className="h-full relative p-6 lg:p-0 lg:max-w-xs">
+      <aside className="h-full relative lg:max-w-xs">
         <SetupStepsSidebar />
       </aside>
 
       {/* Step content */}
-      <main className="p-6 w-full">
+      <main className="lg:p-6 w-full">
         <div className="bg-muted/30 dark:bg-muted/10 p-6 rounded-2xl">
           <StepComponent />
         </div>

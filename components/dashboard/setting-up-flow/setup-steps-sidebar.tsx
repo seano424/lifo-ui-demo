@@ -27,7 +27,7 @@ export function SetupStepsSidebar() {
   const progressPercentage = getProgressPercentage(progress)
 
   return (
-    <div className="flex flex-col gap-6 p-6 bg-muted/30 dark:bg-muted/10 min-w-[280px] h-full lg:min-w-[320px]">
+    <div className="flex flex-col gap-6 p-6 rounded-2xl bg-muted/30 dark:bg-muted/10 min-w-[280px] h-full lg:min-w-[320px] shadow-xs">
       {/* Header */}
       <div className="flex flex-col gap-2">
         <Typography variant="h3" className="font-semibold">
