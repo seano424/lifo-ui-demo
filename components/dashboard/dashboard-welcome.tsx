@@ -44,10 +44,10 @@ export function DashboardWelcome() {
 
         {/* Products card */}
         <WelcomeActionCard
-          title="welcome.actions.products.title"
-          description="welcome.actions.products.description"
+          title="welcome.actions.batches.title"
+          description="welcome.actions.batches.description"
           icon={<PackageOpen className="h-6 w-6" />}
-          link="/dashboard/inventory/products"
+          link="/dashboard/inventory/batches"
           variant="secondary"
         />
       </div>

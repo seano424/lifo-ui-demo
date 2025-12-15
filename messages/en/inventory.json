@@ -477,8 +477,8 @@
               "description": "Set up notifications, integrations, and team permissions."
             },
             "inventory": {
-              "title": "Add your first products",
-              "description": "Upload your inventory via CSV or scan products manually."
+              "title": "Add your first batches",
+              "description": "Upload your inventory via CSV or scan batches manually."
             },
             "team": {
               "title": "Invite team members",

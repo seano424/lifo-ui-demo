@@ -7,8 +7,8 @@
       "actions": {
         "getStarted": "Get Started",
         "deliveries": {
-          "title": "Add Your First Products",
-          "description": "Start by adding products to your inventory through scanning or manual entry."
+          "title": "Add Your First Batches",
+          "description": "Start by adding a batch to your inventory through scanning or manual entry."
         },
         "settings": {
           "title": "Configure Your Store",
@@ -17,6 +17,10 @@
         "products": {
           "title": "Manage Products",
           "description": "View and manage your product catalog and inventory settings."
+        },
+        "batches": {
+          "title": "Manage Batches",
+          "description": "View and manage your batches and their inventory."
         }
       },
       "help": {

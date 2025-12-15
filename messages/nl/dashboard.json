@@ -17,6 +17,10 @@
         "products": {
           "title": "Beheer Producten",
           "description": "Bekijk en beheer uw productcatalogus en voorraad instellingen."
+        },
+        "batches": {
+          "title": "Beheer Batches",
+          "description": "Bekijk en beheer uw batches en hun voorraad."
         }
       },
       "help": {

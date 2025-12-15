@@ -17,6 +17,10 @@
         "products": {
           "title": "Gérer les Produits",
           "description": "Consultez et gérez votre catalogue de produits et les paramètres d'inventaire."
+        },
+        "batches": {
+          "title": "Gérer les Lots",
+          "description": "Consultez et gérez vos lots et leur inventaire."
         }
       },
       "help": {
