@@ -15,21 +15,21 @@ export function IntegrateDataStep() {
   return (
     <div className="flex flex-col gap-6">
       <Typography variant="h2" className="font-bold">
-        {t('steps.integrateData.title')}
+        {t('steps.addStore.title')}
       </Typography>
 
       <Typography variant="p" className="text-muted-foreground">
-        {t('steps.integrateData.description')}
+        {t('steps.addStore.description')}
       </Typography>
 
       {/* Real-time integrations */}
       <div className="flex flex-col gap-4">
         <div className="flex items-center gap-2">
           <Typography variant="h3" className="font-semibold">
-            {t('steps.integrateData.realTime')}
+            {t('steps.addStore.realTime')}
           </Typography>
           <Badge className="font-bold font-heading" variant="invertedSecondary">
-            {t('steps.integrateData.recommended')}
+            {t('steps.addStore.recommended')}
           </Badge>
         </div>
 
@@ -42,7 +42,7 @@ export function IntegrateDataStep() {
                   Square
                 </Typography>
                 <Typography variant="p" className="text-sm text-muted-foreground">
-                  {t('steps.integrateData.squareDescription')}
+                  {t('steps.addStore.squareDescription')}
                 </Typography>
               </div>
             </div>
@@ -52,7 +52,7 @@ export function IntegrateDataStep() {
               className="w-fit group-hover:bg-white group-hover:text-primary-900 hover:bg-white hover:text-primary-900"
             >
               <ExternalLink className="h-4 w-4" />
-              {t('steps.integrateData.connect')}
+              {t('steps.addStore.connect')}
             </Button>
           </div>
         </Card>
@@ -61,7 +61,7 @@ export function IntegrateDataStep() {
       {/* One-time import */}
       <div className="flex flex-col gap-4 mt-4">
         <Typography variant="h3" className="font-semibold">
-          {t('steps.integrateData.oneTime')}
+          {t('steps.addStore.oneTime')}
         </Typography>
 
         <Card className="p-6 border-dashed">
@@ -73,14 +73,14 @@ export function IntegrateDataStep() {
               </Typography>
             </div>
             <Typography variant="p" className="text-sm text-muted-foreground">
-              {t('steps.integrateData.csvDescription')}
+              {t('steps.addStore.csvDescription')}
             </Typography>
             <Button
               variant="outline"
               // disabled
               className="w-fit hover:bg-white hover:text-primary-900"
             >
-              {t('steps.integrateData.importCSV')}
+              {t('steps.addStore.importCSV')}
             </Button>
           </div>
         </Card>

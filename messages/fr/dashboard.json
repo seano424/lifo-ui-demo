@@ -509,7 +509,7 @@
       "complete": "terminé",
       "steps": {
         "createAccount": "Créez votre compte",
-        "integrateData": "Intégrez vos données",
+        "addStore": "Ajoutez votre magasin",
         "createBatch": "Créez votre premier lot",
         "setupNotifications": "Configurez les notifications"
       }
@@ -519,7 +519,7 @@
         "title": "Compte créé",
         "success": "Votre compte a été créé avec succès !"
       },
-      "integrateData": {
+      "addStore": {
         "title": "Choisissez comment intégrer vos données",
         "description": "Suivez les produits par dates d'expiration. Créez des lots, consultez les articles qui expirent et recevez des notifications sur les lots qui expirent.",
         "realTime": "Temps réel",

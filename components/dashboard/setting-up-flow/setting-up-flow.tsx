@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { SetupStepsSidebar } from './setup-steps-sidebar'
 import {
   // CreateAccountStep,
@@ -10,15 +11,28 @@ import { useSetupFlowStore, type SetupStep } from '@/lib/stores/setup-flow-store
 
 const STEP_COMPONENTS: Record<SetupStep, React.ComponentType> = {
   'create-account': DashboardWelcome,
-  'integrate-data': IntegrateDataStep,
+  'add-store': IntegrateDataStep,
   'create-first-batch': CreateBatchStep,
   'setup-notifications': SetupNotificationsStep,
 }
 
 export function SettingUpFlow() {
-  const { currentStep } = useSetupFlowStore()
+  const { currentStep, setCurrentStep } = useSetupFlowStore()
+
+  // Migration: Handle old 'integrate-data' step name from localStorage
+  useEffect(() => {
+    // @ts-expect-error - Handling legacy step name that no longer exists in type
+    if (currentStep === 'integrate-data') {
+      setCurrentStep('add-store')
+    }
+  }, [currentStep, setCurrentStep])
 
   const StepComponent = STEP_COMPONENTS[currentStep]
+
+  // Fallback: If step component is not found, default to first step
+  if (!StepComponent) {
+    return <DashboardWelcome />
+  }
 
   return (
     <div className="flex flex-col lg:flex-row w-full h-full">

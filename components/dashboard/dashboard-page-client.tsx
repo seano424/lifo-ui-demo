@@ -6,13 +6,11 @@ import { DashboardContent } from '@/components/dashboard/dashboard-content'
 import { SettingUpFlow } from '@/components/dashboard/setting-up-flow'
 import { hasBatchesRPC } from '@/lib/queries/batches-rpc'
 import { useStoreState } from '@/lib/stores/store-context'
-import { useSetupFlowStore } from '@/lib/stores/setup-flow-store'
 import { Skeleton } from '@/components/ui/skeleton'
 import { queryKeys } from '@/lib/queries/query-keys'
 
 export function DashboardPageClient() {
   const { activeStore } = useStoreState()
-  const { isSetupComplete } = useSetupFlowStore()
 
   // Check if the active store has any batches
   const { data: hasBatches, isLoading } = useQuery({
@@ -39,15 +37,28 @@ export function DashboardPageClient() {
     )
   }
 
-  // Show setup flow if setup is not complete
-  if (!isSetupComplete && (!activeStore || !hasBatches)) {
+  // Derive setup state from database instead of localStorage
+  // Minimum setup requirement: user needs a store
+  const hasMinimumSetup = !!activeStore
+
+  // Show setup flow if they don't have minimum setup (no store yet)
+  if (!hasMinimumSetup) {
     return <SettingUpFlow />
   }
 
-  // Show welcome screen if no active store or no batches exist
-  if (!activeStore || !hasBatches) {
-    return <DashboardWelcome />
+  // Show welcome screen if they have a store but no batches
+  // (encouraging them to create their first batch)
+  if (!hasBatches) {
+    return (
+      <div className="container md:py-6 lg:py-8">
+        <DashboardWelcome />
+      </div>
+    )
   }
 
-  return <DashboardContent />
+  return (
+    <div className="container md:py-6 lg:py-8">
+      <DashboardContent />
+    </div>
+  )
 }

@@ -5,20 +5,26 @@ import { CheckCircle2, Circle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useSetupFlowStore, type SetupStep, SETUP_STEPS } from '@/lib/stores/setup-flow-store'
 import { useTranslations } from 'next-intl'
+import {
+  useSetupProgress,
+  isStepCompleted,
+  getProgressPercentage,
+} from '@/lib/hooks/use-setup-progress'
 
 const STEP_LABELS: Record<SetupStep, string> = {
   'create-account': 'setupFlow.sidebar.steps.createAccount',
-  'integrate-data': 'setupFlow.sidebar.steps.integrateData',
+  'add-store': 'setupFlow.sidebar.steps.addStore',
   'create-first-batch': 'setupFlow.sidebar.steps.createBatch',
   'setup-notifications': 'setupFlow.sidebar.steps.setupNotifications',
 }
 
 export function SetupStepsSidebar() {
   const t = useTranslations()
-  const { currentStep, isStepCompleted, canAccessStep, goToStep, getProgressPercentage } =
-    useSetupFlowStore()
+  const { currentStep, goToStep } = useSetupFlowStore()
 
-  const progressPercentage = getProgressPercentage()
+  // Derive setup progress from database state
+  const progress = useSetupProgress()
+  const progressPercentage = getProgressPercentage(progress)
 
   return (
     <div className="flex flex-col gap-6 p-6 bg-muted/30 dark:bg-muted/10 min-w-[280px] h-full lg:min-w-[320px]">
@@ -48,26 +54,24 @@ export function SetupStepsSidebar() {
       {/* Steps list */}
       <div className="flex flex-col gap-2">
         {SETUP_STEPS.map(step => {
-          const isCompleted = isStepCompleted(step)
+          const completed = isStepCompleted(step, progress)
           const isCurrent = currentStep === step
-          const canAccess = canAccessStep(step)
 
           return (
             <button
               key={step}
               type="button"
               onClick={() => goToStep(step)}
-              disabled={!canAccess}
               className={cn(
                 'flex items-center gap-3 p-3 rounded-2xl transition-all text-left',
-                'hover:bg-secondary-100/50 disabled:cursor-not-allowed disabled:opacity-50',
+                'hover:bg-secondary-100/50',
                 isCurrent && 'bg-secondary-100/50',
                 !isCurrent && 'hover:bg-muted',
               )}
             >
               {/* Step icon */}
               <div className="flex-shrink-0">
-                {isCompleted ? (
+                {completed ? (
                   <CheckCircle2 className="h-5 w-5 text-primary stroke-2" />
                 ) : (
                   <Circle
@@ -85,7 +89,7 @@ export function SetupStepsSidebar() {
                 className={cn(
                   'font-medium',
                   isCurrent && 'text-secondary-900',
-                  isCompleted && 'text-secondary-900',
+                  completed && 'text-secondary-900',
                 )}
               >
                 {t(STEP_LABELS[step])}

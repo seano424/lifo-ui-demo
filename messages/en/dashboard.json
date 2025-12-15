@@ -507,7 +507,7 @@
       "complete": "complete",
       "steps": {
         "createAccount": "Create your account",
-        "integrateData": "Integrate your data",
+        "addStore": "Add your store",
         "createBatch": "Create your first batch",
         "setupNotifications": "Set up notifications"
       }
@@ -517,7 +517,7 @@
         "title": "Account Created",
         "success": "Your account has been successfully created!"
       },
-      "integrateData": {
+      "addStore": {
         "title": "Choose how to integrate your data",
         "description": "Track Product by Expiry Dates. Create batches, review expiring items, and receive notifications on expiring batches.",
         "realTime": "Real time",

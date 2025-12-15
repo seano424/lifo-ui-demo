@@ -507,7 +507,7 @@
       "complete": "voltooid",
       "steps": {
         "createAccount": "Maak uw account aan",
-        "integrateData": "Integreer uw gegevens",
+        "addStore": "Voeg uw winkel toe",
         "createBatch": "Maak uw eerste batch aan",
         "setupNotifications": "Stel meldingen in"
       }
@@ -517,7 +517,7 @@
         "title": "Account aangemaakt",
         "success": "Uw account is succesvol aangemaakt!"
       },
-      "integrateData": {
+      "addStore": {
         "title": "Kies hoe u uw gegevens wilt integreren",
         "description": "Volg producten op vervaldatum. Maak batches aan, controleer verlopende artikelen en ontvang meldingen over verlopende batches.",
         "realTime": "Real-time",
