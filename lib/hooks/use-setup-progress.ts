@@ -7,7 +7,6 @@ import type { SetupStep } from '@/lib/stores/setup-flow-store'
 export interface SetupProgress {
   hasStore: boolean
   hasBatches: boolean
-  hasNotifications: boolean
   isLoading: boolean
 }
 
@@ -32,13 +31,9 @@ export function useSetupProgress(): SetupProgress {
     gcTime: 5 * 60 * 1000, // 5 minutes
   })
 
-  // TODO: Add notification preferences check when implemented
-  const hasNotifications = false
-
   return {
     hasStore: !!activeStore,
     hasBatches: hasBatches ?? false,
-    hasNotifications,
     isLoading,
   }
 }
@@ -57,9 +52,6 @@ export function isStepCompleted(step: SetupStep, progress: SetupProgress): boole
     case 'create-first-batch':
       // Completed when they have at least one batch
       return progress.hasBatches
-    case 'setup-notifications':
-      // Completed when they've configured notifications
-      return progress.hasNotifications
     default:
       return false
   }
@@ -69,12 +61,7 @@ export function isStepCompleted(step: SetupStep, progress: SetupProgress): boole
  * Calculate overall progress percentage
  */
 export function getProgressPercentage(progress: SetupProgress): number {
-  const steps: SetupStep[] = [
-    'create-account',
-    'add-store',
-    'create-first-batch',
-    'setup-notifications',
-  ]
+  const steps: SetupStep[] = ['create-account', 'add-store', 'create-first-batch']
 
   const completedCount = steps.filter(step => isStepCompleted(step, progress)).length
   return Math.round((completedCount / steps.length) * 100)

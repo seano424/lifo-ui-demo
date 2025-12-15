@@ -15,7 +15,6 @@ const STEP_LABELS: Record<SetupStep, string> = {
   'create-account': 'setupFlow.sidebar.steps.createAccount',
   'add-store': 'setupFlow.sidebar.steps.addStore',
   'create-first-batch': 'setupFlow.sidebar.steps.createBatch',
-  'setup-notifications': 'setupFlow.sidebar.steps.setupNotifications',
 }
 
 export function SetupStepsSidebar() {

@@ -4,7 +4,6 @@ import {
   // CreateAccountStep,
   AddStoreStep,
   CreateBatchStep,
-  SetupNotificationsStep,
 } from './steps'
 import { DashboardWelcome } from '../dashboard-welcome'
 import { useSetupFlowStore, type SetupStep } from '@/lib/stores/setup-flow-store'
@@ -13,17 +12,20 @@ const STEP_COMPONENTS: Record<SetupStep, React.ComponentType> = {
   'create-account': DashboardWelcome,
   'add-store': AddStoreStep,
   'create-first-batch': CreateBatchStep,
-  'setup-notifications': SetupNotificationsStep,
 }
 
 export function SettingUpFlow() {
   const { currentStep, setCurrentStep } = useSetupFlowStore()
 
-  // Migration: Handle old 'integrate-data' step name from localStorage
+  // Migration: Handle old step names from localStorage
   useEffect(() => {
-    // @ts-expect-error - Handling legacy step name that no longer exists in type
+    // @ts-expect-error - Handling legacy step names that no longer exist in type
     if (currentStep === 'integrate-data') {
       setCurrentStep('add-store')
+    }
+    // @ts-expect-error - Handling legacy step names that no longer exist in type
+    if (currentStep === 'setup-notifications') {
+      setCurrentStep('create-first-batch')
     }
   }, [currentStep, setCurrentStep])
 
