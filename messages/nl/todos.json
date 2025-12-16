@@ -52,7 +52,9 @@
     "daysLeftOne": "1 dag over",
     "expiresIn": "Verloopt over {days} dagen",
     "expiresToday": "Verloopt vandaag",
+    "expiresTomorrow": "Verloopt morgen",
     "expired": "Verlopen {days} dagen geleden",
+    "expiredStatus": "Verlopen",
     "expiredYesterday": "Gisteren verlopen",
     "currentlyDiscounted": "Momenteel afgeprijsd: {percent}%",
     "suggestedDiscount": "Voorgestelde korting: {percent}%",
@@ -84,6 +86,7 @@
     "donate": "Doneren",
     "sell": "Verkopen",
     "dispose": "Weggooien",
+    "monitorStock": "Voorraad monitoren",
     "details": "Details"
   },
   "bottomSheet": {

@@ -1,7 +1,8 @@
 'use client'
 
 import { TodoActionBottomSheet } from '@/components/todos/todo-action-bottom-sheet'
-import { TodoCard } from '@/components/todos/todo-card'
+// import { TodoCard } from '@/components/todos/todo-card'
+import { TodoCardV2 } from '@/components/todos/todo-card-v2'
 import { InfiniteScrollErrorBoundary } from '@/components/ui/error-boundary'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useIntersectionObserver } from '@/hooks/use-intersection-observer'
@@ -160,10 +161,10 @@ export function TodoCardList({
 
   return (
     <InfiniteScrollErrorBoundary>
-      <div className="space-y-4 flex flex-col">
-        <div className="flex flex-col gap-12">
+      <div className="flex flex-col gap-8">
+        <div className="flex flex-col gap-8 scroll-m-96 pb-80">
           {sortedTodos.map(todo => (
-            <TodoCard
+            <TodoCardV2
               key={todo.batch_id}
               todo={todo}
               onClick={() => handleTodoClick(todo.batch_id || '')}

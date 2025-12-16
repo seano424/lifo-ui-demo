@@ -52,7 +52,9 @@
     "daysLeftOne": "1 jour restant",
     "expiresIn": "Expire dans {days} jours",
     "expiresToday": "Expire aujourd'hui",
+    "expiresTomorrow": "Expire demain",
     "expired": "Expiré il y a {days} jours",
+    "expiredStatus": "Expiré",
     "expiredYesterday": "Expiré hier",
     "currentlyDiscounted": "Actuellement remisé : {percent}%",
     "suggestedDiscount": "Remise suggérée : {percent}%",
@@ -84,6 +86,7 @@
     "donate": "Faire un don",
     "sell": "Vendre",
     "dispose": "Éliminer",
+    "monitorStock": "Surveiller le stock",
     "details": "Détails"
   },
   "bottomSheet": {
