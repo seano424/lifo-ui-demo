@@ -903,6 +903,7 @@ export type Database = {
           created_by: string | null
           description: string | null
           image_url: string | null
+          is_square_managed: boolean | null
           is_verified: boolean | null
           last_scanned_at: string | null
           last_verified: string | null
@@ -910,6 +911,8 @@ export type Database = {
           open_food_facts_data: Json | null
           product_id: string
           sku: string
+          square_item_id: string | null
+          square_synced_at: string | null
           total_stock: number | null
           typical_shelf_life_days: number
           unit_type: string
@@ -929,6 +932,7 @@ export type Database = {
           created_by?: string | null
           description?: string | null
           image_url?: string | null
+          is_square_managed?: boolean | null
           is_verified?: boolean | null
           last_scanned_at?: string | null
           last_verified?: string | null
@@ -936,6 +940,8 @@ export type Database = {
           open_food_facts_data?: Json | null
           product_id?: string
           sku: string
+          square_item_id?: string | null
+          square_synced_at?: string | null
           total_stock?: number | null
           typical_shelf_life_days: number
           unit_type: string
@@ -955,6 +961,7 @@ export type Database = {
           created_by?: string | null
           description?: string | null
           image_url?: string | null
+          is_square_managed?: boolean | null
           is_verified?: boolean | null
           last_scanned_at?: string | null
           last_verified?: string | null
@@ -962,6 +969,8 @@ export type Database = {
           open_food_facts_data?: Json | null
           product_id?: string
           sku?: string
+          square_item_id?: string | null
+          square_synced_at?: string | null
           total_stock?: number | null
           typical_shelf_life_days?: number
           unit_type?: string
@@ -986,6 +995,8 @@ export type Database = {
           is_active: boolean | null
           product_id: string
           selling_price: number | null
+          square_synced_at: string | null
+          square_variation_id: string | null
           store_id: string
           store_sku: string | null
           supplier_code: string | null
@@ -999,6 +1010,8 @@ export type Database = {
           is_active?: boolean | null
           product_id: string
           selling_price?: number | null
+          square_synced_at?: string | null
+          square_variation_id?: string | null
           store_id: string
           store_sku?: string | null
           supplier_code?: string | null
@@ -1012,6 +1025,8 @@ export type Database = {
           is_active?: boolean | null
           product_id?: string
           selling_price?: number | null
+          square_synced_at?: string | null
+          square_variation_id?: string | null
           store_id?: string
           store_sku?: string | null
           supplier_code?: string | null
@@ -3334,53 +3349,6 @@ export type Database = {
       get_batch_todo_states:
         | {
             Args: {
-              limit_count?: number
-              offset_count?: number
-              target_store_id: string
-            }
-            Returns: {
-              ai_calculated_at: string
-              ai_recommendation: string
-              available_quantity: number
-              batch_id: string
-              batch_number: string
-              batch_status: string
-              completion_status: string
-              composite_score: number
-              cost_price: number
-              current_quantity: number
-              current_selling_price: number
-              current_total_value: number
-              days_to_expiry: number
-              expiry_date: string
-              hours_since_last_action: number
-              last_action_quantity: number
-              last_action_time: string
-              last_action_type: string
-              last_discount_percent: number
-              potential_loss_value: number
-              potential_revenue_value: number
-              priority_order: number
-              product_brand: string
-              product_name: string
-              profit_margin: number
-              profit_margin_percent: number
-              selling_price: number
-              store_id: string
-              todo_state: string
-              total_actions_ever: number
-              total_discounted_quantity: number
-              total_disposed_quantity: number
-              total_donated_quantity: number
-              total_ignored_quantity: number
-              total_sold_quantity: number
-              unit_price: number
-              urgency_level: string
-              view_refreshed_at: string
-            }[]
-          }
-        | {
-            Args: {
               p_limit?: number
               p_offset?: number
               p_store_id?: string
@@ -3435,6 +3403,53 @@ export type Database = {
               total_donated_quantity: number
               total_ignored_quantity: number
               total_sold_quantity: number
+              urgency_level: string
+              view_refreshed_at: string
+            }[]
+          }
+        | {
+            Args: {
+              limit_count?: number
+              offset_count?: number
+              target_store_id: string
+            }
+            Returns: {
+              ai_calculated_at: string
+              ai_recommendation: string
+              available_quantity: number
+              batch_id: string
+              batch_number: string
+              batch_status: string
+              completion_status: string
+              composite_score: number
+              cost_price: number
+              current_quantity: number
+              current_selling_price: number
+              current_total_value: number
+              days_to_expiry: number
+              expiry_date: string
+              hours_since_last_action: number
+              last_action_quantity: number
+              last_action_time: string
+              last_action_type: string
+              last_discount_percent: number
+              potential_loss_value: number
+              potential_revenue_value: number
+              priority_order: number
+              product_brand: string
+              product_name: string
+              profit_margin: number
+              profit_margin_percent: number
+              selling_price: number
+              store_id: string
+              todo_state: string
+              total_actions_ever: number
+              total_discounted_quantity: number
+              total_disposed_quantity: number
+              total_donated_quantity: number
+              total_ignored_quantity: number
+              total_sold_quantity: number
+              unit_price: number
               urgency_level: string
               view_refreshed_at: string
             }[]

@@ -18,10 +18,10 @@ export function NotificationCount({
   const baseClasses = 'flex items-center justify-center rounded-full text-xs font-medium text-white'
 
   const variantClasses = {
-    sidebar: 'h-5 w-5 bg-primary-900',
+    sidebar: 'h-5 w-5 bg-red-500',
     navbar:
-      'min-h-5 min-w-5 bg-primary-900 border border-white px-0.5 py-0.5 text-[10px] font-medium shadow-lg',
-    default: 'h-5 w-5 bg-primary-900',
+      'min-h-5 min-w-5 bg-red-500 border border-white px-0.5 py-0.5 text-[10px] font-medium shadow-lg',
+    default: 'h-5 w-5 bg-red-500',
   }
 
   return (

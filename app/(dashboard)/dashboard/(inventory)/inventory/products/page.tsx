@@ -80,13 +80,15 @@ export default async function InventoryProductsPage({ searchParams }: InventoryP
       pages: 1, // Only prefetch first page
     })
   } catch (error) {
-    logger.queryWarn('InventoryProductsPage', 'Error prefetching data', { error })
+    logger.queryWarn('InventoryProductsPage', 'Error prefetching data', {
+      error,
+    })
     // Continue without prefetch - client will handle loading
   }
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <div className="space-y-6">
+      <div className="space-y-6 container md:py-6 lg:py-8">
         <ProductsHeader />
 
         {/* Client-side filtered product list */}
