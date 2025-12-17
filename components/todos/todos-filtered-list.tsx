@@ -14,12 +14,10 @@ import { UnifiedFiltersModal } from './filters/unified-filters-modal'
 import { UnifiedSearchFiltersBar } from './filters/unified-search-filters-bar'
 import { UnifiedSortModal } from './filters/unified-sort-modal'
 import { CompletedTabWithCounts } from './todos-main-tabs/completed-tab'
-import { ExpiredTabWithCounts } from './todos-main-tabs/expired-tab'
-import { ExpiringTabWithCounts } from './todos-main-tabs/expiring-tab'
 import { InProgressTabWithCounts } from './todos-main-tabs/in-progress-tab'
 import { PendingTabWithCounts } from './todos-main-tabs/pending-tab'
 
-export type TodoTabType = 'pending' | 'in_progress' | 'completed' | 'expiring' | 'expired'
+export type TodoTabType = 'pending' | 'in_progress' | 'completed'
 
 interface TodosFilteredListProps {
   initialFilters?: {
@@ -86,8 +84,6 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
     pending: 0,
     in_progress: 0,
     completed: 0,
-    expiring: 0,
-    expired: 0,
   })
 
   // Callback for tab components to report their counts
@@ -98,12 +94,6 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
   // Tab configuration
   const tabs = useMemo(
     () => [
-      {
-        id: 'expiring' as TodoTabType,
-        label: t('tabs.expiring'),
-        count: tabCounts.expiring,
-        component: ExpiringTabWithCounts,
-      },
       {
         id: 'pending' as TodoTabType,
         label: t('tabs.pending'),
@@ -118,15 +108,9 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
       },
       {
         id: 'completed' as TodoTabType,
-        label: t('tabs.completed'),
+        label: t('tabs.resolved'),
         count: tabCounts.completed,
         component: CompletedTabWithCounts,
-      },
-      {
-        id: 'expired' as TodoTabType,
-        label: t('tabs.expired'),
-        count: tabCounts.expired,
-        component: ExpiredTabWithCounts,
       },
     ],
     [tabCounts, t],
@@ -441,7 +425,7 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
                   {tab.label}
                 </span>
                 <Badge
-                  className="cursor-pointer group-hover/tab:text-primary text-xs sm:text-sm flex items-center justify-center rounded-full px-2 sm:px-3 min-w-[24px] h-6"
+                  className="cursor-pointer group-hover/tab:text-primary text-[10px] sm:text-xs flex items-center justify-center rounded-full px-2 sm:px-3 min-w-[24px] h-6 opacity-70"
                   variant={activeTab === tab.id ? 'primary' : 'default'}
                 >
                   {tab.count}
@@ -452,9 +436,9 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
         </div>
 
         {/* Tab indicator */}
-        <div className="absolute left-0 right-0 bottom-0 h-[4px] bg-border" />
+        <div className="absolute left-0 right-0 bottom-0 h-[3px] bg-border" />
         <div
-          className="absolute bottom-0 h-[4px] bg-primary transition-all duration-300 ease-in-out z-10 rounded-full overflow-hidden"
+          className="absolute bottom-0 h-[3px] bg-primary/85 transition-all duration-300 ease-in-out z-10 rounded-full overflow-hidden"
           style={{
             left: `${indicatorStyle.left}px`,
             width: `${indicatorStyle.width}px`,
@@ -486,30 +470,6 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
             filters={filters}
             pageSize={pageSize}
             onCountUpdate={(count: number) => handleCountUpdate('in_progress', count)}
-          />
-        </div>
-
-        <div
-          style={{
-            display: activeTab === 'expiring' ? 'block' : 'none',
-          }}
-        >
-          <ExpiringTabWithCounts
-            filters={filters}
-            pageSize={pageSize}
-            onCountUpdate={(count: number) => handleCountUpdate('expiring', count)}
-          />
-        </div>
-
-        <div
-          style={{
-            display: activeTab === 'expired' ? 'block' : 'none',
-          }}
-        >
-          <ExpiredTabWithCounts
-            filters={filters}
-            pageSize={pageSize}
-            onCountUpdate={(count: number) => handleCountUpdate('expired', count)}
           />
         </div>
 

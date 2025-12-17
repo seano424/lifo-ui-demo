@@ -8,7 +8,8 @@
     "inProgress": "In Progress",
     "expiring": "Expiring",
     "expired": "Expired",
-    "completed": "Completed"
+    "completed": "Completed",
+    "resolved": "Resolved"
   },
   "pending": {
     "errorLoading": "Error loading pending todos",

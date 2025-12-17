@@ -8,7 +8,8 @@
     "inProgress": "En cours",
     "expiring": "Expirant",
     "expired": "Expiré",
-    "completed": "Terminé"
+    "completed": "Terminé",
+    "resolved": "Résolu"
   },
   "pending": {
     "errorLoading": "Erreur lors du chargement des tâches en attente",

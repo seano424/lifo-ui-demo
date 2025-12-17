@@ -8,7 +8,8 @@
     "inProgress": "Bezig",
     "expiring": "Verlopen binnenkort",
     "expired": "Verlopen",
-    "completed": "Voltooid"
+    "completed": "Voltooid",
+    "resolved": "Opgelost"
   },
   "pending": {
     "errorLoading": "Fout bij het laden van taken in afwachting",
