@@ -79,6 +79,50 @@ export function TodoCardV2({ todo, onClick }: TodoCardV2Props) {
 
   // Get action button configuration - memoized for performance
   const actionButton = useMemo((): ActionButtonConfig => {
+    // For completed items, show what was actually done (past tense)
+    if (todo.completion_status === 'completed' && todo.last_action_type) {
+      switch (todo.last_action_type) {
+        case 'sold':
+          // Check if sold with a discount
+          if (todo.last_discount_percent != null && todo.last_discount_percent > 0) {
+            return {
+              text: t('actions.soldAtDiscount', { percent: todo.last_discount_percent }),
+              variant: 'outline',
+            }
+          }
+          return {
+            text: t('actions.sold'),
+            variant: 'outline',
+          }
+        case 'donate':
+          return {
+            text: t('actions.donated'),
+            icon: HandHeartIcon,
+            variant: 'outline',
+          }
+        case 'dispose':
+          return {
+            text: t('actions.disposed'),
+            icon: Trash2Icon,
+            variant: 'destructive',
+          }
+        case 'discount':
+          // Show the actual discount percentage if available
+          if (todo.last_discount_percent != null && todo.last_discount_percent > 0) {
+            return {
+              text: t('actions.soldAtDiscount', { percent: todo.last_discount_percent }),
+              icon: PercentIcon,
+              variant: 'outline',
+            }
+          }
+          return {
+            text: t('actions.discount'),
+            icon: PercentIcon,
+            variant: 'outline',
+          }
+      }
+    }
+
     const standardRecommendation = isExpiring
       ? 'dispose'
       : migrateRecommendation(todo.ai_recommendation)
@@ -131,7 +175,14 @@ export function TodoCardV2({ todo, onClick }: TodoCardV2Props) {
           variant: 'ghost',
         }
     }
-  }, [isExpiring, todo.ai_recommendation, todo.last_discount_percent, todo.completion_status, t])
+  }, [
+    todo.completion_status,
+    todo.last_action_type,
+    todo.last_discount_percent,
+    isExpiring,
+    todo.ai_recommendation,
+    t,
+  ])
 
   // Calculate value at risk - fixed null safety (use != null instead of &&)
   const valueAtRisk =
@@ -141,6 +192,9 @@ export function TodoCardV2({ todo, onClick }: TodoCardV2Props) {
 
   // Get context-aware footer message based on expiration status
   const footerMessage = useMemo(() => {
+    if (todo.available_quantity === 0) {
+      return t('card.tapToViewDetails')
+    }
     if (isExpiring) {
       return t('card.tapToReview') // "Review & resolve"
     }
@@ -149,7 +203,15 @@ export function TodoCardV2({ todo, onClick }: TodoCardV2Props) {
     }
     // For items expiring in the future (including tomorrow, this week, etc.)
     return t('card.tapToViewDetails') // "View details"
-  }, [isExpiring, isExpiringToday, t])
+  }, [isExpiring, isExpiringToday, t, todo.available_quantity])
+
+  // Get action label - "Suggested" for pending items, "Completed" for completed items
+  const actionLabel = useMemo(() => {
+    if (todo.completion_status === 'completed') {
+      return t('card.completed')
+    }
+    return t('card.suggested')
+  }, [todo.completion_status, t])
 
   const handleCardClick = () => {
     onClick?.()
@@ -180,6 +242,8 @@ export function TodoCardV2({ todo, onClick }: TodoCardV2Props) {
           'border-primary-500 border-l-8 border-y-gray-200 border-r-gray-200',
         isExpiring &&
           'border-red-500 sm:hover:shadow-red-400/50 border-l-8 border-y-gray-200 border-r-gray-200',
+        todo.available_quantity === 0 &&
+          'border-gray-200 border-l sm:hover:shadow-gray-400/50 border-y-gray-200 border-r-gray-200',
       )}
     >
       <div className={cn('w-full text-left flex items-center justify-between group px-4 py-6')}>
@@ -196,7 +260,9 @@ export function TodoCardV2({ todo, onClick }: TodoCardV2Props) {
               <Typography
                 variant="small"
                 className={cn(
-                  statusBadge ? statusBadge.color : 'text-gray-600',
+                  statusBadge && todo.available_quantity != null && todo.available_quantity > 0
+                    ? statusBadge.color
+                    : 'text-gray-600',
                   'flex items-center gap-1 text-xs sm:text-sm',
                 )}
               >
@@ -257,22 +323,13 @@ export function TodoCardV2({ todo, onClick }: TodoCardV2Props) {
           </div>
 
           {/* Right section: Action button + chevron */}
-
           <div className="flex sm:flex-col sm:items-end items-center gap-1">
             <Typography variant="small" className="text-slate-400 text-xs sm:text-sm">
-              {t('card.suggested')}
+              {actionLabel}
             </Typography>
             <span className="bg-slate-400 w-1 h-1 rounded-full sm:hidden"></span>
 
-            <Typography
-              variant="extraSmall"
-              className={cn(
-                'flex items-center gap-1',
-                // actionButton.variant === 'destructive' && 'text-primary',
-                // actionButton.variant === 'outline' && 'text-primary',
-                // actionButton.variant === 'ghost' && ' text-gray-900 '
-              )}
-            >
+            <Typography variant="extraSmall" className={cn('flex items-center gap-1')}>
               {actionButton.icon && <actionButton.icon className="h-3 w-3 hidden sm:block" />}
               {actionButton.text}
             </Typography>

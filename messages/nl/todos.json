@@ -76,6 +76,7 @@
     "tapToReview": "Bekijk en los op",
     "tapToTakeAction": "Onderneem actie",
     "tapToViewDetails": "Bekijk details",
+    "completed": "Voltooid",
     "remaining": "over",
     "donatedAction": "gedoneerd",
     "disposedAction": "weggegooid",
@@ -99,7 +100,11 @@
     "sell": "Verkopen",
     "dispose": "Weggooien",
     "monitorStock": "Voorraad monitoren",
-    "details": "Details"
+    "details": "Details",
+    "sold": "Verkocht",
+    "donated": "Gedoneerd",
+    "disposed": "Weggegooid",
+    "soldAtDiscount": "Verkocht met {percent}% korting"
   },
   "bottomSheet": {
     "units": "{count} eenheden"

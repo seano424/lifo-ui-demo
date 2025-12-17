@@ -76,6 +76,7 @@
     "tapToReview": "Examiner et résoudre",
     "tapToTakeAction": "Passer à l'action",
     "tapToViewDetails": "Voir les détails",
+    "completed": "Terminé",
     "remaining": "restant(s)",
     "donatedAction": "donné(s)",
     "disposedAction": "éliminé(s)",
@@ -99,7 +100,11 @@
     "sell": "Vendre",
     "dispose": "Éliminer",
     "monitorStock": "Surveiller le stock",
-    "details": "Détails"
+    "details": "Détails",
+    "sold": "Vendu",
+    "donated": "Donné",
+    "disposed": "Éliminé",
+    "soldAtDiscount": "Vendu avec {percent}% de réduction"
   },
   "bottomSheet": {
     "units": "{count} unités"

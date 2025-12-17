@@ -76,6 +76,7 @@
     "tapToReview": "Review & resolve",
     "tapToTakeAction": "Take action",
     "tapToViewDetails": "View details",
+    "completed": "Completed",
     "remaining": "remaining",
     "donatedAction": "donated",
     "disposedAction": "disposed",
@@ -99,7 +100,11 @@
     "sell": "Sell",
     "dispose": "Dispose",
     "monitorStock": "Monitor Stock",
-    "details": "Details"
+    "details": "Details",
+    "sold": "Sold",
+    "donated": "Donated",
+    "disposed": "Disposed",
+    "soldAtDiscount": "Sold at {percent}% discount"
   },
   "bottomSheet": {
     "units": "{count, plural, =0 {0 units} =1 {1 unit} other {# units}}"
