@@ -71,7 +71,13 @@
     "donatedOn": "Donné le {date}",
     "disposedOn": "Éliminé le {date}",
     "noRecommendation": "Aucune recommandation",
-    "tapToManage": "Tapez pour gérer"
+    "tapToManage": "Tapez pour gérer",
+    "remaining": "restant(s)",
+    "donatedAction": "donné(s)",
+    "disposedAction": "éliminé(s)",
+    "units": "unités",
+    "discountApplied": "remise appliquée",
+    "discountAppliedToUnits": "{count, plural, =1 {remise appliquée à 1 unité} other {remise appliquée à # unités}}"
   },
   "recommendations": {
     "dispose": "Éliminer immédiatement",

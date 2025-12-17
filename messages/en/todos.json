@@ -71,7 +71,13 @@
     "donatedOn": "Donated on {date}",
     "disposedOn": "Disposed on {date}",
     "noRecommendation": "No recommendation",
-    "tapToManage": "Tap to manage"
+    "tapToManage": "Tap to manage",
+    "remaining": "remaining",
+    "donatedAction": "donated",
+    "disposedAction": "disposed",
+    "units": "units",
+    "discountApplied": "discount applied",
+    "discountAppliedToUnits": "{count, plural, =1 {discount applied to 1 unit} other {discount applied to # units}}"
   },
   "recommendations": {
     "dispose": "Dispose immediately",

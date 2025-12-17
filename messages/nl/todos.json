@@ -71,7 +71,13 @@
     "donatedOn": "Gedoneerd op {date}",
     "disposedOn": "Weggegooid op {date}",
     "noRecommendation": "Geen aanbeveling",
-    "tapToManage": "Tik om te beheren"
+    "tapToManage": "Tik om te beheren",
+    "remaining": "over",
+    "donatedAction": "gedoneerd",
+    "disposedAction": "weggegooid",
+    "units": "eenheden",
+    "discountApplied": "korting toegepast",
+    "discountAppliedToUnits": "{count, plural, =1 {korting toegepast op 1 eenheid} other {korting toegepast op # eenheden}}"
   },
   "recommendations": {
     "dispose": "Direct weggooien",

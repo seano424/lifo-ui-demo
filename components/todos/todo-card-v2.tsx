@@ -202,8 +202,11 @@ export function TodoCardV2({ todo, onClick }: TodoCardV2Props) {
                       (lastActionType === 'donate' || lastActionType === 'dispose') &&
                       lastActionQty > 0
                     ) {
-                      const actionLabel = lastActionType === 'donate' ? 'donated' : 'disposed'
-                      return `${currentQty} remaining • ${lastActionQty} ${actionLabel}`
+                      const actionLabel =
+                        lastActionType === 'donate'
+                          ? t('card.donatedAction')
+                          : t('card.disposedAction')
+                      return `${currentQty} ${t('card.remaining')} • ${lastActionQty} ${actionLabel}`
                     }
 
                     // Case 2: Discount applied
@@ -214,18 +217,18 @@ export function TodoCardV2({ todo, onClick }: TodoCardV2Props) {
                     ) {
                       // Check if discount is partial or full
                       if (totalDiscounted > 0 && totalDiscounted < currentQty) {
-                        return `${currentQty} units • ${discountPercent}% discount applied to ${totalDiscounted} units`
+                        return `${currentQty} ${t('card.units')} • ${discountPercent}% ${t('card.discountAppliedToUnits', { count: totalDiscounted })}`
                       }
-                      return `${currentQty} units • ${discountPercent}% discount applied`
+                      return `${currentQty} ${t('card.units')} • ${discountPercent}% ${t('card.discountApplied')}`
                     }
 
                     // Case 3: No actions yet - show value
                     if (valueAtRisk != null) {
-                      return `${currentQty} units • €${valueAtRisk.toFixed(0)}`
+                      return `${currentQty} ${t('card.units')} • €${valueAtRisk.toFixed(0)}`
                     }
 
                     // Fallback: just quantity
-                    return `${currentQty} units`
+                    return `${currentQty} ${t('card.units')}`
                   })()}
                 </span>
               </Typography>
