@@ -139,6 +139,18 @@ export function TodoCardV2({ todo, onClick }: TodoCardV2Props) {
       ? todo.current_quantity * todo.unit_price
       : null
 
+  // Get context-aware footer message based on expiration status
+  const footerMessage = useMemo(() => {
+    if (isExpiring) {
+      return t('card.tapToReview') // "Review & resolve"
+    }
+    if (isExpiringToday) {
+      return t('card.tapToTakeAction') // "Take action"
+    }
+    // For items expiring in the future (including tomorrow, this week, etc.)
+    return t('card.tapToViewDetails') // "View details"
+  }, [isExpiring, isExpiringToday, t])
+
   const handleCardClick = () => {
     onClick?.()
   }
@@ -162,11 +174,10 @@ export function TodoCardV2({ todo, onClick }: TodoCardV2Props) {
     >
       <div
         className={cn(
-          'w-full text-left flex items-center justify-between group px-4 py-6 border-t-4',
-          daysUntilExpiry <= 7 && 'border-secondary',
-          isExpiring && 'border-primary',
-          isExpiringToday && 'border-primary',
-          isExpiringTomorrow && 'border-secondary',
+          'w-full text-left flex items-center justify-between group px-4 py-6',
+          // daysUntilExpiry <= 2 && 'border-primary-500 border-t-8',
+          todo.urgency_level === 'high' && 'border-primary-500 border-t-8',
+          (todo.urgency_level === 'critical' || isExpiring) && 'border-red-600 border-t-8',
         )}
       >
         {/* Card content */}
@@ -270,7 +281,7 @@ export function TodoCardV2({ todo, onClick }: TodoCardV2Props) {
       {/* Card footer */}
       <div className="flex items-center gap-2 px-5 py-3 bg-slate-50">
         <Typography variant="extraSmall" color="muted">
-          {t('card.tapToManage')}
+          {footerMessage}
         </Typography>
       </div>
     </div>
