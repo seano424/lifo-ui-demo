@@ -233,8 +233,6 @@
   --color-secondary-900: hsl(227 100% 58%);
   --color-secondary-950: hsl(227 100% 40%);
 
-  --color-green-apple: hsl(142 71% 45%);
-
   /* Font families */
   --font-sans:
     var(--font-montserrat), ui-sans-serif, system-ui, -apple-system,

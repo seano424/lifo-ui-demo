@@ -48,6 +48,7 @@
   "emptyStateWithFilters": "Probeer uw filters aan te passen om meer items te zien.",
   "card": {
     "suggestion": "Suggestie",
+    "suggested": "Voorgesteld",
     "daysLeft": "{days} dagen over",
     "daysLeftOne": "1 dag over",
     "expiresIn": "Verloopt over {days} dagen",
@@ -69,7 +70,8 @@
     "completedOn": "Voltooid op {date}",
     "donatedOn": "Gedoneerd op {date}",
     "disposedOn": "Weggegooid op {date}",
-    "noRecommendation": "Geen aanbeveling"
+    "noRecommendation": "Geen aanbeveling",
+    "tapToManage": "Tik om te beheren"
   },
   "recommendations": {
     "dispose": "Direct weggooien",

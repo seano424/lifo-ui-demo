@@ -48,6 +48,7 @@
   "emptyStateWithFilters": "Try adjusting your filters to see more items.",
   "card": {
     "suggestion": "Suggestion",
+    "suggested": "Suggested",
     "daysLeft": "{days, plural, =1 {1 day left} other {# days left}}",
     "daysLeftOne": "1 day left",
     "expiresIn": "{days, plural, =1 {Expires in 1 day} other {Expires in # days}}",
@@ -69,7 +70,8 @@
     "completedOn": "Completed on {date}",
     "donatedOn": "Donated on {date}",
     "disposedOn": "Disposed on {date}",
-    "noRecommendation": "No recommendation"
+    "noRecommendation": "No recommendation",
+    "tapToManage": "Tap to manage"
   },
   "recommendations": {
     "dispose": "Dispose immediately",

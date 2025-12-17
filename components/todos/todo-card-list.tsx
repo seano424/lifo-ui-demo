@@ -1,7 +1,6 @@
 'use client'
 
 import { TodoActionBottomSheet } from '@/components/todos/todo-action-bottom-sheet'
-// import { TodoCard } from '@/components/todos/todo-card'
 import { TodoCardV2 } from '@/components/todos/todo-card-v2'
 import { InfiniteScrollErrorBoundary } from '@/components/ui/error-boundary'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -162,6 +161,13 @@ export function TodoCardList({
   return (
     <InfiniteScrollErrorBoundary>
       <div className="flex flex-col gap-8">
+        {/*
+          Large spacing values explanation:
+          - pb-80 (320px): Bottom padding to prevent the last todo card from being hidden
+            behind the fixed bottom action sheet/navigation
+          - scroll-m-96 (384px): Scroll margin to ensure proper scroll behavior with fixed
+            UI elements (e.g., mobile nav, action sheets)
+        */}
         <div className="flex flex-col gap-8 scroll-m-96 pb-80">
           {sortedTodos.map(todo => (
             <TodoCardV2

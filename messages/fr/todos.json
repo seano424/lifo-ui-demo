@@ -48,6 +48,7 @@
   "emptyStateWithFilters": "Essayez d'ajuster vos filtres pour voir plus d'articles.",
   "card": {
     "suggestion": "Suggestion",
+    "suggested": "Suggesté",
     "daysLeft": "{days} jours restants",
     "daysLeftOne": "1 jour restant",
     "expiresIn": "Expire dans {days} jours",
@@ -69,7 +70,8 @@
     "completedOn": "Terminé le {date}",
     "donatedOn": "Donné le {date}",
     "disposedOn": "Éliminé le {date}",
-    "noRecommendation": "Aucune recommandation"
+    "noRecommendation": "Aucune recommandation",
+    "tapToManage": "Tapez pour gérer"
   },
   "recommendations": {
     "dispose": "Éliminer immédiatement",
