@@ -81,6 +81,10 @@
     "donatedAction": "donné(s)",
     "disposedAction": "éliminé(s)",
     "units": "unités",
+    "unit": "unité",
+    "soldUnits": "vendu(s)",
+    "revenue": "revenu",
+    "total": "total",
     "discountApplied": "remise appliquée",
     "discountAppliedToUnits": "{count, plural, =1 {remise appliquée à 1 unité} other {remise appliquée à # unités}}"
   },

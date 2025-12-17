@@ -283,8 +283,30 @@ export function TodoCardV2({ todo, onClick }: TodoCardV2Props) {
                     const lastActionQty = todo.last_action_quantity ?? 0
                     const discountPercent = todo.last_discount_percent
                     const totalDiscounted = todo.total_discounted_quantity ?? 0
+                    const totalSold = todo.total_sold_quantity ?? 0
+                    const unitPrice = todo.unit_price ?? 0
+                    const isCompleted = todo.completion_status === 'completed'
 
-                    // Case 1: Donate or Dispose action
+                    // Case 1: Completed with sales - show total sold and revenue
+                    if (isCompleted && totalSold > 0) {
+                      let revenue = totalSold * unitPrice
+                      // Adjust for discount if applicable
+                      if (discountPercent != null && discountPercent > 0) {
+                        revenue = revenue * (1 - discountPercent / 100)
+                      }
+                      return `${totalSold} ${t('card.soldUnits')} • €${revenue.toFixed(0)} ${t('card.revenue')}`
+                    }
+
+                    // Case 2: In-progress sales - show remaining and sold with revenue
+                    if (totalSold > 0 && currentQty > 0) {
+                      let revenue = totalSold * unitPrice
+                      if (discountPercent != null && discountPercent > 0) {
+                        revenue = revenue * (1 - discountPercent / 100)
+                      }
+                      return `${currentQty} ${t('card.remaining')} • ${totalSold} ${t('card.soldUnits')} (€${revenue.toFixed(0)})`
+                    }
+
+                    // Case 3: Donate or Dispose action
                     if (
                       (lastActionType === 'donate' || lastActionType === 'dispose') &&
                       lastActionQty > 0
@@ -296,7 +318,7 @@ export function TodoCardV2({ todo, onClick }: TodoCardV2Props) {
                       return `${currentQty} ${t('card.remaining')} • ${lastActionQty} ${actionLabel}`
                     }
 
-                    // Case 2: Discount applied
+                    // Case 4: Discount applied (but not sold yet)
                     if (
                       lastActionType === 'discount' &&
                       discountPercent != null &&
@@ -309,9 +331,9 @@ export function TodoCardV2({ todo, onClick }: TodoCardV2Props) {
                       return `${currentQty} ${t('card.units')} • ${discountPercent}% ${t('card.discountApplied')}`
                     }
 
-                    // Case 3: No actions yet - show value
-                    if (valueAtRisk != null) {
-                      return `${currentQty} ${t('card.units')} • €${valueAtRisk.toFixed(0)}`
+                    // Case 5: No actions yet - show value with unit price
+                    if (valueAtRisk != null && unitPrice > 0) {
+                      return `${currentQty} ${t('card.units')} • €${unitPrice.toFixed(2)}/${t('card.unit')} • €${valueAtRisk.toFixed(0)} ${t('card.total')}`
                     }
 
                     // Fallback: just quantity

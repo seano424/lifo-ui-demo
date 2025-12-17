@@ -81,6 +81,10 @@
     "donatedAction": "donated",
     "disposedAction": "disposed",
     "units": "units",
+    "unit": "unit",
+    "soldUnits": "sold",
+    "revenue": "revenue",
+    "total": "total",
     "discountApplied": "discount applied",
     "discountAppliedToUnits": "{count, plural, =1 {discount applied to 1 unit} other {discount applied to # units}}"
   },

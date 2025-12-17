@@ -81,6 +81,10 @@
     "donatedAction": "gedoneerd",
     "disposedAction": "weggegooid",
     "units": "eenheden",
+    "unit": "eenheid",
+    "soldUnits": "verkocht",
+    "revenue": "opbrengst",
+    "total": "totaal",
     "discountApplied": "korting toegepast",
     "discountAppliedToUnits": "{count, plural, =1 {korting toegepast op 1 eenheid} other {korting toegepast op # eenheden}}"
   },
