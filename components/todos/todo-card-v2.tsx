@@ -167,7 +167,7 @@ export function TodoCardV2({ todo, onClick }: TodoCardV2Props) {
       onClick={handleCardClick}
       onKeyDown={handleKeyDown}
       aria-label={`Todo item: ${todo.product_name}`}
-      className="flex flex-col gap-2 shadow-xs shadow-primary-50 border border-gray-100 rounded-2xl hover:bg-white md:hover:shadow-lg md:hover:shadow-primary-400/50 md:hover:-translate-y-0.5 transition-all duration-400 cursor-pointer"
+      className="flex flex-col gap-2 shadow-xs shadow-primary-50 border border-gray-100 rounded-2xl hover:bg-white md:hover:shadow-lg md:hover:shadow-primary-400/50 md:hover:-translate-y-0.5 transition-all duration-400 cursor-pointer overflow-hidden"
     >
       <div className="w-full text-left flex items-center justify-between  group px-4 py-6">
         {/* Card content */}
