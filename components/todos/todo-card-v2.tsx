@@ -5,7 +5,6 @@ import { cn } from '@/lib/utils'
 import { migrateRecommendation } from '@/lib/utils/recommendation-migration'
 import {
   ChevronRight,
-  TrendingDown,
   Calendar,
   PackageIcon,
   HandHeartIcon,
@@ -153,13 +152,6 @@ export function TodoCardV2({ todo, onClick }: TodoCardV2Props) {
     }
   }
 
-  const noQuantity = todo.current_quantity == null || todo.current_quantity === 0
-
-  const noAction =
-    todo.ai_recommendation == null ||
-    todo.ai_recommendation === 'maintain' ||
-    todo.ai_recommendation === 'monitor'
-
   return (
     <div
       role="button"
@@ -193,18 +185,50 @@ export function TodoCardV2({ todo, onClick }: TodoCardV2Props) {
               </Typography>
             </div>
 
-            {/* Units + value at risk or expiry date */}
-            <div className="flex items-center gap-3 text-sm text-gray-600">
-              <Typography variant="small" className="flex items-center gap-1">
+            {/* Units + action summary */}
+            <div className="flex items-center gap-2 text-sm text-gray-600">
+              <Typography variant="small" className="flex items-center gap-1.5">
                 <PackageIcon className="h-4 w-4 text-gray-400" />
-                <span>{todo.current_quantity ?? 0} units</span>
-              </Typography>
+                <span>
+                  {(() => {
+                    const currentQty = todo.current_quantity ?? 0
+                    const lastActionType = todo.last_action_type
+                    const lastActionQty = todo.last_action_quantity ?? 0
+                    const discountPercent = todo.last_discount_percent
+                    const totalDiscounted = todo.total_discounted_quantity ?? 0
 
-              <div className="flex items-center gap-1">
-                <Typography variant="small" className="text-gray-600">
-                  €{valueAtRisk?.toFixed(0)}
-                </Typography>
-              </div>
+                    // Case 1: Donate or Dispose action
+                    if (
+                      (lastActionType === 'donate' || lastActionType === 'dispose') &&
+                      lastActionQty > 0
+                    ) {
+                      const actionLabel = lastActionType === 'donate' ? 'donated' : 'disposed'
+                      return `${currentQty} remaining • ${lastActionQty} ${actionLabel}`
+                    }
+
+                    // Case 2: Discount applied
+                    if (
+                      lastActionType === 'discount' &&
+                      discountPercent != null &&
+                      discountPercent > 0
+                    ) {
+                      // Check if discount is partial or full
+                      if (totalDiscounted > 0 && totalDiscounted < currentQty) {
+                        return `${currentQty} units • ${discountPercent}% discount applied to ${totalDiscounted} units`
+                      }
+                      return `${currentQty} units • ${discountPercent}% discount applied`
+                    }
+
+                    // Case 3: No actions yet - show value
+                    if (valueAtRisk != null) {
+                      return `${currentQty} units • €${valueAtRisk.toFixed(0)}`
+                    }
+
+                    // Fallback: just quantity
+                    return `${currentQty} units`
+                  })()}
+                </span>
+              </Typography>
             </div>
           </div>
 
