@@ -28,7 +28,7 @@ interface TodoCardV2Props {
 
 // Status badge colors
 const STATUS_COLORS = {
-  expired: 'text-primary',
+  expired: 'text-red-600',
   today: 'text-primary',
   tomorrow: 'text-secondary',
   thisWeek: 'text-secondary',
@@ -170,22 +170,25 @@ export function TodoCardV2({ todo, onClick }: TodoCardV2Props) {
       onClick={handleCardClick}
       onKeyDown={handleKeyDown}
       aria-label={`Todo item: ${todo.product_name}`}
-      className="flex flex-col gap-2 shadow-xs shadow-primary-50 border border-gray-100 rounded-2xl bg-white sm:hover:shadow-lg sm:hover:shadow-primary-400/50 sm:hover:-translate-y-0.5 transition-all duration-400 cursor-pointer overflow-hidden"
+      className={cn(
+        'flex flex-col gap-2 shadow-xs shadow-primary-50 border border-gray-100 rounded-2xl bg-white sm:hover:shadow-lg sm:hover:shadow-primary-400/50 sm:hover:-translate-y-0.5 transition-all duration-400 cursor-pointer overflow-hidden',
+
+        !isExpiring && daysUntilExpiry <= 2
+          ? 'border-primary-500 border-l-8 border-y-gray-200 border-r-gray-200'
+          : 'border-gray-200 border-l sm:hover:shadow-gray-400/50 border-y-gray-200 border-r-gray-200',
+        (todo.urgency_level === 'critical' || todo.urgency_level === 'high') &&
+          'border-primary-500 border-l-8 border-y-gray-200 border-r-gray-200',
+        isExpiring &&
+          'border-red-500 sm:hover:shadow-red-400/50 border-l-8 border-y-gray-200 border-r-gray-200',
+      )}
     >
-      <div
-        className={cn(
-          'w-full text-left flex items-center justify-between group px-4 py-6',
-          // daysUntilExpiry <= 2 && 'border-primary-500 border-t-8',
-          todo.urgency_level === 'high' && 'border-primary-500 border-t-8',
-          (todo.urgency_level === 'critical' || isExpiring) && 'border-red-600 border-t-8',
-        )}
-      >
+      <div className={cn('w-full text-left flex items-center justify-between group px-4 py-6')}>
         {/* Card content */}
-        <div className="flex flex-col sm:flex-row sm:items-center gap-3 justify-between w-full">
+        <div className="flex flex-col sm:flex-row gap-3 justify-between w-full items-stretch">
           {/* Left section: Product info */}
-          <div className="flex-1 min-w-0 flex flex-col gap-4">
+          <div className="flex flex-col gap-4">
             {/* Product name + status badge */}
-            <div className="flex gap-4 flex-wrap flex-col-reverse sm:flex-row">
+            <div className="flex gap-2 lg:gap-4 flex-wrap flex-col-reverse lg:flex-row">
               <Typography className="font-heading" variant="h4">
                 {todo.product_name}
               </Typography>
@@ -204,8 +207,8 @@ export function TodoCardV2({ todo, onClick }: TodoCardV2Props) {
             </div>
 
             {/* Units + action summary */}
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <Typography variant="small" className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1 text-sm text-gray-600">
+              <Typography variant="small" className="flex items-center gap-1">
                 <PackageIcon className="h-4 w-4 text-gray-400" />
                 <span>
                   {(() => {
@@ -254,26 +257,25 @@ export function TodoCardV2({ todo, onClick }: TodoCardV2Props) {
           </div>
 
           {/* Right section: Action button + chevron */}
-          <div className="flex items-center gap-2">
-            <div className="flex sm:flex-col sm:items-end items-center gap-1">
-              <Typography variant="extraSmall" className="text-slate-400">
-                {t('card.suggested')}
-              </Typography>
-              <span className="bg-slate-400 w-1 h-1 rounded-full sm:hidden"></span>
 
-              <Typography
-                variant="extraSmall"
-                className={cn(
-                  'flex items-center gap-1',
-                  // actionButton.variant === 'destructive' && 'text-primary',
-                  // actionButton.variant === 'outline' && 'text-primary',
-                  // actionButton.variant === 'ghost' && ' text-gray-900 '
-                )}
-              >
-                {actionButton.icon && <actionButton.icon className="h-3 w-3 hidden sm:block" />}
-                {actionButton.text}
-              </Typography>
-            </div>
+          <div className="flex sm:flex-col sm:items-end items-center gap-1">
+            <Typography variant="small" className="text-slate-400 text-xs sm:text-sm">
+              {t('card.suggested')}
+            </Typography>
+            <span className="bg-slate-400 w-1 h-1 rounded-full sm:hidden"></span>
+
+            <Typography
+              variant="extraSmall"
+              className={cn(
+                'flex items-center gap-1',
+                // actionButton.variant === 'destructive' && 'text-primary',
+                // actionButton.variant === 'outline' && 'text-primary',
+                // actionButton.variant === 'ghost' && ' text-gray-900 '
+              )}
+            >
+              {actionButton.icon && <actionButton.icon className="h-3 w-3 hidden sm:block" />}
+              {actionButton.text}
+            </Typography>
           </div>
         </div>
       </div>
