@@ -48,11 +48,14 @@
   "emptyStateWithFilters": "Try adjusting your filters to see more items.",
   "card": {
     "suggestion": "Suggestion",
-    "daysLeft": "{days, plural, =1 {1 day left} other {# days left}}",
-    "daysLeftOne": "1 day left",
+    "suggested": "Suggested",
+    "daysLeft": "Expires in {days, plural, =1 {1 day} other {# days}}",
+    "daysLeftOne": "Expires in 1 day",
     "expiresIn": "{days, plural, =1 {Expires in 1 day} other {Expires in # days}}",
     "expiresToday": "Expires today",
+    "expiresTomorrow": "Expires tomorrow",
     "expired": "{days, plural, =1 {Expired 1 day ago} other {Expired # days ago}}",
+    "expiredStatus": "Expired",
     "expiredYesterday": "Expired yesterday",
     "currentlyDiscounted": "Currently discounted: {percent}%",
     "suggestedDiscount": "Suggested discount: {percent}%",
@@ -67,7 +70,17 @@
     "completedOn": "Completed on {date}",
     "donatedOn": "Donated on {date}",
     "disposedOn": "Disposed on {date}",
-    "noRecommendation": "No recommendation"
+    "noRecommendation": "No recommendation",
+    "tapToManage": "Tap to manage",
+    "tapToReview": "Review & resolve",
+    "tapToTakeAction": "Take action",
+    "tapToViewDetails": "View details",
+    "remaining": "remaining",
+    "donatedAction": "donated",
+    "disposedAction": "disposed",
+    "units": "units",
+    "discountApplied": "discount applied",
+    "discountAppliedToUnits": "{count, plural, =1 {discount applied to 1 unit} other {discount applied to # units}}"
   },
   "recommendations": {
     "dispose": "Dispose immediately",
@@ -84,6 +97,7 @@
     "donate": "Donate",
     "sell": "Sell",
     "dispose": "Dispose",
+    "monitorStock": "Monitor Stock",
     "details": "Details"
   },
   "bottomSheet": {

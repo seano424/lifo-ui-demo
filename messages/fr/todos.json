@@ -48,11 +48,14 @@
   "emptyStateWithFilters": "Essayez d'ajuster vos filtres pour voir plus d'articles.",
   "card": {
     "suggestion": "Suggestion",
-    "daysLeft": "{days} jours restants",
-    "daysLeftOne": "1 jour restant",
+    "suggested": "Suggesté",
+    "daysLeft": "Expire dans {days, plural, =1 {1 jour} other {# jours}}",
+    "daysLeftOne": "Expire dans 1 jour",
     "expiresIn": "Expire dans {days} jours",
     "expiresToday": "Expire aujourd'hui",
+    "expiresTomorrow": "Expire demain",
     "expired": "Expiré il y a {days} jours",
+    "expiredStatus": "Expiré",
     "expiredYesterday": "Expiré hier",
     "currentlyDiscounted": "Actuellement remisé : {percent}%",
     "suggestedDiscount": "Remise suggérée : {percent}%",
@@ -67,7 +70,17 @@
     "completedOn": "Terminé le {date}",
     "donatedOn": "Donné le {date}",
     "disposedOn": "Éliminé le {date}",
-    "noRecommendation": "Aucune recommandation"
+    "noRecommendation": "Aucune recommandation",
+    "tapToManage": "Tapez pour gérer",
+    "tapToReview": "Examiner et résoudre",
+    "tapToTakeAction": "Passer à l'action",
+    "tapToViewDetails": "Voir les détails",
+    "remaining": "restant(s)",
+    "donatedAction": "donné(s)",
+    "disposedAction": "éliminé(s)",
+    "units": "unités",
+    "discountApplied": "remise appliquée",
+    "discountAppliedToUnits": "{count, plural, =1 {remise appliquée à 1 unité} other {remise appliquée à # unités}}"
   },
   "recommendations": {
     "dispose": "Éliminer immédiatement",
@@ -84,6 +97,7 @@
     "donate": "Faire un don",
     "sell": "Vendre",
     "dispose": "Éliminer",
+    "monitorStock": "Surveiller le stock",
     "details": "Détails"
   },
   "bottomSheet": {
