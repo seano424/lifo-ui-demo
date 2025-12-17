@@ -49,8 +49,8 @@
   "card": {
     "suggestion": "Suggestion",
     "suggested": "Suggesté",
-    "daysLeft": "{days} jours restants",
-    "daysLeftOne": "1 jour restant",
+    "daysLeft": "Expire dans {days, plural, =1 {1 jour} other {# jours}}",
+    "daysLeftOne": "Expire dans 1 jour",
     "expiresIn": "Expire dans {days} jours",
     "expiresToday": "Expire aujourd'hui",
     "expiresTomorrow": "Expire demain",

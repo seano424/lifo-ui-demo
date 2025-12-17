@@ -168,7 +168,7 @@ export function TodoCardList({
           - scroll-m-96 (384px): Scroll margin to ensure proper scroll behavior with fixed
             UI elements (e.g., mobile nav, action sheets)
         */}
-        <div className="flex flex-col gap-8 scroll-m-96 pb-80">
+        <div className="flex flex-col gap-12 scroll-m-96 pb-80">
           {sortedTodos.map(todo => (
             <TodoCardV2
               key={todo.batch_id}

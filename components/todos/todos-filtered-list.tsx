@@ -344,9 +344,6 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
         onClearAll={handleClearAll}
       />
 
-      {/* Mobile Separator after search */}
-      <div className="border-t border-border mx-4" />
-
       {/* Unified Filters Modal */}
       <UnifiedFiltersModal
         isOpen={showFilters}

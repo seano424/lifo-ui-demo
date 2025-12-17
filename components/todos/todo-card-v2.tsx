@@ -4,7 +4,6 @@ import type { TodoItem } from '@/lib/queries/todos-rpc'
 import { cn } from '@/lib/utils'
 import { migrateRecommendation } from '@/lib/utils/recommendation-migration'
 import {
-  ChevronRight,
   Calendar,
   PackageIcon,
   HandHeartIcon,
@@ -29,10 +28,10 @@ interface TodoCardV2Props {
 
 // Status badge colors
 const STATUS_COLORS = {
-  expired: 'text-red-500',
+  expired: 'text-primary',
   today: 'text-primary',
-  tomorrow: 'text-blue-500',
-  thisWeek: 'text-foreground-muted',
+  tomorrow: 'text-secondary',
+  thisWeek: 'text-secondary',
   default: 'text-foreground-muted',
 } as const
 
@@ -71,7 +70,7 @@ export function TodoCardV2({ todo, onClick }: TodoCardV2Props) {
     }
     if (daysUntilExpiry <= 7) {
       return {
-        text: `${daysUntilExpiry}D Left`,
+        text: t('card.daysLeft', { days: daysUntilExpiry }),
         color: STATUS_COLORS.thisWeek,
       }
     }
@@ -159,15 +158,23 @@ export function TodoCardV2({ todo, onClick }: TodoCardV2Props) {
       onClick={handleCardClick}
       onKeyDown={handleKeyDown}
       aria-label={`Todo item: ${todo.product_name}`}
-      className="flex flex-col gap-2 shadow-xs shadow-primary-50 border border-gray-100 rounded-2xl hover:bg-white md:hover:shadow-lg md:hover:shadow-primary-400/50 md:hover:-translate-y-0.5 transition-all duration-400 cursor-pointer overflow-hidden"
+      className="flex flex-col gap-2 shadow-xs shadow-primary-50 border border-gray-100 rounded-2xl bg-white sm:hover:shadow-lg sm:hover:shadow-primary-400/50 sm:hover:-translate-y-0.5 transition-all duration-400 cursor-pointer overflow-hidden"
     >
-      <div className="w-full text-left flex items-center justify-between  group px-4 py-6">
+      <div
+        className={cn(
+          'w-full text-left flex items-center justify-between group px-4 py-6 border-t-4',
+          daysUntilExpiry <= 7 && 'border-secondary',
+          isExpiring && 'border-primary',
+          isExpiringToday && 'border-primary',
+          isExpiringTomorrow && 'border-secondary',
+        )}
+      >
         {/* Card content */}
-        <div className="flex items-center gap-3 justify-between w-full">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 justify-between w-full">
           {/* Left section: Product info */}
           <div className="flex-1 min-w-0 flex flex-col gap-4">
             {/* Product name + status badge */}
-            <div className="flex items-center gap-4 flex-wrap">
+            <div className="flex gap-4 flex-wrap flex-col-reverse sm:flex-row">
               <Typography className="font-heading" variant="h4">
                 {todo.product_name}
               </Typography>
@@ -176,7 +183,7 @@ export function TodoCardV2({ todo, onClick }: TodoCardV2Props) {
                 variant="small"
                 className={cn(
                   statusBadge ? statusBadge.color : 'text-gray-600',
-                  'flex items-center gap-1',
+                  'flex items-center gap-1 text-xs sm:text-sm',
                 )}
               >
                 <Calendar className="h-3 w-3" />
@@ -237,25 +244,25 @@ export function TodoCardV2({ todo, onClick }: TodoCardV2Props) {
 
           {/* Right section: Action button + chevron */}
           <div className="flex items-center gap-2">
-            <div className="flex flex-col items-end gap-0.5">
-              <Typography variant="extraSmall" className="text-slate-400 font-heading">
+            <div className="flex sm:flex-col sm:items-end items-center gap-1">
+              <Typography variant="extraSmall" className="text-slate-400">
                 {t('card.suggested')}
               </Typography>
+              <span className="bg-slate-400 w-1 h-1 rounded-full sm:hidden"></span>
 
               <Typography
-                variant="small"
+                variant="extraSmall"
                 className={cn(
                   'flex items-center gap-1',
-                  actionButton.variant === 'destructive' && 'text-red-500',
-                  actionButton.variant === 'outline' && 'text-primary-900',
-                  actionButton.variant === 'ghost' && ' text-gray-900 ',
+                  // actionButton.variant === 'destructive' && 'text-primary',
+                  // actionButton.variant === 'outline' && 'text-primary',
+                  // actionButton.variant === 'ghost' && ' text-gray-900 '
                 )}
               >
-                {actionButton.icon && <actionButton.icon className="h-3 w-3" />}
+                {actionButton.icon && <actionButton.icon className="h-3 w-3 hidden sm:block" />}
                 {actionButton.text}
               </Typography>
             </div>
-            <ChevronRight className="h-4 w-4 text-gray-300 md:group-hover:scale-125 transition-transform duration-300" />
           </div>
         </div>
       </div>
