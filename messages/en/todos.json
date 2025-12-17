@@ -180,18 +180,28 @@
       "batchNumberTooLong": "Batch number must be less than {max} characters",
       "batchNumberInvalid": "Batch number can only contain letters, numbers, hyphens, underscores, and spaces",
       "expiryRequired": "Expiry date is required",
+      "expiryDateRequired": "Expiry date is required",
       "expiryTooOld": "Expiry date cannot be more than {years} years in the past",
+      "expiryDateTooFarPast": "Expiry date cannot be more than {years} years in the past",
       "expiryTooFuture": "Expiry date cannot be more than {years} years in the future",
+      "expiryDateTooFarFuture": "Expiry date cannot be more than {years} years in the future",
       "quantityPositive": "Quantity must be 0 or greater",
+      "quantityNegative": "Quantity cannot be negative",
       "quantityWhole": "Quantity must be a whole number",
+      "quantityInteger": "Quantity must be a whole number",
       "costPricePositive": "Cost price must be 0 or greater",
+      "costPriceNegative": "Cost price cannot be negative",
       "sellingPricePositive": "Selling price must be 0 or greater",
-      "priceMax": "Prices cannot exceed €{max}"
+      "sellingPriceNegative": "Selling price cannot be negative",
+      "priceMax": "Prices cannot exceed €{max}",
+      "priceExceedsMax": "Prices cannot exceed €{max}"
     },
     "error": {
       "invalidData": "Invalid data: Batch number may already exist or contain invalid characters",
       "updateFailed": "Update failed: {error}",
-      "unexpected": "An unexpected error occurred while updating the batch"
+      "unexpected": "An unexpected error occurred while updating the batch",
+      "batchNotFound": "This batch no longer exists. It may have been deleted or you may not have permission to access it.",
+      "batchDeleted": "This batch was deleted during the update. The page will refresh automatically."
     },
     "status": {
       "expired": "Expired",

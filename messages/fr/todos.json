@@ -180,18 +180,28 @@
       "batchNumberTooLong": "Le numéro de lot doit contenir moins de {max} caractères",
       "batchNumberInvalid": "Le numéro de lot ne peut contenir que des lettres, chiffres, traits d'union, underscores et espaces",
       "expiryRequired": "La date d'expiration est requise",
+      "expiryDateRequired": "La date d'expiration est requise",
       "expiryTooOld": "La date d'expiration ne peut pas être plus de {years} ans dans le passé",
+      "expiryDateTooFarPast": "La date d'expiration ne peut pas être plus de {years} ans dans le passé",
       "expiryTooFuture": "La date d'expiration ne peut pas être plus de {years} ans dans le futur",
+      "expiryDateTooFarFuture": "La date d'expiration ne peut pas être plus de {years} ans dans le futur",
       "quantityPositive": "La quantité doit être 0 ou plus",
+      "quantityNegative": "La quantité ne peut pas être négative",
       "quantityWhole": "La quantité doit être un nombre entier",
+      "quantityInteger": "La quantité doit être un nombre entier",
       "costPricePositive": "Le prix de revient doit être 0 ou plus",
+      "costPriceNegative": "Le prix de revient ne peut pas être négatif",
       "sellingPricePositive": "Le prix de vente doit être 0 ou plus",
-      "priceMax": "Les prix ne peuvent pas dépasser €{max}"
+      "sellingPriceNegative": "Le prix de vente ne peut pas être négatif",
+      "priceMax": "Les prix ne peuvent pas dépasser €{max}",
+      "priceExceedsMax": "Les prix ne peuvent pas dépasser €{max}"
     },
     "error": {
       "invalidData": "Données invalides : Le numéro de lot existe peut-être déjà ou contient des caractères invalides",
       "updateFailed": "Échec de la mise à jour : {error}",
-      "unexpected": "Une erreur inattendue s'est produite lors de la mise à jour du lot"
+      "unexpected": "Une erreur inattendue s'est produite lors de la mise à jour du lot",
+      "batchNotFound": "Ce lot n'existe plus. Il a peut-être été supprimé ou vous n'avez peut-être pas la permission d'y accéder.",
+      "batchDeleted": "Ce lot a été supprimé pendant la mise à jour. La page se rafraîchira automatiquement."
     },
     "status": {
       "expired": "Expiré",

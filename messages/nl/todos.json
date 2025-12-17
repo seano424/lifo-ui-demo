@@ -180,18 +180,28 @@
       "batchNumberTooLong": "Batchnummer moet minder dan {max} tekens bevatten",
       "batchNumberInvalid": "Batchnummer mag alleen letters, cijfers, koppeltekens, underscores en spaties bevatten",
       "expiryRequired": "Vervaldatum is verplicht",
+      "expiryDateRequired": "Vervaldatum is verplicht",
       "expiryTooOld": "Vervaldatum kan niet meer dan {years} jaar in het verleden liggen",
+      "expiryDateTooFarPast": "Vervaldatum kan niet meer dan {years} jaar in het verleden liggen",
       "expiryTooFuture": "Vervaldatum kan niet meer dan {years} jaar in de toekomst liggen",
+      "expiryDateTooFarFuture": "Vervaldatum kan niet meer dan {years} jaar in de toekomst liggen",
       "quantityPositive": "Aantal moet 0 of hoger zijn",
+      "quantityNegative": "Aantal kan niet negatief zijn",
       "quantityWhole": "Aantal moet een heel getal zijn",
+      "quantityInteger": "Aantal moet een heel getal zijn",
       "costPricePositive": "Kostprijs moet 0 of hoger zijn",
+      "costPriceNegative": "Kostprijs kan niet negatief zijn",
       "sellingPricePositive": "Verkoopprijs moet 0 of hoger zijn",
-      "priceMax": "Prijzen kunnen niet meer dan €{max} bedragen"
+      "sellingPriceNegative": "Verkoopprijs kan niet negatief zijn",
+      "priceMax": "Prijzen kunnen niet meer dan €{max} bedragen",
+      "priceExceedsMax": "Prijzen kunnen niet meer dan €{max} bedragen"
     },
     "error": {
       "invalidData": "Ongeldige gegevens: Batchnummer bestaat mogelijk al of bevat ongeldige tekens",
       "updateFailed": "Update mislukt: {error}",
-      "unexpected": "Er is een onverwachte fout opgetreden bij het bijwerken van de batch"
+      "unexpected": "Er is een onverwachte fout opgetreden bij het bijwerken van de batch",
+      "batchNotFound": "Deze batch bestaat niet meer. Deze is mogelijk verwijderd of u heeft geen toestemming om deze te openen.",
+      "batchDeleted": "Deze batch is verwijderd tijdens de update. De pagina wordt automatisch ververst."
     },
     "status": {
       "expired": "Verlopen",
