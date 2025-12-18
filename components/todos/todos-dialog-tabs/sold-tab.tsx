@@ -25,7 +25,7 @@ export function SoldTab({ selectedBatch, onClose }: SoldTabProps) {
   const { executeSold, isMarkingSold } = useBatchActionRPC(activeStoreId || undefined)
   const { isMobile } = useMediaQuery()
 
-  // Sale timing options
+  // Sale timing options (values match database enum: just-now, today, yesterday, this-week, custom)
   const SALE_TIMING_OPTIONS = [
     { id: 'just-now', label: t('sold.timing.justNow') },
     { id: 'today', label: t('sold.timing.today') },
@@ -59,10 +59,13 @@ export function SoldTab({ selectedBatch, onClose }: SoldTabProps) {
   // Handle sold execution
   const handleSoldAction = async () => {
     try {
+      const timingLabel =
+        SALE_TIMING_OPTIONS.find(opt => opt.id === soldTiming)?.label || soldTiming
       const params = {
         batchId: selectedBatch.batch_id || '',
         quantity: soldQuantity,
-        notes: `Marked ${soldQuantity} units as sold (${SALE_TIMING_OPTIONS.find(opt => opt.id === soldTiming)?.label}) - ${selectedBatch.ai_recommendation || ''}`,
+        saleTiming: soldTiming, // Pass directly - values already match database enum
+        notes: `Marked ${soldQuantity} units as sold (${timingLabel}) - ${selectedBatch.ai_recommendation || ''}`,
         recommendedAction: isValidRecommendedAction(selectedBatch.ai_recommendation)
           ? selectedBatch.ai_recommendation
           : undefined,

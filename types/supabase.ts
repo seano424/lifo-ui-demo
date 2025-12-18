@@ -470,6 +470,7 @@ export type Database = {
           batch_initial_quantity: number | null
           created_at: string
           discount_percentage: number | null
+          dismissal_reason: string | null
           disposal_reason: string | null
           donation_recipient_id: string | null
           entry_id: string
@@ -478,6 +479,8 @@ export type Database = {
           performed_by: string | null
           quantity_affected: number | null
           recommended_action: Database["public"]["Enums"]["action_type"] | null
+          sale_occurred_at: string | null
+          sale_timing: string | null
           store_id: string | null
           total_original_value: number | null
           total_recovered_value: number | null
@@ -491,6 +494,7 @@ export type Database = {
           batch_initial_quantity?: number | null
           created_at?: string
           discount_percentage?: number | null
+          dismissal_reason?: string | null
           disposal_reason?: string | null
           donation_recipient_id?: string | null
           entry_id?: string
@@ -499,6 +503,8 @@ export type Database = {
           performed_by?: string | null
           quantity_affected?: number | null
           recommended_action?: Database["public"]["Enums"]["action_type"] | null
+          sale_occurred_at?: string | null
+          sale_timing?: string | null
           store_id?: string | null
           total_original_value?: number | null
           total_recovered_value?: number | null
@@ -512,6 +518,7 @@ export type Database = {
           batch_initial_quantity?: number | null
           created_at?: string
           discount_percentage?: number | null
+          dismissal_reason?: string | null
           disposal_reason?: string | null
           donation_recipient_id?: string | null
           entry_id?: string
@@ -520,6 +527,8 @@ export type Database = {
           performed_by?: string | null
           quantity_affected?: number | null
           recommended_action?: Database["public"]["Enums"]["action_type"] | null
+          sale_occurred_at?: string | null
+          sale_timing?: string | null
           store_id?: string | null
           total_original_value?: number | null
           total_recovered_value?: number | null
@@ -1233,7 +1242,14 @@ export type Database = {
           days_to_expiry: number | null
           expiry_date: string | null
           hours_since_last_action: number | null
+          last_action_dismissal_reason: string | null
+          last_action_disposal_reason: string | null
+          last_action_notes: string | null
           last_action_quantity: number | null
+          last_action_recipient_id: string | null
+          last_action_recipient_name: string | null
+          last_action_sale_occurred_at: string | null
+          last_action_sale_timing: string | null
           last_action_time: string | null
           last_action_type: Database["public"]["Enums"]["action_type"] | null
           last_discount_percent: number | null
@@ -1258,7 +1274,15 @@ export type Database = {
           urgency_level: string | null
           view_refreshed_at: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "batch_actions_donation_recipient_id_fkey"
+            columns: ["last_action_recipient_id"]
+            isOneToOne: false
+            referencedRelation: "donation_recipients"
+            referencedColumns: ["recipient_id"]
+          },
+        ]
       }
       expiring_products: {
         Row: {
@@ -2369,6 +2393,8 @@ export type Database = {
           p_notes?: string
           p_quantity_sold: number
           p_recommended_action?: string
+          p_sale_occurred_at?: string
+          p_sale_timing?: string
           p_user_id: string
         }
         Returns: Json
@@ -3207,110 +3233,193 @@ export type Database = {
           total_active_count: number
         }[]
       }
-      get_todos_with_counts: {
-        Args: {
-          p_filters?: Json
-          p_limit?: number
-          p_offset?: number
-          p_store_id: string
-        }
-        Returns: {
-          ai_calculated_at: string
-          ai_recommendation: string
-          available_quantity: number
-          batch_id: string
-          batch_number: string
-          batch_status: string
-          completed_count: number
-          completion_status: string
-          composite_score: number
-          cost_price: number
-          current_quantity: number
-          current_selling_price: number
-          current_total_value: number
-          days_to_expiry: number
-          expired_count: number
-          expiring_count: number
-          expiry_date: string
-          hours_since_last_action: number
-          in_progress_count: number
-          last_action_quantity: number
-          last_action_time: string
-          last_action_type: Database["public"]["Enums"]["action_type"]
-          last_discount_percent: number
-          lifecycle_status: string
-          pending_count: number
-          potential_loss_value: number
-          potential_revenue_value: number
-          priority_order: number
-          product_brand: string
-          product_name: string
-          profit_margin: number
-          profit_margin_percent: number
-          selling_price: number
-          store_id: string
-          todo_state: string
-          total_actions_ever: number
-          total_count: number
-          total_discounted_quantity: number
-          total_disposed_quantity: number
-          total_donated_quantity: number
-          total_ignored_quantity: number
-          total_sold_quantity: number
-          unit_price: number
-          urgency_level: string
-          view_refreshed_at: string
-        }[]
-      }
-      get_todos_with_filters: {
-        Args: {
-          p_filters: Json
-          p_limit: number
-          p_offset: number
-          p_store_id: string
-        }
-        Returns: {
-          ai_calculated_at: string
-          ai_recommendation: string
-          available_quantity: number
-          batch_id: string
-          batch_number: string
-          batch_status: string
-          completion_status: string
-          composite_score: number
-          cost_price: number
-          current_quantity: number
-          current_selling_price: number
-          current_total_value: number
-          days_to_expiry: number
-          expiry_date: string
-          hours_since_last_action: number
-          last_action_quantity: number
-          last_action_time: string
-          last_action_type: Database["public"]["Enums"]["action_type"]
-          last_discount_percent: number
-          lifecycle_status: string
-          potential_loss_value: number
-          potential_revenue_value: number
-          priority_order: number
-          product_brand: string
-          product_name: string
-          profit_margin: number
-          profit_margin_percent: number
-          selling_price: number
-          store_id: string
-          todo_state: string
-          total_actions_ever: number
-          total_discounted_quantity: number
-          total_disposed_quantity: number
-          total_donated_quantity: number
-          total_ignored_quantity: number
-          total_sold_quantity: number
-          unit_price: number
-          urgency_level: string
-          view_refreshed_at: string
-        }[]
-      }
+      get_todos_with_counts:
+        | {
+            Args: {
+              p_filters?: Json
+              p_limit?: number
+              p_offset?: number
+              p_store_id: string
+            }
+            Returns: {
+              ai_calculated_at: string
+              ai_recommendation: string
+              available_quantity: number
+              batch_id: string
+              batch_number: string
+              batch_status: string
+              completed_count: number
+              completion_status: string
+              composite_score: number
+              cost_price: number
+              current_quantity: number
+              current_selling_price: number
+              current_total_value: number
+              days_to_expiry: number
+              expired_count: number
+              expiring_count: number
+              expiry_date: string
+              hours_since_last_action: number
+              in_progress_count: number
+              last_action_dismissal_reason: string
+              last_action_disposal_reason: string
+              last_action_notes: string
+              last_action_quantity: number
+              last_action_recipient_id: string
+              last_action_recipient_name: string
+              last_action_sale_occurred_at: string
+              last_action_sale_timing: string
+              last_action_time: string
+              last_action_type: Database["public"]["Enums"]["action_type"]
+              last_discount_percent: number
+              lifecycle_status: string
+              pending_count: number
+              potential_loss_value: number
+              potential_revenue_value: number
+              priority_order: number
+              product_brand: string
+              product_name: string
+              profit_margin: number
+              profit_margin_percent: number
+              selling_price: number
+              store_id: string
+              todo_state: string
+              total_actions_ever: number
+              total_count: number
+              total_discounted_quantity: number
+              total_disposed_quantity: number
+              total_donated_quantity: number
+              total_ignored_quantity: number
+              total_sold_quantity: number
+              unit_price: number
+              urgency_level: string
+              view_refreshed_at: string
+            }[]
+          }
+        | {
+            Args: {
+              p_completion_statuses?: string[]
+              p_limit?: number
+              p_offset?: number
+              p_store_id: string
+              p_todo_states?: string[]
+            }
+            Returns: Json
+          }
+      get_todos_with_filters:
+        | {
+            Args: {
+              p_filters?: Json
+              p_limit?: number
+              p_offset?: number
+              p_store_id: string
+            }
+            Returns: {
+              ai_calculated_at: string
+              ai_recommendation: string
+              available_quantity: number
+              batch_id: string
+              batch_number: string
+              batch_status: string
+              completion_status: string
+              composite_score: number
+              cost_price: number
+              current_quantity: number
+              current_selling_price: number
+              current_total_value: number
+              days_to_expiry: number
+              expiry_date: string
+              hours_since_last_action: number
+              last_action_dismissal_reason: string
+              last_action_disposal_reason: string
+              last_action_notes: string
+              last_action_quantity: number
+              last_action_recipient_id: string
+              last_action_recipient_name: string
+              last_action_sale_occurred_at: string
+              last_action_sale_timing: string
+              last_action_time: string
+              last_action_type: Database["public"]["Enums"]["action_type"]
+              last_discount_percent: number
+              potential_loss_value: number
+              potential_revenue_value: number
+              priority_order: number
+              product_brand: string
+              product_name: string
+              profit_margin: number
+              profit_margin_percent: number
+              selling_price: number
+              store_id: string
+              todo_state: string
+              total_actions_ever: number
+              total_discounted_quantity: number
+              total_disposed_quantity: number
+              total_donated_quantity: number
+              total_ignored_quantity: number
+              total_sold_quantity: number
+              unit_price: number
+              urgency_level: string
+              view_refreshed_at: string
+            }[]
+          }
+        | {
+            Args: {
+              p_completion_statuses?: string[]
+              p_limit?: number
+              p_offset?: number
+              p_store_id: string
+              p_todo_states?: string[]
+            }
+            Returns: {
+              ai_calculated_at: string
+              ai_recommendation: string
+              available_quantity: number
+              batch_id: string
+              batch_number: string
+              batch_status: string
+              completion_status: string
+              composite_score: number
+              cost_price: number
+              current_quantity: number
+              current_selling_price: number
+              current_total_value: number
+              days_to_expiry: number
+              expiry_date: string
+              hours_since_last_action: number
+              last_action_dismissal_reason: string
+              last_action_disposal_reason: string
+              last_action_notes: string
+              last_action_quantity: number
+              last_action_recipient_id: string
+              last_action_recipient_name: string
+              last_action_sale_occurred_at: string
+              last_action_sale_timing: string
+              last_action_time: string
+              last_action_type: Database["public"]["Enums"]["action_type"]
+              last_discount_percent: number
+              lifecycle_status: string
+              potential_loss_value: number
+              potential_revenue_value: number
+              priority_order: number
+              product_brand: string
+              product_name: string
+              profit_margin: number
+              profit_margin_percent: number
+              selling_price: number
+              store_id: string
+              todo_state: string
+              total_actions_ever: number
+              total_count: number
+              total_discounted_quantity: number
+              total_disposed_quantity: number
+              total_donated_quantity: number
+              total_ignored_quantity: number
+              total_sold_quantity: number
+              unit_price: number
+              urgency_level: string
+              view_refreshed_at: string
+            }[]
+          }
       get_urgent_todos_count: { Args: { p_store_id: string }; Returns: number }
       get_user_by_username: { Args: { p_username: string }; Returns: Json }
       get_user_complete_profile: {
