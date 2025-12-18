@@ -263,8 +263,8 @@
     "resetSort": "Sortering resetten",
     "sortBy": "Sorteren op",
     "sortDirection": "Sorteerrichting",
-    "ascending": "Oplopend",
-    "descending": "Aflopend",
+    "ascending": "Asc",
+    "descending": "Desc",
     "expiry": {
       "title": "Vervalperiode",
       "all": "Alle dagen",

@@ -93,3 +93,64 @@ export const isActionType = (value: string): value is TodoActionType => {
 export const isBatchStatus = (value: string): value is BatchStatus => {
   return ['active', 'expired'].includes(value)
 }
+
+// Sort Configuration
+export interface SortFieldOption {
+  value: string
+  label: string
+  description: string
+  emoji: string
+  icon: string
+}
+
+export const sortFieldOptions: SortFieldOption[] = [
+  {
+    value: 'urgency',
+    label: 'Urgency',
+    description: 'Priority level',
+    emoji: '⚡',
+    icon: 'Zap',
+  },
+  {
+    value: 'expiry_date',
+    label: 'Expiry Date',
+    description: 'When items expire',
+    emoji: '📅',
+    icon: 'Calendar',
+  },
+  {
+    value: 'current_quantity',
+    label: 'Current Quantity',
+    description: 'Amount in stock',
+    emoji: '📦',
+    icon: 'Package',
+  },
+  {
+    value: 'potential_loss',
+    label: 'Potential Loss',
+    description: 'Financial impact',
+    emoji: '💰',
+    icon: 'DollarSign',
+  },
+  {
+    value: 'alphabetical',
+    label: 'Alphabetical',
+    description: 'Product name A-Z',
+    emoji: '🔤',
+    icon: 'ArrowDownAZ',
+  },
+  {
+    value: 'action_date',
+    label: 'Action Date',
+    description: 'When action taken',
+    emoji: '📝',
+    icon: 'ClipboardList',
+  },
+  {
+    value: 'effectiveness',
+    label: 'Effectiveness',
+    description: 'Action success rate',
+    emoji: '📊',
+    icon: 'TrendingUp',
+  },
+]

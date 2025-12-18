@@ -1,12 +1,10 @@
 'use client'
 
-import { useCallback, useState } from 'react'
-import { ArrowUpDown } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { useCallback } from 'react'
 import { useTranslations } from 'next-intl'
 import { TodoFilterDropdown } from './todo-filter-dropdown'
 import { TodoFilterSummary } from './todo-filter-summary'
-import { UnifiedSortModal } from './unified-sort-modal'
+import { TodoSortDropdown } from './todo-sort-dropdown'
 import { TodoSearchBar } from './todo-search-bar'
 import type { TodoFiltersState } from './types'
 
@@ -30,7 +28,6 @@ export function UnifiedSearchFiltersBarV2({
   onFiltersChange,
 }: UnifiedSearchFiltersBarV2Props) {
   const t = useTranslations('todos')
-  const [showSort, setShowSort] = useState(false)
 
   const handleClearFilters = useCallback(() => {
     onFiltersChange({
@@ -43,23 +40,29 @@ export function UnifiedSearchFiltersBarV2({
     })
   }, [filters, onFiltersChange])
 
+  const handleResetSort = useCallback(() => {
+    onFiltersChange({
+      ...filters,
+      sortConfig: { field: 'urgency', direction: 'desc' },
+    })
+  }, [filters, onFiltersChange])
+
   return (
     <div className="flex flex-col gap-3">
-      {/* Main row: Filter dropdown, Sort button, Search */}
+      {/* Main row: Filter dropdown, Sort dropdown, Search */}
       <div className="flex flex-col md:flex-row md:items-center gap-3">
         <div className="flex items-center gap-3 relative">
-          {/* Filter Dropdown (NEW) */}
+          {/* Filter Dropdown */}
           <TodoFilterDropdown filters={filters} onFiltersChange={onFiltersChange} />
 
-          {/* Sort Button */}
-          <Button
-            variant="outline"
-            onClick={() => setShowSort(true)}
-            className="gap-2 w-full md:w-auto"
-          >
-            <ArrowUpDown className="h-4 w-4" />
-            {t('filters.sortTitle')}
-          </Button>
+          {/* Sort Dropdown */}
+          <TodoSortDropdown
+            sortConfig={filters.sortConfig || { field: 'urgency', direction: 'desc' }}
+            onSortChange={sortConfig => {
+              onFiltersChange({ ...filters, sortConfig })
+            }}
+            onReset={handleResetSort}
+          />
         </div>
 
         {/* Search Input */}
@@ -74,25 +77,8 @@ export function UnifiedSearchFiltersBarV2({
         </div>
       </div>
 
-      {/* Filter Summary (NEW - replaces badge chips) */}
+      {/* Filter Summary */}
       <TodoFilterSummary filters={filters} onClear={handleClearFilters} />
-
-      {/* Sort Modal (EXISTING - unchanged) */}
-      <UnifiedSortModal
-        isOpen={showSort}
-        onClose={() => setShowSort(false)}
-        sortConfig={filters.sortConfig || { field: 'urgency', direction: 'desc' }}
-        onSortChange={sortConfig => {
-          onFiltersChange({ ...filters, sortConfig })
-        }}
-        onReset={() => {
-          onFiltersChange({
-            ...filters,
-            sortConfig: { field: 'urgency', direction: 'desc' },
-          })
-        }}
-        isLoading={false}
-      />
     </div>
   )
 }

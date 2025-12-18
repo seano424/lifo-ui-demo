@@ -263,8 +263,8 @@
     "resetSort": "Reset Sort",
     "sortBy": "Sort by",
     "sortDirection": "Sort direction",
-    "ascending": "Ascending",
-    "descending": "Descending",
+    "ascending": "Asc",
+    "descending": "Desc",
     "expiry": {
       "title": "Expiry Period",
       "all": "All days",

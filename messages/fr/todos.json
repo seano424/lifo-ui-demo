@@ -263,8 +263,8 @@
     "resetSort": "Réinitialiser le tri",
     "sortBy": "Trier par",
     "sortDirection": "Direction du tri",
-    "ascending": "Croissant",
-    "descending": "Décroissant",
+    "ascending": "Asc",
+    "descending": "Desc",
     "expiry": {
       "title": "Période d'expiration",
       "all": "Tous les jours",
