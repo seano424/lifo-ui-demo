@@ -169,7 +169,15 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
       console.error('Failed to update batch:', error)
 
       if (error instanceof Error) {
-        if (error.message.includes('constraint') || error.message.includes('duplicate')) {
+        if (error.message.includes('not found') || error.message.includes('deleted')) {
+          toast.error(
+            error.message.includes('deleted')
+              ? t('details.error.batchDeleted')
+              : t('details.error.batchNotFound'),
+          )
+          // Optionally close the dialog since the batch no longer exists
+          setTimeout(() => onClose(), 2000)
+        } else if (error.message.includes('constraint') || error.message.includes('duplicate')) {
           toast.error(t('details.error.invalidData'))
         } else if (error.message.includes('network') || error.message.includes('fetch')) {
           toast.error(tErrors('networkError'))

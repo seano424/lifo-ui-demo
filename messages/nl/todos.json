@@ -8,7 +8,8 @@
     "inProgress": "Bezig",
     "expiring": "Verlopen binnenkort",
     "expired": "Verlopen",
-    "completed": "Voltooid"
+    "completed": "Voltooid",
+    "resolved": "Opgelost"
   },
   "pending": {
     "errorLoading": "Fout bij het laden van taken in afwachting",
@@ -75,10 +76,15 @@
     "tapToReview": "Bekijk en los op",
     "tapToTakeAction": "Onderneem actie",
     "tapToViewDetails": "Bekijk details",
+    "completed": "Voltooid",
     "remaining": "over",
     "donatedAction": "gedoneerd",
     "disposedAction": "weggegooid",
     "units": "eenheden",
+    "unit": "eenheid",
+    "soldUnits": "verkocht",
+    "revenue": "opbrengst",
+    "total": "totaal",
     "discountApplied": "korting toegepast",
     "discountAppliedToUnits": "{count, plural, =1 {korting toegepast op 1 eenheid} other {korting toegepast op # eenheden}}"
   },
@@ -98,7 +104,11 @@
     "sell": "Verkopen",
     "dispose": "Weggooien",
     "monitorStock": "Voorraad monitoren",
-    "details": "Details"
+    "details": "Details",
+    "sold": "Verkocht",
+    "donated": "Gedoneerd",
+    "disposed": "Weggegooid",
+    "soldAtDiscount": "Verkocht met {percent}% korting"
   },
   "bottomSheet": {
     "units": "{count} eenheden"
@@ -173,19 +183,21 @@
       "batchNumberRequired": "Batchnummer is verplicht",
       "batchNumberTooLong": "Batchnummer moet minder dan {max} tekens bevatten",
       "batchNumberInvalid": "Batchnummer mag alleen letters, cijfers, koppeltekens, underscores en spaties bevatten",
-      "expiryRequired": "Vervaldatum is verplicht",
-      "expiryTooOld": "Vervaldatum kan niet meer dan {years} jaar in het verleden liggen",
-      "expiryTooFuture": "Vervaldatum kan niet meer dan {years} jaar in de toekomst liggen",
-      "quantityPositive": "Aantal moet 0 of hoger zijn",
-      "quantityWhole": "Aantal moet een heel getal zijn",
-      "costPricePositive": "Kostprijs moet 0 of hoger zijn",
-      "sellingPricePositive": "Verkoopprijs moet 0 of hoger zijn",
-      "priceMax": "Prijzen kunnen niet meer dan €{max} bedragen"
+      "expiryDateRequired": "Vervaldatum is verplicht",
+      "expiryDateTooFarPast": "Vervaldatum kan niet meer dan {years} jaar in het verleden liggen",
+      "expiryDateTooFarFuture": "Vervaldatum kan niet meer dan {years} jaar in de toekomst liggen",
+      "quantityNegative": "Aantal kan niet negatief zijn",
+      "quantityInteger": "Aantal moet een heel getal zijn",
+      "costPriceNegative": "Kostprijs kan niet negatief zijn",
+      "sellingPriceNegative": "Verkoopprijs kan niet negatief zijn",
+      "priceExceedsMax": "Prijzen kunnen niet meer dan €{max} bedragen"
     },
     "error": {
       "invalidData": "Ongeldige gegevens: Batchnummer bestaat mogelijk al of bevat ongeldige tekens",
       "updateFailed": "Update mislukt: {error}",
-      "unexpected": "Er is een onverwachte fout opgetreden bij het bijwerken van de batch"
+      "unexpected": "Er is een onverwachte fout opgetreden bij het bijwerken van de batch",
+      "batchNotFound": "Deze batch bestaat niet meer. Deze is mogelijk verwijderd of u heeft geen toestemming om deze te openen.",
+      "batchDeleted": "Deze batch is verwijderd tijdens de update. De pagina wordt automatisch ververst."
     },
     "status": {
       "expired": "Verlopen",

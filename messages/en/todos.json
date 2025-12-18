@@ -8,7 +8,8 @@
     "inProgress": "In Progress",
     "expiring": "Expiring",
     "expired": "Expired",
-    "completed": "Completed"
+    "completed": "Completed",
+    "resolved": "Resolved"
   },
   "pending": {
     "errorLoading": "Error loading pending todos",
@@ -75,10 +76,15 @@
     "tapToReview": "Review & resolve",
     "tapToTakeAction": "Take action",
     "tapToViewDetails": "View details",
+    "completed": "Completed",
     "remaining": "remaining",
     "donatedAction": "donated",
     "disposedAction": "disposed",
     "units": "units",
+    "unit": "unit",
+    "soldUnits": "sold",
+    "revenue": "revenue",
+    "total": "total",
     "discountApplied": "discount applied",
     "discountAppliedToUnits": "{count, plural, =1 {discount applied to 1 unit} other {discount applied to # units}}"
   },
@@ -98,7 +104,11 @@
     "sell": "Sell",
     "dispose": "Dispose",
     "monitorStock": "Monitor Stock",
-    "details": "Details"
+    "details": "Details",
+    "sold": "Sold",
+    "donated": "Donated",
+    "disposed": "Disposed",
+    "soldAtDiscount": "Sold at {percent}% discount"
   },
   "bottomSheet": {
     "units": "{count, plural, =0 {0 units} =1 {1 unit} other {# units}}"
@@ -173,19 +183,21 @@
       "batchNumberRequired": "Batch number is required",
       "batchNumberTooLong": "Batch number must be less than {max} characters",
       "batchNumberInvalid": "Batch number can only contain letters, numbers, hyphens, underscores, and spaces",
-      "expiryRequired": "Expiry date is required",
-      "expiryTooOld": "Expiry date cannot be more than {years} years in the past",
-      "expiryTooFuture": "Expiry date cannot be more than {years} years in the future",
-      "quantityPositive": "Quantity must be 0 or greater",
-      "quantityWhole": "Quantity must be a whole number",
-      "costPricePositive": "Cost price must be 0 or greater",
-      "sellingPricePositive": "Selling price must be 0 or greater",
-      "priceMax": "Prices cannot exceed €{max}"
+      "expiryDateRequired": "Expiry date is required",
+      "expiryDateTooFarPast": "Expiry date cannot be more than {years} years in the past",
+      "expiryDateTooFarFuture": "Expiry date cannot be more than {years} years in the future",
+      "quantityNegative": "Quantity cannot be negative",
+      "quantityInteger": "Quantity must be a whole number",
+      "costPriceNegative": "Cost price cannot be negative",
+      "sellingPriceNegative": "Selling price cannot be negative",
+      "priceExceedsMax": "Prices cannot exceed €{max}"
     },
     "error": {
       "invalidData": "Invalid data: Batch number may already exist or contain invalid characters",
       "updateFailed": "Update failed: {error}",
-      "unexpected": "An unexpected error occurred while updating the batch"
+      "unexpected": "An unexpected error occurred while updating the batch",
+      "batchNotFound": "This batch no longer exists. It may have been deleted or you may not have permission to access it.",
+      "batchDeleted": "This batch was deleted during the update. The page will refresh automatically."
     },
     "status": {
       "expired": "Expired",
