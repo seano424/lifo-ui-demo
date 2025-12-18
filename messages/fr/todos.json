@@ -250,9 +250,10 @@
   },
   "filters": {
     "title": "Filtrer",
-    "filtersTitle": "Filtres",
+    "filtersTitle": "{count, plural, =0 {Ajouter un filtre} other {Filtres (#)}}",
     "sortTitle": "Trier",
-    "searchPlaceholder": "Rechercher des produits...",
+    "noFiltersApplied": "Aucun filtre appliqué",
+    "searchPlaceholder": "Rechercher des articles...",
     "activeFilters": "Filtres actifs",
     "clearAll": "Effacer tous les filtres",
     "apply": "Appliquer",

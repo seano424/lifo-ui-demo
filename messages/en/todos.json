@@ -250,9 +250,10 @@
   },
   "filters": {
     "title": "Filter",
-    "filtersTitle": "Filters",
+    "filtersTitle": "{count, plural, =0 {Add filter} other {Filters (#)}}",
     "sortTitle": "Sort",
-    "searchPlaceholder": "Search products...",
+    "noFiltersApplied": "No filters applied",
+    "searchPlaceholder": "Search articles...",
     "activeFilters": "Active filters applied",
     "clearAll": "Clear all filters",
     "apply": "Apply",
