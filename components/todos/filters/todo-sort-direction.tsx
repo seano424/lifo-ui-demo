@@ -6,6 +6,11 @@ import { sortFieldOptions } from '@/lib/todo-filter-config'
 import type { SortConfig, SortDirection } from './types'
 import { useTranslations } from 'next-intl'
 
+// Helper to convert snake_case to camelCase for translation keys
+const toCamelCase = (str: string): string => {
+  return str.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase())
+}
+
 interface TodoSortDirectionProps {
   sortConfig: SortConfig
   onDirectionChange: (direction: SortDirection) => void
@@ -20,6 +25,8 @@ export function TodoSortDirection({
   const selectedOption = sortFieldOptions.find(opt => opt.value === sortConfig.field)
   const isDefaultSort = sortConfig.field === 'urgency' && sortConfig.direction === 'desc'
   const t = useTranslations('todos')
+  const tSort = useTranslations('todos.sort')
+  const translationKey = toCamelCase(sortConfig.field)
   return (
     <div className="flex-1 p-3 bg-white">
       <div className="flex items-center justify-between mb-3">
@@ -116,8 +123,12 @@ export function TodoSortDirection({
           <div className="flex items-center gap-2 text-sm">
             <span className="text-lg">{selectedOption?.emoji}</span>
             <div className="flex-1 min-w-0">
-              <div className="font-medium text-violet-900 truncate">{selectedOption?.label}</div>
-              <div className="text-xs text-violet-700">{selectedOption?.description}</div>
+              <div className="font-medium text-violet-900 truncate">
+                {tSort(`${translationKey}.label`)}
+              </div>
+              <div className="text-xs text-violet-700">
+                {tSort(`${translationKey}.description`)}
+              </div>
             </div>
           </div>
         </div>

@@ -295,7 +295,7 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
         )}
 
         <div ref={scrollContainerRef} className="overflow-x-auto scrollbar-none">
-          <div className="flex gap-2 sm:gap-4 min-w-max px-2 sm:px-0">
+          <div className="flex gap-2 sm:gap-8 min-w-max px-2 sm:px-0">
             {tabs.map((tab, index) => (
               <Button
                 key={tab.id}
@@ -311,7 +311,7 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
                   activeTab === tab.id ? 'text-primary' : 'text-muted-foreground/90',
                 )}
               >
-                <span className="text-xs sm:text-sm font-medium truncate max-w-[80px] sm:max-w-none">
+                <span className="text-sm sm:text-base font-medium truncate max-w-[80px] sm:max-w-none">
                   {tab.label}
                 </span>
                 <Badge
@@ -326,9 +326,9 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
         </div>
 
         {/* Tab indicator */}
-        <div className="absolute left-0 right-0 bottom-0 h-[3px] bg-border" />
+        <div className="absolute left-0 right-0 bottom-0 h-[2px] bg-border" />
         <div
-          className="absolute bottom-0 h-[3px] bg-primary/85 transition-all duration-300 ease-in-out z-10 rounded-full overflow-hidden"
+          className="absolute bottom-0 h-[2px] bg-primary/85 transition-all duration-300 ease-in-out z-10 rounded-full overflow-hidden"
           style={{
             left: `${indicatorStyle.left}px`,
             width: `${indicatorStyle.width}px`,
