@@ -37,7 +37,7 @@ export function TodoSortDirection({
             onClick={onReset}
             className="text-xs text-violet-600 hover:text-violet-700 font-medium"
           >
-            Reset
+            {t('filters.reset')}
           </button>
         )}
       </div>

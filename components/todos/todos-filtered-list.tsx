@@ -9,6 +9,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { isUrgencyLevel, isActionType, isBatchStatus } from '@/lib/todo-filter-config'
 import type { SortDirection, SortField, TodoFiltersState } from './filters/types'
 import { UnifiedSearchFiltersBarV2 } from './filters/unified-search-filters-bar-v2'
 import { CompletedTabWithCounts } from './todos-main-tabs/completed-tab'
@@ -61,10 +62,26 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
   )
 
   const [filters, setFilters] = useState<TodoFiltersState>(() => {
+    // Validate urgency levels from URL params
+    const validUrgencyLevels = initialFilters?.urgency
+      ?.filter(u => isUrgencyLevel(u))
+      .map(u => u as TodoUrgencyLevel)
+
+    // Validate action types from URL params
+    const validActionTypes = initialFilters?.actionType
+      ?.filter(a => isActionType(a))
+      .map(a => a as TodoActionType)
+
+    // Validate batch status from URL params
+    const validBatchStatus = initialFilters?.batchStatus
+      ?.filter(b => isBatchStatus(b))
+      .map(b => b as BatchStatus)
+
     return {
-      urgency_level: initialFilters?.urgency as TodoUrgencyLevel[] | undefined,
-      action_type: initialFilters?.actionType as TodoActionType[] | undefined,
-      batch_status: initialFilters?.batchStatus as BatchStatus[] | undefined,
+      urgency_level:
+        validUrgencyLevels && validUrgencyLevels.length > 0 ? validUrgencyLevels : undefined,
+      action_type: validActionTypes && validActionTypes.length > 0 ? validActionTypes : undefined,
+      batch_status: validBatchStatus && validBatchStatus.length > 0 ? validBatchStatus : undefined,
       product_name: initialFilters?.productName || undefined,
       sortConfig: initialFilters?.sort
         ? {

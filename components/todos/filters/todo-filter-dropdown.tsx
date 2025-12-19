@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { filterCategories } from '@/lib/todo-filter-config'
@@ -48,27 +48,30 @@ export function TodoFilterDropdown({ filters, onFiltersChange }: TodoFilterDropd
   const dropdownRef = useRef<HTMLDivElement>(null)
   const t = useTranslations('todos')
 
-  // Click outside to close
+  // Click outside to close & Escape key handler
   useEffect(() => {
+    if (!isOpen) return
+
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsOpen(false)
       }
     }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [])
 
-  // Close on Escape
-  useEffect(() => {
     function handleEscape(event: KeyboardEvent) {
       if (event.key === 'Escape') setIsOpen(false)
     }
-    document.addEventListener('keydown', handleEscape)
-    return () => document.removeEventListener('keydown', handleEscape)
-  }, [])
 
-  const filterCount = getActiveFilterCount(filters)
+    document.addEventListener('mousedown', handleClickOutside)
+    document.addEventListener('keydown', handleEscape)
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+      document.removeEventListener('keydown', handleEscape)
+    }
+  }, [isOpen])
+
+  const filterCount = useMemo(() => getActiveFilterCount(filters), [filters])
 
   return (
     <div className="w-full md:w-auto" ref={dropdownRef}>

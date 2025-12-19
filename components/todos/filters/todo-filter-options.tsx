@@ -2,9 +2,15 @@
 
 import { cn } from '@/lib/utils'
 import { Check } from 'lucide-react'
-import { filterCategories, filterOptions } from '@/lib/todo-filter-config'
-import type { BatchStatus, TodoActionType, TodoUrgencyLevel } from '@/lib/queries/todos-rpc'
+import {
+  filterCategories,
+  filterOptions,
+  isUrgencyLevel,
+  isActionType,
+  isBatchStatus,
+} from '@/lib/todo-filter-config'
 import type { TodoFiltersState } from './types'
+import { useTranslations } from 'next-intl'
 
 interface TodoFilterOptionsProps {
   categoryId: string
@@ -17,6 +23,7 @@ export function TodoFilterOptions({
   filters,
   onFiltersChange,
 }: TodoFilterOptionsProps) {
+  const t = useTranslations('todos.filters')
   const category = filterCategories.find(c => c.id === categoryId)
   const options = filterOptions[categoryId] || []
 
@@ -49,29 +56,35 @@ export function TodoFilterOptions({
 
     switch (categoryId) {
       case 'urgency_level': {
+        if (!isUrgencyLevel(value)) {
+          console.error(`Invalid urgency level: ${value}`)
+          return
+        }
         const current = filters.urgency_level || []
-        const isSelected = current.includes(value as TodoUrgencyLevel)
-        const newValue = isSelected
-          ? current.filter(v => v !== value)
-          : [...current, value as TodoUrgencyLevel]
+        const isSelected = current.includes(value)
+        const newValue = isSelected ? current.filter(v => v !== value) : [...current, value]
         newFilters.urgency_level = newValue.length > 0 ? newValue : undefined
         break
       }
       case 'action_type': {
+        if (!isActionType(value)) {
+          console.error(`Invalid action type: ${value}`)
+          return
+        }
         const current = filters.action_type || []
-        const isSelected = current.includes(value as TodoActionType)
-        const newValue = isSelected
-          ? current.filter(v => v !== value)
-          : [...current, value as TodoActionType]
+        const isSelected = current.includes(value)
+        const newValue = isSelected ? current.filter(v => v !== value) : [...current, value]
         newFilters.action_type = newValue.length > 0 ? newValue : undefined
         break
       }
       case 'batch_status': {
+        if (!isBatchStatus(value)) {
+          console.error(`Invalid batch status: ${value}`)
+          return
+        }
         const current = filters.batch_status || []
-        const isSelected = current.includes(value as BatchStatus)
-        const newValue = isSelected
-          ? current.filter(v => v !== value)
-          : [...current, value as BatchStatus]
+        const isSelected = current.includes(value)
+        const newValue = isSelected ? current.filter(v => v !== value) : [...current, value]
         newFilters.batch_status = newValue.length > 0 ? newValue : undefined
         break
       }
@@ -125,7 +138,7 @@ export function TodoFilterOptions({
             onClick={handleClearCategory}
             className="text-xs text-violet-600 hover:text-violet-700 font-medium"
           >
-            Clear
+            {t('clear')}
           </button>
         )}
       </div>
@@ -162,7 +175,7 @@ export function TodoFilterOptions({
                 hasNoSelections ? 'font-medium text-violet-700' : 'text-gray-700',
               )}
             >
-              All
+              {t('all')}
             </span>
           </label>
         )}
