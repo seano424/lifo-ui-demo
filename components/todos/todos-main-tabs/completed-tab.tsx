@@ -137,7 +137,7 @@ export function CompletedTabWithCounts({
 
   if (isError) {
     return (
-      <div className="text-center pb-80 flex flex-col items-center justify-center gap-4">
+      <div className="text-center min-h-screen pt-20 flex flex-col items-center gap-4">
         <Typography variant="p" color="destructive">
           {t('completed.errorLoading')}
         </Typography>
@@ -150,7 +150,7 @@ export function CompletedTabWithCounts({
 
   if (isLoading) {
     return (
-      <div className="text-center pb-80 flex flex-col items-center justify-center gap-4">
+      <div className="text-center min-h-screen pt-20 flex flex-col items-center gap-4">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
         <Typography variant="p" color="muted">
           {t('completed.loading')}
@@ -161,7 +161,7 @@ export function CompletedTabWithCounts({
 
   if (!todos?.length) {
     return (
-      <div className="text-center pb-80 flex flex-col items-center justify-center gap-4">
+      <div className="text-center min-h-screen pt-20 flex flex-col items-center gap-4">
         <div className="text-6xl mb-4">✅</div>
         <Typography variant="h3" color="primary">
           {t('completed.noCompletedHeading')}
