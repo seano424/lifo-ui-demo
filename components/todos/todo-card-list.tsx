@@ -1,12 +1,15 @@
 'use client'
 
 import { TodoActionBottomSheet } from '@/components/todos/todo-action-bottom-sheet'
+import { TodoCardV3 } from '@/components/todos/todo-card-v3'
 import { TodoCardV2 } from '@/components/todos/todo-card-v2'
 import { InfiniteScrollErrorBoundary } from '@/components/ui/error-boundary'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useIntersectionObserver } from '@/hooks/use-intersection-observer'
+import { useStoreSettings } from '@/hooks/use-store-settings'
 import { DEFAULT_ROOT_MARGIN } from '@/lib/constants/todos'
 import type { TodoItem } from '@/lib/queries/todos-rpc'
+import { getCurrencySymbol } from '@/lib/utils/currency'
 import { useTranslations } from 'next-intl'
 import { useEffect, useMemo, useState } from 'react'
 import { Typography } from '../ui/typography'
@@ -36,6 +39,13 @@ export function TodoCardList({
   emptyStateIcon = '📋',
 }: TodoCardListProps) {
   const t = useTranslations('todos')
+
+  // Fetch store settings to get currency (once for all cards)
+  const { data: storeSettings } = useStoreSettings()
+  const currencySymbol = useMemo(
+    () => getCurrencySymbol(storeSettings?.settings?.currency),
+    [storeSettings?.settings?.currency],
+  )
 
   // Bottom sheet state for todo actions
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false)
@@ -170,11 +180,20 @@ export function TodoCardList({
         */}
         <div className="flex flex-col gap-12 scroll-m-96 pb-80">
           {sortedTodos.map(todo => (
-            <TodoCardV2
-              key={todo.batch_id}
-              todo={todo}
-              onClick={() => handleTodoClick(todo.batch_id || '')}
-            />
+            <div key={todo.batch_id}>
+              <TodoCardV3
+                // key={todo.batch_id}
+                todo={todo}
+                currencySymbol={currencySymbol}
+                onClick={() => handleTodoClick(todo.batch_id || '')}
+              />
+              <TodoCardV2
+                // key={todo.batch_id}
+                todo={todo}
+                // currencySymbol={currencySymbol}
+                onClick={() => handleTodoClick(todo.batch_id || '')}
+              />
+            </div>
           ))}
         </div>
 
@@ -207,6 +226,7 @@ export function TodoCardList({
         isOpen={isBottomSheetOpen}
         onClose={handleCloseBottomSheet}
         selectedBatch={selectedBatch}
+        currencySymbol={currencySymbol}
       />
     </InfiniteScrollErrorBoundary>
   )

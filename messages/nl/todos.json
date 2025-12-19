@@ -86,7 +86,9 @@
     "revenue": "opbrengst",
     "total": "totaal",
     "discountApplied": "korting toegepast",
-    "discountAppliedToUnits": "{count, plural, =1 {korting toegepast op 1 eenheid} other {korting toegepast op # eenheden}}"
+    "discountAppliedToUnits": "{count, plural, =1 {korting toegepast op 1 eenheid} other {korting toegepast op # eenheden}}",
+    "unitPrice": "Prijs per eenheid",
+    "totalValue": "Totale waarde"
   },
   "recommendations": {
     "dispose": "Direct weggooien",

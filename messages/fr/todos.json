@@ -86,7 +86,9 @@
     "revenue": "revenu",
     "total": "total",
     "discountApplied": "remise appliquée",
-    "discountAppliedToUnits": "{count, plural, =1 {remise appliquée à 1 unité} other {remise appliquée à # unités}}"
+    "discountAppliedToUnits": "{count, plural, =1 {remise appliquée à 1 unité} other {remise appliquée à # unités}}",
+    "unitPrice": "Prix unitaire",
+    "totalValue": "Valeur totale"
   },
   "recommendations": {
     "dispose": "Éliminer immédiatement",

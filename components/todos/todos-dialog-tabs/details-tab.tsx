@@ -25,10 +25,11 @@ import { useTheme } from 'next-themes'
 
 interface DetailsTabProps {
   selectedBatch: TodoItem
+  currencySymbol?: string
   onClose: () => void
 }
 
-export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
+export function DetailsTab({ selectedBatch, currencySymbol = '€', onClose }: DetailsTabProps) {
   const t = useTranslations('todos')
   const tCommon = useTranslations()
   const tErrors = useTranslations('errors.common')
@@ -62,7 +63,7 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
     (new Date(selectedBatch.expiry_date || '').getTime() - Date.now()) / (1000 * 60 * 60 * 24),
   )
 
-  const formatCurrency = (value: number) => `€${value.toFixed(2)}`
+  const formatCurrency = (value: number) => `${currencySymbol}${value.toFixed(2)}`
   const formatDate = (date: string) => {
     return new Date(date).toLocaleDateString('en-US', {
       month: 'short',
@@ -429,7 +430,7 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
               </Label>
               {isEditing ? (
                 <div className="flex items-center gap-2 w-40">
-                  <span className="text-sm">€</span>
+                  <span className="text-sm">{currencySymbol}</span>
                   <Input
                     id="cost-price"
                     type="number"
@@ -456,7 +457,7 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
               </Label>
               {isEditing ? (
                 <div className="flex items-center gap-2 w-40">
-                  <span className="text-sm">€</span>
+                  <span className="text-sm">{currencySymbol}</span>
                   <Input
                     id="selling-price"
                     type="number"

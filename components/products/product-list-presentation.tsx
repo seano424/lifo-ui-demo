@@ -20,7 +20,9 @@ import {
 import { Typography } from '@/components/ui/typography'
 import { useCategoryTranslation } from '@/hooks/use-category-translation'
 import { useProductActions } from '@/hooks/use-products'
+import { useStoreSettings } from '@/hooks/use-store-settings'
 import type { Product, ProductSort, SortField } from '@/lib/queries/products'
+import { getCurrencySymbol } from '@/lib/utils/currency'
 import {
   ArrowDown,
   ArrowUp,
@@ -118,6 +120,13 @@ export function ProductsListPresentation({
   const t = useTranslations('products')
   const tButtons = useTranslations('buttons')
   const { getCategoryName } = useCategoryTranslation()
+
+  // Fetch store settings to get currency
+  const { data: storeSettings } = useStoreSettings()
+  const currencySymbol = useMemo(
+    () => getCurrencySymbol(storeSettings?.settings?.currency),
+    [storeSettings?.settings?.currency],
+  )
 
   const { deleteProduct, updateProductPrice, isDeleting, isUpdating } = useProductActions()
 
@@ -283,10 +292,12 @@ export function ProductsListPresentation({
                     <TableCell className="text-right">
                       <div>
                         <div className="font-bold text-lg">
-                          €{product.base_selling_price?.toFixed(2) || '0.00'}
+                          {currencySymbol}
+                          {product.base_selling_price?.toFixed(2) || '0.00'}
                         </div>
                         <div className="text-xs text-muted-foreground">
-                          {t('table.cost')}: €{product.base_cost_price?.toFixed(2) || '0.00'}
+                          {t('table.cost')}: {currencySymbol}
+                          {product.base_cost_price?.toFixed(2) || '0.00'}
                         </div>
                       </div>
                     </TableCell>
