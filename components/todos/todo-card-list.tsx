@@ -4,11 +4,10 @@ import { TodoActionBottomSheet } from '@/components/todos/todo-action-bottom-she
 import { TodoCardV3 } from '@/components/todos/todo-card-v3'
 import { InfiniteScrollErrorBoundary } from '@/components/ui/error-boundary'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useCurrency } from '@/hooks/use-currency'
 import { useIntersectionObserver } from '@/hooks/use-intersection-observer'
-import { useStoreSettings } from '@/hooks/use-store-settings'
 import { DEFAULT_ROOT_MARGIN } from '@/lib/constants/todos'
 import type { TodoItem } from '@/lib/queries/todos-rpc'
-import { getCurrencySymbol } from '@/lib/utils/currency'
 import { useTranslations } from 'next-intl'
 import { useEffect, useMemo, useState } from 'react'
 import { Typography } from '../ui/typography'
@@ -38,13 +37,7 @@ export function TodoCardList({
   emptyStateIcon = '📋',
 }: TodoCardListProps) {
   const t = useTranslations('todos')
-
-  // Fetch store settings to get currency (once for all cards)
-  const { data: storeSettings } = useStoreSettings()
-  const currencySymbol = useMemo(
-    () => getCurrencySymbol(storeSettings?.settings?.currency),
-    [storeSettings?.settings?.currency],
-  )
+  const currencySymbol = useCurrency()
 
   // Bottom sheet state for todo actions
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false)
@@ -169,8 +162,8 @@ export function TodoCardList({
 
   return (
     <InfiniteScrollErrorBoundary>
-      <div className="flex flex-col gap-12">
-        <div className="flex flex-col gap-12 scroll-m-96 pb-80">
+      <div className="flex flex-col gap-8 pb-80">
+        <div className="flex flex-col gap-8 scroll-m-96">
           {sortedTodos.map(todo => (
             <TodoCardV3
               key={todo.batch_id}

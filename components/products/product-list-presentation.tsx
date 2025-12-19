@@ -19,10 +19,9 @@ import {
 } from '@/components/ui/table'
 import { Typography } from '@/components/ui/typography'
 import { useCategoryTranslation } from '@/hooks/use-category-translation'
+import { useCurrency } from '@/hooks/use-currency'
 import { useProductActions } from '@/hooks/use-products'
-import { useStoreSettings } from '@/hooks/use-store-settings'
 import type { Product, ProductSort, SortField } from '@/lib/queries/products'
-import { getCurrencySymbol } from '@/lib/utils/currency'
 import {
   ArrowDown,
   ArrowUp,
@@ -120,13 +119,7 @@ export function ProductsListPresentation({
   const t = useTranslations('products')
   const tButtons = useTranslations('buttons')
   const { getCategoryName } = useCategoryTranslation()
-
-  // Fetch store settings to get currency
-  const { data: storeSettings } = useStoreSettings()
-  const currencySymbol = useMemo(
-    () => getCurrencySymbol(storeSettings?.settings?.currency),
-    [storeSettings?.settings?.currency],
-  )
+  const currencySymbol = useCurrency()
 
   const { deleteProduct, updateProductPrice, isDeleting, isUpdating } = useProductActions()
 
