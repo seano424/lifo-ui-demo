@@ -42,7 +42,7 @@ export function InProgressTab({
 
   if (isError) {
     return (
-      <div className="text-center py-8">
+      <div className="text-center min-h-screen pt-20 flex flex-col items-center gap-4">
         <p className="text-destructive">{t('inProgress.errorLoading')}</p>
         <p className="text-sm text-muted-foreground mt-2">
           {error?.message || tErrors('somethingWrong')}
@@ -53,7 +53,7 @@ export function InProgressTab({
 
   if (isLoading) {
     return (
-      <div className="text-center py-8">
+      <div className="text-center min-h-screen pt-20 flex flex-col items-center gap-4">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
         <p className="text-muted-foreground mt-2">{t('inProgress.loading')}</p>
       </div>
@@ -62,7 +62,7 @@ export function InProgressTab({
 
   if (!todos?.length) {
     return (
-      <div className="text-center py-12 flex flex-col items-center justify-center gap-4">
+      <div className="text-center min-h-screen pt-20 flex flex-col items-center gap-4">
         <div className="text-6xl mb-4">⚡</div>
         <Typography variant="h3" color="primary">
           {t('inProgress.noTodosHeading')}

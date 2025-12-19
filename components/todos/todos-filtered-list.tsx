@@ -364,7 +364,7 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
       />
 
       {/* Tab Content */}
-      <div className="w-full">
+      <div className="w-full pt-2">
         {/* Keep all tab components mounted but only show the active one */}
         <div
           style={{

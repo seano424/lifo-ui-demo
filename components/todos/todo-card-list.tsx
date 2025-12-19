@@ -1,9 +1,10 @@
 'use client'
 
 import { TodoActionBottomSheet } from '@/components/todos/todo-action-bottom-sheet'
-import { TodoCardV2 } from '@/components/todos/todo-card-v2'
+import { TodoCardV3 } from '@/components/todos/todo-card-v3'
 import { InfiniteScrollErrorBoundary } from '@/components/ui/error-boundary'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useCurrency } from '@/hooks/use-currency'
 import { useIntersectionObserver } from '@/hooks/use-intersection-observer'
 import { DEFAULT_ROOT_MARGIN } from '@/lib/constants/todos'
 import type { TodoItem } from '@/lib/queries/todos-rpc'
@@ -36,6 +37,7 @@ export function TodoCardList({
   emptyStateIcon = '📋',
 }: TodoCardListProps) {
   const t = useTranslations('todos')
+  const currencySymbol = useCurrency()
 
   // Bottom sheet state for todo actions
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false)
@@ -160,19 +162,13 @@ export function TodoCardList({
 
   return (
     <InfiniteScrollErrorBoundary>
-      <div className="flex flex-col gap-8">
-        {/*
-          Large spacing values explanation:
-          - pb-80 (320px): Bottom padding to prevent the last todo card from being hidden
-            behind the fixed bottom action sheet/navigation
-          - scroll-m-96 (384px): Scroll margin to ensure proper scroll behavior with fixed
-            UI elements (e.g., mobile nav, action sheets)
-        */}
-        <div className="flex flex-col gap-12 scroll-m-96 pb-80">
+      <div className="flex flex-col gap-8 pb-80">
+        <div className="flex flex-col gap-8 scroll-m-96">
           {sortedTodos.map(todo => (
-            <TodoCardV2
+            <TodoCardV3
               key={todo.batch_id}
               todo={todo}
+              currencySymbol={currencySymbol}
               onClick={() => handleTodoClick(todo.batch_id || '')}
             />
           ))}
@@ -207,6 +203,7 @@ export function TodoCardList({
         isOpen={isBottomSheetOpen}
         onClose={handleCloseBottomSheet}
         selectedBatch={selectedBatch}
+        currencySymbol={currencySymbol}
       />
     </InfiniteScrollErrorBoundary>
   )

@@ -65,21 +65,23 @@ export default async function TodosPage({ searchParams }: TodosPageProps) {
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <div className="flex flex-col gap-6 container py-6">
-        <DashboardInsetHeader page="todos" />
-        <ErrorBoundary>
-          <TodosFilteredList
-            initialFilters={{
-              tab: params.tab,
-              urgency: params.urgency?.split(','),
-              actionType: params.actionType?.split(','),
-              batchStatus: params.batchStatus?.split(','),
-              productName: params.productName,
-              sort: params.sort,
-              direction: params.direction,
-            }}
-          />
-        </ErrorBoundary>
+      <div className="bg-gray-50">
+        <div className="flex flex-col gap-6 container py-6">
+          <DashboardInsetHeader page="todos" />
+          <ErrorBoundary>
+            <TodosFilteredList
+              initialFilters={{
+                tab: params.tab,
+                urgency: params.urgency?.split(','),
+                actionType: params.actionType?.split(','),
+                batchStatus: params.batchStatus?.split(','),
+                productName: params.productName,
+                sort: params.sort,
+                direction: params.direction,
+              }}
+            />
+          </ErrorBoundary>
+        </div>
       </div>
     </HydrationBoundary>
   )

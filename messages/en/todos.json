@@ -86,7 +86,9 @@
     "revenue": "revenue",
     "total": "total",
     "discountApplied": "discount applied",
-    "discountAppliedToUnits": "{count, plural, =1 {discount applied to 1 unit} other {discount applied to # units}}"
+    "discountAppliedToUnits": "{count, plural, =1 {discount applied to 1 unit} other {discount applied to # units}}",
+    "unitPrice": "Unit price",
+    "totalValue": "Total value"
   },
   "recommendations": {
     "dispose": "Dispose immediately",
@@ -253,7 +255,7 @@
     "filtersTitle": "{count, plural, =0 {Add filter} other {Filters (#)}}",
     "sortTitle": "Sort",
     "noFiltersApplied": "No filters applied",
-    "searchPlaceholder": "Search articles...",
+    "searchPlaceholder": "Search batches...",
     "activeFilters": "Active filters applied",
     "clearAll": "Clear all filters",
     "clear": "Clear",

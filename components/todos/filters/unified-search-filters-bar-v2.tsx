@@ -50,7 +50,7 @@ export function UnifiedSearchFiltersBarV2({
   return (
     <div className="flex flex-col gap-3">
       {/* Main row: Filter dropdown, Sort dropdown, Search */}
-      <div className="flex flex-col md:flex-row md:items-center gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div className="flex items-center gap-3 relative">
           {/* Filter Dropdown */}
           <TodoFilterDropdown filters={filters} onFiltersChange={onFiltersChange} />
@@ -66,7 +66,7 @@ export function UnifiedSearchFiltersBarV2({
         </div>
 
         {/* Search Input */}
-        <div className="flex-1 md:max-w-xs md:ml-auto">
+        <div className="w-full md:max-w-sm sm:ml-auto">
           <TodoSearchBar
             searchTerm={searchTerm}
             onSearchChange={onSearchChange}

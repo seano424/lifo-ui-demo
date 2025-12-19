@@ -86,7 +86,9 @@
     "revenue": "revenu",
     "total": "total",
     "discountApplied": "remise appliquée",
-    "discountAppliedToUnits": "{count, plural, =1 {remise appliquée à 1 unité} other {remise appliquée à # unités}}"
+    "discountAppliedToUnits": "{count, plural, =1 {remise appliquée à 1 unité} other {remise appliquée à # unités}}",
+    "unitPrice": "Prix unitaire",
+    "totalValue": "Valeur totale"
   },
   "recommendations": {
     "dispose": "Éliminer immédiatement",
@@ -253,7 +255,7 @@
     "filtersTitle": "{count, plural, =0 {Ajouter un filtre} other {Filtres (#)}}",
     "sortTitle": "Trier",
     "noFiltersApplied": "Aucun filtre appliqué",
-    "searchPlaceholder": "Rechercher des articles...",
+    "searchPlaceholder": "Rechercher des lots...",
     "activeFilters": "Filtres actifs",
     "clearAll": "Effacer tous les filtres",
     "clear": "Effacer",

@@ -86,7 +86,9 @@ export function TodoCardV2({ todo, onClick }: TodoCardV2Props) {
           // Check if sold with a discount
           if (todo.last_discount_percent != null && todo.last_discount_percent > 0) {
             return {
-              text: t('actions.soldAtDiscount', { percent: todo.last_discount_percent }),
+              text: t('actions.soldAtDiscount', {
+                percent: todo.last_discount_percent,
+              }),
               variant: 'outline',
             }
           }
@@ -110,7 +112,9 @@ export function TodoCardV2({ todo, onClick }: TodoCardV2Props) {
           // Show the actual discount percentage if available
           if (todo.last_discount_percent != null && todo.last_discount_percent > 0) {
             return {
-              text: t('actions.soldAtDiscount', { percent: todo.last_discount_percent }),
+              text: t('actions.soldAtDiscount', {
+                percent: todo.last_discount_percent,
+              }),
               icon: PercentIcon,
               variant: 'outline',
             }
@@ -214,30 +218,30 @@ export function TodoCardV2({ todo, onClick }: TodoCardV2Props) {
   }, [todo.completion_status, t])
 
   // Get border classes based on todo state - memoized for performance
-  const borderClasses = useMemo(() => {
-    // No stock - gray border with minimal styling
-    if (todo.available_quantity === 0) {
-      return 'border-gray-200 border-l sm:hover:shadow-gray-400/50'
-    }
+  // const borderClasses = useMemo(() => {
+  //   // No stock - gray border with minimal styling
+  //   if (todo.available_quantity === 0) {
+  //     return 'border-gray-200 border-l sm:hover:shadow-gray-400/50'
+  //   }
 
-    // Expired - red accent with shadow
-    if (isExpiring) {
-      return 'border-red-500 sm:hover:shadow-red-400/50 border-l-8 border-y-gray-200 border-r-gray-200'
-    }
+  //   // Expired - red accent with shadow
+  //   if (isExpiring) {
+  //     return 'border-red-500 sm:hover:shadow-red-400/50 border-l-8 border-y-gray-200 border-r-gray-200'
+  //   }
 
-    // Critical/high urgency - primary accent
-    if (todo.urgency_level === 'critical' || todo.urgency_level === 'high') {
-      return 'border-primary-500 border-l-8 border-y-gray-200 border-r-gray-200'
-    }
+  //   // Critical/high urgency - primary accent
+  //   if (todo.urgency_level === 'critical' || todo.urgency_level === 'high') {
+  //     return 'border-primary-500 border-l-8 border-y-gray-200 border-r-gray-200'
+  //   }
 
-    // Expiring very soon (1-2 days) - primary accent
-    if (!isExpiring && daysUntilExpiry <= 2) {
-      return 'border-primary-500 border-l-8 border-y-gray-200 border-r-gray-200'
-    }
+  //   // Expiring very soon (1-2 days) - primary accent
+  //   if (!isExpiring && daysUntilExpiry <= 2) {
+  //     return 'border-primary-500 border-l-8 border-y-gray-200 border-r-gray-200'
+  //   }
 
-    // Default - gray border
-    return 'border-gray-200 border-l sm:hover:shadow-gray-400/50'
-  }, [todo.available_quantity, todo.urgency_level, isExpiring, daysUntilExpiry])
+  //   // Default - gray border
+  //   return 'border-gray-200 border-l sm:hover:shadow-gray-400/50'
+  // }, [todo.available_quantity, todo.urgency_level, isExpiring, daysUntilExpiry])
 
   // Calculate units summary with action details - memoized for performance
   const unitsSummary = useMemo(() => {
@@ -312,7 +316,7 @@ export function TodoCardV2({ todo, onClick }: TodoCardV2Props) {
       aria-label={`Todo item: ${todo.product_name}`}
       className={cn(
         'flex flex-col gap-2 shadow-xs shadow-primary-50 border border-gray-100 rounded-2xl bg-white sm:hover:shadow-lg sm:hover:shadow-primary-400/50 sm:hover:-translate-y-0.5 transition-all duration-400 cursor-pointer overflow-hidden',
-        borderClasses,
+        // borderClasses,
       )}
     >
       <div className={cn('w-full text-left flex items-center justify-between group px-4 py-6')}>
