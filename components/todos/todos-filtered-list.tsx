@@ -9,10 +9,9 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { isUrgencyLevel, isActionType, isBatchStatus } from '@/lib/todo-filter-config'
 import type { SortDirection, SortField, TodoFiltersState } from './filters/types'
-import { UnifiedFiltersModal } from './filters/unified-filters-modal'
-import { UnifiedSearchFiltersBar } from './filters/unified-search-filters-bar'
-import { UnifiedSortModal } from './filters/unified-sort-modal'
+import { UnifiedSearchFiltersBarV2 } from './filters/unified-search-filters-bar-v2'
 import { CompletedTabWithCounts } from './todos-main-tabs/completed-tab'
 import { InProgressTabWithCounts } from './todos-main-tabs/in-progress-tab'
 import { PendingTabWithCounts } from './todos-main-tabs/pending-tab'
@@ -36,8 +35,6 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
   const t = useTranslations('todos')
   const router = useRouter()
   const { isMobile } = useMediaQuery()
-  const [showFilters, setShowFilters] = useState(false)
-  const [showSort, setShowSort] = useState(false)
 
   const [activeTab, setActiveTab] = useState<TodoTabType>(
     (initialFilters?.tab as TodoTabType) || 'pending',
@@ -65,10 +62,26 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
   )
 
   const [filters, setFilters] = useState<TodoFiltersState>(() => {
+    // Validate urgency levels from URL params
+    const validUrgencyLevels = initialFilters?.urgency
+      ?.filter(u => isUrgencyLevel(u))
+      .map(u => u as TodoUrgencyLevel)
+
+    // Validate action types from URL params
+    const validActionTypes = initialFilters?.actionType
+      ?.filter(a => isActionType(a))
+      .map(a => a as TodoActionType)
+
+    // Validate batch status from URL params
+    const validBatchStatus = initialFilters?.batchStatus
+      ?.filter(b => isBatchStatus(b))
+      .map(b => b as BatchStatus)
+
     return {
-      urgency_level: initialFilters?.urgency as TodoUrgencyLevel[] | undefined,
-      action_type: initialFilters?.actionType as TodoActionType[] | undefined,
-      batch_status: initialFilters?.batchStatus as BatchStatus[] | undefined,
+      urgency_level:
+        validUrgencyLevels && validUrgencyLevels.length > 0 ? validUrgencyLevels : undefined,
+      action_type: validActionTypes && validActionTypes.length > 0 ? validActionTypes : undefined,
+      batch_status: validBatchStatus && validBatchStatus.length > 0 ? validBatchStatus : undefined,
       product_name: initialFilters?.productName || undefined,
       sortConfig: initialFilters?.sort
         ? {
@@ -268,116 +281,10 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
     [handleFiltersChange],
   )
 
-  const handleRemoveFilter = useCallback(
-    (type: 'urgency' | 'action' | 'batch' | 'expiry', value?: string) => {
-      handleFiltersChange(prev => {
-        switch (type) {
-          case 'urgency':
-            return {
-              ...prev,
-              urgency_level: prev.urgency_level?.filter((level: string) => level !== value),
-            }
-          case 'action':
-            return {
-              ...prev,
-              action_type: prev.action_type?.filter(action => action !== value),
-            }
-          case 'batch':
-            return {
-              ...prev,
-              batch_status: prev.batch_status?.filter(status => status !== value),
-            }
-          case 'expiry':
-            return {
-              ...prev,
-              expiry_range: undefined,
-            }
-          default:
-            return prev
-        }
-      })
-    },
-    [handleFiltersChange],
-  )
-
-  const handleClearAll = useCallback(() => {
-    handleFiltersChange(prev => ({
-      ...prev,
-      urgency_level: undefined,
-      action_type: undefined,
-      batch_status: undefined,
-      expiry_range: undefined,
-    }))
-  }, [handleFiltersChange])
-
   return (
-    <div className="space-y-2">
-      {/* Unified Search Bar with Filter/Sort Buttons */}
-      <UnifiedSearchFiltersBar
-        searchTerm={filters.product_name}
-        onSearchChange={handleSearchChange}
-        onFiltersClick={() => setShowFilters(true)}
-        onSortClick={() => setShowSort(true)}
-        isLoading={false}
-        placeholder={t('filters.searchPlaceholder')}
-        urgencyLevel={filters.urgency_level}
-        actionType={filters.action_type}
-        batchStatus={filters.batch_status}
-        expiryRange={filters.expiry_range}
-        onRemoveFilter={handleRemoveFilter}
-        onClearAll={handleClearAll}
-      />
-
-      {/* Unified Filters Modal */}
-      <UnifiedFiltersModal
-        isOpen={showFilters}
-        onClose={() => setShowFilters(false)}
-        filters={{
-          urgency_level: filters.urgency_level,
-          action_type: filters.action_type,
-          batch_status: filters.batch_status,
-          expiry_range: filters.expiry_range,
-        }}
-        onFiltersChange={newFilters => {
-          handleFiltersChange(prev => ({
-            ...prev,
-            ...newFilters,
-          }))
-        }}
-        onClearAll={() => {
-          handleFiltersChange(prev => ({
-            ...prev,
-            urgency_level: undefined,
-            action_type: undefined,
-            batch_status: undefined,
-            expiry_range: undefined,
-          }))
-        }}
-        isLoading={false}
-      />
-
-      {/* Unified Sort Modal */}
-      <UnifiedSortModal
-        isOpen={showSort}
-        onClose={() => setShowSort(false)}
-        sortConfig={filters.sortConfig || { field: 'urgency', direction: 'desc' }}
-        onSortChange={sortConfig => {
-          handleFiltersChange(prev => ({
-            ...prev,
-            sortConfig,
-          }))
-        }}
-        onReset={() => {
-          handleFiltersChange(prev => ({
-            ...prev,
-            sortConfig: defaultSortConfig,
-          }))
-        }}
-        isLoading={false}
-      />
-
+    <div className="flex flex-col gap-4">
       {/* Tab Navigation */}
-      <div className="relative mb-10">
+      <div className="relative">
         {/* Left scroll indicator */}
         {showLeftIndicator && (
           <Button
@@ -405,7 +312,7 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
         )}
 
         <div ref={scrollContainerRef} className="overflow-x-auto scrollbar-none">
-          <div className="flex gap-2 sm:gap-4 min-w-max px-2 sm:px-0">
+          <div className="flex gap-2 sm:gap-8 min-w-max px-2 sm:px-0">
             {tabs.map((tab, index) => (
               <Button
                 key={tab.id}
@@ -421,7 +328,7 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
                   activeTab === tab.id ? 'text-primary' : 'text-muted-foreground/90',
                 )}
               >
-                <span className="text-xs sm:text-sm font-medium truncate max-w-[80px] sm:max-w-none">
+                <span className="text-sm sm:text-base font-medium truncate max-w-[80px] sm:max-w-none">
                   {tab.label}
                 </span>
                 <Badge
@@ -436,15 +343,25 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
         </div>
 
         {/* Tab indicator */}
-        <div className="absolute left-0 right-0 bottom-0 h-[3px] bg-border" />
+        <div className="absolute left-0 right-0 bottom-0 h-[2px] bg-border" />
         <div
-          className="absolute bottom-0 h-[3px] bg-primary/85 transition-all duration-300 ease-in-out z-10 rounded-full overflow-hidden"
+          className="absolute bottom-0 h-[2px] bg-primary/85 transition-all duration-300 ease-in-out z-10 rounded-full overflow-hidden"
           style={{
             left: `${indicatorStyle.left}px`,
             width: `${indicatorStyle.width}px`,
           }}
         />
       </div>
+
+      {/* Unified Search Bar V2 with Filter Dropdown */}
+      <UnifiedSearchFiltersBarV2
+        searchTerm={filters.product_name}
+        onSearchChange={handleSearchChange}
+        isLoading={false}
+        placeholder={t('filters.searchPlaceholder')}
+        filters={filters}
+        onFiltersChange={handleFiltersChange}
+      />
 
       {/* Tab Content */}
       <div className="w-full">

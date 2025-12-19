@@ -52,10 +52,10 @@ export function TodoSearchBar({
     <div
       className={`relative flex items-center gap-2 w-full ${
         isLarge
-          ? 'min-w-[300px] max-w-[400px]'
+          ? 'min-w-[300px] md:max-w-[400px]'
           : isMedium
-            ? 'min-w-[200px] max-w-[350px]'
-            : 'max-w-sm'
+            ? 'min-w-[200px] md:max-w-[350px]'
+            : 'md:max-w-sm'
       }`}
     >
       {/* Search Input */}

@@ -1,3 +1,4 @@
+import DashboardInsetHeader from '@/components/dashboard/dashboard-inset-header'
 import { NoStoresError } from '@/components/dashboard/no-stores-error'
 import { ErrorBoundary } from '@/components/ui/error-boundary'
 import { TodosFilteredList } from '@/components/todos/todos-filtered-list'
@@ -64,7 +65,8 @@ export default async function TodosPage({ searchParams }: TodosPageProps) {
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <div className="flex flex-col gap-6 container md:py-6 lg:py-8">
+      <div className="flex flex-col gap-6 container py-6">
+        <DashboardInsetHeader page="todos" />
         <ErrorBoundary>
           <TodosFilteredList
             initialFilters={{

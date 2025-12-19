@@ -46,7 +46,7 @@
     "allCleared": "Goed gedaan! Alle verlopen items zijn opgeruimd.",
     "noMatch": "Geen verlopen taken komen overeen met uw filters"
   },
-  "emptyStateWithFilters": "Probeer uw filters aan te passen om meer items te zien.",
+  "emptyStateWithFilters": "Probeer uw filters aan te passen om meer taken te zien.",
   "card": {
     "suggestion": "Suggestie",
     "suggested": "Voorgesteld",
@@ -249,12 +249,16 @@
     "urgency": "Urgentie"
   },
   "filters": {
-    "title": "Filteren",
-    "filtersTitle": "Filters",
+    "title": "Filter",
+    "filtersTitle": "{count, plural, =0 {Filter toevoegen} other {Filters (#)}}",
     "sortTitle": "Sorteren",
-    "searchPlaceholder": "Zoek producten...",
+    "noFiltersApplied": "Geen filters toegepast",
+    "searchPlaceholder": "Zoek artikelen...",
     "activeFilters": "Actieve filters toegepast",
     "clearAll": "Alle filters wissen",
+    "clear": "Wissen",
+    "all": "Alle",
+    "reset": "Resetten",
     "apply": "Toepassen",
     "showFilters": "Filters tonen",
     "hideFilters": "Filters verbergen",
@@ -262,8 +266,8 @@
     "resetSort": "Sortering resetten",
     "sortBy": "Sorteren op",
     "sortDirection": "Sorteerrichting",
-    "ascending": "Oplopend",
-    "descending": "Aflopend",
+    "ascending": "Asc",
+    "descending": "Desc",
     "expiry": {
       "title": "Vervalperiode",
       "all": "Alle dagen",
@@ -385,7 +389,7 @@
   "list": {
     "noTodosFound": "Geen taken gevonden",
     "emptyState": "{emptyStateMessage}",
-    "adjustFilters": "Probeer uw filters aan te passen om meer items te zien.",
+    "adjustFilters": "Probeer uw filters aan te passen om meer taken te zien.",
     "loadingMore": "Meer taken laden...",
     "scrollToLoad": "Scroll om meer te laden ({count} geladen)",
     "updating": "Bijwerken..."
