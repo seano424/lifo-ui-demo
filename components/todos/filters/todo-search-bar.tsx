@@ -61,7 +61,7 @@ export function TodoSearchBar({
       {/* Search Input */}
       <div className="relative flex-1">
         <Search
-          className={`absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground ${
+          className={`absolute z-10 left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground ${
             isLarge ? 'h-5 w-5' : isMedium ? 'h-4 w-4' : 'h-4 w-4'
           }`}
         />

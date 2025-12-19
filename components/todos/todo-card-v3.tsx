@@ -3,7 +3,7 @@
 import type { TodoItem } from '@/lib/queries/todos-rpc'
 import { cn } from '@/lib/utils'
 import { migrateRecommendation } from '@/lib/utils/recommendation-migration'
-import { HandHeartIcon, PercentIcon, Trash2Icon, EyeIcon } from 'lucide-react'
+import { HandHeartIcon, PercentIcon, Trash2Icon, EyeIcon, Calendar } from 'lucide-react'
 import { Typography } from '../ui/typography'
 import { format } from 'date-fns'
 import { useTranslations } from 'next-intl'
@@ -188,6 +188,86 @@ export function TodoCardV3({ todo, currencySymbol = '€', onClick }: TodoCardV3
     return format(expiryDate, 'MMM d, yyyy')
   }, [expiryDate, todo.completion_status])
 
+  // Get action label - "Suggested" for pending items, "Completed" for completed items
+  const actionLabel = useMemo(() => {
+    if (todo.completion_status === 'completed') {
+      return t('card.completed')
+    }
+    return t('card.suggested')
+  }, [todo.completion_status, t])
+
+  // Calculate completion details for completed items
+  const completionDetails = useMemo(() => {
+    // const currentQty = todo.current_quantity ?? 0
+    const lastActionType = todo.last_action_type
+    const lastActionQty = todo.last_action_quantity ?? 0
+    const totalSold = todo.total_sold_quantity ?? 0
+    const unitPrice = todo.unit_price ?? 0
+    const isCompleted = todo.completion_status === 'completed'
+
+    if (!isCompleted) return null
+
+    // Case 1: Completed with sales - show total sold and revenue
+    if (totalSold > 0) {
+      const actualSellingPrice = todo.current_selling_price ?? todo.selling_price ?? unitPrice
+      const revenue = totalSold * actualSellingPrice
+      return {
+        label: t('card.soldUnits'),
+        value: totalSold,
+        secondaryLabel: t('card.revenue'),
+        secondaryValue: `${currencySymbol}${revenue.toFixed(0)}`,
+      }
+    }
+
+    // Case 2: Donate action
+    if (lastActionType === 'donate' && lastActionQty > 0) {
+      return {
+        label: t('card.donatedAction'),
+        value: lastActionQty,
+        secondaryLabel: t('card.units'),
+        secondaryValue: null,
+      }
+    }
+
+    // Case 3: Dispose action
+    if (lastActionType === 'dispose' && lastActionQty > 0) {
+      return {
+        label: t('card.disposedAction'),
+        value: lastActionQty,
+        secondaryLabel: t('card.units'),
+        secondaryValue: null,
+      }
+    }
+
+    return null
+  }, [
+    todo.completion_status,
+    // todo.current_quantity,
+    todo.last_action_type,
+    todo.last_action_quantity,
+    todo.total_sold_quantity,
+    todo.unit_price,
+    todo.current_selling_price,
+    todo.selling_price,
+    currencySymbol,
+    t,
+  ])
+
+  // Get context-aware footer message based on expiration status
+  // const footerMessage = useMemo(() => {
+  //   if (todo.available_quantity === 0) {
+  //     return t('card.tapToViewDetails')
+  //   }
+  //   if (isExpiring) {
+  //     return t('card.tapToReview') // "Review & resolve"
+  //   }
+  //   if (isExpiringToday) {
+  //     return t('card.tapToTakeAction') // "Take action"
+  //   }
+  //   // For items expiring in the future (including tomorrow, this week, etc.)
+  //   return t('card.tapToViewDetails') // "View details"
+  // }, [isExpiring, isExpiringToday, t, todo.available_quantity])
+
   const handleCardClick = () => {
     onClick?.()
   }
@@ -209,103 +289,105 @@ export function TodoCardV3({ todo, currencySymbol = '€', onClick }: TodoCardV3
       onClick={handleCardClick}
       onKeyDown={handleKeyDown}
       aria-label={`Todo item: ${todo.product_name}`}
-      className={cn(
-        'bg-card rounded-[14px] p-[18px] cursor-pointer transition-all',
-        'shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.03)]',
-        'hover:shadow-[0_2px_4px_rgba(0,0,0,0.06),0_8px_16px_rgba(0,0,0,0.04)]',
-        'hover:-translate-y-px active:scale-[0.98]',
-        isCompleted && 'opacity-60',
-      )}
+      className="flex gap-2 w-full flex-1 group"
     >
-      {/* Top Row: Category Badge + Date */}
-      <div className="flex justify-between items-center mb-3">
-        <Typography
-          variant="extraSmall"
-          className="px-[11px] py-[5px] rounded-md bg-black/[0.02] text-muted-foreground"
-        >
-          {actionButton.text && `${t('card.suggestion')}: ${actionButton.text}`}
-        </Typography>
-        <Typography variant="extraSmall" className="text-muted-foreground">
-          {formattedDate}
-        </Typography>
-      </div>
-
-      {/* Product Name */}
-      <Typography
-        variant="p"
+      {/* <div className="h-6 w-6 bg-card border-2 border-border rounded-full sm:group-hover:border-primary/40 transition-all duration-400 mt-2" /> */}
+      <div
         className={cn(
-          'font-semibold text-[17px] tracking-tight mb-4',
-          isCompleted && 'line-through',
+          'bg-card w-full flex flex-col gap-3 rounded-[14px] p-[18px] cursor-pointer transition-all shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.03)]',
+          'sm:group-hover:shadow-lg sm:group-hover:shadow-primary-400/50 sm:group-hover:-translate-y-0.5 transition-all duration-400 cursor-pointer overflow-hidden',
+          'sm:hover:-translate-y-px sm:active:scale-[0.98]',
         )}
       >
-        {todo.product_name}
-      </Typography>
-
-      {/* Stock Progress - only show if not completed */}
-      {!isCompleted && (
-        <div className="mb-4">
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-[13px] font-semibold text-foreground">
-              {stockData.currentQty} {t('card.units')}
-            </span>
-            {stockData.initialQty > stockData.currentQty && (
-              <span className="text-xs text-muted-foreground">{stockData.percentage}% stocked</span>
+        {/* Top Row: Status + Date */}
+        <div className="flex justify-between items-center">
+          {/* Status - LEFT side, primary scan element */}
+          <div className="flex items-center gap-1.5">
+            {isUrgent ? (
+              <>
+                <Calendar className="h-3.5 w-3.5 text-destructive" />
+                <Typography
+                  variant="small"
+                  color="destructive"
+                  className="font-semibold font-heading"
+                >
+                  {isExpiring
+                    ? t('card.expiredStatus')
+                    : isExpiringToday
+                      ? t('card.expiresToday')
+                      : isExpiringTomorrow
+                        ? t('card.expiresTomorrow')
+                        : t('card.daysLeft', { days: daysUntilExpiry })}
+                </Typography>
+              </>
+            ) : (
+              <Typography variant="extraSmall" color="muted" className="font-heading font-semibold">
+                {daysUntilExpiry}d until expiry
+              </Typography>
             )}
           </div>
-          {/* Progress Bar - only show if there's been activity */}
-          {stockData.initialQty > stockData.currentQty && (
-            <div className="h-1 bg-black/[0.06] rounded-sm overflow-hidden">
-              <div
-                className="h-full bg-foreground rounded-sm transition-all duration-500"
-                style={{ width: `${stockData.percentage}%` }}
-              />
+
+          {/* Date - RIGHT side */}
+          <Typography variant="extraSmall" color="muted">
+            {formattedDate}
+          </Typography>
+        </div>
+
+        {/* Product Name */}
+        <Typography variant="h4">{todo.product_name}</Typography>
+
+        {/* Inline Meta Row */}
+        <div className="flex items-center">
+          {!isCompleted ? (
+            <>
+              <Typography variant="small" color="default">
+                {stockData.currentQty} {t('card.units')}
+              </Typography>
+              <span className="mx-2 h-1 w-1 rounded-full bg-black/[0.2]"></span>
+              <Typography variant="small" color="muted">
+                {currencySymbol}
+                {unitPrice.toFixed(2)}/{t('card.unit')}
+              </Typography>
+              <span className="mx-2 h-1 w-1 rounded-full bg-black/[0.2]"></span>
+              <Typography variant="small" color="default">
+                {currencySymbol}
+                {valueAtRisk != null ? valueAtRisk.toFixed(2) : '0.00'} total
+              </Typography>
+            </>
+          ) : (
+            <div className="flex items-center">
+              {completionDetails ? (
+                <>
+                  <Typography variant="small" color="default">
+                    {completionDetails.value} {completionDetails.label}
+                  </Typography>
+                  {completionDetails.secondaryValue && (
+                    <>
+                      <span className="mx-2 h-1 w-1 rounded-full bg-black/[0.2]"></span>
+                      <Typography variant="small" color="default">
+                        {completionDetails.secondaryValue} {completionDetails.secondaryLabel}
+                      </Typography>
+                    </>
+                  )}
+                </>
+              ) : (
+                <Typography variant="small" color="default">
+                  {t('card.completed')}
+                </Typography>
+              )}
             </div>
           )}
         </div>
-      )}
 
-      {/* Price Section */}
-      <div className="flex items-center justify-between p-[14px_16px] bg-black/[0.02] rounded-[10px]">
-        <div className="flex items-center gap-6">
-          {/* Unit Price */}
-          <div>
-            <div className="text-[11px] font-medium text-muted-foreground mb-[3px]">
-              {t('card.unitPrice')}
-            </div>
-            <div className="text-[15px] font-semibold text-foreground">
-              {currencySymbol}
-              {unitPrice.toFixed(2)}
-            </div>
-          </div>
-
-          {/* Divider */}
-          <div className="w-px h-7 bg-black/[0.06]" />
-
-          {/* Total Value */}
-          <div>
-            <div className="text-[11px] font-medium text-muted-foreground mb-[3px]">
-              {t('card.totalValue')}
-            </div>
-            <div className="text-[15px] font-bold text-foreground">
-              {currencySymbol}
-              {valueAtRisk != null ? valueAtRisk.toFixed(2) : '0.00'}
-            </div>
-          </div>
+        {/* Suggestion Row - Border Only */}
+        <div className="pt-3.5 mt-auto border-t border-border/60 flex justify-between items-center">
+          <Typography variant="small" color="muted">
+            {actionLabel}
+          </Typography>
+          <Typography className="font-semibold text-secondary" variant="small">
+            {actionButton.text}
+          </Typography>
         </div>
-
-        {/* Expiry Indicator */}
-        {!isCompleted &&
-          (isUrgent ? (
-            <div className="px-[11px] py-[5px] rounded-md bg-destructive/10">
-              <span className="text-xs font-semibold text-destructive">
-                {isExpiring
-                  ? t('card.expiredStatus')
-                  : t('card.daysLeft', { days: daysUntilExpiry })}
-              </span>
-            </div>
-          ) : (
-            <span className="text-xs text-muted-foreground">{daysUntilExpiry}d</span>
-          ))}
       </div>
     </div>
   )

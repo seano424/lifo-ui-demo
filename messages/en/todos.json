@@ -255,7 +255,7 @@
     "filtersTitle": "{count, plural, =0 {Add filter} other {Filters (#)}}",
     "sortTitle": "Sort",
     "noFiltersApplied": "No filters applied",
-    "searchPlaceholder": "Search articles...",
+    "searchPlaceholder": "Search batches...",
     "activeFilters": "Active filters applied",
     "clearAll": "Clear all filters",
     "clear": "Clear",

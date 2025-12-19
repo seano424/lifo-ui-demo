@@ -255,7 +255,7 @@
     "filtersTitle": "{count, plural, =0 {Filter toevoegen} other {Filters (#)}}",
     "sortTitle": "Sorteren",
     "noFiltersApplied": "Geen filters toegepast",
-    "searchPlaceholder": "Zoek artikelen...",
+    "searchPlaceholder": "Zoek batches...",
     "activeFilters": "Actieve filters toegepast",
     "clearAll": "Alle filters wissen",
     "clear": "Wissen",

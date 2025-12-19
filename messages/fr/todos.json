@@ -255,7 +255,7 @@
     "filtersTitle": "{count, plural, =0 {Ajouter un filtre} other {Filtres (#)}}",
     "sortTitle": "Trier",
     "noFiltersApplied": "Aucun filtre appliqué",
-    "searchPlaceholder": "Rechercher des articles...",
+    "searchPlaceholder": "Rechercher des lots...",
     "activeFilters": "Filtres actifs",
     "clearAll": "Effacer tous les filtres",
     "clear": "Effacer",
