@@ -1,15 +1,12 @@
 'use client'
 
 import { BottomSheet } from '@/components/ui/bottom-sheet'
-import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { useBatchTodo } from '@/hooks/use-batch-todo'
 import { useBatchActionRPC, isValidRecommendedAction } from '@/hooks/use-batch-actions-rpc'
 import { useBatchActions } from '@/hooks/use-batches'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 import type { TodoItem } from '@/lib/queries/todos-rpc'
-import { cn } from '@/lib/utils'
 import { Edit3, Save, TagIcon, PercentIcon, PackageOpenIcon, PackageXIcon, X } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -373,54 +370,52 @@ export function TodoActionSheetV2({
             </ActionForm>
 
             {/* Collapsible Sections */}
-            <div className="mt-6 space-y-0 divide-y divide-[rgba(0,0,0,0.06)]">
+            <div className="flex flex-col gap-4 pt-4">
               <CollapsibleSection
                 title="Batch details"
                 defaultOpen={false}
                 action={
                   !isEditingDetails ? (
-                    <Button
+                    <button
                       type="button"
-                      variant="ghost"
-                      size="sm"
                       onClick={handleEditDetails}
-                      className="h-8 text-sm text-black"
+                      className="bg-white px-6 py-3 rounded-3xl flex items-center gap-2"
                     >
-                      <Edit3 className="h-3.5 w-3.5 mr-1.5" />
+                      <Edit3 className="h-3.5 w-3.5" />
                       Edit
-                    </Button>
+                    </button>
                   ) : (
                     <div className="flex gap-2">
-                      <Button
+                      <button
                         type="button"
-                        variant="ghost"
-                        size="sm"
                         onClick={handleCancelEdit}
                         disabled={isUpdating}
-                        className="h-8 text-sm text-[#86868b]"
+                        className="bg-muted-foreground/5 px-6 py-3 rounded-3xl flex items-center gap-2"
                       >
+                        <X className="h-3.5 w-3.5" />
                         Cancel
-                      </Button>
-                      <Button
+                      </button>
+
+                      <button
                         type="button"
-                        variant="ghost"
-                        size="sm"
                         onClick={handleSaveDetails}
                         disabled={isUpdating}
-                        className="h-8 text-sm text-black"
+                        className="bg-white px-6 py-3 rounded-3xl flex items-center gap-2"
                       >
-                        <Save className="h-3.5 w-3.5 mr-1.5" />
+                        <Save className="h-3.5 w-3.5" />
                         Save
-                      </Button>
+                      </button>
                     </div>
                   )
                 }
               >
-                <div className="space-y-3">
+                <div className="flex flex-col divide-y divide-muted-foreground/10 px-3">
                   {isEditingDetails ? (
                     <>
-                      <div className="flex justify-between items-center">
-                        <Label className="text-sm text-[#86868b]">Expiry date</Label>
+                      <div className="flex flex-col gap-2 py-4">
+                        <Typography variant="small" className="px-3">
+                          Expiry date
+                        </Typography>
                         <Input
                           type="date"
                           value={editedValues.expiry_date}
@@ -430,11 +425,13 @@ export function TodoActionSheetV2({
                               expiry_date: e.target.value,
                             }))
                           }
-                          className="w-40 h-9 rounded-lg border-[rgba(0,0,0,0.06)]"
+                          className="w-full h-9 rounded-3xl border-muted-foreground/10"
                         />
                       </div>
-                      <div className="flex justify-between items-center">
-                        <Label className="text-sm text-[#86868b]">Cost price</Label>
+                      <div className="flex flex-col gap-2 py-4">
+                        <Typography variant="small" className="px-3">
+                          Cost price
+                        </Typography>
                         <Input
                           type="number"
                           value={editedValues.cost_price}
@@ -444,11 +441,13 @@ export function TodoActionSheetV2({
                               cost_price: Number(e.target.value),
                             }))
                           }
-                          className="w-40 h-9 rounded-lg border-[rgba(0,0,0,0.06)]"
+                          className="w-full h-9 rounded-3xl border-muted-foreground/10"
                         />
                       </div>
-                      <div className="flex justify-between items-center">
-                        <Label className="text-sm text-[#86868b]">Selling price</Label>
+                      <div className="flex flex-col gap-2 py-4">
+                        <Typography variant="small" className="px-3">
+                          Selling price
+                        </Typography>
                         <Input
                           type="number"
                           value={editedValues.selling_price}
@@ -458,39 +457,50 @@ export function TodoActionSheetV2({
                               selling_price: Number(e.target.value),
                             }))
                           }
-                          className="w-40 h-9 rounded-lg border-[rgba(0,0,0,0.06)]"
+                          className="w-full h-9 rounded-3xl border-muted-foreground/10"
                         />
                       </div>
                     </>
                   ) : (
                     <>
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-[#86868b]">Batch number</span>
-                        <span className="text-sm text-black">{currentBatch.batch_number}</span>
+                      <div className="flex justify-between items-center py-4">
+                        <Typography variant="small">Product</Typography>
+                        <Typography variant="small">{currentBatch.product_name}</Typography>
                       </div>
-                      {currentBatch.product_brand && (
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm text-[#86868b]">Brand</span>
-                          <span className="text-sm text-black">{currentBatch.product_brand}</span>
-                        </div>
-                      )}
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-[#86868b]">Expiry date</span>
-                        <span className="text-sm text-black">
+                      <div className="flex justify-between items-center py-4">
+                        <Typography variant="small">Batch number</Typography>
+                        <Typography variant="small">{currentBatch.batch_number}</Typography>
+                      </div>
+                      <div className="flex justify-between items-center py-4">
+                        <Typography variant="small">Expiry date</Typography>
+                        <Typography variant="small">
                           {formatDate(currentBatch.expiry_date || '')}
-                        </span>
+                        </Typography>
                       </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-[#86868b]">Cost price</span>
-                        <span className="text-sm text-black">
+                      <div className="flex justify-between items-center py-4">
+                        <Typography variant="small">Cost price</Typography>
+                        <Typography variant="small">
                           {formatCurrency(currentBatch.cost_price || 0)}
-                        </span>
+                        </Typography>
                       </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-[#86868b]">Selling price</span>
-                        <span className="text-sm text-black">
+                      <div className="flex justify-between items-center py-4">
+                        <Typography variant="small">Selling price</Typography>
+                        <Typography variant="small">
                           {formatCurrency(currentBatch.selling_price || 0)}
-                        </span>
+                        </Typography>
+                      </div>
+                      <div className="flex justify-between items-center py-4">
+                        <Typography variant="small">Initial quantity</Typography>
+                        <Typography variant="small">
+                          {(currentBatch.last_action_quantity || 0) +
+                            (currentBatch.current_quantity || 0)}
+                        </Typography>
+                      </div>
+                      <div className="flex justify-between items-center py-4">
+                        <Typography variant="small">Current quantity</Typography>
+                        <Typography variant="small">
+                          {currentBatch.current_quantity || 0}
+                        </Typography>
                       </div>
                     </>
                   )}
@@ -498,60 +508,62 @@ export function TodoActionSheetV2({
               </CollapsibleSection>
 
               <CollapsibleSection title="History" defaultOpen={false}>
-                <div className="space-y-3">
+                <div className="flex flex-col divide-y divide-muted-foreground/10 px-3">
                   {currentBatch.last_action_type ? (
                     <>
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-[#86868b]">Last action</span>
-                        <span className="text-sm text-black capitalize">
+                      <div className="flex justify-between items-center py-4">
+                        <Typography variant="small">Last action</Typography>
+                        <Typography variant="small" className="capitalize">
                           {currentBatch.last_action_type.replace('_', ' ')}
-                        </span>
+                        </Typography>
                       </div>
                       {currentBatch.last_action_quantity && (
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm text-[#86868b]">Quantity</span>
-                          <span className="text-sm text-black">
-                            {currentBatch.last_action_quantity}
-                          </span>
+                        <div className="flex justify-between items-center py-4 w-full">
+                          <Typography variant="small">Quantity left</Typography>
+                          <Typography variant="small">
+                            {currentBatch.current_quantity || 0}
+                          </Typography>
                         </div>
                       )}
-                      <div className="border-t border-[rgba(0,0,0,0.06)] pt-3 mt-3">
+                      <div className="flex justify-between items-center py-4">
                         {(currentBatch.total_sold_quantity || 0) > 0 && (
-                          <div className="flex justify-between items-center mb-2">
-                            <span className="text-sm text-[#86868b]">Total sold</span>
-                            <span className="text-sm text-black">
+                          <div className="flex justify-between items-center w-full">
+                            <Typography variant="small">Total sold</Typography>
+                            <Typography variant="small">
                               {currentBatch.total_sold_quantity}
-                            </span>
+                            </Typography>
                           </div>
                         )}
                         {(currentBatch.total_discounted_quantity || 0) > 0 && (
-                          <div className="flex justify-between items-center mb-2">
-                            <span className="text-sm text-[#86868b]">Total discounted</span>
-                            <span className="text-sm text-black">
+                          <div className="flex justify-between items-center py-4">
+                            <Typography variant="small">Total discounted</Typography>
+                            <Typography variant="small">
                               {currentBatch.total_discounted_quantity}
-                            </span>
+                            </Typography>
                           </div>
                         )}
                         {(currentBatch.total_donated_quantity || 0) > 0 && (
-                          <div className="flex justify-between items-center mb-2">
-                            <span className="text-sm text-[#86868b]">Total donated</span>
-                            <span className="text-sm text-black">
+                          <div className="flex justify-between items-center py-4">
+                            <Typography variant="small">Total donated</Typography>
+                            <Typography variant="small">
                               {currentBatch.total_donated_quantity}
-                            </span>
+                            </Typography>
                           </div>
                         )}
                         {(currentBatch.total_disposed_quantity || 0) > 0 && (
-                          <div className="flex justify-between items-center">
-                            <span className="text-sm text-[#86868b]">Total disposed</span>
-                            <span className="text-sm text-black">
+                          <div className="flex justify-between items-center py-4 w-full">
+                            <Typography variant="small">Total disposed</Typography>
+                            <Typography variant="small">
                               {currentBatch.total_disposed_quantity}
-                            </span>
+                            </Typography>
                           </div>
                         )}
                       </div>
                     </>
                   ) : (
-                    <p className="text-sm text-[#86868b] text-center py-2">No actions yet</p>
+                    <Typography variant="small" className="text-center">
+                      No actions yet
+                    </Typography>
                   )}
                 </div>
               </CollapsibleSection>
