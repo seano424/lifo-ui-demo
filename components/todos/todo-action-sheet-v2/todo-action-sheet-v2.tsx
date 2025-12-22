@@ -281,7 +281,7 @@ export function TodoActionSheetV2({
         isOpen={isOpen}
         onClose={onClose}
         titleElement={
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2 lg:p-4">
             <Typography className="font-black" variant="h3">
               {currentBatch.product_name}
             </Typography>
