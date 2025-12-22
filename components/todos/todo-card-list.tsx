@@ -1,6 +1,7 @@
 'use client'
 
-import { TodoActionBottomSheet } from '@/components/todos/todo-action-bottom-sheet'
+// import { TodoActionBottomSheet } from '@/components/todos/todo-action-bottom-sheet'
+import { TodoActionSheetV2 } from './todo-action-sheet-v2'
 import { TodoCardV3 } from '@/components/todos/todo-card-v3'
 import { InfiniteScrollErrorBoundary } from '@/components/ui/error-boundary'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -199,7 +200,7 @@ export function TodoCardList({
       </div>
 
       {/* Todo Action Bottom Sheet */}
-      <TodoActionBottomSheet
+      <TodoActionSheetV2
         isOpen={isBottomSheetOpen}
         onClose={handleCloseBottomSheet}
         selectedBatch={selectedBatch}
