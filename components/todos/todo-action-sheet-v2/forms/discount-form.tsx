@@ -46,7 +46,7 @@ export function DiscountForm({ batch, currencySymbol, isLoading, onConfirm }: Di
     <div className="space-y-4">
       {/* Discount Presets */}
       <div className="space-y-2">
-        <label className="text-sm font-medium text-[#1d1d1f]">Select discount</label>
+        <label className="text-sm font-medium text-black">Select discount</label>
         <div className="grid grid-cols-5 gap-2">
           {discountPresets.map(preset => (
             <button
@@ -54,10 +54,10 @@ export function DiscountForm({ batch, currencySymbol, isLoading, onConfirm }: Di
               type="button"
               onClick={() => handlePresetClick(preset)}
               className={cn(
-                'py-2 px-2 text-sm font-medium rounded-lg transition-all',
+                'py-2 px-2 text-sm font-medium rounded-3xl transition-all',
                 discountPercentage === preset && !customDiscount
-                  ? 'bg-[#1d1d1f] text-white'
-                  : 'bg-white text-[#1d1d1f] border border-[rgba(0,0,0,0.06)] hover:bg-[rgba(0,0,0,0.02)]',
+                  ? 'bg-primary/10 text-black border-8 border-primary/10'
+                  : 'bg-white text-black hover:bg-muted/50 border-8 border-transparent',
               )}
             >
               {preset}%
@@ -72,28 +72,26 @@ export function DiscountForm({ batch, currencySymbol, isLoading, onConfirm }: Di
             max="100"
             className={cn(
               'py-2 px-2 text-sm font-medium rounded-lg text-center transition-all',
-              customDiscount
-                ? 'bg-[#1d1d1f] text-white'
-                : 'bg-white text-[#1d1d1f] border border-[rgba(0,0,0,0.06)]',
-              'focus:outline-none focus:ring-2 focus:ring-[#1d1d1f] focus:ring-offset-1',
+              customDiscount ? 'bg-black text-white' : 'bg-white text-black border border-muted/50',
+              'focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-1',
             )}
           />
         </div>
       </div>
 
       {/* Price Preview */}
-      <div className="bg-white rounded-xl p-4 border border-[rgba(0,0,0,0.06)]">
+      <div className="bg-white rounded-xl p-4 border border-muted/50">
         <div className="space-y-2">
           <div className="flex justify-between items-center">
-            <span className="text-sm text-[#86868b]">Original price</span>
-            <span className="text-sm text-[#86868b] line-through">
+            <span className="text-sm text-muted-foreground">Original price</span>
+            <span className="text-sm text-muted-foreground line-through">
               {currencySymbol}
               {originalPrice.toFixed(2)}
             </span>
           </div>
           <div className="flex justify-between items-center">
-            <span className="text-sm font-medium text-[#1d1d1f]">New price</span>
-            <span className="text-lg font-semibold text-[#1d1d1f]">
+            <span className="text-sm font-medium text-black">New price</span>
+            <span className="text-lg font-semibold text-black">
               {currencySymbol}
               {newPrice.toFixed(2)}
             </span>
@@ -103,7 +101,7 @@ export function DiscountForm({ batch, currencySymbol, isLoading, onConfirm }: Di
 
       {/* Quantity Selector */}
       <div className="space-y-2">
-        <label className="text-sm font-medium text-[#1d1d1f]">Quantity</label>
+        <label className="text-sm font-medium text-black">Quantity</label>
         <div className="flex justify-center">
           <QuantitySelector
             value={quantity}
@@ -120,7 +118,7 @@ export function DiscountForm({ batch, currencySymbol, isLoading, onConfirm }: Di
           checked={printLabels}
           onCheckedChange={checked => setPrintLabels(checked as boolean)}
         />
-        <label htmlFor="print-labels" className="text-sm font-medium text-[#1d1d1f] cursor-pointer">
+        <label htmlFor="print-labels" className="text-sm font-medium text-black cursor-pointer">
           Print discount labels
         </label>
       </div>
@@ -130,7 +128,7 @@ export function DiscountForm({ batch, currencySymbol, isLoading, onConfirm }: Di
         type="button"
         onClick={() => onConfirm(quantity, discountPercentage, printLabels)}
         disabled={isLoading || quantity === 0}
-        className="w-full h-12 bg-black text-white hover:bg-black/90 rounded-xl font-medium"
+        className="w-full h-12 bg-black text-white hover:bg-black/90 rounded-3xl text-base"
       >
         {isLoading ? (
           <span className="flex items-center gap-2">
@@ -138,7 +136,7 @@ export function DiscountForm({ batch, currencySymbol, isLoading, onConfirm }: Di
             Processing...
           </span>
         ) : (
-          `Apply ${discountPercentage}% discount`
+          `Mark ${quantity} as discounted`
         )}
       </Button>
     </div>

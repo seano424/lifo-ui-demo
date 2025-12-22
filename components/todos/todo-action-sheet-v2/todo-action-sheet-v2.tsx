@@ -22,6 +22,7 @@ import { DiscountForm } from './forms/discount-form'
 import { DonateForm } from './forms/donate-form'
 import { DisposeForm } from './forms/dispose-form'
 import type { Database } from '@/types/supabase'
+import { Typography } from '@/components/ui/typography'
 
 interface TodoActionSheetV2Props {
   isOpen: boolean
@@ -247,7 +248,7 @@ export function TodoActionSheetV2({
 
   const handleSaveDetails = async () => {
     try {
-      await updateBatch({
+      updateBatch({
         batchId: currentBatch.batch_id || '',
         updates: {
           expiry_date: editedValues.expiry_date,
@@ -278,34 +279,31 @@ export function TodoActionSheetV2({
 
   return (
     <>
-      <BottomSheet variant="fullHeight" isOpen={isOpen} onClose={onClose}>
-        <div className="flex flex-col h-full max-h-[90vh]">
-          {/* Header */}
-          <div className="px-5 pt-4 pb-3 border-b border-[rgba(0,0,0,0.06)]">
-            <div className="flex items-start justify-between mb-2">
-              <h2 className="text-[22px] font-semibold text-black leading-tight">
-                {currentBatch.product_name}
-              </h2>
-              <button
-                type="button"
-                onClick={onClose}
-                className="p-1 hover:bg-[rgba(0,0,0,0.04)] rounded-full transition-all"
-              >
-                <X className="h-5 w-5 text-[#86868b]" />
-              </button>
-            </div>
-            <p className="text-sm text-[#86868b]">
-              <span className={cn(isExpired && 'text-[#FF3B30]')}>{getExpiryContext()}</span>
-              {' · '}
-              {currentBatch.current_quantity} units
-              {' · '}
-              {currencySymbol}
-              {atRiskValue} at risk
-            </p>
-          </div>
+      <BottomSheet
+        variant="fullHeight"
+        isOpen={isOpen}
+        onClose={onClose}
+        titleElement={
+          <div className="flex flex-col gap-2">
+            <Typography variant="h4">{currentBatch.product_name}</Typography>
 
+            <div className="flex items-center divide-x divide-muted-foreground/10">
+              <Typography variant="muted" color="destructive" className="pr-2">
+                {getExpiryContext()}
+              </Typography>
+              <Typography variant="muted" className="px-2">
+                {currentBatch.current_quantity} units
+              </Typography>
+              <Typography variant="muted" className="pl-2">
+                {currencySymbol} {atRiskValue}
+              </Typography>
+            </div>
+          </div>
+        }
+      >
+        <div className="flex flex-col h-full max-h-[90vh]">
           {/* Scrollable Content */}
-          <div className="flex-1 overflow-y-auto px-5 py-4">
+          <div className="flex-1 overflow-y-auto px-5 py-4 pb-80">
             {/* Action Buttons */}
             <div className="grid grid-cols-4 gap-2 mb-4">
               <ActionButton

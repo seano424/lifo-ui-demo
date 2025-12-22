@@ -67,7 +67,7 @@ export function SellForm({ batch, currencySymbol, isLoading, onConfirm }: SellFo
       </div>
 
       {/* Revenue Preview */}
-      <div className="bg-white rounded-xl p-4 border border-muted-foreground/10">
+      <div className="bg-white rounded-3xl p-3 border border-muted-foreground/10">
         <div className="flex justify-between items-center">
           <span className="text-sm text-muted-foreground">Revenue</span>
           <span className="text-lg font-semibold text-black">
@@ -82,7 +82,7 @@ export function SellForm({ batch, currencySymbol, isLoading, onConfirm }: SellFo
         type="button"
         onClick={() => onConfirm(quantity, timing)}
         disabled={isLoading || quantity === 0}
-        className="w-full h-12 bg-black text-white hover:bg-black/90 rounded-xl font-medium"
+        className="w-full h-12 bg-black text-white hover:bg-black/90 rounded-3xl text-base"
       >
         {isLoading ? (
           <span className="flex items-center gap-2">
@@ -90,9 +90,9 @@ export function SellForm({ batch, currencySymbol, isLoading, onConfirm }: SellFo
             Processing...
           </span>
         ) : quantity === batch.current_quantity ? (
-          'Sell all'
+          'Mark all as sold'
         ) : (
-          `Sell ${quantity} units`
+          `Mark ${quantity} as sold`
         )}
       </Button>
     </div>
