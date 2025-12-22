@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils'
 import type { TodoItem } from '@/lib/queries/todos-rpc'
 import { useState, useEffect } from 'react'
 import { QuantitySelector } from '../components/quantity-selector'
+import { Typography } from '@/components/ui/typography'
 
 interface SellFormProps {
   batch: TodoItem
@@ -34,7 +35,7 @@ export function SellForm({ batch, currencySymbol, isLoading, onConfirm }: SellFo
     <div className="space-y-4">
       {/* Timing Selection */}
       <div className="space-y-2">
-        <label className="text-sm font-medium text-black">When was it sold?</label>
+        <Typography variant="small">When was it sold?</Typography>
         <div className="grid grid-cols-2 gap-2">
           {timingOptions.map(option => (
             <button
@@ -56,7 +57,7 @@ export function SellForm({ batch, currencySymbol, isLoading, onConfirm }: SellFo
 
       {/* Quantity Selector */}
       <div className="space-y-2">
-        <label className="text-sm font-medium text-black">Quantity</label>
+        <Typography variant="small">Quantity</Typography>
         <div className="flex justify-center">
           <QuantitySelector
             value={quantity}

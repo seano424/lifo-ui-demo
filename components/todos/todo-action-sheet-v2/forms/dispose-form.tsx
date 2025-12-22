@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils'
 import type { TodoItem } from '@/lib/queries/todos-rpc'
 import { useState, useEffect } from 'react'
 import { QuantitySelector } from '../components/quantity-selector'
+import { Typography } from '@/components/ui/typography'
 
 interface DisposeFormProps {
   batch: TodoItem
@@ -38,8 +39,8 @@ export function DisposeForm({ batch, currencySymbol, isLoading, onConfirm }: Dis
   return (
     <div className="space-y-4">
       {/* Reason Selection */}
-      <div className="space-y-2">
-        <label className="text-sm font-medium text-black">Reason for disposal</label>
+      <div className="flex flex-col gap-4">
+        <Typography variant="small">Reason for disposal</Typography>
         <div className="grid grid-cols-2 gap-2">
           {reasons.map(r => (
             <button
@@ -47,10 +48,10 @@ export function DisposeForm({ batch, currencySymbol, isLoading, onConfirm }: Dis
               type="button"
               onClick={() => setReason(r.id)}
               className={cn(
-                'py-2 px-3 text-sm font-medium rounded-lg transition-all',
+                'py-2 px-3 text-sm font-medium rounded-3xl transition-all duration-500 ease-in-out flex items-center justify-center gap-2',
                 reason === r.id
-                  ? 'bg-black text-white'
-                  : 'bg-white text-black border border-muted-foreground/10 hover:bg-muted-foreground/5',
+                  ? 'bg-primary/10 text-black border-8 border-primary/10'
+                  : 'bg-white text-black hover:bg-muted/50 border-8 border-transparent',
               )}
             >
               {r.label}
@@ -61,8 +62,8 @@ export function DisposeForm({ batch, currencySymbol, isLoading, onConfirm }: Dis
 
       {/* Custom Reason Input */}
       {reason === 'other' && (
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-black">Specify reason</label>
+        <div className="flex flex-col gap-4">
+          <Typography variant="small">Specify reason</Typography>
           <Input
             type="text"
             value={customReason}
@@ -74,8 +75,8 @@ export function DisposeForm({ batch, currencySymbol, isLoading, onConfirm }: Dis
       )}
 
       {/* Quantity Selector */}
-      <div className="space-y-2">
-        <label className="text-sm font-medium text-black">Quantity</label>
+      <div className="flex flex-col gap-4">
+        <Typography variant="small">Quantity</Typography>
         <div className="flex justify-center">
           <QuantitySelector
             value={quantity}
@@ -86,13 +87,15 @@ export function DisposeForm({ batch, currencySymbol, isLoading, onConfirm }: Dis
       </div>
 
       {/* Loss Summary */}
-      <div className="bg-destructive/5 rounded-xl p-4 border border-destructive/10">
+      <div className="bg-destructive/5 rounded-3xl p-4">
         <div className="flex justify-between items-center">
-          <span className="text-sm text-destructive">Total loss</span>
-          <span className="text-lg font-semibold text-destructive">
+          <Typography color="destructive" variant="small">
+            Total loss
+          </Typography>
+          <Typography color="destructive" variant="h5">
             {currencySymbol}
             {totalLoss}
-          </span>
+          </Typography>
         </div>
       </div>
 
@@ -101,13 +104,13 @@ export function DisposeForm({ batch, currencySymbol, isLoading, onConfirm }: Dis
         type="button"
         onClick={() => onConfirm(quantity, finalReason)}
         disabled={isLoading || quantity === 0 || (reason === 'other' && !customReason.trim())}
-        className="w-full h-12 bg-destructive text-white hover:bg-destructive/90 rounded-xl font-medium"
+        className="w-full h-12 bg-destructive text-white hover:bg-destructive/90 rounded-3xl font-medium"
       >
         {isLoading ? (
-          <span className="flex items-center gap-2">
+          <Typography variant="small">
             <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
             Processing...
-          </span>
+          </Typography>
         ) : (
           `Dispose ${quantity} units`
         )}

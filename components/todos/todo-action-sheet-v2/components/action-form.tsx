@@ -14,7 +14,7 @@ export function ActionForm({ isOpen, children, className }: ActionFormProps) {
     <div
       className={cn(
         'overflow-hidden transition-all duration-300 ease-in-out',
-        isOpen ? 'max-h-[500px] opacity-100 mt-4' : 'max-h-0 opacity-0 mt-0',
+        isOpen ? 'opacity-100 mt-4' : 'max-h-0 opacity-0 mt-0',
         className,
       )}
     >

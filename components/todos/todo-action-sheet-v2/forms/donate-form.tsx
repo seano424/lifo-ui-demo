@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react'
 import { QuantitySelector } from '../components/quantity-selector'
 import { RecipientSelector } from '@/components/donation/recipient-selector'
 import { useActiveStoreId } from '@/lib/stores/store-context'
+import { Typography } from '@/components/ui/typography'
 
 interface DonateFormProps {
   batch: TodoItem
@@ -32,20 +33,17 @@ export function DonateForm({ batch, isLoading, onConfirm }: DonateFormProps) {
     <div className="space-y-4">
       {/* Recipient Selection */}
       <div className="space-y-2">
-        <label className="text-sm font-medium text-black">Select recipient</label>
-        <div className="bg-white rounded-xl p-3 border border-[rgba(0,0,0,0.06)]">
-          <RecipientSelector
-            storeId={activeStoreId || undefined}
-            selectedRecipientId={selectedRecipient || undefined}
-            selectedRecipientName={selectedRecipientName}
-            onRecipientSelect={handleRecipientSelect}
-          />
-        </div>
+        <RecipientSelector
+          storeId={activeStoreId || undefined}
+          selectedRecipientId={selectedRecipient || undefined}
+          selectedRecipientName={selectedRecipientName}
+          onRecipientSelect={handleRecipientSelect}
+        />
       </div>
 
       {/* Quantity Selector */}
       <div className="space-y-2">
-        <label className="text-sm font-medium text-black">Quantity</label>
+        <Typography variant="small">Quantity</Typography>
         <div className="flex justify-center">
           <QuantitySelector
             value={quantity}
@@ -60,13 +58,13 @@ export function DonateForm({ batch, isLoading, onConfirm }: DonateFormProps) {
         type="button"
         onClick={() => onConfirm(quantity, selectedRecipient, selectedRecipientName)}
         disabled={isLoading || quantity === 0 || !selectedRecipient}
-        className="w-full h-12 bg-black text-white hover:bg-black/90 rounded-xl font-medium"
+        className="w-full h-12 bg-black text-white hover:bg-black/90 rounded-3xl"
       >
         {isLoading ? (
-          <span className="flex items-center gap-2">
+          <Typography variant="small">
             <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
             Processing...
-          </span>
+          </Typography>
         ) : quantity === batch.current_quantity ? (
           'Donate all'
         ) : (
