@@ -10,6 +10,7 @@ import { useEffect, useState } from 'react'
 import { useMediaQuery } from '@/hooks/use-mobile'
 import { toast } from 'sonner'
 import { useTranslations } from 'next-intl'
+import { cn } from '@/lib/utils'
 
 interface DisposeTabProps {
   selectedBatch: TodoItem
@@ -127,18 +128,22 @@ export function DisposeTab({ selectedBatch, onClose }: DisposeTabProps) {
           <div className="bg-white rounded-2xl p-4 dark:bg-brand-dark">
             <div className="grid sm:grid-cols-2 grid-cols-1 gap-2">
               {DISPOSAL_REASONS.map(reason => (
-                <Button
+                <button
                   key={reason.id}
-                  size="lg"
-                  variant={selectedDisposalReason === reason.id ? 'subtleTertiary' : 'outline'}
+                  type="button"
                   onClick={() => handleDisposalReasonChange(reason.id)}
-                  className="border-none shadow justify-start"
+                  className={cn(
+                    'py-2 px-3 text-sm font-medium rounded-3xl transition-all duration-500 ease-in-out flex items-center justify-center gap-2',
+                    selectedDisposalReason === reason.id
+                      ? 'bg-primary/10 text-black border-8 border-primary/10'
+                      : 'bg-white text-black hover:bg-muted/50 border-8 border-transparent',
+                  )}
                 >
                   <div className="flex items-center gap-2">
                     <span>{reason.icon}</span>
                     <span className="text-sm">{reason.label}</span>
                   </div>
-                </Button>
+                </button>
               ))}
             </div>
             {selectedDisposalReason === 'other' && (

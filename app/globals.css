@@ -158,6 +158,20 @@
   }
 }
 
+@keyframes toast-pop {
+  0% {
+    transform: translate(-50%, -8px) scale(0.95);
+    opacity: 0;
+  }
+  50% {
+    transform: translate(-50%, 0) scale(1.02);
+  }
+  100% {
+    transform: translate(-50%, 0) scale(1);
+    opacity: 1;
+  }
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @plugin 'tailwind-scrollbar';
