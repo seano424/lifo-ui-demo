@@ -8,7 +8,8 @@
     "inProgress": "En cours",
     "expiring": "Expirant",
     "expired": "Expiré",
-    "completed": "Terminé"
+    "completed": "Terminé",
+    "resolved": "Résolu"
   },
   "pending": {
     "errorLoading": "Erreur lors du chargement des tâches en attente",
@@ -48,11 +49,14 @@
   "emptyStateWithFilters": "Essayez d'ajuster vos filtres pour voir plus d'articles.",
   "card": {
     "suggestion": "Suggestion",
-    "daysLeft": "{days} jours restants",
-    "daysLeftOne": "1 jour restant",
+    "suggested": "Suggesté",
+    "daysLeft": "Expire dans {days, plural, =1 {1 jour} other {# jours}}",
+    "daysLeftOne": "Expire dans 1 jour",
     "expiresIn": "Expire dans {days} jours",
     "expiresToday": "Expire aujourd'hui",
+    "expiresTomorrow": "Expire demain",
     "expired": "Expiré il y a {days} jours",
+    "expiredStatus": "Expiré",
     "expiredYesterday": "Expiré hier",
     "currentlyDiscounted": "Actuellement remisé : {percent}%",
     "suggestedDiscount": "Remise suggérée : {percent}%",
@@ -67,7 +71,24 @@
     "completedOn": "Terminé le {date}",
     "donatedOn": "Donné le {date}",
     "disposedOn": "Éliminé le {date}",
-    "noRecommendation": "Aucune recommandation"
+    "noRecommendation": "Aucune recommandation",
+    "tapToManage": "Tapez pour gérer",
+    "tapToReview": "Examiner et résoudre",
+    "tapToTakeAction": "Passer à l'action",
+    "tapToViewDetails": "Voir les détails",
+    "completed": "Terminé",
+    "remaining": "restant(s)",
+    "donatedAction": "donné(s)",
+    "disposedAction": "éliminé(s)",
+    "units": "unités",
+    "unit": "unité",
+    "soldUnits": "vendu(s)",
+    "revenue": "revenu",
+    "total": "total",
+    "discountApplied": "remise appliquée",
+    "discountAppliedToUnits": "{count, plural, =1 {remise appliquée à 1 unité} other {remise appliquée à # unités}}",
+    "unitPrice": "Prix unitaire",
+    "totalValue": "Valeur totale"
   },
   "recommendations": {
     "dispose": "Éliminer immédiatement",
@@ -84,7 +105,12 @@
     "donate": "Faire un don",
     "sell": "Vendre",
     "dispose": "Éliminer",
-    "details": "Détails"
+    "monitorStock": "Surveiller le stock",
+    "details": "Détails",
+    "sold": "Vendu",
+    "donated": "Donné",
+    "disposed": "Éliminé",
+    "soldAtDiscount": "Vendu avec {percent}% de réduction"
   },
   "bottomSheet": {
     "units": "{count} unités"
@@ -159,19 +185,21 @@
       "batchNumberRequired": "Le numéro de lot est requis",
       "batchNumberTooLong": "Le numéro de lot doit contenir moins de {max} caractères",
       "batchNumberInvalid": "Le numéro de lot ne peut contenir que des lettres, chiffres, traits d'union, underscores et espaces",
-      "expiryRequired": "La date d'expiration est requise",
-      "expiryTooOld": "La date d'expiration ne peut pas être plus de {years} ans dans le passé",
-      "expiryTooFuture": "La date d'expiration ne peut pas être plus de {years} ans dans le futur",
-      "quantityPositive": "La quantité doit être 0 ou plus",
-      "quantityWhole": "La quantité doit être un nombre entier",
-      "costPricePositive": "Le prix de revient doit être 0 ou plus",
-      "sellingPricePositive": "Le prix de vente doit être 0 ou plus",
-      "priceMax": "Les prix ne peuvent pas dépasser €{max}"
+      "expiryDateRequired": "La date d'expiration est requise",
+      "expiryDateTooFarPast": "La date d'expiration ne peut pas être plus de {years} ans dans le passé",
+      "expiryDateTooFarFuture": "La date d'expiration ne peut pas être plus de {years} ans dans le futur",
+      "quantityNegative": "La quantité ne peut pas être négative",
+      "quantityInteger": "La quantité doit être un nombre entier",
+      "costPriceNegative": "Le prix de revient ne peut pas être négatif",
+      "sellingPriceNegative": "Le prix de vente ne peut pas être négatif",
+      "priceExceedsMax": "Les prix ne peuvent pas dépasser €{max}"
     },
     "error": {
       "invalidData": "Données invalides : Le numéro de lot existe peut-être déjà ou contient des caractères invalides",
       "updateFailed": "Échec de la mise à jour : {error}",
-      "unexpected": "Une erreur inattendue s'est produite lors de la mise à jour du lot"
+      "unexpected": "Une erreur inattendue s'est produite lors de la mise à jour du lot",
+      "batchNotFound": "Ce lot n'existe plus. Il a peut-être été supprimé ou vous n'avez peut-être pas la permission d'y accéder.",
+      "batchDeleted": "Ce lot a été supprimé pendant la mise à jour. La page se rafraîchira automatiquement."
     },
     "status": {
       "expired": "Expiré",
@@ -224,11 +252,15 @@
   },
   "filters": {
     "title": "Filtrer",
-    "filtersTitle": "Filtres",
+    "filtersTitle": "{count, plural, =0 {Ajouter un filtre} other {Filtres (#)}}",
     "sortTitle": "Trier",
-    "searchPlaceholder": "Rechercher des produits...",
+    "noFiltersApplied": "Aucun filtre appliqué",
+    "searchPlaceholder": "Rechercher des lots...",
     "activeFilters": "Filtres actifs",
     "clearAll": "Effacer tous les filtres",
+    "clear": "Effacer",
+    "all": "Tous",
+    "reset": "Réinitialiser",
     "apply": "Appliquer",
     "showFilters": "Afficher les filtres",
     "hideFilters": "Masquer les filtres",
@@ -236,8 +268,8 @@
     "resetSort": "Réinitialiser le tri",
     "sortBy": "Trier par",
     "sortDirection": "Direction du tri",
-    "ascending": "Croissant",
-    "descending": "Décroissant",
+    "ascending": "Asc",
+    "descending": "Desc",
     "expiry": {
       "title": "Période d'expiration",
       "all": "Tous les jours",

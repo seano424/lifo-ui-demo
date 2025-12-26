@@ -25,10 +25,11 @@ import { useTheme } from 'next-themes'
 
 interface DetailsTabProps {
   selectedBatch: TodoItem
+  currencySymbol?: string
   onClose: () => void
 }
 
-export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
+export function DetailsTab({ selectedBatch, currencySymbol = '€', onClose }: DetailsTabProps) {
   const t = useTranslations('todos')
   const tCommon = useTranslations()
   const tErrors = useTranslations('errors.common')
@@ -62,7 +63,7 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
     (new Date(selectedBatch.expiry_date || '').getTime() - Date.now()) / (1000 * 60 * 60 * 24),
   )
 
-  const formatCurrency = (value: number) => `€${value.toFixed(2)}`
+  const formatCurrency = (value: number) => `${currencySymbol}${value.toFixed(2)}`
   const formatDate = (date: string) => {
     return new Date(date).toLocaleDateString('en-US', {
       month: 'short',
@@ -169,7 +170,15 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
       console.error('Failed to update batch:', error)
 
       if (error instanceof Error) {
-        if (error.message.includes('constraint') || error.message.includes('duplicate')) {
+        if (error.message.includes('not found') || error.message.includes('deleted')) {
+          toast.error(
+            error.message.includes('deleted')
+              ? t('details.error.batchDeleted')
+              : t('details.error.batchNotFound'),
+          )
+          // Optionally close the dialog since the batch no longer exists
+          setTimeout(() => onClose(), 2000)
+        } else if (error.message.includes('constraint') || error.message.includes('duplicate')) {
           toast.error(t('details.error.invalidData'))
         } else if (error.message.includes('network') || error.message.includes('fetch')) {
           toast.error(tErrors('networkError'))
@@ -421,7 +430,7 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
               </Label>
               {isEditing ? (
                 <div className="flex items-center gap-2 w-40">
-                  <span className="text-sm">€</span>
+                  <span className="text-sm">{currencySymbol}</span>
                   <Input
                     id="cost-price"
                     type="number"
@@ -448,7 +457,7 @@ export function DetailsTab({ selectedBatch, onClose }: DetailsTabProps) {
               </Label>
               {isEditing ? (
                 <div className="flex items-center gap-2 w-40">
-                  <span className="text-sm">€</span>
+                  <span className="text-sm">{currencySymbol}</span>
                   <Input
                     id="selling-price"
                     type="number"

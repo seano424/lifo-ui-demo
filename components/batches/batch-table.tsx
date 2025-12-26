@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/table'
 import { useBatchTodo } from '@/hooks/use-batch-todo'
 import { useColumnSizing } from '@/hooks/use-column-sizing'
+import { useCurrency } from '@/hooks/use-currency'
 import type { BatchSort, BatchSortField, BatchWithProduct } from '@/lib/queries/batches'
 import {
   flexRender,
@@ -50,6 +51,7 @@ export function BatchTable({ data, currentSort, updateSort, isLoading }: BatchTa
   const t = useTranslations('batches.table')
   const tStatus = useTranslations('batches.status')
   const tExpiry = useTranslations('batches.expiry')
+  const currencySymbol = useCurrency()
 
   const { columnSizing, setColumnSizing, DEFAULT_COLUMN_WIDTHS } = useColumnSizing()
 
@@ -97,6 +99,7 @@ export function BatchTable({ data, currentSort, updateSort, isLoading }: BatchTa
     tStatus,
     tExpiry,
     DEFAULT_COLUMN_WIDTHS,
+    currencySymbol,
   })
 
   const table = useReactTable({
@@ -204,6 +207,7 @@ export function BatchTable({ data, currentSort, updateSort, isLoading }: BatchTa
           setSelectedBatchId(null)
         }}
         selectedBatch={selectedBatchTodo || null}
+        currencySymbol={currencySymbol}
       />
     </>
   )

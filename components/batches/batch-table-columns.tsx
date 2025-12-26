@@ -51,6 +51,7 @@ export function createBatchTableColumns({
   tStatus,
   tExpiry,
   DEFAULT_COLUMN_WIDTHS,
+  currencySymbol = '$',
 }: {
   data: BatchWithProduct[]
   currentSort: BatchSort
@@ -59,6 +60,7 @@ export function createBatchTableColumns({
   tStatus: (key: string) => string
   tExpiry: (key: string, params?: { days: number }) => string
   DEFAULT_COLUMN_WIDTHS: Record<string, number>
+  currencySymbol?: string
 }): ColumnDef<BatchWithProduct>[] {
   return [
     {
@@ -191,14 +193,20 @@ export function createBatchTableColumns({
       cell: ({ row }) => (
         <div className="flex items-center justify-end gap-1">
           <DollarSign className="h-3 w-3 text-muted-foreground flex-shrink-0" />
-          <span className="truncate" title={`$${Number(row.original.cost_price).toFixed(2)}`}>
+          <span
+            className="truncate"
+            title={`${currencySymbol}${Number(row.original.cost_price).toFixed(2)}`}
+          >
             {Number(row.original.cost_price).toFixed(2)}
           </span>
         </div>
       ),
       size: DEFAULT_COLUMN_WIDTHS.cost_price,
       minSize: 70,
-      maxSize: calculateMaxWidth(data, item => `$${Number(item.cost_price).toFixed(2)}`),
+      maxSize: calculateMaxWidth(
+        data,
+        item => `${currencySymbol}${Number(item.cost_price).toFixed(2)}`,
+      ),
       enableResizing: true,
     },
     {
@@ -217,14 +225,20 @@ export function createBatchTableColumns({
       cell: ({ row }) => (
         <div className="flex items-center justify-end gap-1">
           <DollarSign className="h-3 w-3 text-muted-foreground flex-shrink-0" />
-          <span className="truncate" title={`$${Number(row.original.selling_price).toFixed(2)}`}>
+          <span
+            className="truncate"
+            title={`${currencySymbol}${Number(row.original.selling_price).toFixed(2)}`}
+          >
             {Number(row.original.selling_price).toFixed(2)}
           </span>
         </div>
       ),
       size: DEFAULT_COLUMN_WIDTHS.selling_price,
       minSize: 70,
-      maxSize: calculateMaxWidth(data, item => `$${Number(item.selling_price).toFixed(2)}`),
+      maxSize: calculateMaxWidth(
+        data,
+        item => `${currencySymbol}${Number(item.selling_price).toFixed(2)}`,
+      ),
       enableResizing: true,
     },
     {
