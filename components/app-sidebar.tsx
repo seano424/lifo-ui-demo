@@ -135,7 +135,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           href="/"
           className="group-data-[collapsible=icon]:hidden hidden sm:flex items-center gap-2 hover:opacity-80 transition-opacity duration-200 ease-in-out"
         >
-          <Logo variant="horizontal" size="sm" />
+          <Logo variant="horizontal" size="sm" priority />
         </Link>
 
         {/* Mobile vertical logo */}
@@ -143,7 +143,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           href="/"
           className="group-data-[collapsible=icon]:hidden sm:hidden hover:opacity-80 transition-opacity duration-200 ease-in-out"
         >
-          <Logo variant="horizontal" size="sm" />
+          <Logo variant="horizontal" size="sm" priority />
         </Link>
 
         {/* Collapsed icon logo */}
@@ -151,7 +151,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           href="/"
           className="group-data-[collapsible=icon]:block hidden hover:opacity-80 transition-opacity duration-200 ease-in-out"
         >
-          <Logo variant="icon" size="sm" />
+          <Logo variant="icon" size="sm" priority />
         </Link>
       </SidebarHeader>
       <SidebarContent className="group-data-[collapsible=icon]:pt-4 pt-4">
