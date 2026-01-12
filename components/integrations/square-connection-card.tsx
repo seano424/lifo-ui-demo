@@ -7,7 +7,7 @@
 
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
-import { CheckCircle2, Square, ExternalLink, RefreshCw, Settings } from 'lucide-react'
+import { CheckCircle2, Square, ExternalLink, Settings } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'

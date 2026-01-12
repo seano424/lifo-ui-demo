@@ -81,6 +81,24 @@
       "disconnect": "Déconnecter",
       "confirm": "Oui, déconnecter",
       "cancel": "Annuler"
+    },
+    "errors": {
+      "signInRequired": "Veuillez vous connecter pour connecter Square",
+      "notAuthenticated": "Non authentifié",
+      "connectFailed": "Échec de la connexion à Square",
+      "disconnectFailed": "Échec de la déconnexion",
+      "syncCatalogFailed": "Échec de la synchronisation du catalogue",
+      "syncInventoryFailed": "Échec de la synchronisation de l'inventaire",
+      "syncOrdersFailed": "Échec de la synchronisation des commandes"
+    },
+    "success": {
+      "disconnected": "Square déconnecté avec succès",
+      "catalogSynced": "Catalogue synchronisé",
+      "catalogSyncDetails": "{created} créés, {updated} mis à jour",
+      "inventorySynced": "Inventaire synchronisé",
+      "inventorySyncDetails": "{batches} lots mis à jour",
+      "ordersSynced": "Commandes synchronisées",
+      "ordersSyncDetails": "{orders} commandes traitées"
     }
   }
 }

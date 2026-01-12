@@ -16,7 +16,7 @@ import { useSquareStatusPolling } from '@/hooks/use-square-integration'
 
 type CallbackStatus = 'processing' | 'success' | 'error'
 
-const MAX_POLLS = 30 // 30 polls * 2 seconds = 60 seconds max
+const MAX_POLLING_TIME_MS = 60000 // 60 seconds max polling time
 
 export function SquareCallbackProcessor() {
   const router = useRouter()
@@ -25,7 +25,7 @@ export function SquareCallbackProcessor() {
 
   const [status, setStatus] = useState<CallbackStatus>('processing')
   const [errorMessage, setErrorMessage] = useState<string>('')
-  const [pollCount, setPollCount] = useState(0)
+  const [pollingStartTime] = useState<number>(Date.now())
 
   // Check for error in URL params (user denied authorization)
   const urlError = searchParams?.get('error')
@@ -55,11 +55,9 @@ export function SquareCallbackProcessor() {
           router.push('/dashboard/integrations/square')
         }, 2000)
       } else {
-        // Increment poll count
-        setPollCount(prev => prev + 1)
-
-        // Check if we've exceeded max polls
-        if (pollCount >= MAX_POLLS) {
+        // Check if we've exceeded max polling time using timestamp
+        const elapsedTime = Date.now() - pollingStartTime
+        if (elapsedTime >= MAX_POLLING_TIME_MS) {
           setStatus('error')
           setErrorMessage(
             'Connection verification timed out. Please try again or contact support if the issue persists.',
@@ -76,7 +74,16 @@ export function SquareCallbackProcessor() {
           'Failed to verify connection. Please try again or contact support if the issue persists.',
       )
     }
-  }, [squareStatus, isError, error, status, pollCount, router, urlError, urlErrorDescription])
+  }, [
+    squareStatus,
+    isError,
+    error,
+    status,
+    pollingStartTime,
+    router,
+    urlError,
+    urlErrorDescription,
+  ])
 
   return (
     <div className="flex min-h-[60vh] flex-col items-center justify-center">

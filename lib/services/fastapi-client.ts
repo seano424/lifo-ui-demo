@@ -834,7 +834,14 @@ export class FastAPIClient {
     storeId: string,
     userToken: string,
   ): Promise<import('@/lib/types/integrations').ConnectionListResponse> {
-    const url = `${this.baseUrl}/api/v1/integrations/square/connections?store_id=${storeId}`
+    // Validate inputs
+    if (!storeId || typeof storeId !== 'string' || storeId.trim() === '') {
+      throw new Error('Store ID is required and must be a non-empty string')
+    }
+
+    // URL encode the storeId to prevent injection
+    const encodedStoreId = encodeURIComponent(storeId)
+    const url = `${this.baseUrl}/api/v1/integrations/square/connections?store_id=${encodedStoreId}`
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), this.timeout)
 
@@ -875,6 +882,11 @@ export class FastAPIClient {
     connectionId: string,
     userToken: string,
   ): Promise<import('@/lib/types/integrations').DisconnectResponse> {
+    // Validate inputs
+    if (!connectionId || typeof connectionId !== 'string' || connectionId.trim() === '') {
+      throw new Error('Connection ID is required and must be a non-empty string')
+    }
+
     const url = `${this.baseUrl}/api/v1/integrations/square/disconnect`
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), this.timeout)
@@ -918,7 +930,14 @@ export class FastAPIClient {
     fullSync: boolean,
     userToken: string,
   ): Promise<import('@/lib/types/integrations').SyncStats> {
-    const url = `${this.baseUrl}/api/v1/integrations/square/connections/${connectionId}/sync/catalog?full_sync=${fullSync}`
+    // Validate inputs
+    if (!connectionId || typeof connectionId !== 'string' || connectionId.trim() === '') {
+      throw new Error('Connection ID is required and must be a non-empty string')
+    }
+
+    // URL encode the connectionId to prevent injection
+    const encodedConnectionId = encodeURIComponent(connectionId)
+    const url = `${this.baseUrl}/api/v1/integrations/square/connections/${encodedConnectionId}/sync/catalog?full_sync=${fullSync}`
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), this.timeout)
 
@@ -960,7 +979,14 @@ export class FastAPIClient {
     fullSync: boolean,
     userToken: string,
   ): Promise<import('@/lib/types/integrations').SyncStats> {
-    const url = `${this.baseUrl}/api/v1/integrations/square/connections/${connectionId}/sync/inventory?full_sync=${fullSync}`
+    // Validate inputs
+    if (!connectionId || typeof connectionId !== 'string' || connectionId.trim() === '') {
+      throw new Error('Connection ID is required and must be a non-empty string')
+    }
+
+    // URL encode the connectionId to prevent injection
+    const encodedConnectionId = encodeURIComponent(connectionId)
+    const url = `${this.baseUrl}/api/v1/integrations/square/connections/${encodedConnectionId}/sync/inventory?full_sync=${fullSync}`
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), this.timeout)
 
@@ -1003,7 +1029,22 @@ export class FastAPIClient {
     fullSync: boolean,
     userToken: string,
   ): Promise<import('@/lib/types/integrations').SyncStats> {
-    const url = `${this.baseUrl}/api/v1/integrations/square/connections/${connectionId}/sync/orders?days_back=${daysBack}&full_sync=${fullSync}`
+    // Validate inputs
+    if (!connectionId || typeof connectionId !== 'string' || connectionId.trim() === '') {
+      throw new Error('Connection ID is required and must be a non-empty string')
+    }
+
+    // Validate daysBack parameter (must be positive and within reasonable bounds)
+    if (typeof daysBack !== 'number' || !Number.isInteger(daysBack) || daysBack < 1) {
+      throw new Error('Days back must be a positive integer')
+    }
+    if (daysBack > 365) {
+      throw new Error('Days back cannot exceed 365 days')
+    }
+
+    // URL encode the connectionId to prevent injection
+    const encodedConnectionId = encodeURIComponent(connectionId)
+    const url = `${this.baseUrl}/api/v1/integrations/square/connections/${encodedConnectionId}/sync/orders?days_back=${daysBack}&full_sync=${fullSync}`
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), this.timeout)
 

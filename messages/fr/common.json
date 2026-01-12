@@ -194,5 +194,27 @@
     "noStoreSelected": "Aucun magasin sélectionné",
     "pleaseSelectStore": "Veuillez sélectionner un magasin pour continuer",
     "whatHappensNext": "Que se passe-t-il ensuite?"
+  },
+  "devToken": {
+    "title": "Assistant de jeton de développement",
+    "accessDenied": "Accès refusé",
+    "accessDeniedMessage": "Cette page n'est disponible que dans les environnements de développement pour des raisons de sécurité.",
+    "goToHome": "Retour à l'accueil",
+    "loggedInAs": "Connecté en tant que:",
+    "yourJwtToken": "Votre jeton JWT:",
+    "copyToClipboard": "Copier dans le presse-papiers",
+    "copied": "Copié!",
+    "backToHome": "Retour à l'accueil",
+    "goToLogin": "Aller à la connexion",
+    "usageInstructions": "Instructions d'utilisation:",
+    "instruction1": "Assurez-vous d'être connecté à l'application",
+    "instruction2": "Cliquez sur le bouton \"Copier dans le presse-papiers\"",
+    "instruction3": "Dans Postman/client API, définissez l'en-tête Authorization sur:",
+    "instruction4": "Le jeton expire dans ~1 heure - actualisez cette page pour en obtenir un nouveau",
+    "securityNote": "Note de sécurité:",
+    "securityMessage": "Cette page est destinée au développement uniquement. N'exposez jamais les jetons JWT en production. Les jetons donnent un accès complet à votre compte.",
+    "apiEndpointsToTest": "Points de terminaison API à tester:",
+    "notLoggedIn": "Non connecté - veuillez vous connecter d'abord",
+    "loading": "Chargement..."
   }
 }

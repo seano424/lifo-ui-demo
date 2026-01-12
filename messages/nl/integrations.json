@@ -81,6 +81,24 @@
       "disconnect": "Verbreek verbinding",
       "confirm": "Ja, verbreek verbinding",
       "cancel": "Annuleren"
+    },
+    "errors": {
+      "signInRequired": "Log in om Square te verbinden",
+      "notAuthenticated": "Niet geauthenticeerd",
+      "connectFailed": "Kon niet verbinden met Square",
+      "disconnectFailed": "Kon niet verbreken",
+      "syncCatalogFailed": "Kon catalogus niet synchroniseren",
+      "syncInventoryFailed": "Kon inventaris niet synchroniseren",
+      "syncOrdersFailed": "Kon bestellingen niet synchroniseren"
+    },
+    "success": {
+      "disconnected": "Square succesvol losgekoppeld",
+      "catalogSynced": "Catalogus gesynchroniseerd",
+      "catalogSyncDetails": "{created} aangemaakt, {updated} bijgewerkt",
+      "inventorySynced": "Inventaris gesynchroniseerd",
+      "inventorySyncDetails": "{batches} batches bijgewerkt",
+      "ordersSynced": "Bestellingen gesynchroniseerd",
+      "ordersSyncDetails": "{orders} bestellingen verwerkt"
     }
   }
 }

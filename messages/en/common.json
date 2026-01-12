@@ -194,5 +194,27 @@
     "noStoreSelected": "No store selected",
     "pleaseSelectStore": "Please select a store to continue",
     "whatHappensNext": "What happens next?"
+  },
+  "devToken": {
+    "title": "Dev Token Helper",
+    "accessDenied": "Access Denied",
+    "accessDeniedMessage": "This page is only available in development environments for security reasons.",
+    "goToHome": "Go to Home",
+    "loggedInAs": "Logged in as:",
+    "yourJwtToken": "Your JWT Token:",
+    "copyToClipboard": "Copy to Clipboard",
+    "copied": "Copied!",
+    "backToHome": "Back to Home",
+    "goToLogin": "Go to Login",
+    "usageInstructions": "Usage Instructions:",
+    "instruction1": "Make sure you're logged in to the app",
+    "instruction2": "Click \"Copy to Clipboard\" button",
+    "instruction3": "In Postman/API client, set Authorization header to:",
+    "instruction4": "Token expires in ~1 hour - refresh this page to get a new one",
+    "securityNote": "Security Note:",
+    "securityMessage": "This page is for development only. Never expose JWT tokens in production. Tokens provide full access to your account.",
+    "apiEndpointsToTest": "API Endpoints to Test:",
+    "notLoggedIn": "Not logged in - please login first",
+    "loading": "Loading..."
   }
 }
