@@ -77,7 +77,8 @@
     "quickStartGuide": "Snelstartgids",
     "scanIn": "Scan In",
     "inventoryManagement": "Voorraadbeheer",
-    "addStore": "Winkel toevoegen"
+    "addStore": "Winkel toevoegen",
+    "expiringSoon": "Verloopt binnenkort"
   },
   "navUser": {
     "upgradeToPro": "Upgrade naar Pro",

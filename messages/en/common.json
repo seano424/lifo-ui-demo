@@ -77,7 +77,8 @@
     "quickStartGuide": "Quick Start Guide",
     "scanIn": "Scan In",
     "inventoryManagement": "Inventory Management",
-    "addStore": "Add Store"
+    "addStore": "Add Store",
+    "expiringSoon": "Expiring Soon"
   },
   "navUser": {
     "upgradeToPro": "Upgrade to Pro",

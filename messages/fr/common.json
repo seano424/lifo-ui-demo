@@ -77,7 +77,8 @@
     "quickStartGuide": "Guide de démarrage rapide",
     "scanIn": "Scanner l'entrée",
     "inventoryManagement": "Gestion des stocks",
-    "addStore": "Ajouter un magasin"
+    "addStore": "Ajouter un magasin",
+    "expiringSoon": "Expire bientôt"
   },
   "navUser": {
     "upgradeToPro": "Passer à Pro",

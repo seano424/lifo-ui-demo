@@ -278,6 +278,7 @@
     "dashboard-title": "Store",
     "dashboard": "Dashboard",
     "operations": "Operations",
+    "expiringSoon": "Expiring Soon",
     "inventory": "Inventory",
     "deliveries": "Deliveries",
     "scanOut": "Scan Out",

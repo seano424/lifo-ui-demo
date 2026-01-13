@@ -58,7 +58,8 @@ export function TodoSortDropdown({ sortConfig, onSortChange, onReset }: TodoSort
         aria-haspopup="true"
         className={cn(
           'gap-2 w-full md:w-auto',
-          isOpen && 'bg-violet-100 text-violet-700 border-violet-200',
+          isOpen && 'bg-violet-100 text-violet-700 border-violet-200 hover:bg-violet-100',
+          !isOpen && 'hover:bg-violet-100',
         )}
       >
         <ArrowUpDown className="h-4 w-4" />

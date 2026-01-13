@@ -13,6 +13,7 @@ import {
   ScanBarcode,
   ScanSearch,
   SettingsIcon,
+  Clock,
 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { usePathname } from 'next/navigation'
@@ -28,6 +29,7 @@ function getPageIcon(pathname: string) {
   if (cleanPath.startsWith('/dashboard/deliveries')) return ScanSearch
   if (cleanPath.startsWith('/dashboard/scan-out')) return ScanBarcode
   if (cleanPath.startsWith('/dashboard/todos')) return ListTodo
+  if (cleanPath.startsWith('/dashboard/expiring-soon')) return Clock
   if (cleanPath.startsWith('/dashboard/inventory/products')) return Package
   if (cleanPath.startsWith('/dashboard/inventory/batches')) return Layers
   if (cleanPath.startsWith('/dashboard/integrations')) return Zap
@@ -93,16 +95,13 @@ export default function DashboardInsetHeader({
           ) : (
             <>
               {/* Main title with dynamic icon */}
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
                 {showIcon && (
-                  <div className="p-2 rounded-xl bg-primary/10 text-primary items-center">
-                    <PageIcon className="h-6 w-6" />
+                  <div className="p-2 rounded-xl bg-secondary-400/10 text-primary items-center">
+                    <PageIcon className="h-6 w-6 text-secondary-900" />
                   </div>
                 )}
-                <Typography
-                  variant="h1"
-                  className="font-black bg-gradient-to-r from-gray-900 to-gray-600 dark:from-gray-100 dark:to-gray-400 bg-clip-text text-transparent capitalize pb-1"
-                >
+                <Typography variant="h1" className="capitalize">
                   {displayTitle}
                 </Typography>
               </div>
