@@ -239,7 +239,7 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
       params.set('direction', filters.sortConfig.direction)
     }
 
-    router.replace(`?${params.toString()}`, { scroll: false })
+    router.push(`?${params.toString()}`, { scroll: false })
   }, [activeTab, filters, router, isInitialized])
 
   const handleTabChange = (tabId: TodoTabType) => {
@@ -312,16 +312,20 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
         )}
 
         <div ref={scrollContainerRef} className="overflow-x-auto scrollbar-none">
-          <div className="flex gap-2 sm:gap-8 min-w-max px-2 sm:px-0">
+          <div className="flex gap-2 sm:gap-8 min-w-max px-2 sm:px-0" role="tablist">
             {tabs.map((tab, index) => (
               <Button
                 key={tab.id}
+                id={`tab-${tab.id}`}
                 ref={(el: HTMLButtonElement | null) => {
                   buttonRefs.current[index] = el
                 }}
                 variant="ghost"
                 size={isMobile ? 'sm' : 'lg'}
                 onClick={() => handleTabChange(tab.id)}
+                role="tab"
+                aria-selected={activeTab === tab.id}
+                aria-controls={`tabpanel-${tab.id}`}
                 className={cn(
                   'rounded-none select-none relative flex flex-col-reverse sm:flex-row items-center pb-4 gap-1 min-w-0 flex-shrink-0',
                   'hover:bg-transparent group/tab',
@@ -367,6 +371,9 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
       <div className="w-full pt-2">
         {/* Keep all tab components mounted but only show the active one */}
         <div
+          id="tabpanel-pending"
+          role="tabpanel"
+          aria-labelledby="tab-pending"
           style={{
             display: activeTab === 'pending' ? 'block' : 'none',
           }}
@@ -379,6 +386,9 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
         </div>
 
         <div
+          id="tabpanel-in_progress"
+          role="tabpanel"
+          aria-labelledby="tab-in_progress"
           style={{
             display: activeTab === 'in_progress' ? 'block' : 'none',
           }}
@@ -391,6 +401,9 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
         </div>
 
         <div
+          id="tabpanel-completed"
+          role="tabpanel"
+          aria-labelledby="tab-completed"
           style={{
             display: activeTab === 'completed' ? 'block' : 'none',
           }}

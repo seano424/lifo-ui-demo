@@ -51,11 +51,14 @@ export default async function ExpiringSoonPage({ searchParams }: ExpiringSoonPag
       }),
     ])
 
-    stores = await fetchUserStores(user.id, serverClient)
+    // Read from cache after prefetch, fallback to fetching if not in cache
+    stores =
+      queryClient.getQueryData(['stores', 'userStores', user.id]) ||
+      (await fetchUserStores(user.id, serverClient))
   } catch (error) {
-    // Silently handle - retry logic already attempted recovery
-    // If all retries failed, stores will be empty array
-    logger.queryWarn('ExpiringSoonPage', 'Error prefetching data after retries', error)
+    // Handle errors from prefetch or fallback fetch
+    // This catches network failures, auth issues, or database errors
+    logger.queryWarn('ExpiringSoonPage', 'Error fetching user stores', error)
     stores = []
   }
 
