@@ -11,8 +11,8 @@
     "completed": "Terminé",
     "resolved": "Résolu",
     "expiringToday": "Aujourd'hui",
-    "expiringSoon": "Bientôt (2-3 jours)",
-    "expiringWeek": "Cette semaine (4-7 jours)"
+    "expiringSoon": "Dans les 2-3 jours",
+    "expiringWeek": "Dans les 4-7 jours"
   },
   "pending": {
     "errorLoading": "Erreur lors du chargement des tâches en attente",

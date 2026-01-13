@@ -11,8 +11,8 @@
     "completed": "Completed",
     "resolved": "Resolved",
     "expiringToday": "Today",
-    "expiringSoon": "Soon (2-3 days)",
-    "expiringWeek": "This Week (4-7 days)"
+    "expiringSoon": "In next 2-3 days",
+    "expiringWeek": "In next 4-7 days"
   },
   "pending": {
     "errorLoading": "Error loading pending todos",
