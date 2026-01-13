@@ -50,6 +50,7 @@ export async function loadMessages(locale: string): Promise<Record<string, unkno
       donation,
       terms,
       privacy,
+      expiringSoon,
     ] = await Promise.all([
       import(`../messages/${locale}/auth.json`).then(m => m.default).catch(() => ({})),
       import(`../messages/${locale}/common.json`).then(m => m.default).catch(() => ({})),
@@ -66,6 +67,7 @@ export async function loadMessages(locale: string): Promise<Record<string, unkno
       import(`../messages/${locale}/donation.json`).then(m => m.default).catch(() => ({})),
       import(`../messages/${locale}/terms.json`).then(m => m.default).catch(() => ({})),
       import(`../messages/${locale}/privacy.json`).then(m => m.default).catch(() => ({})),
+      import(`../messages/${locale}/expiring-soon.json`).then(m => m.default).catch(() => ({})),
     ])
 
     // Merge all messages into a single object with proper namespacing
@@ -95,6 +97,7 @@ export async function loadMessages(locale: string): Promise<Record<string, unkno
       ...onboarding,
       ...settings,
       todos,
+      'expiring-soon': expiringSoon,
       integrations,
       ocr,
       donation,
