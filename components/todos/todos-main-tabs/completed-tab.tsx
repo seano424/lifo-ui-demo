@@ -3,7 +3,7 @@
 import { Typography } from '@/components/ui/typography'
 import { useCompletedTodos, useCompletedTodosWithCounts } from '@/hooks/use-todos-with-filters'
 import { useTranslations } from 'next-intl'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { TodoFiltersState } from '../filters/types'
 import { TodoCardList } from '../todo-card-list'
 
@@ -103,6 +103,9 @@ export function CompletedTabWithCounts({
   const t = useTranslations('todos')
   const tErrors = useTranslations('errors.common')
 
+  // Track hydration to avoid SSR/client mismatch
+  const [isHydrated, setIsHydrated] = useState(false)
+
   const {
     data: todos,
     counts,
@@ -126,6 +129,11 @@ export function CompletedTabWithCounts({
   // Track previous count to avoid unnecessary updates
   const prevCountRef = useRef<number | undefined>(undefined)
 
+  // Set hydration flag
+  useEffect(() => {
+    setIsHydrated(true)
+  }, [])
+
   // Update parent component with count whenever it changes
   useEffect(() => {
     const currentCount = counts?.completed
@@ -135,6 +143,18 @@ export function CompletedTabWithCounts({
     }
   }, [counts?.completed, onCountUpdate])
 
+  // Show loading state during SSR and initial client render to avoid hydration mismatch
+  if (!isHydrated || isLoading) {
+    return (
+      <div className="text-center min-h-screen pt-20 flex flex-col items-center gap-4">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+        <Typography variant="p" color="muted">
+          {t('completed.loading')}
+        </Typography>
+      </div>
+    )
+  }
+
   if (isError) {
     return (
       <div className="text-center min-h-screen pt-20 flex flex-col items-center gap-4">
@@ -143,17 +163,6 @@ export function CompletedTabWithCounts({
         </Typography>
         <Typography variant="p" color="muted">
           {error?.message || tErrors('somethingWrong')}
-        </Typography>
-      </div>
-    )
-  }
-
-  if (isLoading) {
-    return (
-      <div className="text-center min-h-screen pt-20 flex flex-col items-center gap-4">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-        <Typography variant="p" color="muted">
-          {t('completed.loading')}
         </Typography>
       </div>
     )
