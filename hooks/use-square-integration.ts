@@ -152,6 +152,10 @@ export function useDisconnectSquare() {
     onSuccess: () => {
       // Invalidate all Square-related queries using query key factory
       queryClient.invalidateQueries({ queryKey: squareQueryKeys.all })
+
+      // Invalidate stores query since disconnection deactivates the stores
+      queryClient.invalidateQueries({ queryKey: ['stores'] })
+
       toast.success('Square disconnected successfully')
     },
     onError: error => {

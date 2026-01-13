@@ -139,17 +139,28 @@ export function SquareCallbackProcessor() {
           )}
 
           {status === 'success' && squareStatus && (
-            <div className="space-y-2 rounded-lg bg-green-50 p-4 text-sm">
-              {squareStatus.store_name && (
-                <div className="flex justify-between">
-                  <span className="text-gray-600">{t('store')}:</span>
-                  <span className="font-medium text-gray-900">{squareStatus.store_name}</span>
-                </div>
-              )}
+            <div className="space-y-3 rounded-lg bg-green-50 p-4 text-sm">
               {squareStatus.merchant_name && (
                 <div className="flex justify-between">
                   <span className="text-gray-600">{t('merchant')}:</span>
                   <span className="font-medium text-gray-900">{squareStatus.merchant_name}</span>
+                </div>
+              )}
+              {squareStatus.stores && squareStatus.stores.length > 0 && (
+                <div className="space-y-2">
+                  <span className="text-gray-600">
+                    {squareStatus.stores.length === 1
+                      ? t('connectedStore')
+                      : t('connectedStores', { count: squareStatus.stores.length })}
+                    :
+                  </span>
+                  <ul className="ml-4 space-y-1">
+                    {squareStatus.stores.map(store => (
+                      <li key={store.store_id} className="font-medium text-gray-900">
+                        {store.store_name}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               )}
             </div>

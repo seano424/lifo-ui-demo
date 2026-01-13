@@ -68,7 +68,9 @@
       "fetchingBusinessInfo": "Fetching business information",
       "creatingStore": "Creating your store",
       "store": "Store",
-      "merchant": "Merchant"
+      "merchant": "Merchant",
+      "connectedStore": "Connected location",
+      "connectedStores": "Connected {count} locations"
     },
     "disconnect": {
       "title": "Disconnect Square?",

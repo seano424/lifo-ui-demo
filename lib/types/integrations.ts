@@ -4,15 +4,30 @@
  */
 
 /**
+ * Information about a single connected store
+ */
+export interface ConnectedStoreInfo {
+  store_id: string
+  store_name: string
+  location_id: string
+  connection_id: string
+  connection_status: 'active' | 'expired' | 'revoked' | 'error'
+  last_sync_at?: string
+}
+
+/**
  * Square connection status response (from /status endpoint)
  * Used to check if user has an active Square connection
+ * Now supports multiple locations (one store per location)
  */
 export interface SquareConnectionStatus {
   is_connected: boolean
-  store_id?: string
-  store_name?: string
   merchant_id?: string
   merchant_name?: string
+  stores: ConnectedStoreInfo[]
+  // Legacy fields for backward compatibility (first store if multiple exist)
+  store_id?: string
+  store_name?: string
   location_id?: string
   connection_id?: string
   connection_status?: 'active' | 'expired' | 'revoked' | 'error'

@@ -68,7 +68,9 @@
       "fetchingBusinessInfo": "Récupération des informations commerciales",
       "creatingStore": "Création de votre magasin",
       "store": "Magasin",
-      "merchant": "Marchand"
+      "merchant": "Marchand",
+      "connectedStore": "Emplacement connecté",
+      "connectedStores": "{count} emplacements connectés"
     },
     "disconnect": {
       "title": "Déconnecter Square ?",

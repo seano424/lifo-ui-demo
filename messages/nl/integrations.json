@@ -68,7 +68,9 @@
       "fetchingBusinessInfo": "Bedrijfsgegevens ophalen",
       "creatingStore": "Uw winkel aanmaken",
       "store": "Winkel",
-      "merchant": "Handelaar"
+      "merchant": "Handelaar",
+      "connectedStore": "Verbonden locatie",
+      "connectedStores": "{count} locaties verbonden"
     },
     "disconnect": {
       "title": "Square verbreken?",
