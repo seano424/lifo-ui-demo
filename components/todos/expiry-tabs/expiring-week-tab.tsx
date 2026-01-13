@@ -80,7 +80,6 @@ export function ExpiringWeekTab({ filters, pageSize = 20, onCountUpdate }: Expir
   if (!todos?.length) {
     return (
       <div className="text-center py-12 flex flex-col items-center justify-center gap-4">
-        <div className="text-6xl mb-4">📅</div>
         <Typography variant="h3" color="primary">
           {t('expiringWeek.noItemsHeading')}
         </Typography>
@@ -105,7 +104,7 @@ export function ExpiringWeekTab({ filters, pageSize = 20, onCountUpdate }: Expir
       isFetchingNextPage={isFetchingNextPage}
       sortConfig={filters.sortConfig}
       emptyStateMessage={t('expiringWeek.noMatch')}
-      emptyStateIcon="📅"
+      emptyStateIcon=""
     />
   )
 }

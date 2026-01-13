@@ -80,7 +80,6 @@ export function ExpiredTab({ filters, pageSize = 20, onCountUpdate }: ExpiredTab
   if (!todos?.length) {
     return (
       <div className="text-center py-12 flex flex-col items-center justify-center gap-4">
-        <div className="text-6xl mb-4">📦</div>
         <Typography variant="h3" color="primary">
           {t('expired.noExpiredHeading')}
         </Typography>
@@ -105,7 +104,7 @@ export function ExpiredTab({ filters, pageSize = 20, onCountUpdate }: ExpiredTab
       isFetchingNextPage={isFetchingNextPage}
       sortConfig={filters.sortConfig}
       emptyStateMessage={t('expired.noMatch')}
-      emptyStateIcon="📦"
+      emptyStateIcon=""
     />
   )
 }
