@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { useSquareStatusPolling } from '@/hooks/use-square-integration'
+import type { ConnectedStoreInfo } from '@/lib/types/integrations'
 
 type CallbackStatus = 'processing' | 'success' | 'error'
 
@@ -155,7 +156,7 @@ export function SquareCallbackProcessor() {
                     :
                   </span>
                   <ul className="ml-4 space-y-1">
-                    {squareStatus.stores.map(store => (
+                    {squareStatus.stores.map((store: ConnectedStoreInfo) => (
                       <li key={store.store_id} className="font-medium text-gray-900">
                         {store.store_name}
                       </li>

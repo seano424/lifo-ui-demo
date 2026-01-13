@@ -24,7 +24,7 @@ export interface SquareConnectionStatus {
   is_connected: boolean
   merchant_id?: string
   merchant_name?: string
-  stores: ConnectedStoreInfo[]
+  stores?: ConnectedStoreInfo[]
   // Legacy fields for backward compatibility (first store if multiple exist)
   store_id?: string
   store_name?: string
