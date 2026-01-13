@@ -8,6 +8,7 @@ import { createClient as createServerClient } from '@/lib/supabase/server'
 import { logger } from '@/lib/utils/logger'
 import { dehydrate, HydrationBoundary } from '@tanstack/react-query'
 import { redirect } from 'next/navigation'
+import { Suspense } from 'react'
 
 interface ExpiringSoonPageProps {
   searchParams: Promise<{
@@ -72,17 +73,26 @@ export default async function ExpiringSoonPage({ searchParams }: ExpiringSoonPag
         <div className="flex flex-col gap-6 container py-6">
           <DashboardInsetHeader page="expiring-soon" />
           <ErrorBoundary>
-            <TodosFilteredList
-              initialFilters={{
-                tab: params.tab,
-                urgency: params.urgency?.split(','),
-                actionType: params.actionType?.split(','),
-                batchStatus: params.batchStatus?.split(','),
-                productName: params.productName,
-                sort: params.sort,
-                direction: params.direction,
-              }}
-            />
+            <Suspense
+              fallback={
+                <div className="flex flex-col gap-4">
+                  <div className="h-12 bg-gray-200 rounded animate-pulse" />
+                  <div className="h-96 bg-gray-200 rounded animate-pulse" />
+                </div>
+              }
+            >
+              <TodosFilteredList
+                initialFilters={{
+                  tab: params.tab,
+                  urgency: params.urgency?.split(','),
+                  actionType: params.actionType?.split(','),
+                  batchStatus: params.batchStatus?.split(','),
+                  productName: params.productName,
+                  sort: params.sort,
+                  direction: params.direction,
+                }}
+              />
+            </Suspense>
           </ErrorBoundary>
         </div>
       </div>

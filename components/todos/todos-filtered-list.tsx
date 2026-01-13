@@ -7,7 +7,7 @@ import type { BatchStatus, TodoActionType, TodoUrgencyLevel } from '@/lib/querie
 import { cn } from '@/lib/utils'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { isUrgencyLevel, isActionType, isBatchStatus } from '@/lib/todo-filter-config'
 import type { SortDirection, SortField, TodoFiltersState } from './filters/types'
@@ -34,6 +34,7 @@ interface TodosFilteredListProps {
 export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilteredListProps) {
   const t = useTranslations('todos')
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { isMobile } = useMediaQuery()
 
   const [activeTab, setActiveTab] = useState<TodoTabType>(
@@ -51,6 +52,8 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
 
   // Track if filters/tab have been initialized from URL
   const [isInitialized, setIsInitialized] = useState(false)
+  // Track when we're syncing state from URL to prevent infinite loops
+  const isSyncingFromUrl = useRef(false)
 
   // Unified filter state with stable default sort config
   const defaultSortConfig = useMemo(
@@ -203,10 +206,76 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
     setIsInitialized(true)
   }, [])
 
+  // Sync state with URL when user navigates back/forward
+  useEffect(() => {
+    // Skip during initialization to avoid conflicts
+    if (!isInitialized) {
+      return
+    }
+
+    // Mark that we're syncing from URL
+    isSyncingFromUrl.current = true
+
+    const urlTab = searchParams.get('tab') as TodoTabType | null
+    const urlUrgency = searchParams.get('urgency')?.split(',')
+    const urlActionType = searchParams.get('actionType')?.split(',')
+    const urlBatchStatus = searchParams.get('batchStatus')?.split(',')
+    const urlProductName = searchParams.get('productName')
+    const urlSort = searchParams.get('sort')
+    const urlDirection = searchParams.get('direction')
+
+    // Update tab from URL (React will bail out if value hasn't changed)
+    const newTab = (urlTab as TodoTabType) || 'pending'
+    setActiveTab(newTab)
+
+    // Update filters if they changed in URL
+    const validUrgencyLevels = urlUrgency
+      ?.filter(u => isUrgencyLevel(u))
+      .map(u => u as TodoUrgencyLevel)
+
+    const validActionTypes = urlActionType
+      ?.filter(a => isActionType(a))
+      .map(a => a as TodoActionType)
+
+    const validBatchStatus = urlBatchStatus
+      ?.filter(b => isBatchStatus(b))
+      .map(b => b as BatchStatus)
+
+    setFilters(prev => ({
+      ...prev,
+      urgency_level:
+        validUrgencyLevels && validUrgencyLevels.length > 0 ? validUrgencyLevels : undefined,
+      action_type: validActionTypes && validActionTypes.length > 0 ? validActionTypes : undefined,
+      batch_status: validBatchStatus && validBatchStatus.length > 0 ? validBatchStatus : undefined,
+      product_name: urlProductName || undefined,
+      sortConfig: urlSort
+        ? {
+            field: urlSort as SortField,
+            direction: (urlDirection as SortDirection) || 'desc',
+          }
+        : defaultSortConfig,
+    }))
+
+    // Reset the flag after state updates complete
+    const timeoutId = setTimeout(() => {
+      isSyncingFromUrl.current = false
+    }, 0)
+
+    return () => {
+      clearTimeout(timeoutId)
+      isSyncingFromUrl.current = false
+    }
+  }, [searchParams, isInitialized, defaultSortConfig])
+
   // Update URL when tab or filters change (only after initialization)
   useEffect(() => {
     // Skip URL update until component is initialized to prevent loops
     if (!isInitialized) {
+      return
+    }
+
+    // Skip if we're currently syncing from URL to prevent infinite loops
+    if (isSyncingFromUrl.current) {
       return
     }
 
@@ -239,8 +308,13 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
       params.set('direction', filters.sortConfig.direction)
     }
 
-    router.push(`?${params.toString()}`, { scroll: false })
-  }, [activeTab, filters, router, isInitialized])
+    // Only update URL if it's different from current URL
+    const newUrl = `?${params.toString()}`
+    const currentUrl = `?${searchParams.toString()}`
+    if (newUrl !== currentUrl) {
+      router.push(newUrl, { scroll: false })
+    }
+  }, [activeTab, filters, router, isInitialized, searchParams])
 
   const handleTabChange = (tabId: TodoTabType) => {
     setActiveTab(tabId)
