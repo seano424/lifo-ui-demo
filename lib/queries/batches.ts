@@ -418,6 +418,38 @@ export async function updateBatch(
   const context = 'updateBatch'
 
   return withPerformanceTracking(context, 'Update batch', { batchId }, async () => {
+    // First, check if the batch exists and is accessible
+    const { data: existingBatch, error: fetchError } = await supabase
+      .schema('inventory')
+      .from('batches')
+      .select('batch_id, store_id, status, batch_number')
+      .eq('batch_id', batchId)
+      .maybeSingle()
+
+    if (fetchError) {
+      logger.error(context, 'Failed to check batch existence', {
+        batchId,
+        error: fetchError.message,
+        code: fetchError.code,
+      })
+      throw new Error(`Failed to verify batch: ${fetchError.message}`)
+    }
+
+    if (!existingBatch) {
+      logger.error(context, 'Batch not found or not accessible', {
+        batchId,
+        reason: 'Batch may have been deleted or user lacks permission (RLS)',
+      })
+      throw new Error(
+        `Batch with ID "${batchId}" not found. It may have been deleted or you may not have permission to access it.`,
+      )
+    }
+
+    logger.log(context, 'Batch exists, proceeding with update', {
+      batchId,
+      storeId: existingBatch.store_id,
+    })
+
     // Add updated_at timestamp
     const updateWithTimestamp = {
       ...updates,
@@ -435,8 +467,14 @@ export async function updateBatch(
     if (error) {
       // Handle specific error cases
       if (error.code === 'PGRST116') {
-        logger.error(context, 'Batch not found', { batchId, code: error.code })
-        throw new Error(`Batch with ID "${batchId}" not found`)
+        logger.error(context, 'Batch not found during update', {
+          batchId,
+          code: error.code,
+          note: 'Batch existed during check but not during update - possible race condition',
+        })
+        throw new Error(
+          `Batch with ID "${batchId}" was deleted during the update. Please refresh and try again.`,
+        )
       }
 
       if (error.code === '23514') {

@@ -1,9 +1,11 @@
 'use client'
 
-import { TodoActionBottomSheet } from '@/components/todos/todo-action-bottom-sheet'
-import { TodoCard } from '@/components/todos/todo-card'
+// import { TodoActionBottomSheet } from '@/components/todos/todo-action-bottom-sheet'
+import { TodoActionSheetV2 } from './todo-action-sheet-v2'
+import { TodoCardV3 } from '@/components/todos/todo-card-v3'
 import { InfiniteScrollErrorBoundary } from '@/components/ui/error-boundary'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useCurrency } from '@/hooks/use-currency'
 import { useIntersectionObserver } from '@/hooks/use-intersection-observer'
 import { DEFAULT_ROOT_MARGIN } from '@/lib/constants/todos'
 import type { TodoItem } from '@/lib/queries/todos-rpc'
@@ -36,6 +38,7 @@ export function TodoCardList({
   emptyStateIcon = '📋',
 }: TodoCardListProps) {
   const t = useTranslations('todos')
+  const currencySymbol = useCurrency()
 
   // Bottom sheet state for todo actions
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false)
@@ -160,12 +163,13 @@ export function TodoCardList({
 
   return (
     <InfiniteScrollErrorBoundary>
-      <div className="space-y-4 flex flex-col">
-        <div className="flex flex-col gap-12">
+      <div className="flex flex-col gap-8 pb-80">
+        <div className="flex flex-col gap-8 scroll-m-96">
           {sortedTodos.map(todo => (
-            <TodoCard
+            <TodoCardV3
               key={todo.batch_id}
               todo={todo}
+              currencySymbol={currencySymbol}
               onClick={() => handleTodoClick(todo.batch_id || '')}
             />
           ))}
@@ -196,10 +200,11 @@ export function TodoCardList({
       </div>
 
       {/* Todo Action Bottom Sheet */}
-      <TodoActionBottomSheet
+      <TodoActionSheetV2
         isOpen={isBottomSheetOpen}
         onClose={handleCloseBottomSheet}
         selectedBatch={selectedBatch}
+        currencySymbol={currencySymbol}
       />
     </InfiniteScrollErrorBoundary>
   )

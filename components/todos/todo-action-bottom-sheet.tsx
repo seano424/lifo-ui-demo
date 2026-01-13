@@ -28,6 +28,7 @@ interface TodoActionBottomSheetProps {
   isOpen: boolean
   onClose: () => void
   selectedBatch: TodoItem | null
+  currencySymbol?: string
 }
 
 type TabType = 'donate' | 'discount' | 'sold' | 'dispose' | 'details'
@@ -36,6 +37,7 @@ export function TodoActionBottomSheet({
   isOpen,
   onClose,
   selectedBatch,
+  currencySymbol = '€',
 }: TodoActionBottomSheetProps) {
   const t = useTranslations('todos')
   const [activeTab, setActiveTab] = useState<TabType>('details')
@@ -155,7 +157,8 @@ export function TodoActionBottomSheet({
                 })}
               </Typography>
               <Typography className="px-2 text-xs sm:text-base">
-                €{(currentBatch.unit_price || 0).toFixed(2)}
+                {currencySymbol}
+                {(currentBatch.unit_price || 0).toFixed(2)}
               </Typography>
             </div>
           </div>
@@ -166,7 +169,11 @@ export function TodoActionBottomSheet({
         {/* Tab Content Area */}
         <div className="flex-1 overflow-y-auto">
           {activeTab === 'discount' && (
-            <DiscountTab selectedBatch={currentBatch} onClose={onClose} />
+            <DiscountTab
+              selectedBatch={currentBatch}
+              currencySymbol={currencySymbol}
+              onClose={onClose}
+            />
           )}
 
           {activeTab === 'donate' && <DonateTab selectedBatch={currentBatch} onClose={onClose} />}
@@ -175,7 +182,13 @@ export function TodoActionBottomSheet({
 
           {activeTab === 'dispose' && <DisposeTab selectedBatch={currentBatch} onClose={onClose} />}
 
-          {activeTab === 'details' && <DetailsTab selectedBatch={currentBatch} onClose={onClose} />}
+          {activeTab === 'details' && (
+            <DetailsTab
+              selectedBatch={currentBatch}
+              currencySymbol={currencySymbol}
+              onClose={onClose}
+            />
+          )}
         </div>
 
         {/* Tab Navigation */}

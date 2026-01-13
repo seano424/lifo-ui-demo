@@ -21,6 +21,7 @@ import {
 } from '@/hooks/use-donation-recipients'
 import { useTranslations } from 'next-intl'
 import { logger } from '@/lib/utils/logger'
+import { cn } from '@/lib/utils'
 
 interface RecipientSelectorProps {
   storeId: string | undefined
@@ -159,8 +160,8 @@ export function RecipientSelector({
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-8">
-        <div className="animate-spin h-6 w-6 border-2 border-purple-600 border-t-transparent rounded-full" />
-        <span className="ml-2 text-gray-600 dark:text-gray-400">
+        <div className="animate-spin h-6 w-6 border-2 border-primary border-t-transparent rounded-full" />
+        <span className="ml-2 text-primary">
           {t('loadingRecipients') || 'Loading recipients...'}
         </span>
       </div>
@@ -178,12 +179,16 @@ export function RecipientSelector({
           <Typography variant="muted">{t('savedRecipients') || 'Saved Recipients'}</Typography>
           <div className="grid grid-cols-1 gap-2">
             {dbRecipients.map(recipient => (
-              <Button
+              <button
+                type="button"
                 key={recipient.id}
-                size="lg"
-                variant={selectedRecipientId === recipient.id ? 'subtleTertiary' : 'outline'}
                 onClick={() => handleRecipientSelect(recipient)}
-                className="border-none shadow justify-start"
+                className={cn(
+                  'py-2 px-3 text-sm font-medium rounded-3xl transition-all duration-500 ease-in-out flex items-center justify-center gap-2',
+                  selectedRecipientId === recipient.id
+                    ? 'bg-primary/10 text-black border-8 border-primary/10'
+                    : 'bg-white text-black hover:bg-muted/50 border-8 border-transparent',
+                )}
               >
                 <div className="text-left flex-1 flex flex-col gap-1">
                   <Typography>{recipient.name}</Typography>
@@ -191,8 +196,7 @@ export function RecipientSelector({
                     {recipient.type.replace('_', ' ')}
                   </Typography>
                 </div>
-                {selectedRecipientId === recipient.id && <Check className="h-4 w-4 ml-2" />}
-              </Button>
+              </button>
             ))}
           </div>
         </div>
@@ -206,17 +210,19 @@ export function RecipientSelector({
             const isSelected =
               selectedRecipientId === ADHOC_RECIPIENT_UUID && selectedRecipientName === preset.name
             return (
-              <Button
+              <button
+                type="button"
                 key={preset.name}
-                size="lg"
-                variant={isSelected ? 'subtleTertiary' : 'outline'}
                 onClick={() => handlePresetSelect(preset.name)}
-                className="border-none shadow justify-start"
+                className={cn(
+                  'py-2 px-3 text-sm font-medium rounded-3xl transition-all duration-500 ease-in-out flex items-center justify-center gap-2',
+                  isSelected
+                    ? 'bg-primary/10 text-black border-8 border-primary/10'
+                    : 'bg-white text-black hover:bg-muted/50 border-8 border-transparent',
+                )}
               >
-                <span className="mr-2">{preset.icon}</span>
-                <span className="flex-1 text-left">{preset.name}</span>
-                {isSelected && <Check className="h-4 w-4 ml-2" />}
-              </Button>
+                <Typography variant="small">{preset.name}</Typography>
+              </button>
             )
           })}
         </div>
@@ -229,22 +235,20 @@ export function RecipientSelector({
             variant="outline"
             size="lg"
             onClick={() => setShowCustomInput(true)}
-            className="w-full justify-start"
+            className="w-full justify-center gap-2 py-2 px-3 text-sm font-medium rounded-3xl transition-all duration-500 ease-in-out flex items-center bg-white text-black hover:bg-muted/50 border-8 border-transparent"
           >
-            <Plus className="h-4 w-4 mr-2" />
+            <Plus className="h-4 w-4" />
             {t('addCustomRecipient') || 'Add New Recipient'}
           </Button>
         ) : (
-          <div className="space-y-3 p-4 border rounded-lg bg-gray-50 dark:bg-gray-900">
-            <Typography variant="muted" className="text-sm font-medium">
+          <div className="space-y-3 p-4">
+            <Typography variant="small">
               {t('newRecipientDetails') || 'New Recipient Details'}
             </Typography>
 
             {/* Name Field */}
-            <div className="space-y-1">
-              <Label htmlFor="custom-recipient" className="text-xs">
-                {t('recipientName') || 'Recipient Name'} *
-              </Label>
+            <div className="flex flex-col gap-1">
+              <Label htmlFor="custom-recipient">{t('recipientName') || 'Recipient Name'} *</Label>
               <Input
                 id="custom-recipient"
                 value={customName}
@@ -330,7 +334,7 @@ export function RecipientSelector({
               <Button
                 onClick={handleCustomSubmit}
                 disabled={!customName.trim() || isCreating}
-                className="flex-1"
+                className="flex-1 bg-muted text-black hover:bg-muted/90"
               >
                 {isCreating ? (
                   <>
@@ -341,7 +345,7 @@ export function RecipientSelector({
                   tCommon('save') || 'Save'
                 )}
               </Button>
-              <Button variant="outline" onClick={resetCustomForm} disabled={isCreating}>
+              <Button variant="subtleSecondary" onClick={resetCustomForm} disabled={isCreating}>
                 {tCommon('cancel') || 'Cancel'}
               </Button>
             </div>

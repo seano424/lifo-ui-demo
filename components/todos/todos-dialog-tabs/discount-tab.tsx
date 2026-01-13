@@ -14,10 +14,11 @@ import { useTheme } from 'next-themes'
 
 interface DiscountTabProps {
   selectedBatch: TodoItem
+  currencySymbol?: string
   onClose: () => void
 }
 
-export function DiscountTab({ selectedBatch, onClose }: DiscountTabProps) {
+export function DiscountTab({ selectedBatch, currencySymbol = '€', onClose }: DiscountTabProps) {
   const t = useTranslations('todos')
   const tCommon = useTranslations()
   const tErrors = useTranslations('errors.common')
@@ -92,7 +93,7 @@ export function DiscountTab({ selectedBatch, onClose }: DiscountTabProps) {
         quantity: selectedBatch.current_quantity || 0,
         discountPercentage: priceMetrics.actualDiscountPercentage,
         notes: useCustomPrice
-          ? `Set price to €${priceMetrics.newPrice.toFixed(2)} (${priceMetrics.actualDiscountPercentage}% discount) - ${selectedBatch.ai_recommendation || ''}`
+          ? `Set price to ${currencySymbol}${priceMetrics.newPrice.toFixed(2)} (${priceMetrics.actualDiscountPercentage}% discount) - ${selectedBatch.ai_recommendation || ''}`
           : `Applied ${priceMetrics.actualDiscountPercentage}% discount - ${selectedBatch.ai_recommendation || ''}`,
         recommendedAction: isValidRecommendedAction(selectedBatch.ai_recommendation)
           ? selectedBatch.ai_recommendation

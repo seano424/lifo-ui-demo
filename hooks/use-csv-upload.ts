@@ -5,6 +5,7 @@ import { toast } from 'sonner'
 import { CSV_PROCESSING, PRICE_CONSTRAINTS, TOAST_DURATIONS } from '@/lib/constants/file-upload'
 import { convertToISODate } from '@/lib/utils/date-conversion'
 import { logger } from '@/lib/utils/logger'
+import { queryKeys } from '@/lib/queries/query-keys'
 
 interface CSVUploadResponse {
   success: boolean
@@ -801,15 +802,30 @@ export function useCSVUpload() {
       return result
     },
     onSuccess: async (data, { storeId }) => {
-      // Invalidate inventory queries to refresh dashboard
-      queryClient.invalidateQueries({ queryKey: ['store-batches', storeId] })
-      queryClient.invalidateQueries({ queryKey: ['store-inventory', storeId] })
-      queryClient.invalidateQueries({ queryKey: ['expiring-batches', storeId] })
-      queryClient.invalidateQueries({ queryKey: ['batches', storeId] })
+      // ✅ Invalidate ALL batch queries for this store
+      // This matches: infinite queries, expiring batches, low stock, drafts, etc.
+      queryClient.invalidateQueries({ queryKey: queryKeys.batches.byStore(storeId) })
 
-      // Invalidate todos queries (CSV import affects urgency states)
-      queryClient.invalidateQueries({ queryKey: ['todos', 'urgent-count', storeId] })
-      queryClient.invalidateQueries({ queryKey: ['todos', 'summary', storeId] })
+      // ✅ Invalidate ALL product queries for this store
+      // CSV upload creates store_products, so product lists need refreshing
+      queryClient.invalidateQueries({ queryKey: queryKeys.products.byStore(storeId) })
+
+      // ✅ Invalidate ALL todo queries (across all filters, counts, summaries)
+      // New batches affect todos urgency, completion status, counts
+      queryClient.invalidateQueries({ queryKey: queryKeys.todos.all })
+
+      // ✅ CRITICAL: Explicitly invalidate urgent count (sidebar badge)
+      // This query has refetchOnMount:false, so needs explicit invalidation + refetch
+      await queryClient.invalidateQueries({
+        queryKey: queryKeys.todos.urgentCount(storeId),
+        refetchType: 'active', // Force refetch if query is currently mounted
+      })
+
+      // ✅ Invalidate dashboard KPIs (inventory stats, sales, donations, waste)
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboardKPIs.byStore(storeId) })
+
+      // ✅ Invalidate store insights (actionable insights for the store)
+      queryClient.invalidateQueries({ queryKey: queryKeys.storeInsights.store(storeId) })
 
       // Cache upload results for error review
       queryClient.setQueryData(['csv-upload-results'], data)

@@ -8,7 +8,8 @@
     "inProgress": "Bezig",
     "expiring": "Verlopen binnenkort",
     "expired": "Verlopen",
-    "completed": "Voltooid"
+    "completed": "Voltooid",
+    "resolved": "Opgelost"
   },
   "pending": {
     "errorLoading": "Fout bij het laden van taken in afwachting",
@@ -45,14 +46,17 @@
     "allCleared": "Goed gedaan! Alle verlopen items zijn opgeruimd.",
     "noMatch": "Geen verlopen taken komen overeen met uw filters"
   },
-  "emptyStateWithFilters": "Probeer uw filters aan te passen om meer items te zien.",
+  "emptyStateWithFilters": "Probeer uw filters aan te passen om meer taken te zien.",
   "card": {
     "suggestion": "Suggestie",
-    "daysLeft": "{days} dagen over",
-    "daysLeftOne": "1 dag over",
+    "suggested": "Voorgesteld",
+    "daysLeft": "Verloopt over {days, plural, =1 {1 dag} other {# dagen}}",
+    "daysLeftOne": "Verloopt over 1 dag",
     "expiresIn": "Verloopt over {days} dagen",
     "expiresToday": "Verloopt vandaag",
+    "expiresTomorrow": "Verloopt morgen",
     "expired": "Verlopen {days} dagen geleden",
+    "expiredStatus": "Verlopen",
     "expiredYesterday": "Gisteren verlopen",
     "currentlyDiscounted": "Momenteel afgeprijsd: {percent}%",
     "suggestedDiscount": "Voorgestelde korting: {percent}%",
@@ -60,14 +64,31 @@
     "expiringSoon": "Verloopt binnenkort",
     "activeHealthy": "Actief en gezond",
     "editTodo": "Taak bewerken",
-    "unitsLeft": "{quantity} over",
+    "unitsLeft": "{quantity, plural, =0 {0 left} =1 {1 left} other {# left}}",
     "allSold": "Alles verkocht!",
     "donated": "Gedoneerd!",
     "disposed": "Alles weggegooid!",
     "completedOn": "Voltooid op {date}",
     "donatedOn": "Gedoneerd op {date}",
     "disposedOn": "Weggegooid op {date}",
-    "noRecommendation": "Geen aanbeveling"
+    "noRecommendation": "Geen aanbeveling",
+    "tapToManage": "Tik om te beheren",
+    "tapToReview": "Bekijk en los op",
+    "tapToTakeAction": "Onderneem actie",
+    "tapToViewDetails": "Bekijk details",
+    "completed": "Voltooid",
+    "remaining": "over",
+    "donatedAction": "gedoneerd",
+    "disposedAction": "weggegooid",
+    "units": "eenheden",
+    "unit": "eenheid",
+    "soldUnits": "verkocht",
+    "revenue": "opbrengst",
+    "total": "totaal",
+    "discountApplied": "korting toegepast",
+    "discountAppliedToUnits": "{count, plural, =1 {korting toegepast op 1 eenheid} other {korting toegepast op # eenheden}}",
+    "unitPrice": "Prijs per eenheid",
+    "totalValue": "Totale waarde"
   },
   "recommendations": {
     "dispose": "Direct weggooien",
@@ -84,7 +105,12 @@
     "donate": "Doneren",
     "sell": "Verkopen",
     "dispose": "Weggooien",
-    "details": "Details"
+    "monitorStock": "Voorraad monitoren",
+    "details": "Details",
+    "sold": "Verkocht",
+    "donated": "Gedoneerd",
+    "disposed": "Weggegooid",
+    "soldAtDiscount": "Verkocht met {percent}% korting"
   },
   "bottomSheet": {
     "units": "{count} eenheden"
@@ -159,19 +185,21 @@
       "batchNumberRequired": "Batchnummer is verplicht",
       "batchNumberTooLong": "Batchnummer moet minder dan {max} tekens bevatten",
       "batchNumberInvalid": "Batchnummer mag alleen letters, cijfers, koppeltekens, underscores en spaties bevatten",
-      "expiryRequired": "Vervaldatum is verplicht",
-      "expiryTooOld": "Vervaldatum kan niet meer dan {years} jaar in het verleden liggen",
-      "expiryTooFuture": "Vervaldatum kan niet meer dan {years} jaar in de toekomst liggen",
-      "quantityPositive": "Aantal moet 0 of hoger zijn",
-      "quantityWhole": "Aantal moet een heel getal zijn",
-      "costPricePositive": "Kostprijs moet 0 of hoger zijn",
-      "sellingPricePositive": "Verkoopprijs moet 0 of hoger zijn",
-      "priceMax": "Prijzen kunnen niet meer dan €{max} bedragen"
+      "expiryDateRequired": "Vervaldatum is verplicht",
+      "expiryDateTooFarPast": "Vervaldatum kan niet meer dan {years} jaar in het verleden liggen",
+      "expiryDateTooFarFuture": "Vervaldatum kan niet meer dan {years} jaar in de toekomst liggen",
+      "quantityNegative": "Aantal kan niet negatief zijn",
+      "quantityInteger": "Aantal moet een heel getal zijn",
+      "costPriceNegative": "Kostprijs kan niet negatief zijn",
+      "sellingPriceNegative": "Verkoopprijs kan niet negatief zijn",
+      "priceExceedsMax": "Prijzen kunnen niet meer dan €{max} bedragen"
     },
     "error": {
       "invalidData": "Ongeldige gegevens: Batchnummer bestaat mogelijk al of bevat ongeldige tekens",
       "updateFailed": "Update mislukt: {error}",
-      "unexpected": "Er is een onverwachte fout opgetreden bij het bijwerken van de batch"
+      "unexpected": "Er is een onverwachte fout opgetreden bij het bijwerken van de batch",
+      "batchNotFound": "Deze batch bestaat niet meer. Deze is mogelijk verwijderd of u heeft geen toestemming om deze te openen.",
+      "batchDeleted": "Deze batch is verwijderd tijdens de update. De pagina wordt automatisch ververst."
     },
     "status": {
       "expired": "Verlopen",
@@ -223,12 +251,16 @@
     "urgency": "Urgentie"
   },
   "filters": {
-    "title": "Filteren",
-    "filtersTitle": "Filters",
+    "title": "Filter",
+    "filtersTitle": "{count, plural, =0 {Filter toevoegen} other {Filters (#)}}",
     "sortTitle": "Sorteren",
-    "searchPlaceholder": "Zoek producten...",
+    "noFiltersApplied": "Geen filters toegepast",
+    "searchPlaceholder": "Zoek batches...",
     "activeFilters": "Actieve filters toegepast",
     "clearAll": "Alle filters wissen",
+    "clear": "Wissen",
+    "all": "Alle",
+    "reset": "Resetten",
     "apply": "Toepassen",
     "showFilters": "Filters tonen",
     "hideFilters": "Filters verbergen",
@@ -236,8 +268,8 @@
     "resetSort": "Sortering resetten",
     "sortBy": "Sorteren op",
     "sortDirection": "Sorteerrichting",
-    "ascending": "Oplopend",
-    "descending": "Aflopend",
+    "ascending": "Asc",
+    "descending": "Desc",
     "expiry": {
       "title": "Vervalperiode",
       "all": "Alle dagen",
@@ -359,7 +391,7 @@
   "list": {
     "noTodosFound": "Geen taken gevonden",
     "emptyState": "{emptyStateMessage}",
-    "adjustFilters": "Probeer uw filters aan te passen om meer items te zien.",
+    "adjustFilters": "Probeer uw filters aan te passen om meer taken te zien.",
     "loadingMore": "Meer taken laden...",
     "scrollToLoad": "Scroll om meer te laden ({count} geladen)",
     "updating": "Bijwerken..."

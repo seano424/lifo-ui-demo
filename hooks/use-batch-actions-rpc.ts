@@ -112,6 +112,8 @@ interface SoldActionParams {
   p_batch_id: string
   p_quantity_sold: number
   p_user_id: string
+  p_sale_timing?: string | null
+  p_sale_occurred_at?: string | null
   p_notes?: string | null
   p_recommended_action?: string | null
 }
@@ -184,6 +186,8 @@ interface DiscountParams {
 interface SoldParams {
   batchId: string
   quantity: number
+  saleTiming?: string
+  saleOccurredAt?: string | null
   notes?: string
   recommendedAction?: RecommendedAction
 }
@@ -752,6 +756,7 @@ export function useBatchActionRPC(providedStoreId?: string) {
       logger.log('BatchActions', 'Starting sold RPC call', {
         batchId: params.batchId,
         quantity: params.quantity,
+        saleTiming: params.saleTiming,
         recommendedAction: params.recommendedAction,
       })
       const startTime = performance.now()
@@ -759,6 +764,8 @@ export function useBatchActionRPC(providedStoreId?: string) {
         p_batch_id: params.batchId,
         p_quantity_sold: params.quantity,
         p_user_id: userId,
+        p_sale_timing: params.saleTiming || 'just-now',
+        p_sale_occurred_at: params.saleOccurredAt || null,
         p_notes: params.notes || null,
         p_recommended_action: params.recommendedAction || null,
       } as SoldActionParams)
