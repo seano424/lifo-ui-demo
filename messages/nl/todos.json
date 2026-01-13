@@ -11,8 +11,8 @@
     "completed": "Voltooid",
     "resolved": "Opgelost",
     "expiringToday": "Vandaag",
-    "expiringSoon": "Binnenkort",
-    "expiringWeek": "Deze week"
+    "expiringSoon": "Binnenkort (2-3 dagen)",
+    "expiringWeek": "Deze week (4-7 dagen)"
   },
   "pending": {
     "errorLoading": "Fout bij het laden van taken in afwachting",
