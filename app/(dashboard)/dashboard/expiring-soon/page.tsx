@@ -1,7 +1,7 @@
 import DashboardInsetHeader from '@/components/dashboard/dashboard-inset-header'
 import { NoStoresError } from '@/components/dashboard/no-stores-error'
 import { ErrorBoundary } from '@/components/ui/error-boundary'
-import { TodosFilteredList } from '@/components/todos/todos-filtered-list'
+import { TodosExpiryList } from '@/components/todos/todos-expiry-list'
 import { fetchUserPreferences, fetchUserStores } from '@/lib/queries/stores'
 import { createPrefetchedQuery } from '@/lib/react-query/prefetch'
 import { createClient as createServerClient } from '@/lib/supabase/server'
@@ -81,12 +81,11 @@ export default async function ExpiringSoonPage({ searchParams }: ExpiringSoonPag
                 </div>
               }
             >
-              <TodosFilteredList
+              <TodosExpiryList
                 initialFilters={{
                   tab: params.tab,
                   urgency: params.urgency?.split(','),
                   actionType: params.actionType?.split(','),
-                  batchStatus: params.batchStatus?.split(','),
                   productName: params.productName,
                   sort: params.sort,
                   direction: params.direction,

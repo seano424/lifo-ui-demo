@@ -9,7 +9,10 @@
     "expiring": "Verlopen binnenkort",
     "expired": "Verlopen",
     "completed": "Voltooid",
-    "resolved": "Opgelost"
+    "resolved": "Opgelost",
+    "expiringToday": "Vandaag",
+    "expiringSoon": "Binnenkort",
+    "expiringWeek": "Deze week"
   },
   "pending": {
     "errorLoading": "Fout bij het laden van taken in afwachting",
@@ -45,6 +48,27 @@
     "noExpiredHeading": "Geen verlopen items!",
     "allCleared": "Goed gedaan! Alle verlopen items zijn opgeruimd.",
     "noMatch": "Geen verlopen taken komen overeen met uw filters"
+  },
+  "expiringToday": {
+    "errorLoading": "Fout bij het laden van items die vandaag verlopen",
+    "loading": "Items die vandaag verlopen laden...",
+    "noItemsHeading": "Geen items die vandaag verlopen!",
+    "allGood": "Super! Geen dringende items die vandaag verlopen.",
+    "noMatch": "Geen items die vandaag verlopen komen overeen met uw filters"
+  },
+  "expiringSoon": {
+    "errorLoading": "Fout bij het laden van items die binnenkort verlopen",
+    "loading": "Items die binnenkort verlopen laden...",
+    "noItemsHeading": "Geen items die binnenkort verlopen!",
+    "allGood": "Alles is goed! Geen items verlopen binnen 2-3 dagen.",
+    "noMatch": "Geen items die binnenkort verlopen komen overeen met uw filters"
+  },
+  "expiringWeek": {
+    "errorLoading": "Fout bij het laden van items die deze week verlopen",
+    "loading": "Items die deze week verlopen laden...",
+    "noItemsHeading": "Geen items die deze week verlopen!",
+    "allGood": "Alles is vers! Geen items verlopen binnen 4-7 dagen.",
+    "noMatch": "Geen items die deze week verlopen komen overeen met uw filters"
   },
   "emptyStateWithFilters": "Probeer uw filters aan te passen om meer taken te zien.",
   "card": {
