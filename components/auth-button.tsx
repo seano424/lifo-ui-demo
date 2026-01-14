@@ -28,7 +28,7 @@ export function AuthButton({ isMobile }: AuthButtonProps) {
     <div
       className={cn('flex items-center gap-2', isMobile && 'flex-col-reverse gap-2 items-start')}
     >
-      <Button asChild size="default" variant={'secondary'} className={cn(isMobile && 'w-full')}>
+      <Button asChild size="default" variant={'default'} className={cn(isMobile && 'w-full')}>
         <Link href="/dashboard">{t('goToDashboard')}</Link>
       </Button>
 
