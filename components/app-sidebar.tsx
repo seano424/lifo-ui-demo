@@ -2,15 +2,12 @@
 
 import {
   ChartNoAxesCombined,
-  FileEdit,
   HelpCircle,
   Layers,
-  ListTodo,
   Package,
-  ScanBarcode,
-  ScanSearch,
   SettingsIcon,
   Zap,
+  Clock,
 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import Link from 'next/link'
@@ -52,20 +49,26 @@ function useNavigationData() {
         {
           title: t('operations'),
           items: [
+            // {
+            //   title: t('deliveries'),
+            //   url: '/dashboard/deliveries',
+            //   icon: ScanSearch,
+            // },
+            // {
+            //   title: t('scanOut'),
+            //   url: '/dashboard/scan-out',
+            //   icon: ScanBarcode,
+            // },
+            // {
+            //   title: t('todos'),
+            //   url: '/dashboard/todos?tab=pending&urgency=critical%2Chigh&sort=urgency&direction=desc',
+            //   icon: ListTodo,
+            //   badge: urgentTodosCount > 0 ? urgentTodosCount : undefined,
+            // },
             {
-              title: t('deliveries'),
-              url: '/dashboard/deliveries',
-              icon: ScanSearch,
-            },
-            {
-              title: t('scanOut'),
-              url: '/dashboard/scan-out',
-              icon: ScanBarcode,
-            },
-            {
-              title: t('todos'),
-              url: '/dashboard/todos?tab=pending&urgency=critical%2Chigh&sort=urgency&direction=desc',
-              icon: ListTodo,
+              title: t('expiringSoon'),
+              url: '/dashboard/expiring-soon',
+              icon: Clock,
               badge: urgentTodosCount > 0 ? urgentTodosCount : undefined,
             },
           ],
@@ -84,11 +87,11 @@ function useNavigationData() {
               url: '/dashboard/inventory/batches',
               icon: Layers,
             },
-            {
-              title: t('draftBatches'),
-              url: '/dashboard/inventory/batches/drafts',
-              icon: FileEdit,
-            },
+            // {
+            //   title: t('draftBatches'),
+            //   url: '/dashboard/inventory/batches/drafts',
+            //   icon: FileEdit,
+            // },
           ],
         },
         {

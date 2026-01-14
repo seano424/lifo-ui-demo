@@ -18,10 +18,10 @@ export function NotificationCount({
   const baseClasses = 'flex items-center justify-center rounded-full text-xs font-medium text-white'
 
   const variantClasses = {
-    sidebar: 'h-5 w-5 bg-red-500',
+    sidebar: 'h-6 w-6 bg-secondary-900',
     navbar:
-      'min-h-5 min-w-5 bg-red-500 border border-white px-0.5 py-0.5 text-[10px] font-medium shadow-lg',
-    default: 'h-5 w-5 bg-red-500',
+      'min-h-7 min-w-7 bg-secondary-900 border border-white p-1 text-[10px] font-medium shadow-lg',
+    default: 'h-6 w-6 bg-secondary-900',
   }
 
   return (
@@ -29,8 +29,9 @@ export function NotificationCount({
       className={cn(
         baseClasses,
         variantClasses[variant],
-        count > 9 && variant === 'sidebar' && 'w-6', // Make wider for double digits in sidebar
+        count > 9 && variant === 'sidebar' && 'w-6 h-6', // Make wider for double digits in sidebar
         count > 9 && variant === 'navbar' && 'px-2', // Add more padding for double digits in navbar
+        count > 99 && 'min-h-7 min-w-7', // Add more padding for triple digits in navbar
         className,
       )}
     >

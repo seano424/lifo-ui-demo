@@ -34,7 +34,7 @@ export function QuickActionCards() {
           title="todoSuggestions.title"
           description="todoSuggestions.description"
           primaryIcon={<ListTodo className="h-6 w-6" />}
-          link="/dashboard/todos"
+          link="/dashboard/expiring-soon"
           translationKey="dashboard.quickActions"
         />
         <QuickActionCard
