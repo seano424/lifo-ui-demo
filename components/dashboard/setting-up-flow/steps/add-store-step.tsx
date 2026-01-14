@@ -7,13 +7,39 @@ import { Badge } from '@/components/ui/badge'
 import { BottomSheet } from '@/components/ui/bottom-sheet'
 import { useTranslations } from 'next-intl'
 import Image from 'next/image'
-import { ExternalLink } from 'lucide-react'
+import { ExternalLink, CheckCircle2, Loader2, Settings } from 'lucide-react'
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { AddStoreFlow } from '@/components/settings/add-store-flow'
+import { useSquareStatus, useInitiateSquareConnect } from '@/hooks/use-square-integration'
+import { toast } from 'sonner'
 
 export function AddStoreStep() {
   const t = useTranslations('setupFlow')
+  const router = useRouter()
   const [isAddStoreOpen, setIsAddStoreOpen] = useState(false)
+
+  // Square integration hooks
+  const { data: squareStatus, isLoading: isLoadingStatus } = useSquareStatus()
+  const initiateSquareConnect = useInitiateSquareConnect()
+
+  const isSquareConnected = squareStatus?.is_connected || false
+  const isConnecting = initiateSquareConnect.isPending
+
+  const handleSquareConnect = async () => {
+    try {
+      const response = await initiateSquareConnect.mutateAsync()
+      // Redirect to Square OAuth URL
+      if (response.authorization_url) {
+        window.location.href = response.authorization_url
+      } else {
+        toast.error('Failed to get authorization URL')
+      }
+    } catch (error) {
+      // Error is already handled by the hook's onError
+      console.error('Square connection error:', error)
+    }
+  }
 
   return (
     <>
@@ -40,17 +66,28 @@ export function AddStoreStep() {
           <Card
             className="p-6 transition-colors cursor-pointer group"
             onClick={() => {
-              // TODO: Add Square integration handler
-              alert('Square integration clicked\nThis is in progress still...')
+              if (isSquareConnected) {
+                router.push('/dashboard/integrations/square')
+              } else if (!isConnecting && !isLoadingStatus) {
+                handleSquareConnect()
+              }
             }}
           >
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center justify-between">
               <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                 <Image src="/square/square-icon.svg" alt="Square" width={40} height={40} />
                 <div>
-                  <Typography variant="h4" className="font-semibold">
-                    Square
-                  </Typography>
+                  <div className="flex items-center gap-2">
+                    <Typography variant="h4" className="font-semibold">
+                      Square
+                    </Typography>
+                    {isSquareConnected && (
+                      <Badge variant="default" className="gap-1">
+                        <CheckCircle2 className="h-3 w-3" />
+                        Connected
+                      </Badge>
+                    )}
+                  </div>
                   <Typography variant="p" className="text-sm text-muted-foreground">
                     {t('steps.addStore.squareDescription')}
                   </Typography>
@@ -59,9 +96,24 @@ export function AddStoreStep() {
               <Button
                 variant="outline"
                 className="w-fit group-hover:bg-white group-hover:text-primary-900 hover:bg-white hover:text-primary-900 pointer-events-none"
+                disabled={isConnecting || isLoadingStatus}
               >
-                <ExternalLink className="h-4 w-4" />
-                {t('steps.addStore.connect')}
+                {isConnecting || isLoadingStatus ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    {isConnecting ? 'Connecting...' : 'Loading...'}
+                  </>
+                ) : isSquareConnected ? (
+                  <>
+                    <Settings className="h-4 w-4" />
+                    Manage
+                  </>
+                ) : (
+                  <>
+                    <ExternalLink className="h-4 w-4" />
+                    {t('steps.addStore.connect')}
+                  </>
+                )}
               </Button>
             </div>
           </Card>

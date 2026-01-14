@@ -62,6 +62,9 @@ interface ActionableBatch {
   composite_score: number
 }
 
+// UUID v4 format validation regex
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
 export class FastAPIClient {
   private baseUrl: string
   private timeout: number
@@ -102,6 +105,18 @@ export class FastAPIClient {
       return error
     }
     return new Error(`${operation} failed with unknown error`)
+  }
+
+  /**
+   * Validate UUID format for enhanced security
+   */
+  private validateUUID(value: string, fieldName: string): void {
+    if (!value || typeof value !== 'string' || value.trim() === '') {
+      throw new Error(`${fieldName} is required and must be a non-empty string`)
+    }
+    if (!UUID_REGEX.test(value)) {
+      throw new Error(`Invalid ${fieldName} format`)
+    }
   }
 
   /**
@@ -738,6 +753,334 @@ export class FastAPIClient {
    */
   static isEnabled(): boolean {
     return process.env.ENABLE_FASTAPI === 'true' || process.env.NODE_ENV === 'development'
+  }
+
+  // =====================================================================
+  // Square POS Integration Methods
+  // =====================================================================
+
+  /**
+   * Initiate Square OAuth connection flow
+   * Returns authorization URL to redirect user to Square
+   */
+  async initiateSquareConnect(
+    userToken: string,
+  ): Promise<import('@/lib/types/integrations').OAuthAuthorizeResponse> {
+    const url = `${this.baseUrl}/api/v1/integrations/square/connect`
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), this.timeout)
+
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({}),
+        signal: controller.signal,
+      })
+
+      clearTimeout(timeoutId)
+
+      if (!response.ok) {
+        let errorDetails = ''
+        try {
+          const errorData = await response.json()
+          errorDetails = errorData.detail || JSON.stringify(errorData)
+        } catch {
+          errorDetails = await response.text()
+        }
+        throw new Error(`Failed to initiate Square connection: ${errorDetails}`)
+      }
+
+      return await response.json()
+    } catch (error) {
+      clearTimeout(timeoutId)
+      throw this.handleFetchError(error, 'Square OAuth initiation')
+    }
+  }
+
+  /**
+   * Get Square connection status for current user
+   * No store_id required - finds user's active connections
+   */
+  async getSquareStatus(
+    userToken: string,
+  ): Promise<import('@/lib/types/integrations').SquareConnectionStatus> {
+    const url = `${this.baseUrl}/api/v1/integrations/square/status`
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), this.timeout)
+
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+          'Content-Type': 'application/json',
+        },
+        signal: controller.signal,
+      })
+
+      clearTimeout(timeoutId)
+
+      if (!response.ok) {
+        let errorDetails = ''
+        try {
+          const errorData = await response.json()
+          errorDetails = errorData.detail || JSON.stringify(errorData)
+        } catch {
+          errorDetails = await response.text()
+        }
+        throw new Error(`Failed to get Square status: ${errorDetails}`)
+      }
+
+      return await response.json()
+    } catch (error) {
+      clearTimeout(timeoutId)
+      throw this.handleFetchError(error, 'Square status check')
+    }
+  }
+
+  /**
+   * List all Square connections for a store
+   */
+  async listSquareConnections(
+    storeId: string,
+    userToken: string,
+  ): Promise<import('@/lib/types/integrations').ConnectionListResponse> {
+    // Validate inputs with UUID format checking
+    this.validateUUID(storeId, 'Store ID')
+
+    // URL encode the storeId to prevent injection
+    const encodedStoreId = encodeURIComponent(storeId)
+    const url = `${this.baseUrl}/api/v1/integrations/square/connections?store_id=${encodedStoreId}`
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), this.timeout)
+
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+          'Content-Type': 'application/json',
+        },
+        signal: controller.signal,
+      })
+
+      clearTimeout(timeoutId)
+
+      if (!response.ok) {
+        let errorDetails = ''
+        try {
+          const errorData = await response.json()
+          errorDetails = errorData.detail || JSON.stringify(errorData)
+        } catch {
+          errorDetails = await response.text()
+        }
+        throw new Error(`Failed to list Square connections: ${errorDetails}`)
+      }
+
+      return await response.json()
+    } catch (error) {
+      clearTimeout(timeoutId)
+      throw this.handleFetchError(error, 'Square connections list')
+    }
+  }
+
+  /**
+   * Disconnect Square integration
+   */
+  async disconnectSquare(
+    connectionId: string,
+    userToken: string,
+  ): Promise<import('@/lib/types/integrations').DisconnectResponse> {
+    // Validate inputs with UUID format checking
+    this.validateUUID(connectionId, 'Connection ID')
+
+    const url = `${this.baseUrl}/api/v1/integrations/square/disconnect`
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), this.timeout)
+
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ connection_id: connectionId }),
+        signal: controller.signal,
+      })
+
+      clearTimeout(timeoutId)
+
+      if (!response.ok) {
+        let errorDetails = ''
+        try {
+          const errorData = await response.json()
+          errorDetails = errorData.detail || JSON.stringify(errorData)
+        } catch {
+          errorDetails = await response.text()
+        }
+        throw new Error(`Failed to disconnect Square: ${errorDetails}`)
+      }
+
+      return await response.json()
+    } catch (error) {
+      clearTimeout(timeoutId)
+      throw this.handleFetchError(error, 'Square disconnect')
+    }
+  }
+
+  /**
+   * Trigger Square catalog sync
+   */
+  async syncSquareCatalog(
+    connectionId: string,
+    fullSync: boolean,
+    userToken: string,
+  ): Promise<import('@/lib/types/integrations').SyncStats> {
+    // Validate inputs with UUID format checking
+    this.validateUUID(connectionId, 'Connection ID')
+
+    // URL encode the connectionId to prevent injection
+    const encodedConnectionId = encodeURIComponent(connectionId)
+    const url = `${this.baseUrl}/api/v1/integrations/square/connections/${encodedConnectionId}/sync/catalog?full_sync=${fullSync}`
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), this.timeout)
+
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+          'Content-Type': 'application/json',
+        },
+        signal: controller.signal,
+      })
+
+      clearTimeout(timeoutId)
+
+      if (!response.ok) {
+        let errorDetails = ''
+        try {
+          const errorData = await response.json()
+          errorDetails = errorData.detail || JSON.stringify(errorData)
+        } catch {
+          errorDetails = await response.text()
+        }
+        throw new Error(`Failed to sync catalog: ${errorDetails}`)
+      }
+
+      return await response.json()
+    } catch (error) {
+      clearTimeout(timeoutId)
+      throw this.handleFetchError(error, 'Square catalog sync')
+    }
+  }
+
+  /**
+   * Trigger Square inventory sync
+   */
+  async syncSquareInventory(
+    connectionId: string,
+    fullSync: boolean,
+    userToken: string,
+  ): Promise<import('@/lib/types/integrations').SyncStats> {
+    // Validate inputs with UUID format checking
+    this.validateUUID(connectionId, 'Connection ID')
+
+    // URL encode the connectionId to prevent injection
+    const encodedConnectionId = encodeURIComponent(connectionId)
+    const url = `${this.baseUrl}/api/v1/integrations/square/connections/${encodedConnectionId}/sync/inventory?full_sync=${fullSync}`
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), this.timeout)
+
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+          'Content-Type': 'application/json',
+        },
+        signal: controller.signal,
+      })
+
+      clearTimeout(timeoutId)
+
+      if (!response.ok) {
+        let errorDetails = ''
+        try {
+          const errorData = await response.json()
+          errorDetails = errorData.detail || JSON.stringify(errorData)
+        } catch {
+          errorDetails = await response.text()
+        }
+        throw new Error(`Failed to sync inventory: ${errorDetails}`)
+      }
+
+      return await response.json()
+    } catch (error) {
+      clearTimeout(timeoutId)
+      throw this.handleFetchError(error, 'Square inventory sync')
+    }
+  }
+
+  /**
+   * Trigger Square orders sync
+   */
+  async syncSquareOrders(
+    connectionId: string,
+    daysBack: number,
+    fullSync: boolean,
+    userToken: string,
+  ): Promise<import('@/lib/types/integrations').SyncStats> {
+    // Validate inputs with UUID format checking
+    this.validateUUID(connectionId, 'Connection ID')
+
+    // Validate daysBack parameter (must be positive and within reasonable bounds)
+    if (typeof daysBack !== 'number' || !Number.isInteger(daysBack) || daysBack < 1) {
+      throw new Error('Days back must be a positive integer')
+    }
+    if (daysBack > 365) {
+      throw new Error('Days back cannot exceed 365 days')
+    }
+
+    // URL encode the connectionId to prevent injection
+    const encodedConnectionId = encodeURIComponent(connectionId)
+    const url = `${this.baseUrl}/api/v1/integrations/square/connections/${encodedConnectionId}/sync/orders?days_back=${daysBack}&full_sync=${fullSync}`
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), this.timeout)
+
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+          'Content-Type': 'application/json',
+        },
+        signal: controller.signal,
+      })
+
+      clearTimeout(timeoutId)
+
+      if (!response.ok) {
+        let errorDetails = ''
+        try {
+          const errorData = await response.json()
+          errorDetails = errorData.detail || JSON.stringify(errorData)
+        } catch {
+          errorDetails = await response.text()
+        }
+        throw new Error(`Failed to sync orders: ${errorDetails}`)
+      }
+
+      return await response.json()
+    } catch (error) {
+      clearTimeout(timeoutId)
+      throw this.handleFetchError(error, 'Square orders sync')
+    }
   }
 }
 

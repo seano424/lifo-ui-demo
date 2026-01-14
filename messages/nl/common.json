@@ -60,6 +60,7 @@
     "milestones": "Mijlpalen",
     "todos": "Te doen",
     "integrations": "Integraties",
+    "square": "Square",
     "settings": "Instellingen",
     "store": "Winkel",
     "team": "Team",
@@ -194,5 +195,27 @@
     "noStoreSelected": "Geen winkel geselecteerd",
     "pleaseSelectStore": "Selecteer een winkel om door te gaan",
     "whatHappensNext": "Wat gebeurt er hierna?"
+  },
+  "devToken": {
+    "title": "Dev Token Helper",
+    "accessDenied": "Toegang geweigerd",
+    "accessDeniedMessage": "Deze pagina is alleen beschikbaar in ontwikkelomgevingen om veiligheidsredenen.",
+    "goToHome": "Ga naar home",
+    "loggedInAs": "Ingelogd als:",
+    "yourJwtToken": "Uw JWT-token:",
+    "copyToClipboard": "Kopieer naar klembord",
+    "copied": "Gekopieerd!",
+    "backToHome": "Terug naar home",
+    "goToLogin": "Ga naar login",
+    "usageInstructions": "Gebruiksinstructies:",
+    "instruction1": "Zorg ervoor dat u bent ingelogd in de app",
+    "instruction2": "Klik op de knop \"Kopieer naar klembord\"",
+    "instruction3": "Stel in Postman/API-client de Authorization-header in op:",
+    "instruction4": "Token verloopt over ~1 uur - vernieuw deze pagina om een nieuwe te krijgen",
+    "securityNote": "Beveiligingsnotitie:",
+    "securityMessage": "Deze pagina is alleen bedoeld voor ontwikkeling. Stel nooit JWT-tokens bloot in productie. Tokens geven volledige toegang tot uw account.",
+    "apiEndpointsToTest": "API-eindpunten om te testen:",
+    "notLoggedIn": "Niet ingelogd - log eerst in",
+    "loading": "Laden..."
   }
 }
