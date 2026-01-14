@@ -23,6 +23,7 @@ import {
 import { formatDistanceToNow } from 'date-fns'
 import { useEffect } from 'react'
 import { useStoreState } from '@/lib/stores/store-context'
+import { Typography } from '@/components/ui/typography'
 
 export default function SquareManagementPage() {
   const router = useRouter()
@@ -61,7 +62,11 @@ export default function SquareManagementPage() {
 
   const handleSyncOrders = async () => {
     if (!connectionId) return
-    await syncOrdersMutation.mutateAsync({ connectionId, daysBack: 7, fullSync: false })
+    await syncOrdersMutation.mutateAsync({
+      connectionId,
+      daysBack: 7,
+      fullSync: false,
+    })
   }
 
   const isAnySync =
@@ -138,7 +143,9 @@ export default function SquareManagementPage() {
                 <p className="text-sm text-gray-600">
                   {t('lastSync')}:{' '}
                   <span className="font-medium text-gray-900">
-                    {formatDistanceToNow(new Date(squareStatus.last_sync_at), { addSuffix: true })}
+                    {formatDistanceToNow(new Date(squareStatus.last_sync_at), {
+                      addSuffix: true,
+                    })}
                   </span>
                 </p>
               </div>
@@ -156,7 +163,9 @@ export default function SquareManagementPage() {
             <CardDescription>
               {squareStatus.stores?.length === 1
                 ? t('connectedLocationsDescriptionSingle')
-                : t('connectedLocationsDescription', { count: squareStatus.stores?.length || 0 })}
+                : t('connectedLocationsDescription', {
+                    count: squareStatus.stores?.length || 0,
+                  })}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -166,31 +175,24 @@ export default function SquareManagementPage() {
                 return (
                   <div
                     key={store.store_id}
-                    className={`rounded-lg border p-4 transition-shadow hover:shadow-sm ${
-                      isCurrentStore
-                        ? 'border-primary-500 bg-primary-50'
-                        : 'border-gray-200 bg-white'
-                    }`}
+                    className={`rounded-lg p-4 ${isCurrentStore ? 'bg-primary-50' : 'bg-white'}`}
                   >
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                      <div className="space-y-1">
+                      <div className="space-y-2">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <p className="font-medium">{store.store_name}</p>
+                          <Typography variant="p">{store.store_name}</Typography>
                           <Badge
                             variant={store.connection_status === 'active' ? 'default' : 'secondary'}
-                            className="text-xs"
                           >
                             {store.connection_status}
                           </Badge>
                           {isCurrentStore && (
-                            <Badge variant="primary" className="text-xs">
-                              {t('currentLocation')}
-                            </Badge>
+                            <Badge variant="primary">{t('currentLocation')}</Badge>
                           )}
                         </div>
-                        <p className="text-xs text-gray-600 sm:text-sm">
-                          {t('locationId')}: <span className="font-mono">{store.location_id}</span>
-                        </p>
+                        <Typography variant="muted" className="font-mono">
+                          {t('locationId')}: {store.location_id}
+                        </Typography>
                       </div>
                     </div>
                   </div>
