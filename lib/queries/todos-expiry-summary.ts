@@ -1,5 +1,7 @@
 import { createClient } from '@/lib/supabase/client'
 import type { createClient as createServerClient } from '@/lib/supabase/server'
+import { logger } from '@/lib/utils/logger'
+import { withPerformanceTracking } from '@/lib/utils/performance'
 
 // Type for the server client (it's a Promise!)
 type ServerClient = Awaited<ReturnType<typeof createServerClient>>
@@ -24,24 +26,49 @@ export async function fetchExpiryTodosSummary(
   serverClient?: ServerClient,
 ): Promise<ExpiryTodosSummary> {
   const supabase = serverClient || createClient()
+  const context = 'fetchExpiryTodosSummary'
 
-  const { data, error } = await supabase
-    .schema('inventory')
-    .rpc('get_expiry_todos_counts_summary', {
-      p_store_id: storeId,
-    })
+  return withPerformanceTracking(
+    context,
+    'Fetch expiry todos summary (RPC)',
+    { storeId },
+    async () => {
+      try {
+        const { data, error } = await supabase
+          .schema('inventory')
+          .rpc('get_expiry_todos_counts_summary', {
+            p_store_id: storeId,
+          })
 
-  if (error) {
-    throw new Error(`Failed to fetch expiry todos summary: ${error.message}`)
-  }
+        if (error) {
+          logger.queryWarn(context, 'RPC error', {
+            error: error.message,
+            code: error.code,
+            storeId,
+          })
+          throw new Error(`Failed to fetch expiry todos summary: ${error.message}`)
+        }
 
-  return (
-    data || {
-      expiring_today: 0,
-      expiring_soon: 0,
-      expiring_week: 0,
-      expired: 0,
-      total: 0,
-    }
+        const result = data || {
+          expiring_today: 0,
+          expiring_soon: 0,
+          expiring_week: 0,
+          expired: 0,
+          total: 0,
+        }
+
+        logger.log(context, 'Expiry todos summary fetched successfully (RPC)', {
+          storeId,
+          counts: result,
+        })
+
+        return result
+      } catch (err) {
+        logger.queryWarn(context, 'Unexpected error', {
+          error: err instanceof Error ? err.message : String(err),
+        })
+        throw err
+      }
+    },
   )
 }

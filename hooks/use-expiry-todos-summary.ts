@@ -1,4 +1,5 @@
 import { fetchExpiryTodosSummary } from '@/lib/queries/todos-expiry-summary'
+import { queryKeys } from '@/lib/queries/query-keys'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 import { useQuery } from '@tanstack/react-query'
 
@@ -10,7 +11,7 @@ export function useExpiryTodosSummary() {
   const activeStoreId = useActiveStoreId()
 
   return useQuery({
-    queryKey: ['todos', 'expiry-summary', activeStoreId || ''],
+    queryKey: queryKeys.todos.expirySummary(activeStoreId || ''),
     queryFn: () => {
       if (!activeStoreId) throw new Error('No active store')
       return fetchExpiryTodosSummary(activeStoreId)

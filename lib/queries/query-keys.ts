@@ -49,6 +49,10 @@ export const queryKeys = {
     // Ultra-fast expiry count for notification bell (uses store's expiry_alert_days setting)
     expiryCount: (storeId: string) => [...queryKeys.todos.all, 'expiry-count', storeId] as const,
 
+    // Expiry summary counts for all tabs (single query for all expiry ranges)
+    expirySummary: (storeId: string) =>
+      [...queryKeys.todos.all, 'expiry-summary', storeId] as const,
+
     // Tab counts for all filters (efficient count query without fetching full data)
     counts: (storeId: string, filters: TodoFilters) =>
       [...queryKeys.todos.all, 'counts', { storeId, filters }] as const,
