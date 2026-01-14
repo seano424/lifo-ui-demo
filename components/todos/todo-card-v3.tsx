@@ -3,7 +3,6 @@
 import type { TodoItem } from '@/lib/queries/todos-rpc'
 import { cn } from '@/lib/utils'
 import { migrateRecommendation } from '@/lib/utils/recommendation-migration'
-import { HandHeartIcon, PercentIcon, Trash2Icon, EyeIcon, Calendar } from 'lucide-react'
 import { Typography } from '../ui/typography'
 import { format } from 'date-fns'
 import { useTranslations } from 'next-intl'
@@ -49,13 +48,11 @@ export function TodoCardV3({ todo, currencySymbol = '€', onClick }: TodoCardV3
         case 'donate':
           return {
             text: t('actions.donated'),
-            icon: HandHeartIcon,
             variant: 'outline',
           }
         case 'dispose':
           return {
             text: t('actions.disposed'),
-            icon: Trash2Icon,
             variant: 'destructive',
           }
         case 'discount':
@@ -64,13 +61,11 @@ export function TodoCardV3({ todo, currencySymbol = '€', onClick }: TodoCardV3
               text: t('actions.soldAtDiscount', {
                 percent: todo.last_discount_percent,
               }),
-              icon: PercentIcon,
               variant: 'outline',
             }
           }
           return {
             text: t('actions.discount'),
-            icon: PercentIcon,
             variant: 'outline',
           }
       }
@@ -85,7 +80,6 @@ export function TodoCardV3({ todo, currencySymbol = '€', onClick }: TodoCardV3
       return {
         text: t('actions.dispose'),
         variant: 'destructive',
-        icon: Trash2Icon,
       }
     }
 
@@ -106,25 +100,21 @@ export function TodoCardV3({ todo, currencySymbol = '€', onClick }: TodoCardV3
       case 'donate':
         return {
           text: t('actions.donate'),
-          icon: HandHeartIcon,
           variant: 'outline',
         }
       case 'dispose':
         return {
           text: t('actions.dispose'),
-          icon: Trash2Icon,
           variant: 'destructive',
         }
       case 'discount':
         return {
           text: t('actions.discount'),
-          icon: PercentIcon,
           variant: 'outline',
         }
       default:
         return {
           text: t('actions.monitorStock'),
-          icon: EyeIcon,
           variant: 'ghost',
         }
     }
@@ -304,22 +294,19 @@ export function TodoCardV3({ todo, currencySymbol = '€', onClick }: TodoCardV3
           {/* Status - LEFT side, primary scan element */}
           <div className="flex items-center gap-1.5">
             {isUrgent ? (
-              <>
-                <Calendar className="h-3.5 w-3.5 text-destructive" />
-                <Typography
-                  variant="small"
-                  color="destructive"
-                  className="font-semibold font-heading"
-                >
-                  {isExpiring
-                    ? t('card.expiredStatus')
-                    : isExpiringToday
-                      ? t('card.expiresToday')
-                      : isExpiringTomorrow
-                        ? t('card.expiresTomorrow')
-                        : t('card.daysLeft', { days: daysUntilExpiry })}
-                </Typography>
-              </>
+              <Typography
+                variant="small"
+                color="destructive"
+                className="font-semibold font-heading"
+              >
+                {isExpiring
+                  ? t('card.expiredStatus')
+                  : isExpiringToday
+                    ? t('card.expiresToday')
+                    : isExpiringTomorrow
+                      ? t('card.expiresTomorrow')
+                      : t('card.daysLeft', { days: daysUntilExpiry })}
+              </Typography>
             ) : (
               <Typography variant="extraSmall" color="muted" className="font-heading font-semibold">
                 {daysUntilExpiry}d until expiry

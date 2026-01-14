@@ -9,7 +9,10 @@
     "expiring": "Expiring",
     "expired": "Expired",
     "completed": "Completed",
-    "resolved": "Resolved"
+    "resolved": "Resolved",
+    "expiringToday": "Today",
+    "expiringSoon": "2-3 days away",
+    "expiringWeek": "4-7 days away"
   },
   "pending": {
     "errorLoading": "Error loading pending todos",
@@ -45,6 +48,27 @@
     "noExpiredHeading": "No expired items!",
     "allCleared": "Great job! All expired items have been cleared.",
     "noMatch": "No expired todos match your filters"
+  },
+  "expiringToday": {
+    "errorLoading": "Error loading items expiring today",
+    "loading": "Loading items expiring today...",
+    "noItemsHeading": "No items expiring today!",
+    "allGood": "Great! No urgent items expiring today.",
+    "noMatch": "No items expiring today match your filters"
+  },
+  "expiringSoon": {
+    "errorLoading": "Error loading items expiring soon",
+    "loading": "Loading items expiring soon...",
+    "noItemsHeading": "No items expiring soon!",
+    "allGood": "All good! No items expiring in the next 2-3 days.",
+    "noMatch": "No items expiring soon match your filters"
+  },
+  "expiringWeek": {
+    "errorLoading": "Error loading items expiring this week",
+    "loading": "Loading items expiring this week...",
+    "noItemsHeading": "No items expiring this week!",
+    "allGood": "Everything looks fresh! No items expiring in 4-7 days.",
+    "noMatch": "No items expiring this week match your filters"
   },
   "emptyStateWithFilters": "Try adjusting your filters to see more items.",
   "card": {

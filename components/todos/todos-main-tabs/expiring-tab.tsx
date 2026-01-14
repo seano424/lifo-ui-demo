@@ -3,7 +3,7 @@
 import { Typography } from '@/components/ui/typography'
 import { useExpiringTodos, useExpiringTodosWithCounts } from '@/hooks/use-todos-with-filters'
 import { useTranslations } from 'next-intl'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { TodoFiltersState } from '../filters/types'
 import { TodoCardList } from '../todo-card-list'
 
@@ -96,6 +96,9 @@ export function ExpiringTabWithCounts({ filters, pageSize = 20, onCountUpdate }:
   const t = useTranslations('todos')
   const tErrors = useTranslations('errors.common')
 
+  // Track hydration to avoid SSR/client mismatch
+  const [isHydrated, setIsHydrated] = useState(false)
+
   const {
     data: todos,
     counts,
@@ -120,6 +123,11 @@ export function ExpiringTabWithCounts({ filters, pageSize = 20, onCountUpdate }:
   // Track previous count to avoid unnecessary updates
   const prevCountRef = useRef<number | undefined>(undefined)
 
+  // Set hydration flag
+  useEffect(() => {
+    setIsHydrated(true)
+  }, [])
+
   // Update parent component with count whenever it changes
   useEffect(() => {
     const currentCount = counts?.expiring
@@ -129,6 +137,16 @@ export function ExpiringTabWithCounts({ filters, pageSize = 20, onCountUpdate }:
     }
   }, [counts?.expiring, onCountUpdate])
 
+  // Show loading state during SSR and initial client render to avoid hydration mismatch
+  if (!isHydrated || isLoading) {
+    return (
+      <div className="text-center py-8">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+        <p className="text-muted-foreground mt-2">{t('expiring.loading')}</p>
+      </div>
+    )
+  }
+
   if (isError) {
     return (
       <div className="text-center py-8">
@@ -136,15 +154,6 @@ export function ExpiringTabWithCounts({ filters, pageSize = 20, onCountUpdate }:
         <p className="text-sm text-muted-foreground mt-2">
           {error?.message || tErrors('somethingWrong')}
         </p>
-      </div>
-    )
-  }
-
-  if (isLoading) {
-    return (
-      <div className="text-center py-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-        <p className="text-muted-foreground mt-2">{t('expiring.loading')}</p>
       </div>
     )
   }

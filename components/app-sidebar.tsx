@@ -22,7 +22,7 @@ import {
   SidebarHeader,
   SidebarRail,
 } from '@/components/ui/sidebar'
-import { useUrgentTodosCount } from '@/hooks/use-urgent-todos-count'
+import { useExpiryTodosCount } from '@/hooks/use-expiry-todos-count'
 import { useCurrentUser } from '@/hooks/use-users'
 import { TeamSwitcher } from './team-switcher'
 
@@ -30,7 +30,7 @@ import { Logo } from './ui/logo'
 
 function useNavigationData() {
   const t = useTranslations('navigation')
-  const { count: urgentTodosCount } = useUrgentTodosCount()
+  const { count: expiryTodosCount } = useExpiryTodosCount()
 
   return React.useMemo(
     () => ({
@@ -63,13 +63,13 @@ function useNavigationData() {
             //   title: t('todos'),
             //   url: '/dashboard/todos?tab=pending&urgency=critical%2Chigh&sort=urgency&direction=desc',
             //   icon: ListTodo,
-            //   badge: urgentTodosCount > 0 ? urgentTodosCount : undefined,
+            //   badge: expiryTodosCount > 0 ? expiryTodosCount : undefined,
             // },
             {
               title: t('expiringSoon'),
               url: '/dashboard/expiring-soon',
               icon: Clock,
-              badge: urgentTodosCount > 0 ? urgentTodosCount : undefined,
+              badge: expiryTodosCount > 0 ? expiryTodosCount : undefined,
             },
           ],
         },
@@ -116,7 +116,7 @@ function useNavigationData() {
         },
       ],
     }),
-    [t, urgentTodosCount],
+    [t, expiryTodosCount],
   )
 }
 

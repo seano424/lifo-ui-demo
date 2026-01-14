@@ -109,6 +109,7 @@ export type Database = {
           currency: string | null
           display_preferences: Json | null
           donation_preference_config: Json | null
+          expiry_alert_days: number | null
           notification_preferences: Json | null
           opening_hours: Json | null
           peak_hours: Json | null
@@ -125,6 +126,7 @@ export type Database = {
           currency?: string | null
           display_preferences?: Json | null
           donation_preference_config?: Json | null
+          expiry_alert_days?: number | null
           notification_preferences?: Json | null
           opening_hours?: Json | null
           peak_hours?: Json | null
@@ -141,6 +143,7 @@ export type Database = {
           currency?: string | null
           display_preferences?: Json | null
           donation_preference_config?: Json | null
+          expiry_alert_days?: number | null
           notification_preferences?: Json | null
           opening_hours?: Json | null
           peak_hours?: Json | null
@@ -1771,6 +1774,20 @@ export type Database = {
           schedule: string
         }[]
       }
+      get_expiry_todos_count: {
+        Args: { p_expiry_days?: number; p_store_id: string }
+        Returns: number
+      }
+      get_expiry_todos_counts_summary: {
+        Args: { p_store_id: string }
+        Returns: Database["inventory"]["CompositeTypes"]["expiry_todos_summary"]
+        SetofOptions: {
+          from: "*"
+          to: "expiry_todos_summary"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       get_low_stock_batches: {
         Args: { p_store_id: string; p_threshold_quantity?: number }
         Returns: {
@@ -1891,7 +1908,13 @@ export type Database = {
       [_ in never]: never
     }
     CompositeTypes: {
-      [_ in never]: never
+      expiry_todos_summary: {
+        expiring_today: number | null
+        expiring_soon: number | null
+        expiring_week: number | null
+        expired: number | null
+        total: number | null
+      }
     }
   }
   public: {

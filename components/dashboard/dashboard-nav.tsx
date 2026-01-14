@@ -1,5 +1,5 @@
 import DashboardBreadcrumbs from '@/components/dashboard/dashboard-breadcrumbs'
-import { NotificationBell } from '@/components/notifications/notification-bell'
+import { NotificationBellExpiry } from '@/components/notifications/notification-bell-expiry'
 import { TeamSwitcher } from '@/components/team-switcher'
 import { CompactLanguageSwitcher } from '@/components/ui/compact-language-switcher'
 import { Separator } from '@/components/ui/separator'
@@ -19,7 +19,7 @@ export function DashboardNav() {
 
       <div className="flex items-center gap-2">
         <CompactLanguageSwitcher />
-        <NotificationBell />
+        <NotificationBellExpiry />
         <TeamSwitcher compact />
         <UserButton />
       </div>

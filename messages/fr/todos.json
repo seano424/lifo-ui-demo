@@ -9,7 +9,10 @@
     "expiring": "Expirant",
     "expired": "Expiré",
     "completed": "Terminé",
-    "resolved": "Résolu"
+    "resolved": "Résolu",
+    "expiringToday": "Aujourd'hui",
+    "expiringSoon": "Dans les 2-3 jours",
+    "expiringWeek": "Dans les 4-7 jours"
   },
   "pending": {
     "errorLoading": "Erreur lors du chargement des tâches en attente",
@@ -45,6 +48,27 @@
     "noExpiredHeading": "Aucun article expiré !",
     "allCleared": "Excellent travail ! Tous les articles expirés ont été traités.",
     "noMatch": "Aucune tâche expirée ne correspond à vos filtres"
+  },
+  "expiringToday": {
+    "errorLoading": "Erreur lors du chargement des articles expirant aujourd'hui",
+    "loading": "Chargement des articles expirant aujourd'hui...",
+    "noItemsHeading": "Aucun article n'expire aujourd'hui !",
+    "allGood": "Super ! Aucun article urgent n'expire aujourd'hui.",
+    "noMatch": "Aucun article expirant aujourd'hui ne correspond à vos filtres"
+  },
+  "expiringSoon": {
+    "errorLoading": "Erreur lors du chargement des articles expirant bientôt",
+    "loading": "Chargement des articles expirant bientôt...",
+    "noItemsHeading": "Aucun article n'expire bientôt !",
+    "allGood": "Tout va bien ! Aucun article n'expire dans les 2-3 prochains jours.",
+    "noMatch": "Aucun article expirant bientôt ne correspond à vos filtres"
+  },
+  "expiringWeek": {
+    "errorLoading": "Erreur lors du chargement des articles expirant cette semaine",
+    "loading": "Chargement des articles expirant cette semaine...",
+    "noItemsHeading": "Aucun article n'expire cette semaine !",
+    "allGood": "Tout est frais ! Aucun article n'expire dans 4-7 jours.",
+    "noMatch": "Aucun article expirant cette semaine ne correspond à vos filtres"
   },
   "emptyStateWithFilters": "Essayez d'ajuster vos filtres pour voir plus d'articles.",
   "card": {
