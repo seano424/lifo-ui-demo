@@ -48,7 +48,7 @@ export function DisconnectSquareDialog({ connectionId, trigger }: DisconnectSqua
       setTimeout(() => {
         router.push('/dashboard/integrations')
       }, 1000)
-    } catch (error) {
+    } catch (error: unknown) {
       // Error is handled by the mutation hook (toast notification)
       console.error('Disconnect failed:', error)
     }

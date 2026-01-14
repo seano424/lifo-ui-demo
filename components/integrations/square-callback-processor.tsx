@@ -27,13 +27,19 @@ export function SquareCallbackProcessor() {
   const [status, setStatus] = useState<CallbackStatus>('processing')
   const [errorMessage, setErrorMessage] = useState<string>('')
   const [pollingStartTime] = useState<number>(Date.now())
+  const [shouldPoll, setShouldPoll] = useState<boolean>(true)
 
   // Check for error in URL params (user denied authorization)
   const urlError = searchParams?.get('error')
   const urlErrorDescription = searchParams?.get('error_description')
 
   // Poll Square status to check connection completion
-  const { data: squareStatus, isError, error } = useSquareStatusPolling(status === 'processing')
+  // Only poll if status is processing AND shouldPoll is true (handles timeout)
+  const {
+    data: squareStatus,
+    isError,
+    error,
+  } = useSquareStatusPolling(status === 'processing' && shouldPoll)
 
   useEffect(() => {
     // Check for URL error first (user denied authorization)
@@ -59,6 +65,7 @@ export function SquareCallbackProcessor() {
         // Check if we've exceeded max polling time using timestamp
         const elapsedTime = Date.now() - pollingStartTime
         if (elapsedTime >= MAX_POLLING_TIME_MS) {
+          setShouldPoll(false) // Stop polling
           setStatus('error')
           setErrorMessage(
             'Connection verification timed out. Please try again or contact support if the issue persists.',
@@ -69,6 +76,7 @@ export function SquareCallbackProcessor() {
 
     // Handle polling error
     if (isError && status === 'processing') {
+      setShouldPoll(false) // Stop polling on error
       setStatus('error')
       setErrorMessage(
         error?.message ||

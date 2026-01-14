@@ -39,8 +39,12 @@ export default function DevTokenPage() {
   const isValidToken =
     token && token !== t('loading') && !token.startsWith(t('notLoggedIn').split(' ')[0])
 
-  // Block access in production
-  if (process.env.NODE_ENV === 'production') {
+  // Block access in production or if dev tools are not explicitly enabled
+  // This prevents accidental exposure of tokens in production even if NODE_ENV is misconfigured
+  if (
+    process.env.NODE_ENV === 'production' ||
+    process.env.NEXT_PUBLIC_ENABLE_DEV_TOOLS !== 'true'
+  ) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="max-w-md p-8 bg-white rounded-lg shadow">

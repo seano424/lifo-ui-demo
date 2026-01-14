@@ -9,6 +9,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { fastApiClient } from '@/lib/services/fastapi-client'
 import { createClient } from '@/lib/supabase/client'
+import { queryKeys } from '@/lib/queries/query-keys'
 import type {
   SquareConnectionStatus,
   ConnectionListResponse,
@@ -16,19 +17,6 @@ import type {
   DisconnectResponse,
   SyncStats,
 } from '@/lib/types/integrations'
-
-/**
- * Query key factory for consistent cache management
- * Ensures all Square-related queries use the same key structure
- */
-export const squareQueryKeys = {
-  all: ['square'] as const,
-  status: () => [...squareQueryKeys.all, 'status'] as const,
-  statusPolling: () => [...squareQueryKeys.all, 'status', 'polling'] as const,
-  connections: () => [...squareQueryKeys.all, 'connections'] as const,
-  connectionsByStore: (storeId: string | null) =>
-    [...squareQueryKeys.connections(), storeId] as const,
-}
 
 /**
  * Hook to get Square connection status for current user
@@ -39,30 +27,28 @@ export function useSquareStatus() {
   const supabase = createClient()
 
   return useQuery<SquareConnectionStatus, Error>({
-    queryKey: squareQueryKeys.status(),
+    queryKey: queryKeys.square.status(),
     queryFn: async () => {
-      try {
-        const {
-          data: { session },
-        } = await supabase.auth.getSession()
-        if (!session) {
-          // Return default disconnected state instead of throwing
-          return { is_connected: false } satisfies SquareConnectionStatus
-        }
-
-        return await fastApiClient.getSquareStatus(session.access_token)
-      } catch (error) {
-        // Log error but return disconnected state for graceful degradation
-        if (process.env.NODE_ENV === 'development')
-          console.error('Failed to fetch Square status:', error)
-        return { is_connected: false } satisfies SquareConnectionStatus
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
+      if (!session) {
+        throw new Error('Not authenticated')
       }
+
+      return await fastApiClient.getSquareStatus(session.access_token)
     },
     staleTime: 2 * 60 * 1000, // 2 minutes
     gcTime: 5 * 60 * 1000, // 5 minutes (formerly cacheTime)
     refetchOnMount: true, // Always refetch on mount for fresh connection status
     refetchOnWindowFocus: false,
-    retry: false, // Don't retry, return disconnected state immediately
+    retry: (failureCount, error: Error) => {
+      // Don't retry auth errors
+      if (error.message.includes('Not authenticated')) return false
+      // Retry server errors up to 2 times
+      return failureCount < 2
+    },
+    retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
   })
 }
 
@@ -73,34 +59,34 @@ export function useSquareConnections(storeId: string | null) {
   const supabase = createClient()
 
   return useQuery<ConnectionListResponse, Error>({
-    queryKey: squareQueryKeys.connectionsByStore(storeId),
+    queryKey: storeId
+      ? queryKeys.square.connectionsByStore(storeId)
+      : queryKeys.square.connections(),
     queryFn: async () => {
-      try {
-        if (!storeId) {
-          // Return empty list if no store ID
-          return { connections: [], total: 0 }
-        }
-
-        const {
-          data: { session },
-        } = await supabase.auth.getSession()
-        if (!session) {
-          // Return empty list if not authenticated
-          return { connections: [], total: 0 }
-        }
-
-        return await fastApiClient.listSquareConnections(storeId, session.access_token)
-      } catch (error) {
-        // Log error but return empty list for graceful degradation
-        if (process.env.NODE_ENV === 'development')
-          console.error('Failed to fetch Square connections:', error)
-        return { connections: [], total: 0 }
+      if (!storeId) {
+        throw new Error('Store ID is required')
       }
+
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
+      if (!session) {
+        throw new Error('Not authenticated')
+      }
+
+      return await fastApiClient.listSquareConnections(storeId, session.access_token)
     },
     enabled: !!storeId,
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes
-    retry: false, // Don't retry, return empty list immediately
+    retry: (failureCount, error: Error) => {
+      // Don't retry auth or validation errors
+      if (error.message.includes('Not authenticated') || error.message.includes('Store ID'))
+        return false
+      // Retry server errors up to 2 times
+      return failureCount < 2
+    },
+    retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
   })
 }
 
@@ -151,10 +137,10 @@ export function useDisconnectSquare() {
     },
     onSuccess: () => {
       // Invalidate all Square-related queries using query key factory
-      queryClient.invalidateQueries({ queryKey: squareQueryKeys.all })
+      queryClient.invalidateQueries({ queryKey: queryKeys.square.all })
 
       // Invalidate stores query since disconnection deactivates the stores
-      queryClient.invalidateQueries({ queryKey: ['stores'] })
+      queryClient.invalidateQueries({ queryKey: queryKeys.stores.all })
 
       toast.success('Square disconnected successfully')
     },
@@ -186,8 +172,8 @@ export function useSyncSquareCatalog() {
     },
     onSuccess: data => {
       // Invalidate connections and status to refresh last_sync_at using query key factory
-      queryClient.invalidateQueries({ queryKey: squareQueryKeys.connections() })
-      queryClient.invalidateQueries({ queryKey: squareQueryKeys.status() })
+      queryClient.invalidateQueries({ queryKey: queryKeys.square.connections() })
+      queryClient.invalidateQueries({ queryKey: queryKeys.square.status() })
 
       // Show success message with stats
       const message = `Catalog synced: ${data.products_created || 0} created, ${data.products_updated || 0} updated`
@@ -221,9 +207,9 @@ export function useSyncSquareInventory() {
     },
     onSuccess: data => {
       // Invalidate connections, status, and batch queries using query key factory
-      queryClient.invalidateQueries({ queryKey: squareQueryKeys.connections() })
-      queryClient.invalidateQueries({ queryKey: squareQueryKeys.status() })
-      queryClient.invalidateQueries({ queryKey: ['batches'] })
+      queryClient.invalidateQueries({ queryKey: queryKeys.square.connections() })
+      queryClient.invalidateQueries({ queryKey: queryKeys.square.status() })
+      queryClient.invalidateQueries({ queryKey: queryKeys.batches.all })
 
       // Show success message with stats
       const message = `Inventory synced: ${data.batches_updated || 0} batches updated`
@@ -266,9 +252,9 @@ export function useSyncSquareOrders() {
     },
     onSuccess: data => {
       // Invalidate connections, status, and batch queries using query key factory
-      queryClient.invalidateQueries({ queryKey: squareQueryKeys.connections() })
-      queryClient.invalidateQueries({ queryKey: squareQueryKeys.status() })
-      queryClient.invalidateQueries({ queryKey: ['batches'] })
+      queryClient.invalidateQueries({ queryKey: queryKeys.square.connections() })
+      queryClient.invalidateQueries({ queryKey: queryKeys.square.status() })
+      queryClient.invalidateQueries({ queryKey: queryKeys.batches.all })
 
       // Show success message with stats
       const message = `Orders synced: ${data.orders_fetched || 0} orders processed`
@@ -289,29 +275,27 @@ export function useSquareStatusPolling(enabled: boolean = false) {
   const supabase = createClient()
 
   return useQuery<SquareConnectionStatus, Error>({
-    queryKey: squareQueryKeys.statusPolling(),
+    queryKey: queryKeys.square.statusPolling(),
     queryFn: async () => {
-      try {
-        const {
-          data: { session },
-        } = await supabase.auth.getSession()
-        if (!session) {
-          // Return disconnected state if not authenticated
-          return { is_connected: false } satisfies SquareConnectionStatus
-        }
-
-        return await fastApiClient.getSquareStatus(session.access_token)
-      } catch (error) {
-        // Log error but return disconnected state for graceful degradation
-        if (process.env.NODE_ENV === 'development')
-          console.error('Failed to poll Square status:', error)
-        return { is_connected: false } satisfies SquareConnectionStatus
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
+      if (!session) {
+        throw new Error('Not authenticated')
       }
+
+      return await fastApiClient.getSquareStatus(session.access_token)
     },
     enabled,
     refetchInterval: enabled ? 2000 : false, // Poll every 2 seconds when enabled
     refetchOnMount: true,
     refetchOnWindowFocus: false,
-    retry: 3, // Keep retrying for polling since it's a transient operation
+    retry: (failureCount, error: Error) => {
+      // Don't retry auth errors
+      if (error.message.includes('Not authenticated')) return false
+      // Keep retrying for polling since it's a transient operation (up to 3 times)
+      return failureCount < 3
+    },
+    retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
   })
 }

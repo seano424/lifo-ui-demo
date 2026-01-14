@@ -62,6 +62,9 @@ interface ActionableBatch {
   composite_score: number
 }
 
+// UUID v4 format validation regex
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
 export class FastAPIClient {
   private baseUrl: string
   private timeout: number
@@ -102,6 +105,18 @@ export class FastAPIClient {
       return error
     }
     return new Error(`${operation} failed with unknown error`)
+  }
+
+  /**
+   * Validate UUID format for enhanced security
+   */
+  private validateUUID(value: string, fieldName: string): void {
+    if (!value || typeof value !== 'string' || value.trim() === '') {
+      throw new Error(`${fieldName} is required and must be a non-empty string`)
+    }
+    if (!UUID_REGEX.test(value)) {
+      throw new Error(`Invalid ${fieldName} format`)
+    }
   }
 
   /**
@@ -834,10 +849,8 @@ export class FastAPIClient {
     storeId: string,
     userToken: string,
   ): Promise<import('@/lib/types/integrations').ConnectionListResponse> {
-    // Validate inputs
-    if (!storeId || typeof storeId !== 'string' || storeId.trim() === '') {
-      throw new Error('Store ID is required and must be a non-empty string')
-    }
+    // Validate inputs with UUID format checking
+    this.validateUUID(storeId, 'Store ID')
 
     // URL encode the storeId to prevent injection
     const encodedStoreId = encodeURIComponent(storeId)
@@ -882,10 +895,8 @@ export class FastAPIClient {
     connectionId: string,
     userToken: string,
   ): Promise<import('@/lib/types/integrations').DisconnectResponse> {
-    // Validate inputs
-    if (!connectionId || typeof connectionId !== 'string' || connectionId.trim() === '') {
-      throw new Error('Connection ID is required and must be a non-empty string')
-    }
+    // Validate inputs with UUID format checking
+    this.validateUUID(connectionId, 'Connection ID')
 
     const url = `${this.baseUrl}/api/v1/integrations/square/disconnect`
     const controller = new AbortController()
@@ -930,10 +941,8 @@ export class FastAPIClient {
     fullSync: boolean,
     userToken: string,
   ): Promise<import('@/lib/types/integrations').SyncStats> {
-    // Validate inputs
-    if (!connectionId || typeof connectionId !== 'string' || connectionId.trim() === '') {
-      throw new Error('Connection ID is required and must be a non-empty string')
-    }
+    // Validate inputs with UUID format checking
+    this.validateUUID(connectionId, 'Connection ID')
 
     // URL encode the connectionId to prevent injection
     const encodedConnectionId = encodeURIComponent(connectionId)
@@ -979,10 +988,8 @@ export class FastAPIClient {
     fullSync: boolean,
     userToken: string,
   ): Promise<import('@/lib/types/integrations').SyncStats> {
-    // Validate inputs
-    if (!connectionId || typeof connectionId !== 'string' || connectionId.trim() === '') {
-      throw new Error('Connection ID is required and must be a non-empty string')
-    }
+    // Validate inputs with UUID format checking
+    this.validateUUID(connectionId, 'Connection ID')
 
     // URL encode the connectionId to prevent injection
     const encodedConnectionId = encodeURIComponent(connectionId)
@@ -1029,10 +1036,8 @@ export class FastAPIClient {
     fullSync: boolean,
     userToken: string,
   ): Promise<import('@/lib/types/integrations').SyncStats> {
-    // Validate inputs
-    if (!connectionId || typeof connectionId !== 'string' || connectionId.trim() === '') {
-      throw new Error('Connection ID is required and must be a non-empty string')
-    }
+    // Validate inputs with UUID format checking
+    this.validateUUID(connectionId, 'Connection ID')
 
     // Validate daysBack parameter (must be positive and within reasonable bounds)
     if (typeof daysBack !== 'number' || !Number.isInteger(daysBack) || daysBack < 1) {

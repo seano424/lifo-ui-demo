@@ -308,6 +308,15 @@ export const queryKeys = {
     dashboard: (storeId: string) => [...queryKeys.analytics.all, 'dashboard', storeId] as const,
   },
 
+  // Square POS Integration queries
+  square: {
+    all: ['square'] as const,
+    status: () => [...queryKeys.square.all, 'status'] as const,
+    statusPolling: () => [...queryKeys.square.all, 'status', 'polling'] as const,
+    connections: () => [...queryKeys.square.all, 'connections'] as const,
+    connectionsByStore: (storeId: string) => [...queryKeys.square.connections(), storeId] as const,
+  },
+
   // Keep fastapi namespace for any remaining direct calls (deprecated)
   fastapi: {
     all: ['fastapi'] as const,

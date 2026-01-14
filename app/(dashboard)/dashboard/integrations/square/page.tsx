@@ -167,12 +167,13 @@ export default function SquareManagementPage() {
               <Button
                 onClick={handleSyncCatalog}
                 loading={syncCatalogMutation.isPending}
+                loadingText={t('syncing')}
                 disabled={isAnySync}
                 className="w-full min-h-[44px]"
                 variant="outline"
               >
                 <RefreshCw className="mr-2 h-4 w-4" />
-                {syncCatalogMutation.isPending ? t('syncing') : t('syncNow')}
+                {t('syncNow')}
               </Button>
             </CardContent>
           </Card>
@@ -190,12 +191,13 @@ export default function SquareManagementPage() {
               <Button
                 onClick={handleSyncInventory}
                 loading={syncInventoryMutation.isPending}
+                loadingText={t('syncing')}
                 disabled={isAnySync}
                 className="w-full min-h-[44px]"
                 variant="outline"
               >
                 <RefreshCw className="mr-2 h-4 w-4" />
-                {syncInventoryMutation.isPending ? t('syncing') : t('syncNow')}
+                {t('syncNow')}
               </Button>
             </CardContent>
           </Card>
@@ -213,12 +215,13 @@ export default function SquareManagementPage() {
               <Button
                 onClick={handleSyncOrders}
                 loading={syncOrdersMutation.isPending}
+                loadingText={t('syncing')}
                 disabled={isAnySync}
                 className="w-full min-h-[44px]"
                 variant="outline"
               >
                 <RefreshCw className="mr-2 h-4 w-4" />
-                {syncOrdersMutation.isPending ? t('syncing') : t('syncNow')}
+                {t('syncNow')}
               </Button>
             </CardContent>
           </Card>
