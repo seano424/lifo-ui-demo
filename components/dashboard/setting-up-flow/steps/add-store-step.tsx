@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { BottomSheet } from '@/components/ui/bottom-sheet'
 import { useTranslations } from 'next-intl'
 import Image from 'next/image'
-import { ExternalLink, CheckCircle2, Loader2, Settings } from 'lucide-react'
+import { ExternalLink, CheckCircle2, Settings } from 'lucide-react'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { AddStoreFlow } from '@/components/settings/add-store-flow'
@@ -20,11 +20,10 @@ export function AddStoreStep() {
   const [isAddStoreOpen, setIsAddStoreOpen] = useState(false)
 
   // Square integration hooks
-  const { data: squareStatus, isLoading: isLoadingStatus } = useSquareStatus()
+  const { data: squareStatus } = useSquareStatus()
   const initiateSquareConnect = useInitiateSquareConnect()
 
   const isSquareConnected = squareStatus?.is_connected || false
-  const isConnecting = initiateSquareConnect.isPending
 
   const handleSquareConnect = async () => {
     try {
@@ -68,7 +67,7 @@ export function AddStoreStep() {
             onClick={() => {
               if (isSquareConnected) {
                 router.push('/dashboard/integrations/square')
-              } else if (!isConnecting && !isLoadingStatus) {
+              } else {
                 handleSquareConnect()
               }
             }}
@@ -77,14 +76,18 @@ export function AddStoreStep() {
               <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                 <Image src="/square/square-icon.svg" alt="Square" width={40} height={40} />
                 <div>
-                  <div className="flex items-center gap-2">
-                    <Typography variant="h4" className="font-semibold">
+                  <div className="flex items-center gap-2 pb-2">
+                    <Typography variant="h3" className="font-semibold">
                       Square
                     </Typography>
-                    {isSquareConnected && (
+                    {isSquareConnected ? (
                       <Badge variant="default" className="gap-1">
                         <CheckCircle2 className="h-3 w-3" />
                         Connected
+                      </Badge>
+                    ) : (
+                      <Badge variant="secondary" className="gap-1">
+                        Not Connected
                       </Badge>
                     )}
                   </div>
@@ -96,14 +99,8 @@ export function AddStoreStep() {
               <Button
                 variant="outline"
                 className="w-fit group-hover:bg-white group-hover:text-primary-900 hover:bg-white hover:text-primary-900 pointer-events-none"
-                disabled={isConnecting || isLoadingStatus}
               >
-                {isConnecting || isLoadingStatus ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    {isConnecting ? 'Connecting...' : 'Loading...'}
-                  </>
-                ) : isSquareConnected ? (
+                {isSquareConnected ? (
                   <>
                     <Settings className="h-4 w-4" />
                     Manage

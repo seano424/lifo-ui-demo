@@ -51,13 +51,6 @@ export function SquareCallbackProcessor() {
       return
     }
 
-    // TEMPORARY DEBUG LOGGING - Remove after debugging
-    if (squareStatus) {
-      console.log('[Square Callback Debug] Status response:', squareStatus)
-      console.log('[Square Callback Debug] is_connected:', squareStatus.is_connected)
-      console.log('[Square Callback Debug] stores:', squareStatus.stores)
-    }
-
     // Check polling result
     if (status === 'processing' && squareStatus) {
       if (squareStatus.is_connected) {
@@ -158,7 +151,9 @@ export function SquareCallbackProcessor() {
                   <span className="text-gray-600">
                     {squareStatus.stores.length === 1
                       ? t('connectedStore')
-                      : t('connectedStores', { count: squareStatus.stores.length })}
+                      : t('connectedStores', {
+                          count: squareStatus.stores.length,
+                        })}
                     :
                   </span>
                   <ul className="ml-4 space-y-1">
