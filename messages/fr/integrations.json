@@ -48,6 +48,7 @@
     "connectedLocationsDescriptionSingle": "1 emplacement connecté à votre compte Square",
     "locationId": "ID de l'emplacement",
     "currentLocation": "Magasin actuel",
+    "switchToStore": "Changer de magasin",
     "syncCatalog": "Catalogue",
     "syncCatalogDescription": "Synchroniser les produits depuis Square",
     "syncInventory": "Inventaire",

@@ -48,6 +48,7 @@
     "connectedLocationsDescriptionSingle": "1 locatie verbonden met uw Square-account",
     "locationId": "Locatie-ID",
     "currentLocation": "Huidige winkel",
+    "switchToStore": "Wissel naar winkel",
     "syncCatalog": "Catalogus",
     "syncCatalogDescription": "Synchroniseer producten vanuit Square",
     "syncInventory": "Voorraad",

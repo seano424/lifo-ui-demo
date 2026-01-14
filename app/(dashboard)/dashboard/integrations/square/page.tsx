@@ -24,6 +24,7 @@ import { formatDistanceToNow } from 'date-fns'
 import { useEffect } from 'react'
 import { useStoreState } from '@/lib/stores/store-context'
 import { Typography } from '@/components/ui/typography'
+import { useStoreActions, useUserStores } from '@/hooks/use-stores'
 
 export default function SquareManagementPage() {
   const router = useRouter()
@@ -31,6 +32,8 @@ export default function SquareManagementPage() {
 
   // Get currently selected store from team switcher
   const { activeStore } = useStoreState()
+  const { switchStore, isChangingStore } = useStoreActions()
+  const { userStores } = useUserStores()
 
   // Fetch connection status - contains all necessary connection details
   const { data: squareStatus, isLoading: isLoadingStatus } = useSquareStatus()
@@ -87,8 +90,6 @@ export default function SquareManagementPage() {
   if (!squareStatus?.is_connected) {
     return null // Will redirect via useEffect
   }
-
-  console.log('squareStatus', squareStatus)
 
   return (
     <ErrorBoundary>
@@ -154,13 +155,13 @@ export default function SquareManagementPage() {
         </Card>
 
         {/* Connected Locations */}
-        <Card>
-          <CardHeader>
+        <Card className="space-y-4">
+          <CardHeader className="space-y-2">
             <div className="flex items-center gap-2">
               <MapPin className="h-5 w-5 text-primary-600" />
               <CardTitle>{t('connectedLocations')}</CardTitle>
             </div>
-            <CardDescription>
+            <CardDescription className="px-1">
               {squareStatus.stores?.length === 1
                 ? t('connectedLocationsDescriptionSingle')
                 : t('connectedLocationsDescription', {
@@ -172,13 +173,21 @@ export default function SquareManagementPage() {
             <div className="space-y-3">
               {squareStatus.stores?.map(store => {
                 const isCurrentStore = activeStore?.store_id === store.store_id
+                const fullStore = userStores.find(us => us.store.store_id === store.store_id)?.store
+
+                const handleSwitchToStore = () => {
+                  if (fullStore) {
+                    switchStore(fullStore)
+                  }
+                }
+
                 return (
                   <div
                     key={store.store_id}
-                    className={`rounded-lg p-4 ${isCurrentStore ? 'bg-primary-50' : 'bg-white'}`}
+                    className={`rounded-3xl border p-4 ${isCurrentStore ? 'border border-primary-50' : 'border-white'}`}
                   >
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                      <div className="space-y-2">
+                      <div className="space-y-2 flex-1">
                         <div className="flex items-center gap-2 flex-wrap">
                           <Typography variant="p">{store.store_name}</Typography>
                           <Badge
@@ -194,6 +203,27 @@ export default function SquareManagementPage() {
                           {t('locationId')}: {store.location_id}
                         </Typography>
                       </div>
+
+                      {!isCurrentStore && fullStore ? (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={handleSwitchToStore}
+                          disabled={isChangingStore}
+                          className="min-h-[44px] min-w-[44px] shrink-0"
+                        >
+                          {t('switchToStore')}
+                        </Button>
+                      ) : (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          disabled
+                          className="min-h-[44px] min-w-[44px] shrink-0"
+                        >
+                          {t('currentLocation')}
+                        </Button>
+                      )}
                     </div>
                   </div>
                 )
