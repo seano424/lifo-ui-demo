@@ -7,7 +7,7 @@
 
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
-import { ArrowRight, RefreshCw, Square, Package, Boxes, ShoppingCart } from 'lucide-react'
+import { ArrowRight, RefreshCw, Square, Package, Boxes, ShoppingCart, MapPin } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -22,10 +22,14 @@ import {
 } from '@/hooks/use-square-integration'
 import { formatDistanceToNow } from 'date-fns'
 import { useEffect } from 'react'
+import { useStoreState } from '@/lib/stores/store-context'
 
 export default function SquareManagementPage() {
   const router = useRouter()
   const t = useTranslations('integrations.square')
+
+  // Get currently selected store from team switcher
+  const { activeStore } = useStoreState()
 
   // Fetch connection status - contains all necessary connection details
   const { data: squareStatus, isLoading: isLoadingStatus } = useSquareStatus()
@@ -79,6 +83,8 @@ export default function SquareManagementPage() {
     return null // Will redirect via useEffect
   }
 
+  console.log('squareStatus', squareStatus)
+
   return (
     <ErrorBoundary>
       <div className="container max-w-5xl space-y-6 py-6 lg:py-8">
@@ -115,27 +121,15 @@ export default function SquareManagementPage() {
             <CardTitle>{t('connectionDetails')}</CardTitle>
             <CardDescription>{t('connectionDetailsDescription')}</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="space-y-4">
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-1">
                 <p className="text-sm text-gray-600">{t('merchantName')}</p>
                 <p className="font-medium">{squareStatus.merchant_name || 'N/A'}</p>
               </div>
               <div className="space-y-1">
-                <p className="text-sm text-gray-600">{t('storeName')}</p>
-                <p className="font-medium">{squareStatus.store_name || 'N/A'}</p>
-              </div>
-              <div className="space-y-1">
                 <p className="text-sm text-gray-600">{t('merchantId')}</p>
                 <p className="font-mono text-sm">{squareStatus.merchant_id || 'N/A'}</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm text-gray-600">{t('status')}</p>
-                <Badge
-                  variant={squareStatus.connection_status === 'active' ? 'default' : 'secondary'}
-                >
-                  {squareStatus.connection_status || 'unknown'}
-                </Badge>
               </div>
             </div>
 
@@ -149,6 +143,60 @@ export default function SquareManagementPage() {
                 </p>
               </div>
             )}
+          </CardContent>
+        </Card>
+
+        {/* Connected Locations */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <MapPin className="h-5 w-5 text-primary-600" />
+              <CardTitle>{t('connectedLocations')}</CardTitle>
+            </div>
+            <CardDescription>
+              {squareStatus.stores?.length === 1
+                ? t('connectedLocationsDescriptionSingle')
+                : t('connectedLocationsDescription', { count: squareStatus.stores?.length || 0 })}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {squareStatus.stores?.map(store => {
+                const isCurrentStore = activeStore?.store_id === store.store_id
+                return (
+                  <div
+                    key={store.store_id}
+                    className={`rounded-lg border p-4 transition-shadow hover:shadow-sm ${
+                      isCurrentStore
+                        ? 'border-primary-500 bg-primary-50'
+                        : 'border-gray-200 bg-white'
+                    }`}
+                  >
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <p className="font-medium">{store.store_name}</p>
+                          <Badge
+                            variant={store.connection_status === 'active' ? 'default' : 'secondary'}
+                            className="text-xs"
+                          >
+                            {store.connection_status}
+                          </Badge>
+                          {isCurrentStore && (
+                            <Badge variant="primary" className="text-xs">
+                              {t('currentLocation')}
+                            </Badge>
+                          )}
+                        </div>
+                        <p className="text-xs text-gray-600 sm:text-sm">
+                          {t('locationId')}: <span className="font-mono">{store.location_id}</span>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
           </CardContent>
         </Card>
 
