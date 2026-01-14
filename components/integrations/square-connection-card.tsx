@@ -7,7 +7,7 @@
 
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
-import { CheckCircle2, Settings, MapPin } from 'lucide-react'
+import { Settings, MapPin } from 'lucide-react'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -89,24 +89,21 @@ export function SquareConnectionCard({ status, isLoading, onConnect }: SquareCon
       <div className="flex flex-col gap-4">
         {/* Header Section */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center justify-between">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+          <div className="flex items-center gap-2">
             <Image src="/square/square-icon.svg" alt="Square" width={32} height={32} />
             <div className="space-y-1">
               <div className="flex items-center gap-4 flex-wrap">
-                <Typography variant="h4" className="font-semibold">
-                  Square
-                </Typography>
-                <Badge variant="default" className="gap-1">
-                  <CheckCircle2 className="h-3 w-3" />
-                  {t('connected')}
-                </Badge>
+                <Typography variant="h2">Square</Typography>
+                <Badge variant="secondary">{t('connected')}</Badge>
               </div>
-              <Typography variant="muted">{status?.merchant_name || 'N/A'}</Typography>
+              {/* <Typography variant="muted">
+                {status?.merchant_name || 'N/A'}
+              </Typography> */}
             </div>
           </div>
           <Button
             variant="outline"
-            className="w-fit group-hover:bg-white group-hover:text-primary-900 hover:bg-white hover:text-primary-900 pointer-events-none"
+            className="sm:w-fit group-hover:bg-white group-hover:text-primary-900 hover:bg-white hover:text-primary-900 pointer-events-none"
           >
             <Settings className="h-4 w-4" />
             {t('manage')}
@@ -117,7 +114,7 @@ export function SquareConnectionCard({ status, isLoading, onConnect }: SquareCon
         {stores.length > 0 && (
           <div className="space-y-4">
             <div className="flex items-center gap-1">
-              <MapPin className="h-4 w-4 text-primary-600" />
+              <MapPin className="h-4 w-4 text-muted-foreground" />
               <Typography variant="muted">
                 {hasMultipleLocations
                   ? t('connectedLocationsDescription', { count: stores.length })
