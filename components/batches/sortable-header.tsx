@@ -17,23 +17,25 @@ export function SortableHeader({
   children,
   className = '',
 }: SortableHeaderProps) {
+  const isActive = currentSort.field === field
+
   return (
-    <div className={`flex items-center gap-1 ${className}`}>
+    <div className={`flex items-center gap-1 group ${className}`}>
       <Button
         variant="ghost"
         onClick={() => updateSort(field)}
-        className="h-auto p-0 font-semibold hover:bg-transparent"
+        className="h-auto p-0 hover:bg-transparent hover:text-foreground"
       >
         <div className="flex items-center gap-1">
           {children}
-          {currentSort.field === field ? (
+          {isActive ? (
             currentSort.direction === 'asc' ? (
-              <ArrowUp className="h-4 w-4" />
+              <ArrowUp className="h-3.5 w-3.5" />
             ) : (
-              <ArrowDown className="h-4 w-4" />
+              <ArrowDown className="h-3.5 w-3.5" />
             )
           ) : (
-            <ArrowUpDown className="h-4 w-4" />
+            <ArrowUpDown className="h-3.5 w-3.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
           )}
         </div>
       </Button>

@@ -1,7 +1,6 @@
 'use client'
 
 import type { ColumnDef, Header } from '@tanstack/react-table'
-import { Calendar, DollarSign } from 'lucide-react'
 import { SortableHeader } from '@/components/batches/sortable-header'
 import type { BatchSort, BatchSortField, BatchWithProduct } from '@/lib/queries/batches'
 import { getExpiryBadge, getStatusBadge } from '@/lib/utils/batch-utils'
@@ -68,12 +67,17 @@ export function createBatchTableColumns({
       accessorKey: 'batch_number',
       header: () => (
         <SortableHeader field="batch_number" currentSort={currentSort} updateSort={updateSort}>
-          {t('headers.batchNumber')}
+          <span className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
+            {t('headers.batchNumber')}
+          </span>
         </SortableHeader>
       ),
       cell: ({ row }) => (
-        <div className="font-mono text-sm truncate" title={row.original.batch_number}>
-          {row.original.batch_number}
+        <div
+          className="font-mono text-sm text-muted-foreground truncate"
+          title={row.original.batch_number}
+        >
+          {row.original.batch_number?.slice(-6) || ''}
         </div>
       ),
       size: DEFAULT_COLUMN_WIDTHS.batch_number,
@@ -86,17 +90,19 @@ export function createBatchTableColumns({
       accessorFn: row => row.products?.name || '',
       header: () => (
         <SortableHeader field="product_name" currentSort={currentSort} updateSort={updateSort}>
-          {t('headers.product')}
+          <span className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
+            {t('headers.product')}
+          </span>
         </SortableHeader>
       ),
       cell: ({ row }) => (
         <div>
-          <div className="font-medium truncate" title={row.original.products?.name}>
+          <div className="font-semibold truncate" title={row.original.products?.name}>
             {row.original.products?.name}
           </div>
           <div
-            className="text-sm text-muted-foreground truncate"
-            title={`${row.original.products?.sku}`}
+            className="text-xs text-muted-foreground truncate"
+            title={row.original.products?.sku}
           >
             {row.original.products?.sku}
           </div>
@@ -112,28 +118,24 @@ export function createBatchTableColumns({
       accessorKey: 'expiry_date',
       header: () => (
         <SortableHeader field="expiry_date" currentSort={currentSort} updateSort={updateSort}>
-          {t('headers.expiryDate')}
+          <span className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
+            {t('headers.expiryDate')}
+          </span>
         </SortableHeader>
       ),
       cell: ({ row }) => (
-        <div className="flex flex-col gap-1">
+        <div className="flex items-center gap-2">
           {row.original.expiry_date ? (
             <>
-              <div className="flex items-center gap-2">
-                <Calendar className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                <span className="truncate">
-                  {new Date(row.original.expiry_date).toLocaleDateString()}
-                </span>
-              </div>
+              <span className="text-sm truncate">
+                {new Date(row.original.expiry_date).toLocaleDateString()}
+              </span>
               {getExpiryBadge(row.original.expiry_date, tExpiry)}
             </>
           ) : (
-            <div className="flex items-center gap-2">
-              <Calendar className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-              <span className="text-muted-foreground italic truncate">
-                {tExpiry('noExpiryDate')}
-              </span>
-            </div>
+            <span className="text-sm text-muted-foreground italic truncate">
+              {tExpiry('noExpiryDate')}
+            </span>
           )}
         </div>
       ),
@@ -159,17 +161,14 @@ export function createBatchTableColumns({
           updateSort={updateSort}
           className="justify-end"
         >
-          {t('headers.stock')}
+          <span className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
+            {t('headers.stock')}
+          </span>
         </SortableHeader>
       ),
       cell: ({ row }) => (
-        <div className="text-right">
-          <span
-            className="font-medium truncate"
-            title={Number(row.original.current_quantity).toLocaleString()}
-          >
-            {Number(row.original.current_quantity).toLocaleString()}
-          </span>
+        <div className="text-right font-medium tabular-nums">
+          {Number(row.original.current_quantity).toLocaleString()}
         </div>
       ),
       size: DEFAULT_COLUMN_WIDTHS.current_quantity,
@@ -187,18 +186,15 @@ export function createBatchTableColumns({
           updateSort={updateSort}
           className="justify-end"
         >
-          {t('headers.costPrice')}
+          <span className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
+            {t('headers.costPrice')}
+          </span>
         </SortableHeader>
       ),
       cell: ({ row }) => (
-        <div className="flex items-center justify-end gap-1">
-          <DollarSign className="h-3 w-3 text-muted-foreground flex-shrink-0" />
-          <span
-            className="truncate"
-            title={`${currencySymbol}${Number(row.original.cost_price).toFixed(2)}`}
-          >
-            {Number(row.original.cost_price).toFixed(2)}
-          </span>
+        <div className="text-right tabular-nums">
+          {currencySymbol}
+          {Number(row.original.cost_price).toFixed(2)}
         </div>
       ),
       size: DEFAULT_COLUMN_WIDTHS.cost_price,
@@ -219,18 +215,15 @@ export function createBatchTableColumns({
           updateSort={updateSort}
           className="justify-end"
         >
-          {t('headers.sellPrice')}
+          <span className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
+            {t('headers.sellPrice')}
+          </span>
         </SortableHeader>
       ),
       cell: ({ row }) => (
-        <div className="flex items-center justify-end gap-1">
-          <DollarSign className="h-3 w-3 text-muted-foreground flex-shrink-0" />
-          <span
-            className="truncate"
-            title={`${currencySymbol}${Number(row.original.selling_price).toFixed(2)}`}
-          >
-            {Number(row.original.selling_price).toFixed(2)}
-          </span>
+        <div className="text-right tabular-nums">
+          {currencySymbol}
+          {Number(row.original.selling_price).toFixed(2)}
         </div>
       ),
       size: DEFAULT_COLUMN_WIDTHS.selling_price,
@@ -246,10 +239,16 @@ export function createBatchTableColumns({
       accessorKey: 'status',
       header: () => (
         <SortableHeader field="status" currentSort={currentSort} updateSort={updateSort}>
-          {t('headers.status')}
+          <span className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
+            {t('headers.status')}
+          </span>
         </SortableHeader>
       ),
-      cell: ({ row }) => getStatusBadge(row.original.status || 'active', tStatus),
+      cell: ({ row }) => {
+        // Only show status badge if NOT active (reduce visual noise)
+        if (row.original.status === 'active') return null
+        return getStatusBadge(row.original.status || 'active', tStatus)
+      },
       size: DEFAULT_COLUMN_WIDTHS.status,
       minSize: 70,
       maxSize: Math.max(
@@ -263,15 +262,14 @@ export function createBatchTableColumns({
       accessorKey: 'created_at',
       header: () => (
         <SortableHeader field="created_at" currentSort={currentSort} updateSort={updateSort}>
-          {t('headers.createdAt')}
+          <span className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
+            {t('headers.createdAt')}
+          </span>
         </SortableHeader>
       ),
       cell: ({ row }) => (
-        <div className="flex items-center gap-2">
-          <Calendar className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-          <span className="truncate">
-            {row.original.created_at ? new Date(row.original.created_at).toLocaleDateString() : '-'}
-          </span>
+        <div className="text-sm truncate">
+          {row.original.created_at ? new Date(row.original.created_at).toLocaleDateString() : '-'}
         </div>
       ),
       size: DEFAULT_COLUMN_WIDTHS.created_at,

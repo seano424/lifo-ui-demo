@@ -4,7 +4,7 @@ import { BatchListSkeleton } from '@/components/batches/batch-list-skeleton'
 import { ColumnResizer, createBatchTableColumns } from '@/components/batches/batch-table-columns'
 import { TodoActionBottomSheet } from '@/components/todos/todo-action-bottom-sheet'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardTitle } from '@/components/ui/card'
+import { CardDescription, CardTitle } from '@/components/ui/card'
 import {
   Table,
   TableBody,
@@ -128,77 +128,74 @@ export function BatchTable({ data, currentSort, updateSort, isLoading }: BatchTa
 
   if (data.length === 0) {
     return (
-      <Card className="border-0 shadow-none">
-        <CardContent className="flex flex-col items-center justify-center py-12">
-          <Package className="h-12 w-12 text-muted-foreground mb-4" />
-          <CardTitle className="text-lg mb-2">{t('emptyState.title')}</CardTitle>
-          <CardDescription className="text-center max-w-md">
-            {t('emptyState.description')}
-          </CardDescription>
-          <Button asLink href="/dashboard/deliveries" className="mt-4">
-            {t('emptyState.addFirstBatch')}
-          </Button>
-        </CardContent>
-      </Card>
+      <div className="flex flex-col items-center justify-center py-12">
+        <Package className="h-12 w-12 text-muted-foreground mb-4" />
+        <CardTitle className="text-lg mb-2">{t('emptyState.title')}</CardTitle>
+        <CardDescription className="text-center max-w-md">
+          {t('emptyState.description')}
+        </CardDescription>
+        <Button asLink href="/dashboard/deliveries" className="mt-4">
+          {t('emptyState.addFirstBatch')}
+        </Button>
+      </div>
     )
   }
 
   return (
     <>
-      <div className="overflow-x-auto">
-        <Table
-          style={{
-            tableLayout: 'fixed',
-          }}
-        >
-          <TableHeader>
-            {table.getHeaderGroups().map(headerGroup => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map(header => (
-                  <TableHead
-                    key={header.id}
-                    className="relative border-r border-border/50 last:border-r-0 overflow-hidden"
-                    style={{
-                      width: header.getSize(),
-                      minWidth: header.getSize(),
-                      maxWidth: header.getSize(),
-                      position: 'relative',
-                    }}
-                  >
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(header.column.columnDef.header, header.getContext())}
-                    {header.column.getCanResize() && <ColumnResizer header={header} />}
-                  </TableHead>
-                ))}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows.map(row => (
-              <TableRow
-                key={row.id}
-                onClick={() => handleBatchClick(row.original)}
-                className="cursor-pointer hover:bg-muted/50 transition-colors"
-              >
-                {row.getVisibleCells().map(cell => (
-                  <TableCell
-                    key={cell.id}
-                    style={{
-                      width: cell.column.getSize(),
-                      minWidth: cell.column.getSize(),
-                      maxWidth: cell.column.getSize(),
-                    }}
-                    className="border-r border-border/50 last:border-r-0 overflow-hidden"
-                  >
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+      <Table
+        className="border-separate border-spacing-0"
+        style={{
+          tableLayout: 'fixed',
+        }}
+      >
+        <TableHeader>
+          {table.getHeaderGroups().map(headerGroup => (
+            <TableRow key={headerGroup.id}>
+              {headerGroup.headers.map(header => (
+                <TableHead
+                  key={header.id}
+                  className="relative overflow-hidden py-3"
+                  style={{
+                    width: header.getSize(),
+                    minWidth: header.getSize(),
+                    maxWidth: header.getSize(),
+                    position: 'relative',
+                  }}
+                >
+                  {header.isPlaceholder
+                    ? null
+                    : flexRender(header.column.columnDef.header, header.getContext())}
+                  {header.column.getCanResize() && <ColumnResizer header={header} />}
+                </TableHead>
+              ))}
+            </TableRow>
+          ))}
+        </TableHeader>
+        <TableBody>
+          {table.getRowModel().rows.map(row => (
+            <TableRow
+              key={row.id}
+              onClick={() => handleBatchClick(row.original)}
+              className="cursor-pointer hover:bg-muted/30 transition-colors border-b border-border/30"
+            >
+              {row.getVisibleCells().map(cell => (
+                <TableCell
+                  key={cell.id}
+                  style={{
+                    width: cell.column.getSize(),
+                    minWidth: cell.column.getSize(),
+                    maxWidth: cell.column.getSize(),
+                  }}
+                  className="overflow-hidden py-4"
+                >
+                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                </TableCell>
+              ))}
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
 
       <TodoActionBottomSheet
         isOpen={isBottomSheetOpen}

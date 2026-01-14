@@ -1,14 +1,4 @@
-import {
-  AlertTriangle,
-  ArrowDown,
-  ArrowUp,
-  Calendar,
-  Clock,
-  DollarSign,
-  Package,
-  ShoppingBag,
-  TrendingUp,
-} from 'lucide-react'
+import { ArrowDown, ArrowUp } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import {
@@ -35,82 +25,47 @@ export function BatchListSortControls({
 
   return (
     <div className="flex items-center gap-2">
-      <span className="hidden md:block text-sm font-medium text-muted-foreground">
-        {t('sortBy')}:
-      </span>
-
       <Select
         value={currentSort.field}
         onValueChange={(field: BatchSortField) => updateSort(field)}
         disabled={isLoading}
       >
-        <SelectTrigger className="w-full md:w-[180px]">
-          <SelectValue />
+        <SelectTrigger className="w-[180px] h-8">
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-muted-foreground">{t('sortBy')}:</span>
+            <SelectValue />
+            {currentSort.direction === 'asc' ? (
+              <ArrowUp className="h-3 w-3 text-muted-foreground ml-auto" />
+            ) : (
+              <ArrowDown className="h-3 w-3 text-muted-foreground ml-auto" />
+            )}
+          </div>
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="created_at">
-            <span className="flex items-center gap-2">
-              <Calendar className="h-4 w-4" />
-              {t('createdDate')}
-            </span>
-          </SelectItem>
-          <SelectItem value="expiry_date">
-            <span className="flex items-center gap-2">
-              <AlertTriangle className="h-4 w-4" />
-              {t('expiryDate')}
-            </span>
-          </SelectItem>
-          <SelectItem value="batch_number">
-            <span className="flex items-center gap-2">
-              <Package className="h-4 w-4" />
-              {t('batchNumber')}
-            </span>
-          </SelectItem>
-          <SelectItem value="product_name">
-            <span className="flex items-center gap-2">
-              <ShoppingBag className="h-4 w-4" />
-              {t('productName')}
-            </span>
-          </SelectItem>
-          <SelectItem value="current_quantity">
-            <span className="flex items-center gap-2">
-              <TrendingUp className="h-4 w-4" />
-              {t('stockLevel')}
-            </span>
-          </SelectItem>
-          <SelectItem value="cost_price">
-            <span className="flex items-center gap-2">
-              <DollarSign className="h-4 w-4" />
-              {t('costPrice')}
-            </span>
-          </SelectItem>
-          <SelectItem value="selling_price">
-            <span className="flex items-center gap-2">
-              <DollarSign className="h-4 w-4" />
-              {t('sellingPrice')}
-            </span>
-          </SelectItem>
-          <SelectItem value="status">
-            <span className="flex items-center gap-2">
-              <Clock className="h-4 w-4" />
-              {t('status')}
-            </span>
-          </SelectItem>
+          <SelectItem value="created_at">{t('createdDate')}</SelectItem>
+          <SelectItem value="expiry_date">{t('expiryDate')}</SelectItem>
+          <SelectItem value="batch_number">{t('batchNumber')}</SelectItem>
+          <SelectItem value="product_name">{t('productName')}</SelectItem>
+          <SelectItem value="current_quantity">{t('stockLevel')}</SelectItem>
+          <SelectItem value="cost_price">{t('costPrice')}</SelectItem>
+          <SelectItem value="selling_price">{t('sellingPrice')}</SelectItem>
+          <SelectItem value="status">{t('status')}</SelectItem>
         </SelectContent>
       </Select>
 
       <Button
-        variant="outline"
+        variant="ghost"
+        size="sm"
         onClick={() => updateSort(currentSort.field)}
         disabled={isLoading}
-        className="w-1/2 md:w-auto"
+        className="h-8 w-8 p-0"
+        title={currentSort.direction === 'asc' ? t('asc') : t('desc')}
       >
         {currentSort.direction === 'asc' ? (
-          <ArrowUp className="h-4 w-4 opacity-50" />
+          <ArrowUp className="h-4 w-4" />
         ) : (
-          <ArrowDown className="h-4 w-4 opacity-50" />
+          <ArrowDown className="h-4 w-4" />
         )}
-        {currentSort.direction === 'asc' ? t('asc') : t('desc')}
       </Button>
     </div>
   )

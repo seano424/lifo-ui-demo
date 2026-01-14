@@ -1,11 +1,5 @@
 import { useTranslations } from 'next-intl'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+import { Button } from '@/components/ui/button'
 
 interface BatchListFiltersProps {
   filters?: {
@@ -13,16 +7,10 @@ interface BatchListFiltersProps {
     status?: string
   }
   onFiltersChange?: (filters: { expiringInDays?: number; status?: string }) => void
-  count: number
   isLoading: boolean
 }
 
-export function BatchListFilters({
-  filters,
-  onFiltersChange,
-  count,
-  isLoading,
-}: BatchListFiltersProps) {
+export function BatchListFilters({ filters, onFiltersChange, isLoading }: BatchListFiltersProps) {
   const t = useTranslations('batchFilters')
 
   if (!onFiltersChange) {
@@ -30,57 +18,59 @@ export function BatchListFilters({
   }
 
   return (
-    <div className="flex flex-row lg:justify-end gap-2">
-      <Select
-        value={filters?.expiringInDays?.toString() || 'all'}
-        onValueChange={value =>
-          onFiltersChange({
-            ...filters,
-            expiringInDays: value === 'all' ? undefined : parseInt(value, 10),
-          })
-        }
-        disabled={isLoading}
-      >
-        <SelectTrigger className="w-full md:w-[180px] text-nowrap">
-          <SelectValue className="text-nowrap" placeholder={t('expiryFilter')} />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">{t('allItems')}</SelectItem>
-          <SelectItem value="3">{t('expiringInDays', { days: 3 })}</SelectItem>
-          <SelectItem value="7">{t('expiringInDays', { days: 7 })}</SelectItem>
-          <SelectItem value="14">{t('expiringInDays', { days: 14 })}</SelectItem>
-          <SelectItem value="30">{t('expiringInDays', { days: 30 })}</SelectItem>
-        </SelectContent>
-      </Select>
+    <div className="flex flex-wrap items-center gap-2">
+      {/* Expiry Filter Pills */}
+      <div className="flex items-center gap-1">
+        <Button
+          variant={!filters?.expiringInDays ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => onFiltersChange({ ...filters, expiringInDays: undefined })}
+          disabled={isLoading}
+          className="h-8"
+        >
+          {t('allItems')}
+        </Button>
+        {[3, 7, 14, 30].map(days => (
+          <Button
+            key={days}
+            variant={filters?.expiringInDays === days ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => onFiltersChange({ ...filters, expiringInDays: days })}
+            disabled={isLoading}
+            className="h-8"
+          >
+            {days}d
+          </Button>
+        ))}
+      </div>
 
-      <Select
-        value={filters?.status || 'all'}
-        onValueChange={value =>
-          onFiltersChange({
-            ...filters,
-            status: value === 'all' ? undefined : value,
-          })
-        }
-        disabled={isLoading}
-      >
-        <SelectTrigger className="w-full md:w-[140px] text-nowrap">
-          <SelectValue className="text-nowrap" placeholder={t('status')} />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">{t('allStatuses')}</SelectItem>
-          <SelectItem value="active">{t('active')}</SelectItem>
-          <SelectItem value="expired">{t('expired')}</SelectItem>
-          <SelectItem value="damaged">{t('damaged')}</SelectItem>
-          <SelectItem value="sold_out">{t('soldOut')}</SelectItem>
-          <SelectItem value="reserved">{t('reserved')}</SelectItem>
-        </SelectContent>
-      </Select>
+      {/* Divider */}
+      <div className="h-4 w-px bg-border" />
 
-      {!isLoading && count > 0 && (
-        <span className="text-sm text-nowrap items-center text-muted-foreground px-2 hidden md:flex">
-          {t('itemCount', { count })}
-        </span>
-      )}
+      {/* Status Filter Pills */}
+      <div className="flex items-center gap-1">
+        <Button
+          variant={!filters?.status ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => onFiltersChange({ ...filters, status: undefined })}
+          disabled={isLoading}
+          className="h-8"
+        >
+          {t('allStatuses')}
+        </Button>
+        {['active', 'expired', 'damaged'].map(status => (
+          <Button
+            key={status}
+            variant={filters?.status === status ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => onFiltersChange({ ...filters, status })}
+            disabled={isLoading}
+            className="h-8"
+          >
+            {t(status)}
+          </Button>
+        ))}
+      </div>
     </div>
   )
 }
