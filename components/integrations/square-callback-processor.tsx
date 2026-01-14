@@ -29,9 +29,9 @@ export function SquareCallbackProcessor() {
   const [pollingStartTime] = useState<number>(Date.now())
   const [shouldPoll, setShouldPoll] = useState<boolean>(true)
 
-  // Check for error in URL params (user denied authorization)
+  // Check for error in URL params (user denied authorization or other OAuth errors)
   const urlError = searchParams?.get('error')
-  const urlErrorDescription = searchParams?.get('error_description')
+  const urlErrorMessage = searchParams?.get('error_message')
 
   // Poll Square status to check connection completion
   // Only poll if status is processing AND shouldPoll is true (handles timeout)
@@ -46,7 +46,7 @@ export function SquareCallbackProcessor() {
     if (urlError) {
       setStatus('error')
       setErrorMessage(
-        urlErrorDescription || 'Authorization was cancelled. Please try again to connect Square.',
+        urlErrorMessage || 'Authorization was cancelled. Please try again to connect Square.',
       )
       return
     }
@@ -83,16 +83,7 @@ export function SquareCallbackProcessor() {
           'Failed to verify connection. Please try again or contact support if the issue persists.',
       )
     }
-  }, [
-    squareStatus,
-    isError,
-    error,
-    status,
-    pollingStartTime,
-    router,
-    urlError,
-    urlErrorDescription,
-  ])
+  }, [squareStatus, isError, error, status, pollingStartTime, router, urlError, urlErrorMessage])
 
   return (
     <div className="flex min-h-[60vh] flex-col items-center justify-center">
