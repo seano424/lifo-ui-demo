@@ -7,15 +7,18 @@
 
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
-import { CheckCircle2, Square, ExternalLink, Settings } from 'lucide-react'
+import { CheckCircle2, Settings, MapPin } from 'lucide-react'
+import Image from 'next/image'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { Typography } from '@/components/ui/typography'
 import type { SquareConnectionStatus } from '@/lib/types/integrations'
 import { formatDistanceToNow } from 'date-fns'
+import { useStoreState } from '@/lib/stores/store-context'
 
 interface SquareConnectionCardProps {
-  status: SquareConnectionStatus | undefined
+  status?: SquareConnectionStatus
   isLoading: boolean
   onConnect: () => void
 }
@@ -23,99 +26,156 @@ interface SquareConnectionCardProps {
 export function SquareConnectionCard({ status, isLoading, onConnect }: SquareConnectionCardProps) {
   const router = useRouter()
   const t = useTranslations('integrations.square')
+  const { activeStore } = useStoreState()
 
   const isConnected = status?.is_connected || false
+  const stores = status?.stores || []
+  const hasMultipleLocations = stores.length > 1
 
-  const handleViewDetails = () => {
+  const handleManage = () => {
     router.push('/dashboard/integrations/square')
   }
 
-  return (
-    <Card className="relative overflow-hidden">
-      {/* Square brand accent */}
-      <div className="absolute top-0 left-0 h-1 w-full bg-gradient-to-r from-black via-gray-800 to-black" />
-
-      <CardHeader>
-        <div className="flex items-start justify-between">
-          <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-black">
-              <Square className="h-6 w-6 text-white" />
-            </div>
-            <div>
-              <CardTitle className="flex items-center gap-2">
-                {t('title')}
-                {isConnected && (
-                  <Badge variant="default" className="gap-1">
-                    <CheckCircle2 className="h-3 w-3" />
-                    {t('connected')}
-                  </Badge>
-                )}
-              </CardTitle>
-              <CardDescription>{t('description')}</CardDescription>
+  if (isLoading) {
+    return (
+      <Card className="p-6">
+        <div className="space-y-4">
+          <div className="flex items-center gap-4">
+            <div className="h-10 w-10 animate-pulse rounded bg-gray-200" />
+            <div className="flex-1 space-y-4">
+              <div className="h-4 w-1/3 animate-pulse rounded bg-gray-200" />
+              <div className="h-3 w-2/3 animate-pulse rounded bg-gray-200" />
             </div>
           </div>
         </div>
-      </CardHeader>
+      </Card>
+    )
+  }
 
-      <CardContent className="space-y-4">
-        {isLoading ? (
-          <div className="space-y-2">
-            <div className="h-4 w-3/4 animate-pulse rounded bg-gray-200" />
-            <div className="h-4 w-1/2 animate-pulse rounded bg-gray-200" />
+  if (!isConnected) {
+    return (
+      <Card
+        className="p-6 transition-colors cursor-pointer group hover:bg-gray-50"
+        onClick={onConnect}
+      >
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+            <Image src="/square/square-icon.svg" alt="Square" width={40} height={40} />
+            <div>
+              <Typography variant="h4" className="font-semibold">
+                Square
+              </Typography>
+              <Typography variant="p" className="text-sm text-muted-foreground">
+                {t('description')}
+              </Typography>
+            </div>
           </div>
-        ) : isConnected && status ? (
-          <>
-            <div className="space-y-2 text-sm">
-              {status.merchant_name && (
-                <div className="flex justify-between">
-                  <span className="text-gray-600">{t('merchantName')}:</span>
-                  <span className="font-medium">{status.merchant_name}</span>
-                </div>
-              )}
-              {status.store_name && (
-                <div className="flex justify-between">
-                  <span className="text-gray-600">{t('storeName')}:</span>
-                  <span className="font-medium">{status.store_name}</span>
-                </div>
-              )}
-              {status.last_sync_at && (
-                <div className="flex justify-between">
-                  <span className="text-gray-600">{t('lastSync')}:</span>
-                  <span className="text-gray-700">
-                    {formatDistanceToNow(new Date(status.last_sync_at), { addSuffix: true })}
-                  </span>
-                </div>
-              )}
-              {status.connection_status && (
-                <div className="flex justify-between">
-                  <span className="text-gray-600">{t('status')}:</span>
-                  <Badge variant={status.connection_status === 'active' ? 'default' : 'secondary'}>
-                    {status.connection_status}
-                  </Badge>
-                </div>
-              )}
+          <Button
+            variant="outline"
+            className="w-fit group-hover:bg-white group-hover:text-primary-900 hover:bg-white hover:text-primary-900 pointer-events-none"
+          >
+            {t('connect')}
+          </Button>
+        </div>
+      </Card>
+    )
+  }
+
+  return (
+    <Card
+      className="p-6 transition-colors cursor-pointer group hover:bg-gray-50"
+      onClick={handleManage}
+    >
+      <div className="flex flex-col gap-4">
+        {/* Header Section */}
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+            <Image src="/square/square-icon.svg" alt="Square" width={32} height={32} />
+            <div className="space-y-1">
+              <div className="flex items-center gap-4 flex-wrap">
+                <Typography variant="h4" className="font-semibold">
+                  Square
+                </Typography>
+                <Badge variant="default" className="gap-1">
+                  <CheckCircle2 className="h-3 w-3" />
+                  {t('connected')}
+                </Badge>
+              </div>
+              <Typography variant="muted">{status?.merchant_name || 'N/A'}</Typography>
+            </div>
+          </div>
+          <Button
+            variant="outline"
+            className="w-fit group-hover:bg-white group-hover:text-primary-900 hover:bg-white hover:text-primary-900 pointer-events-none"
+          >
+            <Settings className="h-4 w-4" />
+            {t('manage')}
+          </Button>
+        </div>
+
+        {/* Connected Locations Section */}
+        {stores.length > 0 && (
+          <div className="space-y-4">
+            <div className="flex items-center gap-1">
+              <MapPin className="h-4 w-4 text-primary-600" />
+              <Typography variant="muted">
+                {hasMultipleLocations
+                  ? t('connectedLocationsDescription', { count: stores.length })
+                  : t('connectedLocationsDescriptionSingle')}
+              </Typography>
             </div>
 
-            <div className="flex gap-2">
-              <Button onClick={handleViewDetails} variant="default" size="sm" className="flex-1">
-                <Settings className="mr-2 h-4 w-4" />
-                {t('manage')}
-              </Button>
-              <Button onClick={handleViewDetails} variant="outline" size="sm">
-                <ExternalLink className="h-4 w-4" />
-              </Button>
+            <div className="space-y-4">
+              {stores.map(store => {
+                const isCurrentStore = activeStore?.store_id === store.store_id
+
+                return (
+                  <div
+                    key={store.store_id}
+                    className={`rounded-3xl shadow-xs border p-4 ${
+                      isCurrentStore ? 'border border-primary-50' : 'border border-secondary-50'
+                    }`}
+                  >
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                      <div className="space-y-4 flex-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <Typography variant="p" className="text-sm font-medium">
+                            {store.store_name}
+                          </Typography>
+                          <Badge
+                            variant={store.connection_status === 'active' ? 'default' : 'secondary'}
+                            className="text-xs"
+                          >
+                            {store.connection_status}
+                          </Badge>
+                          {isCurrentStore && (
+                            <Badge variant="primary" className="text-xs">
+                              {t('currentLocation')}
+                            </Badge>
+                          )}
+                        </div>
+                        <div className="flex flex-col gap-1">
+                          <Typography variant="muted" className="text-xs font-mono">
+                            {t('locationId')}: {store.location_id}
+                          </Typography>
+                          {store.last_sync_at && (
+                            <Typography variant="muted" className="text-xs">
+                              {t('lastSync')}:{' '}
+                              {formatDistanceToNow(new Date(store.last_sync_at), {
+                                addSuffix: true,
+                              })}
+                            </Typography>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
             </div>
-          </>
-        ) : (
-          <>
-            <p className="text-sm text-gray-600">{t('notConnectedDescription')}</p>
-            <Button onClick={onConnect} variant="default" size="lg" className="w-full">
-              <Square className="mr-2 h-4 w-4" />
-              {t('connect')}
-            </Button>
-          </>
+          </div>
         )}
-      </CardContent>
+      </div>
     </Card>
   )
 }
