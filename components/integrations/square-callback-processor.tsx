@@ -51,6 +51,13 @@ export function SquareCallbackProcessor() {
       return
     }
 
+    // TEMPORARY DEBUG LOGGING - Remove after debugging
+    if (squareStatus) {
+      console.log('[Square Callback Debug] Status response:', squareStatus)
+      console.log('[Square Callback Debug] is_connected:', squareStatus.is_connected)
+      console.log('[Square Callback Debug] stores:', squareStatus.stores)
+    }
+
     // Check polling result
     if (status === 'processing' && squareStatus) {
       if (squareStatus.is_connected) {
@@ -171,7 +178,18 @@ export function SquareCallbackProcessor() {
               <Alert variant="destructive">
                 <AlertCircle className="h-4 w-4" />
                 <AlertTitle>{t('errorTitle')}</AlertTitle>
-                <AlertDescription>{errorMessage}</AlertDescription>
+                <AlertDescription>
+                  {errorMessage}
+                  {/* TEMPORARY DEBUG - Show status response if available */}
+                  {squareStatus && process.env.NODE_ENV === 'development' && (
+                    <details className="mt-2 text-xs">
+                      <summary className="cursor-pointer">Debug Info</summary>
+                      <pre className="mt-1 overflow-auto">
+                        {JSON.stringify(squareStatus, null, 2)}
+                      </pre>
+                    </details>
+                  )}
+                </AlertDescription>
               </Alert>
 
               <div className="flex gap-2">
