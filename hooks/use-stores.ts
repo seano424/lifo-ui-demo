@@ -160,8 +160,6 @@ export function useStoreActions() {
           storeId: newStore.store_id,
         })
         toast.success(`${newStore.store_name} set as primary store`)
-      } else {
-        toast.success(`Switched to ${newStore.store_name}`)
       }
     } catch (error) {
       logger.error('hooks/use-stores', 'Failed to switch stores', {

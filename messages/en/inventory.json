@@ -1,5 +1,10 @@
 {
   "products": {
+    "totalStock": "Total Stock",
+    "activeBatches": "Active Batches",
+    "uncategorized": "Uncategorized",
+    "notAvailable": "N/A",
+    "unnamedProduct": "Unnamed Product",
     "manualEntry": {
       "title": "Manual Entry",
       "manualSearch": "Manual Search",

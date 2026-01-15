@@ -2,7 +2,7 @@
 
 import { BatchListSkeleton } from '@/components/batches/batch-list-skeleton'
 import { createBatchTableColumns } from '@/components/batches/batch-table-columns'
-import { TodoActionBottomSheet } from '@/components/todos/todo-action-bottom-sheet'
+import { BatchModal } from '@/components/batches/batch-modal'
 import { CardDescription, CardTitle } from '@/components/ui/card'
 import {
   Table,
@@ -12,7 +12,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { useBatchTodo } from '@/hooks/use-batch-todo'
 import { useCurrency } from '@/hooks/use-currency'
 import { useStoreState } from '@/lib/stores/store-context'
 import type { BatchSort, BatchSortField, BatchWithProduct } from '@/lib/queries/batches'
@@ -53,14 +52,11 @@ export function BatchTable({ data, currentSort, updateSort, isLoading }: BatchTa
   const currencySymbol = useCurrency()
   const { activeStore } = useStoreState()
 
-  const [selectedBatchId, setSelectedBatchId] = useState<string | null>(null)
+  const [selectedBatch, setSelectedBatch] = useState<BatchWithProduct | null>(null)
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false)
 
-  // Fetch the todo data for the selected batch
-  const { data: selectedBatchTodo } = useBatchTodo(selectedBatchId)
-
   const handleBatchClick = (batch: BatchWithProduct) => {
-    setSelectedBatchId(batch.batch_id)
+    setSelectedBatch(batch)
     setIsBottomSheetOpen(true)
   }
 
@@ -180,13 +176,13 @@ export function BatchTable({ data, currentSort, updateSort, isLoading }: BatchTa
         </TableBody>
       </Table>
 
-      <TodoActionBottomSheet
+      <BatchModal
         isOpen={isBottomSheetOpen}
         onClose={() => {
           setIsBottomSheetOpen(false)
-          setSelectedBatchId(null)
+          setSelectedBatch(null)
         }}
-        selectedBatch={selectedBatchTodo || null}
+        batch={selectedBatch}
         currencySymbol={currencySymbol}
       />
     </>

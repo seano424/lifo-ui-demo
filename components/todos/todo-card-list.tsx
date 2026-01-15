@@ -1,7 +1,6 @@
 'use client'
 
-// import { TodoActionBottomSheet } from '@/components/todos/todo-action-bottom-sheet'
-import { TodoActionSheetV2 } from './todo-action-sheet-v2'
+import { BatchModal } from '@/components/batches/batch-modal'
 import { TodoCardV3 } from '@/components/todos/todo-card-v3'
 import { InfiniteScrollErrorBoundary } from '@/components/ui/error-boundary'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -199,11 +198,11 @@ export function TodoCardList({
         )}
       </div>
 
-      {/* Todo Action Bottom Sheet */}
-      <TodoActionSheetV2
+      {/* Batch Modal */}
+      <BatchModal
         isOpen={isBottomSheetOpen}
         onClose={handleCloseBottomSheet}
-        selectedBatch={selectedBatch}
+        batch={selectedBatch}
         currencySymbol={currencySymbol}
       />
     </InfiniteScrollErrorBoundary>

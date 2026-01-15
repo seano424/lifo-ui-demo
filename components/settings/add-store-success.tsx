@@ -43,7 +43,6 @@ export function AddStoreSuccess({ storeName, storeId, onSuccess }: AddStoreSucce
       // Also set the cookie for server-side consistency
       await setActiveStoreCookie(storeId)
 
-      toast.success(`Switched to ${storeName}`)
       return true
     } catch (error) {
       console.error('Failed to set active store cookie:', error)
