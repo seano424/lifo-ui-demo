@@ -8,8 +8,8 @@
       "searchByProductName": "Or Search by Product Name",
       "inStockItemsOnly": "(In-stock items only)",
       "barcodePlaceholder": "Barcode number (8+ digits)...",
-      "searchPlaceholder": "Search Open Food Facts database...",
-      "inventorySearchPlaceholder": "Search products in inventory...",
+      "searchPlaceholder": "Search",
+      "inventorySearchPlaceholder": "Search",
       "productFound": "Product Found!",
       "outOfStock": "Out of Stock",
       "noStockAvailable": "No stock available in this store",
@@ -37,7 +37,7 @@
       "batch": "batch",
       "batches": "batches",
       "units": "units",
-      "searchPlaceholder": "Search products by name, brand, barcode, or SKU..."
+      "searchPlaceholder": "Search"
     },
     "catalog": {
       "title": "Products Catalog",

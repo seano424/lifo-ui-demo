@@ -177,7 +177,7 @@ export function BatchesFilteredList({ initialFilters, pageSize = 100 }: BatchesF
   return (
     <div className="space-y-6">
       {/* Control bar - Search, Filters, and Sort on same level */}
-      <div className="flex flex-col lg:flex-row lg:items-center gap-4">
+      <div className="flex flex-row flex-wrap lg:items-center lg:gap-4 gap-3">
         {/* Search Bar */}
         <div className="flex-1">
           <TodoSearchBar

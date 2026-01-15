@@ -8,8 +8,8 @@
       "searchByProductName": "Of zoeken op productnaam",
       "inStockItemsOnly": "(Alleen voorradige artikelen)",
       "barcodePlaceholder": "Barcodenummer (8+ cijfers)...",
-      "searchPlaceholder": "Zoeken in Open Food Facts database...",
-      "inventorySearchPlaceholder": "Zoeken naar producten in voorraad...",
+      "searchPlaceholder": "Zoek",
+      "inventorySearchPlaceholder": "Zoek",
       "productFound": "Product gevonden!",
       "outOfStock": "Niet op voorraad",
       "noStockAvailable": "Geen voorraad beschikbaar in deze winkel",
@@ -37,7 +37,7 @@
       "batch": "batch",
       "batches": "batches",
       "units": "eenheden",
-      "searchPlaceholder": "Zoek producten op naam, merk, barcode of SKU..."
+      "searchPlaceholder": "Zoek"
     },
     "catalog": {
       "title": "Productencatalogus",
@@ -130,7 +130,7 @@
         "markAsDamaged": "Markeren als beschadigd",
         "deleteBatch": "Batch verwijderen"
       },
-      "searchPlaceholder": "Zoek batches op productnaam, merk, barcode, batchnummer, locatie...",
+      "searchPlaceholder": "Zoek",
       "emptyState": {
         "title": "Geen batches gevonden",
         "description": "Je hebt nog geen batches in je inventaris. Begin met het toevoegen van je eerste batch om vervaldatums bij te houden en voorraadniveaus te beheren.",
