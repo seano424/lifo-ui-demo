@@ -110,6 +110,7 @@ export function BatchModal({ isOpen, onClose, batch, currencySymbol = '€' }: B
 
   return (
     <BottomSheet
+      className="min-w-xl"
       isOpen={isOpen}
       onClose={onClose}
       titleElement={
@@ -129,7 +130,7 @@ export function BatchModal({ isOpen, onClose, batch, currencySymbol = '€' }: B
       }
     >
       <div className="flex flex-col h-full max-h-[90vh]">
-        <div className="flex-1 overflow-y-auto px-5 py-4 pb-32">
+        <div className="flex-1 overflow-y-auto px-5 py-4">
           {/* Quick Stats */}
           <div className="grid grid-cols-2 gap-4 mb-6">
             <div className="bg-muted/30 rounded-2xl p-4">
@@ -256,39 +257,40 @@ export function BatchModal({ isOpen, onClose, batch, currencySymbol = '€' }: B
                 </div>
               )}
             </div>
-
-            {/* Edit Actions */}
-            {!isEditing ? (
-              <Button
-                variant="subtle"
-                onClick={handleEditClick}
-                className="w-full rounded-2xl flex items-center gap-2"
-                size="lg"
-              >
-                Edit Batch Details
-              </Button>
-            ) : (
-              <div className="flex gap-2">
-                <Button
-                  variant="gray"
-                  onClick={handleCancel}
-                  disabled={isUpdating}
-                  className="flex-1 rounded-2xl"
-                  size="lg"
-                >
-                  Cancel
-                </Button>
+            <div className="py-8">
+              {/* Edit Actions */}
+              {!isEditing ? (
                 <Button
                   variant="subtle"
-                  onClick={handleSave}
-                  disabled={isUpdating}
-                  className="flex-1 rounded-2xl"
+                  onClick={handleEditClick}
+                  className="w-full rounded-2xl flex items-center gap-2"
                   size="lg"
                 >
-                  Save
+                  Edit Batch Details
                 </Button>
-              </div>
-            )}
+              ) : (
+                <div className="flex gap-2">
+                  <Button
+                    variant="gray"
+                    onClick={handleCancel}
+                    disabled={isUpdating}
+                    className="flex-1 rounded-2xl"
+                    size="lg"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    variant="subtle"
+                    onClick={handleSave}
+                    disabled={isUpdating}
+                    className="flex-1 rounded-2xl"
+                    size="lg"
+                  >
+                    Save
+                  </Button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

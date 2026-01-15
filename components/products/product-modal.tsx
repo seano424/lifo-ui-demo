@@ -51,6 +51,7 @@ export function ProductModal({ isOpen, onClose, product }: ProductModalProps) {
 
   return (
     <BottomSheet
+      className="min-w-xl"
       isOpen={isOpen}
       onClose={onClose}
       titleElement={
@@ -62,7 +63,7 @@ export function ProductModal({ isOpen, onClose, product }: ProductModalProps) {
       }
     >
       <div className="flex flex-col h-full max-h-[90vh]">
-        <div className="flex-1 overflow-y-auto px-5 py-4 pb-32">
+        <div className="flex-1 overflow-y-auto px-5 py-4 flex flex-col gap-4">
           {/* Stock Summary */}
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-muted/30 rounded-2xl p-4">
@@ -116,7 +117,7 @@ export function ProductModal({ isOpen, onClose, product }: ProductModalProps) {
             </div>
 
             {/* Edit in Square Note */}
-            <div className="rounded-2xl px-4 pt-8 flex flex-col text-center items-center gap-2">
+            <div className="rounded-2xl px-4 py-8 flex flex-col text-center items-center gap-2">
               <Typography variant="h4" className="text-destructive font-black">
                 Edit in Square
               </Typography>
