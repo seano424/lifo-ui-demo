@@ -2,6 +2,7 @@
 
 import { ProductListSkeleton } from '@/components/products/product-list-skeleton'
 import { createProductTableColumns } from '@/components/products/product-table-columns'
+import { ProductModal } from '@/components/products/product-modal'
 import { CardDescription, CardTitle } from '@/components/ui/card'
 import {
   Table,
@@ -46,6 +47,9 @@ export function ProductsTable({ data, currentSort, updateSort, isLoading }: Prod
 
   const { getCategoryName } = useCategoryTranslation()
 
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+
   const [sorting, setSorting] = useState<SortingState>(() => {
     if (VALID_COLUMN_IDS.includes(currentSort.field)) {
       return [
@@ -70,6 +74,11 @@ export function ProductsTable({ data, currentSort, updateSort, isLoading }: Prod
       setSorting([])
     }
   }, [currentSort])
+
+  const handleProductClick = (product: Product) => {
+    setSelectedProduct(product)
+    setIsModalOpen(true)
+  }
 
   const columns = useMemo(
     () =>
@@ -109,52 +118,66 @@ export function ProductsTable({ data, currentSort, updateSort, isLoading }: Prod
   }
 
   return (
-    <Table
-      style={{
-        tableLayout: 'fixed',
-        borderCollapse: 'separate',
-        borderSpacing: 0,
-      }}
-    >
-      <TableHeader>
-        {table.getHeaderGroups().map(headerGroup => (
-          <TableRow key={headerGroup.id} className="border-b-2 border-border">
-            {headerGroup.headers.map(header => (
-              <TableHead
-                key={header.id}
-                className="py-3 px-4"
-                style={
-                  header.column.columnDef.size ? { width: header.column.columnDef.size } : undefined
-                }
-              >
-                {header.isPlaceholder
-                  ? null
-                  : flexRender(header.column.columnDef.header, header.getContext())}
-              </TableHead>
-            ))}
-          </TableRow>
-        ))}
-      </TableHeader>
-      <TableBody>
-        {table.getRowModel().rows.map(row => (
-          <TableRow
-            key={row.id}
-            className="cursor-pointer hover:bg-muted/30 transition-colors border-b border-border"
-          >
-            {row.getVisibleCells().map(cell => (
-              <TableCell
-                key={cell.id}
-                style={
-                  cell.column.columnDef.size ? { width: cell.column.columnDef.size } : undefined
-                }
-                className="py-4 px-4"
-              >
-                {flexRender(cell.column.columnDef.cell, cell.getContext())}
-              </TableCell>
-            ))}
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+    <>
+      <Table
+        style={{
+          tableLayout: 'fixed',
+          borderCollapse: 'separate',
+          borderSpacing: 0,
+        }}
+      >
+        <TableHeader>
+          {table.getHeaderGroups().map(headerGroup => (
+            <TableRow key={headerGroup.id} className="border-b-2 border-border">
+              {headerGroup.headers.map(header => (
+                <TableHead
+                  key={header.id}
+                  className="py-3 px-4"
+                  style={
+                    header.column.columnDef.size
+                      ? { width: header.column.columnDef.size }
+                      : undefined
+                  }
+                >
+                  {header.isPlaceholder
+                    ? null
+                    : flexRender(header.column.columnDef.header, header.getContext())}
+                </TableHead>
+              ))}
+            </TableRow>
+          ))}
+        </TableHeader>
+        <TableBody>
+          {table.getRowModel().rows.map(row => (
+            <TableRow
+              key={row.id}
+              onClick={() => handleProductClick(row.original)}
+              className="cursor-pointer hover:bg-muted/30 transition-colors border-b border-border"
+            >
+              {row.getVisibleCells().map(cell => (
+                <TableCell
+                  key={cell.id}
+                  style={
+                    cell.column.columnDef.size ? { width: cell.column.columnDef.size } : undefined
+                  }
+                  className="py-4 px-4"
+                >
+                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                </TableCell>
+              ))}
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+
+      <ProductModal
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false)
+          setSelectedProduct(null)
+        }}
+        product={selectedProduct}
+      />
+    </>
   )
 }

@@ -1,5 +1,10 @@
 {
   "products": {
+    "totalStock": "Totale Voorraad",
+    "activeBatches": "Actieve Partijen",
+    "uncategorized": "Niet gecategoriseerd",
+    "notAvailable": "N/B",
+    "unnamedProduct": "Naamloos product",
     "manualEntry": {
       "title": "Handmatige invoer",
       "manualSearch": "Handmatig zoeken",

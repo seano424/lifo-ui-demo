@@ -1,5 +1,10 @@
 {
   "products": {
+    "totalStock": "Stock Total",
+    "activeBatches": "Lots Actifs",
+    "uncategorized": "Non catégorisé",
+    "notAvailable": "N/D",
+    "unnamedProduct": "Produit sans nom",
     "manualEntry": {
       "title": "Saisie manuelle",
       "manualSearch": "Recherche manuelle",

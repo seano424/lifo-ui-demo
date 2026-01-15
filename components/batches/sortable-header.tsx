@@ -35,7 +35,7 @@ export function SortableHeader({
               <ArrowDown className="h-3.5 w-3.5" />
             )
           ) : (
-            <ArrowUpDown className="h-3.5 w-3.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+            <ArrowUpDown className="h-3.5 w-3.5" />
           )}
         </div>
       </Button>

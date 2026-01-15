@@ -8,6 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { ArrowUpDownIcon } from 'lucide-react'
 
 export function BatchListSkeleton() {
   const t = useTranslations('batches.table')
@@ -23,31 +24,57 @@ export function BatchListSkeleton() {
       <TableHeader>
         <TableRow className="border-b-2 border-border">
           <TableHead className="py-3 px-4" style={{ width: 140 }}>
-            <span className="text-sm text-foreground">{t('headers.batchNumber')}</span>
+            <div className="flex items-center gap-1">
+              <span className="text-sm text-foreground">{t('headers.batchNumber')}</span>
+              <ArrowUpDownIcon className="h-3.5 w-3.5" />
+            </div>
           </TableHead>
           <TableHead className="py-3 px-4" style={{ width: 200 }}>
-            <span className="text-sm text-foreground">{t('headers.product')}</span>
+            <div className="flex items-center gap-1">
+              <span className="text-sm text-foreground">{t('headers.product')}</span>
+              <ArrowUpDownIcon className="h-3.5 w-3.5" />
+            </div>
           </TableHead>
           <TableHead className="py-3 px-4" style={{ width: 150 }}>
-            <span className="text-sm text-foreground">{t('headers.location')}</span>
+            <div className="flex items-center gap-1">
+              <span className="text-sm text-foreground">{t('headers.location')}</span>
+            </div>
           </TableHead>
-          <TableHead className="py-3 px-4" style={{ width: 140 }}>
-            <span className="text-sm text-foreground">{t('headers.expiryDate')}</span>
+          <TableHead className="py-3 px-4 text-right" style={{ width: 140 }}>
+            <div className="flex items-center gap-1">
+              <span className="text-sm text-foreground">{t('headers.expiryDate')}</span>
+              <ArrowUpDownIcon className="h-3.5 w-3.5" />
+            </div>
           </TableHead>
-          <TableHead className="py-3 px-4" style={{ width: 140 }}>
-            <span className="text-sm text-foreground">{t('headers.stock')}</span>
+          <TableHead className="py-3 px-4 text-right" style={{ width: 140 }}>
+            <div className="flex items-center gap-1">
+              <span className="text-sm text-foreground">{t('headers.stock')}</span>
+              <ArrowUpDownIcon className="h-3.5 w-3.5" />
+            </div>
           </TableHead>
-          <TableHead className="py-3 px-4" style={{ width: 140 }}>
-            <span className="text-sm text-foreground">{t('headers.costPrice')}</span>
+          <TableHead className="py-3 px-4 text-right" style={{ width: 140 }}>
+            <div className="flex items-center gap-1">
+              <span className="text-sm text-foreground">{t('headers.costPrice')}</span>
+              <ArrowUpDownIcon className="h-3.5 w-3.5" />
+            </div>
           </TableHead>
-          <TableHead className="py-3 px-4" style={{ width: 140 }}>
-            <span className="text-sm text-foreground">{t('headers.sellPrice')}</span>
+          <TableHead className="py-3 px-4 text-right" style={{ width: 140 }}>
+            <div className="flex items-center gap-1">
+              <span className="text-sm text-foreground">{t('headers.sellPrice')}</span>
+              <ArrowUpDownIcon className="h-3.5 w-3.5" />
+            </div>
           </TableHead>
-          <TableHead className="py-3 px-4" style={{ width: 140 }}>
-            <span className="text-sm text-foreground">{t('headers.status')}</span>
+          <TableHead className="py-3 px-4 text-right" style={{ width: 140 }}>
+            <div className="flex items-center gap-1">
+              <span className="text-sm text-foreground">{t('headers.status')}</span>
+              <ArrowUpDownIcon className="h-3.5 w-3.5" />
+            </div>
           </TableHead>
-          <TableHead className="py-3 px-4" style={{ width: 140 }}>
-            <span className="text-sm text-foreground">{t('headers.createdAt')}</span>
+          <TableHead className="py-3 px-4 text-right" style={{ width: 140 }}>
+            <div className="flex items-center gap-1 justify-end">
+              <span className="text-sm text-foreground">{t('headers.createdAt')}</span>
+              <ArrowUpDownIcon className="h-3.5 w-3.5" />
+            </div>
           </TableHead>
         </TableRow>
       </TableHeader>
@@ -60,25 +87,25 @@ export function BatchListSkeleton() {
             <TableCell className="py-4 px-4" style={{ width: 200 }}>
               <Skeleton className="h-5 w-full rounded" />
             </TableCell>
-            <TableCell className="py-4 px-4" style={{ width: 150 }}>
+            <TableCell className="py-4 px-4 text-right" style={{ width: 150 }}>
               <Skeleton className="h-5 w-full rounded" />
             </TableCell>
-            <TableCell className="py-4 px-4" style={{ width: 140 }}>
+            <TableCell className="py-4 px-4 text-right" style={{ width: 140 }}>
               <Skeleton className="h-5 w-full rounded" />
             </TableCell>
-            <TableCell className="py-4 px-4" style={{ width: 140 }}>
+            <TableCell className="py-4 px-4 text-right" style={{ width: 140 }}>
               <Skeleton className="h-5 w-full rounded" />
             </TableCell>
-            <TableCell className="py-4 px-4" style={{ width: 140 }}>
+            <TableCell className="py-4 px-4 text-right" style={{ width: 140 }}>
               <Skeleton className="h-5 w-full rounded" />
             </TableCell>
-            <TableCell className="py-4 px-4" style={{ width: 140 }}>
+            <TableCell className="py-4 px-4 text-right" style={{ width: 140 }}>
               <Skeleton className="h-5 w-full rounded" />
             </TableCell>
-            <TableCell className="py-4 px-4" style={{ width: 140 }}>
+            <TableCell className="py-4 px-4 text-right" style={{ width: 140 }}>
               <Skeleton className="h-5 w-full rounded" />
             </TableCell>
-            <TableCell className="py-4 px-4" style={{ width: 140 }}>
+            <TableCell className="py-4 px-4 text-right" style={{ width: 140 }}>
               <Skeleton className="h-5 w-full rounded" />
             </TableCell>
           </TableRow>

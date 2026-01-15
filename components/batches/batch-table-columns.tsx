@@ -66,15 +66,26 @@ export function createBatchTableColumns({
     },
     {
       id: 'location',
-      header: () => <span className="text-sm text-foreground">{t('headers.location')}</span>,
-      cell: () => <div className="text-sm text-muted-foreground truncate">{storeName || '-'}</div>,
+      header: () => (
+        <div className="flex">
+          <span className="text-sm text-foreground">{t('headers.location')}</span>
+        </div>
+      ),
+      cell: () => (
+        <div className="text-sm text-muted-foreground truncate text-right">{storeName || '-'}</div>
+      ),
       size: 150,
     },
     {
       id: 'expiry_date',
       accessorKey: 'expiry_date',
       header: () => (
-        <SortableHeader field="expiry_date" currentSort={currentSort} updateSort={updateSort}>
+        <SortableHeader
+          field="expiry_date"
+          currentSort={currentSort}
+          updateSort={updateSort}
+          className="justify-end"
+        >
           <span className="text-sm text-foreground">{t('headers.expiryDate')}</span>
         </SortableHeader>
       ),
@@ -84,7 +95,7 @@ export function createBatchTableColumns({
           : false
 
         return (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 justify-end text-right">
             {row.original.expiry_date ? (
               <span className={`text-sm truncate ${isExpired ? 'text-destructive' : ''}`}>
                 {new Date(row.original.expiry_date).toLocaleDateString()}
@@ -165,14 +176,19 @@ export function createBatchTableColumns({
       id: 'status',
       accessorKey: 'status',
       header: () => (
-        <SortableHeader field="status" currentSort={currentSort} updateSort={updateSort}>
+        <SortableHeader
+          field="status"
+          currentSort={currentSort}
+          updateSort={updateSort}
+          className="justify-end"
+        >
           <span className="text-sm text-foreground">{t('headers.status')}</span>
         </SortableHeader>
       ),
       cell: ({ row }) => {
         // Default to 'active' if no status is provided
         const status = row.original.status || 'active'
-        return getStatusBadge(status, tStatus)
+        return <div className="flex justify-end">{getStatusBadge(status, tStatus)}</div>
       },
       size: 140,
     },
@@ -180,12 +196,17 @@ export function createBatchTableColumns({
       id: 'created_at',
       accessorKey: 'created_at',
       header: () => (
-        <SortableHeader field="created_at" currentSort={currentSort} updateSort={updateSort}>
+        <SortableHeader
+          field="created_at"
+          currentSort={currentSort}
+          updateSort={updateSort}
+          className="justify-end"
+        >
           <span className="text-sm text-foreground">{t('headers.createdAt')}</span>
         </SortableHeader>
       ),
       cell: ({ row }) => (
-        <div className="text-sm truncate">
+        <div className="text-sm truncate text-right">
           {row.original.created_at ? new Date(row.original.created_at).toLocaleDateString() : '-'}
         </div>
       ),
