@@ -1,6 +1,5 @@
-import { ArrowDown, ArrowUp } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import { Button } from '@/components/ui/button'
+
 import {
   Select,
   SelectContent,
@@ -9,6 +8,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import type { BatchSort, BatchSortField } from '@/lib/queries/batches'
+import { ArrowUpDownIcon } from 'lucide-react'
 
 interface BatchListSortControlsProps {
   currentSort: BatchSort
@@ -30,30 +30,41 @@ export function BatchListSortControls({
         onValueChange={(field: BatchSortField) => updateSort(field)}
         disabled={isLoading}
       >
-        <SelectTrigger className="w-[180px] h-8">
+        <SelectTrigger className="w-max" hideChevron>
           <div className="flex items-center gap-2">
-            <span className="text-xs text-muted-foreground">{t('sortBy')}:</span>
-            <SelectValue />
-            {currentSort.direction === 'asc' ? (
-              <ArrowUp className="h-3 w-3 text-muted-foreground ml-auto" />
-            ) : (
-              <ArrowDown className="h-3 w-3 text-muted-foreground ml-auto" />
-            )}
+            <SelectValue className="whitespace-nowrap" />
+            <ArrowUpDownIcon className="h-4 w-4" />
           </div>
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="created_at">{t('createdDate')}</SelectItem>
-          <SelectItem value="expiry_date">{t('expiryDate')}</SelectItem>
-          <SelectItem value="batch_number">{t('batchNumber')}</SelectItem>
-          <SelectItem value="product_name">{t('productName')}</SelectItem>
-          <SelectItem value="current_quantity">{t('stockLevel')}</SelectItem>
-          <SelectItem value="cost_price">{t('costPrice')}</SelectItem>
-          <SelectItem value="selling_price">{t('sellingPrice')}</SelectItem>
-          <SelectItem value="status">{t('status')}</SelectItem>
+          <SelectItem value="created_at" hideCheckIcon>
+            {t('createdDate')}
+          </SelectItem>
+          <SelectItem value="expiry_date" hideCheckIcon>
+            {t('expiryDate')}
+          </SelectItem>
+          <SelectItem value="batch_number" hideCheckIcon>
+            {t('batchNumber')}
+          </SelectItem>
+          <SelectItem value="product_name" hideCheckIcon>
+            {t('productName')}
+          </SelectItem>
+          <SelectItem value="current_quantity" hideCheckIcon>
+            {t('stockLevel')}
+          </SelectItem>
+          <SelectItem value="cost_price" hideCheckIcon>
+            {t('costPrice')}
+          </SelectItem>
+          <SelectItem value="selling_price" hideCheckIcon>
+            {t('sellingPrice')}
+          </SelectItem>
+          <SelectItem value="status" hideCheckIcon>
+            {t('status')}
+          </SelectItem>
         </SelectContent>
       </Select>
 
-      <Button
+      {/* <Button
         variant="ghost"
         size="sm"
         onClick={() => updateSort(currentSort.field)}
@@ -66,7 +77,7 @@ export function BatchListSortControls({
         ) : (
           <ArrowDown className="h-4 w-4" />
         )}
-      </Button>
+      </Button> */}
     </div>
   )
 }

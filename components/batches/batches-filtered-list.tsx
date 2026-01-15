@@ -1,6 +1,7 @@
 'use client'
 
 import { AlertTriangle } from 'lucide-react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useState } from 'react'
@@ -30,14 +31,18 @@ export function BatchesFilteredList({ initialFilters, pageSize = 100 }: BatchesF
   const router = useRouter()
   const activeStoreId = useActiveStoreId()
   const t = useTranslations('batches.table')
+  const tButtons = useTranslations('buttons')
 
   const [filters, setFilters] = useState<BatchFilters>(() => {
     const baseFilters: BatchFilters = {
       storeId: activeStoreId || undefined,
     }
 
+    // Default to 180 days if no filter is specified
     if (initialFilters?.filter === 'expiring') {
-      baseFilters.expiringInDays = parseInt(initialFilters.expiringDays || '7', 10)
+      baseFilters.expiringInDays = parseInt(initialFilters.expiringDays || '180', 10)
+    } else if (!initialFilters?.filter) {
+      baseFilters.expiringInDays = 180
     }
 
     if (initialFilters?.status) {
@@ -171,10 +176,10 @@ export function BatchesFilteredList({ initialFilters, pageSize = 100 }: BatchesF
 
   return (
     <div className="space-y-6">
-      {/* Detached control bar */}
-      <div className="flex flex-col gap-4">
+      {/* Control bar - Search, Filters, and Sort on same level */}
+      <div className="flex flex-col lg:flex-row lg:items-center gap-4">
         {/* Search Bar */}
-        <div className="flex items-center gap-2">
+        <div className="flex-1">
           <TodoSearchBar
             searchTerm={filters.search}
             onSearchChange={handleSearchChange}
@@ -184,37 +189,35 @@ export function BatchesFilteredList({ initialFilters, pageSize = 100 }: BatchesF
           />
         </div>
 
-        {/* Filters and Sort Controls */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <BatchListFilters
-            filters={{
-              expiringInDays: filters.expiringInDays,
-              status: filters.status,
-            }}
-            onFiltersChange={handleFiltersChange}
-            isLoading={isLoading}
-          />
-          <div className="flex items-center gap-4">
-            <BatchListSortControls
-              currentSort={filters.sort || { field: 'created_at', direction: 'desc' }}
-              updateSort={field => {
-                const currentSort = filters.sort || {
-                  field: 'created_at',
-                  direction: 'desc',
-                }
-                const newDirection =
-                  currentSort.field === field && currentSort.direction === 'asc' ? 'desc' : 'asc'
-                handleSortChange({ field, direction: newDirection })
-              }}
-              isLoading={isLoading}
-            />
-            {!isLoading && count > 0 && (
-              <span className="text-sm text-muted-foreground hidden sm:inline">
-                {count} {count === 1 ? 'item' : 'items'}
-              </span>
-            )}
-          </div>
-        </div>
+        {/* Filters */}
+        <BatchListFilters
+          filters={{
+            expiringInDays: filters.expiringInDays,
+            status: filters.status,
+          }}
+          onFiltersChange={handleFiltersChange}
+          isLoading={isLoading}
+        />
+
+        {/* Sort Controls */}
+        <BatchListSortControls
+          currentSort={filters.sort || { field: 'created_at', direction: 'desc' }}
+          updateSort={field => {
+            const currentSort = filters.sort || {
+              field: 'created_at',
+              direction: 'desc',
+            }
+            const newDirection =
+              currentSort.field === field && currentSort.direction === 'asc' ? 'desc' : 'asc'
+            handleSortChange({ field, direction: newDirection })
+          }}
+          isLoading={isLoading}
+        />
+
+        {/* Add Batch Button */}
+        <Link href="/dashboard/deliveries">
+          <Button>{tButtons('addBatch')}</Button>
+        </Link>
       </div>
 
       {/* Table with no outer Card */}

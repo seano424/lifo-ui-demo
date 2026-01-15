@@ -130,7 +130,7 @@
         "markAsDamaged": "Mark as Damaged",
         "deleteBatch": "Delete Batch"
       },
-      "searchPlaceholder": "Search batches by product name, brand, barcode, batch number, location...",
+      "searchPlaceholder": "Search",
       "emptyState": {
         "title": "No batches found",
         "description": "Try adjusting your search or filters. ",

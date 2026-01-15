@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
 
-const COLUMN_WIDTHS_STORAGE_KEY = 'lifo-batch-table-columns'
+const COLUMN_WIDTHS_STORAGE_KEY = 'lifo-batch-table-columns-v2'
 
 const DEFAULT_COLUMN_WIDTHS = {
-  batch_number: 120,
+  batch_number: 90,
   product_name: 200,
   supplier: 120,
   expiry_date: 140,

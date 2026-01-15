@@ -1,4 +1,4 @@
-import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react'
+import { ArrowDown, ArrowUp } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import type { ProductSort, SortField } from '@/lib/queries/products'
 import { cn } from '@/lib/utils'
@@ -18,30 +18,28 @@ export function SortableHeader({
   updateSort,
   className,
 }: SortableHeaderProps) {
-  const isCurrentField = currentSort.field === field
-  const direction = isCurrentField ? currentSort.direction : null
-
-  const getSortIcon = () => {
-    if (!isCurrentField) {
-      return <ArrowUpDown className="ml-2 h-4 w-4 opacity-50" />
-    }
-    return direction === 'asc' ? (
-      <ArrowUp className="ml-2 h-4 w-4" />
-    ) : (
-      <ArrowDown className="ml-2 h-4 w-4" />
-    )
-  }
+  const isActive = currentSort.field === field
 
   return (
-    <Button
-      variant="ghost"
-      className={cn('h-auto p-0 font-semibold hover:bg-transparent flex items-center', className)}
-      onClick={() => updateSort(field)}
-    >
-      <div className="flex items-center">
-        {children}
-        {getSortIcon()}
-      </div>
-    </Button>
+    <div className={cn('flex items-center gap-1 group', className)}>
+      <Button
+        variant="ghost"
+        onClick={() => updateSort(field)}
+        className="h-auto p-0 hover:bg-transparent hover:text-foreground"
+      >
+        <div className="flex items-center gap-1">
+          <span className="text-xs text-foreground/80 font-semibold uppercase tracking-wide">
+            {children}
+          </span>
+          {isActive ? (
+            currentSort.direction === 'asc' ? (
+              <ArrowUp className="h-3.5 w-3.5" />
+            ) : (
+              <ArrowDown className="h-3.5 w-3.5" />
+            )
+          ) : null}
+        </div>
+      </Button>
+    </div>
   )
 }

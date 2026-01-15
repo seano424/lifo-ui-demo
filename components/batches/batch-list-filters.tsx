@@ -1,5 +1,10 @@
-import { useTranslations } from 'next-intl'
-import { Button } from '@/components/ui/button'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 
 interface BatchListFiltersProps {
   filters?: {
@@ -11,66 +16,80 @@ interface BatchListFiltersProps {
 }
 
 export function BatchListFilters({ filters, onFiltersChange, isLoading }: BatchListFiltersProps) {
-  const t = useTranslations('batchFilters')
-
   if (!onFiltersChange) {
     return null
   }
 
   return (
     <div className="flex flex-wrap items-center gap-2">
-      {/* Expiry Filter Pills */}
-      <div className="flex items-center gap-1">
-        <Button
-          variant={!filters?.expiringInDays ? 'default' : 'outline'}
-          size="sm"
-          onClick={() => onFiltersChange({ ...filters, expiringInDays: undefined })}
-          disabled={isLoading}
-          className="h-8"
-        >
-          {t('allItems')}
-        </Button>
-        {[3, 7, 14, 30].map(days => (
-          <Button
-            key={days}
-            variant={filters?.expiringInDays === days ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => onFiltersChange({ ...filters, expiringInDays: days })}
-            disabled={isLoading}
-            className="h-8"
-          >
-            {days}d
-          </Button>
-        ))}
-      </div>
+      {/* Date Filter Dropdown */}
+      <Select
+        value={filters?.expiringInDays?.toString() || '180'}
+        onValueChange={value =>
+          onFiltersChange({
+            ...filters,
+            expiringInDays: parseInt(value, 10),
+          })
+        }
+        disabled={isLoading}
+      >
+        <SelectTrigger className="w-[140px]" hideChevron>
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-muted-foreground">Date:</span>
+            <SelectValue />
+          </div>
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="3" hideCheckIcon>
+            3D
+          </SelectItem>
+          <SelectItem value="7" hideCheckIcon>
+            7D
+          </SelectItem>
+          <SelectItem value="14" hideCheckIcon>
+            14D
+          </SelectItem>
+          <SelectItem value="30" hideCheckIcon>
+            30D
+          </SelectItem>
+          <SelectItem value="90" hideCheckIcon>
+            90D
+          </SelectItem>
+          <SelectItem value="180" hideCheckIcon>
+            180D
+          </SelectItem>
+        </SelectContent>
+      </Select>
 
-      {/* Divider */}
-      <div className="h-4 w-px bg-border" />
-
-      {/* Status Filter Pills */}
-      <div className="flex items-center gap-1">
-        <Button
-          variant={!filters?.status ? 'default' : 'outline'}
-          size="sm"
-          onClick={() => onFiltersChange({ ...filters, status: undefined })}
-          disabled={isLoading}
-          className="h-8"
-        >
-          {t('allStatuses')}
-        </Button>
-        {['active', 'expired', 'damaged'].map(status => (
-          <Button
-            key={status}
-            variant={filters?.status === status ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => onFiltersChange({ ...filters, status })}
-            disabled={isLoading}
-            className="h-8"
-          >
-            {t(status)}
-          </Button>
-        ))}
-      </div>
+      {/* Status Filter Dropdown */}
+      <Select
+        value={filters?.status || 'all'}
+        onValueChange={value =>
+          onFiltersChange({
+            ...filters,
+            status: value === 'all' ? undefined : value,
+          })
+        }
+        disabled={isLoading}
+      >
+        <SelectTrigger className="w-[140px]" hideChevron>
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-muted-foreground">Status:</span>
+            <SelectValue />
+          </div>
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all" hideCheckIcon>
+            All
+          </SelectItem>
+          <SelectItem value="active" hideCheckIcon>
+            Active
+          </SelectItem>
+          <SelectItem value="expired" hideCheckIcon>
+            Expired
+          </SelectItem>
+        </SelectContent>
+      </Select>
     </div>
   )
 }

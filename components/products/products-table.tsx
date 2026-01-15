@@ -1,12 +1,9 @@
 'use client'
 
 import { ProductListSkeleton } from '@/components/products/product-list-skeleton'
-import {
-  ColumnResizer,
-  createProductTableColumns,
-} from '@/components/products/product-table-columns'
+import { createProductTableColumns } from '@/components/products/product-table-columns'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardTitle } from '@/components/ui/card'
+import { CardDescription, CardTitle } from '@/components/ui/card'
 import {
   Table,
   TableBody,
@@ -16,8 +13,6 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { useCategoryTranslation } from '@/hooks/use-category-translation'
-import { useProductColumnSizing } from '@/hooks/use-product-column-sizing'
-import { useProductActions } from '@/hooks/use-products'
 import type { Product, ProductSort, SortField } from '@/lib/queries/products'
 import {
   flexRender,
@@ -51,10 +46,7 @@ export function ProductsTable({ data, currentSort, updateSort, isLoading }: Prod
   const tButtons = useTranslations('buttons')
   const tTable = useTranslations('productTable')
 
-  const { updateProductPrice, deleteProduct, isUpdating } = useProductActions()
   const { getCategoryName } = useCategoryTranslation()
-
-  const { columnSizing, setColumnSizing, DEFAULT_COLUMN_WIDTHS } = useProductColumnSizing()
 
   const [sorting, setSorting] = useState<SortingState>(() => {
     if (VALID_COLUMN_IDS.includes(currentSort.field)) {
@@ -84,47 +76,24 @@ export function ProductsTable({ data, currentSort, updateSort, isLoading }: Prod
   const columns = useMemo(
     () =>
       createProductTableColumns({
-        data,
         currentSort,
         updateSort,
-        updateProductPrice,
-        deleteProduct,
-        isUpdating,
-        DEFAULT_COLUMN_WIDTHS,
         t: tTable,
         getCategoryName,
       }),
-    [
-      data,
-      currentSort,
-      updateSort,
-      updateProductPrice,
-      deleteProduct,
-      isUpdating,
-      DEFAULT_COLUMN_WIDTHS,
-      tTable,
-      getCategoryName,
-    ],
+    [currentSort, updateSort, tTable, getCategoryName],
   )
 
   const table = useReactTable({
     data,
     columns,
     state: {
-      columnSizing,
       sorting,
     },
-    onColumnSizingChange: setColumnSizing,
     onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    columnResizeMode: 'onChange',
-    enableColumnResizing: true,
     enableSorting: false,
-    defaultColumn: {
-      minSize: 50,
-      maxSize: 500,
-    },
   })
 
   if (isLoading) {
@@ -133,39 +102,41 @@ export function ProductsTable({ data, currentSort, updateSort, isLoading }: Prod
 
   if (data.length === 0) {
     return (
-      <Card className="border-0 border-t rounded-t-none shadow-none">
-        <CardContent className="flex flex-col items-center justify-center py-12">
-          <Package className="h-12 w-12 text-muted-foreground mb-4" />
-          <CardTitle className="text-lg mb-2">{t('empty.title')}</CardTitle>
-          <CardDescription className="text-center max-w-md">
-            {t('empty.storeDescription')}
-          </CardDescription>
-          <Button asLink href="/dashboard/deliveries" className="mt-4">
-            {tButtons('addProduct')}
-          </Button>
-        </CardContent>
-      </Card>
+      <div className="flex flex-col items-center justify-center py-12">
+        <Package className="h-12 w-12 text-muted-foreground mb-4" />
+        <CardTitle className="text-lg mb-2">{t('empty.title')}</CardTitle>
+        <CardDescription className="text-center max-w-md">
+          {t('empty.storeDescription')}
+        </CardDescription>
+        <Button asLink href="/dashboard/deliveries" className="mt-4">
+          {tButtons('addProduct')}
+        </Button>
+      </div>
     )
   }
 
   return (
-    <Table className="w-full table-fixed border-0 border-t rounded-t-none shadow-none">
+    <Table
+      style={{
+        tableLayout: 'fixed',
+        borderCollapse: 'separate',
+        borderSpacing: 0,
+      }}
+    >
       <TableHeader>
         {table.getHeaderGroups().map(headerGroup => (
-          <TableRow key={headerGroup.id}>
+          <TableRow key={headerGroup.id} className="border-b-2 border-border">
             {headerGroup.headers.map(header => (
               <TableHead
                 key={header.id}
-                className="relative border-r border-border/50 last:border-r-0 overflow-hidden"
-                style={{
-                  width: header.getSize(),
-                  position: 'relative',
-                }}
+                className="py-3"
+                style={
+                  header.column.columnDef.size ? { width: header.column.columnDef.size } : undefined
+                }
               >
                 {header.isPlaceholder
                   ? null
                   : flexRender(header.column.columnDef.header, header.getContext())}
-                {header.column.getCanResize() && <ColumnResizer header={header} />}
               </TableHead>
             ))}
           </TableRow>
@@ -173,14 +144,17 @@ export function ProductsTable({ data, currentSort, updateSort, isLoading }: Prod
       </TableHeader>
       <TableBody>
         {table.getRowModel().rows.map(row => (
-          <TableRow key={row.id}>
+          <TableRow
+            key={row.id}
+            className="cursor-pointer hover:bg-muted/30 transition-colors border-b border-border"
+          >
             {row.getVisibleCells().map(cell => (
               <TableCell
                 key={cell.id}
-                style={{
-                  width: cell.column.getSize(),
-                }}
-                className="border-r border-border/50 last:border-r-0 overflow-hidden"
+                style={
+                  cell.column.columnDef.size ? { width: cell.column.columnDef.size } : undefined
+                }
+                className="py-4"
               >
                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
               </TableCell>

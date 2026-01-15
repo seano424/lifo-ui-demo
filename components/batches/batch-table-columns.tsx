@@ -1,65 +1,26 @@
 'use client'
 
-import type { ColumnDef, Header } from '@tanstack/react-table'
+import type { ColumnDef } from '@tanstack/react-table'
 import { SortableHeader } from '@/components/batches/sortable-header'
 import type { BatchSort, BatchSortField, BatchWithProduct } from '@/lib/queries/batches'
-import { getExpiryBadge, getStatusBadge } from '@/lib/utils/batch-utils'
-
-interface ColumnResizerProps {
-  header: Header<BatchWithProduct, unknown>
-}
-
-function ColumnResizer({ header }: ColumnResizerProps) {
-  return (
-    <div
-      className={`absolute right-0 top-0 h-full w-2 cursor-col-resize bg-transparent  z-10 ${
-        header.column.getIsResizing() ? '' : ''
-      }`}
-      style={{
-        userSelect: 'none' as const,
-        touchAction: 'none' as const,
-      }}
-      onMouseDown={header.getResizeHandler()}
-      onTouchStart={header.getResizeHandler()}
-      onDoubleClick={() => {
-        header.column.resetSize()
-      }}
-    >
-      <div
-        className={`w-0.5 h-full ml-auto transition-all ${
-          header.column.getIsResizing() ? 'bg-brand-secondary' : 'bg-transparent hover:bg-border'
-        }`}
-      />
-    </div>
-  )
-}
-
-const calculateMaxWidth = (
-  data: BatchWithProduct[],
-  accessor: (item: BatchWithProduct) => string,
-) => {
-  const maxLength = Math.max(...data.map(item => accessor(item)?.length || 0), 10)
-  return Math.min(Math.max(maxLength * 8 + 40, 100), 400)
-}
+import { getStatusBadge } from '@/lib/utils/batch-utils'
 
 export function createBatchTableColumns({
-  data,
   currentSort,
   updateSort,
   t,
   tStatus,
   tExpiry,
-  DEFAULT_COLUMN_WIDTHS,
   currencySymbol = '$',
+  storeName,
 }: {
-  data: BatchWithProduct[]
   currentSort: BatchSort
   updateSort: (field: BatchSortField) => void
   t: (key: string) => string
   tStatus: (key: string) => string
   tExpiry: (key: string, params?: { days: number }) => string
-  DEFAULT_COLUMN_WIDTHS: Record<string, number>
   currencySymbol?: string
+  storeName?: string
 }): ColumnDef<BatchWithProduct>[] {
   return [
     {
@@ -67,7 +28,7 @@ export function createBatchTableColumns({
       accessorKey: 'batch_number',
       header: () => (
         <SortableHeader field="batch_number" currentSort={currentSort} updateSort={updateSort}>
-          <span className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
+          <span className="text-xs text-foreground/80 font-semibold uppercase tracking-wide">
             {t('headers.batchNumber')}
           </span>
         </SortableHeader>
@@ -80,17 +41,14 @@ export function createBatchTableColumns({
           {row.original.batch_number?.slice(-6) || ''}
         </div>
       ),
-      size: DEFAULT_COLUMN_WIDTHS.batch_number,
-      minSize: 80,
-      maxSize: calculateMaxWidth(data, item => item.batch_number || ''),
-      enableResizing: true,
+      size: 90,
     },
     {
       id: 'product_name',
       accessorFn: row => row.products?.name || '',
       header: () => (
         <SortableHeader field="product_name" currentSort={currentSort} updateSort={updateSort}>
-          <span className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
+          <span className="text-xs text-foreground/80 font-semibold uppercase tracking-wide">
             {t('headers.product')}
           </span>
         </SortableHeader>
@@ -108,48 +66,48 @@ export function createBatchTableColumns({
           </div>
         </div>
       ),
-      size: DEFAULT_COLUMN_WIDTHS.product_name,
-      minSize: 120,
-      maxSize: calculateMaxWidth(data, item => item.products?.name || ''),
-      enableResizing: true,
+      size: 200,
+    },
+    {
+      id: 'location',
+      header: () => (
+        <span className="text-xs text-foreground/80 font-semibold uppercase tracking-wide">
+          {t('headers.location')}
+        </span>
+      ),
+      cell: () => <div className="text-sm text-muted-foreground truncate">{storeName || '-'}</div>,
+      size: 150,
     },
     {
       id: 'expiry_date',
       accessorKey: 'expiry_date',
       header: () => (
         <SortableHeader field="expiry_date" currentSort={currentSort} updateSort={updateSort}>
-          <span className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
+          <span className="text-xs text-foreground/80 font-semibold uppercase tracking-wide">
             {t('headers.expiryDate')}
           </span>
         </SortableHeader>
       ),
-      cell: ({ row }) => (
-        <div className="flex items-center gap-2">
-          {row.original.expiry_date ? (
-            <>
-              <span className="text-sm truncate">
+      cell: ({ row }) => {
+        const isExpired = row.original.expiry_date
+          ? new Date(row.original.expiry_date) < new Date()
+          : false
+
+        return (
+          <div className="flex items-center gap-2">
+            {row.original.expiry_date ? (
+              <span className={`text-sm truncate ${isExpired ? 'text-red-600 font-medium' : ''}`}>
                 {new Date(row.original.expiry_date).toLocaleDateString()}
               </span>
-              {getExpiryBadge(row.original.expiry_date, tExpiry)}
-            </>
-          ) : (
-            <span className="text-sm text-muted-foreground italic truncate">
-              {tExpiry('noExpiryDate')}
-            </span>
-          )}
-        </div>
-      ),
-      size: DEFAULT_COLUMN_WIDTHS.expiry_date,
-      minSize: 100,
-      maxSize: Math.max(
-        180,
-        calculateMaxWidth(data, item =>
-          item.expiry_date
-            ? new Date(item.expiry_date).toLocaleDateString()
-            : tExpiry('noExpiryDate'),
-        ),
-      ),
-      enableResizing: true,
+            ) : (
+              <span className="text-sm text-muted-foreground italic truncate">
+                {tExpiry('noExpiryDate')}
+              </span>
+            )}
+          </div>
+        )
+      },
+      size: 140,
     },
     {
       id: 'current_quantity',
@@ -161,7 +119,7 @@ export function createBatchTableColumns({
           updateSort={updateSort}
           className="justify-end"
         >
-          <span className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
+          <span className="text-xs text-foreground/80 font-semibold uppercase tracking-wide">
             {t('headers.stock')}
           </span>
         </SortableHeader>
@@ -171,10 +129,7 @@ export function createBatchTableColumns({
           {Number(row.original.current_quantity).toLocaleString()}
         </div>
       ),
-      size: DEFAULT_COLUMN_WIDTHS.current_quantity,
-      minSize: 90,
-      maxSize: calculateMaxWidth(data, item => Number(item.current_quantity).toLocaleString()),
-      enableResizing: true,
+      size: 120,
     },
     {
       id: 'cost_price',
@@ -186,7 +141,7 @@ export function createBatchTableColumns({
           updateSort={updateSort}
           className="justify-end"
         >
-          <span className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
+          <span className="text-xs text-foreground/80 font-semibold uppercase tracking-wide">
             {t('headers.costPrice')}
           </span>
         </SortableHeader>
@@ -197,13 +152,7 @@ export function createBatchTableColumns({
           {Number(row.original.cost_price).toFixed(2)}
         </div>
       ),
-      size: DEFAULT_COLUMN_WIDTHS.cost_price,
-      minSize: 70,
-      maxSize: calculateMaxWidth(
-        data,
-        item => `${currencySymbol}${Number(item.cost_price).toFixed(2)}`,
-      ),
-      enableResizing: true,
+      size: 110,
     },
     {
       id: 'selling_price',
@@ -215,7 +164,7 @@ export function createBatchTableColumns({
           updateSort={updateSort}
           className="justify-end"
         >
-          <span className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
+          <span className="text-xs text-foreground/80 font-semibold uppercase tracking-wide">
             {t('headers.sellPrice')}
           </span>
         </SortableHeader>
@@ -226,43 +175,31 @@ export function createBatchTableColumns({
           {Number(row.original.selling_price).toFixed(2)}
         </div>
       ),
-      size: DEFAULT_COLUMN_WIDTHS.selling_price,
-      minSize: 70,
-      maxSize: calculateMaxWidth(
-        data,
-        item => `${currencySymbol}${Number(item.selling_price).toFixed(2)}`,
-      ),
-      enableResizing: true,
+      size: 110,
     },
     {
       id: 'status',
       accessorKey: 'status',
       header: () => (
         <SortableHeader field="status" currentSort={currentSort} updateSort={updateSort}>
-          <span className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
+          <span className="text-xs text-foreground/80 font-semibold uppercase tracking-wide">
             {t('headers.status')}
           </span>
         </SortableHeader>
       ),
       cell: ({ row }) => {
-        // Only show status badge if NOT active (reduce visual noise)
-        if (row.original.status === 'active') return null
-        return getStatusBadge(row.original.status || 'active', tStatus)
+        // Default to 'active' if no status is provided
+        const status = row.original.status || 'active'
+        return getStatusBadge(status, tStatus)
       },
-      size: DEFAULT_COLUMN_WIDTHS.status,
-      minSize: 70,
-      maxSize: Math.max(
-        130,
-        calculateMaxWidth(data, item => item.status || 'active'),
-      ),
-      enableResizing: true,
+      size: 100,
     },
     {
       id: 'created_at',
       accessorKey: 'created_at',
       header: () => (
         <SortableHeader field="created_at" currentSort={currentSort} updateSort={updateSort}>
-          <span className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
+          <span className="text-xs text-foreground/80 font-semibold uppercase tracking-wide">
             {t('headers.createdAt')}
           </span>
         </SortableHeader>
@@ -272,17 +209,7 @@ export function createBatchTableColumns({
           {row.original.created_at ? new Date(row.original.created_at).toLocaleDateString() : '-'}
         </div>
       ),
-      size: DEFAULT_COLUMN_WIDTHS.created_at,
-      minSize: 100,
-      maxSize: Math.max(
-        180,
-        calculateMaxWidth(data, item =>
-          item.created_at ? new Date(item.created_at).toLocaleDateString() : '-',
-        ),
-      ),
-      enableResizing: true,
+      size: 140,
     },
   ]
 }
-
-export { ColumnResizer }

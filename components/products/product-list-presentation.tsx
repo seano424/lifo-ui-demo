@@ -22,16 +22,7 @@ import { useCategoryTranslation } from '@/hooks/use-category-translation'
 import { useCurrency } from '@/hooks/use-currency'
 import { useProductActions } from '@/hooks/use-products'
 import type { Product, ProductSort, SortField } from '@/lib/queries/products'
-import {
-  ArrowDown,
-  ArrowUp,
-  ArrowUpDown,
-  Edit,
-  Euro,
-  MoreHorizontal,
-  Package,
-  Trash2,
-} from 'lucide-react'
+import { ArrowDown, ArrowUp, Edit, Euro, MoreHorizontal, Package, Trash2 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useCallback, useMemo } from 'react'
 
@@ -67,9 +58,6 @@ function SortableHeader({ field, children, currentSort, onSort, className }: Sor
   const direction = isCurrentField ? currentSort.direction : null
 
   const getSortIcon = () => {
-    if (!isCurrentField) {
-      return <ArrowUpDown className="ml-2 h-4 w-4 opacity-50" />
-    }
     return direction === 'asc' ? (
       <ArrowUp className="ml-2 h-4 w-4" />
     ) : (

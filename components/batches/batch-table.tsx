@@ -1,7 +1,7 @@
 'use client'
 
 import { BatchListSkeleton } from '@/components/batches/batch-list-skeleton'
-import { ColumnResizer, createBatchTableColumns } from '@/components/batches/batch-table-columns'
+import { createBatchTableColumns } from '@/components/batches/batch-table-columns'
 import { TodoActionBottomSheet } from '@/components/todos/todo-action-bottom-sheet'
 import { Button } from '@/components/ui/button'
 import { CardDescription, CardTitle } from '@/components/ui/card'
@@ -14,8 +14,8 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { useBatchTodo } from '@/hooks/use-batch-todo'
-import { useColumnSizing } from '@/hooks/use-column-sizing'
 import { useCurrency } from '@/hooks/use-currency'
+import { useStoreState } from '@/lib/stores/store-context'
 import type { BatchSort, BatchSortField, BatchWithProduct } from '@/lib/queries/batches'
 import {
   flexRender,
@@ -52,8 +52,7 @@ export function BatchTable({ data, currentSort, updateSort, isLoading }: BatchTa
   const tStatus = useTranslations('batches.status')
   const tExpiry = useTranslations('batches.expiry')
   const currencySymbol = useCurrency()
-
-  const { columnSizing, setColumnSizing, DEFAULT_COLUMN_WIDTHS } = useColumnSizing()
+  const { activeStore } = useStoreState()
 
   const [selectedBatchId, setSelectedBatchId] = useState<string | null>(null)
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false)
@@ -92,34 +91,25 @@ export function BatchTable({ data, currentSort, updateSort, isLoading }: BatchTa
   }, [currentSort])
 
   const columns = createBatchTableColumns({
-    data,
     currentSort,
     updateSort,
     t,
     tStatus,
     tExpiry,
-    DEFAULT_COLUMN_WIDTHS,
     currencySymbol,
+    storeName: activeStore?.store_name,
   })
 
   const table = useReactTable({
     data,
     columns,
     state: {
-      columnSizing,
       sorting,
     },
-    onColumnSizingChange: setColumnSizing,
     onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    columnResizeMode: 'onChange',
-    enableColumnResizing: true,
     enableSorting: false,
-    defaultColumn: {
-      minSize: 50,
-      maxSize: 400,
-    },
   })
 
   if (isLoading) {
@@ -144,29 +134,28 @@ export function BatchTable({ data, currentSort, updateSort, isLoading }: BatchTa
   return (
     <>
       <Table
-        className="border-separate border-spacing-0"
         style={{
           tableLayout: 'fixed',
+          borderCollapse: 'separate',
+          borderSpacing: 0,
         }}
       >
         <TableHeader>
           {table.getHeaderGroups().map(headerGroup => (
-            <TableRow key={headerGroup.id}>
+            <TableRow key={headerGroup.id} className="border-b-2 border-border">
               {headerGroup.headers.map(header => (
                 <TableHead
                   key={header.id}
-                  className="relative overflow-hidden py-3"
-                  style={{
-                    width: header.getSize(),
-                    minWidth: header.getSize(),
-                    maxWidth: header.getSize(),
-                    position: 'relative',
-                  }}
+                  className="py-3 border-b border-brand-dark/40"
+                  style={
+                    header.column.columnDef.size
+                      ? { width: header.column.columnDef.size }
+                      : undefined
+                  }
                 >
                   {header.isPlaceholder
                     ? null
                     : flexRender(header.column.columnDef.header, header.getContext())}
-                  {header.column.getCanResize() && <ColumnResizer header={header} />}
                 </TableHead>
               ))}
             </TableRow>
@@ -177,17 +166,15 @@ export function BatchTable({ data, currentSort, updateSort, isLoading }: BatchTa
             <TableRow
               key={row.id}
               onClick={() => handleBatchClick(row.original)}
-              className="cursor-pointer hover:bg-muted/30 transition-colors border-b border-border/30"
+              className="cursor-pointer hover:bg-muted/30 transition-colors"
             >
               {row.getVisibleCells().map(cell => (
                 <TableCell
                   key={cell.id}
-                  style={{
-                    width: cell.column.getSize(),
-                    minWidth: cell.column.getSize(),
-                    maxWidth: cell.column.getSize(),
-                  }}
-                  className="overflow-hidden py-4"
+                  style={
+                    cell.column.columnDef.size ? { width: cell.column.columnDef.size } : undefined
+                  }
+                  className="py-4 border-b border-border"
                 >
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </TableCell>

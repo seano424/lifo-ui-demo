@@ -1,6 +1,6 @@
 'use client'
 
-import type { ColumnDef, Header } from '@tanstack/react-table'
+import type { ColumnDef } from '@tanstack/react-table'
 import { Building2, Tag } from 'lucide-react'
 import type { useTranslations } from 'next-intl'
 
@@ -8,35 +8,6 @@ import { SortableHeader } from '@/components/products/sortable-header'
 import { Badge } from '@/components/ui/badge'
 import { Typography } from '@/components/ui/typography'
 import type { Product, ProductSort, SortField } from '@/lib/queries/products'
-
-interface ColumnResizerProps {
-  header: Header<Product, unknown>
-}
-
-function ColumnResizer({ header }: ColumnResizerProps) {
-  return (
-    <div
-      className={`absolute right-0 top-0 h-full w-2 cursor-col-resize bg-transparent z-10 ${
-        header.column.getIsResizing() ? '' : ''
-      }`}
-      style={{
-        userSelect: 'none' as const,
-        touchAction: 'none' as const,
-      }}
-      onMouseDown={header.getResizeHandler()}
-      onTouchStart={header.getResizeHandler()}
-      onDoubleClick={() => {
-        header.column.resetSize()
-      }}
-    >
-      <div
-        className={`w-0.5 h-full ml-auto transition-all ${
-          header.column.getIsResizing() ? 'bg-brand-secondary' : 'bg-transparent hover:bg-border'
-        }`}
-      />
-    </div>
-  )
-}
 
 const getCategoryBadgeColor = (category: string) => {
   const colors = {
@@ -60,17 +31,11 @@ const getCategoryBadgeColor = (category: string) => {
 export function createProductTableColumns({
   currentSort,
   updateSort,
-  DEFAULT_COLUMN_WIDTHS,
   t,
   getCategoryName,
 }: {
-  data: Product[]
   currentSort: ProductSort
   updateSort: (field: SortField) => void
-  updateProductPrice: (id: string, price: number) => void
-  deleteProduct: (id: string) => void
-  isUpdating: boolean
-  DEFAULT_COLUMN_WIDTHS: Record<string, number>
   t: ReturnType<typeof useTranslations>
   getCategoryName: (product: Product) => string
 }): ColumnDef<Product>[] {
@@ -96,59 +61,7 @@ export function createProductTableColumns({
           </div>
         </div>
       ),
-      size: DEFAULT_COLUMN_WIDTHS.name || 250,
-      minSize: 150,
-      maxSize: 400,
-      enableResizing: true,
-    },
-    {
-      id: 'category',
-      accessorKey: 'category',
-      header: () => (
-        <SortableHeader field="category" currentSort={currentSort} updateSort={updateSort}>
-          {t('category')}
-        </SortableHeader>
-      ),
-      cell: ({ row }) => (
-        <div className="flex items-center gap-2">
-          <Tag className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-          {row.original.category_code ? (
-            <Badge
-              variant="outline"
-              className={`${getCategoryBadgeColor(row.original.category_code)}`}
-            >
-              {getCategoryName(row.original)}
-            </Badge>
-          ) : (
-            <span className="text-muted-foreground text-sm">{t('uncategorized')}</span>
-          )}
-        </div>
-      ),
-      size: DEFAULT_COLUMN_WIDTHS.category || 150,
-      minSize: 100,
-      maxSize: 200,
-      enableResizing: true,
-    },
-    {
-      id: 'brand',
-      accessorKey: 'brand',
-      header: () => (
-        <SortableHeader field="brand" currentSort={currentSort} updateSort={updateSort}>
-          {t('brand')}
-        </SortableHeader>
-      ),
-      cell: ({ row }) => (
-        <div className="flex items-center gap-2">
-          <Building2 className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-          <span className="truncate" title={row.original.brand || t('notAvailable')}>
-            {row.original.brand || t('notAvailable')}
-          </span>
-        </div>
-      ),
-      size: DEFAULT_COLUMN_WIDTHS.brand || 150,
-      minSize: 80,
-      maxSize: 200,
-      enableResizing: true,
+      size: 300,
     },
     {
       id: 'total_stock',
@@ -169,10 +82,7 @@ export function createProductTableColumns({
           {/* <div className="text-xs text-muted-foreground">{row.original.unit_type || 'units'}</div> */}
         </div>
       ),
-      size: DEFAULT_COLUMN_WIDTHS.total_stock || 80,
-      minSize: 60,
-      maxSize: 120,
-      enableResizing: true,
+      size: 100,
     },
     // {
     //   id: 'base_selling_price',
@@ -223,10 +133,7 @@ export function createProductTableColumns({
           <span>{row.original.active_batches_count || 0}</span>
         </Typography>
       ),
-      size: DEFAULT_COLUMN_WIDTHS.active_batches_count || 120,
-      minSize: 100,
-      maxSize: 140,
-      enableResizing: true,
+      size: 130,
     },
     {
       id: 'created_at',
@@ -243,10 +150,50 @@ export function createProductTableColumns({
             : t('notAvailable')}
         </div>
       ),
-      size: DEFAULT_COLUMN_WIDTHS.created_at || 100,
-      minSize: 80,
-      maxSize: 120,
-      enableResizing: true,
+      size: 110,
+    },
+    {
+      id: 'category',
+      accessorKey: 'category',
+      header: () => (
+        <SortableHeader field="category" currentSort={currentSort} updateSort={updateSort}>
+          {t('category')}
+        </SortableHeader>
+      ),
+      cell: ({ row }) => (
+        <div className="flex items-center gap-2">
+          <Tag className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+          {row.original.category_code ? (
+            <Badge
+              variant="outline"
+              className={`${getCategoryBadgeColor(row.original.category_code)}`}
+            >
+              {getCategoryName(row.original)}
+            </Badge>
+          ) : (
+            <span className="text-muted-foreground text-sm">{t('uncategorized')}</span>
+          )}
+        </div>
+      ),
+      size: 140,
+    },
+    {
+      id: 'brand',
+      accessorKey: 'brand',
+      header: () => (
+        <SortableHeader field="brand" currentSort={currentSort} updateSort={updateSort}>
+          {t('brand')}
+        </SortableHeader>
+      ),
+      cell: ({ row }) => (
+        <div className="flex items-center gap-2">
+          <Building2 className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+          <span className="truncate" title={row.original.brand || t('notAvailable')}>
+            {row.original.brand || t('notAvailable')}
+          </span>
+        </div>
+      ),
+      size: 140,
     },
     // {
     //   id: 'actions',
@@ -307,5 +254,3 @@ export function createProductTableColumns({
     // },
   ]
 }
-
-export { ColumnResizer }
