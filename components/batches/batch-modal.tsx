@@ -118,10 +118,10 @@ export function BatchModal({ isOpen, onClose, batch, currencySymbol = '€' }: B
             {getProductName()}
           </Typography>
           <div className="flex items-center divide-x divide-muted-foreground/10">
-            <Typography variant="small" color="muted" className="pr-2 font-semibold">
+            <Typography variant="p" className="pr-2 font-semibold">
               {getExpiryContext()}
             </Typography>
-            <Typography variant="small" color="muted" className="pl-2">
+            <Typography variant="p" className="pl-2">
               {currentQuantity} units
             </Typography>
           </div>
@@ -134,17 +134,13 @@ export function BatchModal({ isOpen, onClose, batch, currencySymbol = '€' }: B
           <div className="grid grid-cols-2 gap-4 mb-6">
             <div className="bg-muted/30 rounded-2xl p-4">
               <div className="flex items-center gap-2 mb-2">
-                <Typography variant="small" color="muted">
-                  Current Stock
-                </Typography>
+                <Typography variant="p">Current Stock</Typography>
               </div>
               <Typography variant="h3">{currentQuantity || 0}</Typography>
             </div>
-            <div className="bg-muted/30 rounded-2xl p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <Typography variant="small" color="muted">
-                  Value
-                </Typography>
+            <div className="bg-muted/30 rounded-2xl p-4 text-right justify-end">
+              <div className="flex items-center justify-end gap-2 mb-2">
+                <Typography variant="p">Value</Typography>
               </div>
               <Typography variant="h3">
                 {formatCurrency((currentQuantity || 0) * (batch.selling_price || 0))}
@@ -154,46 +150,19 @@ export function BatchModal({ isOpen, onClose, batch, currencySymbol = '€' }: B
 
           {/* Batch Details */}
           <div className="flex flex-col gap-4">
-            {/* Edit Actions */}
-            {!isEditing ? (
-              <Button
-                variant="outline"
-                onClick={handleEditClick}
-                className="w-full rounded-2xl flex items-center gap-2"
-              >
-                Edit Batch Details
-              </Button>
-            ) : (
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  onClick={handleCancel}
-                  disabled={isUpdating}
-                  className="flex-1 rounded-2xl"
-                >
-                  Cancel
-                </Button>
-                <Button onClick={handleSave} disabled={isUpdating} className="flex-1 rounded-2xl">
-                  Save
-                </Button>
-              </div>
-            )}
-
             {/* Details Section */}
-            <div className="flex flex-col divide-y divide-muted-foreground/10 bg-muted/30 rounded-2xl px-4">
+            <div className="flex flex-col bg-muted/30 rounded-2xl px-4">
               <div className="flex justify-between items-center py-4">
                 <div className="flex items-center gap-2">
-                  <Typography variant="small" color="muted">
-                    Batch Number
-                  </Typography>
+                  <Typography variant="p">Batch Number</Typography>
                 </div>
-                <Typography variant="small">{batchNumber}</Typography>
+                <Typography variant="p">{batchNumber}</Typography>
               </div>
 
               {/* Expiry Date - Editable */}
               <div className="flex justify-between items-center py-4 gap-2">
                 <div className="flex flex-1 items-center gap-2">
-                  <Typography variant="small" className="text-nowrap" color="muted">
+                  <Typography variant="p" className="text-nowrap">
                     Expiry Date
                   </Typography>
                 </div>
@@ -201,6 +170,7 @@ export function BatchModal({ isOpen, onClose, batch, currencySymbol = '€' }: B
                   <div>
                     <Input
                       type="date"
+                      size="sm"
                       className="w-40"
                       value={editedValues.expiry_date}
                       onChange={e =>
@@ -212,20 +182,21 @@ export function BatchModal({ isOpen, onClose, batch, currencySymbol = '€' }: B
                     />
                   </div>
                 ) : (
-                  <Typography variant="small">{formatDate(batch.expiry_date)}</Typography>
+                  <Typography variant="p">{formatDate(batch.expiry_date)}</Typography>
                 )}
               </div>
 
               {/* Cost Price - Editable */}
               <div className="flex justify-between items-center py-4 gap-2">
                 <div className="flex items-center gap-2">
-                  <Typography variant="small" className="text-nowrap" color="muted">
+                  <Typography variant="p" className="text-nowrap">
                     Cost Price
                   </Typography>
                 </div>
                 {isEditing ? (
                   <div>
                     <Input
+                      size="sm"
                       className="w-40"
                       type="number"
                       min="0"
@@ -240,20 +211,21 @@ export function BatchModal({ isOpen, onClose, batch, currencySymbol = '€' }: B
                     />
                   </div>
                 ) : (
-                  <Typography variant="small">{formatCurrency(batch.cost_price || 0)}</Typography>
+                  <Typography variant="p">{formatCurrency(batch.cost_price || 0)}</Typography>
                 )}
               </div>
 
               {/* Selling Price - Editable */}
               <div className="flex justify-between items-center py-4 gap-2">
                 <div className="flex items-center gap-2">
-                  <Typography variant="small" className="text-nowrap" color="muted">
+                  <Typography variant="p" className="text-nowrap">
                     Selling Price
                   </Typography>
                 </div>
                 {isEditing ? (
                   <div>
                     <Input
+                      size="sm"
                       className="w-40"
                       type="number"
                       min="0"
@@ -268,9 +240,7 @@ export function BatchModal({ isOpen, onClose, batch, currencySymbol = '€' }: B
                     />
                   </div>
                 ) : (
-                  <Typography variant="small">
-                    {formatCurrency(batch.selling_price || 0)}
-                  </Typography>
+                  <Typography variant="p">{formatCurrency(batch.selling_price || 0)}</Typography>
                 )}
               </div>
 
@@ -278,14 +248,47 @@ export function BatchModal({ isOpen, onClose, batch, currencySymbol = '€' }: B
               {'created_at' in batch && batch.created_at && (
                 <div className="flex justify-between items-center py-4 gap-2">
                   <div className="flex items-center gap-2">
-                    <Typography variant="small" className="text-nowrap" color="muted">
+                    <Typography variant="p" className="text-nowrap">
                       Created
                     </Typography>
                   </div>
-                  <Typography variant="small">{formatDate(batch.created_at)}</Typography>
+                  <Typography variant="p">{formatDate(batch.created_at)}</Typography>
                 </div>
               )}
             </div>
+
+            {/* Edit Actions */}
+            {!isEditing ? (
+              <Button
+                variant="subtle"
+                onClick={handleEditClick}
+                className="w-full rounded-2xl flex items-center gap-2"
+                size="lg"
+              >
+                Edit Batch Details
+              </Button>
+            ) : (
+              <div className="flex gap-2">
+                <Button
+                  variant="gray"
+                  onClick={handleCancel}
+                  disabled={isUpdating}
+                  className="flex-1 rounded-2xl"
+                  size="lg"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant="subtle"
+                  onClick={handleSave}
+                  disabled={isUpdating}
+                  className="flex-1 rounded-2xl"
+                  size="lg"
+                >
+                  Save
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </div>

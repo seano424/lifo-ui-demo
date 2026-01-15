@@ -54,48 +54,39 @@ export function ProductModal({ isOpen, onClose, product }: ProductModalProps) {
       isOpen={isOpen}
       onClose={onClose}
       titleElement={
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2 py-4">
           <Typography className="font-black" variant="h3">
             {product.name || t('unnamedProduct')}
           </Typography>
-          <div className="flex items-center gap-2">
-            <Typography variant="small" color="muted" className="font-mono">
-              SKU: {product.sku || t('notAvailable')}
-            </Typography>
-          </div>
         </div>
       }
     >
       <div className="flex flex-col h-full max-h-[90vh]">
         <div className="flex-1 overflow-y-auto px-5 py-4 pb-32">
           {/* Stock Summary */}
-          <div className="grid grid-cols-2 gap-4 mb-6">
+          <div className="grid grid-cols-2 gap-4">
             <div className="bg-muted/30 rounded-2xl p-4">
               <div className="flex items-center gap-2 mb-2">
-                <Typography variant="small" color="muted">
-                  {t('totalStock')}
-                </Typography>
+                <Typography variant="p">{t('totalStock')}</Typography>
               </div>
               <Typography variant="h3">{product.total_stock || 0}</Typography>
             </div>
             <div className="bg-muted/30 rounded-2xl p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <Typography variant="small" color="muted">
-                  {t('activeBatches')}
-                </Typography>
+              <div className="flex items-center justify-end text-right gap-2 mb-2">
+                <Typography variant="p">{t('activeBatches')}</Typography>
               </div>
-              <Typography variant="h3">{product.active_batches_count || 0}</Typography>
+              <Typography variant="h3" className="text-right">
+                {product.active_batches_count || 0}
+              </Typography>
             </div>
           </div>
 
           {/* Product Details */}
           <div className="flex flex-col gap-4">
-            <div className="flex flex-col divide-y divide-muted-foreground/10 bg-muted/30 rounded-2xl px-4">
+            <div className="flex flex-col bg-muted/30 rounded-2xl px-4">
               <div className="flex justify-between items-center py-4">
                 <div className="flex items-center gap-2">
-                  <Typography variant="small" color="muted">
-                    Category
-                  </Typography>
+                  <Typography variant="p">Category</Typography>
                 </div>
                 {product.category_code ? (
                   <Badge
@@ -105,39 +96,33 @@ export function ProductModal({ isOpen, onClose, product }: ProductModalProps) {
                     {getCategoryName(product)}
                   </Badge>
                 ) : (
-                  <Typography variant="small">{t('uncategorized')}</Typography>
+                  <Typography variant="p">{t('uncategorized')}</Typography>
                 )}
               </div>
 
               <div className="flex justify-between items-center py-4">
                 <div className="flex items-center gap-2">
-                  <Typography variant="small" color="muted">
-                    Brand
-                  </Typography>
+                  <Typography variant="p">Brand</Typography>
                 </div>
-                <Typography variant="small">{product.brand || t('notAvailable')}</Typography>
+                <Typography variant="p">{product.brand || t('notAvailable')}</Typography>
               </div>
 
               <div className="flex justify-between items-center py-4">
                 <div className="flex items-center gap-2">
-                  <Typography variant="small" color="muted">
-                    Date Added
-                  </Typography>
+                  <Typography variant="p">Date Added</Typography>
                 </div>
-                <Typography variant="small">{formatDate(product.created_at)}</Typography>
+                <Typography variant="p">{formatDate(product.created_at)}</Typography>
               </div>
             </div>
 
             {/* Edit in Square Note */}
-            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-2xl p-4 flex items-start gap-3">
-              <div>
-                <Typography variant="small" className="font-semibold mb-1">
-                  Edit in Square
-                </Typography>
-                <Typography variant="small" color="muted">
-                  To edit product details, please use your Square dashboard or POS system.
-                </Typography>
-              </div>
+            <div className="rounded-2xl px-4 pt-8 flex flex-col text-center items-center gap-2">
+              <Typography variant="h4" className="text-destructive font-black">
+                Edit in Square
+              </Typography>
+              <Typography variant="h5" className="max-w-md font-medium">
+                To edit product details, please use your Square dashboard or POS system.
+              </Typography>
             </div>
           </div>
         </div>
