@@ -28,9 +28,7 @@ export function SortableHeader({
         className="h-auto p-0 hover:bg-transparent hover:text-foreground"
       >
         <div className="flex items-center gap-1">
-          <span className="text-xs text-foreground/80 font-semibold uppercase tracking-wide">
-            {children}
-          </span>
+          <span className="text-sm text-foreground">{children}</span>
           {isActive ? (
             currentSort.direction === 'asc' ? (
               <ArrowUp className="h-3.5 w-3.5" />

@@ -23,49 +23,31 @@ export function BatchListSkeleton() {
       <TableHeader>
         <TableRow className="border-b-2 border-border">
           <TableHead className="py-3 px-4" style={{ width: 140 }}>
-            <span className="text-xs text-foreground/80 font-semibold uppercase tracking-wide">
-              {t('headers.batchNumber')}
-            </span>
+            <span className="text-sm text-foreground">{t('headers.batchNumber')}</span>
           </TableHead>
           <TableHead className="py-3 px-4" style={{ width: 200 }}>
-            <span className="text-xs text-foreground/80 font-semibold uppercase tracking-wide">
-              {t('headers.product')}
-            </span>
+            <span className="text-sm text-foreground">{t('headers.product')}</span>
           </TableHead>
           <TableHead className="py-3 px-4" style={{ width: 150 }}>
-            <span className="text-xs text-foreground/80 font-semibold uppercase tracking-wide">
-              {t('headers.location')}
-            </span>
+            <span className="text-sm text-foreground">{t('headers.location')}</span>
           </TableHead>
           <TableHead className="py-3 px-4" style={{ width: 140 }}>
-            <span className="text-xs text-foreground/80 font-semibold uppercase tracking-wide">
-              {t('headers.expiryDate')}
-            </span>
+            <span className="text-sm text-foreground">{t('headers.expiryDate')}</span>
           </TableHead>
           <TableHead className="py-3 px-4" style={{ width: 140 }}>
-            <span className="text-xs text-foreground/80 font-semibold uppercase tracking-wide">
-              {t('headers.stock')}
-            </span>
+            <span className="text-sm text-foreground">{t('headers.stock')}</span>
           </TableHead>
           <TableHead className="py-3 px-4" style={{ width: 140 }}>
-            <span className="text-xs text-foreground/80 font-semibold uppercase tracking-wide">
-              {t('headers.costPrice')}
-            </span>
+            <span className="text-sm text-foreground">{t('headers.costPrice')}</span>
           </TableHead>
           <TableHead className="py-3 px-4" style={{ width: 140 }}>
-            <span className="text-xs text-foreground/80 font-semibold uppercase tracking-wide">
-              {t('headers.sellPrice')}
-            </span>
+            <span className="text-sm text-foreground">{t('headers.sellPrice')}</span>
           </TableHead>
           <TableHead className="py-3 px-4" style={{ width: 140 }}>
-            <span className="text-xs text-foreground/80 font-semibold uppercase tracking-wide">
-              {t('headers.status')}
-            </span>
+            <span className="text-sm text-foreground">{t('headers.status')}</span>
           </TableHead>
           <TableHead className="py-3 px-4" style={{ width: 140 }}>
-            <span className="text-xs text-foreground/80 font-semibold uppercase tracking-wide">
-              {t('headers.createdAt')}
-            </span>
+            <span className="text-sm text-foreground">{t('headers.createdAt')}</span>
           </TableHead>
         </TableRow>
       </TableHeader>

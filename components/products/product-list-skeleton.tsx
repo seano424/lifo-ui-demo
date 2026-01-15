@@ -23,34 +23,22 @@ export function ProductListSkeleton() {
       <TableHeader>
         <TableRow className="border-b-2 border-border">
           <TableHead className="py-3" style={{ width: 200 }}>
-            <span className="text-xs text-foreground/80 font-semibold uppercase tracking-wide">
-              {t('product')}
-            </span>
+            <span className="text-sm text-foreground">{t('product')}</span>
           </TableHead>
           <TableHead className="py-3" style={{ width: 120 }}>
-            <span className="text-xs text-foreground/80 font-semibold uppercase tracking-wide">
-              {t('totalStock')}
-            </span>
+            <span className="text-sm text-foreground">{t('totalStock')}</span>
           </TableHead>
           <TableHead className="py-3" style={{ width: 160 }}>
-            <span className="text-xs text-foreground/80 font-semibold uppercase tracking-wide">
-              {t('activeBatches')}
-            </span>
+            <span className="text-sm text-foreground">{t('activeBatches')}</span>
           </TableHead>
           <TableHead className="py-3" style={{ width: 120 }}>
-            <span className="text-xs text-foreground/80 font-semibold uppercase tracking-wide">
-              {t('dateAdded')}
-            </span>
+            <span className="text-sm text-foreground">{t('dateAdded')}</span>
           </TableHead>
           <TableHead className="py-3" style={{ width: 140 }}>
-            <span className="text-xs text-foreground/80 font-semibold uppercase tracking-wide">
-              {t('category')}
-            </span>
+            <span className="text-sm text-foreground">{t('category')}</span>
           </TableHead>
           <TableHead className="py-3" style={{ width: 140 }}>
-            <span className="text-xs text-foreground/80 font-semibold uppercase tracking-wide">
-              {t('brand')}
-            </span>
+            <span className="text-sm text-foreground">{t('brand')}</span>
           </TableHead>
         </TableRow>
       </TableHeader>

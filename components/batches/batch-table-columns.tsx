@@ -28,9 +28,7 @@ export function createBatchTableColumns({
       accessorKey: 'batch_number',
       header: () => (
         <SortableHeader field="batch_number" currentSort={currentSort} updateSort={updateSort}>
-          <span className="text-xs text-foreground/80 font-semibold uppercase tracking-wide">
-            {t('headers.batchNumber')}
-          </span>
+          <span className="text-sm text-foreground">{t('headers.batchNumber')}</span>
         </SortableHeader>
       ),
       cell: ({ row }) => (
@@ -48,9 +46,7 @@ export function createBatchTableColumns({
       accessorFn: row => row.products?.name || '',
       header: () => (
         <SortableHeader field="product_name" currentSort={currentSort} updateSort={updateSort}>
-          <span className="text-xs text-foreground/80 font-semibold uppercase tracking-wide">
-            {t('headers.product')}
-          </span>
+          <span className="text-sm text-foreground">{t('headers.product')}</span>
         </SortableHeader>
       ),
       cell: ({ row }) => (
@@ -70,11 +66,7 @@ export function createBatchTableColumns({
     },
     {
       id: 'location',
-      header: () => (
-        <span className="text-xs text-foreground/80 font-semibold uppercase tracking-wide">
-          {t('headers.location')}
-        </span>
-      ),
+      header: () => <span className="text-sm text-foreground">{t('headers.location')}</span>,
       cell: () => <div className="text-sm text-muted-foreground truncate">{storeName || '-'}</div>,
       size: 150,
     },
@@ -83,9 +75,7 @@ export function createBatchTableColumns({
       accessorKey: 'expiry_date',
       header: () => (
         <SortableHeader field="expiry_date" currentSort={currentSort} updateSort={updateSort}>
-          <span className="text-xs text-foreground/80 font-semibold uppercase tracking-wide">
-            {t('headers.expiryDate')}
-          </span>
+          <span className="text-sm text-foreground">{t('headers.expiryDate')}</span>
         </SortableHeader>
       ),
       cell: ({ row }) => {
@@ -119,9 +109,7 @@ export function createBatchTableColumns({
           updateSort={updateSort}
           className="justify-end"
         >
-          <span className="text-xs text-foreground/80 font-semibold uppercase tracking-wide">
-            {t('headers.stock')}
-          </span>
+          <span className="text-sm text-foreground">{t('headers.stock')}</span>
         </SortableHeader>
       ),
       cell: ({ row }) => (
@@ -141,9 +129,7 @@ export function createBatchTableColumns({
           updateSort={updateSort}
           className="justify-end"
         >
-          <span className="text-xs text-foreground/80 font-semibold uppercase tracking-wide">
-            {t('headers.costPrice')}
-          </span>
+          <span className="text-sm text-foreground">{t('headers.costPrice')}</span>
         </SortableHeader>
       ),
       cell: ({ row }) => (
@@ -164,9 +150,7 @@ export function createBatchTableColumns({
           updateSort={updateSort}
           className="justify-end"
         >
-          <span className="text-xs text-foreground/80 font-semibold uppercase tracking-wide">
-            {t('headers.sellPrice')}
-          </span>
+          <span className="text-sm text-foreground">{t('headers.sellPrice')}</span>
         </SortableHeader>
       ),
       cell: ({ row }) => (
@@ -182,9 +166,7 @@ export function createBatchTableColumns({
       accessorKey: 'status',
       header: () => (
         <SortableHeader field="status" currentSort={currentSort} updateSort={updateSort}>
-          <span className="text-xs text-foreground/80 font-semibold uppercase tracking-wide">
-            {t('headers.status')}
-          </span>
+          <span className="text-sm text-foreground">{t('headers.status')}</span>
         </SortableHeader>
       ),
       cell: ({ row }) => {
@@ -199,9 +181,7 @@ export function createBatchTableColumns({
       accessorKey: 'created_at',
       header: () => (
         <SortableHeader field="created_at" currentSort={currentSort} updateSort={updateSort}>
-          <span className="text-xs text-foreground/80 font-semibold uppercase tracking-wide">
-            {t('headers.createdAt')}
-          </span>
+          <span className="text-sm text-foreground">{t('headers.createdAt')}</span>
         </SortableHeader>
       ),
       cell: ({ row }) => (

@@ -113,7 +113,7 @@ function PricingCard({
           </Typography>
           {fees.map(fee => (
             <div key={fee.type} className="flex justify-between items-center">
-              <Typography variant="p" className="text-xs text-foreground/70">
+              <Typography variant="p" className="text-sm text-foreground/70">
                 {fee.type}
               </Typography>
               <Typography variant="p" className="text-xs  text-primary-700">
