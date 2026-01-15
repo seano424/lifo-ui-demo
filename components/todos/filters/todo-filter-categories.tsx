@@ -56,7 +56,7 @@ export function TodoFilterCategories({
             className={cn(
               'w-full px-4 py-2.5 flex items-center justify-between text-left transition-colors',
               'hover:bg-gray-100',
-              isActive && 'bg-primary-50 hover:bg-primary-50 text-primary-700 font-medium',
+              isActive && 'bg-primary-50 hover:bg-primary-50 text-primary-700 ',
               !isActive && 'text-gray-700',
             )}
           >

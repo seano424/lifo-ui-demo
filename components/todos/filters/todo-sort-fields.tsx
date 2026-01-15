@@ -53,7 +53,7 @@ export function TodoSortFields({ selectedField, onFieldSelect }: TodoSortFieldsP
             className={cn(
               'w-full px-4 py-2.5 flex items-center gap-2 text-left transition-colors',
               'hover:bg-gray-100',
-              isSelected && 'bg-violet-50 text-violet-700 font-medium',
+              isSelected && 'bg-violet-50 text-violet-700 ',
               !isSelected && 'text-gray-700',
             )}
           >

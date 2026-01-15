@@ -2,7 +2,6 @@
 
 import { ProductListSkeleton } from '@/components/products/product-list-skeleton'
 import { createProductTableColumns } from '@/components/products/product-table-columns'
-import { Button } from '@/components/ui/button'
 import { CardDescription, CardTitle } from '@/components/ui/card'
 import {
   Table,
@@ -43,7 +42,6 @@ interface ProductsTableProps {
 
 export function ProductsTable({ data, currentSort, updateSort, isLoading }: ProductsTableProps) {
   const t = useTranslations('products')
-  const tButtons = useTranslations('buttons')
   const tTable = useTranslations('productTable')
 
   const { getCategoryName } = useCategoryTranslation()
@@ -102,15 +100,10 @@ export function ProductsTable({ data, currentSort, updateSort, isLoading }: Prod
 
   if (data.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-12">
+      <div className="flex flex-col items-center justify-center py-16 border border-border rounded-lg bg-muted/10">
         <Package className="h-12 w-12 text-muted-foreground mb-4" />
         <CardTitle className="text-lg mb-2">{t('empty.title')}</CardTitle>
-        <CardDescription className="text-center max-w-md">
-          {t('empty.storeDescription')}
-        </CardDescription>
-        <Button asLink href="/dashboard/deliveries" className="mt-4">
-          {tButtons('addProduct')}
-        </Button>
+        <CardDescription className="text-center max-w-md">{t('empty.description')}</CardDescription>
       </div>
     )
   }
@@ -129,7 +122,7 @@ export function ProductsTable({ data, currentSort, updateSort, isLoading }: Prod
             {headerGroup.headers.map(header => (
               <TableHead
                 key={header.id}
-                className="py-3"
+                className="py-3 px-4"
                 style={
                   header.column.columnDef.size ? { width: header.column.columnDef.size } : undefined
                 }
@@ -154,7 +147,7 @@ export function ProductsTable({ data, currentSort, updateSort, isLoading }: Prod
                 style={
                   cell.column.columnDef.size ? { width: cell.column.columnDef.size } : undefined
                 }
-                className="py-4"
+                className="py-4 px-4"
               >
                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
               </TableCell>

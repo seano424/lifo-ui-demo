@@ -69,21 +69,21 @@ export default function SquareConnectPage() {
               <div className="flex gap-3">
                 <CheckCircle className="h-5 w-5 flex-shrink-0 text-green-600" />
                 <div>
-                  <p className="font-medium">{t('benefit1Title')}</p>
+                  <p className="">{t('benefit1Title')}</p>
                   <p className="text-sm text-gray-600">{t('benefit1Description')}</p>
                 </div>
               </div>
               <div className="flex gap-3">
                 <CheckCircle className="h-5 w-5 flex-shrink-0 text-green-600" />
                 <div>
-                  <p className="font-medium">{t('benefit2Title')}</p>
+                  <p className="">{t('benefit2Title')}</p>
                   <p className="text-sm text-gray-600">{t('benefit2Description')}</p>
                 </div>
               </div>
               <div className="flex gap-3">
                 <CheckCircle className="h-5 w-5 flex-shrink-0 text-green-600" />
                 <div>
-                  <p className="font-medium">{t('benefit3Title')}</p>
+                  <p className="">{t('benefit3Title')}</p>
                   <p className="text-sm text-gray-600">{t('benefit3Description')}</p>
                 </div>
               </div>

@@ -131,12 +131,12 @@ export function TodoFilterOptions({
   return (
     <div className="flex-1 p-3 bg-white">
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-medium text-gray-900">{category.label}</h3>
+        <h3 className="text-sm  text-gray-900">{category.label}</h3>
         {!hasNoSelections && (
           <button
             type="button"
             onClick={handleClearCategory}
-            className="text-xs text-violet-600 hover:text-violet-700 font-medium"
+            className="text-xs text-violet-600 hover:text-violet-700 "
           >
             {t('clear')}
           </button>
@@ -169,12 +169,7 @@ export function TodoFilterOptions({
                 {hasNoSelections && <Check className="w-3 h-3 text-white" strokeWidth={3} />}
               </div>
             </div>
-            <span
-              className={cn(
-                'text-sm',
-                hasNoSelections ? 'font-medium text-violet-700' : 'text-gray-700',
-              )}
-            >
+            <span className={cn('text-sm', hasNoSelections ? ' text-violet-700' : 'text-gray-700')}>
               {t('all')}
             </span>
           </label>
@@ -213,7 +208,7 @@ export function TodoFilterOptions({
                 <span
                   className={cn(
                     'text-sm flex-1',
-                    isSelected ? 'font-medium text-violet-700' : 'text-gray-700',
+                    isSelected ? ' text-violet-700' : 'text-gray-700',
                   )}
                 >
                   {option.label}
@@ -249,10 +244,7 @@ export function TodoFilterOptions({
                 </div>
               </div>
               <span
-                className={cn(
-                  'text-sm flex-1',
-                  isSelected ? 'font-medium text-violet-700' : 'text-gray-700',
-                )}
+                className={cn('text-sm flex-1', isSelected ? ' text-violet-700' : 'text-gray-700')}
               >
                 {option.label}
               </span>

@@ -3,7 +3,6 @@
 import { BatchListSkeleton } from '@/components/batches/batch-list-skeleton'
 import { createBatchTableColumns } from '@/components/batches/batch-table-columns'
 import { TodoActionBottomSheet } from '@/components/todos/todo-action-bottom-sheet'
-import { Button } from '@/components/ui/button'
 import { CardDescription, CardTitle } from '@/components/ui/card'
 import {
   Table,
@@ -118,15 +117,12 @@ export function BatchTable({ data, currentSort, updateSort, isLoading }: BatchTa
 
   if (data.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-12">
+      <div className="flex flex-col items-center justify-center py-16 border border-border rounded-lg bg-muted/10">
         <Package className="h-12 w-12 text-muted-foreground mb-4" />
         <CardTitle className="text-lg mb-2">{t('emptyState.title')}</CardTitle>
         <CardDescription className="text-center max-w-md">
           {t('emptyState.description')}
         </CardDescription>
-        <Button asLink href="/dashboard/deliveries" className="mt-4">
-          {t('emptyState.addFirstBatch')}
-        </Button>
       </div>
     )
   }
@@ -146,7 +142,7 @@ export function BatchTable({ data, currentSort, updateSort, isLoading }: BatchTa
               {headerGroup.headers.map(header => (
                 <TableHead
                   key={header.id}
-                  className="py-3 border-b border-brand-dark/40"
+                  className="py-3 px-4 border-b border-brand-dark/40"
                   style={
                     header.column.columnDef.size
                       ? { width: header.column.columnDef.size }
@@ -174,7 +170,7 @@ export function BatchTable({ data, currentSort, updateSort, isLoading }: BatchTa
                   style={
                     cell.column.columnDef.size ? { width: cell.column.columnDef.size } : undefined
                   }
-                  className="py-4 border-b border-border"
+                  className="py-4 px-4 border-b border-border"
                 >
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </TableCell>

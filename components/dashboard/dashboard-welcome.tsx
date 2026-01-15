@@ -138,7 +138,7 @@ function WelcomeActionCard({
           <div className="flex items-center mt-auto pt-2 border-t border-gray-100/50 dark:border-gray-800/50">
             <div
               className={cn(
-                'flex items-center gap-1 text-sm font-medium transition-all',
+                'flex items-center gap-1 text-sm  transition-all',
                 variant === 'primary'
                   ? 'text-primary group-hover:text-primary-700'
                   : 'text-secondary group-hover:text-secondary-700',

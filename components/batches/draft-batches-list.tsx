@@ -144,9 +144,7 @@ export function DraftBatchesList({ className, onSelectBatch }: DraftBatchesListP
                     </TableCell>
                     <TableCell>
                       <div className="space-y-0.5">
-                        <div className="font-medium">
-                          {batch.products?.name || 'Unknown Product'}
-                        </div>
+                        <div className="">{batch.products?.name || 'Unknown Product'}</div>
                         {batch.products?.sku && (
                           <div className="text-xs text-muted-foreground font-mono">
                             SKU: {batch.products.sku}
@@ -157,7 +155,7 @@ export function DraftBatchesList({ className, onSelectBatch }: DraftBatchesListP
                     <TableCell>
                       <div className="flex items-center gap-2 text-sm">
                         <Package className="h-3.5 w-3.5 text-muted-foreground" />
-                        <span className="font-medium">{batch.current_quantity}</span>
+                        <span className="">{batch.current_quantity}</span>
                         <span className="text-muted-foreground">/ {batch.initial_quantity}</span>
                       </div>
                     </TableCell>

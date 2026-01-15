@@ -154,9 +154,7 @@ export function BatchValidationTable({
                     />
                   </td>
                   <td className="border border-gray-200 p-2">
-                    <div className="text-xs font-medium text-gray-700">
-                      {getCategoryLabel(item.Category)}
-                    </div>
+                    <div className="text-xs  text-gray-700">{getCategoryLabel(item.Category)}</div>
                   </td>
                   <td className="border border-gray-200 p-2">
                     <div className="flex items-center justify-center gap-1">
@@ -280,12 +278,12 @@ export function BatchValidationTable({
                 <Input
                   value={item.Product_Name}
                   onChange={e => onUpdateItem(actualIndex, 'Product_Name', e.target.value)}
-                  className="font-medium text-sm h-8"
+                  className=" text-sm h-8"
                   placeholder="Product Name"
                   maxLength={255}
                   disabled={disabled}
                 />
-                <div className="text-xs font-medium text-gray-700 bg-gray-50 p-2 rounded-lg">
+                <div className="text-xs  text-gray-700 bg-gray-50 p-2 rounded-lg">
                   Category: {getCategoryLabel(item.Category)}
                 </div>
                 <div className="flex items-center gap-2">
@@ -316,9 +314,7 @@ export function BatchValidationTable({
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <div className="space-y-1">
-                    <label className="text-xs font-medium text-gray-700">
-                      {t('preview.table.costPrice')}
-                    </label>
+                    <label className="text-xs  text-gray-700">{t('preview.table.costPrice')}</label>
                     <Input
                       type="number"
                       value={item.Cost_Price.toFixed(2)}
@@ -346,7 +342,7 @@ export function BatchValidationTable({
                     )}
                   </div>
                   <div className="space-y-1">
-                    <label className="text-xs font-medium text-gray-700">
+                    <label className="text-xs  text-gray-700">
                       {t('preview.table.sellingPrice')}
                     </label>
                     <Input
@@ -377,9 +373,7 @@ export function BatchValidationTable({
                   </div>
                 </div>
                 <div className="space-y-1">
-                  <label className="text-xs font-medium text-gray-700">
-                    {t('preview.table.expiryDate')}
-                  </label>
+                  <label className="text-xs  text-gray-700">{t('preview.table.expiryDate')}</label>
                   {item.Expiry_Date ? (
                     <Input
                       type="date"

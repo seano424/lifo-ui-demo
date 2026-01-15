@@ -147,11 +147,11 @@ export default function SupportPage() {
                       <div className="flex items-start justify-between gap-2">
                         <Typography
                           variant="h3"
-                          className="text-base font-medium leading-tight text-muted-foreground"
+                          className="text-base  leading-tight text-muted-foreground"
                         >
                           {article.title}
                         </Typography>
-                        <span className="px-2 py-1 bg-orange-100 text-orange-600 text-xs font-medium rounded-md shrink-0">
+                        <span className="px-2 py-1 bg-orange-100 text-orange-600 text-xs  rounded-md shrink-0">
                           {t('common.comingSoon')}
                         </span>
                       </div>
@@ -160,7 +160,7 @@ export default function SupportPage() {
                       <Typography variant="p" color="muted" className="text-sm mb-3 line-clamp-2">
                         {article.description}
                       </Typography>
-                      <div className="flex items-center gap-1 text-xs text-muted-foreground font-medium">
+                      <div className="flex items-center gap-1 text-xs text-muted-foreground ">
                         <Clock className="h-3 w-3" />
                         <span>{article.readTime}</span>
                       </div>
@@ -171,7 +171,7 @@ export default function SupportPage() {
                     <Card className="h-full hover:shadow-md transition-shadow duration-200 cursor-pointer">
                       <CardHeader className="pb-3">
                         <div className="flex items-start justify-between gap-2">
-                          <Typography variant="h3" className="text-base font-medium leading-tight">
+                          <Typography variant="h3" className="text-base  leading-tight">
                             {article.title}
                           </Typography>
                           <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0" />
@@ -181,7 +181,7 @@ export default function SupportPage() {
                         <Typography variant="p" color="muted" className="text-sm mb-3 line-clamp-2">
                           {article.description}
                         </Typography>
-                        <div className="flex items-center gap-1 text-xs text-muted-foreground font-medium">
+                        <div className="flex items-center gap-1 text-xs text-muted-foreground ">
                           <Clock className="h-3 w-3" />
                           <span>{article.readTime}</span>
                         </div>

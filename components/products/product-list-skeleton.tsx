@@ -22,22 +22,22 @@ export function ProductListSkeleton() {
     >
       <TableHeader>
         <TableRow className="border-b-2 border-border">
-          <TableHead className="py-3" style={{ width: 300 }}>
+          <TableHead className="py-3" style={{ width: 200 }}>
             <span className="text-xs text-foreground/80 font-semibold uppercase tracking-wide">
               {t('product')}
             </span>
           </TableHead>
-          <TableHead className="py-3" style={{ width: 100 }}>
+          <TableHead className="py-3" style={{ width: 120 }}>
             <span className="text-xs text-foreground/80 font-semibold uppercase tracking-wide">
               {t('totalStock')}
             </span>
           </TableHead>
-          <TableHead className="py-3" style={{ width: 130 }}>
+          <TableHead className="py-3" style={{ width: 160 }}>
             <span className="text-xs text-foreground/80 font-semibold uppercase tracking-wide">
               {t('activeBatches')}
             </span>
           </TableHead>
-          <TableHead className="py-3" style={{ width: 110 }}>
+          <TableHead className="py-3" style={{ width: 120 }}>
             <span className="text-xs text-foreground/80 font-semibold uppercase tracking-wide">
               {t('dateAdded')}
             </span>
@@ -57,16 +57,16 @@ export function ProductListSkeleton() {
       <TableBody>
         {Array.from({ length: 10 }).map((_, i) => (
           <TableRow key={`skeleton-${i + 1}`} className="border-b border-border">
-            <TableCell className="py-4" style={{ width: 300 }}>
+            <TableCell className="py-4" style={{ width: 200 }}>
               <Skeleton className="h-5 w-full rounded" />
             </TableCell>
-            <TableCell className="py-4" style={{ width: 100 }}>
+            <TableCell className="py-4" style={{ width: 120 }}>
               <Skeleton className="h-5 w-full rounded" />
             </TableCell>
-            <TableCell className="py-4" style={{ width: 130 }}>
+            <TableCell className="py-4" style={{ width: 120 }}>
               <Skeleton className="h-5 w-full rounded" />
             </TableCell>
-            <TableCell className="py-4" style={{ width: 110 }}>
+            <TableCell className="py-4" style={{ width: 140 }}>
               <Skeleton className="h-5 w-full rounded" />
             </TableCell>
             <TableCell className="py-4" style={{ width: 140 }}>

@@ -143,7 +143,7 @@ export function SquareCallbackProcessor() {
               {squareStatus.merchant_name && (
                 <div className="flex justify-between">
                   <span className="text-gray-600">{t('merchant')}:</span>
-                  <span className="font-medium text-gray-900">{squareStatus.merchant_name}</span>
+                  <span className=" text-gray-900">{squareStatus.merchant_name}</span>
                 </div>
               )}
               {squareStatus.stores && squareStatus.stores.length > 0 && (
@@ -156,7 +156,7 @@ export function SquareCallbackProcessor() {
                   </span>
                   <ul className="ml-4 space-y-1">
                     {squareStatus.stores.map((store: ConnectedStoreInfo) => (
-                      <li key={store.store_id} className="font-medium text-gray-900">
+                      <li key={store.store_id} className=" text-gray-900">
                         {store.store_name}
                       </li>
                     ))}

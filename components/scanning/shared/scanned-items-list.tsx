@@ -134,7 +134,7 @@ export default function ScannedItemsList({
     <div className={`p-4 ${className}`}>
       <div className="flex items-center justify-between mb-3">
         <Typography variant="p">{finalTitle}</Typography>
-        <div className="text-sm font-medium text-gray-500 bg-gray-100 p-2 w-10 h-10 flex items-center justify-center rounded-full">
+        <div className="text-sm  text-gray-500 bg-gray-100 p-2 w-10 h-10 flex items-center justify-center rounded-full">
           {items.length > 99 ? '99+' : items.length}
         </div>
       </div>
@@ -207,7 +207,7 @@ export default function ScannedItemsList({
               {/* Product Info - Now editable in advanced mode */}
               {!showAdvancedEdit ? (
                 <div className="p-3 bg-gray-50 rounded-2xl">
-                  <div className="text-sm font-medium">{editingItem?.productName}</div>
+                  <div className="text-sm ">{editingItem?.productName}</div>
                   {editingItem?.brand && (
                     <div className="text-xs text-gray-600">{editingItem.brand}</div>
                   )}
@@ -215,12 +215,12 @@ export default function ScannedItemsList({
                 </div>
               ) : (
                 <div className="space-y-3 p-3 bg-blue-50 rounded-2xl border border-blue-200">
-                  <div className="text-sm font-medium text-blue-800 mb-2">
+                  <div className="text-sm  text-blue-800 mb-2">
                     {t('editDialog.sections.productDetails')}
                   </div>
 
                   <div>
-                    <Label htmlFor="edit-product-name" className="text-sm font-medium">
+                    <Label htmlFor="edit-product-name" className="text-sm ">
                       {t('editDialog.formLabels.productName')}
                     </Label>
                     <Input
@@ -240,7 +240,7 @@ export default function ScannedItemsList({
 
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <Label htmlFor="edit-brand" className="text-sm font-medium">
+                      <Label htmlFor="edit-brand" className="text-sm ">
                         {t('editDialog.formLabels.brand')}
                       </Label>
                       <Input
@@ -259,7 +259,7 @@ export default function ScannedItemsList({
                     </div>
 
                     <div>
-                      <Label htmlFor="edit-barcode" className="text-sm font-medium">
+                      <Label htmlFor="edit-barcode" className="text-sm ">
                         {t('editDialog.formLabels.barcode')}
                       </Label>
                       <Input
@@ -283,7 +283,7 @@ export default function ScannedItemsList({
               {/* Quick Edit Form - Always visible */}
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <h4 className="text-sm font-medium">
+                  <h4 className="text-sm ">
                     {showAdvancedEdit
                       ? t('editDialog.sections.inventoryDetails')
                       : t('editDialog.sections.quickEdit')}
@@ -309,7 +309,7 @@ export default function ScannedItemsList({
                 </div>
 
                 <div>
-                  <Label htmlFor="edit-expiry" className="text-sm font-medium">
+                  <Label htmlFor="edit-expiry" className="text-sm ">
                     {t('editDialog.formLabels.expiryDate')}
                   </Label>
                   <Input
@@ -329,7 +329,7 @@ export default function ScannedItemsList({
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <Label htmlFor="edit-quantity" className="text-sm font-medium">
+                    <Label htmlFor="edit-quantity" className="text-sm ">
                       {t('editDialog.formLabels.quantity')}
                     </Label>
                     <Input
@@ -348,7 +348,7 @@ export default function ScannedItemsList({
                   </div>
 
                   <div>
-                    <Label htmlFor="edit-price" className="text-sm font-medium">
+                    <Label htmlFor="edit-price" className="text-sm ">
                       {t('editDialog.formLabels.price')}
                     </Label>
                     <div className="relative mt-1">

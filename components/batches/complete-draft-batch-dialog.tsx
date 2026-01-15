@@ -171,7 +171,7 @@ export function CompleteDraftBatchDialog({
                     value={expiryDate}
                     onChange={e => setExpiryDate(e.target.value)}
                     min={new Date().toISOString().split('T')[0]}
-                    className="pl-11 h-12 text-base font-medium border-2 focus:border-primary-500 dark:focus:border-primary-400"
+                    className="pl-11 h-12 text-base  border-2 focus:border-primary-500 dark:focus:border-primary-400"
                     disabled={isPending}
                     placeholder="YYYY-MM-DD"
                   />
@@ -189,7 +189,7 @@ export function CompleteDraftBatchDialog({
               </div>
               {expiryDate && (
                 <div className="bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-lg p-3">
-                  <p className="text-sm font-medium text-green-800 dark:text-green-200">
+                  <p className="text-sm  text-green-800 dark:text-green-200">
                     Captured date: <span className="font-bold">{expiryDate}</span>
                   </p>
                   <p className="text-xs text-green-700 dark:text-green-300 mt-1">

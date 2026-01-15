@@ -125,7 +125,7 @@ export function UnifiedSortModal({
       <div className={`space-y-8 ${padding}`}>
         {/* Sort Field Selection */}
         <div className={spacing}>
-          <h4 className={`${isMobile ? 'text-sm' : 'text-base'} font-medium text-muted-foreground`}>
+          <h4 className={`${isMobile ? 'text-sm' : 'text-base'}  text-muted-foreground`}>
             {t('filters.sortBy')}
           </h4>
           <div className={`grid ${gridCols} gap-3`}>
@@ -145,7 +145,7 @@ export function UnifiedSortModal({
                     {option.emoji}
                   </span>
                   <div className="flex flex-col items-start flex-1 min-w-0">
-                    <span className={`font-medium ${isMobile ? 'text-xs' : 'text-sm'} truncate`}>
+                    <span className={` ${isMobile ? 'text-xs' : 'text-sm'} truncate`}>
                       {t(option.labelKey)}
                     </span>
                     <span
@@ -164,7 +164,7 @@ export function UnifiedSortModal({
 
         {/* Sort Direction Selection */}
         <div className={spacing}>
-          <h4 className={`${isMobile ? 'text-sm' : 'text-base'} font-medium text-muted-foreground`}>
+          <h4 className={`${isMobile ? 'text-sm' : 'text-base'}  text-muted-foreground`}>
             {t('filters.sortDirection')}
           </h4>
           <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-2'} gap-3`}>
@@ -192,7 +192,7 @@ export function UnifiedSortModal({
 
         {/* Current Sort Display */}
         <div className="space-y-2">
-          <h4 className={`${isMobile ? 'text-sm' : 'text-base'} font-medium text-muted-foreground`}>
+          <h4 className={`${isMobile ? 'text-sm' : 'text-base'}  text-muted-foreground`}>
             {t('filters.currentSort')}
           </h4>
           <div className={`p-3 bg-muted rounded-lg ${isMobile ? 'p-2' : 'p-4'}`}>
@@ -202,7 +202,7 @@ export function UnifiedSortModal({
               <span className={`${isMobile ? 'text-base' : 'text-lg'}`}>
                 {SORT_OPTIONS.find(o => o.value === sortConfig.field)?.emoji}
               </span>
-              <span className="font-medium truncate flex-1 min-w-0">
+              <span className="truncate flex-1 min-w-0">
                 {t(SORT_OPTIONS.find(o => o.value === sortConfig.field)?.labelKey || '')}
               </span>
               <span className={`text-muted-foreground ${isMobile ? 'text-sm' : 'text-base'}`}>

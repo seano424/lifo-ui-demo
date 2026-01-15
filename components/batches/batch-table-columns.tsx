@@ -41,7 +41,7 @@ export function createBatchTableColumns({
           {row.original.batch_number?.slice(-6) || ''}
         </div>
       ),
-      size: 90,
+      size: 140,
     },
     {
       id: 'product_name',
@@ -55,7 +55,7 @@ export function createBatchTableColumns({
       ),
       cell: ({ row }) => (
         <div>
-          <div className="font-semibold truncate" title={row.original.products?.name}>
+          <div className="truncate" title={row.original.products?.name}>
             {row.original.products?.name}
           </div>
           <div
@@ -96,7 +96,7 @@ export function createBatchTableColumns({
         return (
           <div className="flex items-center gap-2">
             {row.original.expiry_date ? (
-              <span className={`text-sm truncate ${isExpired ? 'text-red-600 font-medium' : ''}`}>
+              <span className={`text-sm truncate ${isExpired ? 'text-destructive' : ''}`}>
                 {new Date(row.original.expiry_date).toLocaleDateString()}
               </span>
             ) : (
@@ -125,11 +125,11 @@ export function createBatchTableColumns({
         </SortableHeader>
       ),
       cell: ({ row }) => (
-        <div className="text-right font-medium tabular-nums">
+        <div className="text-right tabular-nums">
           {Number(row.original.current_quantity).toLocaleString()}
         </div>
       ),
-      size: 120,
+      size: 140,
     },
     {
       id: 'cost_price',
@@ -152,7 +152,7 @@ export function createBatchTableColumns({
           {Number(row.original.cost_price).toFixed(2)}
         </div>
       ),
-      size: 110,
+      size: 140,
     },
     {
       id: 'selling_price',
@@ -175,7 +175,7 @@ export function createBatchTableColumns({
           {Number(row.original.selling_price).toFixed(2)}
         </div>
       ),
-      size: 110,
+      size: 140,
     },
     {
       id: 'status',
@@ -192,7 +192,7 @@ export function createBatchTableColumns({
         const status = row.original.status || 'active'
         return getStatusBadge(status, tStatus)
       },
-      size: 100,
+      size: 140,
     },
     {
       id: 'created_at',

@@ -51,7 +51,7 @@ export function HeroBadge({
       >
         <Badge variant="primary">
           {iconToShow}
-          <span className="font-medium text-primary truncate">{text}</span>
+          <span className=" text-primary truncate">{text}</span>
         </Badge>
       </div>
     </div>

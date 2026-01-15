@@ -48,7 +48,7 @@ function Stat({ icon, label, description, subtext, accentColor }: StatProps) {
         <div className="mt-auto">
           <div className="w-full h-px bg-gradient-to-r from-transparent via-foreground/20 to-transparent mb-4"></div>
           <div className="flex items-center gap-2">
-            <Typography variant="p" className="text-foreground/60 text-sm font-medium">
+            <Typography variant="p" className="text-foreground/60 text-sm ">
               {subtext}
             </Typography>
           </div>

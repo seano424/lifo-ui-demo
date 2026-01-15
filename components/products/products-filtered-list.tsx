@@ -191,21 +191,23 @@ export function ProductsFilteredList({
         </Link>
       </div>
 
-      {/* Table with no outer Card */}
-      <ProductsTable
-        data={data}
-        isLoading={isLoading}
-        currentSort={filters.sort || { field: 'created_at', direction: 'desc' }}
-        updateSort={field => {
-          const currentSort = filters.sort || {
-            field: 'created_at',
-            direction: 'desc',
-          }
-          const newDirection =
-            currentSort.field === field && currentSort.direction === 'asc' ? 'desc' : 'asc'
-          handleSortChange({ field, direction: newDirection })
-        }}
-      />
+      {/* Table with horizontal scroll */}
+      <div className="overflow-x-auto">
+        <ProductsTable
+          data={data}
+          isLoading={isLoading}
+          currentSort={filters.sort || { field: 'created_at', direction: 'desc' }}
+          updateSort={field => {
+            const currentSort = filters.sort || {
+              field: 'created_at',
+              direction: 'desc',
+            }
+            const newDirection =
+              currentSort.field === field && currentSort.direction === 'asc' ? 'desc' : 'asc'
+            handleSortChange({ field, direction: newDirection })
+          }}
+        />
+      </div>
 
       {hasMore && (
         <div className="flex justify-center pt-6">

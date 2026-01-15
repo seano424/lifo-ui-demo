@@ -30,12 +30,12 @@ export function TodoSortDirection({
   return (
     <div className="flex-1 p-3 bg-white">
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-medium text-gray-900">{t('filters.sortDirection')}</h3>
+        <h3 className="text-sm  text-gray-900">{t('filters.sortDirection')}</h3>
         {!isDefaultSort && (
           <button
             type="button"
             onClick={onReset}
-            className="text-xs text-violet-600 hover:text-violet-700 font-medium"
+            className="text-xs text-violet-600 hover:text-violet-700 "
           >
             {t('filters.reset')}
           </button>
@@ -73,7 +73,7 @@ export function TodoSortDirection({
           <span
             className={cn(
               'text-sm flex-1',
-              sortConfig.direction === 'asc' ? 'font-medium text-violet-700' : 'text-gray-700',
+              sortConfig.direction === 'asc' ? ' text-violet-700' : 'text-gray-700',
             )}
           >
             {t('filters.ascending')}
@@ -108,7 +108,7 @@ export function TodoSortDirection({
           <span
             className={cn(
               'text-sm flex-1',
-              sortConfig.direction === 'desc' ? 'font-medium text-violet-700' : 'text-gray-700',
+              sortConfig.direction === 'desc' ? ' text-violet-700' : 'text-gray-700',
             )}
           >
             {t('filters.descending')}
@@ -118,14 +118,12 @@ export function TodoSortDirection({
 
       {/* Current Sort Display */}
       <div className="mt-4">
-        <h4 className="text-xs font-medium text-gray-500 mb-2">{t('filters.currentSort')}</h4>
+        <h4 className="text-xs  text-gray-500 mb-2">{t('filters.currentSort')}</h4>
         <div className="p-3 bg-violet-50 rounded-lg border border-violet-100">
           <div className="flex items-center gap-2 text-sm">
             <span className="text-lg">{selectedOption?.emoji}</span>
             <div className="flex-1 min-w-0">
-              <div className="font-medium text-violet-900 truncate">
-                {tSort(`${translationKey}.label`)}
-              </div>
+              <div className=" text-violet-900 truncate">{tSort(`${translationKey}.label`)}</div>
               <div className="text-xs text-violet-700">
                 {tSort(`${translationKey}.description`)}
               </div>

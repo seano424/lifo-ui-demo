@@ -235,7 +235,7 @@ export function ProductsListPresentation({
               <TableBody>
                 {products.map(product => (
                   <TableRow key={product.product_id}>
-                    <TableCell className="font-medium">
+                    <TableCell className="">
                       <div>
                         <div className="font-semibold">
                           {product.name || t('table.unnamedProduct')}
@@ -264,7 +264,7 @@ export function ProductsListPresentation({
                     </TableCell>
                     <TableCell>
                       <div className="text-sm">
-                        <span className="font-medium">{product.total_stock || 0}</span>
+                        <span className="">{product.total_stock || 0}</span>
                         <span className="text-muted-foreground ml-1">
                           {product.unit_type || t('table.units')}
                         </span>
@@ -284,7 +284,7 @@ export function ProductsListPresentation({
                     </TableCell>
                     <TableCell>
                       <div className="text-sm">
-                        <span className="font-medium">{product.active_batches_count || 0}</span>
+                        <span className="">{product.active_batches_count || 0}</span>
                         <span className="text-muted-foreground ml-1">
                           {(product.active_batches_count || 0) === 1
                             ? t('table.batch')

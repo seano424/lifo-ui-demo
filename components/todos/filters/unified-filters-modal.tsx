@@ -172,7 +172,7 @@ export function UnifiedFiltersModal({
       <div className={`space-y-8 ${padding}`}>
         {/* Urgency Filter */}
         <div className={spacing}>
-          <h4 className={`${isMobile ? 'text-sm' : 'text-base'} font-medium text-muted-foreground`}>
+          <h4 className={`${isMobile ? 'text-sm' : 'text-base'}  text-muted-foreground`}>
             {t('filters.urgency.title')}
           </h4>
           <div className={`grid ${gridCols} gap-3`}>
@@ -203,7 +203,7 @@ export function UnifiedFiltersModal({
 
         {/* Action Type Filter */}
         <div className={spacing}>
-          <h4 className={`${isMobile ? 'text-sm' : 'text-base'} font-medium text-muted-foreground`}>
+          <h4 className={`${isMobile ? 'text-sm' : 'text-base'}  text-muted-foreground`}>
             {t('filters.action.title')}
           </h4>
           <div className={`grid ${gridCols} gap-3`}>
@@ -234,7 +234,7 @@ export function UnifiedFiltersModal({
 
         {/* Batch Status Filter */}
         <div className={spacing}>
-          <h4 className={`${isMobile ? 'text-sm' : 'text-base'} font-medium text-muted-foreground`}>
+          <h4 className={`${isMobile ? 'text-sm' : 'text-base'}  text-muted-foreground`}>
             {t('filters.batchStatus.title')}
           </h4>
           <div className={`grid ${gridCols} gap-3`}>
@@ -265,7 +265,7 @@ export function UnifiedFiltersModal({
 
         {/* Expiry Filter */}
         <div className={spacing}>
-          <h4 className={`${isMobile ? 'text-sm' : 'text-base'} font-medium text-muted-foreground`}>
+          <h4 className={`${isMobile ? 'text-sm' : 'text-base'}  text-muted-foreground`}>
             {t('filters.expiry.title')}
           </h4>
           <div className={`grid ${gridCols} gap-3`}>
@@ -295,9 +295,7 @@ export function UnifiedFiltersModal({
         {/* Active Filters Display */}
         {hasActiveFilters && (
           <div className="space-y-2">
-            <h4
-              className={`${isMobile ? 'text-sm' : 'text-base'} font-medium text-muted-foreground`}
-            >
+            <h4 className={`${isMobile ? 'text-sm' : 'text-base'}  text-muted-foreground`}>
               {t('filters.activeFilters')}
             </h4>
             <div className="flex flex-wrap gap-2">

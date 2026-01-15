@@ -50,7 +50,7 @@ export function createProductTableColumns({
       ),
       cell: ({ row }) => (
         <div>
-          <div className="font-medium truncate" title={row.original.name}>
+          <div className="truncate" title={row.original.name}>
             {row.original.name || t('unnamedProduct')}
           </div>
           <div
@@ -61,7 +61,7 @@ export function createProductTableColumns({
           </div>
         </div>
       ),
-      size: 300,
+      size: 200,
     },
     {
       id: 'total_stock',
@@ -78,11 +78,11 @@ export function createProductTableColumns({
       ),
       cell: ({ row }) => (
         <div className="text-right">
-          <div className="font-medium">{row.original.total_stock || 0}</div>
+          <div className="">{row.original.total_stock || 0}</div>
           {/* <div className="text-xs text-muted-foreground">{row.original.unit_type || 'units'}</div> */}
         </div>
       ),
-      size: 100,
+      size: 120,
     },
     // {
     //   id: 'base_selling_price',
@@ -133,7 +133,7 @@ export function createProductTableColumns({
           <span>{row.original.active_batches_count || 0}</span>
         </Typography>
       ),
-      size: 130,
+      size: 120,
     },
     {
       id: 'created_at',
@@ -150,7 +150,7 @@ export function createProductTableColumns({
             : t('notAvailable')}
         </div>
       ),
-      size: 110,
+      size: 140,
     },
     {
       id: 'category',

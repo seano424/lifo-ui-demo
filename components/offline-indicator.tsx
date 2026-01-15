@@ -38,7 +38,7 @@ export function OfflineIndicator() {
             <Wifi className="h-5 w-5 text-green-600 flex-shrink-0" />
           )}
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium leading-tight">
+            <p className="text-sm  leading-tight">
               {isOffline ? "You're offline. Some features may be limited." : 'Connection restored!'}
             </p>
           </div>

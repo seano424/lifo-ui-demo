@@ -406,7 +406,7 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
                   activeTab === tab.id ? 'text-primary' : 'text-muted-foreground/90',
                 )}
               >
-                <span className="text-sm sm:text-base font-medium truncate max-w-[80px] sm:max-w-none">
+                <span className="text-sm sm:text-base truncate max-w-[80px] sm:max-w-none">
                   {tab.label}
                 </span>
                 <Badge

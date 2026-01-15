@@ -539,7 +539,7 @@ export default function ManualBarcodeEntry({
                                     }}
                                   >
                                     <div className="flex-1">
-                                      <div className="font-medium">{product.name}</div>
+                                      <div className="">{product.name}</div>
                                       {product.brand && (
                                         <div className="text-sm text-gray-500">{product.brand}</div>
                                       )}
@@ -576,7 +576,7 @@ export default function ManualBarcodeEntry({
                                   }}
                                 >
                                   <div className="flex-1">
-                                    <div className="font-medium">
+                                    <div className="">
                                       {product.product_name || 'Unknown Product'}
                                     </div>
                                     {product.brands && (
@@ -898,7 +898,7 @@ export default function ManualBarcodeEntry({
                                 }}
                               >
                                 <div className="text-left">
-                                  <div className="font-medium">
+                                  <div className="">
                                     {product.product_name || 'Unknown Product'}
                                   </div>
                                   {product.brands && (

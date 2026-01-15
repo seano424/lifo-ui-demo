@@ -41,10 +41,10 @@ export function OnboardingSuccess({ storeName }: OnboardingSuccessProps) {
           <div className="space-y-3">
             <div className="flex items-start gap-3">
               <div className="w-6 h-6 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                <span className="text-xs font-medium text-primary">1</span>
+                <span className="text-xs  text-primary">1</span>
               </div>
               <div className="space-y-1 flex flex-col">
-                <Typography variant="small" className="font-medium">
+                <Typography variant="small" className="">
                   {t('nextSteps.completeSetup.title')}
                 </Typography>
                 <Typography variant="small" color="muted">
@@ -55,10 +55,10 @@ export function OnboardingSuccess({ storeName }: OnboardingSuccessProps) {
 
             <div className="flex items-start gap-3">
               <div className="w-6 h-6 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                <span className="text-xs font-medium text-primary">2</span>
+                <span className="text-xs  text-primary">2</span>
               </div>
               <div className="space-y-1 flex flex-col">
-                <Typography variant="small" className="font-medium">
+                <Typography variant="small" className="">
                   {t('nextSteps.addProducts.title')}
                 </Typography>
                 <Typography variant="small" color="muted">
@@ -69,10 +69,10 @@ export function OnboardingSuccess({ storeName }: OnboardingSuccessProps) {
 
             <div className="flex items-start gap-3">
               <div className="w-6 h-6 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                <span className="text-xs font-medium text-primary">3</span>
+                <span className="text-xs  text-primary">3</span>
               </div>
               <div className="space-y-1 flex flex-col">
-                <Typography variant="small" className="font-medium">
+                <Typography variant="small" className="">
                   {t('nextSteps.inviteTeam.title')}
                 </Typography>
                 <Typography variant="small" color="muted">

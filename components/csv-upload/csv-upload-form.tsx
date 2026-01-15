@@ -378,7 +378,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                               key={`validation-warning-${idx}-${warning.message.slice(0, 20)}`}
                               className="space-y-2 border-t border-red-200 pt-2"
                             >
-                              <p className="text-red-700 font-medium">{warning.message}</p>
+                              <p className="text-red-700 ">{warning.message}</p>
                               {warning.suggestion && (
                                 <p className="text-red-600 text-sm italic">{warning.suggestion}</p>
                               )}

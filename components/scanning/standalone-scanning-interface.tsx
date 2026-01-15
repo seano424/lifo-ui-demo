@@ -694,7 +694,7 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
                       className="flex justify-between items-start p-2 bg-white rounded-2xl border text-sm"
                     >
                       <div className="flex-1">
-                        <div className="font-medium">{item.productName}</div>
+                        <div className="">{item.productName}</div>
                         {item.brand && <div className="text-xs text-gray-600">{item.brand}</div>}
                         <div className="text-xs text-gray-500">
                           {t('submission.totals.expires')}{' '}
@@ -704,7 +704,7 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="font-medium">
+                        <div className="">
                           {item.quantity}x {formatPrice(item.price)}
                         </div>
                         <div className="text-xs text-gray-600">
@@ -718,11 +718,11 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
 
               {/* Total Summary */}
               <div className="border-t pt-3">
-                <div className="flex justify-between items-center font-medium">
+                <div className="flex justify-between items-center ">
                   <span>{t('submission.totals.totalItems')}</span>
                   <span>{scannedItems.reduce((sum, item) => sum + item.quantity, 0)}</span>
                 </div>
-                <div className="flex justify-between items-center font-medium">
+                <div className="flex justify-between items-center ">
                   <span>{t('submission.totals.totalValue')}</span>
                   <span>
                     {formatPrice(

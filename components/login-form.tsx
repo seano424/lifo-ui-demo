@@ -100,7 +100,7 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
           <div className="mt-6 text-center text-sm text-muted-foreground">
             <Typography variant="p" color="muted">
               {t('noAccount')}{' '}
-              <Link href="/auth/sign-up" className="text-primary hover:underline font-medium">
+              <Link href="/auth/sign-up" className="text-primary hover:underline ">
                 {t('signUp')}
               </Link>
             </Typography>
@@ -112,14 +112,14 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
               {t('termsAndPrivacyPrefix')}{' '}
               <Link
                 href="/terms"
-                className="underline hover:text-foreground font-medium text-foreground underline-offset-4"
+                className="underline hover:text-foreground  text-foreground underline-offset-4"
               >
                 {t('termsOfUse')}
               </Link>{' '}
               {t('termsAndPrivacyMiddle')}{' '}
               <Link
                 href="/privacy"
-                className="underline hover:text-foreground font-medium text-foreground underline-offset-4"
+                className="underline hover:text-foreground  text-foreground underline-offset-4"
               >
                 {t('privacyPolicy')}
               </Link>
