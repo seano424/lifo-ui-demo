@@ -86,7 +86,7 @@ export function SetupStepsSidebar() {
               <Typography
                 variant="p"
                 className={cn(
-                  'font-medium',
+                  '',
                   isCurrent && 'text-secondary-900',
                   completed && 'text-secondary-900',
                 )}

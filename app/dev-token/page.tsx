@@ -52,7 +52,7 @@ export default function DevTokenPage() {
           <p className="text-gray-700 mb-4">{t('accessDeniedMessage')}</p>
           <a
             href="/"
-            className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition inline-block"
+            className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg  transition inline-block"
           >
             {t('goToHome')}
           </a>
@@ -73,9 +73,7 @@ export default function DevTokenPage() {
         )}
 
         <div className="bg-white rounded-lg shadow p-6 mb-4">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            {t('yourJwtToken')}
-          </label>
+          <label className="block text-sm  text-gray-700 mb-2">{t('yourJwtToken')}</label>
           <div className="bg-gray-900 text-green-400 p-4 rounded font-mono text-xs break-all overflow-auto max-h-96">
             {token}
           </div>
@@ -86,7 +84,7 @@ export default function DevTokenPage() {
             type="button"
             onClick={copyToken}
             disabled={!isValidToken}
-            className={`px-6 py-3 rounded-lg font-medium transition ${
+            className={`px-6 py-3 rounded-lg  transition ${
               isValidToken
                 ? 'bg-blue-600 hover:bg-blue-700 text-white'
                 : 'bg-gray-300 text-gray-500 cursor-not-allowed'
@@ -97,7 +95,7 @@ export default function DevTokenPage() {
 
           <a
             href="/"
-            className="px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-medium transition inline-block"
+            className="px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-lg  transition inline-block"
           >
             {t('backToHome')}
           </a>
@@ -105,7 +103,7 @@ export default function DevTokenPage() {
           {!isValidToken && (
             <a
               href="/login"
-              className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition inline-block"
+              className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg  transition inline-block"
             >
               {t('goToLogin')}
             </a>

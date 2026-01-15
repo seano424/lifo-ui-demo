@@ -6,32 +6,48 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Skeleton } from '@/components/ui/skeleton'
-import { getLocalizedCategoryName } from '@/lib/category-translations'
-import type { Category } from '@/lib/queries/products'
+
 import { useCategories } from '@/hooks/use-categories'
+import type { Category } from '@/lib/queries/products'
 
 interface ProductListFiltersProps {
   filters?: {
     category?: string
   }
   onFiltersChange?: (filters: { category?: string }) => void
-  count: number
   isLoading: boolean
 }
 
 export function ProductListFilters({
   filters,
   onFiltersChange,
-  count,
   isLoading,
 }: ProductListFiltersProps) {
   const t = useTranslations('productFilters')
+  const tCategories = useTranslations('productCategories')
   const locale = useLocale()
   const { categories, isLoading: categoriesLoading } = useCategories()
 
   const getCategoryDisplayName = (category: Category) => {
-    return getLocalizedCategoryName(category, locale)
+    // Try to get translation from i18n first
+    try {
+      const translation = tCategories(category.category_code)
+      if (translation && translation !== category.category_code && translation.length > 0) {
+        return translation
+      }
+    } catch {
+      // Translation not found, fall through to fallback
+    }
+
+    // Fallback to database field based on locale
+    switch (locale) {
+      case 'fr':
+        return category.display_name_fr || category.display_name_en
+      case 'nl':
+        return category.display_name_nl || category.display_name_en
+      default:
+        return category.display_name_en
+    }
   }
 
   if (!onFiltersChange) {
@@ -39,7 +55,7 @@ export function ProductListFilters({
   }
 
   return (
-    <div className="flex flex-col-reverse items-center md:flex-row justify-end gap-2">
+    <div className="flex flex-wrap items-center gap-2">
       <Select
         value={filters?.category || 'all'}
         onValueChange={value =>
@@ -50,30 +66,20 @@ export function ProductListFilters({
         }
         disabled={isLoading || categoriesLoading}
       >
-        <SelectTrigger className="lg:w-[180px] text-nowrap">
+        <SelectTrigger className="w-[180px]" hideChevron>
           <SelectValue placeholder={t('categoryFilter')} />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="all">{t('allCategories')}</SelectItem>
+          <SelectItem value="all" hideCheckIcon>
+            {t('allCategories')}
+          </SelectItem>
           {categories.map(category => (
-            <SelectItem key={category.category_code} value={category.category_code}>
+            <SelectItem key={category.category_code} value={category.category_code} hideCheckIcon>
               {getCategoryDisplayName(category)}
             </SelectItem>
           ))}
         </SelectContent>
       </Select>
-
-      {isLoading && (
-        <Skeleton className="justify-between gap-1 hidden md:flex">
-          <Skeleton className="h-5 w-6 bg-muted-foreground/10" />
-          <Skeleton className="h-5 w-16 bg-muted-foreground/10" />
-        </Skeleton>
-      )}
-      {!isLoading && count > 0 && (
-        <span className="text-sm items-center text-muted-foreground px-2 hidden md:flex">
-          {t('productCount', { count })}
-        </span>
-      )}
     </div>
   )
 }

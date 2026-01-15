@@ -133,7 +133,7 @@ export function DisposeTab({ selectedBatch, onClose }: DisposeTabProps) {
                   type="button"
                   onClick={() => handleDisposalReasonChange(reason.id)}
                   className={cn(
-                    'py-2 px-3 text-sm font-medium rounded-3xl transition-all duration-500 ease-in-out flex items-center justify-center gap-2',
+                    'py-2 px-3 text-sm  rounded-3xl transition-all duration-500 ease-in-out flex items-center justify-center gap-2',
                     selectedDisposalReason === reason.id
                       ? 'bg-primary/10 text-black border-8 border-primary/10'
                       : 'bg-white text-black hover:bg-muted/50 border-8 border-transparent',

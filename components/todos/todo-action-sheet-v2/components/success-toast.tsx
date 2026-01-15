@@ -46,7 +46,7 @@ export function SuccessToast({ message, show, onHide, duration = 3000 }: Success
       }}
     >
       <CheckCircle2 className="h-5 w-5" />
-      <span className="text-sm font-medium">{message}</span>
+      <span className="text-sm ">{message}</span>
     </div>
   )
 }

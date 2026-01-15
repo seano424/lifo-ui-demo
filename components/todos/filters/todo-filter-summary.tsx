@@ -50,11 +50,7 @@ export function TodoFilterSummary({ filters, onClear }: TodoFilterSummaryProps) 
   return (
     <div className="flex items-center gap-3 text-sm ml-2">
       <span className="text-gray-600">{parts.join(' • ')}</span>
-      <button
-        type="button"
-        onClick={onClear}
-        className="text-violet-600 hover:text-violet-700 font-medium"
-      >
+      <button type="button" onClick={onClear} className="text-violet-600 hover:text-violet-700 ">
         {t('filters.clearAll')}
       </button>
     </div>

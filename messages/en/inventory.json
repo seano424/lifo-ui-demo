@@ -8,8 +8,8 @@
       "searchByProductName": "Or Search by Product Name",
       "inStockItemsOnly": "(In-stock items only)",
       "barcodePlaceholder": "Barcode number (8+ digits)...",
-      "searchPlaceholder": "Search Open Food Facts database...",
-      "inventorySearchPlaceholder": "Search products in inventory...",
+      "searchPlaceholder": "Search",
+      "inventorySearchPlaceholder": "Search",
       "productFound": "Product Found!",
       "outOfStock": "Out of Stock",
       "noStockAvailable": "No stock available in this store",
@@ -37,7 +37,7 @@
       "batch": "batch",
       "batches": "batches",
       "units": "units",
-      "searchPlaceholder": "Search products by name, brand, barcode, or SKU..."
+      "searchPlaceholder": "Search"
     },
     "catalog": {
       "title": "Products Catalog",
@@ -95,11 +95,19 @@
     "desc": "Descending"
   },
   "batchFilters": {
+    "date": "Date",
     "expiryFilter": "Expiry Filter",
     "allItems": "All Items",
     "expiringInDays": "Expiring in {days} days",
+    "3days": "3D",
+    "7days": "7D",
+    "14days": "14D",
+    "30days": "30D",
+    "90days": "90D",
+    "180days": "180D",
     "status": "Status",
     "allStatuses": "All Statuses",
+    "all": "All",
     "active": "Active",
     "draft": "Draft",
     "expired": "Expired",
@@ -130,7 +138,7 @@
         "markAsDamaged": "Mark as Damaged",
         "deleteBatch": "Delete Batch"
       },
-      "searchPlaceholder": "Search batches by product name, brand, barcode, batch number, location...",
+      "searchPlaceholder": "Search",
       "emptyState": {
         "title": "No batches found",
         "description": "Try adjusting your search or filters. ",

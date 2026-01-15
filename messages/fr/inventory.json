@@ -8,8 +8,8 @@
       "searchByProductName": "Ou rechercher par nom de produit",
       "inStockItemsOnly": "(Articles en stock uniquement)",
       "barcodePlaceholder": "Numéro de code-barres (8+ chiffres)...",
-      "searchPlaceholder": "Rechercher dans la base Open Food Facts...",
-      "inventorySearchPlaceholder": "Rechercher des produits en inventaire...",
+      "searchPlaceholder": "Rechercher",
+      "inventorySearchPlaceholder": "Rechercher",
       "productFound": "Produit trouvé !",
       "outOfStock": "Rupture de stock",
       "noStockAvailable": "Aucun stock disponible dans ce magasin",
@@ -37,7 +37,7 @@
       "batch": "lot",
       "batches": "lots",
       "units": "unités",
-      "searchPlaceholder": "Rechercher des produits par nom, marque, code-barres ou SKU..."
+      "searchPlaceholder": "Rechercher"
     },
     "catalog": {
       "title": "Catalogue des produits",
@@ -95,11 +95,19 @@
     "desc": "Décroissant"
   },
   "batchFilters": {
+    "date": "Date",
     "expiryFilter": "Filtre d'expiration",
     "allItems": "Tous les articles",
     "expiringInDays": "Expire dans {days} jours",
+    "3days": "3J",
+    "7days": "7J",
+    "14days": "14J",
+    "30days": "30J",
+    "90days": "90J",
+    "180days": "180J",
     "status": "Statut",
     "allStatuses": "Tous les statuts",
+    "all": "Tous",
     "active": "Actif",
     "draft": "Brouillon",
     "expired": "Expiré",
@@ -130,7 +138,7 @@
         "markAsDamaged": "Marquer comme endommagé",
         "deleteBatch": "Supprimer le lot"
       },
-      "searchPlaceholder": "Rechercher des lots par nom de produit, marque, code-barres, numéro de lot, emplacement...",
+      "searchPlaceholder": "Rechercher",
       "emptyState": {
         "title": "Aucun lot trouvé",
         "description": "Vous n'avez encore aucun lot dans votre inventaire. Commencez par ajouter votre premier lot pour suivre les dates d'expiration et gérer les niveaux de stock.",

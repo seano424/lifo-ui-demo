@@ -48,7 +48,7 @@ export function DisposeForm({ batch, currencySymbol, isLoading, onConfirm }: Dis
               type="button"
               onClick={() => setReason(r.id)}
               className={cn(
-                'py-2 px-3 text-sm font-medium rounded-3xl transition-all duration-500 ease-in-out flex items-center justify-center gap-2',
+                'py-2 px-3 text-sm  rounded-3xl transition-all duration-500 ease-in-out flex items-center justify-center gap-2',
                 reason === r.id
                   ? 'bg-primary/10 text-black border-8 border-primary/10'
                   : 'bg-white text-black hover:bg-muted/50 border-8 border-transparent',
@@ -104,7 +104,7 @@ export function DisposeForm({ batch, currencySymbol, isLoading, onConfirm }: Dis
         type="button"
         onClick={() => onConfirm(quantity, finalReason)}
         disabled={isLoading || quantity === 0 || (reason === 'other' && !customReason.trim())}
-        className="w-full h-12 bg-destructive text-white hover:bg-destructive/90 rounded-3xl font-medium"
+        className="w-full h-12 bg-destructive text-white hover:bg-destructive/90 rounded-3xl "
       >
         {isLoading ? (
           <Typography variant="small">

@@ -68,7 +68,7 @@ export function IntegrateDataStep() {
           <div className="flex flex-col gap-4">
             <div className="flex items-center gap-3">
               <FileUp className="h-5 w-5 text-muted-foreground" />
-              <Typography variant="h4" className="font-medium">
+              <Typography variant="h4" className="">
                 CSV
               </Typography>
             </div>

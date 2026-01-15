@@ -76,7 +76,7 @@ export function DisconnectSquareDialog({ connectionId, trigger }: DisconnectSqua
           <div className="space-y-2 text-left">
             <AlertDialogDescription>{t('description')}</AlertDialogDescription>
             <div className="rounded-lg bg-amber-50 p-3 text-sm">
-              <p className="font-medium text-amber-900">{t('warning')}</p>
+              <p className=" text-amber-900">{t('warning')}</p>
               <ul className="mt-2 list-disc space-y-1 pl-4 text-amber-800">
                 <li>{t('warningSync')}</li>
                 <li>{t('warningReconnect')}</li>

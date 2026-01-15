@@ -43,7 +43,7 @@ export function SellForm({ batch, currencySymbol, isLoading, onConfirm }: SellFo
               type="button"
               onClick={() => setTiming(option.id)}
               className={cn(
-                'py-2 px-3 text-sm font-medium rounded-3xl transition-all duration-500 ease-in-out',
+                'py-2 px-3 text-sm  rounded-3xl transition-all duration-500 ease-in-out',
                 timing === option.id
                   ? 'bg-primary/10 text-black border-8 border-primary/10'
                   : 'bg-white text-black hover:bg-muted/50 border-8 border-transparent',

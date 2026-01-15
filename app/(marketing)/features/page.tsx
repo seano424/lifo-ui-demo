@@ -75,7 +75,7 @@ function MockDashboard() {
     <div className="w-full space-y-4">
       <div className="bg-gradient-to-r from-primary-50 to-secondary-50 rounded-2xl p-4 sm:p-6 border border-primary-100">
         <div className="flex items-center justify-between mb-3">
-          <Typography variant="p" className="text-sm sm:text-base font-medium text-primary-800">
+          <Typography variant="p" className="text-sm sm:text-base  text-primary-800">
             {t('inventoryOverview')}
           </Typography>
           <TrendingUp size={20} className="text-primary-600" />
@@ -149,7 +149,7 @@ function MockScanning() {
           <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center">
             <CheckCircle size={16} className="text-white" />
           </div>
-          <Typography variant="p" className="text-sm sm:text-base font-medium text-secondary-800">
+          <Typography variant="p" className="text-sm sm:text-base  text-secondary-800">
             {t('scanningActive')}
           </Typography>
         </div>
@@ -239,7 +239,7 @@ function MockAI() {
         <div className="space-y-3">
           <div className="bg-white/70 rounded-xl p-3 border border-primary-100/50">
             <div className="flex flex-col gap-1">
-              <Typography variant="p" className="text-sm font-medium text-primary-800">
+              <Typography variant="p" className="text-sm  text-primary-800">
                 📦 {t('reorderMilk')}
               </Typography>
               <Typography variant="p" className="text-xs text-primary-600">
@@ -249,7 +249,7 @@ function MockAI() {
           </div>
           <div className="bg-white/70 rounded-xl p-3 border border-primary-100/50">
             <div className="flex flex-col gap-1">
-              <Typography variant="p" className="text-sm font-medium text-primary-800">
+              <Typography variant="p" className="text-sm  text-primary-800">
                 ⚡ {t('promoteExpiring')}
               </Typography>
               <Typography variant="p" className="text-xs text-primary-600">

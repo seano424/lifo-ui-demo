@@ -1,7 +1,6 @@
 import { dehydrate, HydrationBoundary } from '@tanstack/react-query'
 import { redirect } from 'next/navigation'
 import { BatchesFilteredList } from '@/components/batches/batches-filtered-list'
-import BatchesHeader from '@/components/batches/batches-header'
 import { NoStoresError } from '@/components/dashboard/no-stores-error'
 import {
   type BatchFilters,
@@ -134,9 +133,7 @@ export default async function InventoryBatchesPage({ searchParams }: InventoryBa
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <div className="flex flex-col gap-6 container md:py-6 lg:py-8">
-        <BatchesHeader />
-
+      <div className="flex flex-col gap-6 container py-6">
         <BatchesFilteredList
           initialFilters={{
             filter: params.filter,

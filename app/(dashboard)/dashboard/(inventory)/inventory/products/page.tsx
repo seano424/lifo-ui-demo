@@ -2,7 +2,6 @@ import { dehydrate, HydrationBoundary } from '@tanstack/react-query'
 import { redirect } from 'next/navigation'
 import { NoStoresError } from '@/components/dashboard/no-stores-error'
 import { ProductsFilteredList } from '@/components/products/products-filtered-list'
-import ProductsHeader from '@/components/products/products-header'
 import type { ProductFilters, SortField } from '@/lib/queries/products'
 import { fetchProductsPageRPC } from '@/lib/queries/products-rpc'
 import { queryKeys } from '@/lib/queries/query-keys'
@@ -88,10 +87,7 @@ export default async function InventoryProductsPage({ searchParams }: InventoryP
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <div className="space-y-6 container md:py-6 lg:py-8">
-        <ProductsHeader />
-
-        {/* Client-side filtered product list */}
+      <div className="space-y-6 container py-6">
         <ProductsFilteredList
           initialFilters={{
             category: params.category,

@@ -111,7 +111,7 @@ export function TrendIndicator({
             getBackgroundColor(),
           )}
         >
-          <span className={cn('font-medium text-sm', getTrendColor())}>{formatChange(change)}</span>
+          <span className={cn(' text-sm', getTrendColor())}>{formatChange(change)}</span>
           {getTrendIcon()}
           {Math.abs(changePercent) > 0.01 && (
             <span className={cn('text-sm', getTrendColor())}>
@@ -126,21 +126,21 @@ export function TrendIndicator({
         <div className="space-y-1">
           <div className="flex items-center justify-between text-xs text-gray-600">
             <span>{t('previous')}</span>
-            <span className="font-medium">{formatValue(previous)}</span>
+            <span className="">{formatValue(previous)}</span>
           </div>
 
           {periodMin !== undefined && periodMax !== undefined && (
             <>
               <div className="flex items-center justify-between text-xs text-gray-600">
                 <span>{t('periodLow')}</span>
-                <span className="font-medium">
+                <span className="">
                   {formatValue(periodMin)}
                   {minDate && ` (${formatDate(minDate)})`}
                 </span>
               </div>
               <div className="flex items-center justify-between text-xs text-gray-600">
                 <span>{t('periodHigh')}</span>
-                <span className="font-medium">
+                <span className="">
                   {formatValue(periodMax)}
                   {maxDate && ` (${formatDate(maxDate)})`}
                 </span>

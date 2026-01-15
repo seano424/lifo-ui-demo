@@ -15,12 +15,11 @@ export function NotificationCount({
 }: NotificationCountProps) {
   if (count <= 0) return null
 
-  const baseClasses = 'flex items-center justify-center rounded-full text-xs font-medium text-white'
+  const baseClasses = 'flex items-center justify-center rounded-full text-xs  text-white'
 
   const variantClasses = {
     sidebar: 'h-6 w-6 bg-secondary-900',
-    navbar:
-      'min-h-7 min-w-7 bg-secondary-900 border border-white p-1 text-[10px] font-medium shadow-lg',
+    navbar: 'min-h-7 min-w-7 bg-secondary-900 border border-white p-1 text-[10px]  shadow-lg',
     default: 'h-6 w-6 bg-secondary-900',
   }
 

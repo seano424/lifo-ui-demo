@@ -51,7 +51,7 @@ function PricingCard({
       {/* Coming Soon badge */}
       {isComingSoon && (
         <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-50">
-          <div className="bg-gradient-to-r from-gray-400 to-gray-500 text-white px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap">
+          <div className="bg-gradient-to-r from-gray-400 to-gray-500 text-white px-4 py-2 rounded-full text-xs  whitespace-nowrap">
             {t('badges.comingSoon')}
           </div>
         </div>
@@ -113,10 +113,10 @@ function PricingCard({
           </Typography>
           {fees.map(fee => (
             <div key={fee.type} className="flex justify-between items-center">
-              <Typography variant="p" className="text-xs text-foreground/70">
+              <Typography variant="p" className="text-sm text-foreground/70">
                 {fee.type}
               </Typography>
-              <Typography variant="p" className="text-xs font-medium text-primary-700">
+              <Typography variant="p" className="text-xs  text-primary-700">
                 {fee.percentage}
               </Typography>
             </div>
@@ -126,7 +126,7 @@ function PricingCard({
 
       {/* Selling Point */}
       <div className="mb-6 p-4 rounded-2xl bg-card border border-secondary-100/50">
-        <Typography variant="p" className="text-sm font-medium text-secondary-800">
+        <Typography variant="p" className="text-sm  text-secondary-800">
           💡 {sellingPoint}
         </Typography>
       </div>
@@ -179,7 +179,7 @@ export default function PricingPage() {
         {/* Contact Message */}
         {/* <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-primary-600/90 via-primary-700/90 to-secondary-700/90 shadow-lg hover:shadow-xl transition-all duration-300 border border-primary-400/20 backdrop-blur-sm">
-            <Typography variant="p" className="text-sm text-white font-medium">
+            <Typography variant="p" className="text-sm text-white ">
               📧 {t("contactUs")}: <strong> contact@lifo-app.com </strong>
             </Typography>
           </div>

@@ -136,7 +136,7 @@ export function SquareConnectionCard({ status, isLoading, onConnect }: SquareCon
                     <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                       <div className="space-y-4 flex-1">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <Typography variant="p" className="text-sm font-medium">
+                          <Typography variant="p" className="text-sm ">
                             {store.store_name}
                           </Typography>
                           <Badge

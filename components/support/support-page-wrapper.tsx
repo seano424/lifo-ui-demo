@@ -36,9 +36,8 @@ export function SupportPageWrapper({
       <DashboardInsetHeader
         title={title}
         description={description}
-        showIcon={false}
         rightContent={
-          <div className="flex items-center gap-1 text-sm text-muted-foreground font-medium">
+          <div className="flex items-center gap-1 text-sm text-muted-foreground ">
             <Clock className="h-4 w-4" />
             <span>{readTime}</span>
           </div>

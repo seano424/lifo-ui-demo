@@ -71,13 +71,7 @@ export function TodoSearchBar({
           value={localSearchTerm}
           onChange={e => setLocalSearchTerm(e.target.value)}
           disabled={isLoading}
-          className={`pl-10 pr-10 w-full ${
-            isLarge
-              ? 'h-12 text-lg border-2 focus:border-primary'
-              : isMedium
-                ? 'h-11 text-base border-2 focus:border-primary'
-                : ''
-          }`}
+          className="pl-10"
         />
         {hasSearch && (
           <Button

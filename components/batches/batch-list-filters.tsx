@@ -1,4 +1,5 @@
 import { useTranslations } from 'next-intl'
+
 import {
   Select,
   SelectContent,
@@ -13,16 +14,10 @@ interface BatchListFiltersProps {
     status?: string
   }
   onFiltersChange?: (filters: { expiringInDays?: number; status?: string }) => void
-  count: number
   isLoading: boolean
 }
 
-export function BatchListFilters({
-  filters,
-  onFiltersChange,
-  count,
-  isLoading,
-}: BatchListFiltersProps) {
+export function BatchListFilters({ filters, onFiltersChange, isLoading }: BatchListFiltersProps) {
   const t = useTranslations('batchFilters')
 
   if (!onFiltersChange) {
@@ -30,29 +25,47 @@ export function BatchListFilters({
   }
 
   return (
-    <div className="flex flex-row lg:justify-end gap-2">
+    <div className="flex flex-wrap items-center gap-2">
+      {/* Date Filter Dropdown */}
       <Select
-        value={filters?.expiringInDays?.toString() || 'all'}
+        value={filters?.expiringInDays?.toString() || '180'}
         onValueChange={value =>
           onFiltersChange({
             ...filters,
-            expiringInDays: value === 'all' ? undefined : parseInt(value, 10),
+            expiringInDays: parseInt(value, 10),
           })
         }
         disabled={isLoading}
       >
-        <SelectTrigger className="w-full md:w-[180px] text-nowrap">
-          <SelectValue className="text-nowrap" placeholder={t('expiryFilter')} />
+        <SelectTrigger className="w-[140px]" hideChevron>
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-muted-foreground">{t('date')}:</span>
+            <SelectValue />
+          </div>
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="all">{t('allItems')}</SelectItem>
-          <SelectItem value="3">{t('expiringInDays', { days: 3 })}</SelectItem>
-          <SelectItem value="7">{t('expiringInDays', { days: 7 })}</SelectItem>
-          <SelectItem value="14">{t('expiringInDays', { days: 14 })}</SelectItem>
-          <SelectItem value="30">{t('expiringInDays', { days: 30 })}</SelectItem>
+          <SelectItem value="3" hideCheckIcon>
+            {t('3days')}
+          </SelectItem>
+          <SelectItem value="7" hideCheckIcon>
+            {t('7days')}
+          </SelectItem>
+          <SelectItem value="14" hideCheckIcon>
+            {t('14days')}
+          </SelectItem>
+          <SelectItem value="30" hideCheckIcon>
+            {t('30days')}
+          </SelectItem>
+          <SelectItem value="90" hideCheckIcon>
+            {t('90days')}
+          </SelectItem>
+          <SelectItem value="180" hideCheckIcon>
+            {t('180days')}
+          </SelectItem>
         </SelectContent>
       </Select>
 
+      {/* Status Filter Dropdown */}
       <Select
         value={filters?.status || 'all'}
         onValueChange={value =>
@@ -63,24 +76,24 @@ export function BatchListFilters({
         }
         disabled={isLoading}
       >
-        <SelectTrigger className="w-full md:w-[140px] text-nowrap">
-          <SelectValue className="text-nowrap" placeholder={t('status')} />
+        <SelectTrigger className="w-[140px]" hideChevron>
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-muted-foreground">{t('status')}:</span>
+            <SelectValue />
+          </div>
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="all">{t('allStatuses')}</SelectItem>
-          <SelectItem value="active">{t('active')}</SelectItem>
-          <SelectItem value="expired">{t('expired')}</SelectItem>
-          <SelectItem value="damaged">{t('damaged')}</SelectItem>
-          <SelectItem value="sold_out">{t('soldOut')}</SelectItem>
-          <SelectItem value="reserved">{t('reserved')}</SelectItem>
+          <SelectItem value="all" hideCheckIcon>
+            {t('all')}
+          </SelectItem>
+          <SelectItem value="active" hideCheckIcon>
+            {t('active')}
+          </SelectItem>
+          <SelectItem value="expired" hideCheckIcon>
+            {t('expired')}
+          </SelectItem>
         </SelectContent>
       </Select>
-
-      {!isLoading && count > 0 && (
-        <span className="text-sm text-nowrap items-center text-muted-foreground px-2 hidden md:flex">
-          {t('itemCount', { count })}
-        </span>
-      )}
     </div>
   )
 }

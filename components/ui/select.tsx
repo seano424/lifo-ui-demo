@@ -22,24 +22,36 @@ function SelectTrigger({
   className,
   size = 'default',
   children,
+  hideChevron = false,
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Trigger> & {
-  size?: 'sm' | 'default'
+  size?: 'sm' | 'default' | 'lg' | 'xl'
+  hideChevron?: boolean
 }) {
+  const sizeClasses = {
+    sm: 'px-3 py-1.5 text-sm',
+    default: 'px-6 py-2.5 text-sm',
+    lg: 'px-6 py-3 text-base',
+    xl: 'px-8 py-4 text-lg',
+  }
+
   return (
     <SelectPrimitive.Trigger
       data-slot="select-trigger"
       data-size={size}
       className={cn(
-        "flex w-full select-none items-center justify-between rounded-2xl text-sm tracking-wide font-semibold font-heading border border-input bg-transparent px-3 py-2.5 shadow-xs transition-colors data-[placeholder]:text-muted-foreground focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "flex w-full select-none items-center justify-between rounded-2xl tracking-wide font-semibold font-heading border border-input bg-transparent shadow-xs transition-colors data-[placeholder]:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        sizeClasses[size],
         className,
       )}
       {...props}
     >
       {children}
-      <SelectPrimitive.Icon asChild>
-        <ChevronDownIcon className="size-4 opacity-50" />
-      </SelectPrimitive.Icon>
+      {!hideChevron && (
+        <SelectPrimitive.Icon asChild>
+          <ChevronDownIcon className="size-4 opacity-50" />
+        </SelectPrimitive.Icon>
+      )}
     </SelectPrimitive.Trigger>
   )
 }
@@ -94,8 +106,11 @@ function SelectLabel({ className, ...props }: React.ComponentProps<typeof Select
 function SelectItem({
   className,
   children,
+  hideCheckIcon = false,
   ...props
-}: React.ComponentProps<typeof SelectPrimitive.Item>) {
+}: React.ComponentProps<typeof SelectPrimitive.Item> & {
+  hideCheckIcon?: boolean
+}) {
   return (
     <SelectPrimitive.Item
       data-slot="select-item"
@@ -106,11 +121,13 @@ function SelectItem({
       {...props}
     >
       <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
-      <span className="absolute right-2 flex size-3.5 items-center justify-center">
-        <SelectPrimitive.ItemIndicator>
-          <CheckIcon className="size-4" />
-        </SelectPrimitive.ItemIndicator>
-      </span>
+      {!hideCheckIcon && (
+        <span className="absolute right-2 flex size-3.5 items-center justify-center">
+          <SelectPrimitive.ItemIndicator>
+            <CheckIcon className="size-4" />
+          </SelectPrimitive.ItemIndicator>
+        </span>
+      )}
     </SelectPrimitive.Item>
   )
 }

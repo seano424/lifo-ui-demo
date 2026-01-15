@@ -1,6 +1,4 @@
-import { ArrowUpDown } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import { Card } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
   Table,
@@ -15,77 +13,59 @@ export function ProductListSkeleton() {
   const t = useTranslations('productTable')
 
   return (
-    <Card className="border-0 border-t rounded-t-none shadow-none">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>
-              <div className="flex items-center gap-1">
-                {t('product')}
-                <ArrowUpDown className="h-4 w-4" />
-              </div>
-            </TableHead>
-            <TableHead>
-              <div className="flex items-center gap-1">
-                {t('category')}
-                <ArrowUpDown className="h-4 w-4" />
-              </div>
-            </TableHead>
-            <TableHead>
-              <div className="flex items-center gap-1">
-                {t('brand')}
-                <ArrowUpDown className="h-4 w-4" />
-              </div>
-            </TableHead>
-            <TableHead className="text-right">
-              <div className="flex items-center justify-end gap-1">
-                {t('totalStock')}
-                <ArrowUpDown className="h-4 w-4" />
-              </div>
-            </TableHead>
-            <TableHead className="text-right">
-              <div className="flex items-center justify-end gap-1">
-                {t('activeBatches')}
-                <ArrowUpDown className="h-4 w-4" />
-              </div>
-            </TableHead>
-            <TableHead>
-              <div className="flex items-center gap-1">
-                {t('dateAdded')}
-                <ArrowUpDown className="h-4 w-4" />
-              </div>
-            </TableHead>
-            <TableHead className="w-12"></TableHead>
+    <Table
+      style={{
+        tableLayout: 'fixed',
+        borderCollapse: 'separate',
+        borderSpacing: 0,
+      }}
+    >
+      <TableHeader>
+        <TableRow className="border-b-2 border-border">
+          <TableHead className="py-3" style={{ width: 200 }}>
+            <span className="text-sm text-foreground">{t('product')}</span>
+          </TableHead>
+          <TableHead className="py-3" style={{ width: 120 }}>
+            <span className="text-sm text-foreground">{t('totalStock')}</span>
+          </TableHead>
+          <TableHead className="py-3" style={{ width: 160 }}>
+            <span className="text-sm text-foreground">{t('activeBatches')}</span>
+          </TableHead>
+          <TableHead className="py-3" style={{ width: 120 }}>
+            <span className="text-sm text-foreground">{t('dateAdded')}</span>
+          </TableHead>
+          <TableHead className="py-3" style={{ width: 140 }}>
+            <span className="text-sm text-foreground">{t('category')}</span>
+          </TableHead>
+          <TableHead className="py-3" style={{ width: 140 }}>
+            <span className="text-sm text-foreground">{t('brand')}</span>
+          </TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {Array.from({ length: 10 }).map((_, i) => (
+          <TableRow key={`skeleton-${i + 1}`} className="border-b border-border">
+            <TableCell className="py-4" style={{ width: 200 }}>
+              <Skeleton className="h-5 w-full rounded" />
+            </TableCell>
+            <TableCell className="py-4" style={{ width: 120 }}>
+              <Skeleton className="h-5 w-full rounded" />
+            </TableCell>
+            <TableCell className="py-4" style={{ width: 120 }}>
+              <Skeleton className="h-5 w-full rounded" />
+            </TableCell>
+            <TableCell className="py-4" style={{ width: 140 }}>
+              <Skeleton className="h-5 w-full rounded" />
+            </TableCell>
+            <TableCell className="py-4" style={{ width: 140 }}>
+              <Skeleton className="h-5 w-full rounded" />
+            </TableCell>
+            <TableCell className="py-4" style={{ width: 140 }}>
+              <Skeleton className="h-5 w-full rounded" />
+            </TableCell>
           </TableRow>
-        </TableHeader>
-        <TableBody>
-          {Array.from({ length: 20 }).map((_, i) => (
-            <TableRow key={`skeleton-${i + 1}`}>
-              <TableCell className="border-r border-border/50 flex items-center justify-center">
-                <Skeleton className="h-12 w-64 rounded" />
-              </TableCell>
-              <TableCell className="border-r border-border/50">
-                <Skeleton className="h-12 w-full rounded" />
-              </TableCell>
-              <TableCell className="border-r border-border/50">
-                <Skeleton className="h-12 w-full rounded" />
-              </TableCell>
-              <TableCell className="border-r border-border/50">
-                <Skeleton className="h-12 w-full rounded" />
-              </TableCell>
-              <TableCell className="border-r border-border/50">
-                <Skeleton className="h-12 w-full rounded" />
-              </TableCell>
-              <TableCell className="border-r border-border/50">
-                <Skeleton className="h-12 w-full rounded" />
-              </TableCell>
-              <TableCell>
-                <Skeleton className="h-12 w-full rounded" />
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </Card>
+        ))}
+      </TableBody>
+    </Table>
   )
 }

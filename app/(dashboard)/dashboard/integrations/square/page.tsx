@@ -131,7 +131,7 @@ export default function SquareManagementPage() {
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-1">
                 <p className="text-sm text-gray-600">{t('merchantName')}</p>
-                <p className="font-medium">{squareStatus.merchant_name || 'N/A'}</p>
+                <p className="">{squareStatus.merchant_name || 'N/A'}</p>
               </div>
               <div className="space-y-1">
                 <p className="text-sm text-gray-600">{t('merchantId')}</p>
@@ -143,7 +143,7 @@ export default function SquareManagementPage() {
               <div className="rounded-lg bg-gray-50 p-3">
                 <p className="text-sm text-gray-600">
                   {t('lastSync')}:{' '}
-                  <span className="font-medium text-gray-900">
+                  <span className=" text-gray-900">
                     {formatDistanceToNow(new Date(squareStatus.last_sync_at), {
                       addSuffix: true,
                     })}

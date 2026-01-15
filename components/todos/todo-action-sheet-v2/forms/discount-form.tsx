@@ -46,7 +46,7 @@ export function DiscountForm({ batch, currencySymbol, isLoading, onConfirm }: Di
     <div className="space-y-4">
       {/* Discount Presets */}
       <div className="space-y-2">
-        <label className="text-sm font-medium text-black">Select discount</label>
+        <label className="text-sm  text-black">Select discount</label>
         <div className="grid grid-cols-5 gap-2">
           {discountPresets.map(preset => (
             <button
@@ -54,7 +54,7 @@ export function DiscountForm({ batch, currencySymbol, isLoading, onConfirm }: Di
               type="button"
               onClick={() => handlePresetClick(preset)}
               className={cn(
-                'py-2 px-2 text-sm font-medium rounded-3xl transition-all',
+                'py-2 px-2 text-sm  rounded-3xl transition-all',
                 discountPercentage === preset && !customDiscount
                   ? 'bg-primary/10 text-black border-8 border-primary/10'
                   : 'bg-white text-black hover:bg-muted/50 border-8 border-transparent',
@@ -71,7 +71,7 @@ export function DiscountForm({ batch, currencySymbol, isLoading, onConfirm }: Di
             min="0"
             max="100"
             className={cn(
-              'py-2 px-2 text-sm font-medium rounded-lg text-center transition-all',
+              'py-2 px-2 text-sm  rounded-lg text-center transition-all',
               customDiscount ? 'bg-black text-white' : 'bg-white text-black border border-muted/50',
               'focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-1',
             )}
@@ -90,7 +90,7 @@ export function DiscountForm({ batch, currencySymbol, isLoading, onConfirm }: Di
             </span>
           </div>
           <div className="flex justify-between items-center">
-            <span className="text-sm font-medium text-black">New price</span>
+            <span className="text-sm  text-black">New price</span>
             <span className="text-lg font-semibold text-black">
               {currencySymbol}
               {newPrice.toFixed(2)}
@@ -101,7 +101,7 @@ export function DiscountForm({ batch, currencySymbol, isLoading, onConfirm }: Di
 
       {/* Quantity Selector */}
       <div className="space-y-2">
-        <label className="text-sm font-medium text-black">Quantity</label>
+        <label className="text-sm  text-black">Quantity</label>
         <div className="flex justify-center">
           <QuantitySelector
             value={quantity}
@@ -118,7 +118,7 @@ export function DiscountForm({ batch, currencySymbol, isLoading, onConfirm }: Di
           checked={printLabels}
           onCheckedChange={checked => setPrintLabels(checked as boolean)}
         />
-        <label htmlFor="print-labels" className="text-sm font-medium text-black cursor-pointer">
+        <label htmlFor="print-labels" className="text-sm  text-black cursor-pointer">
           Print discount labels
         </label>
       </div>

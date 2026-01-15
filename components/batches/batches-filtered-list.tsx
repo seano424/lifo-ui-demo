@@ -1,6 +1,7 @@
 'use client'
 
 import { AlertTriangle } from 'lucide-react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useState } from 'react'
@@ -10,7 +11,6 @@ import { BatchTable } from '@/components/batches/batch-table'
 import { TodoSearchBar } from '@/components/todos/filters/todo-search-bar'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
 import { useBatches } from '@/hooks/use-batches'
 import type { BatchFilters, BatchSort, BatchSortField } from '@/lib/queries/batches'
 import { useActiveStoreId } from '@/lib/stores/store-context'
@@ -31,14 +31,18 @@ export function BatchesFilteredList({ initialFilters, pageSize = 100 }: BatchesF
   const router = useRouter()
   const activeStoreId = useActiveStoreId()
   const t = useTranslations('batches.table')
+  const tButtons = useTranslations('buttons')
 
   const [filters, setFilters] = useState<BatchFilters>(() => {
     const baseFilters: BatchFilters = {
       storeId: activeStoreId || undefined,
     }
 
+    // Default to 180 days if no filter is specified
     if (initialFilters?.filter === 'expiring') {
-      baseFilters.expiringInDays = parseInt(initialFilters.expiringDays || '7', 10)
+      baseFilters.expiringInDays = parseInt(initialFilters.expiringDays || '180', 10)
+    } else if (!initialFilters?.filter) {
+      baseFilters.expiringInDays = 180
     }
 
     if (initialFilters?.status) {
@@ -161,6 +165,19 @@ export function BatchesFilteredList({ initialFilters, pageSize = 100 }: BatchesF
     [updateFilters],
   )
 
+  const handleSortFieldChange = useCallback(
+    (field: BatchSortField) => {
+      const currentSort = filters.sort || {
+        field: 'created_at',
+        direction: 'desc' as const,
+      }
+      const newDirection =
+        currentSort.field === field && currentSort.direction === 'asc' ? 'desc' : 'asc'
+      handleSortChange({ field, direction: newDirection })
+    },
+    [filters.sort, handleSortChange],
+  )
+
   if (error) {
     return (
       <Alert variant="destructive">
@@ -171,64 +188,52 @@ export function BatchesFilteredList({ initialFilters, pageSize = 100 }: BatchesF
   }
 
   return (
-    <div className="space-y-4">
-      <Card>
-        <div className="p-4">
-          <div className="flex flex-col gap-4">
-            {/* Search Bar */}
-            <div className="flex justify-center">
-              <TodoSearchBar
-                searchTerm={filters.search}
-                onSearchChange={handleSearchChange}
-                isLoading={false}
-                placeholder={t('searchPlaceholder')}
-                size="large"
-              />
-            </div>
-
-            {/* Filters and Sort Controls */}
-            <div className="flex flex-col lg:flex-row lg:justify-between gap-4">
-              <BatchListFilters
-                filters={{
-                  expiringInDays: filters.expiringInDays,
-                  status: filters.status,
-                }}
-                onFiltersChange={handleFiltersChange}
-                count={count}
-                isLoading={isLoading}
-              />
-              <BatchListSortControls
-                currentSort={filters.sort || { field: 'created_at', direction: 'desc' }}
-                updateSort={field => {
-                  const currentSort = filters.sort || {
-                    field: 'created_at',
-                    direction: 'desc',
-                  }
-                  const newDirection =
-                    currentSort.field === field && currentSort.direction === 'asc' ? 'desc' : 'asc'
-                  handleSortChange({ field, direction: newDirection })
-                }}
-                isLoading={isLoading}
-              />
-            </div>
-          </div>
+    <div className="space-y-6">
+      {/* Control bar - Search, Filters, and Sort on same level */}
+      <div className="flex flex-row flex-wrap lg:items-center lg:gap-4 gap-3">
+        {/* Search Bar */}
+        <div className="flex-1">
+          <TodoSearchBar
+            searchTerm={filters.search}
+            onSearchChange={handleSearchChange}
+            isLoading={false}
+            placeholder={t('searchPlaceholder')}
+            size="large"
+          />
         </div>
 
+        {/* Filters */}
+        <BatchListFilters
+          filters={{
+            expiringInDays: filters.expiringInDays,
+            status: filters.status,
+          }}
+          onFiltersChange={handleFiltersChange}
+          isLoading={isLoading}
+        />
+
+        {/* Sort Controls */}
+        <BatchListSortControls
+          currentSort={filters.sort || { field: 'created_at', direction: 'desc' }}
+          updateSort={handleSortFieldChange}
+          isLoading={isLoading}
+        />
+
+        {/* Add Batch Button */}
+        <Link href="/dashboard/deliveries">
+          <Button>{tButtons('addBatch')}</Button>
+        </Link>
+      </div>
+
+      {/* Table with horizontal scroll */}
+      <div className="overflow-x-auto">
         <BatchTable
           data={data}
           isLoading={isLoading}
           currentSort={filters.sort || { field: 'created_at', direction: 'desc' }}
-          updateSort={field => {
-            const currentSort = filters.sort || {
-              field: 'created_at',
-              direction: 'desc',
-            }
-            const newDirection =
-              currentSort.field === field && currentSort.direction === 'asc' ? 'desc' : 'asc'
-            handleSortChange({ field, direction: newDirection })
-          }}
+          updateSort={handleSortFieldChange}
         />
-      </Card>
+      </div>
 
       {hasMore && (
         <div className="flex justify-center pt-6">

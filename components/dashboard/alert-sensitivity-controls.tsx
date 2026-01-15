@@ -140,19 +140,19 @@ export function AlertSensitivityControls({
               {currentAlertLevel === 'conservative' && (
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 bg-red-500 rounded-full" />
-                  <span className="font-medium">{t('levels.conservative')}</span>
+                  <span className="">{t('levels.conservative')}</span>
                 </div>
               )}
               {currentAlertLevel === 'balanced' && (
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 bg-yellow-500 rounded-full" />
-                  <span className="font-medium">{t('levels.balanced')}</span>
+                  <span className="">{t('levels.balanced')}</span>
                 </div>
               )}
               {currentAlertLevel === 'proactive' && (
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 bg-primary-500 rounded-full" />
-                  <span className="font-medium">{t('levels.proactive')}</span>
+                  <span className="">{t('levels.proactive')}</span>
                 </div>
               )}
             </div>
@@ -163,7 +163,7 @@ export function AlertSensitivityControls({
 
           {/* Alert Level Selection */}
           <div className="space-y-4">
-            <Label className="text-sm font-medium">{t('currentPreference')}</Label>
+            <Label className="text-sm ">{t('currentPreference')}</Label>
 
             <Select
               value={currentAlertLevel}
@@ -230,21 +230,17 @@ export function AlertSensitivityControls({
           {showAdvanced && (
             <div className="space-y-4 p-4 bg-muted/30 rounded-2xl border border-dashed">
               <div className="text-sm space-y-3">
-                <p className="font-medium">{t('technical.thresholds')}</p>
+                <p className="">{t('technical.thresholds')}</p>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <p className="text-xs font-medium text-yellow-700">
-                      {t('technical.warningLevel')}
-                    </p>
+                    <p className="text-xs  text-yellow-700">{t('technical.warningLevel')}</p>
                     <p className="text-lg font-mono">{thresholds.warning.toFixed(2)}</p>
                     <p className="text-xs text-muted-foreground">
                       {Math.round(thresholds.warning * 100)}% {t('technical.compositeScore')}
                     </p>
                   </div>
                   <div className="space-y-1">
-                    <p className="text-xs font-medium text-red-700">
-                      {t('technical.criticalLevel')}
-                    </p>
+                    <p className="text-xs  text-red-700">{t('technical.criticalLevel')}</p>
                     <p className="text-lg font-mono">{thresholds.critical.toFixed(2)}</p>
                     <p className="text-xs text-muted-foreground">
                       {Math.round(thresholds.critical * 100)}% {t('technical.compositeScore')}
@@ -253,7 +249,7 @@ export function AlertSensitivityControls({
                 </div>
                 <Separator />
                 <div className="space-y-1">
-                  <p className="text-xs font-medium">{t('technical.howScoringWorks')}</p>
+                  <p className="text-xs ">{t('technical.howScoringWorks')}</p>
                   <ul className="text-xs text-muted-foreground space-y-1">
                     <li>• {t('technical.expiryScore')}</li>
                     <li>• {t('technical.marginScore')}</li>

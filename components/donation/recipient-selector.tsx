@@ -184,7 +184,7 @@ export function RecipientSelector({
                 key={recipient.id}
                 onClick={() => handleRecipientSelect(recipient)}
                 className={cn(
-                  'py-2 px-3 text-sm font-medium rounded-3xl transition-all duration-500 ease-in-out flex items-center justify-center gap-2',
+                  'py-2 px-3 text-sm  rounded-3xl transition-all duration-500 ease-in-out flex items-center justify-center gap-2',
                   selectedRecipientId === recipient.id
                     ? 'bg-primary/10 text-black border-8 border-primary/10'
                     : 'bg-white text-black hover:bg-muted/50 border-8 border-transparent',
@@ -215,7 +215,7 @@ export function RecipientSelector({
                 key={preset.name}
                 onClick={() => handlePresetSelect(preset.name)}
                 className={cn(
-                  'py-2 px-3 text-sm font-medium rounded-3xl transition-all duration-500 ease-in-out flex items-center justify-center gap-2',
+                  'py-2 px-3 text-sm  rounded-3xl transition-all duration-500 ease-in-out flex items-center justify-center gap-2',
                   isSelected
                     ? 'bg-primary/10 text-black border-8 border-primary/10'
                     : 'bg-white text-black hover:bg-muted/50 border-8 border-transparent',
@@ -235,7 +235,7 @@ export function RecipientSelector({
             variant="outline"
             size="lg"
             onClick={() => setShowCustomInput(true)}
-            className="w-full justify-center gap-2 py-2 px-3 text-sm font-medium rounded-3xl transition-all duration-500 ease-in-out flex items-center bg-white text-black hover:bg-muted/50 border-8 border-transparent"
+            className="w-full justify-center gap-2 py-2 px-3 text-sm  rounded-3xl transition-all duration-500 ease-in-out flex items-center bg-white text-black hover:bg-muted/50 border-8 border-transparent"
           >
             <Plus className="h-4 w-4" />
             {t('addCustomRecipient') || 'Add New Recipient'}

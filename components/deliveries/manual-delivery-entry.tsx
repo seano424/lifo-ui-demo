@@ -403,11 +403,11 @@ export default function ManualDeliveryEntry({
             </div>
 
             <div className="border-t pt-3">
-              <div className="flex justify-between items-center font-medium">
+              <div className="flex justify-between items-center ">
                 <span>{t('confirmation.totals.totalItems')}</span>
                 <span>{scannedItems.reduce((sum, item) => sum + item.quantity, 0)}</span>
               </div>
-              <div className="flex justify-between items-center font-medium">
+              <div className="flex justify-between items-center ">
                 <span>{t('confirmation.totals.totalValue')}</span>
                 <span>
                   {formatPrice(

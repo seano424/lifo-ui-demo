@@ -286,7 +286,7 @@ export function TodoCard({ todo, onClick }: TodoCardProps) {
 
         <div className="absolute right-4 top-0 opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-muted rounded p-1.5 group/edit">
           <PenLine className="h-4 w-4" />
-          <div className="absolute right-2 text-xs w-min text-nowrap bg-brand-dark font-medium text-white rounded-lg py-1 px-2.5 -top-full opacity-0 group-hover/edit:opacity-100 transition-all duration-1000 delay-300">
+          <div className="absolute right-2 text-xs w-min text-nowrap bg-brand-dark  text-white rounded-lg py-1 px-2.5 -top-full opacity-0 group-hover/edit:opacity-100 transition-all duration-1000 delay-300">
             {t('card.editTodo')}
           </div>
         </div>

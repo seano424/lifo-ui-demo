@@ -136,7 +136,7 @@ export function TeamSwitcher({ compact = false }: TeamSwitcherProps) {
                   >
                     <div className="flex items-center gap-5 justify-between w-full">
                       <div className="flex flex-1 flex-col gap-1 justify-between">
-                        <span className="font-medium">{store.store_name}</span>
+                        <span className="">{store.store_name}</span>
 
                         <div className="flex items-center gap-1 text-xs text-muted-foreground">
                           <MapPin className="size-3" />
@@ -172,7 +172,7 @@ export function TeamSwitcher({ compact = false }: TeamSwitcherProps) {
                   <div className="flex size-6 items-center justify-center rounded-2xl border bg-transparent">
                     <Settings className="size-4" />
                   </div>
-                  <div className="font-medium text-muted-foreground">{t('setAsPrimaryStore')}</div>
+                  <div className=" text-muted-foreground">{t('setAsPrimaryStore')}</div>
                 </DropdownMenuItem>
               )}
             </DropdownMenuContent>

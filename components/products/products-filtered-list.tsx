@@ -1,6 +1,7 @@
 'use client'
 
 import { AlertTriangle } from 'lucide-react'
+import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useState } from 'react'
@@ -10,7 +11,6 @@ import { ProductsTable } from '@/components/products/products-table'
 import { TodoSearchBar } from '@/components/todos/filters/todo-search-bar'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
 import { useProducts } from '@/hooks/use-products'
 import type { ProductFilters, ProductSort, SortField } from '@/lib/queries/products'
 import { useActiveStoreId } from '@/lib/stores/store-context'
@@ -34,6 +34,7 @@ export function ProductsFilteredList({
   const searchParams = useSearchParams()
   const activeStoreId = useActiveStoreId()
   const t = useTranslations('products.table')
+  const tButtons = useTranslations('buttons')
 
   const [filters, setFilters] = useState<ProductFilters>(() => {
     const baseFilters: ProductFilters = {
@@ -146,48 +147,52 @@ export function ProductsFilteredList({
   }
 
   return (
-    <div className="space-y-4">
-      <Card>
-        <div className="p-4">
-          <div className="flex flex-col gap-4">
-            {/* Search Bar */}
-            <div className="flex justify-center">
-              <TodoSearchBar
-                searchTerm={filters.search}
-                onSearchChange={handleSearchChange}
-                isLoading={false}
-                placeholder={t('searchPlaceholder')}
-                size="large"
-              />
-            </div>
-
-            {/* Filters and Sort Controls */}
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <ProductListFilters
-                filters={{
-                  category: filters.category || undefined,
-                }}
-                onFiltersChange={handleFiltersChange}
-                count={count}
-                isLoading={isLoading}
-              />
-              <ProductListSortControls
-                currentSort={filters.sort || { field: 'created_at', direction: 'desc' }}
-                updateSort={field => {
-                  const currentSort = filters.sort || {
-                    field: 'created_at',
-                    direction: 'desc',
-                  }
-                  const newDirection =
-                    currentSort.field === field && currentSort.direction === 'asc' ? 'desc' : 'asc'
-                  handleSortChange({ field, direction: newDirection })
-                }}
-                isLoading={isLoading}
-              />
-            </div>
-          </div>
+    <div className="space-y-6">
+      {/* Control bar - Search, Filters, and Sort on same level */}
+      <div className="flex flex-row flex-wrap lg:items-center lg:gap-4 gap-3">
+        {/* Search Bar */}
+        <div className="flex-1">
+          <TodoSearchBar
+            searchTerm={filters.search}
+            onSearchChange={handleSearchChange}
+            isLoading={false}
+            placeholder={t('searchPlaceholder')}
+            size="large"
+          />
         </div>
 
+        {/* Filters */}
+        <ProductListFilters
+          filters={{
+            category: filters.category || undefined,
+          }}
+          onFiltersChange={handleFiltersChange}
+          isLoading={isLoading}
+        />
+
+        {/* Sort Controls */}
+        <ProductListSortControls
+          currentSort={filters.sort || { field: 'created_at', direction: 'desc' }}
+          updateSort={field => {
+            const currentSort = filters.sort || {
+              field: 'created_at',
+              direction: 'desc',
+            }
+            const newDirection =
+              currentSort.field === field && currentSort.direction === 'asc' ? 'desc' : 'asc'
+            handleSortChange({ field, direction: newDirection })
+          }}
+          isLoading={isLoading}
+        />
+
+        {/* Add Product Button */}
+        <Link href="/dashboard/deliveries">
+          <Button>{tButtons('addProduct')}</Button>
+        </Link>
+      </div>
+
+      {/* Table with horizontal scroll */}
+      <div className="overflow-x-auto">
         <ProductsTable
           data={data}
           isLoading={isLoading}
@@ -202,7 +207,7 @@ export function ProductsFilteredList({
             handleSortChange({ field, direction: newDirection })
           }}
         />
-      </Card>
+      </div>
 
       {hasMore && (
         <div className="flex justify-center pt-6">

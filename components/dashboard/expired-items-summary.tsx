@@ -91,10 +91,7 @@ export function ExpiredItemsSummary() {
 
             {/* Actions Needed */}
             <div className="border-t pt-4 mt-4">
-              <Typography
-                variant="p"
-                className="font-medium text-gray-900 dark:text-brand-white mb-3"
-              >
+              <Typography variant="p" className=" text-gray-900 dark:text-brand-white mb-3">
                 {t('actionsNeeded')}:
               </Typography>
               <div className="space-y-2 text-sm text-gray-600 dark:text-brand-white">
