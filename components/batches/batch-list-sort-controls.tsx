@@ -7,8 +7,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Button } from '@/components/ui/button'
 import type { BatchSort, BatchSortField } from '@/lib/queries/batches'
-import { ArrowUpDownIcon } from 'lucide-react'
+import { ArrowDown, ArrowUp, ArrowUpDownIcon } from 'lucide-react'
 
 interface BatchListSortControlsProps {
   currentSort: BatchSort
@@ -64,7 +65,7 @@ export function BatchListSortControls({
         </SelectContent>
       </Select>
 
-      {/* <Button
+      <Button
         variant="ghost"
         size="sm"
         onClick={() => updateSort(currentSort.field)}
@@ -77,7 +78,7 @@ export function BatchListSortControls({
         ) : (
           <ArrowDown className="h-4 w-4" />
         )}
-      </Button> */}
+      </Button>
     </div>
   )
 }

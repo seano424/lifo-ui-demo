@@ -1,3 +1,5 @@
+import { useTranslations } from 'next-intl'
+
 import {
   Select,
   SelectContent,
@@ -16,6 +18,8 @@ interface BatchListFiltersProps {
 }
 
 export function BatchListFilters({ filters, onFiltersChange, isLoading }: BatchListFiltersProps) {
+  const t = useTranslations('batchFilters')
+
   if (!onFiltersChange) {
     return null
   }
@@ -35,28 +39,28 @@ export function BatchListFilters({ filters, onFiltersChange, isLoading }: BatchL
       >
         <SelectTrigger className="w-[140px]" hideChevron>
           <div className="flex items-center gap-2">
-            <span className="text-xs text-muted-foreground">Date:</span>
+            <span className="text-xs text-muted-foreground">{t('date')}:</span>
             <SelectValue />
           </div>
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="3" hideCheckIcon>
-            3D
+            {t('3days')}
           </SelectItem>
           <SelectItem value="7" hideCheckIcon>
-            7D
+            {t('7days')}
           </SelectItem>
           <SelectItem value="14" hideCheckIcon>
-            14D
+            {t('14days')}
           </SelectItem>
           <SelectItem value="30" hideCheckIcon>
-            30D
+            {t('30days')}
           </SelectItem>
           <SelectItem value="90" hideCheckIcon>
-            90D
+            {t('90days')}
           </SelectItem>
           <SelectItem value="180" hideCheckIcon>
-            180D
+            {t('180days')}
           </SelectItem>
         </SelectContent>
       </Select>
@@ -74,19 +78,19 @@ export function BatchListFilters({ filters, onFiltersChange, isLoading }: BatchL
       >
         <SelectTrigger className="w-[140px]" hideChevron>
           <div className="flex items-center gap-2">
-            <span className="text-xs text-muted-foreground">Status:</span>
+            <span className="text-xs text-muted-foreground">{t('status')}:</span>
             <SelectValue />
           </div>
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all" hideCheckIcon>
-            All
+            {t('all')}
           </SelectItem>
           <SelectItem value="active" hideCheckIcon>
-            Active
+            {t('active')}
           </SelectItem>
           <SelectItem value="expired" hideCheckIcon>
-            Expired
+            {t('expired')}
           </SelectItem>
         </SelectContent>
       </Select>

@@ -165,6 +165,19 @@ export function BatchesFilteredList({ initialFilters, pageSize = 100 }: BatchesF
     [updateFilters],
   )
 
+  const handleSortFieldChange = useCallback(
+    (field: BatchSortField) => {
+      const currentSort = filters.sort || {
+        field: 'created_at',
+        direction: 'desc' as const,
+      }
+      const newDirection =
+        currentSort.field === field && currentSort.direction === 'asc' ? 'desc' : 'asc'
+      handleSortChange({ field, direction: newDirection })
+    },
+    [filters.sort, handleSortChange],
+  )
+
   if (error) {
     return (
       <Alert variant="destructive">
@@ -202,15 +215,7 @@ export function BatchesFilteredList({ initialFilters, pageSize = 100 }: BatchesF
         {/* Sort Controls */}
         <BatchListSortControls
           currentSort={filters.sort || { field: 'created_at', direction: 'desc' }}
-          updateSort={field => {
-            const currentSort = filters.sort || {
-              field: 'created_at',
-              direction: 'desc',
-            }
-            const newDirection =
-              currentSort.field === field && currentSort.direction === 'asc' ? 'desc' : 'asc'
-            handleSortChange({ field, direction: newDirection })
-          }}
+          updateSort={handleSortFieldChange}
           isLoading={isLoading}
         />
 
@@ -226,15 +231,7 @@ export function BatchesFilteredList({ initialFilters, pageSize = 100 }: BatchesF
           data={data}
           isLoading={isLoading}
           currentSort={filters.sort || { field: 'created_at', direction: 'desc' }}
-          updateSort={field => {
-            const currentSort = filters.sort || {
-              field: 'created_at',
-              direction: 'desc',
-            }
-            const newDirection =
-              currentSort.field === field && currentSort.direction === 'asc' ? 'desc' : 'asc'
-            handleSortChange({ field, direction: newDirection })
-          }}
+          updateSort={handleSortFieldChange}
         />
       </div>
 

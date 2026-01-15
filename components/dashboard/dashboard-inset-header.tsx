@@ -3,49 +3,13 @@
 import { Skeleton } from '@/components/ui/skeleton'
 import { Typography } from '@/components/ui/typography'
 import { cn } from '@/lib/utils'
-import {
-  ChartNoAxesCombined,
-  HelpCircle,
-  Layers,
-  ListTodo,
-  Package,
-  Zap,
-  ScanBarcode,
-  ScanSearch,
-  SettingsIcon,
-  Clock,
-} from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import { usePathname } from 'next/navigation'
-import { useMemo } from 'react'
-
-// Function to get the appropriate icon based on the current path
-function getPageIcon(pathname: string) {
-  // Remove query parameters and normalize path
-  const cleanPath = pathname.split('?')[0]
-
-  // Main dashboard pages from sidebar
-  if (cleanPath === '/dashboard') return ChartNoAxesCombined
-  if (cleanPath.startsWith('/dashboard/deliveries')) return ScanSearch
-  if (cleanPath.startsWith('/dashboard/scan-out')) return ScanBarcode
-  if (cleanPath.startsWith('/dashboard/todos')) return ListTodo
-  if (cleanPath.startsWith('/dashboard/expiring-soon')) return Clock
-  if (cleanPath.startsWith('/dashboard/inventory/products')) return Package
-  if (cleanPath.startsWith('/dashboard/inventory/batches')) return Layers
-  if (cleanPath.startsWith('/dashboard/integrations')) return Zap
-  if (cleanPath.startsWith('/dashboard/settings')) return SettingsIcon
-  if (cleanPath.startsWith('/dashboard/support')) return HelpCircle
-
-  // Default fallback
-  return ChartNoAxesCombined
-}
 
 export default function DashboardInsetHeader({
   page,
   title,
   description,
   rightContent,
-  showIcon = true,
   isLoading,
   className,
 }: {
@@ -53,13 +17,9 @@ export default function DashboardInsetHeader({
   title?: string
   description?: string
   rightContent?: React.ReactNode
-  showIcon?: boolean
   isLoading?: boolean
   className?: string
 }) {
-  const pathname = usePathname()
-  const PageIcon = useMemo(() => getPageIcon(pathname), [pathname])
-
   // Always call hook unconditionally, use fallback page key if not provided
   const t = useTranslations(page || 'dashboard')
 
@@ -96,11 +56,6 @@ export default function DashboardInsetHeader({
             <>
               {/* Main title with dynamic icon */}
               <div className="flex items-center gap-2">
-                {showIcon && (
-                  <div className="p-2 rounded-xl bg-secondary-400/10 text-primary items-center">
-                    <PageIcon className="h-6 w-6 text-secondary-900" />
-                  </div>
-                )}
                 <Typography variant="h1" className="capitalize">
                   {displayTitle}
                 </Typography>
