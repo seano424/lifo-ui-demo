@@ -67,7 +67,14 @@ export function ProductsFilteredList({
   )
 
   useEffect(() => {
-    setFilters(prev => ({ ...prev, storeId: activeStoreId || undefined }))
+    setFilters(prev => {
+      // Only update if storeId actually changed to prevent unnecessary re-renders
+      const newStoreId = activeStoreId || undefined
+      if (prev.storeId === newStoreId) {
+        return prev
+      }
+      return { ...prev, storeId: newStoreId }
+    })
   }, [activeStoreId])
 
   const updateFilters = useCallback(
@@ -109,7 +116,12 @@ export function ProductsFilteredList({
         }
       }
 
-      router.replace(`?${params.toString()}`)
+      // Only update URL if it actually changed
+      const newUrl = `?${params.toString()}`
+      const currentUrl = `?${searchParams.toString()}`
+      if (newUrl !== currentUrl) {
+        router.push(newUrl, { scroll: false })
+      }
     },
     [searchParams, router],
   )

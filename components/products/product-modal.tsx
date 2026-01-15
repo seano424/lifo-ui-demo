@@ -6,7 +6,6 @@ import { Badge } from '@/components/ui/badge'
 import type { Product } from '@/lib/queries/products'
 import { useCategoryTranslation } from '@/hooks/use-category-translation'
 import { useTranslations } from 'next-intl'
-import { Tag, Building2, Package, Calendar, BarChart3, ExternalLink } from 'lucide-react'
 
 interface ProductModalProps {
   isOpen: boolean
@@ -52,7 +51,6 @@ export function ProductModal({ isOpen, onClose, product }: ProductModalProps) {
 
   return (
     <BottomSheet
-      variant="fullHeight"
       isOpen={isOpen}
       onClose={onClose}
       titleElement={
@@ -74,7 +72,6 @@ export function ProductModal({ isOpen, onClose, product }: ProductModalProps) {
           <div className="grid grid-cols-2 gap-4 mb-6">
             <div className="bg-muted/30 rounded-2xl p-4">
               <div className="flex items-center gap-2 mb-2">
-                <Package className="h-4 w-4 text-muted-foreground" />
                 <Typography variant="small" color="muted">
                   {t('totalStock')}
                 </Typography>
@@ -83,7 +80,6 @@ export function ProductModal({ isOpen, onClose, product }: ProductModalProps) {
             </div>
             <div className="bg-muted/30 rounded-2xl p-4">
               <div className="flex items-center gap-2 mb-2">
-                <BarChart3 className="h-4 w-4 text-muted-foreground" />
                 <Typography variant="small" color="muted">
                   {t('activeBatches')}
                 </Typography>
@@ -97,7 +93,6 @@ export function ProductModal({ isOpen, onClose, product }: ProductModalProps) {
             <div className="flex flex-col divide-y divide-muted-foreground/10 bg-muted/30 rounded-2xl px-4">
               <div className="flex justify-between items-center py-4">
                 <div className="flex items-center gap-2">
-                  <Tag className="h-4 w-4 text-muted-foreground" />
                   <Typography variant="small" color="muted">
                     Category
                   </Typography>
@@ -116,7 +111,6 @@ export function ProductModal({ isOpen, onClose, product }: ProductModalProps) {
 
               <div className="flex justify-between items-center py-4">
                 <div className="flex items-center gap-2">
-                  <Building2 className="h-4 w-4 text-muted-foreground" />
                   <Typography variant="small" color="muted">
                     Brand
                   </Typography>
@@ -126,7 +120,6 @@ export function ProductModal({ isOpen, onClose, product }: ProductModalProps) {
 
               <div className="flex justify-between items-center py-4">
                 <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4 text-muted-foreground" />
                   <Typography variant="small" color="muted">
                     Date Added
                   </Typography>
@@ -137,7 +130,6 @@ export function ProductModal({ isOpen, onClose, product }: ProductModalProps) {
 
             {/* Edit in Square Note */}
             <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-2xl p-4 flex items-start gap-3">
-              <ExternalLink className="h-5 w-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
               <div>
                 <Typography variant="small" className="font-semibold mb-1">
                   Edit in Square

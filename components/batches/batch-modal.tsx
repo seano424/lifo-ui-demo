@@ -10,17 +10,6 @@ import { useBatchActions } from '@/hooks/use-batches'
 import type { Database } from '@/types/supabase'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import {
-  Calendar,
-  Package,
-  TrendingUp,
-  TrendingDown,
-  Hash,
-  Clock,
-  Edit3,
-  Save,
-  X,
-} from 'lucide-react'
 
 interface BatchModalProps {
   isOpen: boolean
@@ -121,11 +110,10 @@ export function BatchModal({ isOpen, onClose, batch, currencySymbol = '€' }: B
 
   return (
     <BottomSheet
-      variant="fullHeight"
       isOpen={isOpen}
       onClose={onClose}
       titleElement={
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2 py-4">
           <Typography className="font-black" variant="h3">
             {getProductName()}
           </Typography>
@@ -146,7 +134,6 @@ export function BatchModal({ isOpen, onClose, batch, currencySymbol = '€' }: B
           <div className="grid grid-cols-2 gap-4 mb-6">
             <div className="bg-muted/30 rounded-2xl p-4">
               <div className="flex items-center gap-2 mb-2">
-                <Package className="h-4 w-4 text-muted-foreground" />
                 <Typography variant="small" color="muted">
                   Current Stock
                 </Typography>
@@ -155,7 +142,6 @@ export function BatchModal({ isOpen, onClose, batch, currencySymbol = '€' }: B
             </div>
             <div className="bg-muted/30 rounded-2xl p-4">
               <div className="flex items-center gap-2 mb-2">
-                <TrendingUp className="h-4 w-4 text-muted-foreground" />
                 <Typography variant="small" color="muted">
                   Value
                 </Typography>
@@ -175,7 +161,6 @@ export function BatchModal({ isOpen, onClose, batch, currencySymbol = '€' }: B
                 onClick={handleEditClick}
                 className="w-full rounded-2xl flex items-center gap-2"
               >
-                <Edit3 className="h-4 w-4" />
                 Edit Batch Details
               </Button>
             ) : (
@@ -186,11 +171,9 @@ export function BatchModal({ isOpen, onClose, batch, currencySymbol = '€' }: B
                   disabled={isUpdating}
                   className="flex-1 rounded-2xl"
                 >
-                  <X className="h-4 w-4 mr-2" />
                   Cancel
                 </Button>
                 <Button onClick={handleSave} disabled={isUpdating} className="flex-1 rounded-2xl">
-                  <Save className="h-4 w-4 mr-2" />
                   Save
                 </Button>
               </div>
@@ -200,7 +183,6 @@ export function BatchModal({ isOpen, onClose, batch, currencySymbol = '€' }: B
             <div className="flex flex-col divide-y divide-muted-foreground/10 bg-muted/30 rounded-2xl px-4">
               <div className="flex justify-between items-center py-4">
                 <div className="flex items-center gap-2">
-                  <Hash className="h-4 w-4 text-muted-foreground" />
                   <Typography variant="small" color="muted">
                     Batch Number
                   </Typography>
@@ -209,77 +191,82 @@ export function BatchModal({ isOpen, onClose, batch, currencySymbol = '€' }: B
               </div>
 
               {/* Expiry Date - Editable */}
-              <div className="flex justify-between items-center py-4">
-                <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4 text-muted-foreground" />
-                  <Typography variant="small" color="muted">
+              <div className="flex justify-between items-center py-4 gap-2">
+                <div className="flex flex-1 items-center gap-2">
+                  <Typography variant="small" className="text-nowrap" color="muted">
                     Expiry Date
                   </Typography>
                 </div>
                 {isEditing ? (
-                  <Input
-                    type="date"
-                    value={editedValues.expiry_date}
-                    onChange={e =>
-                      setEditedValues(prev => ({
-                        ...prev,
-                        expiry_date: e.target.value,
-                      }))
-                    }
-                    className="w-40 h-8 text-sm"
-                  />
+                  <div>
+                    <Input
+                      type="date"
+                      className="w-40"
+                      value={editedValues.expiry_date}
+                      onChange={e =>
+                        setEditedValues(prev => ({
+                          ...prev,
+                          expiry_date: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
                 ) : (
                   <Typography variant="small">{formatDate(batch.expiry_date)}</Typography>
                 )}
               </div>
 
               {/* Cost Price - Editable */}
-              <div className="flex justify-between items-center py-4">
+              <div className="flex justify-between items-center py-4 gap-2">
                 <div className="flex items-center gap-2">
-                  <TrendingDown className="h-4 w-4 text-muted-foreground" />
-                  <Typography variant="small" color="muted">
+                  <Typography variant="small" className="text-nowrap" color="muted">
                     Cost Price
                   </Typography>
                 </div>
                 {isEditing ? (
-                  <Input
-                    type="number"
-                    step="0.01"
-                    value={editedValues.cost_price}
-                    onChange={e =>
-                      setEditedValues(prev => ({
-                        ...prev,
-                        cost_price: Number(e.target.value),
-                      }))
-                    }
-                    className="w-32 h-8 text-sm"
-                  />
+                  <div>
+                    <Input
+                      className="w-40"
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value={editedValues.cost_price}
+                      onChange={e =>
+                        setEditedValues(prev => ({
+                          ...prev,
+                          cost_price: Number(e.target.value),
+                        }))
+                      }
+                    />
+                  </div>
                 ) : (
                   <Typography variant="small">{formatCurrency(batch.cost_price || 0)}</Typography>
                 )}
               </div>
 
               {/* Selling Price - Editable */}
-              <div className="flex justify-between items-center py-4">
+              <div className="flex justify-between items-center py-4 gap-2">
                 <div className="flex items-center gap-2">
-                  <TrendingUp className="h-4 w-4 text-muted-foreground" />
-                  <Typography variant="small" color="muted">
+                  <Typography variant="small" className="text-nowrap" color="muted">
                     Selling Price
                   </Typography>
                 </div>
                 {isEditing ? (
-                  <Input
-                    type="number"
-                    step="0.01"
-                    value={editedValues.selling_price}
-                    onChange={e =>
-                      setEditedValues(prev => ({
-                        ...prev,
-                        selling_price: Number(e.target.value),
-                      }))
-                    }
-                    className="w-32 h-8 text-sm"
-                  />
+                  <div>
+                    <Input
+                      className="w-40"
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value={editedValues.selling_price}
+                      onChange={e =>
+                        setEditedValues(prev => ({
+                          ...prev,
+                          selling_price: Number(e.target.value),
+                        }))
+                      }
+                    />
+                  </div>
                 ) : (
                   <Typography variant="small">
                     {formatCurrency(batch.selling_price || 0)}
@@ -289,10 +276,9 @@ export function BatchModal({ isOpen, onClose, batch, currencySymbol = '€' }: B
 
               {/* Created At */}
               {'created_at' in batch && batch.created_at && (
-                <div className="flex justify-between items-center py-4">
+                <div className="flex justify-between items-center py-4 gap-2">
                   <div className="flex items-center gap-2">
-                    <Clock className="h-4 w-4 text-muted-foreground" />
-                    <Typography variant="small" color="muted">
+                    <Typography variant="small" className="text-nowrap" color="muted">
                       Created
                     </Typography>
                   </div>

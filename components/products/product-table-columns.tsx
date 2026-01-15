@@ -82,39 +82,8 @@ export function createProductTableColumns({
           {/* <div className="text-xs text-muted-foreground">{row.original.unit_type || 'units'}</div> */}
         </div>
       ),
-      size: 120,
+      size: 200,
     },
-    // {
-    //   id: 'base_selling_price',
-    //   accessorKey: 'base_selling_price',
-    //   header: () => (
-    //     <SortableHeader
-    //       field="base_selling_price"
-    //       currentSort={currentSort}
-    //       updateSort={updateSort}
-    //       className="justify-end"
-    //     >
-    //       Price
-    //     </SortableHeader>
-    //   ),
-    //   cell: ({ row }) => (
-    //     <div className="text-right">
-    //       <div className="flex items-center justify-end gap-1 font-bold">
-    //         <Euro className="h-3 w-3 text-muted-foreground flex-shrink-0" />
-    //         <span title={`€${Number(row.original.base_selling_price || 0).toFixed(2)}`}>
-    //           {Number(row.original.base_selling_price || 0).toFixed(2)}
-    //         </span>
-    //       </div>
-    //       <div className="text-xs text-muted-foreground">
-    //         Cost: €{Number(row.original.base_cost_price || 0).toFixed(2)}
-    //       </div>
-    //     </div>
-    //   ),
-    //   size: DEFAULT_COLUMN_WIDTHS.base_selling_price || 100,
-    //   minSize: 80,
-    //   maxSize: 120,
-    //   enableResizing: true,
-    // },
     {
       id: 'active_batches_count',
       accessorKey: 'active_batches_count',
@@ -133,35 +102,48 @@ export function createProductTableColumns({
           <span>{row.original.active_batches_count || 0}</span>
         </Typography>
       ),
-      size: 120,
+      size: 200,
     },
     {
       id: 'created_at',
       accessorKey: 'created_at',
       header: () => (
-        <SortableHeader field="created_at" currentSort={currentSort} updateSort={updateSort}>
+        <SortableHeader
+          field="created_at"
+          currentSort={currentSort}
+          updateSort={updateSort}
+          className="justify-end"
+        >
           {t('dateAdded')}
         </SortableHeader>
       ),
       cell: ({ row }) => (
-        <div className="text-sm text-muted-foreground">
+        <Typography
+          variant="small"
+          className="text-muted-foreground text-right flex items-center justify-end"
+        >
           {row.original.created_at
             ? new Date(row.original.created_at).toLocaleDateString()
             : t('notAvailable')}
-        </div>
+        </Typography>
       ),
-      size: 140,
+      size: 200,
     },
     {
       id: 'category',
       accessorKey: 'category',
       header: () => (
-        <SortableHeader field="category" currentSort={currentSort} updateSort={updateSort}>
+        <SortableHeader
+          field="category"
+          currentSort={currentSort}
+          updateSort={updateSort}
+          className="justify-end"
+        >
           {t('category')}
         </SortableHeader>
       ),
       cell: ({ row }) => (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 justify-end text-right">
           <Tag className="h-4 w-4 text-muted-foreground flex-shrink-0" />
           {row.original.category_code ? (
             <Badge
@@ -175,82 +157,30 @@ export function createProductTableColumns({
           )}
         </div>
       ),
-      size: 140,
+      size: 240,
     },
     {
       id: 'brand',
       accessorKey: 'brand',
       header: () => (
-        <SortableHeader field="brand" currentSort={currentSort} updateSort={updateSort}>
+        <SortableHeader
+          field="brand"
+          currentSort={currentSort}
+          updateSort={updateSort}
+          className="justify-end"
+        >
           {t('brand')}
         </SortableHeader>
       ),
       cell: ({ row }) => (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 justify-end text-right">
           <Building2 className="h-4 w-4 text-muted-foreground flex-shrink-0" />
           <span className="truncate" title={row.original.brand || t('notAvailable')}>
             {row.original.brand || t('notAvailable')}
           </span>
         </div>
       ),
-      size: 140,
+      size: 240,
     },
-    // {
-    //   id: 'actions',
-    //   header: '',
-    //   cell: ({ row }) => (
-    //     <DropdownMenu>
-    //       <DropdownMenuTrigger asChild>
-    //         <Button variant="ghost" size="sm" disabled={isUpdating}>
-    //           <MoreHorizontal className="h-4 w-4" />
-    //           <span className="sr-only">{t('openMenu')}</span>
-    //         </Button>
-    //       </DropdownMenuTrigger>
-    //       <DropdownMenuContent align="end">
-    //         <DropdownMenuLabel>{t('actions')}</DropdownMenuLabel>
-    //         <DropdownMenuItem>
-    //           <Eye className="mr-2 h-4 w-4" />
-    //           {t('viewDetails')}
-    //         </DropdownMenuItem>
-    //         <DropdownMenuItem>
-    //           <Package className="mr-2 h-4 w-4" />
-    //           {t('viewBatches')}
-    //         </DropdownMenuItem>
-    //         <DropdownMenuItem>
-    //           <Edit className="mr-2 h-4 w-4" />
-    //           {t('editProduct')}
-    //         </DropdownMenuItem>
-    //         <DropdownMenuSeparator />
-    //         <DropdownMenuItem
-    //           onClick={() => {
-    //             const currentPrice = row.original.base_selling_price || 0
-    //             const newPrice = prompt(t('enterNewPrice'), currentPrice.toString())
-    //             if (newPrice && !Number.isNaN(Number(newPrice))) {
-    //               updateProductPrice(row.original.product_id, Number(newPrice))
-    //             }
-    //           }}
-    //         >
-    //           <Euro className="mr-2 h-4 w-4" />
-    //           {t('updatePrice')}
-    //         </DropdownMenuItem>
-    //         <DropdownMenuSeparator />
-    //         <DropdownMenuItem
-    //           onClick={() => {
-    //             if (confirm(t('confirmDeleteProduct'))) {
-    //               deleteProduct(row.original.product_id)
-    //             }
-    //           }}
-    //           className="text-destructive"
-    //         >
-    //           <Trash2 className="mr-2 h-4 w-4" />
-    //           {t('deleteProduct')}
-    //         </DropdownMenuItem>
-    //       </DropdownMenuContent>
-    //     </DropdownMenu>
-    //   ),
-    //   enableResizing: false,
-    //   size: DEFAULT_COLUMN_WIDTHS.actions || 60,
-    //   minSize: 50,
-    // },
   ]
 }
