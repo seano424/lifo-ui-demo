@@ -1,5 +1,35 @@
 {
   "dashboard": {
+    "title": "Voorraad Dashboard",
+    "subtitle": "Volg vervaldatums en beheer uw voorraad",
+    "expiringSoon": {
+      "title": "Verloopt Binnenkort",
+      "subtitle": "Komende 7 dagen",
+      "today": "Vandaag",
+      "tomorrow": "Morgen",
+      "thisWeek": "Deze Week",
+      "expiringWithinWeek": "verloopt binnen een week",
+      "expiringThisWeek": "verloopt deze week",
+      "notExpiring": "niet verlopend",
+      "expiringCount": "{expiring} van {total} batches verlopen",
+      "seeAll": "Bekijk alle verlopende artikelen",
+      "errors": {
+        "loadingError": "Kan vervalgegevens niet laden"
+      }
+    },
+    "inventoryOverview": {
+      "title": "Voorraad Overzicht",
+      "totalBatches": "Totaal Aantal Batches",
+      "productsTracked": "Gevolgde Producten",
+      "errors": {
+        "loadingError": "Kan voorraadoverzicht niet laden"
+      },
+      "viewAllProducts": "Bekijk alle producten",
+      "viewAllBatches": "Bekijk alle batches"
+    },
+    "actions": {
+      "addDelivery": "Levering Toevoegen"
+    },
     "welcome": {
       "title": "Welkom op Uw Dashboard",
       "description": "Begin met het beheren van uw voorraad door uw eerste producten toe te voegen. Hier zijn enkele snelle acties om u op weg te helpen.",

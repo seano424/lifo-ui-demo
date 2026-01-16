@@ -1,0 +1,127 @@
+'use client'
+
+import { useTranslations } from 'next-intl'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Typography } from '@/components/ui/typography'
+import { useExpiryDashboardSummary } from '@/hooks/use-expiry-dashboard-summary'
+
+interface ExpiringSoonCardProps {
+  storeId: string | null
+}
+
+export function ExpiringSoonCard({ storeId }: ExpiringSoonCardProps) {
+  const t = useTranslations('dashboard.expiringSoon')
+  const { data, isLoading, error } = useExpiryDashboardSummary(storeId)
+
+  if (isLoading) {
+    return (
+      <div className="bg-white dark:bg-brand-dark rounded-2xl border p-6">
+        <div className="space-y-4">
+          <Skeleton className="h-6 w-48" />
+          <div className="space-y-3">
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-12 w-full" />
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (error || !data) {
+    return (
+      <div className="bg-white dark:bg-brand-dark rounded-2xl border p-6">
+        <div className="text-center">
+          <Typography variant="p">{t('errors.loadingError')}</Typography>
+        </div>
+      </div>
+    )
+  }
+
+  const totalExpiring = data.expiring_today + data.expiring_tomorrow + data.expiring_this_week
+  const totalActiveBatches = data.total_active_batches
+  const expiringPercentage =
+    totalActiveBatches > 0 ? Math.round((totalExpiring / totalActiveBatches) * 100) : 0
+
+  return (
+    <div className="bg-white dark:bg-brand-dark rounded-2xl border">
+      {/* Header */}
+      <div className="p-6 border-b h-24 flex flex-col justify-center w-full">
+        <div className="flex justify-between items-center gap-2">
+          <div className="text-gray-500 dark:text-brand-white flex flex-col gap-1">
+            <Typography variant="h4">{t('title')}</Typography>
+            <Typography variant="small">{t('subtitle')}</Typography>
+          </div>
+          <Typography
+            variant="h2"
+            className="text-3xl font-bold text-gray-900 dark:text-brand-white mt-1"
+          >
+            {totalExpiring}
+          </Typography>
+        </div>
+      </div>
+
+      {/* Expiry Counts */}
+      <div className="py-6">
+        <div className="space-y-3 px-6">
+          {/* Today */}
+          <div className="flex items-center justify-between py-2">
+            <Typography variant="h5">{t('today')}</Typography>
+            <Typography variant="h5">{data.expiring_today}</Typography>
+          </div>
+
+          {/* Tomorrow */}
+          <div className="flex items-center justify-between py-2">
+            <Typography variant="h5">{t('tomorrow')}</Typography>
+            <Typography variant="h5">{data.expiring_tomorrow}</Typography>
+          </div>
+
+          {/* This Week */}
+          <div className="flex items-center justify-between py-2">
+            <Typography variant="h5">{t('thisWeek')}</Typography>
+            <Typography variant="h5">{data.expiring_this_week}</Typography>
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-2 flex-1 justify-end text-right mt-8 border-t border-gray-200 dark:border-brand-dark pt-8 px-6">
+          <Typography variant="h5" className="capitalize">
+            {expiringPercentage}% {t('expiringWithinWeek')}
+          </Typography>
+          <div className="h-2 bg-gray-200 dark:bg-brand-dark rounded-full mt-4">
+            <div
+              className="h-2 bg-primary-900 rounded-full transition-all duration-300"
+              style={{ width: `${expiringPercentage}%` }}
+            />
+          </div>
+          <div className="mt-4 flex justify-between items-center">
+            {/* <Typography
+              variant="small"
+              className="mt-1 capitalize"
+            >
+              {totalActiveBatches - totalExpiring} {t('notExpiring')}
+            </Typography> */}
+            <Typography variant="p" className="mt-1 capitalize">
+              {data.expiring_this_week} {t('expiringThisWeek')}
+            </Typography>
+            <Typography variant="p" className="mt-1 capitalize">
+              {t('expiringCount', {
+                expiring: totalExpiring,
+                total: totalActiveBatches,
+              })}
+            </Typography>
+          </div>
+        </div>
+
+        {/* See All Link */}
+        {/* <Button
+          asLink
+          href="/dashboard/expiring-soon"
+          size="lg"
+          className="w-full mt-6"
+        >
+          {t('seeAll')}
+        </Button> */}
+      </div>
+    </div>
+  )
+}
