@@ -4,9 +4,14 @@
     "subtitle": "Track expiry dates and manage your inventory",
     "expiringSoon": {
       "title": "Expiring Soon",
+      "subtitle": "Next 7 days",
       "today": "Today",
       "tomorrow": "Tomorrow",
-      "thisWeek": "This Week (2-7 days)",
+      "thisWeek": "This Week",
+      "expiringWithinWeek": "expiring within the week",
+      "expiringThisWeek": "expiring this week",
+      "notExpiring": "not expiring",
+      "expiringCount": "{expiring} of {total} batches expiring",
       "seeAll": "See all expiring items",
       "errors": {
         "loadingError": "Unable to load expiry data"
@@ -18,7 +23,9 @@
       "productsTracked": "Products Tracked",
       "errors": {
         "loadingError": "Unable to load inventory overview"
-      }
+      },
+      "viewAllProducts": "View all products",
+      "viewAllBatches": "View all batches"
     },
     "actions": {
       "addDelivery": "Add Delivery"

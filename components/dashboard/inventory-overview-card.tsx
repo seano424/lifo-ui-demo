@@ -1,12 +1,12 @@
 'use client'
 
-import { Package, ShoppingBag } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
-import { Card } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Typography } from '@/components/ui/typography'
 import { useExpiryDashboardSummary } from '@/hooks/use-expiry-dashboard-summary'
+import { Button } from '@/components/ui/button'
+import { ExternalLink } from 'lucide-react'
 
 interface InventoryOverviewCardProps {
   storeId: string | null
@@ -18,63 +18,75 @@ export function InventoryOverviewCard({ storeId }: InventoryOverviewCardProps) {
 
   if (isLoading) {
     return (
-      <Card className="p-6 space-y-4">
-        <Skeleton className="h-7 w-48" />
-        <div className="grid grid-cols-2 gap-4">
-          <Skeleton className="h-24" />
-          <Skeleton className="h-24" />
+      <div className="bg-white dark:bg-brand-dark rounded-2xl border p-6">
+        <div className="space-y-4">
+          <Skeleton className="h-6 w-48" />
+          <div className="space-y-3">
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-12 w-full" />
+          </div>
         </div>
-      </Card>
+      </div>
     )
   }
 
   if (error || !data) {
     return (
-      <Card className="p-6">
+      <div className="bg-white dark:bg-brand-dark rounded-2xl border p-6">
         <div className="text-center">
-          <Typography variant="p" className="text-muted-foreground">
-            {t('errors.loadingError')}
-          </Typography>
+          <Typography variant="p">{t('errors.loadingError')}</Typography>
         </div>
-      </Card>
+      </div>
     )
   }
 
   return (
-    <Card className="p-6 space-y-5">
+    <div className="bg-white dark:bg-brand-dark rounded-2xl border flex flex-col justify-between">
       {/* Header */}
-      <Typography variant="h3" className="font-bold">
-        {t('title')}
-      </Typography>
+      <div className="p-6 border-b h-24 flex items-center justify-between">
+        <Typography variant="h4">{t('title')}</Typography>
+      </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-2 gap-4">
-        {/* Total Batches */}
-        <div className="flex flex-col gap-3 p-4 rounded-xl bg-muted/50 border">
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <Package className="h-5 w-5" />
-            <Typography variant="small" className="font-medium">
-              {t('totalBatches')}
-            </Typography>
+      {/* Stats */}
+      <div className="p-6 flex-1">
+        <div className="space-y-3">
+          {/* Total Batches */}
+          <div className="flex items-center justify-between py-2">
+            <Typography variant="h5">{t('totalBatches')}</Typography>
+            <Typography variant="h5">{data.total_active_batches.toLocaleString()}</Typography>
           </div>
-          <Typography variant="h2" className="font-bold">
-            {data.total_active_batches.toLocaleString()}
-          </Typography>
-        </div>
 
-        {/* Products Tracked */}
-        <div className="flex flex-col gap-3 p-4 rounded-xl bg-muted/50 border">
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <ShoppingBag className="h-5 w-5" />
-            <Typography variant="small" className="font-medium">
-              {t('productsTracked')}
-            </Typography>
+          {/* Products Tracked */}
+          <div className="flex items-center justify-between py-2">
+            <Typography variant="h5">{t('productsTracked')}</Typography>
+            <Typography variant="h5">{data.total_products.toLocaleString()}</Typography>
           </div>
-          <Typography variant="h2" className="font-bold">
-            {data.total_products.toLocaleString()}
-          </Typography>
         </div>
       </div>
-    </Card>
+
+      {/* place at the bottom of the card */}
+      <div className="flex gap-2 p-6 border-t">
+        <Button
+          asLink
+          variant="gray"
+          href="/dashboard/inventory/products"
+          size="lg"
+          className="w-full group/button"
+        >
+          {t('viewAllProducts')}
+          <ExternalLink className="w-4 h-4 text-gray-600 group-hover/button:text-gray-900 transition-colors duration-500 ease-in-out" />
+        </Button>
+        <Button
+          asLink
+          variant="gray"
+          href="/dashboard/inventory/batches"
+          size="lg"
+          className="w-full group/button"
+        >
+          {t('viewAllBatches')}{' '}
+          <ExternalLink className="w-4 h-4 text-gray-600 group-hover/button:text-gray-900 transition-colors duration-500 ease-in-out" />
+        </Button>
+      </div>
+    </div>
   )
 }

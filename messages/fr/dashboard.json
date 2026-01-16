@@ -4,9 +4,14 @@
     "subtitle": "Suivez les dates d'expiration et gérez votre inventaire",
     "expiringSoon": {
       "title": "Expire Bientôt",
+      "subtitle": "7 prochains jours",
       "today": "Aujourd'hui",
       "tomorrow": "Demain",
-      "thisWeek": "Cette Semaine (2-7 jours)",
+      "thisWeek": "Cette Semaine",
+      "expiringWithinWeek": "expirant dans la semaine",
+      "expiringThisWeek": "expirant cette semaine",
+      "notExpiring": "n'expirant pas",
+      "expiringCount": "{expiring} sur {total} lots expirant",
       "seeAll": "Voir tous les articles qui expirent",
       "errors": {
         "loadingError": "Impossible de charger les données d'expiration"
@@ -18,7 +23,9 @@
       "productsTracked": "Produits Suivis",
       "errors": {
         "loadingError": "Impossible de charger l'aperçu de l'inventaire"
-      }
+      },
+      "viewAllProducts": "Voir tous les produits",
+      "viewAllBatches": "Voir tous les lots"
     },
     "actions": {
       "addDelivery": "Ajouter une Livraison"

@@ -30,7 +30,7 @@ const buttonVariants = cva(
         subtle:
           'bg-primary-600 text-white shadow-sm hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600',
         subtleSecondary:
-          'bg-secondary-100 text-sky-700 shadow-xs hover:bg-secondary-100/80 dark:bg-secondary-900 dark:text-secondary-100 dark:hover:bg-secondary-900',
+          'bg-secondary-100/10 text-sky-700 shadow-xs hover:bg-secondary-100/80 dark:bg-secondary-900 dark:text-secondary-100 dark:hover:bg-secondary-900',
 
         // Brand variants (preserved for backward compatibility)
         brand:
@@ -40,7 +40,7 @@ const buttonVariants = cva(
         brandSecondaryOutline:
           'border border-brand-secondary bg-background shadow-xs hover:bg-secondary-50 hover:text-brand-secondary dark:hover:bg-secondary-900/10 dark:hover:text-secondary-300',
         black: 'bg-black text-white shadow-sm hover:bg-black/90',
-        gray: 'bg-gray-200 text-gray-900 shadow-sm hover:bg-gray-300',
+        gray: 'bg-gray-50 hover:bg-gray-50/90',
         subtleGray: 'bg-gray-100 text-gray-900 shadow-sm hover:bg-gray-200',
       },
       size: {

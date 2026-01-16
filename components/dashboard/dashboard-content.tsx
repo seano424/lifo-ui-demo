@@ -8,36 +8,34 @@
 
 // New simplified components
 import { AddDeliveryButton } from '@/components/dashboard/add-delivery-button'
+import DashboardInsetHeader from '@/components/dashboard/dashboard-inset-header'
 import { ExpiringSoonCard } from '@/components/dashboard/expiring-soon-card'
 import { InventoryOverviewCard } from '@/components/dashboard/inventory-overview-card'
-import { Typography } from '@/components/ui/typography'
 import { useStoreState } from '@/lib/stores/store-context'
 import { useTranslations } from 'next-intl'
 
 export function DashboardContent() {
-  const t = useTranslations('dashboard')
+  const t = useTranslations('dashboardNav')
   const { activeStore } = useStoreState()
 
   return (
-    <div className="flex flex-col gap-6 pb-8 animate-in fade-in-0 duration-500">
-      {/* Simple Header */}
-      <div className="space-y-2">
-        <Typography variant="h1" className="text-2xl md:text-3xl font-bold">
-          {activeStore?.store_name || t('title')}
-        </Typography>
-        <Typography variant="p" className="text-muted-foreground">
-          {t('subtitle')}
-        </Typography>
+    <div className="flex flex-col gap-8 pb-8 animate-in fade-in-0 duration-1000">
+      {/* Enhanced Header */}
+      <DashboardInsetHeader
+        title={t('titles.dashboard')}
+        description={t('descriptions.dashboard')}
+      />
+
+      {/* Simplified Dashboard */}
+      <div className="flex flex-col gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-6">
+          <ExpiringSoonCard storeId={activeStore?.store_id || null} />
+
+          <InventoryOverviewCard storeId={activeStore?.store_id || null} />
+        </div>
+
+        <AddDeliveryButton />
       </div>
-
-      {/* Primary: Expiring Soon */}
-      <ExpiringSoonCard storeId={activeStore?.store_id || null} />
-
-      {/* Secondary: Inventory Overview */}
-      <InventoryOverviewCard storeId={activeStore?.store_id || null} />
-
-      {/* CTA: Add Delivery */}
-      <AddDeliveryButton />
 
       {/* OLD DASHBOARD SECTIONS (Commented out for potential future use) */}
       {/*

@@ -4,9 +4,14 @@
     "subtitle": "Volg vervaldatums en beheer uw voorraad",
     "expiringSoon": {
       "title": "Verloopt Binnenkort",
+      "subtitle": "Komende 7 dagen",
       "today": "Vandaag",
       "tomorrow": "Morgen",
-      "thisWeek": "Deze Week (2-7 dagen)",
+      "thisWeek": "Deze Week",
+      "expiringWithinWeek": "verloopt binnen een week",
+      "expiringThisWeek": "verloopt deze week",
+      "notExpiring": "niet verlopend",
+      "expiringCount": "{expiring} van {total} batches verlopen",
       "seeAll": "Bekijk alle verlopende artikelen",
       "errors": {
         "loadingError": "Kan vervalgegevens niet laden"
@@ -18,7 +23,9 @@
       "productsTracked": "Gevolgde Producten",
       "errors": {
         "loadingError": "Kan voorraadoverzicht niet laden"
-      }
+      },
+      "viewAllProducts": "Bekijk alle producten",
+      "viewAllBatches": "Bekijk alle batches"
     },
     "actions": {
       "addDelivery": "Levering Toevoegen"

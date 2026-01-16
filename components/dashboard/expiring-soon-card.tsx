@@ -1,10 +1,6 @@
 'use client'
 
-import { ArrowRight, Calendar, Clock } from 'lucide-react'
-import Link from 'next/link'
 import { useTranslations } from 'next-intl'
-
-import { Card } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Typography } from '@/components/ui/typography'
 import { useExpiryDashboardSummary } from '@/hooks/use-expiry-dashboard-summary'
@@ -19,97 +15,113 @@ export function ExpiringSoonCard({ storeId }: ExpiringSoonCardProps) {
 
   if (isLoading) {
     return (
-      <Card className="p-6 space-y-4">
-        <Skeleton className="h-7 w-40" />
-        <div className="space-y-3">
-          <Skeleton className="h-12 w-full" />
-          <Skeleton className="h-12 w-full" />
-          <Skeleton className="h-12 w-full" />
+      <div className="bg-white dark:bg-brand-dark rounded-2xl border p-6">
+        <div className="space-y-4">
+          <Skeleton className="h-6 w-48" />
+          <div className="space-y-3">
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-12 w-full" />
+          </div>
         </div>
-        <Skeleton className="h-10 w-full" />
-      </Card>
+      </div>
     )
   }
 
   if (error || !data) {
     return (
-      <Card className="p-6">
+      <div className="bg-white dark:bg-brand-dark rounded-2xl border p-6">
         <div className="text-center">
-          <Typography variant="p" className="text-muted-foreground">
-            {t('errors.loadingError')}
-          </Typography>
+          <Typography variant="p">{t('errors.loadingError')}</Typography>
         </div>
-      </Card>
+      </div>
     )
   }
 
-  const expiryItems = [
-    {
-      label: t('today'),
-      count: data.expiring_today,
-      icon: <Clock className="h-5 w-5 text-red-500" />,
-      urgent: true,
-    },
-    {
-      label: t('tomorrow'),
-      count: data.expiring_tomorrow,
-      icon: <Calendar className="h-5 w-5 text-orange-500" />,
-      urgent: false,
-    },
-    {
-      label: t('thisWeek'),
-      count: data.expiring_this_week,
-      icon: <Calendar className="h-5 w-5 text-yellow-500" />,
-      urgent: false,
-    },
-  ]
+  const totalExpiring = data.expiring_today + data.expiring_tomorrow + data.expiring_this_week
+  const totalActiveBatches = data.total_active_batches
+  const expiringPercentage =
+    totalActiveBatches > 0 ? Math.round((totalExpiring / totalActiveBatches) * 100) : 0
 
   return (
-    <Card className="p-6 space-y-5">
+    <div className="bg-white dark:bg-brand-dark rounded-2xl border">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <Typography variant="h3" className="font-bold">
-          {t('title')}
-        </Typography>
+      <div className="p-6 border-b h-24 flex flex-col justify-center w-full">
+        <div className="flex justify-between items-center gap-2">
+          <div className="text-gray-500 dark:text-brand-white flex flex-col gap-1">
+            <Typography variant="h4">{t('title')}</Typography>
+            <Typography variant="small">{t('subtitle')}</Typography>
+          </div>
+          <Typography
+            variant="h2"
+            className="text-3xl font-bold text-gray-900 dark:text-brand-white mt-1"
+          >
+            {totalExpiring}
+          </Typography>
+        </div>
       </div>
 
       {/* Expiry Counts */}
-      <div className="space-y-3">
-        {expiryItems.map(item => (
-          <div
-            key={item.label}
-            className={`flex items-center justify-between p-4 rounded-xl border transition-colors ${
-              item.urgent
-                ? 'bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-900/30'
-                : 'bg-muted/50'
-            }`}
-          >
-            <div className="flex items-center gap-3">
-              {item.icon}
-              <Typography variant="p" className="font-medium">
-                {item.label}
-              </Typography>
-            </div>
-            <Typography
-              variant="h3"
-              className={`font-bold ${item.urgent ? 'text-red-600 dark:text-red-400' : ''}`}
+      <div className="py-6">
+        <div className="space-y-3 px-6">
+          {/* Today */}
+          <div className="flex items-center justify-between py-2">
+            <Typography variant="h5">{t('today')}</Typography>
+            <Typography variant="h5">{data.expiring_today}</Typography>
+          </div>
+
+          {/* Tomorrow */}
+          <div className="flex items-center justify-between py-2">
+            <Typography variant="h5">{t('tomorrow')}</Typography>
+            <Typography variant="h5">{data.expiring_tomorrow}</Typography>
+          </div>
+
+          {/* This Week */}
+          <div className="flex items-center justify-between py-2">
+            <Typography variant="h5">{t('thisWeek')}</Typography>
+            <Typography variant="h5">{data.expiring_this_week}</Typography>
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-2 flex-1 justify-end text-right mt-8 border-t border-gray-200 dark:border-brand-dark pt-8 px-6">
+          <Typography variant="h5" className="capitalize">
+            {expiringPercentage}% {t('expiringWithinWeek')}
+          </Typography>
+          <div className="h-2 bg-gray-200 dark:bg-brand-dark rounded-full mt-4">
+            <div
+              className="h-2 bg-primary-900 rounded-full transition-all duration-300"
+              style={{ width: `${expiringPercentage}%` }}
+            />
+          </div>
+          <div className="mt-4 flex justify-between items-center">
+            {/* <Typography
+              variant="small"
+              className="mt-1 capitalize"
             >
-              {item.count}
+              {totalActiveBatches - totalExpiring} {t('notExpiring')}
+            </Typography> */}
+            <Typography variant="p" className="mt-1 capitalize">
+              {data.expiring_this_week} {t('expiringThisWeek')}
+            </Typography>
+            <Typography variant="p" className="mt-1 capitalize">
+              {t('expiringCount', {
+                expiring: totalExpiring,
+                total: totalActiveBatches,
+              })}
             </Typography>
           </div>
-        ))}
-      </div>
+        </div>
 
-      {/* See All Link */}
-      <Link
-        href="/dashboard/expiring-soon"
-        className="flex items-center justify-center gap-2 w-full py-3 px-4 rounded-xl border border-primary bg-primary/5 hover:bg-primary/10 transition-colors group min-h-[44px]"
-      >
-        <Typography variant="p" className="font-medium text-primary">
+        {/* See All Link */}
+        {/* <Button
+          asLink
+          href="/dashboard/expiring-soon"
+          size="lg"
+          className="w-full mt-6"
+        >
           {t('seeAll')}
-        </Typography>
-        <ArrowRight className="h-4 w-4 text-primary group-hover:translate-x-1 transition-transform" />
-      </Link>
-    </Card>
+        </Button> */}
+      </div>
+    </div>
   )
 }
