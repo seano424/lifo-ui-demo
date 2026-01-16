@@ -1,5 +1,28 @@
 {
   "dashboard": {
+    "title": "Inventory Dashboard",
+    "subtitle": "Track expiry dates and manage your inventory",
+    "expiringSoon": {
+      "title": "Expiring Soon",
+      "today": "Today",
+      "tomorrow": "Tomorrow",
+      "thisWeek": "This Week (2-7 days)",
+      "seeAll": "See all expiring items",
+      "errors": {
+        "loadingError": "Unable to load expiry data"
+      }
+    },
+    "inventoryOverview": {
+      "title": "Inventory Overview",
+      "totalBatches": "Total Batches",
+      "productsTracked": "Products Tracked",
+      "errors": {
+        "loadingError": "Unable to load inventory overview"
+      }
+    },
+    "actions": {
+      "addDelivery": "Add Delivery"
+    },
     "welcome": {
       "title": "Welcome to Your Dashboard",
       "description": "Get started with your inventory management by adding your first products. Here are some quick actions to help you get started.",

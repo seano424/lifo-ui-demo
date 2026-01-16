@@ -1,5 +1,28 @@
 {
   "dashboard": {
+    "title": "Voorraad Dashboard",
+    "subtitle": "Volg vervaldatums en beheer uw voorraad",
+    "expiringSoon": {
+      "title": "Verloopt Binnenkort",
+      "today": "Vandaag",
+      "tomorrow": "Morgen",
+      "thisWeek": "Deze Week (2-7 dagen)",
+      "seeAll": "Bekijk alle verlopende artikelen",
+      "errors": {
+        "loadingError": "Kan vervalgegevens niet laden"
+      }
+    },
+    "inventoryOverview": {
+      "title": "Voorraad Overzicht",
+      "totalBatches": "Totaal Aantal Batches",
+      "productsTracked": "Gevolgde Producten",
+      "errors": {
+        "loadingError": "Kan voorraadoverzicht niet laden"
+      }
+    },
+    "actions": {
+      "addDelivery": "Levering Toevoegen"
+    },
     "welcome": {
       "title": "Welkom op Uw Dashboard",
       "description": "Begin met het beheren van uw voorraad door uw eerste producten toe te voegen. Hier zijn enkele snelle acties om u op weg te helpen.",

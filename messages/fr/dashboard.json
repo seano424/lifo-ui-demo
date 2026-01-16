@@ -1,5 +1,28 @@
 {
   "dashboard": {
+    "title": "Tableau de Bord Inventaire",
+    "subtitle": "Suivez les dates d'expiration et gérez votre inventaire",
+    "expiringSoon": {
+      "title": "Expire Bientôt",
+      "today": "Aujourd'hui",
+      "tomorrow": "Demain",
+      "thisWeek": "Cette Semaine (2-7 jours)",
+      "seeAll": "Voir tous les articles qui expirent",
+      "errors": {
+        "loadingError": "Impossible de charger les données d'expiration"
+      }
+    },
+    "inventoryOverview": {
+      "title": "Aperçu de l'Inventaire",
+      "totalBatches": "Total des Lots",
+      "productsTracked": "Produits Suivis",
+      "errors": {
+        "loadingError": "Impossible de charger l'aperçu de l'inventaire"
+      }
+    },
+    "actions": {
+      "addDelivery": "Ajouter une Livraison"
+    },
     "welcome": {
       "title": "Bienvenue sur Votre Dashboard",
       "description": "Commencez à gérer votre inventaire en ajoutant vos premiers produits. Voici quelques actions rapides pour vous aider à démarrer.",

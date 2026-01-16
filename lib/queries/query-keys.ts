@@ -12,6 +12,13 @@ export const queryKeys = {
     detail: (storeId: string) => [...queryKeys.stores.all, 'detail', storeId] as const,
   },
 
+  // Dashboard overview queries
+  dashboard: {
+    all: ['dashboard'] as const,
+    expirySummary: (storeId: string) =>
+      [...queryKeys.dashboard.all, 'expiry-summary', storeId] as const,
+  },
+
   // Enhanced Todos and RPC queries with flexible filtering support
   todos: {
     all: ['todos'] as const,
