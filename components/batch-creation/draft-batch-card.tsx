@@ -50,6 +50,7 @@ export function DraftBatchCard({ product, onAddExpiry, onSkip, className }: Draf
                   fill
                   className="object-cover"
                   sizes="80px"
+                  unoptimized
                 />
               ) : (
                 <div className="flex items-center justify-center h-full">

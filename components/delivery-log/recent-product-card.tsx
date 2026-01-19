@@ -91,6 +91,7 @@ export function RecentProductCard({
                   fill
                   className="object-cover"
                   sizes="56px"
+                  unoptimized
                 />
               ) : (
                 <div className="flex items-center justify-center h-full">

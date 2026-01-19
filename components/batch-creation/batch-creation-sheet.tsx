@@ -363,6 +363,7 @@ export function BatchCreationSheet({
                         fill
                         className="object-cover"
                         sizes="64px"
+                        unoptimized
                       />
                     ) : (
                       <div className="flex items-center justify-center h-full">
