@@ -10,6 +10,7 @@ import { useBatchActions } from '@/hooks/use-batches'
 import type { Database } from '@/types/supabase'
 import { useState } from 'react'
 import { toast } from 'sonner'
+import { parseISODateAsLocal } from '@/lib/utils/date-conversion'
 
 interface BatchModalProps {
   isOpen: boolean
@@ -45,7 +46,8 @@ export function BatchModal({ isOpen, onClose, batch, currencySymbol = '€' }: B
 
   const formatDate = (date: string | null) => {
     if (!date) return 'N/A'
-    return new Date(date).toLocaleDateString('en-US', {
+    const localDate = parseISODateAsLocal(date)
+    return localDate.toLocaleDateString('en-US', {
       month: 'short',
       day: 'numeric',
       year: 'numeric',
@@ -57,7 +59,8 @@ export function BatchModal({ isOpen, onClose, batch, currencySymbol = '€' }: B
   const calculateDaysToExpiry = () => {
     if (!batch.expiry_date) return null
     const today = new Date()
-    const expiryDate = new Date(batch.expiry_date)
+    today.setHours(0, 0, 0, 0)
+    const expiryDate = parseISODateAsLocal(batch.expiry_date)
     const diffTime = expiryDate.getTime() - today.getTime()
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
     return diffDays
@@ -75,7 +78,8 @@ export function BatchModal({ isOpen, onClose, batch, currencySymbol = '€' }: B
 
   const handleEditClick = () => {
     setEditedValues({
-      expiry_date: batch.expiry_date ? new Date(batch.expiry_date).toISOString().split('T')[0] : '',
+      // Keep date string as-is since it's already in YYYY-MM-DD format
+      expiry_date: batch.expiry_date || '',
       cost_price: batch.cost_price || 0,
       selling_price: batch.selling_price || 0,
     })

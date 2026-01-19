@@ -29,6 +29,7 @@ import {
   type ProductWithDraftBatches,
 } from '@/hooks/use-draft-batches'
 import { cn } from '@/lib/utils'
+import { parseISODateAsLocal } from '@/lib/utils/date-conversion'
 
 type Step = 'product-selection' | 'expiry-entry' | 'success'
 
@@ -445,7 +446,7 @@ export function BatchCreationSheet({
                       value={customDate ? format(customDate, 'yyyy-MM-dd') : ''}
                       onChange={e => {
                         if (e.target.value) {
-                          handleDateSelect(new Date(e.target.value))
+                          handleDateSelect(parseISODateAsLocal(e.target.value))
                         }
                       }}
                       min={new Date().toISOString().split('T')[0]}

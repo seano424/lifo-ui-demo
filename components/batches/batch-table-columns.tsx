@@ -4,6 +4,7 @@ import type { ColumnDef } from '@tanstack/react-table'
 import { SortableHeader } from '@/components/batches/sortable-header'
 import type { BatchSort, BatchSortField, BatchWithProduct } from '@/lib/queries/batches'
 import { getStatusBadge } from '@/lib/utils/batch-utils'
+import { parseISODateAsLocal } from '@/lib/utils/date-conversion'
 
 export function createBatchTableColumns({
   currentSort,
@@ -90,15 +91,21 @@ export function createBatchTableColumns({
         </SortableHeader>
       ),
       cell: ({ row }) => {
-        const isExpired = row.original.expiry_date
-          ? new Date(row.original.expiry_date) < new Date()
-          : false
+        let expiryDate: Date | null = null
+        let isExpired = false
+
+        if (row.original.expiry_date) {
+          expiryDate = parseISODateAsLocal(row.original.expiry_date)
+          const today = new Date()
+          today.setHours(0, 0, 0, 0)
+          isExpired = expiryDate < today
+        }
 
         return (
           <div className="flex items-center gap-2 justify-end text-right">
-            {row.original.expiry_date ? (
+            {expiryDate ? (
               <span className={`text-sm truncate ${isExpired ? 'text-destructive' : ''}`}>
-                {new Date(row.original.expiry_date).toLocaleDateString()}
+                {expiryDate.toLocaleDateString()}
               </span>
             ) : (
               <span className="text-sm text-muted-foreground italic truncate">

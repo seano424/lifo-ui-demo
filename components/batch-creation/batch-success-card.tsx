@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import type { ActivateDraftBatchResult } from '@/hooks/use-draft-batches'
 import { cn } from '@/lib/utils'
+import { parseISODateAsLocal } from '@/lib/utils/date-conversion'
 
 interface BatchSuccessCardProps {
   result: ActivateDraftBatchResult
@@ -33,7 +34,7 @@ export function BatchSuccessCard({
   onSkip,
   className,
 }: BatchSuccessCardProps) {
-  const expiryDate = new Date(result.expiry_date)
+  const expiryDate = parseISODateAsLocal(result.expiry_date)
   const formattedDate = format(expiryDate, 'MMM d, yyyy')
 
   return (

@@ -8,6 +8,7 @@ import { useCurrency } from '@/hooks/use-currency'
 import { useIntersectionObserver } from '@/hooks/use-intersection-observer'
 import { DEFAULT_ROOT_MARGIN } from '@/lib/constants/todos'
 import type { TodoItem } from '@/lib/queries/todos-rpc'
+import { parseISODateAsLocal } from '@/lib/utils/date-conversion'
 import { useTranslations } from 'next-intl'
 import { useEffect, useMemo, useState } from 'react'
 import { Typography } from '../ui/typography'
@@ -78,8 +79,8 @@ export function TodoCardList({
           break
         }
         case 'expiry_date':
-          aVal = a.expiry_date ? new Date(a.expiry_date).getTime() : 0
-          bVal = b.expiry_date ? new Date(b.expiry_date).getTime() : 0
+          aVal = a.expiry_date ? parseISODateAsLocal(a.expiry_date).getTime() : 0
+          bVal = b.expiry_date ? parseISODateAsLocal(b.expiry_date).getTime() : 0
           break
         case 'current_quantity':
           aVal = a.current_quantity || 0

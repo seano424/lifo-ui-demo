@@ -7,6 +7,7 @@ import type { TodoItem } from '@/lib/queries/todos-rpc'
 import { cn } from '@/lib/utils'
 import { migrateRecommendation } from '@/lib/utils/recommendation-migration'
 import { logger } from '@/lib/utils/logger'
+import { parseISODateAsLocal } from '@/lib/utils/date-conversion'
 import { Calendar, Package, PenLine, CheckIcon } from 'lucide-react'
 import { startOfDay, isToday, differenceInDays, addDays, isBefore } from 'date-fns'
 import { useTranslations } from 'next-intl'
@@ -75,8 +76,7 @@ export function TodoCard({ todo, onClick }: TodoCardProps) {
     onClick?.()
   }
 
-  // Format expiry date with reliable timezone handling using date-fns
-  const expiryDate = todo.expiry_date ? new Date(todo.expiry_date) : new Date()
+  const expiryDate = todo.expiry_date ? parseISODateAsLocal(todo.expiry_date) : new Date()
   const today = new Date()
 
   // Use date-fns for reliable date comparisons
