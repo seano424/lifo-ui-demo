@@ -66,7 +66,7 @@ export default async function RootLayout({
 
   return (
     <html
-      lang="fr"
+      lang="en"
       suppressHydrationWarning
       data-scroll-behavior="smooth"
       className={`${raleway.variable} ${montserrat.variable} ${robotoMono.variable} ${debugScreens}`}

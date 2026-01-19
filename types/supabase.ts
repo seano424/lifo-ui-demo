@@ -1582,6 +1582,15 @@ export type Database = {
       }
     }
     Functions: {
+      activate_draft_batch: {
+        Args: {
+          p_batch_id: string
+          p_expiry_date: string
+          p_quantity?: number
+          p_user_id?: string
+        }
+        Returns: Json
+      }
       auto_expire_batches: { Args: never; Returns: number }
       batch_update_quantities: { Args: { items: Json }; Returns: Json }
       calculate_batch_score_manual: {
@@ -1738,6 +1747,16 @@ export type Database = {
           recipient_type: Database["public"]["Enums"]["donation_recipient_type"]
         }[]
       }
+      get_draft_batches_by_product: {
+        Args: {
+          p_category_codes?: string[]
+          p_limit?: number
+          p_offset?: number
+          p_store_id: string
+        }
+        Returns: Json
+      }
+      get_draft_batches_summary: { Args: { p_store_id: string }; Returns: Json }
       get_expiring_batches: {
         Args: { p_days_ahead?: number; p_store_id: string }
         Returns: {
@@ -1868,6 +1887,10 @@ export type Database = {
           recovered_value: number
         }[]
       }
+      get_recent_delivery_products: {
+        Args: { p_limit?: number; p_store_id: string }
+        Returns: Json
+      }
       get_urgent_todos_count: { Args: { p_store_id: string }; Returns: number }
       get_user_stores: {
         Args: never
@@ -1878,6 +1901,10 @@ export type Database = {
         }[]
       }
       has_batches: { Args: { p_store_id: string }; Returns: boolean }
+      log_delivery_create_drafts: {
+        Args: { p_items: Json; p_store_id: string; p_user_id: string }
+        Returns: Json
+      }
       manual_expire_batch: { Args: { batch_uuid: string }; Returns: boolean }
       map_legacy_category: {
         Args: { legacy_category: string }
@@ -2913,6 +2940,10 @@ export type Database = {
           supplier: string
           total_value: number
         }[]
+      }
+      get_expiry_dashboard_summary: {
+        Args: { p_store_id: string }
+        Returns: Json
       }
       get_items_needing_reeval: {
         Args: { p_limit?: number; p_offset?: number; p_store_id: string }

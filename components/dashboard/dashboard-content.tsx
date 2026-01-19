@@ -11,6 +11,7 @@ import { AddDeliveryButton } from '@/components/dashboard/add-delivery-button'
 import DashboardInsetHeader from '@/components/dashboard/dashboard-inset-header'
 import { ExpiringSoonCard } from '@/components/dashboard/expiring-soon-card'
 import { InventoryOverviewCard } from '@/components/dashboard/inventory-overview-card'
+import { DraftBatchNotification } from '@/components/draft-batch-notification'
 import { useStoreState } from '@/lib/stores/store-context'
 import { useTranslations } from 'next-intl'
 
@@ -25,6 +26,9 @@ export function DashboardContent() {
         title={t('titles.dashboard')}
         description={t('descriptions.dashboard')}
       />
+
+      {/* Draft Batch Notification */}
+      <DraftBatchNotification variant="full" />
 
       {/* Simplified Dashboard */}
       <div className="flex flex-col gap-8">

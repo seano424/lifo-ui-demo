@@ -220,9 +220,9 @@ export function BatchesFilteredList({ initialFilters, pageSize = 100 }: BatchesF
         />
 
         {/* Add Batch Button */}
-        <Link href="/dashboard/deliveries">
+        {/* <Link href="/dashboard/deliveries">
           <Button>{tButtons('addBatch')}</Button>
-        </Link>
+        </Link> */}
       </div>
 
       {/* Table with horizontal scroll */}

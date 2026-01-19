@@ -198,9 +198,9 @@ export function ProductsFilteredList({
         />
 
         {/* Add Product Button */}
-        <Link href="/dashboard/deliveries">
+        {/* <Link href="/dashboard/deliveries">
           <Button>{tButtons('addProduct')}</Button>
-        </Link>
+        </Link> */}
       </div>
 
       {/* Table with horizontal scroll */}

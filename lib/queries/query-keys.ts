@@ -172,6 +172,13 @@ export const queryKeys = {
     todo: (batchId: string) => [...queryKeys.batches.all, 'todo', batchId] as const,
     // Check if store has any batches (for welcome screen logic)
     hasBatches: (storeId: string) => [...queryKeys.batches.byStore(storeId), 'hasBatches'] as const,
+    // Draft batch queries (for LIFO batch creation workflow)
+    draftSummary: (storeId: string) =>
+      [...queryKeys.batches.byStore(storeId), 'draftSummary'] as const,
+    draftsByProduct: (storeId: string, options?: object) =>
+      [...queryKeys.batches.byStore(storeId), 'draftsByProduct', options] as const,
+    recentDeliveries: (storeId: string, limit?: number) =>
+      [...queryKeys.batches.byStore(storeId), 'recentDeliveries', { limit }] as const,
   },
 
   // Store users queries

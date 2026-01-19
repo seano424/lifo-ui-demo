@@ -5,6 +5,7 @@ import {
   HelpCircle,
   Layers,
   Package,
+  PackagePlus,
   SettingsIcon,
   Zap,
   Clock,
@@ -24,6 +25,7 @@ import {
 } from '@/components/ui/sidebar'
 import { useExpiryTodosCount } from '@/hooks/use-expiry-todos-count'
 import { useCurrentUser } from '@/hooks/use-users'
+import { useDraftBatchCount } from '@/components/draft-batch-notification'
 import { TeamSwitcher } from './team-switcher'
 
 import { Logo } from './ui/logo'
@@ -31,6 +33,7 @@ import { Logo } from './ui/logo'
 function useNavigationData() {
   const t = useTranslations('navigation')
   const { count: expiryTodosCount } = useExpiryTodosCount()
+  const draftBatchCount = useDraftBatchCount()
 
   return React.useMemo(
     () => ({
@@ -77,6 +80,12 @@ function useNavigationData() {
           title: t('inventory'),
           items: [
             {
+              title: t('newBatches'),
+              url: '/dashboard/inventory/new',
+              icon: PackagePlus,
+              badge: draftBatchCount,
+            },
+            {
               title: t('products'),
               url: '/dashboard/inventory/products',
               icon: Package,
@@ -87,11 +96,6 @@ function useNavigationData() {
               url: '/dashboard/inventory/batches',
               icon: Layers,
             },
-            // {
-            //   title: t('draftBatches'),
-            //   url: '/dashboard/inventory/batches/drafts',
-            //   icon: FileEdit,
-            // },
           ],
         },
         {
@@ -116,7 +120,7 @@ function useNavigationData() {
         },
       ],
     }),
-    [t, expiryTodosCount],
+    [t, expiryTodosCount, draftBatchCount],
   )
 }
 
