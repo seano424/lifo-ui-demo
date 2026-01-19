@@ -351,9 +351,9 @@ export function BatchCreationSheet({
               )}
             >
               {/* Product Header */}
-              <div className="flex gap-4 p-4 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800">
+              <div className="flex gap-4 p-4 rounded-lg bg-gray-50 dark:bg-gray-900">
                 <div className="shrink-0">
-                  <div className="relative h-16 w-16 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+                  <div className="relative h-16 w-16 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800">
                     {currentProduct.product_name ? (
                       <Image
                         src={`https://placehold.co/200x200/e5e7eb/6b7280?text=${encodeURIComponent(
@@ -401,10 +401,8 @@ export function BatchCreationSheet({
               )}
 
               {/* Quantity Selector */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                  Select Quantity
-                </label>
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="quantity-selector">Select Quantity</Label>
                 <QuantitySelector
                   value={selectedQuantity}
                   onChange={setSelectedQuantity}
@@ -423,10 +421,8 @@ export function BatchCreationSheet({
               </div>
 
               {/* Expiry Preset Buttons */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                  Choose Expiry Date
-                </label>
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="expiry-preset-buttons">Choose Expiry Date</Label>
                 <ExpiryPresetButtons
                   onSelect={days => {
                     setSelectedDays(days)
@@ -442,13 +438,11 @@ export function BatchCreationSheet({
               {showDatePicker && (
                 <div
                   className={cn(
-                    'space-y-2',
+                    'flex flex-col gap-2',
                     'animate-in fade-in-0 slide-in-from-top-2 duration-200',
                   )}
                 >
-                  <Label htmlFor="custom-expiry-date" className="text-sm font-medium">
-                    Custom Expiry Date
-                  </Label>
+                  <Label htmlFor="custom-expiry-date">Custom Expiry Date</Label>
                   <div className="relative">
                     <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-primary-600 dark:text-primary-400" />
                     <Input
@@ -461,7 +455,7 @@ export function BatchCreationSheet({
                         }
                       }}
                       min={new Date().toISOString().split('T')[0]}
-                      className="pl-11 h-12 text-base border-2 focus:border-primary-500 dark:focus:border-primary-400"
+                      className="pl-11 h-12 text-base border-2 focus:border-primary-500 dark:focus:border-primary-400 rounded-lg"
                       placeholder="YYYY-MM-DD"
                     />
                   </div>

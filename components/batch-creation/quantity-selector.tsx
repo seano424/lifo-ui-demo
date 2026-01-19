@@ -62,7 +62,7 @@ export function QuantitySelector({
         className={cn(
           // 44px minimum tap target for mobile
           'h-11 w-11 shrink-0 rounded-xl',
-          'border-2 border-gray-300 bg-white dark:bg-gray-800 dark:border-gray-600',
+          'border bg-white dark:bg-gray-800',
           'hover:border-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700',
           'active:scale-95 transition-transform',
           'disabled:opacity-40 disabled:cursor-not-allowed',
@@ -77,7 +77,7 @@ export function QuantitySelector({
         className={cn(
           'flex-1 min-w-[80px] text-center',
           'px-4 py-2.5 rounded-lg',
-          'border-2 border-gray-200 bg-gray-50 dark:bg-gray-800 dark:border-gray-700',
+          'border bg-gray-50 dark:bg-gray-800',
         )}
       >
         <span
@@ -101,7 +101,7 @@ export function QuantitySelector({
         className={cn(
           // 44px minimum tap target for mobile
           'h-11 w-11 shrink-0 rounded-xl',
-          'border-2 border-primary-600 bg-primary-50 dark:bg-primary-900/20 dark:border-primary-700',
+          'border bg-primary-50 dark:bg-primary-900/20',
           'hover:border-primary-700 hover:bg-primary-100 dark:hover:bg-primary-900/30',
           'active:scale-95 transition-transform',
           'disabled:opacity-40 disabled:cursor-not-allowed',
