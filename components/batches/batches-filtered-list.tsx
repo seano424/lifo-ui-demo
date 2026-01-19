@@ -1,7 +1,6 @@
 'use client'
 
 import { AlertTriangle } from 'lucide-react'
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useState } from 'react'
@@ -31,7 +30,6 @@ export function BatchesFilteredList({ initialFilters, pageSize = 100 }: BatchesF
   const router = useRouter()
   const activeStoreId = useActiveStoreId()
   const t = useTranslations('batches.table')
-  const tButtons = useTranslations('buttons')
 
   const [filters, setFilters] = useState<BatchFilters>(() => {
     const baseFilters: BatchFilters = {

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Package, X } from 'lucide-react'
+import { X } from 'lucide-react'
 import Link from 'next/link'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -9,6 +9,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { useDraftBatchesSummary } from '@/hooks/use-draft-batches'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 import { cn } from '@/lib/utils'
+import { Typography } from '@/components/ui/typography'
 
 const DISMISSED_STORAGE_KEY = 'lifo_dismissed_drafts'
 
@@ -142,53 +143,48 @@ export function DraftBatchNotification({
 
   // Full version (for dashboard/banner)
   return (
-    <Alert
-      className={cn(
-        'relative border-2 border-orange-200 bg-orange-50 dark:border-orange-800 dark:bg-orange-900/20',
-        className,
-      )}
-    >
-      <div className="flex items-start gap-3">
-        {/* Icon */}
-        <div className="shrink-0 mt-0.5">
-          <Package className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+    <Alert className={cn('flex gap-4', className)}>
+      {/* Icon */}
+      {/* <div className="shrink-0 mt-0.5">
+        <Package className="h-5 w-5 text-primary" />
+      </div> */}
+
+      {/* Content */}
+      <div className="flex-1 min-w-0">
+        <AlertDescription>
+          <Typography variant="h4" className="mb-1">
+            {totalDrafts} {totalDrafts === 1 ? 'item needs' : 'items need'} expiry dates
+          </Typography>
+          <Typography variant="p">
+            {totalUnits} units across {summary?.products_with_drafts || 0} products are waiting to
+            be activated
+          </Typography>
+        </AlertDescription>
+
+        {/* Action Button */}
+        <div className="mt-3">
+          <Button
+            asChild
+            asLink
+            href="/dashboard/inventory/new"
+            variant="black"
+            className="rounded-4xl font-bold tracking-tight px-3"
+          >
+            Add Expiry Dates
+          </Button>
         </div>
-
-        {/* Content */}
-        <div className="flex-1 min-w-0">
-          <AlertDescription className="text-orange-900 dark:text-orange-100">
-            <p className="font-semibold mb-1">
-              {totalDrafts} {totalDrafts === 1 ? 'item needs' : 'items need'} expiry dates
-            </p>
-            <p className="text-sm text-orange-700 dark:text-orange-200">
-              {totalUnits} units across {summary?.products_with_drafts || 0} products are waiting to
-              be activated
-            </p>
-          </AlertDescription>
-
-          {/* Action Button */}
-          <div className="mt-3">
-            <Button
-              asChild
-              size="sm"
-              className="bg-orange-600 hover:bg-orange-700 dark:bg-orange-700 dark:hover:bg-orange-600 text-white"
-            >
-              <Link href="/dashboard/inventory/new">Add Expiry Dates</Link>
-            </Button>
-          </div>
-        </div>
-
-        {/* Dismiss Button */}
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={handleDismiss}
-          className="shrink-0 h-8 w-8 text-orange-600 hover:text-orange-700 hover:bg-orange-100 dark:text-orange-400 dark:hover:text-orange-300 dark:hover:bg-orange-900/30"
-          aria-label="Dismiss notification"
-        >
-          <X className="h-4 w-4" />
-        </Button>
       </div>
+
+      {/* Dismiss Button */}
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={handleDismiss}
+        className="shrink-0 h-8 w-8 border"
+        aria-label="Dismiss notification"
+      >
+        <X className="h-4 w-4" />
+      </Button>
     </Alert>
   )
 }

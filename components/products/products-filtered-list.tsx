@@ -1,7 +1,6 @@
 'use client'
 
 import { AlertTriangle } from 'lucide-react'
-import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useState } from 'react'
@@ -34,7 +33,6 @@ export function ProductsFilteredList({
   const searchParams = useSearchParams()
   const activeStoreId = useActiveStoreId()
   const t = useTranslations('products.table')
-  const tButtons = useTranslations('buttons')
 
   const [filters, setFilters] = useState<ProductFilters>(() => {
     const baseFilters: ProductFilters = {
