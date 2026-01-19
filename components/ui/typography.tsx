@@ -24,6 +24,7 @@ const typographyVariants = cva('', {
       muted: 'text-muted-foreground',
       primary: 'text-primary',
       destructive: 'text-destructive',
+      secondary: 'text-secondary',
     },
   },
   defaultVariants: {

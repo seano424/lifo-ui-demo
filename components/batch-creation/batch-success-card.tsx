@@ -7,6 +7,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import type { ActivateDraftBatchResult } from '@/hooks/use-draft-batches'
 import { cn } from '@/lib/utils'
 import { parseISODateAsLocal } from '@/lib/utils/date-conversion'
+import { Typography } from '@/components/ui/typography'
 
 interface BatchSuccessCardProps {
   result: ActivateDraftBatchResult
@@ -34,16 +35,16 @@ export function BatchSuccessCard({
   onSkip,
   className,
 }: BatchSuccessCardProps) {
-  const expiryDate = parseISODateAsLocal(result.expiry_date)
-  const formattedDate = format(expiryDate, 'MMM d, yyyy')
+  const expiryDate = result.expiry_date ? parseISODateAsLocal(result.expiry_date) : null
+  const formattedDate = expiryDate ? format(expiryDate, 'MMM d, yyyy') : 'N/A'
 
   return (
     <Card
       className={cn(
         'overflow-hidden border-2',
         result.success
-          ? 'border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20'
-          : 'border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/20',
+          ? 'border-primary/20 dark:border-primary-800'
+          : 'border-red-200 dark:border-red-800',
         className,
       )}
     >
@@ -54,41 +55,36 @@ export function BatchSuccessCard({
             {result.success ? (
               <div className="relative">
                 <CheckCircle2
-                  className={cn(
-                    'h-16 w-16 text-green-600 dark:text-green-400',
-                    'animate-in zoom-in-50 duration-300',
-                  )}
+                  className={cn('h-16 w-16', 'text-primary', 'animate-in zoom-in-50 duration-300')}
                 />
                 {/* Pulse animation ring */}
-                <div className="absolute inset-0 h-16 w-16 rounded-full bg-green-500/20 animate-ping" />
+                <div className="absolute inset-0 h-16 w-16 rounded-full bg-primary/20 animate-ping" />
               </div>
             ) : (
-              <AlertCircle className="h-16 w-16 text-red-600 dark:text-red-400 animate-in zoom-in-50 duration-300" />
+              <AlertCircle className="h-16 w-16 text-primary animate-in zoom-in-50 duration-300" />
             )}
           </div>
 
           {/* Success/Error Message */}
-          <div className="text-center space-y-1">
-            <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+          <div className="text-center flex flex-col gap-4">
+            <Typography variant="h3" color="primary">
               {result.success ? 'Batch Added!' : 'Failed to Add Batch'}
-            </h3>
-            <div className="text-base text-gray-700 dark:text-gray-300">
-              <p className="font-semibold">
-                {result.activated_quantity} units → {formattedDate}
-              </p>
-            </div>
+            </Typography>
+            <Typography variant="p" color="primary">
+              {result.activated_quantity} units → {formattedDate}
+            </Typography>
           </div>
 
           {/* Split Batch Info */}
           {result.was_split && result.remaining_draft_quantity && (
-            <div className="p-3 rounded-lg bg-blue-50 border border-blue-200 dark:bg-blue-900/20 dark:border-blue-800">
+            <div className="p-3 rounded-lg bg-secondary-50 border border-secondary-200 dark:bg-secondary-900/20 dark:border-secondary-800">
               <div className="flex items-start gap-2">
-                <AlertCircle className="h-5 w-5 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
+                <AlertCircle className="h-5 w-5 text-secondary-600 dark:text-secondary-400 shrink-0 mt-0.5" />
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-blue-900 dark:text-blue-100">
+                  <p className="text-sm font-medium text-secondary-900 dark:text-secondary-100">
                     {result.remaining_draft_quantity} units still need expiry date
                   </p>
-                  <p className="text-xs text-blue-700 dark:text-blue-300 mt-1">
+                  <p className="text-xs text-secondary-700 dark:text-secondary-300 mt-1">
                     The batch was split. Continue to add expiry date for the remaining units.
                   </p>
                 </div>
@@ -98,7 +94,9 @@ export function BatchSuccessCard({
 
           {/* Message */}
           {result.message && !result.was_split && (
-            <p className="text-sm text-center text-gray-600 dark:text-gray-400">{result.message}</p>
+            <Typography className="text-center" variant="p">
+              {result.message}
+            </Typography>
           )}
 
           {/* Action Buttons */}
@@ -114,7 +112,8 @@ export function BatchSuccessCard({
                   className={cn(
                     'w-full min-h-[44px]',
                     'font-semibold',
-                    result.was_split && 'bg-blue-600 hover:bg-blue-700 dark:bg-blue-700',
+                    result.was_split &&
+                      'bg-secondary-600 hover:bg-secondary-700 dark:bg-secondary-700',
                   )}
                 >
                   {result.was_split ? 'Add Expiry for Remaining Units' : 'Add Another Batch'}

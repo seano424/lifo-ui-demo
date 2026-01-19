@@ -393,6 +393,16 @@ export function useActivateDraftBatch() {
           queryClient.invalidateQueries({
             queryKey: queryKeys.batches.byStore(activeStoreId),
           })
+
+          // Invalidate todo counts (expiry counts will change when batches are activated)
+          queryClient.invalidateQueries({
+            queryKey: queryKeys.todos.all,
+          })
+
+          // Invalidate products queries (stock levels changed)
+          queryClient.invalidateQueries({
+            queryKey: queryKeys.products.byStore(activeStoreId),
+          })
         }
 
         // Invalidate the activated batch detail

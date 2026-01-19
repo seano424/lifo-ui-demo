@@ -79,7 +79,8 @@
     "scanIn": "Scan In",
     "inventoryManagement": "Voorraadbeheer",
     "addStore": "Winkel toevoegen",
-    "expiringSoon": "Verloopt binnenkort"
+    "expiringSoon": "Verloopt binnenkort",
+    "new": "Nieuw"
   },
   "navUser": {
     "upgradeToPro": "Upgrade naar Pro",

@@ -79,7 +79,8 @@
     "scanIn": "Scanner l'entrée",
     "inventoryManagement": "Gestion des stocks",
     "addStore": "Ajouter un magasin",
-    "expiringSoon": "Expire bientôt"
+    "expiringSoon": "Expire bientôt",
+    "new": "Nouveau"
   },
   "navUser": {
     "upgradeToPro": "Passer à Pro",

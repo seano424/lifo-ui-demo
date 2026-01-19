@@ -79,7 +79,8 @@
     "scanIn": "Scan In",
     "inventoryManagement": "Inventory Management",
     "addStore": "Add Store",
-    "expiringSoon": "Expiring Soon"
+    "expiringSoon": "Expiring Soon",
+    "new": "New"
   },
   "navUser": {
     "upgradeToPro": "Upgrade to Pro",

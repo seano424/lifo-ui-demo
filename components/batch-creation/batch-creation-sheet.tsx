@@ -30,6 +30,7 @@ import {
 } from '@/hooks/use-draft-batches'
 import { cn } from '@/lib/utils'
 import { parseISODateAsLocal } from '@/lib/utils/date-conversion'
+import { Typography } from '@/components/ui/typography'
 
 type Step = 'product-selection' | 'expiry-entry' | 'success'
 
@@ -114,7 +115,9 @@ export function BatchCreationSheet({
 
   const resetExpiryForm = useCallback(() => {
     if (currentProduct) {
-      setSelectedQuantity(currentProduct.total_draft_quantity)
+      // Use first batch's quantity, not total across all batches
+      const firstBatchQuantity = currentProduct.draft_batches[0]?.quantity ?? 1
+      setSelectedQuantity(firstBatchQuantity)
       setSelectedDays(currentProduct.last_expiry_days)
     }
     setCustomDate(undefined)
@@ -179,8 +182,12 @@ export function BatchCreationSheet({
         quantity: selectedQuantity,
       })
 
-      setActivationResult(result)
-      setCurrentStep('success')
+      // Only transition to success step if actually successful
+      if (result.success) {
+        setActivationResult(result)
+        setCurrentStep('success')
+      }
+      // Error case is already handled by the mutation's onSuccess callback with toast
     } catch (error) {
       console.error('Failed to activate batch:', error)
       // Error toast is already shown by the mutation hook
@@ -383,12 +390,12 @@ export function BatchCreationSheet({
 
               {/* Category Hint */}
               {currentProduct.category_name && currentProduct.typical_shelf_life_days && (
-                <div className="p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
-                  <p className="text-sm text-blue-900 dark:text-blue-100">
-                    <Calendar className="h-4 w-4 inline mr-2" />
+                <div className="p-3 rounded-lg bg-secondary-50 dark:bg-secondary-900/20 flex justify-center items-center gap-1">
+                  <Calendar className="h-3 w-3 text-secondary" />
+                  <Typography variant="small" color="secondary">
                     {currentProduct.category_name} typically expires in +
                     {currentProduct.typical_shelf_life_days} days
-                  </p>
+                  </Typography>
                 </div>
               )}
 
@@ -401,12 +408,15 @@ export function BatchCreationSheet({
                   value={selectedQuantity}
                   onChange={setSelectedQuantity}
                   min={1}
-                  max={currentProduct.total_draft_quantity}
+                  max={
+                    currentProduct.draft_batches[0]?.quantity ?? currentProduct.total_draft_quantity
+                  }
                 />
-                {selectedQuantity < currentProduct.total_draft_quantity && (
+                {selectedQuantity < (currentProduct.draft_batches[0]?.quantity ?? 0) && (
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                    Batch will be split. {currentProduct.total_draft_quantity - selectedQuantity}{' '}
-                    units will remain in draft.
+                    Batch will be split.{' '}
+                    {(currentProduct.draft_batches[0]?.quantity ?? 0) - selectedQuantity} units will
+                    remain in draft.
                   </p>
                 )}
               </div>
