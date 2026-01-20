@@ -22,7 +22,7 @@
     "supabase:start": "supabase start",
     "supabase:stop": "supabase stop",
     "supabase:status": "supabase status",
-    "update-types": "npx supabase gen types typescript --project-id jrgmetdsohowtxickqij --schema user_mgmt,timeseries,scoring,inventory,business,analytics,public > types/supabase.ts"
+    "update-types": "npx supabase gen types typescript --project-id jrgmetdsohowtxickqij --schema user_mgmt,timeseries,scoring,inventory,business,analytics,public,integrations > types/supabase.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.1.1",
