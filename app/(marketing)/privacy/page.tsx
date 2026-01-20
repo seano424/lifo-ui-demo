@@ -217,7 +217,6 @@ export default function PrivacyPage() {
                 <ul className="list-disc list-inside space-y-2 ml-4 text-foreground/80 leading-relaxed">
                   <li>{t('section8.cookiesSet.items.0')}</li>
                   <li>{t('section8.cookiesSet.items.1')}</li>
-                  <li>{t('section8.cookiesSet.items.2')}</li>
                 </ul>
               </div>
             </div>

@@ -1,37 +1,209 @@
 {
-  "actions": {
-    "add": "Toevoegen",
-    "edit": "Bewerken",
-    "delete": "Verwijderen",
-    "save": "Opslaan",
-    "cancel": "Annuleren",
-    "scan": "Scannen",
-    "discount": "Korting",
-    "donate": "Doneren"
-  },
-  "forms": {
-    "productName": "Productnaam",
-    "expirationDate": "Vervaldatum",
-    "quantity": "Hoeveelheid",
-    "price": "Prijs",
-    "category": "Categorie",
-    "required": "Vereist"
-  },
-  "status": {
-    "fresh": "Vers",
-    "expiringSoon": "Verloopt Binnenkort",
-    "expired": "Verlopen",
-    "discounted": "Korting",
-    "donated": "Gedoneerd",
-    "sold": "Verkocht"
-  },
-  "validation": {
-    "required": "Dit veld is verplicht",
-    "invalidEmail": "Ongeldig e-mailadres",
-    "passwordTooShort": "Wachtwoord moet minimaal 8 tekens bevatten",
-    "dateMustBeFuture": "Datum moet in de toekomst liggen"
-  },
   "common": {
+    "actions": {
+      "add": "Toevoegen",
+      "edit": "Bewerken",
+      "delete": "Verwijderen",
+      "save": "Opslaan",
+      "cancel": "Annuleren",
+      "scan": "Scannen",
+      "discount": "Korting",
+      "donate": "Doneren"
+    },
+    "forms": {
+      "productName": "Productnaam",
+      "expirationDate": "Vervaldatum",
+      "quantity": "Hoeveelheid",
+      "price": "Prijs",
+      "category": "Categorie",
+      "required": "Vereist"
+    },
+    "status": {
+      "fresh": "Vers",
+      "expiringSoon": "Verloopt Binnenkort",
+      "expired": "Verlopen",
+      "discounted": "Korting",
+      "donated": "Gedoneerd",
+      "sold": "Verkocht"
+    },
+    "validation": {
+      "required": "Dit veld is verplicht",
+      "invalidEmail": "Ongeldig e-mailadres",
+      "passwordTooShort": "Wachtwoord moet minimaal 8 tekens bevatten",
+      "dateMustBeFuture": "Datum moet in de toekomst liggen"
+    },
+    "breadcrumbs": {
+      "batches": "Partijen",
+      "draftBatches": "Concept Partijen",
+      "drafts": "Concepten",
+      "billing": "Facturering",
+      "dashboard": "Dashboard",
+      "inventory": "Voorraad",
+      "deliveries": "Leveringen",
+      "scanOut": "Scan Uit",
+      "analytics": "Analyses",
+      "performance": "Prestaties",
+      "milestones": "Mijlpalen",
+      "todos": "Te doen",
+      "integrations": "Integraties",
+      "square": "Square",
+      "settings": "Instellingen",
+      "store": "Winkel",
+      "team": "Team",
+      "users": "Gebruikers",
+      "teams": "Teams",
+      "stores": "Winkels",
+      "products": "Producten",
+      "categories": "Categorieën",
+      "reports": "Rapporten",
+      "notifications": "Meldingen",
+      "account": "Account",
+      "profile": "Profiel",
+      "help": "Help",
+      "support": "Ondersteuning",
+      "quickStartGuide": "Snelstartgids",
+      "scanIn": "Scan In",
+      "inventoryManagement": "Voorraadbeheer",
+      "addStore": "Winkel toevoegen",
+      "expiringSoon": "Verloopt binnenkort"
+    },
+    "navUser": {
+      "upgradeToPro": "Upgrade naar Pro",
+      "account": "Account",
+      "billing": "Facturering",
+      "notifications": "Notificaties",
+      "language": "Taal",
+      "theme": "Thema"
+    },
+    "errors": {
+      "pageNotFoundTitle": "Pagina niet gevonden",
+      "pageNotFoundDescription": "De pagina die u zoekt bestaat niet of is verplaatst.",
+      "backToHome": "Terug naar startpagina",
+      "goBack": "Ga terug",
+      "needHelp": "Hulp nodig?",
+      "contactSupport": "Neem contact op met ons ondersteuningsteam",
+      "common": {
+        "genericError": "Er is een fout opgetreden",
+        "networkError": "Netwerkfout. Controleer uw verbinding.",
+        "serverError": "Serverfout. Probeer het later opnieuw.",
+        "unauthorized": "U heeft geen toestemming om toegang te krijgen tot deze resource.",
+        "notFound": "De gevraagde resource is niet gevonden.",
+        "validationFailed": "Controleer uw invoer en probeer opnieuw.",
+        "timeoutError": "Verzoek verlopen. Probeer opnieuw.",
+        "unknownError": "Er is een onbekende fout opgetreden",
+        "unexpected": "Er is een onverwachte fout opgetreden",
+        "somethingWrong": "Er is iets misgegaan",
+        "permissionDenied": "Toegang geweigerd",
+        "unableToLoadContent": "Kan deze inhoud niet laden. Probeer het opnieuw.",
+        "unableToLoadMoreItems": "Kan geen extra items laden. Ververs de pagina om opnieuw te proberen.",
+        "retry": "Opnieuw proberen"
+      },
+      "pages": {
+        "users": {
+          "loginRequired": "Log in om gebruikers te bekijken.",
+          "noStoreAccess": "Geen winkeltoegang",
+          "noStoreAccessDescription": "U heeft nog geen toegang tot winkels."
+        }
+      },
+      "forms": {
+        "required": "Dit veld is verplicht",
+        "invalidEmail": "Voer een geldig e-mailadres in",
+        "passwordTooShort": "Wachtwoord moet minimaal 6 tekens bevatten",
+        "passwordsNoMatch": "Wachtwoorden komen niet overeen",
+        "invalidPhone": "Voer een geldig telefoonnummer in",
+        "invalidUrl": "Voer een geldige URL in",
+        "nameTooLong": "Naam is te lang",
+        "emailTaken": "Dit e-mailadres is al in gebruik",
+        "usernameTaken": "Deze gebruikersnaam is al bezet",
+        "usernameInvalid": "Gebruikersnaam mag alleen letters, cijfers en underscores bevatten"
+      },
+      "api": {
+        "createFailed": "Item aanmaken mislukt",
+        "updateFailed": "Item bijwerken mislukt",
+        "deleteFailed": "Item verwijderen mislukt",
+        "loadFailed": "Gegevens laden mislukt",
+        "saveFailed": "Wijzigingen opslaan mislukt",
+        "uploadFailed": "Bestand uploaden mislukt",
+        "connectionFailed": "Verbinding mislukt",
+        "authFailed": "Authenticatie mislukt"
+      },
+      "emptyStates": {
+        "noResults": "Geen resultaten gevonden",
+        "noData": "Geen gegevens beschikbaar",
+        "noBatches": "Geen batches gevonden",
+        "noProducts": "Geen producten gevonden",
+        "noUsers": "Geen gebruikers gevonden",
+        "emptySearch": "Geen resultaten komen overeen met uw zoekopdracht",
+        "tryDifferentSearch": "Probeer uw zoekcriteria aan te passen"
+      },
+      "loading": {
+        "loading": "Laden...",
+        "processing": "Verwerken...",
+        "saving": "Opslaan...",
+        "uploading": "Uploaden...",
+        "searching": "Zoeken...",
+        "deleting": "Verwijderen...",
+        "updating": "Bijwerken..."
+      }
+    },
+    "cancel": "Annuleren",
+    "close": "Sluiten",
+    "save": "Opslaan",
+    "edit": "Bewerken",
+    "saving": "Opslaan...",
+    "optional": "optioneel",
+    "pwa": {
+      "installPrompt": {
+        "title": "LIFO Installeren",
+        "subtitle": "Experimentele PWA",
+        "installButton": "Installeren",
+        "dismissAriaLabel": "Negeren",
+        "closeAriaLabel": "Sluiten"
+      }
+    },
+    "cookieConsent": {
+      "message": "We gebruiken cookies om uw ervaring te verbeteren en websiteverkeer te analyseren. Door te accepteren gaat u akkoord met ons gebruik van cookies.",
+      "accept": "Accepteren",
+      "decline": "Weigeren",
+      "learnMore": "Meer informatie",
+      "manageCookies": "Cookies beheren"
+    },
+    "trendIndicator": {
+      "previous": "Vorige:",
+      "periodLow": "Periode minimum:",
+      "periodHigh": "Periode maximum:"
+    },
+    "scanning": {
+      "totalItems": "Totaal artikelen:",
+      "totalValue": "Totale waarde:",
+      "noBatchesAvailable": "Geen batches beschikbaar",
+      "openMenu": "Menu openen",
+      "noStoreSelected": "Geen winkel geselecteerd",
+      "pleaseSelectStore": "Selecteer een winkel om door te gaan",
+      "whatHappensNext": "Wat gebeurt er hierna?"
+    },
+    "devToken": {
+      "title": "Dev Token Helper",
+      "accessDenied": "Toegang geweigerd",
+      "accessDeniedMessage": "Deze pagina is alleen beschikbaar in ontwikkelomgevingen om veiligheidsredenen.",
+      "goToHome": "Ga naar home",
+      "loggedInAs": "Ingelogd als:",
+      "yourJwtToken": "Uw JWT-token:",
+      "copyToClipboard": "Kopieer naar klembord",
+      "copied": "Gekopieerd!",
+      "backToHome": "Terug naar home",
+      "goToLogin": "Ga naar login",
+      "usageInstructions": "Gebruiksinstructies:",
+      "instruction1": "Zorg ervoor dat u bent ingelogd in de app",
+      "instruction2": "Klik op de knop \"Kopieer naar klembord\"",
+      "instruction3": "Stel in Postman/API-client de Authorization-header in op:",
+      "instruction4": "Token verloopt over ~1 uur - vernieuw deze pagina om een nieuwe te krijgen",
+      "securityNote": "Beveiligingsnotitie:",
+      "securityMessage": "Deze pagina is alleen bedoeld voor ontwikkeling. Stel nooit JWT-tokens bloot in productie. Tokens geven volledige toegang tot uw account.",
+      "apiEndpointsToTest": "API-eindpunten om te testen:",
+      "notLoggedIn": "Niet ingelogd - log eerst in",
+      "loading": "Laden..."
+    },
     "more": "Meer",
     "aria": {
       "toggleTheme": "Thema wisselen",
@@ -45,177 +217,5 @@
       "createAccount": "Account aanmaken",
       "backToSupportCenter": "Terug naar helpcentrum"
     }
-  },
-  "breadcrumbs": {
-    "batches": "Partijen",
-    "draftBatches": "Concept Partijen",
-    "drafts": "Concepten",
-    "billing": "Facturering",
-    "dashboard": "Dashboard",
-    "inventory": "Voorraad",
-    "deliveries": "Leveringen",
-    "scanOut": "Scan Uit",
-    "analytics": "Analyses",
-    "performance": "Prestaties",
-    "milestones": "Mijlpalen",
-    "todos": "Te doen",
-    "integrations": "Integraties",
-    "square": "Square",
-    "settings": "Instellingen",
-    "store": "Winkel",
-    "team": "Team",
-    "users": "Gebruikers",
-    "teams": "Teams",
-    "stores": "Winkels",
-    "products": "Producten",
-    "categories": "Categorieën",
-    "reports": "Rapporten",
-    "notifications": "Meldingen",
-    "account": "Account",
-    "profile": "Profiel",
-    "help": "Help",
-    "support": "Ondersteuning",
-    "quickStartGuide": "Snelstartgids",
-    "scanIn": "Scan In",
-    "inventoryManagement": "Voorraadbeheer",
-    "addStore": "Winkel toevoegen",
-    "expiringSoon": "Verloopt binnenkort"
-  },
-  "navUser": {
-    "upgradeToPro": "Upgrade naar Pro",
-    "account": "Account",
-    "billing": "Facturering",
-    "notifications": "Notificaties",
-    "language": "Taal",
-    "theme": "Thema"
-  },
-  "errors": {
-    "pageNotFoundTitle": "Pagina niet gevonden",
-    "pageNotFoundDescription": "De pagina die u zoekt bestaat niet of is verplaatst.",
-    "backToHome": "Terug naar startpagina",
-    "goBack": "Ga terug",
-    "needHelp": "Hulp nodig?",
-    "contactSupport": "Neem contact op met ons ondersteuningsteam",
-    "common": {
-      "genericError": "Er is een fout opgetreden",
-      "networkError": "Netwerkfout. Controleer uw verbinding.",
-      "serverError": "Serverfout. Probeer het later opnieuw.",
-      "unauthorized": "U heeft geen toestemming om toegang te krijgen tot deze resource.",
-      "notFound": "De gevraagde resource is niet gevonden.",
-      "validationFailed": "Controleer uw invoer en probeer opnieuw.",
-      "timeoutError": "Verzoek verlopen. Probeer opnieuw.",
-      "unknownError": "Er is een onbekende fout opgetreden",
-      "unexpected": "Er is een onverwachte fout opgetreden",
-      "somethingWrong": "Er is iets misgegaan",
-      "permissionDenied": "Toegang geweigerd",
-      "unableToLoadContent": "Kan deze inhoud niet laden. Probeer het opnieuw.",
-      "unableToLoadMoreItems": "Kan geen extra items laden. Ververs de pagina om opnieuw te proberen.",
-      "retry": "Opnieuw proberen"
-    },
-    "pages": {
-      "users": {
-        "loginRequired": "Log in om gebruikers te bekijken.",
-        "noStoreAccess": "Geen winkeltoegang",
-        "noStoreAccessDescription": "U heeft nog geen toegang tot winkels."
-      }
-    },
-    "forms": {
-      "required": "Dit veld is verplicht",
-      "invalidEmail": "Voer een geldig e-mailadres in",
-      "passwordTooShort": "Wachtwoord moet minimaal 6 tekens bevatten",
-      "passwordsNoMatch": "Wachtwoorden komen niet overeen",
-      "invalidPhone": "Voer een geldig telefoonnummer in",
-      "invalidUrl": "Voer een geldige URL in",
-      "nameTooLong": "Naam is te lang",
-      "emailTaken": "Dit e-mailadres is al in gebruik",
-      "usernameTaken": "Deze gebruikersnaam is al bezet",
-      "usernameInvalid": "Gebruikersnaam mag alleen letters, cijfers en underscores bevatten"
-    },
-    "api": {
-      "createFailed": "Item aanmaken mislukt",
-      "updateFailed": "Item bijwerken mislukt",
-      "deleteFailed": "Item verwijderen mislukt",
-      "loadFailed": "Gegevens laden mislukt",
-      "saveFailed": "Wijzigingen opslaan mislukt",
-      "uploadFailed": "Bestand uploaden mislukt",
-      "connectionFailed": "Verbinding mislukt",
-      "authFailed": "Authenticatie mislukt"
-    },
-    "emptyStates": {
-      "noResults": "Geen resultaten gevonden",
-      "noData": "Geen gegevens beschikbaar",
-      "noBatches": "Geen batches gevonden",
-      "noProducts": "Geen producten gevonden",
-      "noUsers": "Geen gebruikers gevonden",
-      "emptySearch": "Geen resultaten komen overeen met uw zoekopdracht",
-      "tryDifferentSearch": "Probeer uw zoekcriteria aan te passen"
-    },
-    "loading": {
-      "loading": "Laden...",
-      "processing": "Verwerken...",
-      "saving": "Opslaan...",
-      "uploading": "Uploaden...",
-      "searching": "Zoeken...",
-      "deleting": "Verwijderen...",
-      "updating": "Bijwerken..."
-    }
-  },
-  "cancel": "Annuleren",
-  "close": "Sluiten",
-  "save": "Opslaan",
-  "edit": "Bewerken",
-  "saving": "Opslaan...",
-  "optional": "optioneel",
-  "pwa": {
-    "installPrompt": {
-      "title": "LIFO Installeren",
-      "subtitle": "Experimentele PWA",
-      "installButton": "Installeren",
-      "dismissAriaLabel": "Negeren",
-      "closeAriaLabel": "Sluiten"
-    }
-  },
-  "cookieConsent": {
-    "message": "We gebruiken cookies om uw ervaring te verbeteren en websiteverkeer te analyseren. Door te accepteren gaat u akkoord met ons gebruik van cookies.",
-    "accept": "Accepteren",
-    "decline": "Weigeren",
-    "learnMore": "Meer informatie",
-    "manageCookies": "Cookies beheren"
-  },
-  "trendIndicator": {
-    "previous": "Vorige:",
-    "periodLow": "Periode minimum:",
-    "periodHigh": "Periode maximum:"
-  },
-  "scanning": {
-    "totalItems": "Totaal artikelen:",
-    "totalValue": "Totale waarde:",
-    "noBatchesAvailable": "Geen batches beschikbaar",
-    "openMenu": "Menu openen",
-    "noStoreSelected": "Geen winkel geselecteerd",
-    "pleaseSelectStore": "Selecteer een winkel om door te gaan",
-    "whatHappensNext": "Wat gebeurt er hierna?"
-  },
-  "devToken": {
-    "title": "Dev Token Helper",
-    "accessDenied": "Toegang geweigerd",
-    "accessDeniedMessage": "Deze pagina is alleen beschikbaar in ontwikkelomgevingen om veiligheidsredenen.",
-    "goToHome": "Ga naar home",
-    "loggedInAs": "Ingelogd als:",
-    "yourJwtToken": "Uw JWT-token:",
-    "copyToClipboard": "Kopieer naar klembord",
-    "copied": "Gekopieerd!",
-    "backToHome": "Terug naar home",
-    "goToLogin": "Ga naar login",
-    "usageInstructions": "Gebruiksinstructies:",
-    "instruction1": "Zorg ervoor dat u bent ingelogd in de app",
-    "instruction2": "Klik op de knop \"Kopieer naar klembord\"",
-    "instruction3": "Stel in Postman/API-client de Authorization-header in op:",
-    "instruction4": "Token verloopt over ~1 uur - vernieuw deze pagina om een nieuwe te krijgen",
-    "securityNote": "Beveiligingsnotitie:",
-    "securityMessage": "Deze pagina is alleen bedoeld voor ontwikkeling. Stel nooit JWT-tokens bloot in productie. Tokens geven volledige toegang tot uw account.",
-    "apiEndpointsToTest": "API-eindpunten om te testen:",
-    "notLoggedIn": "Niet ingelogd - log eerst in",
-    "loading": "Laden..."
   }
 }
