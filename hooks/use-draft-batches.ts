@@ -71,6 +71,20 @@ export interface ActivateDraftBatchResult {
 }
 
 /**
+ * Result from ignoring a draft batch
+ */
+export interface IgnoreDraftBatchResult {
+  success: boolean
+  ignored_batch_id: string
+  ignored_quantity: number
+  product_name: string
+  was_split: boolean
+  remaining_draft_batch_id: string | null
+  remaining_draft_quantity: number | null
+  message: string
+}
+
+/**
  * Item for delivery logging
  */
 export interface DeliveryItem {
@@ -436,6 +450,115 @@ export function useActivateDraftBatch() {
 }
 
 /**
+ * Hook to ignore a draft batch (mark as not needed)
+ *
+ * @example
+ * ```tsx
+ * const { mutateAsync: ignoreBatch, isPending } = useIgnoreDraftBatch()
+ *
+ * await ignoreBatch({
+ *   batchId: 'batch-uuid',
+ *   quantity: 10, // optional - ignores partial quantity
+ *   userId: 'user-uuid' // optional
+ * })
+ * ```
+ */
+export function useIgnoreDraftBatch() {
+  const queryClient = useQueryClient()
+  const supabase = createClient()
+  const activeStoreId = useActiveStoreId()
+
+  return useMutation({
+    mutationFn: async (params: {
+      batchId: string
+      quantity?: number
+      userId?: string
+    }): Promise<IgnoreDraftBatchResult> => {
+      const context = 'ignoreDraftBatch'
+
+      logger.log(context, 'Starting draft batch ignore', {
+        batchId: params.batchId,
+        quantity: params.quantity,
+      })
+
+      const startTime = performance.now()
+      const { data, error } = await supabase.schema('inventory').rpc('ignore_draft_batch', {
+        p_batch_id: params.batchId,
+        p_quantity: params.quantity || null,
+        p_user_id: params.userId || null,
+      })
+      const endTime = performance.now()
+
+      logger.log(
+        context,
+        `Ignore draft batch RPC completed in ${(endTime - startTime).toFixed(2)}ms`,
+        {
+          success: !error,
+          batchId: params.batchId,
+        },
+      )
+
+      if (error) {
+        logger.error(context, 'RPC error', { error, batchId: params.batchId })
+        throw error
+      }
+
+      return data as IgnoreDraftBatchResult
+    },
+
+    onSuccess: (result, _variables) => {
+      if (result.success) {
+        const message = result.was_split
+          ? `${result.ignored_quantity} units moved to ignored. ${result.remaining_draft_quantity} units remain in draft.`
+          : `${result.ignored_quantity} units moved to ignored`
+
+        toast.success(`${result.product_name} ignored`, {
+          description: message,
+        })
+
+        // Invalidate draft batches queries
+        if (activeStoreId) {
+          queryClient.invalidateQueries({
+            queryKey: queryKeys.batches.byStore(activeStoreId),
+          })
+
+          // Invalidate products queries (stock levels changed)
+          queryClient.invalidateQueries({
+            queryKey: queryKeys.products.byStore(activeStoreId),
+          })
+        }
+
+        // Invalidate the ignored batch detail
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.batches.detail(result.ignored_batch_id),
+        })
+
+        // If batch was split, also invalidate the remaining draft batch
+        if (result.was_split && result.remaining_draft_batch_id) {
+          queryClient.invalidateQueries({
+            queryKey: queryKeys.batches.detail(result.remaining_draft_batch_id),
+          })
+        }
+      } else {
+        toast.error('Failed to ignore batch', {
+          description: result.message,
+        })
+      }
+    },
+
+    onError: (error: Error, variables) => {
+      logger.error('ignoreDraftBatch', 'Mutation error', {
+        error,
+        batchId: variables.batchId,
+      })
+      toast.error('Failed to ignore draft batch', {
+        description: error.message,
+      })
+    },
+  })
+}
+
+/**
  * Hook to log a delivery and create draft batches
  *
  * @example
@@ -566,8 +689,10 @@ export function useLogDelivery() {
  *   draftsByProduct,
  *   recentProducts,
  *   activateBatch,
+ *   ignoreBatch,
  *   logDelivery,
  *   isActivating,
+ *   isIgnoring,
  *   isLoggingDelivery
  * } = useDraftBatchManagement()
  * ```
@@ -577,6 +702,7 @@ export function useDraftBatchManagement(storeId?: string) {
   const draftsByProduct = useDraftBatchesByProduct({}, storeId)
   const recentProducts = useRecentDeliveryProducts(20, storeId)
   const activateMutation = useActivateDraftBatch()
+  const ignoreMutation = useIgnoreDraftBatch()
   const logDeliveryMutation = useLogDelivery()
 
   return {
@@ -592,10 +718,12 @@ export function useDraftBatchManagement(storeId?: string) {
 
     // Mutations
     activateBatch: activateMutation.mutateAsync,
+    ignoreBatch: ignoreMutation.mutateAsync,
     logDelivery: logDeliveryMutation.mutateAsync,
 
     // Mutation states
     isActivating: activateMutation.isPending,
+    isIgnoring: ignoreMutation.isPending,
     isLoggingDelivery: logDeliveryMutation.isPending,
 
     // Raw query/mutation objects for advanced usage
@@ -603,6 +731,7 @@ export function useDraftBatchManagement(storeId?: string) {
     draftsByProductQuery: draftsByProduct,
     recentProductsQuery: recentProducts,
     activateMutation,
+    ignoreMutation,
     logDeliveryMutation,
   }
 }

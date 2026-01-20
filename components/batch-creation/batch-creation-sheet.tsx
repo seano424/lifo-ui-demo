@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { addDays, format } from 'date-fns'
-import { Calendar, ChevronLeft, Package } from 'lucide-react'
+import { Calendar, ChevronLeft, Package, XCircle } from 'lucide-react'
 import Image from 'next/image'
 import {
   Sheet,
@@ -24,6 +24,7 @@ import {
 } from '@/components/batch-creation'
 import {
   useActivateDraftBatch,
+  useIgnoreDraftBatch,
   useDraftBatchesByProduct,
   type ActivateDraftBatchResult,
   type ProductWithDraftBatches,
@@ -108,6 +109,7 @@ export function BatchCreationSheet({
   // ============================================================================
 
   const { mutateAsync: activateBatch, isPending: isActivating } = useActivateDraftBatch()
+  const { mutateAsync: ignoreBatch, isPending: isIgnoring } = useIgnoreDraftBatch()
 
   // ============================================================================
   // HANDLERS
@@ -190,6 +192,32 @@ export function BatchCreationSheet({
       // Error case is already handled by the mutation's onSuccess callback with toast
     } catch (error) {
       console.error('Failed to activate batch:', error)
+      // Error toast is already shown by the mutation hook
+    }
+  }
+
+  const handleIgnoreBatch = async () => {
+    if (!currentProduct) return
+
+    // Get the first draft batch for this product
+    const batchId = currentProduct.draft_batches[0]?.batch_id
+    if (!batchId) {
+      console.error('No draft batch ID found')
+      return
+    }
+
+    try {
+      const result = await ignoreBatch({
+        batchId,
+        quantity: currentProduct.draft_batches[0]?.quantity,
+      })
+
+      if (result.success) {
+        // Move to next product or close
+        handleContinueOrSkip()
+      }
+    } catch (error) {
+      console.error('Failed to ignore batch:', error)
       // Error toast is already shown by the mutation hook
     }
   }
@@ -335,7 +363,7 @@ export function BatchCreationSheet({
                   <DraftBatchCard
                     key={product.product_id}
                     product={product}
-                    onAddExpiry={() => handleProductSelect(index)}
+                    onClick={() => handleProductSelect(index)}
                   />
                 ))
               )}
@@ -471,10 +499,27 @@ export function BatchCreationSheet({
               <Button
                 size="lg"
                 className="w-full min-h-[44px] font-semibold"
-                disabled={!isDateSelected || isActivating}
+                disabled={!isDateSelected || isActivating || isIgnoring}
                 onClick={handleActivateBatch}
               >
                 {isActivating ? 'Adding Batch...' : `Add Batch (${selectedQuantity} units)`}
+              </Button>
+
+              {/* Ignore Button */}
+              <Button
+                type="button"
+                variant="ghost"
+                size="lg"
+                onClick={handleIgnoreBatch}
+                disabled={isActivating || isIgnoring}
+                className={cn(
+                  'w-full min-h-[44px]',
+                  'text-gray-600 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300',
+                  'hover:bg-gray-100 dark:hover:bg-gray-800',
+                )}
+              >
+                <XCircle className="h-4 w-4 mr-2" />
+                {isIgnoring ? 'Ignoring...' : 'Ignore This Batch'}
               </Button>
             </div>
           )}

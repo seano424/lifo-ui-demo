@@ -1,41 +1,46 @@
 'use client'
 
-import { Calendar, Package } from 'lucide-react'
+import { Calendar, ChevronRight, Package } from 'lucide-react'
 import Image from 'next/image'
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import type { ProductWithDraftBatches } from '@/hooks/use-draft-batches'
 import { cn } from '@/lib/utils'
 
 interface DraftBatchCardProps {
   product: ProductWithDraftBatches
-  onAddExpiry: () => void
-  onSkip?: () => void
+  onClick: () => void
   className?: string
 }
 
 /**
  * Compact card showing a product with draft batches
  * Optimized for mobile-first batch creation workflow
+ * Click to open batch creation sheet
  *
  * @example
  * ```tsx
  * <DraftBatchCard
  *   product={productWithDrafts}
- *   onAddExpiry={() => openExpiryDialog(product)}
- *   onSkip={() => skipProduct(product.product_id)}
+ *   onClick={() => openBatchSheet(product)}
  * />
  * ```
  */
-export function DraftBatchCard({ product, onAddExpiry, onSkip, className }: DraftBatchCardProps) {
-  const hasLastExpiry = product.last_expiry_days !== null
+export function DraftBatchCard({ product, onClick, className }: DraftBatchCardProps) {
   const categoryHint = product.category_name
     ? `${product.category_name} typically expires in +${product.typical_shelf_life_days || '?'} days`
     : null
 
   return (
-    <Card className={cn('overflow-hidden', className)}>
+    <Card
+      className={cn(
+        'overflow-hidden cursor-pointer transition-all',
+        'hover:shadow-md hover:border-primary-300 dark:hover:border-primary-700',
+        'active:scale-[0.99]',
+        className,
+      )}
+      onClick={onClick}
+    >
       <CardContent className="p-4">
         <div className="flex gap-4">
           {/* Product Image */}
@@ -92,55 +97,11 @@ export function DraftBatchCard({ product, onAddExpiry, onSkip, className }: Draf
               </p>
             )}
           </div>
-        </div>
 
-        {/* Action Buttons */}
-        <div className="mt-4 flex gap-2">
-          {/* Quick "Same" button if last expiry exists */}
-          {hasLastExpiry && (
-            <Button
-              type="button"
-              variant="default"
-              size="lg"
-              onClick={onAddExpiry}
-              className={cn(
-                'flex-1 min-h-[44px]',
-                'font-semibold',
-                'bg-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600',
-              )}
-            >
-              <Calendar className="h-4 w-4 mr-2" />
-              Same (+{product.last_expiry_days}d)
-            </Button>
-          )}
-
-          {/* "Different..." or "Add Expiry" button */}
-          <Button
-            type="button"
-            variant={hasLastExpiry ? 'outline' : 'default'}
-            size="lg"
-            onClick={onAddExpiry}
-            className={cn(
-              hasLastExpiry ? 'flex-none px-6' : 'flex-1',
-              'min-h-[44px]',
-              'font-semibold',
-            )}
-          >
-            {hasLastExpiry ? 'Different...' : 'Add Expiry Date'}
-          </Button>
-
-          {/* Optional Skip button */}
-          {onSkip && (
-            <Button
-              type="button"
-              variant="ghost"
-              size="lg"
-              onClick={onSkip}
-              className="flex-none px-4 min-h-[44px] text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-            >
-              Skip
-            </Button>
-          )}
+          {/* Chevron Indicator */}
+          <div className="shrink-0 flex items-center">
+            <ChevronRight className="h-5 w-5 text-gray-400" />
+          </div>
         </div>
       </CardContent>
     </Card>

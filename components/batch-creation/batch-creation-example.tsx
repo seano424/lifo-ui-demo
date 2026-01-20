@@ -178,11 +178,8 @@ export function BatchCreationExample() {
           </p>
           <DraftBatchCard
             product={mockProduct}
-            onAddExpiry={() => {
-              alert('Add expiry clicked!')
-            }}
-            onSkip={() => {
-              alert('Skip clicked!')
+            onClick={() => {
+              alert('Draft batch card clicked!')
             }}
           />
         </CardContent>
@@ -237,8 +234,8 @@ export function BatchCreationExample() {
           <div className="space-y-4">
             <DraftBatchCard
               product={mockProduct}
-              onAddExpiry={() => {
-                console.log('Opening expiry form...')
+              onClick={() => {
+                console.log('Opening batch creation sheet...')
               }}
             />
 

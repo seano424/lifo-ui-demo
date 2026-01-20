@@ -220,7 +220,7 @@ export default function NewBatchesPage() {
               <DraftBatchCard
                 key={product.product_id}
                 product={product}
-                onAddExpiry={() => handleOpenSheet(product)}
+                onClick={() => handleOpenSheet(product)}
               />
             ))}
           </div>
