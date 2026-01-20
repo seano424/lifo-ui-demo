@@ -199,9 +199,6 @@ async function upsertGlobalProduct(
       base_selling_price: productData.sellingPrice,
       open_food_facts_data: (productData.openFoodFactsData as Json) || null,
       created_by: (await supabase.auth.getUser()).data.user?.id || null,
-      total_stock: 0, // Will be updated by database triggers
-      active_batches_count: 0, // Will be updated by database triggers
-      avg_days_to_expiry: null,
     }
 
     const { data: newProduct, error } = await supabase
@@ -601,9 +598,6 @@ async function bulkUpsertProducts(
         base_selling_price: productData.sellingPrice,
         open_food_facts_data: (productData.openFoodFactsData as Json) || null,
         created_by: userId || null,
-        total_stock: 0,
-        active_batches_count: 0,
-        avg_days_to_expiry: null,
       })),
     )
 
