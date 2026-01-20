@@ -27,19 +27,19 @@ function getDaysLeftStyling(daysLeft: number): {
   }
   if (daysLeft === 0) {
     return {
-      textClass: 'text-destructive font-bold',
+      textClass: 'text-destructive',
       label: 'Today',
     }
   }
   if (daysLeft <= 3) {
     return {
-      textClass: 'text-destructive font-bold',
+      textClass: 'text-destructive',
       label: `${daysLeft} ${daysLeft === 1 ? 'day' : 'days'}`,
     }
   }
   if (daysLeft <= 7) {
     return {
-      textClass: 'text-orange-600 font-semibold',
+      textClass: '',
       label: `${daysLeft} days`,
     }
   }
