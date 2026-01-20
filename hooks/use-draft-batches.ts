@@ -8,6 +8,7 @@ import { useActiveStoreId } from '@/lib/stores/store-context'
 import { logger } from '@/lib/utils/logger'
 import { withPerformanceTracking } from '@/lib/utils/performance'
 import { toast } from 'sonner'
+import { useRestoreIgnoredBatch } from './use-ignored-batches'
 
 // ============================================================================
 // TYPE DEFINITIONS
@@ -132,6 +133,7 @@ export interface DraftBatchesByProductOptions {
   category_codes?: string[]
   limit?: number
   offset?: number
+  search?: string
 }
 
 // ============================================================================
@@ -190,6 +192,7 @@ async function fetchDraftBatchesByProduct(
           p_category_codes: options.category_codes || null,
           p_limit: options.limit || null,
           p_offset: options.offset || null,
+          p_search: options.search || null,
         })
 
       if (error) {
@@ -467,6 +470,7 @@ export function useIgnoreDraftBatch() {
   const queryClient = useQueryClient()
   const supabase = createClient()
   const activeStoreId = useActiveStoreId()
+  const { mutateAsync: restoreBatch } = useRestoreIgnoredBatch()
 
   return useMutation({
     mutationFn: async (params: {
@@ -506,6 +510,42 @@ export function useIgnoreDraftBatch() {
       return data as IgnoreDraftBatchResult
     },
 
+    onMutate: async params => {
+      if (!activeStoreId) return
+
+      // Cancel outgoing refetches to prevent overwriting optimistic update
+      await queryClient.cancelQueries({
+        queryKey: queryKeys.batches.draftsByProduct(activeStoreId, {}),
+      })
+
+      // Snapshot previous value for rollback
+      const previousDrafts = queryClient.getQueryData(
+        queryKeys.batches.draftsByProduct(activeStoreId, {}),
+      )
+
+      // Optimistically remove batch from the list
+      queryClient.setQueryData(
+        queryKeys.batches.draftsByProduct(activeStoreId, {}),
+        (old: ProductWithDraftBatches[] | undefined) => {
+          if (!old) return old
+
+          return old
+            .map(product => ({
+              ...product,
+              draft_batches: product.draft_batches.filter(b => b.batch_id !== params.batchId),
+              draft_batch_count: product.draft_batches.filter(b => b.batch_id !== params.batchId)
+                .length,
+              total_draft_quantity: product.draft_batches
+                .filter(b => b.batch_id !== params.batchId)
+                .reduce((sum, b) => sum + b.quantity, 0),
+            }))
+            .filter(p => p.draft_batches.length > 0) // Remove products with no drafts
+        },
+      )
+
+      return { previousDrafts }
+    },
+
     onSuccess: (result, _variables) => {
       if (result.success) {
         const message = result.was_split
@@ -514,9 +554,16 @@ export function useIgnoreDraftBatch() {
 
         toast.success(`${result.product_name} ignored`, {
           description: message,
+          action: {
+            label: 'Undo',
+            onClick: () => {
+              restoreBatch({ batchId: result.ignored_batch_id })
+            },
+          },
+          duration: 5000,
         })
 
-        // Invalidate draft batches queries
+        // Invalidate all batch queries for the store
         if (activeStoreId) {
           queryClient.invalidateQueries({
             queryKey: queryKeys.batches.byStore(activeStoreId),
@@ -546,7 +593,15 @@ export function useIgnoreDraftBatch() {
       }
     },
 
-    onError: (error: Error, variables) => {
+    onError: (error: Error, variables, context) => {
+      // Rollback optimistic update on error
+      if (context?.previousDrafts && activeStoreId) {
+        queryClient.setQueryData(
+          queryKeys.batches.draftsByProduct(activeStoreId, {}),
+          context.previousDrafts,
+        )
+      }
+
       logger.error('ignoreDraftBatch', 'Mutation error', {
         error,
         batchId: variables.batchId,

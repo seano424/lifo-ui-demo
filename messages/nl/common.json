@@ -48,10 +48,14 @@
   },
   "breadcrumbs": {
     "batches": "Partijen",
+    "stock": "Voorraad",
     "draftBatches": "Concept Partijen",
     "drafts": "Concepten",
+    "needsDates": "Datums Nodig",
+    "setAside": "Opzij Gezet",
     "billing": "Facturering",
     "dashboard": "Dashboard",
+    "overview": "Overzicht",
     "inventory": "Voorraad",
     "deliveries": "Leveringen",
     "scanOut": "Scan Uit",
@@ -79,8 +83,10 @@
     "scanIn": "Scan In",
     "inventoryManagement": "Voorraadbeheer",
     "addStore": "Winkel toevoegen",
+    "expiring": "Verlopend",
     "expiringSoon": "Verloopt binnenkort",
-    "new": "Nieuw"
+    "new": "Nieuw",
+    "ignored": "Genegeerd"
   },
   "navUser": {
     "upgradeToPro": "Upgrade naar Pro",

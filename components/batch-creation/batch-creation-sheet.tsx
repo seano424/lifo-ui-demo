@@ -42,6 +42,7 @@ interface BatchCreationSheetProps {
   products?: ProductWithDraftBatches[]
   singleProduct?: ProductWithDraftBatches
   onComplete?: () => void
+  hideIgnoreButton?: boolean
 }
 
 /**
@@ -75,6 +76,7 @@ export function BatchCreationSheet({
   products: externalProducts,
   singleProduct,
   onComplete,
+  hideIgnoreButton = false,
 }: BatchCreationSheetProps) {
   // ============================================================================
   // STATE MANAGEMENT
@@ -506,21 +508,23 @@ export function BatchCreationSheet({
               </Button>
 
               {/* Ignore Button */}
-              <Button
-                type="button"
-                variant="ghost"
-                size="lg"
-                onClick={handleIgnoreBatch}
-                disabled={isActivating || isIgnoring}
-                className={cn(
-                  'w-full min-h-[44px]',
-                  'text-gray-600 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300',
-                  'hover:bg-gray-100 dark:hover:bg-gray-800',
-                )}
-              >
-                <XCircle className="h-4 w-4 mr-2" />
-                {isIgnoring ? 'Ignoring...' : 'Ignore This Batch'}
-              </Button>
+              {!hideIgnoreButton && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="lg"
+                  onClick={handleIgnoreBatch}
+                  disabled={isActivating || isIgnoring}
+                  className={cn(
+                    'w-full min-h-[44px]',
+                    'text-gray-600 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300',
+                    'hover:bg-gray-100 dark:hover:bg-gray-800',
+                  )}
+                >
+                  <XCircle className="h-4 w-4 mr-2" />
+                  {isIgnoring ? 'Ignoring...' : 'Ignore This Batch'}
+                </Button>
+              )}
             </div>
           )}
 

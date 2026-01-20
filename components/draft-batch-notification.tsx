@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { useDraftBatchesSummary } from '@/hooks/use-draft-batches'
+import { useIgnoredBatchesSummary } from '@/hooks/use-ignored-batches'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 import { cn } from '@/lib/utils'
 import { Typography } from '@/components/ui/typography'
@@ -209,4 +210,26 @@ export function useDraftBatchCount(): number | undefined {
 
   const totalDrafts = summary?.total_draft_batches || 0
   return totalDrafts > 0 ? totalDrafts : undefined
+}
+
+/**
+ * Compact badge version for sidebar navigation items (ignored batches)
+ * Returns just the count number for use in badge prop
+ *
+ * @example
+ * ```tsx
+ * const ignoredCount = useIgnoredBatchCount()
+ *
+ * <NavItem
+ *   title="Ignored Batches"
+ *   badge={ignoredCount}
+ * />
+ * ```
+ */
+export function useIgnoredBatchCount(): number | undefined {
+  const storeId = useActiveStoreId()
+  const { data: summary } = useIgnoredBatchesSummary(storeId || undefined)
+
+  const totalIgnored = summary?.total_ignored_batches || 0
+  return totalIgnored > 0 ? totalIgnored : undefined
 }

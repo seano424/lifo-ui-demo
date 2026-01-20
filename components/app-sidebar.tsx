@@ -9,6 +9,7 @@ import {
   SettingsIcon,
   Zap,
   Clock,
+  XCircle,
 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import Link from 'next/link'
@@ -42,7 +43,7 @@ function useNavigationData() {
           title: t('dashboard'),
           items: [
             {
-              title: t('dashboard'),
+              title: t('overview'),
               url: '/dashboard',
               icon: ChartNoAxesCombined,
               isActive: true,
@@ -52,27 +53,22 @@ function useNavigationData() {
         {
           title: t('operations'),
           items: [
-            // {
-            //   title: t('deliveries'),
-            //   url: '/dashboard/deliveries',
-            //   icon: ScanSearch,
-            // },
-            // {
-            //   title: t('scanOut'),
-            //   url: '/dashboard/scan-out',
-            //   icon: ScanBarcode,
-            // },
-            // {
-            //   title: t('todos'),
-            //   url: '/dashboard/todos?tab=pending&urgency=critical%2Chigh&sort=urgency&direction=desc',
-            //   icon: ListTodo,
-            //   badge: expiryTodosCount > 0 ? expiryTodosCount : undefined,
-            // },
             {
-              title: t('expiringSoon'),
-              url: '/dashboard/expiring-soon',
+              title: t('expiring'),
+              url: '/dashboard/expiring',
               icon: Clock,
               badge: expiryTodosCount > 0 ? expiryTodosCount : undefined,
+            },
+            {
+              title: t('needsDates'),
+              url: '/dashboard/inventory/new',
+              icon: PackagePlus,
+              badge: draftBatchCount,
+            },
+            {
+              title: t('setAside'),
+              url: '/dashboard/inventory/ignored',
+              icon: XCircle,
             },
           ],
         },
@@ -80,21 +76,15 @@ function useNavigationData() {
           title: t('inventory'),
           items: [
             {
-              title: t('newBatches'),
-              url: '/dashboard/inventory/new',
-              icon: PackagePlus,
-              badge: draftBatchCount,
+              title: t('stock'),
+              url: '/dashboard/inventory/batches',
+              icon: Layers,
             },
             {
               title: t('products'),
               url: '/dashboard/inventory/products',
               icon: Package,
               isActive: true,
-            },
-            {
-              title: t('batches'),
-              url: '/dashboard/inventory/batches',
-              icon: Layers,
             },
           ],
         },

@@ -179,6 +179,11 @@ export const queryKeys = {
       [...queryKeys.batches.byStore(storeId), 'draftsByProduct', options] as const,
     recentDeliveries: (storeId: string, limit?: number) =>
       [...queryKeys.batches.byStore(storeId), 'recentDeliveries', { limit }] as const,
+    // Ignored batch queries (for ignored batches workflow)
+    ignoredSummary: (storeId: string) =>
+      [...queryKeys.batches.byStore(storeId), 'ignored', 'summary'] as const,
+    ignoredByProduct: (storeId: string, options?: Record<string, unknown>) =>
+      [...queryKeys.batches.byStore(storeId), 'ignored', 'by-product', options] as const,
   },
 
   // Store users queries

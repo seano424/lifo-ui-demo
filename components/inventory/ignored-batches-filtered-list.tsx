@@ -1,13 +1,12 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { AlertCircle, CheckCircle, Filter, Package, Plus } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { AlertCircle, Filter, Package, PartyPopper, Plus } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
-import { Skeleton } from '@/components/ui/skeleton'
+import { useCallback, useEffect, useState } from 'react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -16,57 +15,121 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { BatchCreationSheet, DraftBatchCard } from '@/components/batch-creation'
+import { Skeleton } from '@/components/ui/skeleton'
 import { TodoSearchBar } from '@/components/todos/filters/todo-search-bar'
+import { BatchCreationSheet, DraftBatchCard } from '@/components/batch-creation'
 import {
-  useDraftBatchesByProduct,
-  useDraftBatchesSummary,
-  type ProductWithDraftBatches,
-} from '@/hooks/use-draft-batches'
+  useIgnoredBatchesByProduct,
+  useIgnoredBatchesSummary,
+  type ProductWithIgnoredBatches,
+} from '@/hooks/use-ignored-batches'
 import { useActiveStoreId } from '@/lib/stores/store-context'
+import type { ProductWithDraftBatches } from '@/hooks/use-draft-batches'
+
+/**
+ * Transform ProductWithIgnoredBatches to ProductWithDraftBatches
+ * This allows us to reuse the BatchCreationSheet component for ignored batches
+ */
+function transformIgnoredProductToDraftProduct(
+  product: ProductWithIgnoredBatches,
+): ProductWithDraftBatches {
+  return {
+    product_id: product.product_id,
+    product_name: product.product_name,
+    product_brand: product.product_brand,
+    category_name: product.category_name,
+    typical_shelf_life_days: product.typical_shelf_life_days,
+    draft_batch_count: product.ignored_batch_count,
+    total_draft_quantity: product.total_ignored_quantity,
+    draft_batches: product.ignored_batches.map(batch => ({
+      batch_id: batch.batch_id,
+      batch_number: batch.batch_number,
+      quantity: batch.quantity,
+      received_date: batch.received_date,
+      created_at: batch.created_at,
+    })),
+    last_expiry_days: null,
+    last_batch_expiry_date: null,
+    total_count: product.total_count,
+  }
+}
+
+interface IgnoredBatchesFilteredListProps {
+  initialFilters?: {
+    category?: string
+    search?: string
+  }
+  pageSize?: number
+}
+
+interface IgnoredBatchFilters {
+  storeId?: string
+  category_codes?: string[]
+  search?: string
+  limit?: number
+  offset?: number
+}
 
 const ITEMS_PER_PAGE = 20
 
-export default function NewBatchesPage() {
-  const storeId = useActiveStoreId()
+export function IgnoredBatchesFilteredList({
+  initialFilters,
+  pageSize = ITEMS_PER_PAGE,
+}: IgnoredBatchesFilteredListProps) {
   const router = useRouter()
+  const activeStoreId = useActiveStoreId()
 
   // State
-  const [filters, setFilters] = useState<{
-    category_codes?: string[]
-    search?: string
-  }>(() => ({
-    category_codes: undefined,
-    search: undefined,
-  }))
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([])
+  const [filters, setFilters] = useState<IgnoredBatchFilters>(() => {
+    const baseFilters: IgnoredBatchFilters = {
+      storeId: activeStoreId || undefined,
+    }
+
+    if (initialFilters?.category) {
+      baseFilters.category_codes = [initialFilters.category]
+    }
+
+    if (initialFilters?.search) {
+      baseFilters.search = initialFilters.search
+    }
+
+    return baseFilters
+  })
+
+  const [currentPage, setCurrentPage] = useState(1)
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(
+    initialFilters?.category ? [initialFilters.category] : [],
+  )
   const [selectedProduct, setSelectedProduct] = useState<ProductWithDraftBatches | null>(null)
   const [isSheetOpen, setIsSheetOpen] = useState(false)
-  const [currentPage, setCurrentPage] = useState(1)
 
   // Fetch summary data
-  const { data: summary, isLoading: isSummaryLoading } = useDraftBatchesSummary(
-    storeId || undefined,
+  const { data: summary, isLoading: isSummaryLoading } = useIgnoredBatchesSummary(
+    activeStoreId || undefined,
   )
 
-  // Fetch draft batches by product
+  // Fetch ignored batches by product
   const {
     data: products,
     isLoading: isProductsLoading,
     error: productsError,
-  } = useDraftBatchesByProduct(
+  } = useIgnoredBatchesByProduct(
     {
       category_codes: selectedCategories.length > 0 ? selectedCategories : undefined,
-      limit: ITEMS_PER_PAGE,
-      offset: (currentPage - 1) * ITEMS_PER_PAGE,
+      limit: pageSize,
+      offset: (currentPage - 1) * pageSize,
       search: filters.search || undefined,
     },
-    storeId || undefined,
+    activeStoreId || undefined,
   )
+
+  useEffect(() => {
+    setFilters(prev => ({ ...prev, storeId: activeStoreId || undefined }))
+  }, [activeStoreId])
 
   // Calculate pagination
   const totalProducts = products?.[0]?.total_count || 0
-  const totalPages = Math.ceil(totalProducts / ITEMS_PER_PAGE)
+  const totalPages = Math.ceil(totalProducts / pageSize)
   const hasNextPage = currentPage < totalPages
   const hasPrevPage = currentPage > 1
 
@@ -74,8 +137,15 @@ export default function NewBatchesPage() {
   const categories = summary?.by_category || []
 
   // Handlers
+  const handleCategoryToggle = (categoryCode: string) => {
+    setSelectedCategories(prev =>
+      prev.includes(categoryCode) ? prev.filter(c => c !== categoryCode) : [...prev, categoryCode],
+    )
+    setCurrentPage(1) // Reset to first page when filtering
+  }
+
   const updateFilters = useCallback(
-    (newFilters: Partial<typeof filters>) => {
+    (newFilters: Partial<IgnoredBatchFilters>) => {
       setFilters(prev => ({ ...prev, ...newFilters }))
 
       // Update URL params
@@ -110,20 +180,9 @@ export default function NewBatchesPage() {
     [updateFilters],
   )
 
-  const handleCategoryToggle = (categoryCode: string) => {
-    setSelectedCategories(prev => {
-      const updated = prev.includes(categoryCode)
-        ? prev.filter(c => c !== categoryCode)
-        : [...prev, categoryCode]
-
-      updateFilters({ category_codes: updated.length > 0 ? updated : undefined })
-      return updated
-    })
-    setCurrentPage(1)
-  }
-
-  const handleOpenSheet = (product: ProductWithDraftBatches) => {
-    setSelectedProduct(product)
+  const handleOpenSheet = (product: ProductWithIgnoredBatches) => {
+    const transformedProduct = transformIgnoredProductToDraftProduct(product)
+    setSelectedProduct(transformedProduct)
     setIsSheetOpen(true)
   }
 
@@ -133,28 +192,28 @@ export default function NewBatchesPage() {
   }
 
   const isLoading = isSummaryLoading || isProductsLoading
-  const totalDrafts = summary?.total_draft_batches || 0
+  const totalIgnored = summary?.total_ignored_batches || 0
   const totalUnits = summary?.total_units || 0
 
   return (
-    <div className="container space-y-6 md:py-6 lg:py-8">
+    <div className="space-y-6">
       {/* Page Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
-            New Batches
+            Ignored Batches
           </h1>
           <p className="text-base text-gray-500 dark:text-gray-400 mt-1">
-            Add expiry dates to activate your inventory
+            Batches you chose to skip. Restore them to continue setup.
           </p>
         </div>
 
         {/* Summary Stats */}
-        {!isLoading && totalDrafts > 0 && (
+        {!isLoading && totalIgnored > 0 && (
           <div className="flex flex-wrap items-center gap-3">
             <Badge variant="secondary" className="text-base px-3 py-1.5">
               <Package className="h-4 w-4 mr-2" />
-              {totalDrafts} {totalDrafts === 1 ? 'batch' : 'batches'}
+              {totalIgnored} {totalIgnored === 1 ? 'batch' : 'batches'}
             </Badge>
             <Badge variant="outline" className="text-base px-3 py-1.5">
               {totalUnits} units
@@ -163,7 +222,7 @@ export default function NewBatchesPage() {
         )}
       </div>
 
-      {/* Search and Filters */}
+      {/* Control bar - Search and Filters */}
       <div className="flex flex-row flex-wrap lg:items-center lg:gap-4 gap-3">
         {/* Search Bar */}
         <div className="flex-1">
@@ -171,7 +230,7 @@ export default function NewBatchesPage() {
             searchTerm={filters.search}
             onSearchChange={handleSearchChange}
             isLoading={false}
-            placeholder="Search batches..."
+            placeholder="Search ignored batches..."
             size="large"
           />
         </div>
@@ -202,7 +261,7 @@ export default function NewBatchesPage() {
                   <div className="flex items-center justify-between w-full">
                     <span>{category.category_name}</span>
                     <Badge variant="outline" className="ml-2 text-xs">
-                      {category.draft_count}
+                      {category.ignored_count}
                     </Badge>
                   </div>
                 </DropdownMenuCheckboxItem>
@@ -233,7 +292,10 @@ export default function NewBatchesPage() {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => setSelectedCategories([])}
+              onClick={() => {
+                setSelectedCategories([])
+                setCurrentPage(1)
+              }}
               className="h-7 text-xs"
             >
               Clear all
@@ -255,22 +317,22 @@ export default function NewBatchesPage() {
       {productsError && (
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
-          <AlertDescription>Failed to load draft batches. Please try again.</AlertDescription>
+          <AlertDescription>Failed to load ignored batches. Please try again.</AlertDescription>
         </Alert>
       )}
 
       {/* Empty State */}
-      {!isLoading && !productsError && totalDrafts === 0 && (
+      {!isLoading && !productsError && totalIgnored === 0 && (
         <Card className="border-2 border-dashed border-gray-200 dark:border-gray-800">
           <CardContent className="flex flex-col items-center justify-center py-16 px-6 text-center">
             <div className="rounded-full bg-green-50 dark:bg-green-900/20 p-4 mb-4">
-              <PartyPopper className="h-12 w-12 text-green-600 dark:text-green-400" />
+              <CheckCircle className="h-12 w-12 text-green-600 dark:text-green-400" />
             </div>
             <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
-              No draft batches!
+              No ignored batches
             </h3>
             <p className="text-base text-gray-500 dark:text-gray-400 max-w-md">
-              All your batches have expiry dates assigned. New deliveries will appear here.
+              All your deliveries are being tracked. Batches you ignore will appear here.
             </p>
           </CardContent>
         </Card>
@@ -283,7 +345,7 @@ export default function NewBatchesPage() {
             {products.map(product => (
               <DraftBatchCard
                 key={product.product_id}
-                product={product}
+                product={transformIgnoredProductToDraftProduct(product)}
                 onClick={() => handleOpenSheet(product)}
               />
             ))}
@@ -293,8 +355,8 @@ export default function NewBatchesPage() {
           {totalPages > 1 && (
             <div className="flex items-center justify-between border-t border-gray-200 dark:border-gray-800 pt-4">
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                Showing {(currentPage - 1) * ITEMS_PER_PAGE + 1} to{' '}
-                {Math.min(currentPage * ITEMS_PER_PAGE, totalProducts)} of {totalProducts} products
+                Showing {(currentPage - 1) * pageSize + 1} to{' '}
+                {Math.min(currentPage * pageSize, totalProducts)} of {totalProducts} products
               </p>
               <div className="flex gap-2">
                 <Button
@@ -323,9 +385,10 @@ export default function NewBatchesPage() {
       <BatchCreationSheet
         open={isSheetOpen}
         onOpenChange={setIsSheetOpen}
-        storeId={storeId || ''}
+        storeId={activeStoreId || ''}
         singleProduct={selectedProduct || undefined}
         onComplete={handleSheetComplete}
+        hideIgnoreButton={true}
       />
     </div>
   )
