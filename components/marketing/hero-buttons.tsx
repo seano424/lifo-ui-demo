@@ -12,8 +12,9 @@ export function HeroButtons() {
   return (
     <>
       {currentUser && (
-        <Button size="lg" asLink href="/dashboard">
+        <Button size="lg" asLink href="/dashboard" className="capitalize">
           {t('dashboard')}
+          <ChevronRightIcon className="w-4 h-4" />
         </Button>
       )}
       {!currentUser && (
@@ -21,7 +22,7 @@ export function HeroButtons() {
           asLink
           href="/onboarding/create-account"
           size="lg"
-          className="font-semibold font-heading flex items-center gap-1"
+          className="font-semibold font-heading flex items-center gap-1 capitalize"
           variant="black"
         >
           {t('freeTrial')}

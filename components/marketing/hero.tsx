@@ -3,7 +3,7 @@ import { HeroButtons } from '@/components/marketing/hero-buttons'
 import { HeroDescription } from '@/components/marketing/hero-description'
 import { HeroHeading } from '@/components/marketing/hero-heading'
 import { Logo } from '@/components/ui/logo'
-import { Typography } from '@/components/ui/typography'
+// import { Typography } from '@/components/ui/typography'
 
 export function Hero() {
   return (
@@ -13,9 +13,9 @@ export function Hero() {
     >
       <div className="flex flex-col items-center gap-2">
         <Logo variant="svg" />
-        <Typography variant="h2" color="primary" className="font-heading font-black">
+        {/* <Typography variant="h2" color="primary" className="font-heading font-black">
           LIFO
-        </Typography>
+        </Typography> */}
       </div>
       <a
         href="https://www.producthunt.com/products/lifo-mvp-v1?embed=true&utm_source=badge-featured&utm_medium=badge"
