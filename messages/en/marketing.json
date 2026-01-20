@@ -75,8 +75,9 @@
   },
   "landingpage": {
     "hero": {
-      "title": "Smarter Inventory Decisions Batch by Batch",
-      "subtitle": "Get alerts on expiring food products to maximize your profits and reduce waste",
+      "title": "Expiry tracking that drives action",
+      "subtitle": "LIFO shows your team exactly what's expiring so you can discount, donate, or sell in time.",
+      "subtitle2": "LIFO shows your team exactly which food batches need attention so you can discount, donate, or sell before it's too late.",
       "buttons": {
         "freeTrial": "Start my free trial",
         "explore": "Explore the platform",
@@ -84,7 +85,8 @@
       },
       "badge": {
         "text": "Enjoy a one month free trial",
-        "welcomeBack": "Your dashboard is ready"
+        "welcomeBack": "Your dashboard is ready",
+        "square": "Works with Square"
       }
     },
     "features": {

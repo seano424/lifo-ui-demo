@@ -16,6 +16,7 @@ interface LogoProps {
   darkMode?: boolean // Force dark/light mode
   href?: string // Make it clickable
   priority?: boolean // Image loading priority (default: false)
+  withText?: boolean
 }
 
 const sizeMap = {
@@ -32,6 +33,7 @@ export function Logo({
   href,
   darkMode,
   priority = false,
+  withText = false,
 }: LogoProps) {
   const { resolvedTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
@@ -89,13 +91,30 @@ export function Logo({
 
   if (href) {
     return (
-      <Link href={href} className="inline-block">
+      <Link
+        href={href}
+        className={cn(
+          'inline-block',
+          withText && 'flex items-center gap-2 font-heading font-black text-4xl',
+        )}
+      >
         {logoElement}
+        {withText && 'LIFO'}
       </Link>
     )
   }
 
-  return logoElement
+  return (
+    <div
+      className={cn(
+        'inline-block',
+        withText && 'flex items-center gap-2 font-heading font-black text-4xl',
+      )}
+    >
+      {logoElement}
+      {withText && 'LIFO'}
+    </div>
+  )
 }
 
 // Specific logo components for common use cases

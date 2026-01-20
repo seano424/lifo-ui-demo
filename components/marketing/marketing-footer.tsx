@@ -20,10 +20,7 @@ export function MarketingFooter() {
           <div className="space-y-4">
             <div className="flex items-center gap-2">
               <Logo variant="svg" size="sm" className="w-10 h-auto" />
-              <Typography
-                variant="h4"
-                className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-violet-700 via-indigo-400 to-blue-600"
-              >
+              <Typography variant="h4" className="font-heading font-black text-xl">
                 LIFO
               </Typography>
             </div>

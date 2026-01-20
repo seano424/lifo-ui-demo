@@ -131,10 +131,8 @@ const MarketingNav = ({ menu }: MarketingNavProps) => {
       <nav className="hidden justify-between lg:flex container mx-auto">
         <div className="flex items-center gap-8">
           {/* <NavbarLogo variant="text" href="/" /> */}
-          <Link href="/">
-            <Logo variant="svg" size="sm" priority />
-          </Link>
 
+          <Logo variant="svg" size="sm" priority href="/" withText />
           <NavigationMenu>
             <NavigationMenuList>{menuItems.map(item => renderMenuItem(item))}</NavigationMenuList>
           </NavigationMenu>

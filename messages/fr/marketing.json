@@ -75,8 +75,9 @@
   },
   "landingpage": {
     "hero": {
-      "title": "La gestion de stocks plus intelligente Lot par lot",
-      "subtitle": "Obtenez des alertes sur les stocks expirents au bon moment, et connectez-vous avec des banques alimentaires",
+      "title": "Suivi d'expiration qui stimule l'action",
+      "subtitle": "LIFO montre à votre équipe exactement ce qui expire pour que vous puissiez réduire les prix, donner ou vendre à temps.",
+      "subtitle2": "LIFO montre à votre équipe exactement quels lots alimentaires nécessitent attention pour que vous puissiez réduire les prix, donner ou vendre avant qu'il ne soit trop tard.",
       "buttons": {
         "freeTrial": "Démarrer mon essai gratuit",
         "explore": "Explorer la plateforme",
@@ -84,7 +85,8 @@
       },
       "badge": {
         "text": "Profitez d'un mois d'essai gratuit",
-        "welcomeBack": "Votre tableau de bord est prêt"
+        "welcomeBack": "Votre tableau de bord est prêt",
+        "square": "Fonctionne avec Square"
       }
     },
     "features": {
