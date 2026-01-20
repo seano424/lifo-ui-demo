@@ -118,7 +118,7 @@ export default function PWAInstallPrompt() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-6 h-6 bg-white rounded flex items-center justify-center">
-              <Logo variant="icon-dark" size="sm" className="w-4 h-4" />
+              <Logo variant="svg" size="sm" className="w-4 h-4" />
             </div>
             <div>
               <p className=" text-xs">{t('title')}</p>
@@ -150,7 +150,7 @@ export default function PWAInstallPrompt() {
         <div className="bg-white rounded-lg shadow-lg border border-gray-200 p-3 max-w-xs">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded flex items-center justify-center flex-shrink-0">
-              <Logo variant="icon-dark" size="sm" className="w-6 h-6" />
+              <Logo variant="svg" size="sm" className="w-6 h-6" />
             </div>
             <div className="flex-1 min-w-0">
               <h3 className=" text-gray-900 text-xs">{t('title')}</h3>

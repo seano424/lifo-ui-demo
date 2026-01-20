@@ -47,7 +47,6 @@ interface BatchTableProps {
 
 export function BatchTable({ data, currentSort, updateSort, isLoading }: BatchTableProps) {
   const t = useTranslations('batches.table')
-  const tStatus = useTranslations('batches.status')
   const tExpiry = useTranslations('batches.expiry')
   const currencySymbol = useCurrency()
   const { activeStore } = useStoreState()
@@ -89,9 +88,7 @@ export function BatchTable({ data, currentSort, updateSort, isLoading }: BatchTa
     currentSort,
     updateSort,
     t,
-    tStatus,
     tExpiry,
-    currencySymbol,
     storeName: activeStore?.store_name,
   })
 
@@ -134,11 +131,11 @@ export function BatchTable({ data, currentSort, updateSort, isLoading }: BatchTa
       >
         <TableHeader>
           {table.getHeaderGroups().map(headerGroup => (
-            <TableRow key={headerGroup.id} className="border-b-2 border-border">
+            <TableRow key={headerGroup.id} className="border-b border-border">
               {headerGroup.headers.map(header => (
                 <TableHead
                   key={header.id}
-                  className="py-3 px-4 border-b border-brand-dark/40"
+                  className="py-3 px-4"
                   style={
                     header.column.columnDef.size
                       ? { width: header.column.columnDef.size }
@@ -166,7 +163,7 @@ export function BatchTable({ data, currentSort, updateSort, isLoading }: BatchTa
                   style={
                     cell.column.columnDef.size ? { width: cell.column.columnDef.size } : undefined
                   }
-                  className="py-4 px-4 border-b border-border"
+                  className="py-4 px-4"
                 >
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </TableCell>

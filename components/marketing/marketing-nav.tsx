@@ -132,7 +132,7 @@ const MarketingNav = ({ menu }: MarketingNavProps) => {
         <div className="flex items-center gap-8">
           {/* <NavbarLogo variant="text" href="/" /> */}
           <Link href="/">
-            <Logo variant="horizontal" size="sm" priority />
+            <Logo variant="svg" size="sm" priority />
           </Link>
 
           <NavigationMenu>
@@ -150,7 +150,7 @@ const MarketingNav = ({ menu }: MarketingNavProps) => {
       <div className="block lg:hidden container mx-auto">
         <div className="flex items-center justify-between">
           <Link href="/">
-            <Logo variant="horizontal" size="sm" priority />
+            <Logo variant="svg" size="sm" priority />
           </Link>
           <Sheet>
             <SheetTrigger asChild>
@@ -162,7 +162,7 @@ const MarketingNav = ({ menu }: MarketingNavProps) => {
               <SheetHeader>
                 <SheetTitle>
                   <Link href="/">
-                    <Logo variant="horizontal" size="sm" priority />
+                    <Logo variant="svg" size="sm" priority />
                   </Link>
                 </SheetTitle>
               </SheetHeader>

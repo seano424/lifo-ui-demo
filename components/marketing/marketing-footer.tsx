@@ -19,7 +19,7 @@ export function MarketingFooter() {
           {/* Logo and Description */}
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <Logo variant="icon" size="sm" className="w-10 h-auto" />
+              <Logo variant="svg" size="sm" className="w-10 h-auto" />
               <Typography
                 variant="h4"
                 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-violet-700 via-indigo-400 to-blue-600"

@@ -36,13 +36,14 @@ export function BatchesFilteredList({ initialFilters, pageSize = 100 }: BatchesF
       storeId: activeStoreId || undefined,
     }
 
-    // Default to 180 days if no filter is specified
+    // Default to 180 days expiring filter
     if (initialFilters?.filter === 'expiring') {
       baseFilters.expiringInDays = parseInt(initialFilters.expiringDays || '180', 10)
     } else if (!initialFilters?.filter) {
       baseFilters.expiringInDays = 180
     }
 
+    // Default to active status
     if (initialFilters?.status) {
       baseFilters.status = initialFilters.status as
         | 'active'
@@ -50,6 +51,8 @@ export function BatchesFilteredList({ initialFilters, pageSize = 100 }: BatchesF
         | 'damaged'
         | 'sold_out'
         | 'reserved'
+    } else {
+      baseFilters.status = 'active'
     }
 
     if (initialFilters?.search) {
@@ -62,10 +65,8 @@ export function BatchesFilteredList({ initialFilters, pageSize = 100 }: BatchesF
         direction: (initialFilters.direction || 'asc') as 'asc' | 'desc',
       }
     } else {
-      baseFilters.sort =
-        initialFilters?.filter === 'expiring'
-          ? { field: 'expiry_date', direction: 'asc' }
-          : { field: 'created_at', direction: 'desc' }
+      // Default to expiry_date ascending for expiry intelligence focus
+      baseFilters.sort = { field: 'expiry_date', direction: 'asc' }
     }
 
     return baseFilters
@@ -166,8 +167,8 @@ export function BatchesFilteredList({ initialFilters, pageSize = 100 }: BatchesF
   const handleSortFieldChange = useCallback(
     (field: BatchSortField) => {
       const currentSort = filters.sort || {
-        field: 'created_at',
-        direction: 'desc' as const,
+        field: 'expiry_date',
+        direction: 'asc' as const,
       }
       const newDirection =
         currentSort.field === field && currentSort.direction === 'asc' ? 'desc' : 'asc'
@@ -212,7 +213,7 @@ export function BatchesFilteredList({ initialFilters, pageSize = 100 }: BatchesF
 
         {/* Sort Controls */}
         <BatchListSortControls
-          currentSort={filters.sort || { field: 'created_at', direction: 'desc' }}
+          currentSort={filters.sort || { field: 'expiry_date', direction: 'asc' }}
           updateSort={handleSortFieldChange}
           isLoading={isLoading}
         />
@@ -228,7 +229,7 @@ export function BatchesFilteredList({ initialFilters, pageSize = 100 }: BatchesF
         <BatchTable
           data={data}
           isLoading={isLoading}
-          currentSort={filters.sort || { field: 'created_at', direction: 'desc' }}
+          currentSort={filters.sort || { field: 'expiry_date', direction: 'asc' }}
           updateSort={handleSortFieldChange}
         />
       </div>
