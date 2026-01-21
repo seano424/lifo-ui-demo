@@ -15,6 +15,7 @@ interface InventoryOverviewCardProps {
 
 export function InventoryOverviewCard({ storeId }: InventoryOverviewCardProps) {
   const t = useTranslations('dashboard.inventoryOverview')
+  const tExpiry = useTranslations('dashboard.expiringSoon')
   const { data, isLoading, error } = useExpiryDashboardSummary(storeId)
   const draftBatchCount = useDraftBatchCount()
 
@@ -69,6 +70,16 @@ export function InventoryOverviewCard({ storeId }: InventoryOverviewCardProps) {
             <Typography variant="p">{t('needsDates')}</Typography>
             <Typography variant="p">{draftBatchCount?.toLocaleString() || '0'}</Typography>
           </div>
+
+          {/* Expiring This Week */}
+          <div className="flex items-center justify-between py-2">
+            <Typography variant="p" className="capitalize">
+              {tExpiry('expiringThisWeek')}
+            </Typography>
+            <Typography variant="p" className="capitalize">
+              {data.expiring_this_week?.toLocaleString() || '0'}
+            </Typography>
+          </div>
         </div>
       </div>
 
@@ -77,7 +88,7 @@ export function InventoryOverviewCard({ storeId }: InventoryOverviewCardProps) {
         <Button
           asLink
           variant="gray"
-          href="/dashboard/inventory/products"
+          href="/dashboard/inventory/products?sort=active_batches_count&direction=desc"
           size="lg"
           className="w-full group/button"
         >

@@ -153,7 +153,7 @@ export function DraftBatchNotification({
       {/* Content */}
       <div className="flex-1 min-w-0">
         <AlertDescription>
-          <Typography variant="h4" className="mb-1">
+          <Typography variant="h3" color="primary" className="mb-1">
             {totalDrafts} {totalDrafts === 1 ? 'item needs' : 'items need'} expiry dates
           </Typography>
           <Typography variant="p">

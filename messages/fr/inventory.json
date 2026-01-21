@@ -122,6 +122,10 @@
     "itemCount": "{count} articles"
   },
   "batches": {
+    "page": {
+      "title": "Lots",
+      "description": "Votre inventaire regroupé par date d'expiration"
+    },
     "table": {
       "headers": {
         "batchNumber": "N° de lot",

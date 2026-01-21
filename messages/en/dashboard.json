@@ -3,10 +3,12 @@
     "title": "Inventory Dashboard",
     "subtitle": "Track expiry dates and manage your inventory",
     "expiringSoon": {
-      "title": "Expiring Soon",
-      "subtitle": "Next 7 days",
+      "title": "Expiring in 3 days",
+      "subtitle": "Next 3 days",
       "today": "Today",
       "tomorrow": "Tomorrow",
+      "inTwoDays": "In 2 Days",
+      "inThreeDays": "In 3 Days",
       "thisWeek": "This Week",
       "expiringWithinWeek": "expiring within the week",
       "expiringThisWeek": "expiring this week",
@@ -309,11 +311,11 @@
     "dashboard-title": "Store",
     "dashboard": "Dashboard",
     "overview": "Overview",
-    "operations": "Operations",
+    "actions": "Actions",
     "expiring": "Expiring",
     "expiringSoon": "Expiring Soon",
     "needsDates": "Needs Dates",
-    "setAside": "Set Aside",
+    "ignored": "Ignored",
     "inventory": "Inventory",
     "stock": "Stock",
     "newBatches": "New Batches",
@@ -516,7 +518,7 @@
     "descriptions": {
       "batches": "View and manage your store's inventory batches",
       "products": "View and manage your store's product inventory",
-      "dashboard": "Monitor your store's performance, track inventory, and optimize operations with real-time insights and AI-powered recommendations."
+      "dashboard": "Here's what needs your attention today."
     }
   },
   "timeSelector": {

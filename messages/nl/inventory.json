@@ -122,6 +122,10 @@
     "itemCount": "{count} artikelen"
   },
   "batches": {
+    "page": {
+      "title": "Batches",
+      "description": "Uw voorraad gegroepeerd op vervaldatum"
+    },
     "table": {
       "headers": {
         "batchNumber": "Batch nr.",

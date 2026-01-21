@@ -38,7 +38,8 @@ export function ExpiringSoonCard({ storeId }: ExpiringSoonCardProps) {
     )
   }
 
-  const totalExpiring = data.expiring_today + data.expiring_tomorrow + data.expiring_this_week
+  // Use the pre-calculated total_expiring which matches the sidebar badge
+  const totalExpiring = data.total_expiring
   const totalActiveBatches = data.total_active_batches
   const expiringPercentage =
     totalActiveBatches > 0 ? Math.round((totalExpiring / totalActiveBatches) * 100) : 0
@@ -48,11 +49,12 @@ export function ExpiringSoonCard({ storeId }: ExpiringSoonCardProps) {
       {/* Header */}
       <div className="p-6 border-b h-24 flex flex-col justify-center w-full">
         <div className="flex justify-between items-center gap-2">
-          <div className="flex flex-col gap-1">
-            <Typography variant="h3">{t('title')}</Typography>
-            <Typography variant="small">{t('subtitle')}</Typography>
-          </div>
-          <Typography variant="h3">{totalExpiring}</Typography>
+          <Typography variant="h3" color="primary">
+            {t('title')}
+          </Typography>
+          <Typography variant="h3" color="primary">
+            {totalExpiring}
+          </Typography>
         </div>
       </div>
 
@@ -69,6 +71,18 @@ export function ExpiringSoonCard({ storeId }: ExpiringSoonCardProps) {
           <div className="flex items-center justify-between py-2">
             <Typography variant="p">{t('tomorrow')}</Typography>
             <Typography variant="p">{data.expiring_tomorrow}</Typography>
+          </div>
+
+          {/* In Two Days */}
+          <div className="flex items-center justify-between py-2">
+            <Typography variant="p">{t('inTwoDays')}</Typography>
+            <Typography variant="p">{data.expiring_in_two_days}</Typography>
+          </div>
+
+          {/* In Three Days */}
+          <div className="flex items-center justify-between py-2">
+            <Typography variant="p">{t('inThreeDays')}</Typography>
+            <Typography variant="p">{data.expiring_in_three_days}</Typography>
           </div>
 
           {/* This Week */}

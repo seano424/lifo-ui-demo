@@ -3,10 +3,12 @@
     "title": "Tableau de Bord Inventaire",
     "subtitle": "Suivez les dates d'expiration et gérez votre inventaire",
     "expiringSoon": {
-      "title": "Expire Bientôt",
-      "subtitle": "7 prochains jours",
+      "title": "Expire dans 3 jours",
+      "subtitle": "3 prochains jours",
       "today": "Aujourd'hui",
       "tomorrow": "Demain",
+      "inTwoDays": "Dans 2 Jours",
+      "inThreeDays": "Dans 3 Jours",
       "thisWeek": "Cette Semaine",
       "expiringWithinWeek": "expirant dans la semaine",
       "expiringThisWeek": "expirant cette semaine",
@@ -309,11 +311,11 @@
     "dashboard-title": "Magasin",
     "dashboard": "Tableau de bord",
     "overview": "Aperçu",
-    "operations": "Opérations",
+    "actions": "Actions",
     "expiring": "Expirant",
     "expiringSoon": "Expire bientôt",
     "needsDates": "Nécessite Dates",
-    "setAside": "Mis de Côté",
+    "ignored": "Ignoré",
     "inventory": "Inventaire",
     "stock": "Stock",
     "newBatches": "Nouveaux Lots",
@@ -517,7 +519,7 @@
     "descriptions": {
       "batches": "Visualisez et gérez les lots d'inventaire de votre magasin",
       "products": "Visualisez et gérez l'inventaire des produits de votre magasin",
-      "dashboard": "Surveillez les performances de votre magasin, suivez l'inventaire et optimisez les opérations avec des insights en temps réel et des recommandations alimentées par l'IA."
+      "dashboard": "Voici ce qui nécessite votre attention aujourd'hui."
     }
   },
   "timeSelector": {

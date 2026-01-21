@@ -122,6 +122,10 @@
     "itemCount": "{count} items"
   },
   "batches": {
+    "page": {
+      "title": "Batches",
+      "description": "Your inventory grouped by expiration date"
+    },
     "table": {
       "headers": {
         "batchNumber": "Batch #",

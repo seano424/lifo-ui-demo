@@ -3,10 +3,12 @@
     "title": "Voorraad Dashboard",
     "subtitle": "Volg vervaldatums en beheer uw voorraad",
     "expiringSoon": {
-      "title": "Verloopt Binnenkort",
-      "subtitle": "Komende 7 dagen",
+      "title": "Verloopt over 3 dagen",
+      "subtitle": "Komende 3 dagen",
       "today": "Vandaag",
       "tomorrow": "Morgen",
+      "inTwoDays": "Over 2 Dagen",
+      "inThreeDays": "Over 3 Dagen",
       "thisWeek": "Deze Week",
       "expiringWithinWeek": "verloopt binnen een week",
       "expiringThisWeek": "verloopt deze week",
@@ -309,11 +311,11 @@
     "dashboard-title": "Winkel",
     "dashboard": "Dashboard",
     "overview": "Overzicht",
-    "operations": "Operaties",
+    "actions": "Acties",
     "expiring": "Verlopend",
     "expiringSoon": "Verloopt binnenkort",
     "needsDates": "Datums Nodig",
-    "setAside": "Opzij Gezet",
+    "ignored": "Genegeerd",
     "inventory": "Voorraad",
     "stock": "Voorraad",
     "newBatches": "Nieuwe Batches",
@@ -515,7 +517,7 @@
     "descriptions": {
       "batches": "Bekijk en beheer de voorraad batches van uw winkel",
       "products": "Bekijk en beheer uw product voorraad",
-      "dashboard": "Monitor de prestaties van uw winkel, volg voorraad en optimaliseer operaties met real-time inzichten en AI-aangedreven aanbevelingen."
+      "dashboard": "Dit heeft vandaag uw aandacht nodig."
     }
   },
   "timeSelector": {

@@ -50,7 +50,7 @@ function useNavigationData() {
           ],
         },
         {
-          title: t('operations'),
+          title: t('actions'),
           items: [
             {
               title: t('expiring'),
@@ -65,7 +65,7 @@ function useNavigationData() {
               badge: draftBatchCount,
             },
             {
-              title: t('setAside'),
+              title: t('ignored'),
               url: '/dashboard/inventory/ignored',
               icon: XCircle,
             },
