@@ -145,7 +145,7 @@ export function NavMain({
                             <SidebarMenuSubButton asChild tooltip={subItem.title}>
                               <Link href={subItem.url} onClick={handleLinkClick}>
                                 {subItem.icon && (
-                                  <subItem.icon className="!text-secondary-900 dark:!text-primary-50" />
+                                  <subItem.icon className="text-secondary-900 dark:text-primary-50" />
                                 )}
                                 <span>{subItem.title}</span>
                                 {subItem.badge && <NavBadge count={subItem.badge} />}
