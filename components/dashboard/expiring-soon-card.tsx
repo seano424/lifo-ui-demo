@@ -41,20 +41,20 @@ export function ExpiringSoonCard({ storeId }: ExpiringSoonCardProps) {
   // Use the pre-calculated total_expiring which matches the sidebar badge
   const totalExpiring = data.total_expiring
   const totalActiveBatches = data.total_active_batches
+  const expiringThisWeek = data.expiring_this_week
+  // Calculate percentage based on batches expiring this week
   const expiringPercentage =
-    totalActiveBatches > 0 ? Math.round((totalExpiring / totalActiveBatches) * 100) : 0
+    totalActiveBatches > 0 ? Math.round((expiringThisWeek / totalActiveBatches) * 100) : 0
 
   return (
     <div className="bg-white dark:bg-brand-dark rounded-2xl border">
       {/* Header */}
       <div className="p-6 border-b h-24 flex flex-col justify-center w-full">
         <div className="flex justify-between items-center gap-2">
-          <Typography variant="h3" color="primary">
-            {t('title')}
-          </Typography>
-          <Typography variant="h3" color="primary">
-            {totalExpiring}
-          </Typography>
+          <Typography variant="h3">{t('title')}</Typography>
+          <div className="flex items-center gap-2 border rounded-full px-4 py-2">
+            <Typography variant="h3">{totalExpiring}</Typography>
+          </div>
         </div>
       </div>
 
@@ -110,11 +110,11 @@ export function ExpiringSoonCard({ storeId }: ExpiringSoonCardProps) {
               {totalActiveBatches - totalExpiring} {t('notExpiring')}
             </Typography> */}
             <Typography variant="p" className="mt-1 capitalize">
-              {data.expiring_this_week} {t('expiringThisWeek')}
+              {expiringThisWeek} {t('expiringThisWeek')}
             </Typography>
             <Typography variant="p" className="mt-1 capitalize">
               {t('expiringCount', {
-                expiring: totalExpiring,
+                expiring: expiringThisWeek,
                 total: totalActiveBatches,
               })}
             </Typography>

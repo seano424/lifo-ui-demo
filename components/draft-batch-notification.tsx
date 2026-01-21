@@ -153,7 +153,7 @@ export function DraftBatchNotification({
       {/* Content */}
       <div className="flex-1 min-w-0">
         <AlertDescription>
-          <Typography variant="h3" color="primary" className="mb-1">
+          <Typography variant="h3" className="mb-1">
             {totalDrafts} {totalDrafts === 1 ? 'item needs' : 'items need'} expiry dates
           </Typography>
           <Typography variant="p">
@@ -181,7 +181,7 @@ export function DraftBatchNotification({
         variant="ghost"
         size="icon"
         onClick={handleDismiss}
-        className="shrink-0 h-8 w-8 border"
+        className="shrink-0 h-8 w-8 shadow-secondary-100 shadow-xl"
         aria-label="Dismiss notification"
       >
         <X className="h-4 w-4" />

@@ -1,5 +1,9 @@
 {
   "products": {
+    "page": {
+      "title": "Producten",
+      "description": "Bekijk en beheer alle producten in uw voorraad"
+    },
     "totalStock": "Totale Voorraad",
     "activeBatches": "Actieve Partijen",
     "uncategorized": "Niet gecategoriseerd",

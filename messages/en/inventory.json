@@ -1,5 +1,9 @@
 {
   "products": {
+    "page": {
+      "title": "Products",
+      "description": "View and manage all products in your inventory"
+    },
     "totalStock": "Total Stock",
     "activeBatches": "Active Batches",
     "uncategorized": "Uncategorized",
