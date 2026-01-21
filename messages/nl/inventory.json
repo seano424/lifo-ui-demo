@@ -128,6 +128,7 @@
         "product": "Product",
         "supplier": "Leverancier",
         "expiryDate": "Vervaldatum",
+        "daysLeft": "Dagen over",
         "quantity": "Hoeveelheid",
         "stock": "Voorraad",
         "costPrice": "Kostprijs",

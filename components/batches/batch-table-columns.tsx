@@ -68,7 +68,7 @@ export function createBatchTableColumns({
       accessorFn: row => row.products?.name || '',
       header: () => (
         <SortableHeader field="product_name" currentSort={currentSort} updateSort={updateSort}>
-          <span className="text-sm text-foreground">{t('headers.product')}</span>
+          {t('headers.product')}
         </SortableHeader>
       ),
       cell: ({ row }) => (
@@ -96,7 +96,7 @@ export function createBatchTableColumns({
           updateSort={updateSort}
           className="justify-end"
         >
-          <span className="text-sm text-foreground">{t('headers.expiryDate')}</span>
+          {t('headers.expiryDate')}
         </SortableHeader>
       ),
       cell: ({ row }) => {
@@ -117,9 +117,7 @@ export function createBatchTableColumns({
                 {expiryDate.toLocaleDateString()}
               </span>
             ) : (
-              <span className="text-sm text-muted-foreground italic truncate">
-                {tExpiry('noExpiryDate')}
-              </span>
+              <span className="text-sm truncate">{tExpiry('noExpiryDate')}</span>
             )}
           </div>
         )
@@ -130,15 +128,20 @@ export function createBatchTableColumns({
       id: 'days_left',
       accessorKey: 'expiry_date',
       header: () => (
-        <div className="flex justify-end">
-          <span className="text-sm text-foreground">Days Left</span>
-        </div>
+        <SortableHeader
+          field="expiry_date"
+          currentSort={currentSort}
+          updateSort={updateSort}
+          className="justify-end"
+        >
+          {t('headers.daysLeft')}
+        </SortableHeader>
       ),
       cell: ({ row }) => {
         if (!row.original.expiry_date) {
           return (
             <div className="text-right">
-              <span className="text-sm text-muted-foreground italic">-</span>
+              <span className="text-sm">-</span>
             </div>
           )
         }
@@ -165,7 +168,7 @@ export function createBatchTableColumns({
           updateSort={updateSort}
           className="justify-end"
         >
-          <span className="text-sm text-foreground">Quantity</span>
+          {t('headers.quantity')}
         </SortableHeader>
       ),
       cell: ({ row }) => (
@@ -177,11 +180,7 @@ export function createBatchTableColumns({
     },
     {
       id: 'location',
-      header: () => (
-        <div className="flex">
-          <span className="text-sm text-foreground">{t('headers.location')}</span>
-        </div>
-      ),
+      header: () => <div className="flex">{t('headers.location')}</div>,
       cell: () => <div className="text-sm text-muted-foreground truncate">{storeName || '-'}</div>,
       size: 130,
     },
