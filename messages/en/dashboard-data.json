@@ -116,6 +116,7 @@
     "lastUpdated": "Last Updated"
   },
   "productCategories": {
+    "SQUARE_IMPORT": "Square Import",
     "household_other": "Household & Other",
     "fresh_produce": "Fresh Produce",
     "fresh_meat_fish": "Fresh Meat & Fish",

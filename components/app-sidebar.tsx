@@ -9,6 +9,7 @@ import {
   Zap,
   Clock,
   XCircle,
+  Package,
 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import Link from 'next/link'
@@ -79,12 +80,12 @@ function useNavigationData() {
               url: '/dashboard/inventory/batches',
               icon: Layers,
             },
-            // {
-            //   title: t('products'),
-            //   url: '/dashboard/inventory/products',
-            //   icon: Package,
-            //   isActive: true,
-            // },
+            {
+              title: t('products'),
+              url: '/dashboard/inventory/products',
+              icon: Package,
+              isActive: true,
+            },
           ],
         },
         {
