@@ -213,10 +213,10 @@ export function DeliveryLogSheet({ open, onOpenChange, onComplete }: DeliveryLog
       <Sheet open={open} onOpenChange={handleOpenChange}>
         <SheetContent
           side="right"
-          className={cn('w-full sm:max-w-lg', 'p-0 flex flex-col', 'overflow-hidden')}
+          className={cn('w-full sm:max-w-lg', 'p-0 flex flex-col h-full', 'overflow-hidden')}
         >
-          {/* Header */}
-          <SheetHeader className="px-6 py-4 border-b border-gray-200 dark:border-gray-800">
+          {/* Header - Fixed */}
+          <SheetHeader className="px-6 py-4 border-b border-gray-200 dark:border-gray-800 shrink-0">
             <div className="flex items-center justify-between">
               <div>
                 <SheetTitle>Quick Add Delivery</SheetTitle>
@@ -236,8 +236,8 @@ export function DeliveryLogSheet({ open, onOpenChange, onComplete }: DeliveryLog
             </div>
           </SheetHeader>
 
-          {/* Search Input */}
-          <div className="px-6 pt-4 pb-3 border-b border-gray-200 dark:border-gray-800">
+          {/* Search Input - Fixed */}
+          <div className="px-6 pt-4 pb-3 border-b border-gray-200 dark:border-gray-800 shrink-0">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
               <Input
@@ -260,9 +260,9 @@ export function DeliveryLogSheet({ open, onOpenChange, onComplete }: DeliveryLog
             </div>
           </div>
 
-          {/* Content Area */}
-          <div className="flex-1 overflow-hidden flex flex-col">
-            <ScrollArea className="flex-1">
+          {/* Content Area - Scrollable */}
+          <div className="flex-1 min-h-0 overflow-hidden">
+            <ScrollArea className="h-full">
               <div className="p-6 space-y-6">
                 {/* Recent Products Section */}
                 <div>
@@ -330,9 +330,9 @@ export function DeliveryLogSheet({ open, onOpenChange, onComplete }: DeliveryLog
             </ScrollArea>
           </div>
 
-          {/* Footer - Always visible summary */}
+          {/* Footer - Always visible summary - Fixed */}
           {deliveryItems.size > 0 && (
-            <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900">
+            <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 shrink-0">
               <div className="flex items-center justify-between text-sm">
                 <span className="text-gray-600 dark:text-gray-400">
                   {deliveryItems.size} product{deliveryItems.size !== 1 ? 's' : ''} •{' '}
