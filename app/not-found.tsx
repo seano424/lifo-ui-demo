@@ -20,7 +20,7 @@ export default function NotFound() {
           transition={{ duration: 0.5 }}
         >
           <div className="flex justify-center mb-6">
-            <Logo variant="icon" size="lg" className="h-20 w-auto opacity-70" />
+            <Logo variant="svg" size="lg" className="h-20 w-auto opacity-70" />
           </div>
 
           <motion.div

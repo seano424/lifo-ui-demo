@@ -75,8 +75,9 @@
   },
   "landingpage": {
     "hero": {
-      "title": "Slimmere voorraad beslissingen Batch per batch",
-      "subtitle": "Ontvang waarschuwingen over verlopen voorraad op het juiste moment, en verbind u met voedselbanken",
+      "title": "Vervaldatum tracking die actie stimuleert",
+      "subtitle": "LIFO toont uw team precies wat verloopt zodat u kunt korting geven, doneren of verkopen voordat het te laat is.",
+      "subtitle2": "LIFO toont uw team precies welke voedselbatches aandacht nodig hebben zodat u kunt korting geven, doneren of verkopen voordat het te laat is.",
       "buttons": {
         "freeTrial": "Start mijn gratis proefperiode",
         "explore": "Verken het platform",
@@ -84,7 +85,8 @@
       },
       "badge": {
         "text": "Geniet van een gratis proefperiode van een maand",
-        "welcomeBack": "Uw dashboard is klaar"
+        "welcomeBack": "Uw dashboard is klaar",
+        "square": "Werkt met Square"
       }
     },
     "features": {

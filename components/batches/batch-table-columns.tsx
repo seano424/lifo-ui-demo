@@ -3,78 +3,163 @@
 import type { ColumnDef } from '@tanstack/react-table'
 import { SortableHeader } from '@/components/batches/sortable-header'
 import type { BatchSort, BatchSortField, BatchWithProduct } from '@/lib/queries/batches'
-import { getStatusBadge } from '@/lib/utils/batch-utils'
+import { parseISODateAsLocal } from '@/lib/utils/date-conversion'
+
+// Export column metadata for use in skeleton
+export const BATCH_TABLE_COLUMN_CONFIG = [
+  {
+    id: 'product_name',
+    headerKey: 'headers.product',
+    width: 130,
+    align: 'left',
+    hasMultipleLines: true,
+    sortable: true,
+  },
+  {
+    id: 'expiry_date',
+    headerKey: 'headers.expiryDate',
+    width: 130,
+    align: 'right',
+    hasMultipleLines: false,
+    sortable: true,
+  },
+  {
+    id: 'days_left',
+    headerKey: 'headers.daysLeft',
+    width: 130,
+    align: 'right',
+    hasMultipleLines: false,
+    sortable: true,
+  },
+  {
+    id: 'current_quantity',
+    headerKey: 'headers.quantity',
+    width: 130,
+    align: 'right',
+    hasMultipleLines: false,
+    sortable: true,
+  },
+  {
+    id: 'location',
+    headerKey: 'headers.location',
+    width: 130,
+    align: 'right',
+    hasMultipleLines: false,
+    sortable: false,
+  },
+] as const
+
+// Helper function to get alignment classes from config
+function getAlignmentClasses(columnIndex: number): {
+  headerClass: string
+  cellClass: string
+} {
+  const align = BATCH_TABLE_COLUMN_CONFIG[columnIndex].align
+  if (align === 'right') {
+    return {
+      headerClass: 'justify-end',
+      cellClass: 'text-right',
+    }
+  }
+  return {
+    headerClass: '',
+    cellClass: '',
+  }
+}
+
+// Helper function to calculate days until expiry
+function getDaysLeft(expiryDate: Date): number {
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const expiry = new Date(expiryDate)
+  expiry.setHours(0, 0, 0, 0)
+  return Math.ceil((expiry.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+}
+
+// Helper function to get urgency styling for days left
+function getDaysLeftStyling(daysLeft: number): {
+  textClass: string
+  label: string
+} {
+  if (daysLeft < 0) {
+    return {
+      textClass: 'text-destructive',
+      label: 'Expired',
+    }
+  }
+  if (daysLeft === 0) {
+    return {
+      textClass: 'text-destructive',
+      label: 'Today',
+    }
+  }
+  if (daysLeft <= 3) {
+    return {
+      textClass: 'text-destructive',
+      label: `${daysLeft} ${daysLeft === 1 ? 'day' : 'days'}`,
+    }
+  }
+  if (daysLeft <= 7) {
+    return {
+      textClass: '',
+      label: `${daysLeft} days`,
+    }
+  }
+  return {
+    textClass: 'text-muted-foreground',
+    label: `${daysLeft} days`,
+  }
+}
 
 export function createBatchTableColumns({
   currentSort,
   updateSort,
   t,
-  tStatus,
   tExpiry,
-  currencySymbol = '$',
   storeName,
 }: {
   currentSort: BatchSort
   updateSort: (field: BatchSortField) => void
   t: (key: string) => string
-  tStatus: (key: string) => string
   tExpiry: (key: string, params?: { days: number }) => string
-  currencySymbol?: string
   storeName?: string
 }): ColumnDef<BatchWithProduct>[] {
+  const alignments = {
+    product_name: getAlignmentClasses(0),
+    expiry_date: getAlignmentClasses(1),
+    days_left: getAlignmentClasses(2),
+    current_quantity: getAlignmentClasses(3),
+    location: getAlignmentClasses(4),
+  }
+
   return [
-    {
-      id: 'batch_number',
-      accessorKey: 'batch_number',
-      header: () => (
-        <SortableHeader field="batch_number" currentSort={currentSort} updateSort={updateSort}>
-          <span className="text-sm text-foreground">{t('headers.batchNumber')}</span>
-        </SortableHeader>
-      ),
-      cell: ({ row }) => (
-        <div
-          className="font-mono text-sm text-muted-foreground truncate"
-          title={row.original.batch_number}
-        >
-          {row.original.batch_number?.slice(-6) || ''}
-        </div>
-      ),
-      size: 140,
-    },
     {
       id: 'product_name',
       accessorFn: row => row.products?.name || '',
       header: () => (
-        <SortableHeader field="product_name" currentSort={currentSort} updateSort={updateSort}>
-          <span className="text-sm text-foreground">{t('headers.product')}</span>
+        <SortableHeader
+          field="product_name"
+          currentSort={currentSort}
+          updateSort={updateSort}
+          className={alignments.product_name.headerClass}
+        >
+          {t('headers.product')}
         </SortableHeader>
       ),
       cell: ({ row }) => (
-        <div>
-          <div className="truncate" title={row.original.products?.name}>
+        <div className={alignments.product_name.cellClass}>
+          <div className="truncate font-medium" title={row.original.products?.name}>
             {row.original.products?.name}
           </div>
           <div
-            className="text-xs text-muted-foreground truncate"
+            className="text-sm text-muted-foreground truncate"
             title={row.original.products?.sku}
           >
             {row.original.products?.sku}
           </div>
         </div>
       ),
-      size: 200,
-    },
-    {
-      id: 'location',
-      header: () => (
-        <div className="flex">
-          <span className="text-sm text-foreground">{t('headers.location')}</span>
-        </div>
-      ),
-      cell: () => (
-        <div className="text-sm text-muted-foreground truncate text-right">{storeName || '-'}</div>
-      ),
-      size: 150,
+      size: BATCH_TABLE_COLUMN_CONFIG[0].width,
     },
     {
       id: 'expiry_date',
@@ -84,31 +169,69 @@ export function createBatchTableColumns({
           field="expiry_date"
           currentSort={currentSort}
           updateSort={updateSort}
-          className="justify-end"
+          className={alignments.expiry_date.headerClass}
         >
-          <span className="text-sm text-foreground">{t('headers.expiryDate')}</span>
+          {t('headers.expiryDate')}
         </SortableHeader>
       ),
       cell: ({ row }) => {
-        const isExpired = row.original.expiry_date
-          ? new Date(row.original.expiry_date) < new Date()
-          : false
+        let expiryDate: Date | null = null
+        let isExpired = false
+
+        if (row.original.expiry_date) {
+          expiryDate = parseISODateAsLocal(row.original.expiry_date)
+          const today = new Date()
+          today.setHours(0, 0, 0, 0)
+          isExpired = expiryDate < today
+        }
 
         return (
-          <div className="flex items-center gap-2 justify-end text-right">
-            {row.original.expiry_date ? (
+          <div className={alignments.expiry_date.cellClass}>
+            {expiryDate ? (
               <span className={`text-sm truncate ${isExpired ? 'text-destructive' : ''}`}>
-                {new Date(row.original.expiry_date).toLocaleDateString()}
+                {expiryDate.toLocaleDateString()}
               </span>
             ) : (
-              <span className="text-sm text-muted-foreground italic truncate">
-                {tExpiry('noExpiryDate')}
-              </span>
+              <span className="text-sm truncate">{tExpiry('noExpiryDate')}</span>
             )}
           </div>
         )
       },
-      size: 140,
+      size: BATCH_TABLE_COLUMN_CONFIG[1].width,
+    },
+    {
+      id: 'days_left',
+      accessorKey: 'expiry_date',
+      header: () => (
+        <SortableHeader
+          field="expiry_date"
+          currentSort={currentSort}
+          updateSort={updateSort}
+          className={alignments.days_left.headerClass}
+        >
+          {t('headers.daysLeft')}
+        </SortableHeader>
+      ),
+      cell: ({ row }) => {
+        if (!row.original.expiry_date) {
+          return (
+            <div className={alignments.days_left.cellClass}>
+              <span className="text-sm">-</span>
+            </div>
+          )
+        }
+
+        const expiryDate = parseISODateAsLocal(row.original.expiry_date)
+        const daysLeft = getDaysLeft(expiryDate)
+        const { textClass, label } = getDaysLeftStyling(daysLeft)
+
+        return (
+          <div className={alignments.days_left.cellClass}>
+            <span className={`text-sm ${textClass}`}>{label}</span>
+          </div>
+        )
+      },
+      size: BATCH_TABLE_COLUMN_CONFIG[2].width,
     },
     {
       id: 'current_quantity',
@@ -118,99 +241,33 @@ export function createBatchTableColumns({
           field="current_quantity"
           currentSort={currentSort}
           updateSort={updateSort}
-          className="justify-end"
+          className={alignments.current_quantity.headerClass}
         >
-          <span className="text-sm text-foreground">{t('headers.stock')}</span>
+          {t('headers.quantity')}
         </SortableHeader>
       ),
       cell: ({ row }) => (
-        <div className="text-right tabular-nums">
+        <div className={`${alignments.current_quantity.cellClass} tabular-nums`}>
           {Number(row.original.current_quantity).toLocaleString()}
         </div>
       ),
-      size: 140,
+      size: BATCH_TABLE_COLUMN_CONFIG[3].width,
     },
     {
-      id: 'cost_price',
-      accessorKey: 'cost_price',
+      id: 'location',
       header: () => (
-        <SortableHeader
-          field="cost_price"
-          currentSort={currentSort}
-          updateSort={updateSort}
-          className="justify-end"
+        <div
+          className={`flex font-heading font-semibold items-center ${alignments.location.headerClass}`}
         >
-          <span className="text-sm text-foreground">{t('headers.costPrice')}</span>
-        </SortableHeader>
-      ),
-      cell: ({ row }) => (
-        <div className="text-right tabular-nums">
-          {currencySymbol}
-          {Number(row.original.cost_price).toFixed(2)}
+          {t('headers.location')}
         </div>
       ),
-      size: 140,
-    },
-    {
-      id: 'selling_price',
-      accessorKey: 'selling_price',
-      header: () => (
-        <SortableHeader
-          field="selling_price"
-          currentSort={currentSort}
-          updateSort={updateSort}
-          className="justify-end"
-        >
-          <span className="text-sm text-foreground">{t('headers.sellPrice')}</span>
-        </SortableHeader>
-      ),
-      cell: ({ row }) => (
-        <div className="text-right tabular-nums">
-          {currencySymbol}
-          {Number(row.original.selling_price).toFixed(2)}
+      cell: () => (
+        <div className={`text-sm text-muted-foreground truncate ${alignments.location.cellClass}`}>
+          {storeName || '-'}
         </div>
       ),
-      size: 140,
-    },
-    {
-      id: 'status',
-      accessorKey: 'status',
-      header: () => (
-        <SortableHeader
-          field="status"
-          currentSort={currentSort}
-          updateSort={updateSort}
-          className="justify-end"
-        >
-          <span className="text-sm text-foreground">{t('headers.status')}</span>
-        </SortableHeader>
-      ),
-      cell: ({ row }) => {
-        // Default to 'active' if no status is provided
-        const status = row.original.status || 'active'
-        return <div className="flex justify-end">{getStatusBadge(status, tStatus)}</div>
-      },
-      size: 140,
-    },
-    {
-      id: 'created_at',
-      accessorKey: 'created_at',
-      header: () => (
-        <SortableHeader
-          field="created_at"
-          currentSort={currentSort}
-          updateSort={updateSort}
-          className="justify-end"
-        >
-          <span className="text-sm text-foreground">{t('headers.createdAt')}</span>
-        </SortableHeader>
-      ),
-      cell: ({ row }) => (
-        <div className="text-sm truncate text-right">
-          {row.original.created_at ? new Date(row.original.created_at).toLocaleDateString() : '-'}
-        </div>
-      ),
-      size: 140,
+      size: BATCH_TABLE_COLUMN_CONFIG[4].width,
     },
   ]
 }

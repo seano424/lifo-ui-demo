@@ -294,7 +294,7 @@
 
     /* Muted areas - subtle gray */
     --muted: 220 14% 96%;
-    --muted-foreground: 220 8% 46%;
+    --muted-foreground: 0 0% 30%;
 
     /* Accent - using primary-50 for consistency */
     --accent: 252 100% 98%;

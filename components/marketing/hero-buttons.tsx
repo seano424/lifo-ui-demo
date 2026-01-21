@@ -2,19 +2,19 @@
 
 import { Button } from '@/components/ui/button'
 import { useCurrentUser } from '@/hooks/use-users'
-import { LayoutDashboard, Sparkles } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import { ChevronRightIcon } from 'lucide-react'
 
 export function HeroButtons() {
   const t = useTranslations('landingpage.hero.buttons')
   const { data: currentUser } = useCurrentUser()
 
   return (
-    <div className="flex flex-col sm:flex-row gap-3">
+    <>
       {currentUser && (
-        <Button size="lg" asLink href="/dashboard">
-          <LayoutDashboard size={24} />
+        <Button size="lg" asLink href="/dashboard" className="capitalize">
           {t('dashboard')}
+          <ChevronRightIcon className="w-4 h-4" />
         </Button>
       )}
       {!currentUser && (
@@ -22,13 +22,13 @@ export function HeroButtons() {
           asLink
           href="/onboarding/create-account"
           size="lg"
-          variant="outline"
-          className="border-foreground/20 hover:border-foreground/40 transition-colors"
+          className="font-semibold font-heading flex items-center gap-1 capitalize"
+          variant="black"
         >
-          <Sparkles size={18} />
           {t('freeTrial')}
+          <ChevronRightIcon className="w-4 h-4" />
         </Button>
       )}
-    </div>
+    </>
   )
 }

@@ -1,7 +1,6 @@
 'use client'
 
 import { Skeleton } from '@/components/ui/skeleton'
-import { Typography } from '@/components/ui/typography'
 import { cn } from '@/lib/utils'
 import { useTranslations } from 'next-intl'
 
@@ -28,38 +27,29 @@ export default function DashboardInsetHeader({
   const displayDescription = page ? t('page.description') : description
 
   return (
-    <div className={cn(className)}>
-      <div className="flex flex-col gap-4 flex-1">
-        {isLoading ? (
-          <div className="space-y-4">
-            {/* Icon and title skeleton */}
-            <div className="flex items-center gap-3">
-              <Skeleton className="w-10 h-10 rounded-xl animate-pulse" />
-              <Skeleton className="w-[300px] h-8 rounded-xl animate-pulse" />
-            </div>
-            {/* Description skeleton */}
-            <div className="space-y-2">
-              <Skeleton className="w-[500px] h-4 rounded-lg animate-pulse" />
-              <Skeleton className="w-[400px] h-4 rounded-lg animate-pulse" />
-            </div>
-          </div>
-        ) : (
-          <>
-            {/* Main title with dynamic icon */}
-            <div className="flex items-center gap-2">
-              <Typography variant="h1" className="capitalize">
-                {displayTitle}
-              </Typography>
-            </div>
-
-            {displayDescription && (
-              <Typography className="max-w-5xl text-muted-foreground leading-relaxed" variant="p">
-                {displayDescription}
-              </Typography>
-            )}
-          </>
-        )}
-      </div>
+    <div
+      className={cn(
+        'flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between',
+        className,
+      )}
+    >
+      {isLoading ? (
+        <div className="space-y-4 flex-1">
+          {/* Title skeleton */}
+          <Skeleton className="w-[300px] h-9 rounded-lg animate-pulse" />
+          {/* Description skeleton */}
+          <Skeleton className="w-[500px] h-5 rounded-lg animate-pulse" />
+        </div>
+      ) : (
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
+            {displayTitle}
+          </h1>
+          {displayDescription && (
+            <p className="text-base text-gray-500 dark:text-gray-400 mt-1">{displayDescription}</p>
+          )}
+        </div>
+      )}
 
       {/* Right content with enhanced styling */}
       {isLoading ? (
@@ -68,7 +58,7 @@ export default function DashboardInsetHeader({
           <Skeleton className="w-[100px] h-10 rounded-xl animate-pulse" />
         </div>
       ) : (
-        rightContent && <div className="flex items-center gap-3">{rightContent}</div>
+        rightContent && <div className="flex flex-wrap items-center gap-3">{rightContent}</div>
       )}
     </div>
   )

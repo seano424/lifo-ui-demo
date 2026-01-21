@@ -1,7 +1,9 @@
 import { dehydrate, HydrationBoundary } from '@tanstack/react-query'
 import { redirect } from 'next/navigation'
+import DashboardInsetHeader from '@/components/dashboard/dashboard-inset-header'
 import { NoStoresError } from '@/components/dashboard/no-stores-error'
 import { ProductsFilteredList } from '@/components/products/products-filtered-list'
+import { getTranslations } from 'next-intl/server'
 import type { ProductFilters, SortField } from '@/lib/queries/products'
 import { fetchProductsPageRPC } from '@/lib/queries/products-rpc'
 import { queryKeys } from '@/lib/queries/query-keys'
@@ -23,6 +25,7 @@ export default async function InventoryProductsPage({ searchParams }: InventoryP
   const params = await searchParams
   const { queryClient } = await createPrefetchedQuery()
   const serverClient = await createServerClient()
+  const t = await getTranslations('inventory.products.page')
 
   // Get current authenticated user
   const {
@@ -87,7 +90,8 @@ export default async function InventoryProductsPage({ searchParams }: InventoryP
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <div className="space-y-6 container py-6">
+      <div className="flex flex-col gap-6 container py-6">
+        <DashboardInsetHeader title={t('title')} description={t('description')} />
         <ProductsFilteredList
           initialFilters={{
             category: params.category,

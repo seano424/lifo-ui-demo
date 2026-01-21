@@ -17,6 +17,7 @@ import type { TodoItem } from '@/lib/queries/todos-rpc'
 import type { Database } from '@/types/supabase'
 import { cn } from '@/lib/utils'
 import { migrateRecommendation } from '@/lib/utils/recommendation-migration'
+import { parseISODateAsLocal } from '@/lib/utils/date-conversion'
 import { Edit3, Save, X } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -101,7 +102,7 @@ export function DetailsTab({ selectedBatch, currencySymbol = '€', onClose }: D
     if (!editedValues.expiry_date) {
       return t('details.validation.expiryDateRequired')
     }
-    const expiryDate = new Date(editedValues.expiry_date)
+    const expiryDate = parseISODateAsLocal(editedValues.expiry_date)
     const pastLimit = new Date()
     pastLimit.setFullYear(pastLimit.getFullYear() - MAX_YEARS_IN_PAST)
     const futureLimit = new Date()

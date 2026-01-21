@@ -38,26 +38,23 @@ export function ExpiringSoonCard({ storeId }: ExpiringSoonCardProps) {
     )
   }
 
-  const totalExpiring = data.expiring_today + data.expiring_tomorrow + data.expiring_this_week
+  // Use the pre-calculated total_expiring which matches the sidebar badge
+  const totalExpiring = data.total_expiring
   const totalActiveBatches = data.total_active_batches
+  const expiringThisWeek = data.expiring_this_week
+  // Calculate percentage based on batches expiring this week
   const expiringPercentage =
-    totalActiveBatches > 0 ? Math.round((totalExpiring / totalActiveBatches) * 100) : 0
+    totalActiveBatches > 0 ? Math.round((expiringThisWeek / totalActiveBatches) * 100) : 0
 
   return (
     <div className="bg-white dark:bg-brand-dark rounded-2xl border">
       {/* Header */}
       <div className="p-6 border-b h-24 flex flex-col justify-center w-full">
         <div className="flex justify-between items-center gap-2">
-          <div className="text-gray-500 dark:text-brand-white flex flex-col gap-1">
-            <Typography variant="h4">{t('title')}</Typography>
-            <Typography variant="small">{t('subtitle')}</Typography>
+          <Typography variant="h3">{t('title')}</Typography>
+          <div className="flex items-center gap-2 border rounded-full px-4 py-2">
+            <Typography variant="h3">{totalExpiring}</Typography>
           </div>
-          <Typography
-            variant="h2"
-            className="text-3xl font-bold text-gray-900 dark:text-brand-white mt-1"
-          >
-            {totalExpiring}
-          </Typography>
         </div>
       </div>
 
@@ -66,25 +63,37 @@ export function ExpiringSoonCard({ storeId }: ExpiringSoonCardProps) {
         <div className="space-y-3 px-6">
           {/* Today */}
           <div className="flex items-center justify-between py-2">
-            <Typography variant="h5">{t('today')}</Typography>
-            <Typography variant="h5">{data.expiring_today}</Typography>
+            <Typography variant="p">{t('today')}</Typography>
+            <Typography variant="p">{data.expiring_today}</Typography>
           </div>
 
           {/* Tomorrow */}
           <div className="flex items-center justify-between py-2">
-            <Typography variant="h5">{t('tomorrow')}</Typography>
-            <Typography variant="h5">{data.expiring_tomorrow}</Typography>
+            <Typography variant="p">{t('tomorrow')}</Typography>
+            <Typography variant="p">{data.expiring_tomorrow}</Typography>
+          </div>
+
+          {/* In Two Days */}
+          <div className="flex items-center justify-between py-2">
+            <Typography variant="p">{t('inTwoDays')}</Typography>
+            <Typography variant="p">{data.expiring_in_two_days}</Typography>
+          </div>
+
+          {/* In Three Days */}
+          <div className="flex items-center justify-between py-2">
+            <Typography variant="p">{t('inThreeDays')}</Typography>
+            <Typography variant="p">{data.expiring_in_three_days}</Typography>
           </div>
 
           {/* This Week */}
           <div className="flex items-center justify-between py-2">
-            <Typography variant="h5">{t('thisWeek')}</Typography>
-            <Typography variant="h5">{data.expiring_this_week}</Typography>
+            <Typography variant="p">{t('thisWeek')}</Typography>
+            <Typography variant="p">{data.expiring_this_week}</Typography>
           </div>
         </div>
 
         <div className="flex flex-col gap-2 flex-1 justify-end text-right mt-8 border-t border-gray-200 dark:border-brand-dark pt-8 px-6">
-          <Typography variant="h5" className="capitalize">
+          <Typography variant="p" className="capitalize">
             {expiringPercentage}% {t('expiringWithinWeek')}
           </Typography>
           <div className="h-2 bg-gray-200 dark:bg-brand-dark rounded-full mt-4">
@@ -101,11 +110,11 @@ export function ExpiringSoonCard({ storeId }: ExpiringSoonCardProps) {
               {totalActiveBatches - totalExpiring} {t('notExpiring')}
             </Typography> */}
             <Typography variant="p" className="mt-1 capitalize">
-              {data.expiring_this_week} {t('expiringThisWeek')}
+              {expiringThisWeek} {t('expiringThisWeek')}
             </Typography>
             <Typography variant="p" className="mt-1 capitalize">
               {t('expiringCount', {
-                expiring: totalExpiring,
+                expiring: expiringThisWeek,
                 total: totalActiveBatches,
               })}
             </Typography>

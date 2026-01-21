@@ -1,5 +1,9 @@
 {
   "products": {
+    "page": {
+      "title": "Produits",
+      "description": "Voir et gérer tous les produits dans votre inventaire"
+    },
     "totalStock": "Stock Total",
     "activeBatches": "Lots Actifs",
     "uncategorized": "Non catégorisé",
@@ -122,12 +126,17 @@
     "itemCount": "{count} articles"
   },
   "batches": {
+    "page": {
+      "title": "Lots",
+      "description": "Votre inventaire regroupé par date d'expiration"
+    },
     "table": {
       "headers": {
         "batchNumber": "N° de lot",
         "product": "Produit",
         "supplier": "Fournisseur",
         "expiryDate": "Date d'expiration",
+        "daysLeft": "Jours restants",
         "quantity": "Quantité",
         "stock": "Stock",
         "costPrice": "Prix de revient",

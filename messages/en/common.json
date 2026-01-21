@@ -34,10 +34,14 @@
     },
     "breadcrumbs": {
       "batches": "Batches",
+      "stock": "Stock",
       "draftBatches": "Draft Batches",
       "drafts": "Drafts",
+      "needsDates": "Needs Dates",
+      "setAside": "Set Aside",
       "billing": "Billings",
       "dashboard": "Dashboard",
+      "overview": "Overview",
       "inventory": "Inventory",
       "deliveries": "Deliveries",
       "scanOut": "Scan Out",
@@ -65,7 +69,10 @@
       "scanIn": "Scan In",
       "inventoryManagement": "Inventory Management",
       "addStore": "Add Store",
-      "expiringSoon": "Expiring Soon"
+      "expiring": "Expiring",
+      "expiringSoon": "Expiring Soon",
+      "new": "New",
+      "ignored": "Ignored"
     },
     "navUser": {
       "upgradeToPro": "Upgrade to Pro",
