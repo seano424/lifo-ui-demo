@@ -24,9 +24,16 @@ interface BatchesFilteredListProps {
     direction?: string
   }
   pageSize?: number
+  highlightExpiring?: boolean
+  expiryAlertDays?: number
 }
 
-export function BatchesFilteredList({ initialFilters, pageSize = 100 }: BatchesFilteredListProps) {
+export function BatchesFilteredList({
+  initialFilters,
+  pageSize = 100,
+  highlightExpiring = false,
+  expiryAlertDays = 3,
+}: BatchesFilteredListProps) {
   const router = useRouter()
   const activeStoreId = useActiveStoreId()
   const t = useTranslations('batches.table')
@@ -231,6 +238,8 @@ export function BatchesFilteredList({ initialFilters, pageSize = 100 }: BatchesF
           isLoading={isLoading}
           currentSort={filters.sort || { field: 'expiry_date', direction: 'asc' }}
           updateSort={handleSortFieldChange}
+          highlightExpiring={highlightExpiring}
+          expiryAlertDays={expiryAlertDays}
         />
       </div>
 

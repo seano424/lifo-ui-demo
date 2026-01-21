@@ -1,5 +1,5 @@
 import { BatchesFilteredList } from '@/components/batches/batches-filtered-list'
-import DashboardInsetHeader from '@/components/dashboard/dashboard-inset-header'
+// import DashboardInsetHeader from '@/components/dashboard/dashboard-inset-header'
 import { NoStoresError } from '@/components/dashboard/no-stores-error'
 import {
   type BatchFilters,
@@ -116,20 +116,19 @@ export default async function ExpiringSoonPage({ searchParams }: ExpiringSoonPag
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <div className="bg-gray-50">
-        <div className="flex flex-col gap-6 container py-6 min-h-screen">
-          <DashboardInsetHeader page="expiring-soon" />
-          <BatchesFilteredList
-            initialFilters={{
-              filter: 'expiring',
-              expiringDays: params.expiringDays || '30',
-              status: params.status || 'active',
-              search: params.search,
-              sort: params.sort,
-              direction: params.direction,
-            }}
-          />
-        </div>
+      <div className="flex flex-col gap-6 container py-6 min-h-screen">
+        {/* <DashboardInsetHeader page="expiring-soon" /> */}
+        <BatchesFilteredList
+          highlightExpiring={true}
+          initialFilters={{
+            filter: 'expiring',
+            expiringDays: params.expiringDays || '30',
+            status: params.status || 'active',
+            search: params.search,
+            sort: params.sort,
+            direction: params.direction,
+          }}
+        />
       </div>
     </HydrationBoundary>
   )

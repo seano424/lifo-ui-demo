@@ -1,6 +1,6 @@
 'use client'
 
-import { BatchListSkeleton } from '@/components/batches/batch-list-skeleton'
+import { BatchTableSkeleton } from '@/components/batches/batch-table-skeleton'
 import { createBatchTableColumns } from '@/components/batches/batch-table-columns'
 import { BatchModal } from '@/components/batches/batch-modal'
 import { CardDescription, CardTitle } from '@/components/ui/card'
@@ -25,6 +25,7 @@ import {
 import { Package } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
+import { cn } from '@/lib/utils'
 
 const VALID_COLUMN_IDS = [
   'batch_number',
@@ -43,9 +44,18 @@ interface BatchTableProps {
   currentSort: BatchSort
   updateSort: (field: BatchSortField) => void
   isLoading: boolean
+  highlightExpiring?: boolean
+  expiryAlertDays?: number
 }
 
-export function BatchTable({ data, currentSort, updateSort, isLoading }: BatchTableProps) {
+export function BatchTable({
+  data,
+  currentSort,
+  updateSort,
+  isLoading,
+  highlightExpiring = false,
+  expiryAlertDays = 3,
+}: BatchTableProps) {
   const t = useTranslations('batches.table')
   const tExpiry = useTranslations('batches.expiry')
   const currencySymbol = useCurrency()
@@ -57,6 +67,23 @@ export function BatchTable({ data, currentSort, updateSort, isLoading }: BatchTa
   const handleBatchClick = (batch: BatchWithProduct) => {
     setSelectedBatch(batch)
     setIsBottomSheetOpen(true)
+  }
+
+  // Helper function to check if batch is expiring soon (matches expiryTodosCount logic)
+  const isExpiringSoon = (batch: BatchWithProduct): boolean => {
+    if (!batch.expiry_date || !highlightExpiring) return false
+
+    const expiryDate = new Date(batch.expiry_date)
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    expiryDate.setHours(0, 0, 0, 0)
+
+    const daysToExpiry = Math.floor(
+      (expiryDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
+    )
+
+    // Match expiryTodosCount logic: days_to_expiry >= 0 AND days_to_expiry <= expiryAlertDays
+    return daysToExpiry >= 0 && daysToExpiry <= expiryAlertDays
   }
 
   const [sorting, setSorting] = useState<SortingState>(() => {
@@ -105,7 +132,7 @@ export function BatchTable({ data, currentSort, updateSort, isLoading }: BatchTa
   })
 
   if (isLoading) {
-    return <BatchListSkeleton />
+    return <BatchTableSkeleton />
   }
 
   if (data.length === 0) {
@@ -131,11 +158,11 @@ export function BatchTable({ data, currentSort, updateSort, isLoading }: BatchTa
       >
         <TableHeader>
           {table.getHeaderGroups().map(headerGroup => (
-            <TableRow key={headerGroup.id} className="border-b border-border">
+            <TableRow key={headerGroup.id}>
               {headerGroup.headers.map(header => (
                 <TableHead
                   key={header.id}
-                  className="py-3 px-4"
+                  className="sticky top-0 bg-background z-10 py-3 px-4"
                   style={
                     header.column.columnDef.size
                       ? { width: header.column.columnDef.size }
@@ -155,7 +182,10 @@ export function BatchTable({ data, currentSort, updateSort, isLoading }: BatchTa
             <TableRow
               key={row.id}
               onClick={() => handleBatchClick(row.original)}
-              className="cursor-pointer hover:bg-muted/30 transition-colors"
+              className={cn(
+                'cursor-pointer transition-all border-none duration-100 ease-in-out',
+                isExpiringSoon(row.original) ? 'hover:bg-muted/30' : 'hover:bg-muted/30',
+              )}
             >
               {row.getVisibleCells().map(cell => (
                 <TableCell
@@ -163,7 +193,7 @@ export function BatchTable({ data, currentSort, updateSort, isLoading }: BatchTa
                   style={
                     cell.column.columnDef.size ? { width: cell.column.columnDef.size } : undefined
                   }
-                  className="py-4 px-4"
+                  className="py-3 px-4"
                 >
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </TableCell>

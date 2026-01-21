@@ -5,6 +5,68 @@ import { SortableHeader } from '@/components/batches/sortable-header'
 import type { BatchSort, BatchSortField, BatchWithProduct } from '@/lib/queries/batches'
 import { parseISODateAsLocal } from '@/lib/utils/date-conversion'
 
+// Export column metadata for use in skeleton
+export const BATCH_TABLE_COLUMN_CONFIG = [
+  {
+    id: 'product_name',
+    headerKey: 'headers.product',
+    width: 130,
+    align: 'left',
+    hasMultipleLines: true,
+    sortable: true,
+  },
+  {
+    id: 'expiry_date',
+    headerKey: 'headers.expiryDate',
+    width: 130,
+    align: 'right',
+    hasMultipleLines: false,
+    sortable: true,
+  },
+  {
+    id: 'days_left',
+    headerKey: 'headers.daysLeft',
+    width: 130,
+    align: 'right',
+    hasMultipleLines: false,
+    sortable: true,
+  },
+  {
+    id: 'current_quantity',
+    headerKey: 'headers.quantity',
+    width: 130,
+    align: 'right',
+    hasMultipleLines: false,
+    sortable: true,
+  },
+  {
+    id: 'location',
+    headerKey: 'headers.location',
+    width: 130,
+    align: 'right',
+    hasMultipleLines: false,
+    sortable: false,
+  },
+] as const
+
+// Helper function to get alignment classes from config
+function getAlignmentClasses(columnIndex: number): {
+  headerClass: string
+  cellClass: string
+} {
+  const align = BATCH_TABLE_COLUMN_CONFIG[columnIndex].align
+  if (align === 'right') {
+    return {
+      headerClass: 'justify-end',
+      cellClass: 'text-right',
+    }
+  }
+  return {
+    headerClass: '',
+    cellClass: '',
+  }
+}
+
 // Helper function to calculate days until expiry
 function getDaysLeft(expiryDate: Date): number {
   const today = new Date()
@@ -21,7 +83,7 @@ function getDaysLeftStyling(daysLeft: number): {
 } {
   if (daysLeft < 0) {
     return {
-      textClass: 'text-destructive font-semibold',
+      textClass: 'text-destructive',
       label: 'Expired',
     }
   }
@@ -62,29 +124,42 @@ export function createBatchTableColumns({
   tExpiry: (key: string, params?: { days: number }) => string
   storeName?: string
 }): ColumnDef<BatchWithProduct>[] {
+  const alignments = {
+    product_name: getAlignmentClasses(0),
+    expiry_date: getAlignmentClasses(1),
+    days_left: getAlignmentClasses(2),
+    current_quantity: getAlignmentClasses(3),
+    location: getAlignmentClasses(4),
+  }
+
   return [
     {
       id: 'product_name',
       accessorFn: row => row.products?.name || '',
       header: () => (
-        <SortableHeader field="product_name" currentSort={currentSort} updateSort={updateSort}>
+        <SortableHeader
+          field="product_name"
+          currentSort={currentSort}
+          updateSort={updateSort}
+          className={alignments.product_name.headerClass}
+        >
           {t('headers.product')}
         </SortableHeader>
       ),
       cell: ({ row }) => (
-        <div>
-          <div className="truncate" title={row.original.products?.name}>
+        <div className={alignments.product_name.cellClass}>
+          <div className="truncate font-medium" title={row.original.products?.name}>
             {row.original.products?.name}
           </div>
           <div
-            className="text-xs text-muted-foreground truncate"
+            className="text-sm text-muted-foreground truncate"
             title={row.original.products?.sku}
           >
             {row.original.products?.sku}
           </div>
         </div>
       ),
-      size: 170,
+      size: BATCH_TABLE_COLUMN_CONFIG[0].width,
     },
     {
       id: 'expiry_date',
@@ -94,7 +169,7 @@ export function createBatchTableColumns({
           field="expiry_date"
           currentSort={currentSort}
           updateSort={updateSort}
-          className="justify-end"
+          className={alignments.expiry_date.headerClass}
         >
           {t('headers.expiryDate')}
         </SortableHeader>
@@ -111,7 +186,7 @@ export function createBatchTableColumns({
         }
 
         return (
-          <div className="flex items-center gap-2 justify-end text-right">
+          <div className={alignments.expiry_date.cellClass}>
             {expiryDate ? (
               <span className={`text-sm truncate ${isExpired ? 'text-destructive' : ''}`}>
                 {expiryDate.toLocaleDateString()}
@@ -122,7 +197,7 @@ export function createBatchTableColumns({
           </div>
         )
       },
-      size: 130,
+      size: BATCH_TABLE_COLUMN_CONFIG[1].width,
     },
     {
       id: 'days_left',
@@ -132,7 +207,7 @@ export function createBatchTableColumns({
           field="expiry_date"
           currentSort={currentSort}
           updateSort={updateSort}
-          className="justify-end"
+          className={alignments.days_left.headerClass}
         >
           {t('headers.daysLeft')}
         </SortableHeader>
@@ -140,7 +215,7 @@ export function createBatchTableColumns({
       cell: ({ row }) => {
         if (!row.original.expiry_date) {
           return (
-            <div className="text-right">
+            <div className={alignments.days_left.cellClass}>
               <span className="text-sm">-</span>
             </div>
           )
@@ -151,12 +226,12 @@ export function createBatchTableColumns({
         const { textClass, label } = getDaysLeftStyling(daysLeft)
 
         return (
-          <div className="text-right">
+          <div className={alignments.days_left.cellClass}>
             <span className={`text-sm ${textClass}`}>{label}</span>
           </div>
         )
       },
-      size: 130,
+      size: BATCH_TABLE_COLUMN_CONFIG[2].width,
     },
     {
       id: 'current_quantity',
@@ -166,23 +241,33 @@ export function createBatchTableColumns({
           field="current_quantity"
           currentSort={currentSort}
           updateSort={updateSort}
-          className="justify-end"
+          className={alignments.current_quantity.headerClass}
         >
           {t('headers.quantity')}
         </SortableHeader>
       ),
       cell: ({ row }) => (
-        <div className="text-right tabular-nums">
+        <div className={`${alignments.current_quantity.cellClass} tabular-nums`}>
           {Number(row.original.current_quantity).toLocaleString()}
         </div>
       ),
-      size: 130,
+      size: BATCH_TABLE_COLUMN_CONFIG[3].width,
     },
     {
       id: 'location',
-      header: () => <div className="flex">{t('headers.location')}</div>,
-      cell: () => <div className="text-sm text-muted-foreground truncate">{storeName || '-'}</div>,
-      size: 130,
+      header: () => (
+        <div
+          className={`flex font-heading font-semibold items-center ${alignments.location.headerClass}`}
+        >
+          {t('headers.location')}
+        </div>
+      ),
+      cell: () => (
+        <div className={`text-sm text-muted-foreground truncate ${alignments.location.cellClass}`}>
+          {storeName || '-'}
+        </div>
+      ),
+      size: BATCH_TABLE_COLUMN_CONFIG[4].width,
     },
   ]
 }
