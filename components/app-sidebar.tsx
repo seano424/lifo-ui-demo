@@ -75,7 +75,7 @@ function useNavigationData() {
           title: t('inventory'),
           items: [
             {
-              title: t('stock'),
+              title: t('batches'),
               url: '/dashboard/inventory/batches',
               icon: Layers,
             },

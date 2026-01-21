@@ -21,6 +21,7 @@
       "title": "Voorraad Overzicht",
       "totalBatches": "Totaal Aantal Batches",
       "productsTracked": "Gevolgde Producten",
+      "needsDates": "Heeft Datums Nodig",
       "errors": {
         "loadingError": "Kan voorraadoverzicht niet laden"
       },

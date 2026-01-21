@@ -17,9 +17,9 @@ const defaultUrl = process.env.VERCEL_URL
 
 export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
-  title: 'LIFO - AI-Powered Food Waste Management',
+  title: 'LIFO - Expiry Tracking for Food Retailers',
   description:
-    'LIFO helps retailers reduce food waste through AI-driven inventory management. Scan products, track expiration dates, and optimize discounting and donations to maximize profitability.',
+    "LIFO helps food retailers reduce waste by tracking what's expiring and when to act—discount, donate, or sell in time.",
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,

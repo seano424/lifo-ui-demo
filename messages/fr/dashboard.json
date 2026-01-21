@@ -21,6 +21,7 @@
       "title": "Aperçu de l'Inventaire",
       "totalBatches": "Total des Lots",
       "productsTracked": "Produits Suivis",
+      "needsDates": "Nécessite des Dates",
       "errors": {
         "loadingError": "Impossible de charger l'aperçu de l'inventaire"
       },

@@ -21,6 +21,7 @@
       "title": "Inventory Overview",
       "totalBatches": "Total Batches",
       "productsTracked": "Products Tracked",
+      "needsDates": "Needs Dates",
       "errors": {
         "loadingError": "Unable to load inventory overview"
       },
