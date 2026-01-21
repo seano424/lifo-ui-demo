@@ -53,7 +53,7 @@ export function ExpiringSoonCard({ storeId }: ExpiringSoonCardProps) {
             <Typography variant="small">{t('subtitle')}</Typography>
           </div>
           <Typography
-            variant="h2"
+            variant="h3"
             className="text-3xl font-bold text-gray-900 dark:text-brand-white mt-1"
           >
             {totalExpiring}

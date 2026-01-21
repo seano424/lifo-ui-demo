@@ -74,6 +74,8 @@ export async function loadMessages(locale: string): Promise<Record<string, unkno
     const messages = {
       ...auth,
       ...common,
+      // Also expose common nested keys at root for backward compatibility
+      ...(common.common || {}),
       ...dashboard,
       ...dashboardAdmin,
       ...dashboardData,

@@ -1,37 +1,216 @@
 {
-  "actions": {
-    "add": "Add",
-    "edit": "Edit",
-    "delete": "Delete",
-    "save": "Save",
-    "cancel": "Cancel",
-    "scan": "Scan",
-    "discount": "Discount",
-    "donate": "Donate"
-  },
-  "forms": {
-    "productName": "Product Name",
-    "expirationDate": "Expiration Date",
-    "quantity": "Quantity",
-    "price": "Price",
-    "category": "Category",
-    "required": "Required"
-  },
-  "status": {
-    "fresh": "Fresh",
-    "expiringSoon": "Expiring Soon",
-    "expired": "Expired",
-    "discounted": "Discounted",
-    "donated": "Donated",
-    "sold": "Sold"
-  },
-  "validation": {
-    "required": "This field is required",
-    "invalidEmail": "Invalid email address",
-    "passwordTooShort": "Password must be at least 8 characters",
-    "dateMustBeFuture": "Date must be in the future"
-  },
   "common": {
+    "actions": {
+      "add": "Add",
+      "edit": "Edit",
+      "delete": "Delete",
+      "save": "Save",
+      "cancel": "Cancel",
+      "scan": "Scan",
+      "discount": "Discount",
+      "donate": "Donate"
+    },
+    "forms": {
+      "productName": "Product Name",
+      "expirationDate": "Expiration Date",
+      "quantity": "Quantity",
+      "price": "Price",
+      "category": "Category",
+      "required": "Required"
+    },
+    "status": {
+      "fresh": "Fresh",
+      "expiringSoon": "Expiring Soon",
+      "expired": "Expired",
+      "discounted": "Discounted",
+      "donated": "Donated",
+      "sold": "Sold"
+    },
+    "validation": {
+      "required": "This field is required",
+      "invalidEmail": "Invalid email address",
+      "passwordTooShort": "Password must be at least 8 characters",
+      "dateMustBeFuture": "Date must be in the future"
+    },
+    "breadcrumbs": {
+      "batches": "Batches",
+      "stock": "Stock",
+      "draftBatches": "Draft Batches",
+      "drafts": "Drafts",
+      "needsDates": "Needs Dates",
+      "setAside": "Set Aside",
+      "billing": "Billings",
+      "dashboard": "Dashboard",
+      "overview": "Overview",
+      "inventory": "Inventory",
+      "deliveries": "Deliveries",
+      "scanOut": "Scan Out",
+      "analytics": "Analytics",
+      "performance": "Performance",
+      "milestones": "Milestones",
+      "todos": "Todos",
+      "integrations": "Integrations",
+      "square": "Square",
+      "settings": "Settings",
+      "store": "Store",
+      "team": "Team",
+      "users": "Users",
+      "teams": "Teams",
+      "stores": "Stores",
+      "products": "Products",
+      "categories": "Categories",
+      "reports": "Reports",
+      "notifications": "Notifications",
+      "account": "Account",
+      "profile": "Profile",
+      "help": "Help",
+      "support": "Support",
+      "quickStartGuide": "Quick Start Guide",
+      "scanIn": "Scan In",
+      "inventoryManagement": "Inventory Management",
+      "addStore": "Add Store",
+      "expiring": "Expiring",
+      "expiringSoon": "Expiring Soon",
+      "new": "New",
+      "ignored": "Ignored"
+    },
+    "navUser": {
+      "upgradeToPro": "Upgrade to Pro",
+      "account": "Account",
+      "billing": "Billing",
+      "notifications": "Notifications",
+      "language": "Language",
+      "theme": "Theme"
+    },
+    "errors": {
+      "pageNotFoundTitle": "Page not found",
+      "pageNotFoundDescription": "The page you're looking for doesn't exist or has been moved.",
+      "backToHome": "Back to Home",
+      "goBack": "Go Back",
+      "needHelp": "Need help?",
+      "contactSupport": "Contact our support team",
+      "common": {
+        "genericError": "An error occurred",
+        "networkError": "Network error. Please check your connection.",
+        "serverError": "Server error. Please try again later.",
+        "unauthorized": "You don't have permission to access this resource.",
+        "notFound": "The requested resource was not found.",
+        "validationFailed": "Please check your input and try again.",
+        "timeoutError": "Request timed out. Please try again.",
+        "unknownError": "An unknown error occurred",
+        "unexpected": "An unexpected error occurred",
+        "somethingWrong": "Something went wrong",
+        "permissionDenied": "Permission denied",
+        "unableToLoadContent": "Unable to load this content. Please try again.",
+        "unableToLoadMoreItems": "Unable to load more items. Please refresh the page to try again.",
+        "retry": "Retry"
+      },
+      "pages": {
+        "users": {
+          "loginRequired": "Please log in to view users.",
+          "noStoreAccess": "No Store Access",
+          "noStoreAccessDescription": "You don't have access to any stores yet."
+        }
+      },
+      "forms": {
+        "required": "This field is required",
+        "invalidEmail": "Please enter a valid email address",
+        "passwordTooShort": "Password must be at least 6 characters",
+        "passwordsNoMatch": "Passwords do not match",
+        "invalidPhone": "Please enter a valid phone number",
+        "invalidUrl": "Please enter a valid URL",
+        "nameTooLong": "Name is too long",
+        "emailTaken": "This email is already in use",
+        "usernameTaken": "This username is already taken",
+        "usernameInvalid": "Username can only contain letters, numbers, and underscores"
+      },
+      "api": {
+        "createFailed": "Failed to create item",
+        "updateFailed": "Failed to update item",
+        "deleteFailed": "Failed to delete item",
+        "loadFailed": "Failed to load data",
+        "saveFailed": "Failed to save changes",
+        "uploadFailed": "Failed to upload file",
+        "connectionFailed": "Connection failed",
+        "authFailed": "Authentication failed"
+      },
+      "emptyStates": {
+        "noResults": "No results found",
+        "noData": "No data available",
+        "noBatches": "No batches found",
+        "noProducts": "No products found",
+        "noUsers": "No users found",
+        "emptySearch": "No results match your search",
+        "tryDifferentSearch": "Try adjusting your search criteria"
+      },
+      "loading": {
+        "loading": "Loading...",
+        "processing": "Processing...",
+        "saving": "Saving...",
+        "uploading": "Uploading...",
+        "searching": "Searching...",
+        "deleting": "Deleting...",
+        "updating": "Updating..."
+      }
+    },
+    "cancel": "Cancel",
+    "close": "Close",
+    "save": "Save",
+    "edit": "Edit",
+    "saving": "Saving...",
+    "optional": "optional",
+    "pwa": {
+      "installPrompt": {
+        "title": "Install LIFO",
+        "subtitle": "Experimental PWA",
+        "installButton": "Install",
+        "dismissAriaLabel": "Dismiss",
+        "closeAriaLabel": "Close"
+      }
+    },
+    "cookieConsent": {
+      "message": "We use cookies to enhance your experience and analyze site traffic. By accepting, you agree to our use of cookies.",
+      "accept": "Accept",
+      "decline": "Decline",
+      "learnMore": "Learn more",
+      "manageCookies": "Manage cookies"
+    },
+    "trendIndicator": {
+      "previous": "Previous:",
+      "periodLow": "Period Low:",
+      "periodHigh": "Period High:"
+    },
+    "scanning": {
+      "totalItems": "Total Items:",
+      "totalValue": "Total Value:",
+      "noBatchesAvailable": "No batches available",
+      "openMenu": "Open menu",
+      "noStoreSelected": "No store selected",
+      "pleaseSelectStore": "Please select a store to continue",
+      "whatHappensNext": "What happens next?"
+    },
+    "devToken": {
+      "title": "Dev Token Helper",
+      "accessDenied": "Access Denied",
+      "accessDeniedMessage": "This page is only available in development environments for security reasons.",
+      "goToHome": "Go to Home",
+      "loggedInAs": "Logged in as:",
+      "yourJwtToken": "Your JWT Token:",
+      "copyToClipboard": "Copy to Clipboard",
+      "copied": "Copied!",
+      "backToHome": "Back to Home",
+      "goToLogin": "Go to Login",
+      "usageInstructions": "Usage Instructions:",
+      "instruction1": "Make sure you're logged in to the app",
+      "instruction2": "Click \"Copy to Clipboard\" button",
+      "instruction3": "In Postman/API client, set Authorization header to:",
+      "instruction4": "Token expires in ~1 hour - refresh this page to get a new one",
+      "securityNote": "Security Note:",
+      "securityMessage": "This page is for development only. Never expose JWT tokens in production. Tokens provide full access to your account.",
+      "apiEndpointsToTest": "API Endpoints to Test:",
+      "notLoggedIn": "Not logged in - please login first",
+      "loading": "Loading..."
+    },
     "more": "More",
     "aria": {
       "toggleTheme": "Toggle theme",
@@ -45,184 +224,5 @@
       "createAccount": "Create Account",
       "backToSupportCenter": "Back to Support Center"
     }
-  },
-  "breadcrumbs": {
-    "batches": "Batches",
-    "stock": "Stock",
-    "draftBatches": "Draft Batches",
-    "drafts": "Drafts",
-    "needsDates": "Needs Dates",
-    "setAside": "Set Aside",
-    "billing": "Billings",
-    "dashboard": "Dashboard",
-    "overview": "Overview",
-    "inventory": "Inventory",
-    "deliveries": "Deliveries",
-    "scanOut": "Scan Out",
-    "analytics": "Analytics",
-    "performance": "Performance",
-    "milestones": "Milestones",
-    "todos": "Todos",
-    "integrations": "Integrations",
-    "square": "Square",
-    "settings": "Settings",
-    "store": "Store",
-    "team": "Team",
-    "users": "Users",
-    "teams": "Teams",
-    "stores": "Stores",
-    "products": "Products",
-    "categories": "Categories",
-    "reports": "Reports",
-    "notifications": "Notifications",
-    "account": "Account",
-    "profile": "Profile",
-    "help": "Help",
-    "support": "Support",
-    "quickStartGuide": "Quick Start Guide",
-    "scanIn": "Scan In",
-    "inventoryManagement": "Inventory Management",
-    "addStore": "Add Store",
-    "expiring": "Expiring",
-    "expiringSoon": "Expiring Soon",
-    "new": "New",
-    "ignored": "Ignored"
-  },
-  "navUser": {
-    "upgradeToPro": "Upgrade to Pro",
-    "account": "Account",
-    "billing": "Billing",
-    "notifications": "Notifications",
-    "language": "Language",
-    "theme": "Theme"
-  },
-  "errors": {
-    "pageNotFoundTitle": "Page not found",
-    "pageNotFoundDescription": "The page you're looking for doesn't exist or has been moved.",
-    "backToHome": "Back to Home",
-    "goBack": "Go Back",
-    "needHelp": "Need help?",
-    "contactSupport": "Contact our support team",
-    "common": {
-      "genericError": "An error occurred",
-      "networkError": "Network error. Please check your connection.",
-      "serverError": "Server error. Please try again later.",
-      "unauthorized": "You don't have permission to access this resource.",
-      "notFound": "The requested resource was not found.",
-      "validationFailed": "Please check your input and try again.",
-      "timeoutError": "Request timed out. Please try again.",
-      "unknownError": "An unknown error occurred",
-      "unexpected": "An unexpected error occurred",
-      "somethingWrong": "Something went wrong",
-      "permissionDenied": "Permission denied",
-      "unableToLoadContent": "Unable to load this content. Please try again.",
-      "unableToLoadMoreItems": "Unable to load more items. Please refresh the page to try again.",
-      "retry": "Retry"
-    },
-    "pages": {
-      "users": {
-        "loginRequired": "Please log in to view users.",
-        "noStoreAccess": "No Store Access",
-        "noStoreAccessDescription": "You don't have access to any stores yet."
-      }
-    },
-    "forms": {
-      "required": "This field is required",
-      "invalidEmail": "Please enter a valid email address",
-      "passwordTooShort": "Password must be at least 6 characters",
-      "passwordsNoMatch": "Passwords do not match",
-      "invalidPhone": "Please enter a valid phone number",
-      "invalidUrl": "Please enter a valid URL",
-      "nameTooLong": "Name is too long",
-      "emailTaken": "This email is already in use",
-      "usernameTaken": "This username is already taken",
-      "usernameInvalid": "Username can only contain letters, numbers, and underscores"
-    },
-    "api": {
-      "createFailed": "Failed to create item",
-      "updateFailed": "Failed to update item",
-      "deleteFailed": "Failed to delete item",
-      "loadFailed": "Failed to load data",
-      "saveFailed": "Failed to save changes",
-      "uploadFailed": "Failed to upload file",
-      "connectionFailed": "Connection failed",
-      "authFailed": "Authentication failed"
-    },
-    "emptyStates": {
-      "noResults": "No results found",
-      "noData": "No data available",
-      "noBatches": "No batches found",
-      "noProducts": "No products found",
-      "noUsers": "No users found",
-      "emptySearch": "No results match your search",
-      "tryDifferentSearch": "Try adjusting your search criteria"
-    },
-    "loading": {
-      "loading": "Loading...",
-      "processing": "Processing...",
-      "saving": "Saving...",
-      "uploading": "Uploading...",
-      "searching": "Searching...",
-      "deleting": "Deleting...",
-      "updating": "Updating..."
-    }
-  },
-  "cancel": "Cancel",
-  "close": "Close",
-  "save": "Save",
-  "edit": "Edit",
-  "saving": "Saving...",
-  "optional": "optional",
-  "pwa": {
-    "installPrompt": {
-      "title": "Install LIFO",
-      "subtitle": "Experimental PWA",
-      "installButton": "Install",
-      "dismissAriaLabel": "Dismiss",
-      "closeAriaLabel": "Close"
-    }
-  },
-  "cookieConsent": {
-    "message": "We use cookies to enhance your experience and analyze site traffic. By accepting, you agree to our use of cookies.",
-    "accept": "Accept",
-    "decline": "Decline",
-    "learnMore": "Learn more",
-    "manageCookies": "Manage cookies"
-  },
-  "trendIndicator": {
-    "previous": "Previous:",
-    "periodLow": "Period Low:",
-    "periodHigh": "Period High:"
-  },
-  "scanning": {
-    "totalItems": "Total Items:",
-    "totalValue": "Total Value:",
-    "noBatchesAvailable": "No batches available",
-    "openMenu": "Open menu",
-    "noStoreSelected": "No store selected",
-    "pleaseSelectStore": "Please select a store to continue",
-    "whatHappensNext": "What happens next?"
-  },
-  "devToken": {
-    "title": "Dev Token Helper",
-    "accessDenied": "Access Denied",
-    "accessDeniedMessage": "This page is only available in development environments for security reasons.",
-    "goToHome": "Go to Home",
-    "loggedInAs": "Logged in as:",
-    "yourJwtToken": "Your JWT Token:",
-    "copyToClipboard": "Copy to Clipboard",
-    "copied": "Copied!",
-    "backToHome": "Back to Home",
-    "goToLogin": "Go to Login",
-    "usageInstructions": "Usage Instructions:",
-    "instruction1": "Make sure you're logged in to the app",
-    "instruction2": "Click \"Copy to Clipboard\" button",
-    "instruction3": "In Postman/API client, set Authorization header to:",
-    "instruction4": "Token expires in ~1 hour - refresh this page to get a new one",
-    "securityNote": "Security Note:",
-    "securityMessage": "This page is for development only. Never expose JWT tokens in production. Tokens provide full access to your account.",
-    "apiEndpointsToTest": "API Endpoints to Test:",
-    "notLoggedIn": "Not logged in - please login first",
-    "loading": "Loading..."
   }
 }

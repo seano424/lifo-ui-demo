@@ -463,6 +463,301 @@ export type Database = {
       [_ in never]: never
     }
   }
+  integrations: {
+    Tables: {
+      square_connections: {
+        Row: {
+          access_token_encrypted: string
+          connected_at: string
+          connection_id: string
+          connection_status: string
+          created_at: string
+          disconnected_at: string | null
+          is_active: boolean
+          last_sync_at: string | null
+          last_token_refresh_at: string | null
+          refresh_token_encrypted: string
+          square_business_name: string | null
+          square_country: string | null
+          square_currency: string | null
+          square_location_id: string
+          square_merchant_id: string
+          store_id: string
+          token_expires_at: string
+          token_refresh_count: number | null
+          token_scopes: string[] | null
+          updated_at: string
+        }
+        Insert: {
+          access_token_encrypted: string
+          connected_at?: string
+          connection_id?: string
+          connection_status?: string
+          created_at?: string
+          disconnected_at?: string | null
+          is_active?: boolean
+          last_sync_at?: string | null
+          last_token_refresh_at?: string | null
+          refresh_token_encrypted: string
+          square_business_name?: string | null
+          square_country?: string | null
+          square_currency?: string | null
+          square_location_id: string
+          square_merchant_id: string
+          store_id: string
+          token_expires_at: string
+          token_refresh_count?: number | null
+          token_scopes?: string[] | null
+          updated_at?: string
+        }
+        Update: {
+          access_token_encrypted?: string
+          connected_at?: string
+          connection_id?: string
+          connection_status?: string
+          created_at?: string
+          disconnected_at?: string | null
+          is_active?: boolean
+          last_sync_at?: string | null
+          last_token_refresh_at?: string | null
+          refresh_token_encrypted?: string
+          square_business_name?: string | null
+          square_country?: string | null
+          square_currency?: string | null
+          square_location_id?: string
+          square_merchant_id?: string
+          store_id?: string
+          token_expires_at?: string
+          token_refresh_count?: number | null
+          token_scopes?: string[] | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      square_sync_history: {
+        Row: {
+          completed_at: string | null
+          connection_id: string
+          duration_ms: number | null
+          error_code: string | null
+          error_details: Json | null
+          error_message: string | null
+          records_created: number | null
+          records_failed: number | null
+          records_processed: number | null
+          records_skipped: number | null
+          records_updated: number | null
+          square_catalog_version: number | null
+          square_line_item_ids: string[] | null
+          square_order_ids: string[] | null
+          started_at: string
+          store_id: string
+          sync_id: string
+          sync_metadata: Json | null
+          sync_status: string
+          sync_type: string
+        }
+        Insert: {
+          completed_at?: string | null
+          connection_id: string
+          duration_ms?: number | null
+          error_code?: string | null
+          error_details?: Json | null
+          error_message?: string | null
+          records_created?: number | null
+          records_failed?: number | null
+          records_processed?: number | null
+          records_skipped?: number | null
+          records_updated?: number | null
+          square_catalog_version?: number | null
+          square_line_item_ids?: string[] | null
+          square_order_ids?: string[] | null
+          started_at?: string
+          store_id: string
+          sync_id?: string
+          sync_metadata?: Json | null
+          sync_status?: string
+          sync_type: string
+        }
+        Update: {
+          completed_at?: string | null
+          connection_id?: string
+          duration_ms?: number | null
+          error_code?: string | null
+          error_details?: Json | null
+          error_message?: string | null
+          records_created?: number | null
+          records_failed?: number | null
+          records_processed?: number | null
+          records_skipped?: number | null
+          records_updated?: number | null
+          square_catalog_version?: number | null
+          square_line_item_ids?: string[] | null
+          square_order_ids?: string[] | null
+          started_at?: string
+          store_id?: string
+          sync_id?: string
+          sync_metadata?: Json | null
+          sync_status?: string
+          sync_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "square_sync_history_connection_id_store_id_fkey"
+            columns: ["connection_id", "store_id"]
+            isOneToOne: false
+            referencedRelation: "square_connections"
+            referencedColumns: ["connection_id", "store_id"]
+          },
+          {
+            foreignKeyName: "square_sync_history_connection_id_store_id_fkey"
+            columns: ["connection_id", "store_id"]
+            isOneToOne: false
+            referencedRelation: "v_square_connection_status"
+            referencedColumns: ["connection_id", "store_id"]
+          },
+        ]
+      }
+      square_sync_state: {
+        Row: {
+          consecutive_failures: number | null
+          created_at: string
+          current_status: string
+          last_catalog_check_at: string | null
+          last_cursor_updated_at: string | null
+          last_successful_sync_at: string | null
+          last_sync_error: string | null
+          square_catalog_version: number | null
+          store_id: string
+          sync_cursor: string | null
+          sync_state_id: string
+          sync_type: string
+          updated_at: string
+        }
+        Insert: {
+          consecutive_failures?: number | null
+          created_at?: string
+          current_status?: string
+          last_catalog_check_at?: string | null
+          last_cursor_updated_at?: string | null
+          last_successful_sync_at?: string | null
+          last_sync_error?: string | null
+          square_catalog_version?: number | null
+          store_id: string
+          sync_cursor?: string | null
+          sync_state_id?: string
+          sync_type: string
+          updated_at?: string
+        }
+        Update: {
+          consecutive_failures?: number | null
+          created_at?: string
+          current_status?: string
+          last_catalog_check_at?: string | null
+          last_cursor_updated_at?: string | null
+          last_successful_sync_at?: string | null
+          last_sync_error?: string | null
+          square_catalog_version?: number | null
+          store_id?: string
+          sync_cursor?: string | null
+          sync_state_id?: string
+          sync_type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      square_webhook_events: {
+        Row: {
+          event_created_at: string
+          event_id: string
+          event_type: string
+          last_processing_attempt_at: string | null
+          payload: Json
+          processed_at: string | null
+          processing_attempts: number | null
+          processing_error: string | null
+          processing_error_code: string | null
+          processing_status: string
+          received_at: string
+          square_merchant_id: string
+        }
+        Insert: {
+          event_created_at: string
+          event_id: string
+          event_type: string
+          last_processing_attempt_at?: string | null
+          payload: Json
+          processed_at?: string | null
+          processing_attempts?: number | null
+          processing_error?: string | null
+          processing_error_code?: string | null
+          processing_status?: string
+          received_at?: string
+          square_merchant_id: string
+        }
+        Update: {
+          event_created_at?: string
+          event_id?: string
+          event_type?: string
+          last_processing_attempt_at?: string | null
+          payload?: Json
+          processed_at?: string | null
+          processing_attempts?: number | null
+          processing_error?: string | null
+          processing_error_code?: string | null
+          processing_status?: string
+          received_at?: string
+          square_merchant_id?: string
+        }
+        Relationships: []
+      }
+    }
+    Views: {
+      v_square_connection_status: {
+        Row: {
+          connected_at: string | null
+          connection_id: string | null
+          connection_status: string | null
+          failed_syncs_last_24h: number | null
+          is_active: boolean | null
+          last_sync_at: string | null
+          last_token_refresh_at: string | null
+          square_business_name: string | null
+          square_location_id: string | null
+          square_merchant_id: string | null
+          store_id: string | null
+          store_name: string | null
+          syncs_last_24h: number | null
+          token_expires_at: string | null
+        }
+        Relationships: []
+      }
+      v_square_sync_state_overview: {
+        Row: {
+          consecutive_failures: number | null
+          current_status: string | null
+          has_cursor: boolean | null
+          last_successful_sync_at: string | null
+          square_catalog_version: number | null
+          store_id: string | null
+          store_name: string | null
+          sync_state_id: string | null
+          sync_type: string | null
+          updated_at: string | null
+        }
+        Relationships: []
+      }
+    }
+    Functions: {
+      [_ in never]: never
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   inventory: {
     Tables: {
       batch_actions: {
@@ -572,6 +867,13 @@ export type Database = {
             columns: ["batch_id"]
             isOneToOne: false
             referencedRelation: "batches"
+            referencedColumns: ["batch_id"]
+          },
+          {
+            foreignKeyName: "batch_actions_batch_id_fkey"
+            columns: ["batch_id"]
+            isOneToOne: false
+            referencedRelation: "expiring_products"
             referencedColumns: ["batch_id"]
           },
           {
@@ -903,8 +1205,6 @@ export type Database = {
       }
       products: {
         Row: {
-          active_batches_count: number | null
-          avg_days_to_expiry: number | null
           barcode: string | null
           barcode_type: string | null
           base_cost_price: number
@@ -925,15 +1225,12 @@ export type Database = {
           sku: string
           square_item_id: string | null
           square_synced_at: string | null
-          total_stock: number | null
           typical_shelf_life_days: number
           unit_type: string
           updated_at: string | null
           verification_count: number | null
         }
         Insert: {
-          active_batches_count?: number | null
-          avg_days_to_expiry?: number | null
           barcode?: string | null
           barcode_type?: string | null
           base_cost_price: number
@@ -954,15 +1251,12 @@ export type Database = {
           sku: string
           square_item_id?: string | null
           square_synced_at?: string | null
-          total_stock?: number | null
           typical_shelf_life_days: number
           unit_type: string
           updated_at?: string | null
           verification_count?: number | null
         }
         Update: {
-          active_batches_count?: number | null
-          avg_days_to_expiry?: number | null
           barcode?: string | null
           barcode_type?: string | null
           base_cost_price?: number
@@ -983,7 +1277,6 @@ export type Database = {
           sku?: string
           square_item_id?: string | null
           square_synced_at?: string | null
-          total_stock?: number | null
           typical_shelf_life_days?: number
           unit_type?: string
           updated_at?: string | null
@@ -1289,45 +1582,18 @@ export type Database = {
       }
       expiring_products: {
         Row: {
-          active_batches_count: number | null
-          avg_days_to_expiry: number | null
           barcode: string | null
-          barcode_type: string | null
-          base_cost_price: number | null
-          base_selling_price: number | null
+          batch_id: string | null
           brand: string | null
           category_code: string | null
-          category_id: string | null
-          category_name: string | null
-          created_at: string | null
-          created_by: string | null
           current_quantity: number | null
           days_to_expiry: number | null
-          description: string | null
           expiry_date: string | null
-          image_url: string | null
-          is_verified: boolean | null
-          last_scanned_at: string | null
-          last_verified: string | null
           name: string | null
-          open_food_facts_data: Json | null
           product_id: string | null
-          sku: string | null
-          total_stock: number | null
-          typical_shelf_life_days: number | null
-          unit_type: string | null
-          updated_at: string | null
-          verification_count: number | null
+          store_id: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "products_category_id_fkey"
-            columns: ["category_id"]
-            isOneToOne: false
-            referencedRelation: "categories"
-            referencedColumns: ["category_id"]
-          },
-        ]
+        Relationships: []
       }
       my_store_products: {
         Row: {
@@ -1353,6 +1619,7 @@ export type Database = {
           product_id: string | null
           sku: string | null
           store_cost_price: number | null
+          store_id: string | null
           store_is_active: boolean | null
           store_selling_price: number | null
           store_sku: string | null
@@ -1375,47 +1642,18 @@ export type Database = {
       }
       products_needing_barcodes: {
         Row: {
-          active_batches_count: number | null
-          avg_days_to_expiry: number | null
           barcode: string | null
-          barcode_type: string | null
-          base_cost_price: number | null
-          base_selling_price: number | null
           brand: string | null
           category_code: string | null
-          category_id: string | null
-          category_name: string | null
-          created_at: string | null
-          created_by: string | null
-          description: string | null
-          image_url: string | null
           is_verified: boolean | null
-          last_scanned_at: string | null
-          last_verified: string | null
           name: string | null
-          open_food_facts_data: Json | null
           product_id: string | null
           sku: string | null
-          total_stock: number | null
-          typical_shelf_life_days: number | null
-          unit_type: string | null
-          updated_at: string | null
-          verification_count: number | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "products_category_id_fkey"
-            columns: ["category_id"]
-            isOneToOne: false
-            referencedRelation: "categories"
-            referencedColumns: ["category_id"]
-          },
-        ]
+        Relationships: []
       }
       products_with_categories: {
         Row: {
-          active_batches_count: number | null
-          avg_days_to_expiry: number | null
           barcode: string | null
           barcode_type: string | null
           base_cost_price: number | null
@@ -1438,7 +1676,6 @@ export type Database = {
           open_food_facts_data: Json | null
           product_id: string | null
           sku: string | null
-          total_stock: number | null
           typical_shelf_life_days: number | null
           unit_type: string | null
           updated_at: string | null
@@ -1525,6 +1762,13 @@ export type Database = {
             columns: ["batch_id"]
             isOneToOne: false
             referencedRelation: "batches"
+            referencedColumns: ["batch_id"]
+          },
+          {
+            foreignKeyName: "sales_events_batch_id_fkey"
+            columns: ["batch_id"]
+            isOneToOne: false
+            referencedRelation: "expiring_products"
             referencedColumns: ["batch_id"]
           },
         ]
@@ -4612,6 +4856,9 @@ export const Constants = {
         "organic",
       ],
     },
+  },
+  integrations: {
+    Enums: {},
   },
   inventory: {
     Enums: {},
