@@ -296,7 +296,7 @@ export function BatchCreationFlow() {
   }
 
   if (!currentProduct) {
-    return <div>No draft batches to process</div>
+    return <div>No new deliveries to process</div>
   }
 
   return (

@@ -66,7 +66,7 @@ export function DraftBatchesList({ className, onSelectBatch }: DraftBatchesListP
       <Card className={cn('border-0 shadow-none', className)}>
         <CardContent className="flex flex-col items-center justify-center py-12">
           <Package className="h-12 w-12 text-muted-foreground mb-4" />
-          <CardTitle className="text-lg mb-2">No Draft Batches</CardTitle>
+          <CardTitle className="text-lg mb-2">No New Deliveries</CardTitle>
           <CardDescription className="text-center max-w-md">
             All batches have expiry dates. Upload a CSV without expiry dates to create draft
             batches.

@@ -51,7 +51,7 @@ function useNavigationData() {
           ],
         },
         {
-          title: t('actions'),
+          title: t('batches'),
           items: [
             {
               title: t('expiring'),
@@ -60,7 +60,7 @@ function useNavigationData() {
               badge: expiryTodosCount > 0 ? expiryTodosCount : undefined,
             },
             {
-              title: t('needsDates'),
+              title: t('newDeliveries'),
               url: '/dashboard/inventory/new',
               icon: PackagePlus,
               badge: draftBatchCount,
@@ -70,16 +70,16 @@ function useNavigationData() {
               url: '/dashboard/inventory/ignored',
               icon: XCircle,
             },
-          ],
-        },
-        {
-          title: t('inventory'),
-          items: [
             {
-              title: t('batches'),
+              title: t('all'),
               url: '/dashboard/inventory/batches',
               icon: Layers,
             },
+          ],
+        },
+        {
+          title: t('catalog'),
+          items: [
             {
               title: t('products'),
               url: '/dashboard/inventory/products',

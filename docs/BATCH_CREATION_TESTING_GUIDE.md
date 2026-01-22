@@ -181,7 +181,7 @@ Each product shows a `DraftBatchCard`:
 
 #### **Empty State** (if no drafts)
 - Party popper icon (green background)
-- "No draft batches!"
+- "No new deliveries!"
 - "All your batches have expiry dates assigned"
 
 ---
@@ -399,7 +399,7 @@ VALUES (
 **Check if draft batches exist:**
 1. Go to `/dashboard/inventory/new`
 2. Should see products listed
-3. If empty state → No draft batches in database
+3. If empty state → No new deliveries in database
 
 **Query to check draft count:**
 ```sql

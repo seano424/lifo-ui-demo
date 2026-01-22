@@ -155,7 +155,7 @@ export function BatchCreationSheetDemo() {
         <CardContent className="p-8 text-center">
           <Package className="h-12 w-12 mx-auto text-gray-400 mb-4" />
           <p className="text-gray-600 dark:text-gray-400">
-            No draft batches found. All batches have expiry dates assigned.
+            No new deliveries found. All batches have expiry dates assigned.
           </p>
         </CardContent>
       </Card>
