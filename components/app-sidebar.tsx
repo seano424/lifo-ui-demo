@@ -7,7 +7,7 @@ import {
   PackagePlus,
   SettingsIcon,
   Zap,
-  Clock,
+  CalendarFold,
   XCircle,
   Package,
 } from 'lucide-react'
@@ -56,7 +56,7 @@ function useNavigationData() {
             {
               title: t('expiring'),
               url: '/dashboard/expiring',
-              icon: Clock,
+              icon: CalendarFold,
               badge: expiryTodosCount > 0 ? expiryTodosCount : undefined,
             },
             {
