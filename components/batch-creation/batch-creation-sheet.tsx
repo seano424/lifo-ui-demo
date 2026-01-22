@@ -4,18 +4,11 @@ import { useCallback, useEffect, useState } from 'react'
 import { addDays, format } from 'date-fns'
 import { Calendar, ChevronLeft, Package, XCircle } from 'lucide-react'
 import Image from 'next/image'
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from '@/components/ui/sheet'
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import {
   BatchSuccessCard,
   DraftBatchCard,
@@ -276,8 +269,8 @@ export function BatchCreationSheet({
 
   const isDateSelected = selectedDays !== null || customDate !== undefined
   const hasMultipleProducts = effectiveProducts.length > 1
-  const currentProductNumber = selectedProductIndex + 1
-  const totalProducts = effectiveProducts.length
+  // const currentProductNumber = selectedProductIndex + 1
+  // const totalProducts = effectiveProducts.length
 
   // ============================================================================
   // RENDER
@@ -290,7 +283,7 @@ export function BatchCreationSheet({
         className={cn('w-full sm:max-w-lg', 'p-0 flex flex-col', 'overflow-hidden')}
       >
         {/* Header */}
-        <SheetHeader className="px-6 py-4 border-b border-gray-200 dark:border-gray-800">
+        <SheetHeader className="px-6 py-4">
           <div className="flex items-center gap-3">
             {/* Back Button */}
             {currentStep === 'expiry-entry' && !singleProduct && (
@@ -307,11 +300,11 @@ export function BatchCreationSheet({
 
             <div className="flex-1 min-w-0">
               <SheetTitle>
-                {currentStep === 'product-selection' && 'Add Expiry Dates'}
+                {/* {currentStep === 'product-selection' && 'Add Expiry Dates'}
                 {currentStep === 'expiry-entry' && 'Set Expiry Date'}
-                {currentStep === 'success' && 'Batch Added'}
+                {currentStep === 'success' && 'Batch Added'} */}
               </SheetTitle>
-              <SheetDescription>
+              {/* <SheetDescription>
                 {currentStep === 'product-selection' &&
                   `${totalProducts} product${totalProducts !== 1 ? 's' : ''} with draft batches`}
                 {currentStep === 'expiry-entry' &&
@@ -319,7 +312,7 @@ export function BatchCreationSheet({
                     ? `Product ${currentProductNumber} of ${totalProducts}`
                     : 'Choose quantity and expiry date')}
                 {currentStep === 'success' && 'Successfully activated batch'}
-              </SheetDescription>
+              </SheetDescription> */}
             </div>
           </div>
         </SheetHeader>
@@ -348,7 +341,7 @@ export function BatchCreationSheet({
           {currentStep === 'product-selection' && !isLoading && !fetchError && (
             <div
               className={cn(
-                'p-6 space-y-4',
+                'px-6 space-y-4',
                 'animate-in fade-in-0 slide-in-from-right-4 duration-300',
               )}
             >
@@ -376,7 +369,7 @@ export function BatchCreationSheet({
           {currentStep === 'expiry-entry' && currentProduct && (
             <div
               className={cn(
-                'p-6 space-y-6',
+                'px-6 space-y-6',
                 'animate-in fade-in-0 slide-in-from-right-4 duration-300',
               )}
             >
@@ -403,26 +396,29 @@ export function BatchCreationSheet({
                   </div>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-base text-gray-900 dark:text-gray-100 truncate">
+                  <Typography variant="p" className="truncate font-bold">
                     {currentProduct.product_name}
-                  </h3>
+                  </Typography>
                   {currentProduct.product_brand && (
-                    <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
+                    <Typography variant="small" color="muted" className="truncate">
                       {currentProduct.product_brand}
-                    </p>
+                    </Typography>
                   )}
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    {currentProduct.total_draft_quantity} units in{' '}
+                  <Typography variant="small" color="muted">
+                    Current stock: {currentProduct.total_draft_quantity} units in{' '}
                     {currentProduct.draft_batch_count} batch
                     {currentProduct.draft_batch_count !== 1 ? 'es' : ''}
-                  </p>
+                  </Typography>
+
+                  <Typography variant="small" color="muted">
+                    Just added: {currentProduct.draft_batches[0]?.quantity} units
+                  </Typography>
                 </div>
               </div>
 
               {/* Category Hint */}
               {currentProduct.category_name && currentProduct.typical_shelf_life_days && (
-                <div className="p-3 rounded-lg bg-secondary-50 dark:bg-secondary-900/20 flex justify-center items-center gap-1">
-                  <Calendar className="h-3 w-3 text-secondary" />
+                <div className="flex justify-center items-center gap-1">
                   <Typography variant="small" color="secondary">
                     {currentProduct.category_name} typically expires in +
                     {currentProduct.typical_shelf_life_days} days
@@ -432,7 +428,7 @@ export function BatchCreationSheet({
 
               {/* Quantity Selector */}
               <div className="flex flex-col gap-2">
-                <Label htmlFor="quantity-selector">Select Quantity</Label>
+                {/* <Label htmlFor="quantity-selector">Select Quantity</Label> */}
                 <QuantitySelector
                   value={selectedQuantity}
                   onChange={setSelectedQuantity}
@@ -442,17 +438,17 @@ export function BatchCreationSheet({
                   }
                 />
                 {selectedQuantity < (currentProduct.draft_batches[0]?.quantity ?? 0) && (
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                  <Typography variant="small" color="secondary" className="mt-2 text-center">
                     Batch will be split.{' '}
                     {(currentProduct.draft_batches[0]?.quantity ?? 0) - selectedQuantity} units will
                     remain in draft.
-                  </p>
+                  </Typography>
                 )}
               </div>
 
               {/* Expiry Preset Buttons */}
               <div className="flex flex-col gap-2">
-                <Label htmlFor="expiry-preset-buttons">Choose Expiry Date</Label>
+                {/* <Label htmlFor="expiry-preset-buttons">Choose Expiry Date</Label> */}
                 <ExpiryPresetButtons
                   onSelect={days => {
                     setSelectedDays(days)
@@ -472,7 +468,7 @@ export function BatchCreationSheet({
                     'animate-in fade-in-0 slide-in-from-top-2 duration-200',
                   )}
                 >
-                  <Label htmlFor="custom-expiry-date">Custom Expiry Date</Label>
+                  {/* <Label htmlFor="custom-expiry-date">Custom Expiry Date</Label> */}
                   <div className="relative">
                     <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-primary-600 dark:text-primary-400" />
                     <Input
@@ -530,7 +526,7 @@ export function BatchCreationSheet({
 
           {/* Step 3: Success */}
           {currentStep === 'success' && activationResult && (
-            <div className={cn('p-6', 'animate-in fade-in-0 slide-in-from-right-4 duration-300')}>
+            <div className={cn('px-6', 'animate-in fade-in-0 slide-in-from-right-4 duration-300')}>
               <BatchSuccessCard
                 result={activationResult}
                 onAddAnother={activationResult.was_split ? handleAddAnother : undefined}
@@ -542,7 +538,7 @@ export function BatchCreationSheet({
 
         {/* Footer */}
         {currentStep === 'product-selection' && effectiveProducts.length > 0 && (
-          <div className="p-6 border-t border-gray-200 dark:border-gray-800">
+          <div className="px-6 border-t border-gray-200 dark:border-gray-800">
             <Button
               size="lg"
               variant="outline"
@@ -555,7 +551,7 @@ export function BatchCreationSheet({
         )}
 
         {currentStep === 'expiry-entry' && !singleProduct && hasMultipleProducts && (
-          <div className="p-6 border-t border-gray-200 dark:border-gray-800">
+          <div className="px-6 border-t border-gray-200 dark:border-gray-800">
             <Button
               size="lg"
               variant="ghost"
