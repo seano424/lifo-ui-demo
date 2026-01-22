@@ -267,7 +267,7 @@ export default function NewBatchesPage() {
               <PartyPopper className="h-12 w-12 text-green-600 dark:text-green-400" />
             </div>
             <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
-              No draft batches!
+              No new deliveries!
             </h3>
             <p className="text-base text-gray-500 dark:text-gray-400 max-w-md">
               All your batches have expiry dates assigned. New deliveries will appear here.

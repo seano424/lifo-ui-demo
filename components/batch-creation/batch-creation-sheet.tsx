@@ -355,7 +355,7 @@ export function BatchCreationSheet({
               {effectiveProducts.length === 0 ? (
                 <div className="text-center py-12">
                   <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-600 dark:text-gray-400">No draft batches found</p>
+                  <p className="text-gray-600 dark:text-gray-400">No new deliveries found</p>
                   <p className="text-sm text-gray-500 dark:text-gray-500 mt-2">
                     All batches have expiry dates assigned
                   </p>
