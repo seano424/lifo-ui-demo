@@ -11,7 +11,7 @@ const BREAKPOINTS = {
 } as const
 
 export function useIsMobile() {
-  const [isMobile, setIsMobile] = React.useState<boolean>(false)
+  const [isMobile, setIsMobile] = React.useState<boolean | undefined>(undefined)
 
   React.useEffect(() => {
     const mql = window.matchMedia(`(max-width: ${BREAKPOINTS.md - 1}px)`)
@@ -23,7 +23,7 @@ export function useIsMobile() {
     return () => mql.removeEventListener('change', onChange)
   }, [])
 
-  return isMobile
+  return isMobile ?? false
 }
 
 export function useIsTablet() {
