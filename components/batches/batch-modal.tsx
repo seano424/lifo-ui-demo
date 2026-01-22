@@ -46,9 +46,8 @@ export function BatchModal({ isOpen, onClose, batch, currencySymbol = '€' }: B
 
   const formatDate = (date: string | null) => {
     if (!date) return 'N/A'
-    // Extract just the date portion if this is a timestamp (YYYY-MM-DDTHH:MM:SS)
-    const dateOnly = date.split('T')[0]
-    const localDate = parseISODateAsLocal(dateOnly)
+    // parseISODateAsLocal now handles both date-only and timestamp formats
+    const localDate = parseISODateAsLocal(date)
     return localDate.toLocaleDateString('en-US', {
       month: 'short',
       day: 'numeric',

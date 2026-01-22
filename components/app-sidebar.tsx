@@ -125,44 +125,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   if (!user) return
 
-  // Prevent hydration mismatch by only rendering interactive elements after mount
-  if (!mounted) {
-    return (
-      <Sidebar
-        collapsible="icon"
-        className="bg-secondary-100/10 dark:bg-brand-dark border-l-none"
-        {...props}
-      >
-        <SidebarHeader className="flex gap-2 justify-center items-center h-16 border-b dark:bg-brand-dark">
-          <Link
-            href="/"
-            className="group-data-[collapsible=icon]:hidden hidden sm:flex items-center gap-2 hover:opacity-80 transition-opacity duration-200 ease-in-out font-heading font-black text-4xl"
-          >
-            <Logo variant="svg" size="sm" priority />
-            LIFO
-          </Link>
-          <Link
-            href="/"
-            className="group-data-[collapsible=icon]:hidden sm:hidden hover:opacity-80 transition-opacity duration-200 ease-in-out"
-          >
-            <Logo variant="svg" size="sm" priority />
-          </Link>
-          <Link
-            href="/"
-            className="group-data-[collapsible=icon]:block hidden hover:opacity-80 transition-opacity duration-200 ease-in-out"
-          >
-            <Logo variant="svg" size="sm" priority />
-          </Link>
-        </SidebarHeader>
-        <SidebarContent className="group-data-[collapsible=icon]:pt-4 pt-4">
-          <NavMain sections={navigationData.navSections} />
-        </SidebarContent>
-        <SidebarFooter className="py-4" />
-        <SidebarRail />
-      </Sidebar>
-    )
-  }
-
   return (
     <Sidebar
       collapsible="icon"
@@ -197,13 +159,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent className="group-data-[collapsible=icon]:pt-4 pt-4">
         <NavMain sections={navigationData.navSections} />
-        <div className="group-data-[collapsible=icon]:hidden sm:hidden p-4 mt-4">
-          <TeamSwitcher />
-        </div>
+        {mounted && (
+          <div className="group-data-[collapsible=icon]:hidden sm:hidden p-4 mt-4">
+            <TeamSwitcher />
+          </div>
+        )}
       </SidebarContent>
-      <SidebarFooter className="py-4">
-        <NavUser user={user} />
-      </SidebarFooter>
+      <SidebarFooter className="py-4">{mounted && <NavUser user={user} />}</SidebarFooter>
       <SidebarRail />
     </Sidebar>
   )
