@@ -4,12 +4,12 @@ import * as React from 'react'
 import { cn } from '@/lib/utils'
 
 const badgeVariants = cva(
-  'inline-flex items-center justify-center gap-1.5 rounded-4xl capitalize whitespace-nowrap transition-colors duration-200 ease-in-out [&_svg]:pointer-events-none [&_svg]:size-3 [&_svg]:shrink-0',
+  'inline-flex items-center font-bold font-heading justify-center gap-1.5 rounded-4xl capitalize whitespace-nowrap transition-colors duration-200 ease-in-out [&_svg]:pointer-events-none [&_svg]:size-3 [&_svg]:shrink-0',
   {
     variants: {
       variant: {
         default: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-100',
-        primary: 'bg-primary text-white',
+        primary: 'bg-primary-50 text-primary-600',
         secondary: 'bg-secondary text-white',
         destructive: 'bg-red-100 text-red-900 dark:bg-red-900/20 dark:text-red-300',
         success: 'bg-green-100 text-green-900 dark:bg-green-900/20 dark:text-green-300',

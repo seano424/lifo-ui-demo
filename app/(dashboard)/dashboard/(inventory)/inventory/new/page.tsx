@@ -2,7 +2,7 @@
 
 import { useCallback, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { AlertCircle, Filter, Package, PartyPopper, Plus } from 'lucide-react'
+import { AlertCircle, Filter, PartyPopper, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -24,6 +24,7 @@ import {
   type ProductWithDraftBatches,
 } from '@/hooks/use-draft-batches'
 import { useActiveStoreId } from '@/lib/stores/store-context'
+import { Typography } from '@/components/ui/typography'
 
 const ITEMS_PER_PAGE = 20
 
@@ -137,34 +138,24 @@ export default function NewBatchesPage() {
   const totalUnits = summary?.total_units || 0
 
   return (
-    <div className="container space-y-6 md:py-6 lg:py-8">
+    <div className="container space-y-4 py-6">
       {/* Page Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
-            New Batches
-          </h1>
-          <p className="text-base text-gray-500 dark:text-gray-400 mt-1">
-            Add expiry dates to activate your inventory
-          </p>
-        </div>
+        <Typography variant="h3">Deliveries</Typography>
 
         {/* Summary Stats */}
         {!isLoading && totalDrafts > 0 && (
           <div className="flex flex-wrap items-center gap-3">
-            <Badge variant="secondary" className="text-base px-3 py-1.5">
-              <Package className="h-4 w-4 mr-2" />
+            <Badge variant="primary">
               {totalDrafts} {totalDrafts === 1 ? 'batch' : 'batches'}
             </Badge>
-            <Badge variant="outline" className="text-base px-3 py-1.5">
-              {totalUnits} units
-            </Badge>
+            <Badge variant="primary">{totalUnits} units</Badge>
           </div>
         )}
       </div>
 
       {/* Search and Filters */}
-      <div className="flex flex-row flex-wrap lg:items-center lg:gap-4 gap-3">
+      <div className="flex flex-row flex-wrap lg:items-center lg:gap-4 gap-3 bg-gray-50 dark:bg-gray-900 rounded-2xl p-4">
         {/* Search Bar */}
         <div className="flex-1">
           <TodoSearchBar
@@ -279,7 +270,7 @@ export default function NewBatchesPage() {
       {/* Products List */}
       {!isLoading && !productsError && products && products.length > 0 && (
         <>
-          <div className="space-y-4">
+          <div className="space-y-4 bg-gray-50 dark:bg-gray-900 rounded-2xl p-4">
             {products.map(product => (
               <DraftBatchCard
                 key={product.product_id}
