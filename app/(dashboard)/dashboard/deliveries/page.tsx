@@ -14,13 +14,13 @@ import { useMediaQuery } from '@/hooks/use-mobile'
 
 export default function DeliveriesPage() {
   const { activeStore: currentStore } = useStoreState()
-  const t = useTranslations('dashboard.deliveries')
+  const t = useTranslations('dashboard.newDeliveries')
 
   const { isDesktop } = useMediaQuery()
 
   return (
     <div className="space-y-6 container md:py-6 lg:py-8">
-      <DashboardInsetHeader title={t('title')} description={t('description')} />
+      <DashboardInsetHeader title={t('title')} description={t('addBatchDescription')} />
       {/* Mobile Tabs */}
       {!isDesktop && (
         <Tabs defaultValue="scan" className="w-full lg:hidden">

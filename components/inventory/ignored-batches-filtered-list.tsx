@@ -1,6 +1,6 @@
 'use client'
 
-import { AlertCircle, CheckCircle, Filter, Package, Plus } from 'lucide-react'
+import { AlertCircle, CheckCircle, Filter, Plus } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
@@ -16,6 +16,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Typography } from '@/components/ui/typography'
 import { TodoSearchBar } from '@/components/todos/filters/todo-search-bar'
 import { BatchCreationSheet, DraftBatchCard } from '@/components/batch-creation'
 import {
@@ -196,34 +197,24 @@ export function IgnoredBatchesFilteredList({
   const totalUnits = summary?.total_units || 0
 
   return (
-    <div className="space-y-6">
+    <div className="container space-y-4 py-6">
       {/* Page Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
-            Ignored Batches
-          </h1>
-          <p className="text-base text-gray-500 dark:text-gray-400 mt-1">
-            Batches you chose to skip. Restore them to continue setup.
-          </p>
-        </div>
+        <Typography variant="h3">Ignored Batches</Typography>
 
         {/* Summary Stats */}
         {!isLoading && totalIgnored > 0 && (
           <div className="flex flex-wrap items-center gap-3">
-            <Badge variant="secondary" className="text-base px-3 py-1.5">
-              <Package className="h-4 w-4 mr-2" />
+            <Badge variant="primary">
               {totalIgnored} {totalIgnored === 1 ? 'batch' : 'batches'}
             </Badge>
-            <Badge variant="outline" className="text-base px-3 py-1.5">
-              {totalUnits} units
-            </Badge>
+            <Badge variant="primary">{totalUnits} units</Badge>
           </div>
         )}
       </div>
 
       {/* Control bar - Search and Filters */}
-      <div className="flex flex-row flex-wrap lg:items-center lg:gap-4 gap-3">
+      <div className="flex flex-row flex-wrap lg:items-center lg:gap-4 gap-3 bg-gray-50 dark:bg-gray-900 rounded-2xl p-4">
         {/* Search Bar */}
         <div className="flex-1">
           <TodoSearchBar
@@ -341,7 +332,7 @@ export function IgnoredBatchesFilteredList({
       {/* Products List */}
       {!isLoading && !productsError && products && products.length > 0 && (
         <>
-          <div className="space-y-4">
+          <div className="space-y-4 bg-gray-50 dark:bg-gray-900 rounded-2xl p-4">
             {products.map(product => (
               <DraftBatchCard
                 key={product.product_id}

@@ -1,5 +1,13 @@
 {
   "dashboard": {
+    "newDeliveries": {
+      "title": "Nieuwe Leveringen",
+      "description": "Voeg nieuwe items toe aan uw voorraad",
+      "searchPlaceholder": "Zoek batches...",
+      "addBatch": "Voeg Batch Toe",
+      "addBatchDescription": "Voeg een nieuwe batch toe aan uw voorraad",
+      "addBatchButton": "Voeg Batch Toe"
+    },
     "title": "Voorraad Dashboard",
     "subtitle": "Volg vervaldatums en beheer uw voorraad",
     "expiringSoon": {

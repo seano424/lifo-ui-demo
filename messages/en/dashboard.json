@@ -1,5 +1,13 @@
 {
   "dashboard": {
+    "newDeliveries": {
+      "title": "New Deliveries",
+      "description": "Add new items to your inventory",
+      "searchPlaceholder": "Search batches...",
+      "addBatch": "Add Batch",
+      "addBatchDescription": "Add a new batch to your inventory",
+      "addBatchButton": "Add Batch"
+    },
     "title": "Inventory Dashboard",
     "subtitle": "Track expiry dates and manage your inventory",
     "expiringSoon": {
@@ -316,6 +324,7 @@
     "expiringSoon": "Expiring Soon",
     "needsDates": "Needs Dates",
     "newDeliveries": "New Deliveries",
+    "deliveries": "Deliveries",
     "ignored": "Ignored",
     "all": "All Batches",
     "inventory": "Inventory",
@@ -323,7 +332,6 @@
     "stock": "Stock",
     "newBatches": "New Batches",
     "ignoredBatches": "Ignored",
-    "deliveries": "Deliveries",
     "scanOut": "Scan Out",
     "todos": "Todos",
     "performance": "Performance",

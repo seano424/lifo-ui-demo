@@ -61,23 +61,22 @@ export function QuantitySelector({
         disabled={disabled || isAtMin}
         className={cn(
           // 44px minimum tap target for mobile
-          'h-11 w-11 shrink-0 rounded-xl',
-          'border bg-white dark:bg-gray-800',
-          'hover:border-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700',
+          'h-11 w-11 shrink-0 rounded-2xl',
+          'border-none bg-primary-50 text-primary-600',
           'active:scale-95 transition-transform',
           'disabled:opacity-40 disabled:cursor-not-allowed',
         )}
         aria-label="Decrease quantity"
       >
-        <Minus className="h-5 w-5 text-gray-700 dark:text-gray-300" />
+        <Minus className="h-5 w-5 text-primary-600" />
       </Button>
 
       {/* Current Value Display */}
       <div
         className={cn(
           'flex-1 min-w-[80px] text-center',
-          'px-4 py-2.5 rounded-lg',
-          'border bg-gray-50 dark:bg-gray-800',
+          'px-4 py-2.5 rounded-2xl',
+          'bg-gray-50 dark:bg-gray-800',
         )}
       >
         <span
@@ -100,15 +99,14 @@ export function QuantitySelector({
         disabled={disabled || isAtMax}
         className={cn(
           // 44px minimum tap target for mobile
-          'h-11 w-11 shrink-0 rounded-xl',
-          'border bg-primary-50 dark:bg-primary-900/20',
-          'hover:border-primary-700 hover:bg-primary-100 dark:hover:bg-primary-900/30',
+          'h-11 w-11 shrink-0 rounded-2xl',
+          'border-none bg-primary-50 text-primary-600',
           'active:scale-95 transition-transform',
-          'disabled:opacity-40 disabled:cursor-not-allowed',
+          'disabled:bg-opacity-50 disabled:cursor-not-allowed',
         )}
         aria-label="Increase quantity"
       >
-        <Plus className="h-5 w-5 text-primary-700 dark:text-primary-400" />
+        <Plus className="h-5 w-5 text-primary-600" />
       </Button>
     </div>
   )

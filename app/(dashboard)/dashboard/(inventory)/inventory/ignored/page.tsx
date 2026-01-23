@@ -139,14 +139,12 @@ export default async function IgnoredBatchesPage({ searchParams }: IgnoredBatche
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <div className="flex flex-col gap-6 container py-6">
-        <IgnoredBatchesFilteredList
-          initialFilters={{
-            category: params.category,
-            search: params.search,
-          }}
-        />
-      </div>
+      <IgnoredBatchesFilteredList
+        initialFilters={{
+          category: params.category,
+          search: params.search,
+        }}
+      />
     </HydrationBoundary>
   )
 }

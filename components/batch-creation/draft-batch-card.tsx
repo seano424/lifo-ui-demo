@@ -1,11 +1,12 @@
 'use client'
 
-import { Calendar, ChevronRight, Package } from 'lucide-react'
+import { Calendar, Package } from 'lucide-react'
 import Image from 'next/image'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import type { ProductWithDraftBatches } from '@/hooks/use-draft-batches'
 import { cn } from '@/lib/utils'
+import { Typography } from '@/components/ui/typography'
 
 interface DraftBatchCardProps {
   product: ProductWithDraftBatches
@@ -34,9 +35,7 @@ export function DraftBatchCard({ product, onClick, className }: DraftBatchCardPr
   return (
     <Card
       className={cn(
-        'overflow-hidden cursor-pointer transition-all',
-        'hover:shadow-md hover:border-primary-300 dark:hover:border-primary-700',
-        'active:scale-[0.99]',
+        'overflow-hidden cursor-pointer transition-all active:scale-[0.99] border-none shadow-none select-none',
         className,
       )}
       onClick={onClick}
@@ -69,38 +68,35 @@ export function DraftBatchCard({ product, onClick, className }: DraftBatchCardPr
           <div className="flex-1 min-w-0 space-y-2">
             {/* Product Name & Brand */}
             <div>
-              <h3 className="font-semibold text-base text-gray-900 dark:text-gray-100 truncate">
+              <Typography variant="h5" className="truncate font-bold">
                 {product.product_name}
-              </h3>
-              {product.product_brand && (
+              </Typography>
+              {/* {product.product_brand && (
                 <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
                   {product.product_brand}
                 </p>
-              )}
-            </div>
-
-            {/* Draft Quantity Badge */}
-            <div className="flex items-center gap-2">
-              <Badge variant="secondary" className="font-semibold">
-                {product.total_draft_quantity} units
-              </Badge>
-              <span className="text-xs text-gray-500 dark:text-gray-400">
-                {product.draft_batch_count} batch{product.draft_batch_count !== 1 ? 'es' : ''}
-              </span>
+              )} */}
             </div>
 
             {/* Category Hint */}
             {categoryHint && (
-              <p className="text-xs text-gray-600 dark:text-gray-400 flex items-center gap-1">
+              <Typography variant="muted" className="flex items-center gap-1">
                 <Calendar className="h-3 w-3" />
                 {categoryHint}
-              </p>
+              </Typography>
             )}
+
+            {/* Total Draft Quantity */}
+            <div className="flex items-center gap-2">
+              <Typography variant="muted">
+                {product.total_draft_quantity} items need dates
+              </Typography>
+            </div>
           </div>
 
           {/* Chevron Indicator */}
           <div className="shrink-0 flex items-center">
-            <ChevronRight className="h-5 w-5 text-gray-400" />
+            <Badge variant="primary">{product.total_draft_quantity} units</Badge>
           </div>
         </div>
       </CardContent>
