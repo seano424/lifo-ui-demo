@@ -25,13 +25,14 @@ import {
 } from '@/hooks/use-draft-batches'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 import { Typography } from '@/components/ui/typography'
+import { useTranslations } from 'next-intl'
 
 const ITEMS_PER_PAGE = 20
 
 export default function NewBatchesPage() {
   const storeId = useActiveStoreId()
   const router = useRouter()
-
+  const t = useTranslations('dashboard.newDeliveries')
   // State
   const [filters, setFilters] = useState<{
     category_codes?: string[]
@@ -141,7 +142,7 @@ export default function NewBatchesPage() {
     <div className="container space-y-4 py-6">
       {/* Page Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <Typography variant="h3">Deliveries</Typography>
+        <Typography variant="h3">{t('title')}</Typography>
 
         {/* Summary Stats */}
         {!isLoading && totalDrafts > 0 && (

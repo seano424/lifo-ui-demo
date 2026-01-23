@@ -1,5 +1,13 @@
 {
   "dashboard": {
+    "newDeliveries": {
+      "title": "Nouvelles Livraisons",
+      "description": "Ajoutez de nouveaux articles à votre inventaire",
+      "searchPlaceholder": "Rechercher des lots...",
+      "addBatch": "Ajouter un Lot",
+      "addBatchDescription": "Ajoutez un nouveau lot à votre inventaire",
+      "addBatchButton": "Ajouter un Lot"
+    },
     "title": "Tableau de Bord Inventaire",
     "subtitle": "Suivez les dates d'expiration et gérez votre inventaire",
     "expiringSoon": {
