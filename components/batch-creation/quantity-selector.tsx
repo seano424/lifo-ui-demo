@@ -61,7 +61,7 @@ export function QuantitySelector({
         disabled={disabled || isAtMin}
         className={cn(
           // 44px minimum tap target for mobile
-          'h-11 w-11 shrink-0 rounded-4xl',
+          'h-11 w-11 shrink-0 rounded-2xl',
           'border-none bg-primary-50 text-primary-600',
           'active:scale-95 transition-transform',
           'disabled:opacity-40 disabled:cursor-not-allowed',
@@ -75,7 +75,7 @@ export function QuantitySelector({
       <div
         className={cn(
           'flex-1 min-w-[80px] text-center',
-          'px-4 py-2.5 rounded-4xl',
+          'px-4 py-2.5 rounded-2xl',
           'bg-gray-50 dark:bg-gray-800',
         )}
       >
@@ -99,7 +99,7 @@ export function QuantitySelector({
         disabled={disabled || isAtMax}
         className={cn(
           // 44px minimum tap target for mobile
-          'h-11 w-11 shrink-0 rounded-4xl',
+          'h-11 w-11 shrink-0 rounded-2xl',
           'border-none bg-primary-50 text-primary-600',
           'active:scale-95 transition-transform',
           'disabled:bg-opacity-50 disabled:cursor-not-allowed',

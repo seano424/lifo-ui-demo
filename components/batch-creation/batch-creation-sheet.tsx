@@ -4,11 +4,18 @@ import { useCallback, useEffect, useState } from 'react'
 import { addDays, format } from 'date-fns'
 import { Calendar, ChevronLeft, Package, XCircle } from 'lucide-react'
 import Image from 'next/image'
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import {
   BatchSuccessCard,
   DraftBatchCard,
@@ -269,8 +276,8 @@ export function BatchCreationSheet({
 
   const isDateSelected = selectedDays !== null || customDate !== undefined
   const hasMultipleProducts = effectiveProducts.length > 1
-  // const currentProductNumber = selectedProductIndex + 1
-  // const totalProducts = effectiveProducts.length
+  const currentProductNumber = selectedProductIndex + 1
+  const totalProducts = effectiveProducts.length
 
   // ============================================================================
   // RENDER
@@ -300,11 +307,11 @@ export function BatchCreationSheet({
 
             <div className="flex-1 min-w-0">
               <SheetTitle>
-                {/* {currentStep === 'product-selection' && 'Add Expiry Dates'}
+                {currentStep === 'product-selection' && 'Add Expiry Dates'}
                 {currentStep === 'expiry-entry' && 'Set Expiry Date'}
-                {currentStep === 'success' && 'Batch Added'} */}
+                {currentStep === 'success' && 'Batch Added'}
               </SheetTitle>
-              {/* <SheetDescription>
+              <SheetDescription>
                 {currentStep === 'product-selection' &&
                   `${totalProducts} product${totalProducts !== 1 ? 's' : ''} with draft batches`}
                 {currentStep === 'expiry-entry' &&
@@ -312,7 +319,7 @@ export function BatchCreationSheet({
                     ? `Product ${currentProductNumber} of ${totalProducts}`
                     : 'Choose quantity and expiry date')}
                 {currentStep === 'success' && 'Successfully activated batch'}
-              </SheetDescription> */}
+              </SheetDescription>
             </div>
           </div>
         </SheetHeader>
@@ -428,7 +435,9 @@ export function BatchCreationSheet({
 
               {/* Quantity Selector */}
               <div className="flex flex-col gap-2">
-                {/* <Label htmlFor="quantity-selector">Select Quantity</Label> */}
+                <Label htmlFor="quantity-selector" className="sr-only">
+                  Select Quantity
+                </Label>
                 <QuantitySelector
                   value={selectedQuantity}
                   onChange={setSelectedQuantity}
@@ -448,7 +457,9 @@ export function BatchCreationSheet({
 
               {/* Expiry Preset Buttons */}
               <div className="flex flex-col gap-2">
-                {/* <Label htmlFor="expiry-preset-buttons">Choose Expiry Date</Label> */}
+                <Label htmlFor="expiry-preset-buttons" className="sr-only">
+                  Choose Expiry Date
+                </Label>
                 <ExpiryPresetButtons
                   onSelect={days => {
                     setSelectedDays(days)
@@ -468,7 +479,9 @@ export function BatchCreationSheet({
                     'animate-in fade-in-0 slide-in-from-top-2 duration-200',
                   )}
                 >
-                  {/* <Label htmlFor="custom-expiry-date">Custom Expiry Date</Label> */}
+                  <Label htmlFor="custom-expiry-date" className="sr-only">
+                    Custom Expiry Date
+                  </Label>
                   <div className="relative">
                     <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-primary-600 dark:text-primary-400" />
                     <Input

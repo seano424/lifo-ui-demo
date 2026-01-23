@@ -60,7 +60,7 @@ function useNavigationData() {
               badge: expiryTodosCount > 0 ? expiryTodosCount : undefined,
             },
             {
-              title: t('deliveries'),
+              title: t('newDeliveries'),
               url: '/dashboard/inventory/new',
               icon: PackagePlus,
               badge: draftBatchCount,
