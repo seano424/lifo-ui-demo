@@ -4,7 +4,7 @@
  */
 
 /**
- * Parse an ISO date string (YYYY-MM-DD) as a local date to avoid timezone issues.
+ * Parse an ISO date string (YYYY-MM-DD) or timestamp (YYYY-MM-DDTHH:MM:SS) as a local date to avoid timezone issues.
  *
  * When you use `new Date("2026-01-20")`, JavaScript interprets it as UTC midnight,
  * which can display as the previous day in timezones behind UTC (like US timezones).
@@ -12,7 +12,7 @@
  * This function parses the date components and creates a Date object in the local timezone,
  * ensuring that "2026-01-20" always displays as January 20, 2026 regardless of timezone.
  *
- * @param dateString - ISO formatted date string (YYYY-MM-DD)
+ * @param dateString - ISO formatted date string (YYYY-MM-DD) or timestamp (YYYY-MM-DDTHH:MM:SS)
  * @returns Date object in local timezone
  *
  * @example
@@ -21,9 +21,12 @@
  *
  * // With this function (local interpretation):
  * const date = parseISODateAsLocal("2026-01-20") // Always shows Jan 20
+ * const date2 = parseISODateAsLocal("2026-01-20T14:30:00") // Always shows Jan 20
  */
 export function parseISODateAsLocal(dateString: string): Date {
-  const [year, month, day] = dateString.split('-').map(Number)
+  // Handle both date-only and timestamp formats by extracting just the date portion
+  const dateOnly = dateString.split('T')[0]
+  const [year, month, day] = dateOnly.split('-').map(Number)
   return new Date(year, month - 1, day)
 }
 

@@ -82,7 +82,7 @@ function useNavigationData() {
           items: [
             {
               title: t('products'),
-              url: '/dashboard/inventory/products',
+              url: '/dashboard/inventory/products?sort=active_batches_count&direction=desc',
               icon: Package,
               isActive: true,
             },
@@ -117,6 +117,11 @@ function useNavigationData() {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { data: user } = useCurrentUser()
   const navigationData = useNavigationData()
+  const [mounted, setMounted] = React.useState(false)
+
+  React.useEffect(() => {
+    setMounted(true)
+  }, [])
 
   if (!user) return
 
@@ -154,13 +159,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent className="group-data-[collapsible=icon]:pt-4 pt-4">
         <NavMain sections={navigationData.navSections} />
-        <div className="group-data-[collapsible=icon]:hidden sm:hidden p-4 mt-4">
-          <TeamSwitcher />
-        </div>
+        {mounted && (
+          <div className="group-data-[collapsible=icon]:hidden sm:hidden p-4 mt-4">
+            <TeamSwitcher />
+          </div>
+        )}
       </SidebarContent>
-      <SidebarFooter className="py-4">
-        <NavUser user={user} />
-      </SidebarFooter>
+      <SidebarFooter className="py-4">{mounted && <NavUser user={user} />}</SidebarFooter>
       <SidebarRail />
     </Sidebar>
   )
