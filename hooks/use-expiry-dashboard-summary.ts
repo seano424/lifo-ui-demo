@@ -3,9 +3,12 @@ import { createClient } from '@/lib/supabase/client'
 import { queryKeys } from '@/lib/queries/query-keys'
 
 export interface ExpiryDashboardSummary {
-  expiring_today: number
-  expiring_tomorrow: number
-  expiring_this_week: number
+  expiring_today: number // Day 0
+  expiring_tomorrow: number // Day 1
+  expiring_in_two_days: number // Day 2
+  expiring_in_three_days: number // Day 3
+  expiring_this_week: number // Sum of above (matches sidebar badge)
+  total_expiring: number // Same as expiring_this_week
   total_active_batches: number
   total_products: number
 }

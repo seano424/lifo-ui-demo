@@ -1,12 +1,22 @@
 {
   "dashboard": {
+    "newDeliveries": {
+      "title": "Nieuwe Leveringen",
+      "description": "Voeg nieuwe items toe aan uw voorraad",
+      "searchPlaceholder": "Zoek batches...",
+      "addBatch": "Voeg Batch Toe",
+      "addBatchDescription": "Voeg een nieuwe batch toe aan uw voorraad",
+      "addBatchButton": "Voeg Batch Toe"
+    },
     "title": "Voorraad Dashboard",
     "subtitle": "Volg vervaldatums en beheer uw voorraad",
     "expiringSoon": {
-      "title": "Verloopt Binnenkort",
-      "subtitle": "Komende 7 dagen",
+      "title": "Verloopt over 3 dagen",
+      "subtitle": "Komende 3 dagen",
       "today": "Vandaag",
       "tomorrow": "Morgen",
+      "inTwoDays": "Over 2 Dagen",
+      "inThreeDays": "Over 3 Dagen",
       "thisWeek": "Deze Week",
       "expiringWithinWeek": "verloopt binnen een week",
       "expiringThisWeek": "verloopt deze week",
@@ -21,6 +31,7 @@
       "title": "Voorraad Overzicht",
       "totalBatches": "Totaal Aantal Batches",
       "productsTracked": "Gevolgde Producten",
+      "needsDates": "Heeft Datums Nodig",
       "errors": {
         "loadingError": "Kan voorraadoverzicht niet laden"
       },
@@ -307,9 +318,18 @@
   "navigation": {
     "dashboard-title": "Winkel",
     "dashboard": "Dashboard",
-    "operations": "Operaties",
+    "overview": "Overzicht",
+    "actions": "Acties",
+    "expiring": "Verlopend",
     "expiringSoon": "Verloopt binnenkort",
+    "needsDates": "Datums Nodig",
+    "newDeliveries": "Nieuwe Leveringen",
+    "ignored": "Genegeerd",
+    "all": "Alle Batches",
     "inventory": "Voorraad",
+    "catalog": "Catalogus",
+    "stock": "Voorraad",
+    "newBatches": "Nieuwe Batches",
     "integrations": "Integraties",
     "deliveries": "Leveringen",
     "scanOut": "Scan Uit",
@@ -508,7 +528,7 @@
     "descriptions": {
       "batches": "Bekijk en beheer de voorraad batches van uw winkel",
       "products": "Bekijk en beheer uw product voorraad",
-      "dashboard": "Monitor de prestaties van uw winkel, volg voorraad en optimaliseer operaties met real-time inzichten en AI-aangedreven aanbevelingen."
+      "dashboard": "Dit heeft vandaag uw aandacht nodig."
     }
   },
   "timeSelector": {

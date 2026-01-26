@@ -4,10 +4,12 @@ import {
   ChartNoAxesCombined,
   HelpCircle,
   Layers,
-  Package,
+  PackagePlus,
   SettingsIcon,
   Zap,
-  Clock,
+  CalendarFold,
+  XCircle,
+  Package,
 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import Link from 'next/link'
@@ -24,6 +26,7 @@ import {
 } from '@/components/ui/sidebar'
 import { useExpiryTodosCount } from '@/hooks/use-expiry-todos-count'
 import { useCurrentUser } from '@/hooks/use-users'
+import { useDraftBatchCount } from '@/components/draft-batch-notification'
 import { TeamSwitcher } from './team-switcher'
 
 import { Logo } from './ui/logo'
@@ -31,6 +34,7 @@ import { Logo } from './ui/logo'
 function useNavigationData() {
   const t = useTranslations('navigation')
   const { count: expiryTodosCount } = useExpiryTodosCount()
+  const draftBatchCount = useDraftBatchCount()
 
   return React.useMemo(
     () => ({
@@ -39,7 +43,7 @@ function useNavigationData() {
           title: t('dashboard'),
           items: [
             {
-              title: t('dashboard'),
+              title: t('overview'),
               url: '/dashboard',
               icon: ChartNoAxesCombined,
               isActive: true,
@@ -47,51 +51,41 @@ function useNavigationData() {
           ],
         },
         {
-          title: t('operations'),
+          title: t('batches'),
           items: [
-            // {
-            //   title: t('deliveries'),
-            //   url: '/dashboard/deliveries',
-            //   icon: ScanSearch,
-            // },
-            // {
-            //   title: t('scanOut'),
-            //   url: '/dashboard/scan-out',
-            //   icon: ScanBarcode,
-            // },
-            // {
-            //   title: t('todos'),
-            //   url: '/dashboard/todos?tab=pending&urgency=critical%2Chigh&sort=urgency&direction=desc',
-            //   icon: ListTodo,
-            //   badge: expiryTodosCount > 0 ? expiryTodosCount : undefined,
-            // },
             {
-              title: t('expiringSoon'),
-              url: '/dashboard/expiring-soon',
-              icon: Clock,
+              title: t('expiring'),
+              url: '/dashboard/expiring',
+              icon: CalendarFold,
               badge: expiryTodosCount > 0 ? expiryTodosCount : undefined,
+            },
+            {
+              title: t('newDeliveries'),
+              url: '/dashboard/inventory/new',
+              icon: PackagePlus,
+              badge: draftBatchCount,
+            },
+            {
+              title: t('ignored'),
+              url: '/dashboard/inventory/ignored',
+              icon: XCircle,
+            },
+            {
+              title: t('all'),
+              url: '/dashboard/inventory/batches',
+              icon: Layers,
             },
           ],
         },
         {
-          title: t('inventory'),
+          title: t('catalog'),
           items: [
             {
               title: t('products'),
-              url: '/dashboard/inventory/products',
+              url: '/dashboard/inventory/products?sort=active_batches_count&direction=desc',
               icon: Package,
               isActive: true,
             },
-            {
-              title: t('batches'),
-              url: '/dashboard/inventory/batches',
-              icon: Layers,
-            },
-            // {
-            //   title: t('draftBatches'),
-            //   url: '/dashboard/inventory/batches/drafts',
-            //   icon: FileEdit,
-            // },
           ],
         },
         {
@@ -116,13 +110,18 @@ function useNavigationData() {
         },
       ],
     }),
-    [t, expiryTodosCount],
+    [t, expiryTodosCount, draftBatchCount],
   )
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { data: user } = useCurrentUser()
   const navigationData = useNavigationData()
+  const [mounted, setMounted] = React.useState(false)
+
+  React.useEffect(() => {
+    setMounted(true)
+  }, [])
 
   if (!user) return
 
@@ -136,9 +135,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         {/* Desktop logo with text */}
         <Link
           href="/"
-          className="group-data-[collapsible=icon]:hidden hidden sm:flex items-center gap-2 hover:opacity-80 transition-opacity duration-200 ease-in-out"
+          className="group-data-[collapsible=icon]:hidden hidden sm:flex items-center gap-2 hover:opacity-80 transition-opacity duration-200 ease-in-out font-heading font-black text-4xl"
         >
-          <Logo variant="horizontal" size="sm" priority />
+          <Logo variant="svg" size="sm" priority />
+          LIFO
         </Link>
 
         {/* Mobile vertical logo */}
@@ -146,7 +146,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           href="/"
           className="group-data-[collapsible=icon]:hidden sm:hidden hover:opacity-80 transition-opacity duration-200 ease-in-out"
         >
-          <Logo variant="horizontal" size="sm" priority />
+          <Logo variant="svg" size="sm" priority />
         </Link>
 
         {/* Collapsed icon logo */}
@@ -154,18 +154,18 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           href="/"
           className="group-data-[collapsible=icon]:block hidden hover:opacity-80 transition-opacity duration-200 ease-in-out"
         >
-          <Logo variant="icon" size="sm" priority />
+          <Logo variant="svg" size="sm" priority />
         </Link>
       </SidebarHeader>
       <SidebarContent className="group-data-[collapsible=icon]:pt-4 pt-4">
         <NavMain sections={navigationData.navSections} />
-        <div className="group-data-[collapsible=icon]:hidden sm:hidden p-4 mt-4">
-          <TeamSwitcher />
-        </div>
+        {mounted && (
+          <div className="group-data-[collapsible=icon]:hidden sm:hidden p-4 mt-4">
+            <TeamSwitcher />
+          </div>
+        )}
       </SidebarContent>
-      <SidebarFooter className="py-4">
-        <NavUser user={user} />
-      </SidebarFooter>
+      <SidebarFooter className="py-4">{mounted && <NavUser user={user} />}</SidebarFooter>
       <SidebarRail />
     </Sidebar>
   )

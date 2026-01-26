@@ -34,10 +34,14 @@
     },
     "breadcrumbs": {
       "batches": "Lots",
+      "stock": "Stock",
       "draftBatches": "Lots Brouillons",
       "drafts": "Brouillons",
+      "needsDates": "Nécessite Dates",
+      "setAside": "Mis de Côté",
       "billing": "Facturations",
       "dashboard": "Tableau de bord",
+      "overview": "Aperçu",
       "inventory": "Inventaire",
       "deliveries": "Livraisons",
       "scanOut": "Sorties",
@@ -65,7 +69,10 @@
       "scanIn": "Scanner l'entrée",
       "inventoryManagement": "Gestion des stocks",
       "addStore": "Ajouter un magasin",
-      "expiringSoon": "Expire bientôt"
+      "expiring": "Expirant",
+      "expiringSoon": "Expire bientôt",
+      "new": "Nouveau",
+      "ignored": "Ignorés"
     },
     "navUser": {
       "upgradeToPro": "Passer à Pro",

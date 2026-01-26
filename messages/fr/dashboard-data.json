@@ -116,6 +116,7 @@
     "lastUpdated": "Dernière mise à jour"
   },
   "productCategories": {
+    "SQUARE_IMPORT": "Import Square",
     "household_other": "Ménage et divers",
     "fresh_produce": "Produits frais",
     "fresh_meat_fish": "Viande et poisson frais",

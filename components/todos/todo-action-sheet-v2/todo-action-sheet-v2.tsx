@@ -234,9 +234,8 @@ export function TodoActionSheetV2({
 
   const handleEditDetails = () => {
     setEditedValues({
-      expiry_date: currentBatch.expiry_date
-        ? new Date(currentBatch.expiry_date).toISOString().split('T')[0]
-        : '',
+      // Keep date string as-is since it's already in YYYY-MM-DD format
+      expiry_date: currentBatch.expiry_date || '',
       cost_price: currentBatch.cost_price || 0,
       selling_price: currentBatch.selling_price || 0,
     })

@@ -1,7 +1,9 @@
 import { dehydrate, HydrationBoundary } from '@tanstack/react-query'
 import { redirect } from 'next/navigation'
 import { BatchesFilteredList } from '@/components/batches/batches-filtered-list'
+import DashboardInsetHeader from '@/components/dashboard/dashboard-inset-header'
 import { NoStoresError } from '@/components/dashboard/no-stores-error'
+import { getTranslations } from 'next-intl/server'
 import {
   type BatchFilters,
   type BatchSortField,
@@ -30,6 +32,7 @@ export default async function InventoryBatchesPage({ searchParams }: InventoryBa
   const params = await searchParams
   const { queryClient } = await createPrefetchedQuery()
   const serverClient = await createServerClient()
+  const t = await getTranslations('inventory.batches.page')
 
   // Get current authenticated user
   const {
@@ -134,6 +137,7 @@ export default async function InventoryBatchesPage({ searchParams }: InventoryBa
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <div className="flex flex-col gap-6 container py-6">
+        <DashboardInsetHeader title={t('title')} description={t('description')} />
         <BatchesFilteredList
           initialFilters={{
             filter: params.filter,

@@ -1996,6 +1996,7 @@ export type Database = {
           p_category_codes?: string[]
           p_limit?: number
           p_offset?: number
+          p_search?: string
           p_store_id: string
         }
         Returns: Json
@@ -2050,6 +2051,20 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      get_ignored_batches_by_product: {
+        Args: {
+          p_category_codes?: string[]
+          p_limit?: number
+          p_offset?: number
+          p_search?: string
+          p_store_id: string
+        }
+        Returns: Json
+      }
+      get_ignored_batches_summary: {
+        Args: { p_store_id: string }
+        Returns: Json
       }
       get_low_stock_batches: {
         Args: { p_store_id: string; p_threshold_quantity?: number }
@@ -2145,6 +2160,10 @@ export type Database = {
         }[]
       }
       has_batches: { Args: { p_store_id: string }; Returns: boolean }
+      ignore_draft_batch: {
+        Args: { p_batch_id: string; p_quantity?: number; p_user_id?: string }
+        Returns: Json
+      }
       log_delivery_create_drafts: {
         Args: { p_items: Json; p_store_id: string; p_user_id: string }
         Returns: Json
@@ -2161,6 +2180,10 @@ export type Database = {
       resolve_category_from_off_data: {
         Args: { off_categories: string[] }
         Returns: string
+      }
+      restore_ignored_batch: {
+        Args: { p_batch_id: string; p_user_id?: string }
+        Returns: Json
       }
       trigger_manual_expiry_cleanup: { Args: never; Returns: Json }
       user_can_access_store: { Args: { store_uuid: string }; Returns: boolean }
@@ -2231,6 +2254,7 @@ export type Database = {
           added_by: string | null
           cost_price: number | null
           created_at: string | null
+          image_url: string | null
           is_active: boolean | null
           product_id: string
           selling_price: number | null
@@ -2244,6 +2268,7 @@ export type Database = {
           added_by?: string | null
           cost_price?: number | null
           created_at?: string | null
+          image_url?: string | null
           is_active?: boolean | null
           product_id: string
           selling_price?: number | null
@@ -2257,6 +2282,7 @@ export type Database = {
           added_by?: string | null
           cost_price?: number | null
           created_at?: string | null
+          image_url?: string | null
           is_active?: boolean | null
           product_id?: string
           selling_price?: number | null
@@ -2469,6 +2495,15 @@ export type Database = {
       }
     }
     Functions: {
+      activate_draft_batch: {
+        Args: {
+          p_batch_id: string
+          p_expiry_date: string
+          p_quantity?: number
+          p_user_id?: string
+        }
+        Returns: Json
+      }
       add_existing_user_to_store: {
         Args: {
           input_role?: string
@@ -3155,6 +3190,17 @@ export type Database = {
           total_count: number
         }[]
       }
+      get_draft_batches_by_product: {
+        Args: {
+          p_category_codes?: string[]
+          p_limit?: number
+          p_offset?: number
+          p_search?: string
+          p_store_id: string
+        }
+        Returns: Json
+      }
+      get_draft_batches_summary: { Args: { p_store_id: string }; Returns: Json }
       get_enum_values: {
         Args: { enum_name: string; schema_name?: string }
         Returns: string[]
@@ -3186,6 +3232,20 @@ export type Database = {
         }[]
       }
       get_expiry_dashboard_summary: {
+        Args: { p_store_id: string }
+        Returns: Json
+      }
+      get_ignored_batches_by_product: {
+        Args: {
+          p_category_codes?: string[]
+          p_limit?: number
+          p_offset?: number
+          p_search?: string
+          p_store_id: string
+        }
+        Returns: Json
+      }
+      get_ignored_batches_summary: {
         Args: { p_store_id: string }
         Returns: Json
       }
@@ -3302,6 +3362,10 @@ export type Database = {
           updated_at: string
           verification_count: number
         }[]
+      }
+      get_recent_delivery_products: {
+        Args: { p_limit?: number; p_store_id: string }
+        Returns: Json
       }
       get_recently_discounted: {
         Args: { p_limit?: number; p_offset?: number; p_store_id: string }
@@ -3793,6 +3857,10 @@ export type Database = {
         }[]
       }
       has_batches: { Args: { p_store_id: string }; Returns: boolean }
+      ignore_draft_batch: {
+        Args: { p_batch_id: string; p_quantity?: number; p_user_id?: string }
+        Returns: Json
+      }
       invite_user_to_store: {
         Args: {
           p_permissions?: Json
@@ -3800,6 +3868,10 @@ export type Database = {
           p_store_id: string
           p_user_email: string
         }
+        Returns: Json
+      }
+      log_delivery_create_drafts: {
+        Args: { p_items: Json; p_store_id: string; p_user_id: string }
         Returns: Json
       }
       lookup_product_with_cache: {
@@ -3842,6 +3914,10 @@ export type Database = {
           input_index: number
           product_id: string
         }[]
+      }
+      restore_ignored_batch: {
+        Args: { p_batch_id: string; p_user_id?: string }
+        Returns: Json
       }
       rls_check_store_access: {
         Args: { check_store_id: string }

@@ -1,12 +1,22 @@
 {
   "dashboard": {
+    "newDeliveries": {
+      "title": "New Deliveries",
+      "description": "Add new items to your inventory",
+      "searchPlaceholder": "Search batches...",
+      "addBatch": "Add Batch",
+      "addBatchDescription": "Add a new batch to your inventory",
+      "addBatchButton": "Add Batch"
+    },
     "title": "Inventory Dashboard",
     "subtitle": "Track expiry dates and manage your inventory",
     "expiringSoon": {
-      "title": "Expiring Soon",
-      "subtitle": "Next 7 days",
+      "title": "Expiring in 3 days",
+      "subtitle": "Next 3 days",
       "today": "Today",
       "tomorrow": "Tomorrow",
+      "inTwoDays": "In 2 Days",
+      "inThreeDays": "In 3 Days",
       "thisWeek": "This Week",
       "expiringWithinWeek": "expiring within the week",
       "expiringThisWeek": "expiring this week",
@@ -21,6 +31,7 @@
       "title": "Inventory Overview",
       "totalBatches": "Total Batches",
       "productsTracked": "Products Tracked",
+      "needsDates": "Needs Dates",
       "errors": {
         "loadingError": "Unable to load inventory overview"
       },
@@ -307,10 +318,20 @@
   "navigation": {
     "dashboard-title": "Store",
     "dashboard": "Dashboard",
-    "operations": "Operations",
+    "overview": "Overview",
+    "actions": "Actions",
+    "expiring": "Expiring",
     "expiringSoon": "Expiring Soon",
-    "inventory": "Inventory",
+    "needsDates": "Needs Dates",
+    "newDeliveries": "New Deliveries",
     "deliveries": "Deliveries",
+    "ignored": "Ignored",
+    "all": "All Batches",
+    "inventory": "Inventory",
+    "catalog": "Catalog",
+    "stock": "Stock",
+    "newBatches": "New Batches",
+    "ignoredBatches": "Ignored",
     "scanOut": "Scan Out",
     "todos": "Todos",
     "performance": "Performance",
@@ -508,7 +529,7 @@
     "descriptions": {
       "batches": "View and manage your store's inventory batches",
       "products": "View and manage your store's product inventory",
-      "dashboard": "Monitor your store's performance, track inventory, and optimize operations with real-time insights and AI-powered recommendations."
+      "dashboard": "Here's what needs your attention today."
     }
   },
   "timeSelector": {

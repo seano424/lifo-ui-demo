@@ -7,11 +7,8 @@ export function HeroDescription() {
   const t = useTranslations('landingpage.hero')
 
   return (
-    <Typography variant="h3" className="font-normal font-sans text-primary max-w-xl mx-auto">
-      {t('subtitle', {
-        fallback:
-          'Simplify your inventory management, optimize your costs and make informed decisions with our intelligent stock analysis platform.',
-      })}
+    <Typography variant="h5" className="lg:max-w-lg mx-auto text-center max-w-md font-normal">
+      {t('subtitle')}
     </Typography>
   )
 }

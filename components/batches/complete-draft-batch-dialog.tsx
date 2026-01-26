@@ -21,6 +21,7 @@ import { toast } from 'sonner'
 import type { Batch } from '@/lib/queries/batches'
 import type { ExpiryDateInfo } from '@/lib/stores/scanning-workflow-store'
 import ScanningCamera from '@/components/scanning/shared/scanning-camera'
+import { parseISODateAsLocal } from '@/lib/utils/date-conversion'
 
 interface CompleteDraftBatchDialogProps {
   batch: Batch | null
@@ -62,7 +63,7 @@ export function CompleteDraftBatchDialog({
     }
 
     // Validate date is in the future
-    const selectedDate = new Date(expiryDate)
+    const selectedDate = parseISODateAsLocal(expiryDate)
     const today = new Date()
     today.setHours(0, 0, 0, 0)
 
@@ -73,15 +74,17 @@ export function CompleteDraftBatchDialog({
 
     // Update batch with expiry date and change status to active
     try {
+      // Calculate manufacture date (30 days before expiry as default)
+      const manufactureDate = new Date(selectedDate)
+      manufactureDate.setDate(manufactureDate.getDate() - 30)
+      const manufactureDateStr = `${manufactureDate.getFullYear()}-${String(manufactureDate.getMonth() + 1).padStart(2, '0')}-${String(manufactureDate.getDate()).padStart(2, '0')}`
+
       updateBatch({
         batchId: batch.batch_id,
         updates: {
           expiry_date: expiryDate,
           status: 'active' as const,
-          // Calculate manufacture date (30 days before expiry as default)
-          manufacture_date: new Date(selectedDate.getTime() - 30 * 24 * 60 * 60 * 1000)
-            .toISOString()
-            .split('T')[0],
+          manufacture_date: manufactureDateStr,
         },
       })
 

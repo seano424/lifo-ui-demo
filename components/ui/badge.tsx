@@ -1,44 +1,63 @@
 import { cva, type VariantProps } from 'class-variance-authority'
-import type * as React from 'react'
+import * as React from 'react'
 
 import { cn } from '@/lib/utils'
 
 const badgeVariants = cva(
-  'inline-flex items-center cursor-default rounded-2xl px-2.5 py-2 text-xs capitalize',
+  'inline-flex items-center font-bold font-heading justify-center gap-1.5 rounded-4xl capitalize whitespace-nowrap transition-colors duration-200 ease-in-out [&_svg]:pointer-events-none [&_svg]:size-3 [&_svg]:shrink-0',
   {
     variants: {
       variant: {
-        default:
-          'bg-gray-100/50 text-gray-800 border-gray-500 dark:bg-secondary-900 dark:text-gray-200 dark:border-gray-500',
-        primary:
-          'bg-primary-100/50 text-primary-900 border-primary-500 dark:bg-primary-900 dark:text-primary-100 dark:border-primary-500',
-        secondary:
-          'bg-secondary-50/50 text-secondary-800 border-secondary-500 dark:bg-secondary-700 dark:text-secondary-100 dark:border-secondary-500',
-        destructive:
-          'bg-red-50/50 text-red-800 border-red-500 dark:bg-red-700 dark:text-red-100 dark:border-red-500',
-        outline: 'border border-primary-50',
-        ghost: 'text-foreground border-none',
-        cyan: 'bg-cyan-100/50 text-cyan-800 border-cyan-500 dark:bg-cyan-700 dark:text-cyan-100 dark:border-cyan-500',
-        gray: 'bg-gray-100/50 text-muted-foreground/90 border-gray-500 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-500',
-        blue: 'bg-blue-100/50 text-blue-800 border-blue-500 dark:bg-blue-700 dark:text-blue-100 dark:border-blue-500',
-        green:
-          'bg-primary-100/50 text-primary-800 border-primary-500 dark:bg-primary-700 dark:text-primary-100 dark:border-primary-500',
-        invertedSecondary:
-          'bg-sky-400 text-white border-sky-500 dark:bg-sky-700 dark:text-white dark:border-sky-500',
+        default: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-100',
+        primary: 'bg-primary-50 text-primary-600',
+        secondary: 'bg-secondary text-white',
+        destructive: 'bg-red-100 text-red-900 dark:bg-red-900/20 dark:text-red-300',
+        success: 'bg-green-100 text-green-900 dark:bg-green-900/20 dark:text-green-300',
+        warning: 'bg-yellow-100 text-yellow-900 dark:bg-yellow-900/20 dark:text-yellow-300',
+        info: 'bg-blue-100 text-blue-900 dark:bg-blue-900/20 dark:text-blue-300',
+        outline: 'border border-input bg-background text-foreground',
+        ghost: 'text-foreground',
+        subtle: 'bg-primary-50 text-primary-900 dark:bg-primary-900/10 dark:text-primary-300',
+        subtleSecondary:
+          'bg-secondary-50 text-secondary-900 dark:bg-secondary-900/10 dark:text-secondary-300',
+        cyan: 'bg-cyan-100 text-cyan-900 dark:bg-cyan-900/20 dark:text-cyan-300',
+        gray: 'bg-gray-100 text-gray-900 dark:bg-gray-700 dark:text-gray-100',
+        blue: 'bg-blue-100 text-blue-900 dark:bg-blue-900/20 dark:text-blue-300',
+        green: 'bg-primary-100 text-primary-900 dark:bg-primary-900/20 dark:text-primary-300',
+        invertedSecondary: 'bg-secondary-900 text-white dark:bg-secondary-700 dark:text-white',
+        // Interactive variants with hover states
+        interactivePrimary:
+          'bg-primary-100 text-primary-900 hover:bg-primary-200 dark:bg-primary-900/20 dark:text-primary-300 dark:hover:bg-primary-900/30 cursor-pointer',
+        interactiveSecondary:
+          'bg-secondary-100 text-secondary-900 hover:bg-secondary-200 dark:bg-secondary-900/20 dark:text-secondary-300 dark:hover:bg-secondary-900/30 cursor-pointer',
+        interactiveDestructive:
+          'bg-red-100 text-red-900 hover:bg-red-200 dark:bg-red-900/20 dark:text-red-300 dark:hover:bg-red-900/30 cursor-pointer',
+      },
+      size: {
+        sm: 'px-3 py-1.5 text-sm',
+        default: 'px-6 py-2.5 text-sm',
+        lg: 'px-6 py-3 text-base',
+        xl: 'px-8 py-4 text-lg',
       },
     },
     defaultVariants: {
       variant: 'default',
+      size: 'default',
     },
   },
 )
 
 export interface BadgeProps
-  extends React.HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof badgeVariants> {}
-
-function Badge({ className, variant, ...props }: BadgeProps) {
-  return <div className={cn(badgeVariants({ variant }), className)} {...props} />
+  extends React.HTMLAttributes<HTMLSpanElement>,
+    VariantProps<typeof badgeVariants> {
+  asChild?: boolean
 }
+
+const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
+  ({ className, variant, size, ...props }, ref) => {
+    return <span ref={ref} className={cn(badgeVariants({ variant, size }), className)} {...props} />
+  },
+)
+Badge.displayName = 'Badge'
 
 export { Badge, badgeVariants }

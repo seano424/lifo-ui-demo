@@ -84,7 +84,7 @@ export function DashboardWelcome() {
 
           {/* Right side with illustration */}
           <div className="flex-shrink-0 relative w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48">
-            <Logo variant="icon" size="xl" className="w-full h-full opacity-30" />
+            <Logo variant="svg" size="xl" className="w-full h-full opacity-30" />
           </div>
         </div>
       </div>
