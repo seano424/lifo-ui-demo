@@ -1297,6 +1297,7 @@ export type Database = {
           added_by: string | null
           cost_price: number | null
           created_at: string | null
+          image_url: string | null
           is_active: boolean | null
           product_id: string
           selling_price: number | null
@@ -1312,6 +1313,7 @@ export type Database = {
           added_by?: string | null
           cost_price?: number | null
           created_at?: string | null
+          image_url?: string | null
           is_active?: boolean | null
           product_id: string
           selling_price?: number | null
@@ -1327,6 +1329,7 @@ export type Database = {
           added_by?: string | null
           cost_price?: number | null
           created_at?: string | null
+          image_url?: string | null
           is_active?: boolean | null
           product_id?: string
           selling_price?: number | null
@@ -2246,51 +2249,6 @@ export type Database = {
           sale_timestamp?: string | null
           sku?: string | null
           store_id?: string | null
-        }
-        Relationships: []
-      }
-      store_products: {
-        Row: {
-          added_by: string | null
-          cost_price: number | null
-          created_at: string | null
-          image_url: string | null
-          is_active: boolean | null
-          product_id: string
-          selling_price: number | null
-          store_id: string
-          store_sku: string | null
-          supplier_code: string | null
-          updated_at: string | null
-          updated_by: string | null
-        }
-        Insert: {
-          added_by?: string | null
-          cost_price?: number | null
-          created_at?: string | null
-          image_url?: string | null
-          is_active?: boolean | null
-          product_id: string
-          selling_price?: number | null
-          store_id: string
-          store_sku?: string | null
-          supplier_code?: string | null
-          updated_at?: string | null
-          updated_by?: string | null
-        }
-        Update: {
-          added_by?: string | null
-          cost_price?: number | null
-          created_at?: string | null
-          image_url?: string | null
-          is_active?: boolean | null
-          product_id?: string
-          selling_price?: number | null
-          store_id?: string
-          store_sku?: string | null
-          supplier_code?: string | null
-          updated_at?: string | null
-          updated_by?: string | null
         }
         Relationships: []
       }
