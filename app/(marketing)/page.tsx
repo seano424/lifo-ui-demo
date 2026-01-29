@@ -11,7 +11,7 @@ export default function Home() {
       <div className="absolute inset-0 -z-10 pointer-events-none">
         {/* CSS gradient base layer - soft purple/blue ambient atmosphere */}
         <div
-          className="absolute inset-0 bg-white"
+          className="absolute inset-0 bg-white opacity-10"
           style={{
             background:
               'radial-gradient(ellipse 80% 50% at 80% 20%, hsl(252 100% 92% / 0.5) 0%, transparent 50%), radial-gradient(ellipse 80% 50% at 20% 30%, hsl(227 100% 92% / 0.4) 0%, transparent 50%), radial-gradient(ellipse 60% 40% at 50% 50%, hsl(252 100% 95% / 0.3) 0%, transparent 50%), white',
@@ -33,7 +33,7 @@ export default function Home() {
           style={{ animationDelay: '0s' }}
         >
           <div
-            className="absolute inset-0 blur-3xl opacity-30"
+            className="absolute inset-0 blur-3xl opacity-50"
             style={{
               background:
                 'radial-gradient(circle, hsl(252 100% 85% / 0.9) 0%, hsl(252 100% 90% / 0.6) 40%, transparent 70%)',
@@ -44,7 +44,7 @@ export default function Home() {
         {/* Top-right blue blob - reduced opacity */}
         <div className="absolute -top-40 -right-40 w-[60vw] max-w-[700px] h-[60vw] max-h-[700px] animate-float-slow will-change-transform">
           <div
-            className="absolute inset-0 blur-3xl opacity-25"
+            className="absolute inset-0 blur-3xl opacity-50"
             style={{
               background:
                 'radial-gradient(circle, hsl(227 100% 85% / 0.9) 0%, hsl(227 100% 90% / 0.6) 40%, transparent 70%)',
@@ -58,7 +58,7 @@ export default function Home() {
           style={{ animationDelay: '2s' }}
         >
           <div
-            className="absolute inset-0 blur-3xl opacity-20"
+            className="absolute inset-0 blur-3xl opacity-10"
             style={{
               background:
                 'radial-gradient(circle, hsl(227 100% 88% / 0.9) 0%, hsl(227 100% 92% / 0.6) 40%, transparent 70%)',
@@ -72,7 +72,7 @@ export default function Home() {
           style={{ animationDelay: '4s' }}
         >
           <div
-            className="absolute inset-0 blur-3xl opacity-15"
+            className="absolute inset-0 blur-3xl opacity-50"
             style={{
               background:
                 'radial-gradient(circle, hsl(240 100% 88% / 0.8) 0%, hsl(240 100% 92% / 0.5) 40%, transparent 70%)',
