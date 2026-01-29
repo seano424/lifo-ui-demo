@@ -13,7 +13,7 @@ interface CtaFeatureProps {
 function CtaFeature({ icon, title, description }: CtaFeatureProps) {
   return (
     <div className="flex gap-4 items-start">
-      <div className="text-primary-900 bg-blue-100/70 p-2.5 rounded-2xl border border-blue-200/50 shadow-sm">
+      <div className="text-primary-800 bg-blue-100/70 p-2.5 rounded-2xl border border-blue-200/50 shadow-sm">
         {icon}
       </div>
       <div className="flex flex-col gap-1">

@@ -47,9 +47,9 @@ export function NoStoresError({
             </Typography>
             <div className="bg-primary/5 p-3 sm:p-4 rounded-2xl border border-primary/25 mb-2">
               <div className="flex items-start gap-4">
-                <Store className="h-12 w-12 sm:h-20 sm:w-20 text-primary-600" />
+                <Store className="h-12 w-12 sm:h-20 sm:w-20 text-primary-800" />
                 <div>
-                  <Typography variant="p" className="text-xs sm:text-lg font-bold text-primary-600">
+                  <Typography variant="p" className="text-xs sm:text-lg font-bold text-primary-800">
                     {t('noStores.tip.title')}
                   </Typography>
                   <Typography variant="p" className="text-xs sm:text-sm text-muted-foreground mt-1">

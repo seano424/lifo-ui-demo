@@ -133,9 +133,16 @@ const MarketingNav = ({ menu }: MarketingNavProps) => {
           {/* <NavbarLogo variant="text" href="/" /> */}
 
           <Logo variant="svg" size="sm" priority href="/" withText />
-          <NavigationMenu>
+          {/* <NavigationMenu>
             <NavigationMenuList>{menuItems.map(item => renderMenuItem(item))}</NavigationMenuList>
-          </NavigationMenu>
+          </NavigationMenu> */}
+          <div className="flex items-center gap-8 px-4">
+            {menuItems.map(item => (
+              <Link key={item.title} href={item.url} className="hover:text-brand-primary">
+                {item.title}
+              </Link>
+            ))}
+          </div>
         </div>
 
         <div className="flex items-center gap-2">
@@ -207,7 +214,7 @@ const renderMenuItem = (item: MenuItem) => {
     <NavigationMenuItem key={item.title}>
       <NavigationMenuLink
         href={item.url}
-        className="group inline-flex h-10 w-max items-center justify-center bg-background px-4 py-2 transition-colors hover:bg-brand-primary/10 hover:text-brand-primary dark:hover:bg-brand-secondary/10 dark:hover:text-white rounded-2xl tracking-wide  font-heading text-base"
+        className="group inline-flex h-10 w-max items-center justify-center bg-background px-4 py-2 transition-colors hover:text-brand-primary dark:hover:text-white rounded-2xl font-sans font-semibold text-sm"
       >
         {item.title}
       </NavigationMenuLink>

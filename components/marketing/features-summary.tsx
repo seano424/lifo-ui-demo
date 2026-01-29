@@ -38,25 +38,25 @@ export function FeaturesSummary() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 py-8 px-8 rounded-2xl bg-card border shadow-lg overflow-hidden h-full">
           <Feature
-            icon={<Calendar size={28} className="text-primary-900" strokeWidth={1.5} />}
+            icon={<Calendar size={28} className="text-primary-800" strokeWidth={1.5} />}
             title={t('expiryTracking.title')}
             description={t('expiryTracking.description')}
           />
 
           <Feature
-            icon={<Bell size={28} className="text-primary-900" strokeWidth={1.5} />}
+            icon={<Bell size={28} className="text-primary-800" strokeWidth={1.5} />}
             title={t('predictiveAlerts.title')}
             description={t('predictiveAlerts.description')}
           />
 
           <Feature
-            icon={<Clock size={28} className="text-primary-900" strokeWidth={1.5} />}
+            icon={<Clock size={28} className="text-primary-800" strokeWidth={1.5} />}
             title={t('timeSaving.title')}
             description={t('timeSaving.description')}
           />
 
           <Feature
-            icon={<Tablet size={28} className="text-primary-900" strokeWidth={1.5} />}
+            icon={<Tablet size={28} className="text-primary-800" strokeWidth={1.5} />}
             title={t('compatibility.title')}
             description={t('compatibility.description')}
           />

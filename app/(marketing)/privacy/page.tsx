@@ -141,7 +141,7 @@ export default function PrivacyPage() {
               {t('section7.contact')}{' '}
               <Link
                 href={`mailto:${t('section7.email')}`}
-                className="text-primary-700 hover:text-primary-600 underline"
+                className="text-primary-800 hover:text-primary-800 underline"
               >
                 {t('section7.email')}
               </Link>
@@ -306,7 +306,7 @@ export default function PrivacyPage() {
                     href={t('section14.euAuthorities.link')}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-primary-700 hover:text-primary-600 underline"
+                    className="text-primary-800 hover:text-primary-800 underline"
                   >
                     {t('section14.euAuthorities.link')}
                   </Link>
@@ -324,7 +324,7 @@ export default function PrivacyPage() {
                       href={`https://${t('section14.netherlands.website')}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-primary-700 hover:text-primary-600 underline"
+                      className="text-primary-800 hover:text-primary-800 underline"
                     >
                       {t('section14.netherlands.website')}
                     </Link>
@@ -333,7 +333,7 @@ export default function PrivacyPage() {
                     Email:{' '}
                     <Link
                       href={`mailto:${t('section14.netherlands.email')}`}
-                      className="text-primary-700 hover:text-primary-600 underline"
+                      className="text-primary-800 hover:text-primary-800 underline"
                     >
                       {t('section14.netherlands.email')}
                     </Link>
@@ -365,7 +365,7 @@ export default function PrivacyPage() {
               <strong>Email:</strong>{' '}
               <Link
                 href={`mailto:${t('section16.email')}`}
-                className="text-primary-700 hover:text-primary-600 underline"
+                className="text-primary-800 hover:text-primary-800 underline"
               >
                 {t('section16.email')}
               </Link>

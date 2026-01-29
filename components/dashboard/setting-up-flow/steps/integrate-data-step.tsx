@@ -49,7 +49,7 @@ export function IntegrateDataStep() {
             <Button
               variant="outline"
               // disabled
-              className="w-fit group-hover:bg-white group-hover:text-primary-900 hover:bg-white hover:text-primary-900"
+              className="w-fit group-hover:bg-white group-hover:text-primary-800 hover:bg-white hover:text-primary-800"
             >
               <ExternalLink className="h-4 w-4" />
               {t('steps.addStore.connect')}
@@ -78,7 +78,7 @@ export function IntegrateDataStep() {
             <Button
               variant="outline"
               // disabled
-              className="w-fit hover:bg-white hover:text-primary-900"
+              className="w-fit hover:bg-white hover:text-primary-800"
             >
               {t('steps.addStore.importCSV')}
             </Button>

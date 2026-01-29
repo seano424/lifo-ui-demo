@@ -177,7 +177,7 @@ export function StoreInsightsDashboard({ storeId: propStoreId }: StoreInsightsDa
                   </div>
                   <div className="p-3 bg-primary-50 rounded">
                     <p className="">{t('overview.discountsApplied')}</p>
-                    <p className="text-primary-600">
+                    <p className="text-primary-800">
                       {t('overview.saved', {
                         discountValue: t('comingSoon'),
                       })}

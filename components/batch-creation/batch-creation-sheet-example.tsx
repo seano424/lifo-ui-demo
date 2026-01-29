@@ -40,7 +40,7 @@ export function DashboardBatchButton() {
         {summary.total_draft_batches > 0 && (
           <Badge
             variant="secondary"
-            className="ml-2 bg-white dark:bg-gray-900 text-primary-600 dark:text-primary-400"
+            className="ml-2 bg-white dark:bg-gray-900 text-primary-800 dark:text-primary-400"
           >
             {summary.total_draft_batches}
           </Badge>
@@ -181,19 +181,19 @@ export function BatchCreationSheetDemo() {
         <CardContent className="space-y-4">
           <div className="grid grid-cols-3 gap-4">
             <div className="text-center">
-              <p className="text-3xl font-bold text-primary-600 dark:text-primary-400">
+              <p className="text-3xl font-bold text-primary-800 dark:text-primary-400">
                 {summary.total_draft_batches}
               </p>
               <p className="text-sm text-gray-600 dark:text-gray-400">Draft Batches</p>
             </div>
             <div className="text-center">
-              <p className="text-3xl font-bold text-primary-600 dark:text-primary-400">
+              <p className="text-3xl font-bold text-primary-800 dark:text-primary-400">
                 {summary.total_units}
               </p>
               <p className="text-sm text-gray-600 dark:text-gray-400">Total Units</p>
             </div>
             <div className="text-center">
-              <p className="text-3xl font-bold text-primary-600 dark:text-primary-400">
+              <p className="text-3xl font-bold text-primary-800 dark:text-primary-400">
                 {summary.products_with_drafts}
               </p>
               <p className="text-sm text-gray-600 dark:text-gray-400">Products</p>

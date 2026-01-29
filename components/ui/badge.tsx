@@ -9,7 +9,7 @@ const badgeVariants = cva(
     variants: {
       variant: {
         default: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-100',
-        primary: 'bg-primary-50 text-primary-600',
+        primary: 'bg-primary-50 text-primary-800',
         secondary: 'bg-secondary text-white',
         destructive: 'bg-red-100 text-red-900 dark:bg-red-900/20 dark:text-red-300',
         success: 'bg-green-100 text-green-900 dark:bg-green-900/20 dark:text-green-300',
@@ -17,17 +17,17 @@ const badgeVariants = cva(
         info: 'bg-blue-100 text-blue-900 dark:bg-blue-900/20 dark:text-blue-300',
         outline: 'border border-input bg-background text-foreground',
         ghost: 'text-foreground',
-        subtle: 'bg-primary-50 text-primary-900 dark:bg-primary-900/10 dark:text-primary-300',
+        subtle: 'bg-primary-50 text-primary-800 dark:bg-primary-900/10 dark:text-primary-300',
         subtleSecondary:
           'bg-secondary-50 text-secondary-900 dark:bg-secondary-900/10 dark:text-secondary-300',
         cyan: 'bg-cyan-100 text-cyan-900 dark:bg-cyan-900/20 dark:text-cyan-300',
         gray: 'bg-gray-100 text-gray-900 dark:bg-gray-700 dark:text-gray-100',
         blue: 'bg-blue-100 text-blue-900 dark:bg-blue-900/20 dark:text-blue-300',
-        green: 'bg-primary-100 text-primary-900 dark:bg-primary-900/20 dark:text-primary-300',
+        green: 'bg-primary-100 text-primary-800 dark:bg-primary-900/20 dark:text-primary-300',
         invertedSecondary: 'bg-secondary-900 text-white dark:bg-secondary-700 dark:text-white',
         // Interactive variants with hover states
         interactivePrimary:
-          'bg-primary-100 text-primary-900 hover:bg-primary-200 dark:bg-primary-900/20 dark:text-primary-300 dark:hover:bg-primary-900/30 cursor-pointer',
+          'bg-primary-100 text-primary-800 hover:bg-primary-200 dark:bg-primary-900/20 dark:text-primary-300 dark:hover:bg-primary-900/30 cursor-pointer',
         interactiveSecondary:
           'bg-secondary-100 text-secondary-900 hover:bg-secondary-200 dark:bg-secondary-900/20 dark:text-secondary-300 dark:hover:bg-secondary-900/30 cursor-pointer',
         interactiveDestructive:

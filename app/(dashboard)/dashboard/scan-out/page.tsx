@@ -22,7 +22,7 @@ export default function ScanOutPage() {
 
         {removedItems.length > 0 && (
           <div className="mt-8 flex flex-col gap-8">
-            <Typography variant="h3" className="text-center font-black text-primary-900">
+            <Typography variant="h3" className="text-center font-black text-primary-800">
               {t('recentlyRemoved', { count: removedItems.length })}
             </Typography>
             <div className="flex flex-col gap-2">

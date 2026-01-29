@@ -62,7 +62,7 @@ export function DeliveryDashboardCard() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle className="text-lg">Quick Add Delivery</CardTitle>
-            <Truck className="h-5 w-5 text-primary-600 dark:text-primary-400" />
+            <Truck className="h-5 w-5 text-primary-800 dark:text-primary-400" />
           </div>
           <CardDescription>Add products from recent deliveries</CardDescription>
         </CardHeader>
@@ -189,7 +189,7 @@ export function DeliveryLogDemo() {
         <CardContent>
           <div className="grid grid-cols-2 gap-4">
             <div className="text-center">
-              <p className="text-3xl font-bold text-primary-600 dark:text-primary-400">
+              <p className="text-3xl font-bold text-primary-800 dark:text-primary-400">
                 {recentProducts?.length || 0}
               </p>
               <p className="text-sm text-gray-600 dark:text-gray-400">Recent Products</p>

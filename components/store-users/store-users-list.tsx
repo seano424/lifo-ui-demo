@@ -583,7 +583,7 @@ export function StoreUsersList({ storeId: propStoreId, serverPermissions }: Stor
                           {t('dialogs.resetPassword.statusLocked')}
                         </span>
                       ) : (
-                        <span className="ml-2 text-primary-600 flex items-center gap-1">
+                        <span className="ml-2 text-primary-800 flex items-center gap-1">
                           <Key className="w-3 h-3" />
                           {t('dialogs.resetPassword.statusActive')}
                         </span>

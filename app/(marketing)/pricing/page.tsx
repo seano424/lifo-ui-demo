@@ -96,7 +96,7 @@ function PricingCard({
         <ul className="space-y-3">
           {features.map(feature => (
             <li key={feature} className="flex items-start gap-3">
-              <Check size={18} className="text-primary-600 mt-0.5 flex-shrink-0" />
+              <Check size={18} className="text-primary-800 mt-0.5 flex-shrink-0" />
               <Typography variant="p" className="text-foreground/80 text-sm">
                 {feature}
               </Typography>
@@ -116,7 +116,7 @@ function PricingCard({
               <Typography variant="p" className="text-sm text-foreground/70">
                 {fee.type}
               </Typography>
-              <Typography variant="p" className="text-xs  text-primary-700">
+              <Typography variant="p" className="text-xs  text-primary-800">
                 {fee.percentage}
               </Typography>
             </div>

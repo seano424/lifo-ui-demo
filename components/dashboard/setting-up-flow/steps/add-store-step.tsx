@@ -13,6 +13,7 @@ import { useRouter } from 'next/navigation'
 import { AddStoreFlow } from '@/components/settings/add-store-flow'
 import { useSquareStatus, useInitiateSquareConnect } from '@/hooks/use-square-integration'
 import { toast } from 'sonner'
+import { cn } from '@/lib/utils'
 
 export function AddStoreStep() {
   const t = useTranslations('setupFlow')
@@ -51,73 +52,64 @@ export function AddStoreStep() {
           {t('steps.addStore.description')}
         </Typography>
 
-        {/* Real-time integrations */}
-        <div className="flex flex-col gap-4">
-          <div className="flex items-center gap-2">
-            <Typography variant="h3" className="font-semibold">
-              {t('steps.addStore.integration')}
-            </Typography>
-            <Badge className="font-bold font-heading" variant="invertedSecondary">
-              {t('steps.addStore.recommended')}
-            </Badge>
-          </div>
-
-          <Card
-            className="p-6 transition-colors cursor-pointer group"
-            onClick={() => {
-              if (isSquareConnected) {
-                router.push('/dashboard/integrations/square')
-              } else {
-                handleSquareConnect()
-              }
-            }}
-          >
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center justify-between">
-              <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                <Image src="/square/square-icon.svg" alt="Square" width={40} height={40} />
-                <div>
-                  <div className="flex items-center gap-2 pb-2">
-                    <Typography variant="h3" className="font-semibold">
-                      Square
-                    </Typography>
-                    {isSquareConnected ? (
-                      <Badge variant="default" className="gap-1">
-                        <CheckCircle2 className="h-3 w-3" />
-                        Connected
-                      </Badge>
-                    ) : (
-                      <Badge variant="secondary" className="gap-1">
-                        Not Connected
-                      </Badge>
-                    )}
-                  </div>
-                  <Typography variant="p" className="text-sm text-muted-foreground">
-                    {t('steps.addStore.squareDescription')}
+        <Card
+          className={cn(
+            'p-6 transition-colors cursor-pointer group',
+            isSquareConnected ? 'shadow-primary-500 shadow-xl border-t-0' : '',
+          )}
+          onClick={() => {
+            if (isSquareConnected) {
+              router.push('/dashboard/integrations/square')
+            } else {
+              handleSquareConnect()
+            }
+          }}
+        >
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+              <Image src="/square/square-icon.svg" alt="Square" width={40} height={40} />
+              <div>
+                <div className="flex items-center gap-2 pb-2">
+                  <Typography variant="h3" className="font-semibold">
+                    Square
                   </Typography>
+                  {isSquareConnected ? (
+                    <Badge variant="primary" className="gap-1">
+                      <CheckCircle2 className="h-5 w-5 text-primary stroke-2" />
+                      Connected
+                    </Badge>
+                  ) : (
+                    <Badge variant="secondary" className="gap-1">
+                      Not Connected
+                    </Badge>
+                  )}
                 </div>
+                <Typography variant="p" className="text-sm text-muted-foreground">
+                  {t('steps.addStore.squareDescription')}
+                </Typography>
               </div>
-              <Button
-                variant="outline"
-                className="w-fit group-hover:bg-white group-hover:text-primary-900 hover:bg-white hover:text-primary-900 pointer-events-none"
-              >
-                {isSquareConnected ? (
-                  <>
-                    <Settings className="h-4 w-4" />
-                    Manage
-                  </>
-                ) : (
-                  <>
-                    <ExternalLink className="h-4 w-4" />
-                    {t('steps.addStore.connect')}
-                  </>
-                )}
-              </Button>
             </div>
-          </Card>
-        </div>
+            <Button
+              variant="outline"
+              className="w-fit group-hover:bg-white group-hover:text-primary-800 hover:bg-white hover:text-primary-800 pointer-events-none"
+            >
+              {isSquareConnected ? (
+                <>
+                  <Settings className="h-4 w-4" />
+                  Manage
+                </>
+              ) : (
+                <>
+                  <ExternalLink className="h-4 w-4" />
+                  {t('steps.addStore.connect')}
+                </>
+              )}
+            </Button>
+          </div>
+        </Card>
 
         {/* One-time import */}
-        <div className="flex flex-col gap-4 mt-4">
+        {/* <div className="flex flex-col gap-4 mt-4">
           <Typography variant="h3" className="font-semibold">
             {t('steps.addStore.manual')}
           </Typography>
@@ -140,13 +132,13 @@ export function AddStoreStep() {
               </div>
               <Button
                 variant="outline"
-                className="w-fit group-hover:bg-white group-hover:text-primary-900 hover:bg-white hover:text-primary-900 pointer-events-none"
+                className="w-fit group-hover:bg-white group-hover:text-primary-800 hover:bg-white hover:text-primary-800 pointer-events-none"
               >
                 {t('steps.addStore.manualEntryButton')}
               </Button>
             </div>
           </Card>
-        </div>
+        </div> */}
       </div>
 
       <BottomSheet

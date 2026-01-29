@@ -280,7 +280,7 @@ export default function UserAccountInformation() {
               <div className="flex flex-col gap-2">
                 <Typography variant="p">{t('profile.email')}</Typography>
                 <Typography variant="p">{user.email}</Typography>
-                <Typography className="mt-1 text-primary-900" variant="p">
+                <Typography className="mt-1 text-primary-800" variant="p">
                   {t('profile.emailNotice')}
                 </Typography>
               </div>
@@ -351,7 +351,7 @@ export default function UserAccountInformation() {
               <Typography variant="p" className="flex items-center gap-2">
                 {user.phone ? formatPhoneNumber(user.phone) : t('phone.noPhone')}
                 {user.phone_verified && (
-                  <span className="text-primary-600 text-sm">✓ {t('phone.verified')}</span>
+                  <span className="text-primary-800 text-sm">✓ {t('phone.verified')}</span>
                 )}
               </Typography>
               {!user.phone && (

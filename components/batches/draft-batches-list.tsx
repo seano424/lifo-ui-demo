@@ -54,7 +54,7 @@ export function DraftBatchesList({ className, onSelectBatch }: DraftBatchesListP
     return (
       <Card className={cn('border-0 shadow-none', className)}>
         <CardContent className="flex flex-col items-center justify-center py-12">
-          <Clock className="h-8 w-8 animate-spin text-primary-600 mb-4" />
+          <Clock className="h-8 w-8 animate-spin text-primary-800 mb-4" />
           <CardDescription>Loading draft batches...</CardDescription>
         </CardContent>
       </Card>

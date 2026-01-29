@@ -232,7 +232,7 @@ export function DetailsTab({ selectedBatch, currencySymbol = '€', onClose }: D
       case 'fresh':
         return {
           label: t('details.status.fresh'),
-          className: 'text-primary-600 bg-primary-50',
+          className: 'text-primary-800 bg-primary-50',
         }
       default:
         return { label: status, className: 'text-gray-600 bg-gray-50' }
@@ -379,7 +379,7 @@ export function DetailsTab({ selectedBatch, currencySymbol = '€', onClose }: D
                         ? 'text-red-600'
                         : daysToExpiry <= 7
                           ? 'text-orange-600'
-                          : 'text-primary-600',
+                          : 'text-primary-800',
                     )}
                   >
                     (

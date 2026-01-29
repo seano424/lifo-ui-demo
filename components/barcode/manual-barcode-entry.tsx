@@ -491,7 +491,7 @@ export default function ManualBarcodeEntry({
                                     {t('outOfStock')}
                                   </Typography>
                                 ) : product.total_available_quantity ? (
-                                  <Typography variant="small" className="text-primary-900">
+                                  <Typography variant="small" className="text-primary-800">
                                     {product.total_available_quantity} {t('unitsAvailable')}
                                     {product.batch_count &&
                                       product.batch_count > 1 &&
@@ -666,7 +666,7 @@ export default function ManualBarcodeEntry({
                               <div>
                                 <strong>Stock:</strong>{' '}
                                 {barcodeStockStatus.hasStock ? (
-                                  <span className="text-primary-600">
+                                  <span className="text-primary-800">
                                     {barcodeStockStatus.availableQuantity} {t('unitsAvailable')}
                                   </span>
                                 ) : (

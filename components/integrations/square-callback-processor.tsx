@@ -92,7 +92,7 @@ export function SquareCallbackProcessor() {
           <div className="flex items-center justify-center">
             {status === 'processing' && (
               <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary-100">
-                <Loader2 className="h-8 w-8 animate-spin text-primary-900" />
+                <Loader2 className="h-8 w-8 animate-spin text-primary-800" />
               </div>
             )}
             {status === 'success' && (

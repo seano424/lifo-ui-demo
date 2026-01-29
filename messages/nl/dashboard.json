@@ -573,7 +573,7 @@
         "success": "Uw account is succesvol aangemaakt!"
       },
       "addStore": {
-        "title": "Kies hoe u uw gegevens wilt integreren",
+        "title": "Verbind uw Square account",
         "description": "Volg producten op vervaldatum. Maak batches aan, controleer verlopende artikelen en ontvang meldingen over verlopende batches.",
         "realTime": "Real-time",
         "recommended": "Aanbevolen",

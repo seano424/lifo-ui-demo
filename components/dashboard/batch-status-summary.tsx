@@ -200,7 +200,7 @@ export function BatchStatusSummary() {
           </div>
 
           <div className="flex flex-col gap-2 flex-1 justify-end text-right mt-4">
-            <Typography variant="h4" className="lowercase text-primary-900 dark:text-brand-white">
+            <Typography variant="h4" className="lowercase text-primary-800 dark:text-brand-white">
               {attentionPercentage}% {t('needsAttention')}
             </Typography>
             <div className="h-2 bg-gray-200 dark:bg-brand-dark rounded-full mt-2">

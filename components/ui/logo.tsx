@@ -20,10 +20,10 @@ interface LogoProps {
 }
 
 const sizeMap = {
-  sm: 'h-8',
-  md: 'h-12',
-  lg: 'h-16',
-  xl: 'h-24',
+  sm: 'h-6',
+  md: 'h-8',
+  lg: 'h-10',
+  xl: 'h-12',
 }
 
 export function Logo({
@@ -95,7 +95,7 @@ export function Logo({
         href={href}
         className={cn(
           'inline-block',
-          withText && 'flex items-center gap-2 font-heading font-black text-4xl',
+          withText && 'flex items-center gap-2 font-heading font-bold text-2xl',
         )}
       >
         {logoElement}
@@ -108,7 +108,7 @@ export function Logo({
     <div
       className={cn(
         'inline-block',
-        withText && 'flex items-center gap-2 font-heading font-black text-4xl',
+        withText && 'flex items-center gap-2 font-heading font-bold text-2xl',
       )}
     >
       {logoElement}

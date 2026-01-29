@@ -50,7 +50,7 @@ export default function Contact() {
           <div className="space-y-6 lg:space-y-8 h-full flex flex-col justify-center py-4 lg:py-0">
             <div className="space-y-4 lg:space-y-6">
               <div className="flex gap-3 items-start group p-4 rounded-2xl bg-card backdrop-blur-sm border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-100 to-secondary-100 flex items-center justify-center text-primary-700 group-hover:scale-110 transition-transform duration-300">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-100 to-secondary-100 flex items-center justify-center text-primary-800 group-hover:scale-110 transition-transform duration-300">
                   <MessageSquare size={20} strokeWidth={1.5} />
                 </div>
                 <div className="flex flex-col gap-1">
@@ -70,7 +70,7 @@ export default function Contact() {
               </div>
 
               <div className="flex gap-3 items-start group p-4 rounded-2xl bg-card backdrop-blur-sm border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-100 to-secondary-100 flex items-center justify-center text-primary-700 group-hover:scale-110 transition-transform duration-300">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-100 to-secondary-100 flex items-center justify-center text-primary-800 group-hover:scale-110 transition-transform duration-300">
                   <Users size={20} strokeWidth={1.5} />
                 </div>
                 <div className="flex flex-col gap-1">
@@ -90,7 +90,7 @@ export default function Contact() {
               </div>
 
               <div className="flex gap-3 items-start group p-4 rounded-2xl bg-card backdrop-blur-sm border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-100 to-secondary-100 flex items-center justify-center text-primary-700 group-hover:scale-110 transition-transform duration-300">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-100 to-secondary-100 flex items-center justify-center text-primary-800 group-hover:scale-110 transition-transform duration-300">
                   <Mail size={20} strokeWidth={1.5} />
                 </div>
                 <div className="flex flex-col gap-1">

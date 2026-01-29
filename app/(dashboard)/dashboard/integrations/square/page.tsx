@@ -158,7 +158,7 @@ export default function SquareManagementPage() {
         <Card className="space-y-4">
           <CardHeader className="space-y-2">
             <div className="flex items-center gap-2">
-              <MapPin className="h-5 w-5 text-primary-600" />
+              <MapPin className="h-5 w-5 text-primary-800" />
               <CardTitle>{t('connectedLocations')}</CardTitle>
             </div>
             <CardDescription className="px-1">
@@ -238,7 +238,7 @@ export default function SquareManagementPage() {
           <Card>
             <CardHeader>
               <div className="flex items-center gap-2">
-                <Package className="h-5 w-5 text-primary-600" />
+                <Package className="h-5 w-5 text-primary-800" />
                 <CardTitle className="text-base sm:text-lg">{t('syncCatalog')}</CardTitle>
               </div>
               <CardDescription className="text-sm">{t('syncCatalogDescription')}</CardDescription>
@@ -262,7 +262,7 @@ export default function SquareManagementPage() {
           <Card>
             <CardHeader>
               <div className="flex items-center gap-2">
-                <Boxes className="h-5 w-5 text-primary-600" />
+                <Boxes className="h-5 w-5 text-primary-800" />
                 <CardTitle className="text-base sm:text-lg">{t('syncInventory')}</CardTitle>
               </div>
               <CardDescription className="text-sm">{t('syncInventoryDescription')}</CardDescription>
@@ -286,7 +286,7 @@ export default function SquareManagementPage() {
           <Card>
             <CardHeader>
               <div className="flex items-center gap-2">
-                <ShoppingCart className="h-5 w-5 text-primary-600" />
+                <ShoppingCart className="h-5 w-5 text-primary-800" />
                 <CardTitle className="text-base sm:text-lg">{t('syncOrders')}</CardTitle>
               </div>
               <CardDescription className="text-sm">{t('syncOrdersDescription')}</CardDescription>

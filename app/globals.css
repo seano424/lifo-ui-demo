@@ -271,7 +271,7 @@
 
 /* Container utility with auto-centering and responsive padding */
 @utility container {
-  @apply mx-auto px-4 sm:px-8 max-w-6xl;
+  @apply mx-auto px-4 max-w-7xl;
 }
 
 @layer base {

@@ -104,7 +104,7 @@ export default function InventoryForm({
                 {t('titles.detailsCaptured')}
               </Typography>
             </div>
-            <Typography variant="h3" className="text-primary-700 font-black">
+            <Typography variant="h3" className="text-primary-800 font-black">
               {t('titles.reviewAndSubmit')}
             </Typography>
           </div>

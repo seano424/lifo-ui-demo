@@ -59,7 +59,7 @@ export function UploadResultsDisplay({ result, onUploadAnother }: UploadResultsD
         {/* Performance Metrics */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="text-center">
-            <div className="text-2xl font-bold text-primary-600">{result.processed || 0}</div>
+            <div className="text-2xl font-bold text-primary-800">{result.processed || 0}</div>
             <Typography variant="p" color="muted">
               {t('results.metrics.processed')}
             </Typography>

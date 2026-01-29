@@ -176,7 +176,7 @@ export default function TermsPage() {
               {t('section7.contact')}{' '}
               <Link
                 href={`mailto:${t('section7.email')}`}
-                className="text-primary-700 hover:text-primary-600 underline"
+                className="text-primary-800 hover:text-primary-800 underline"
               >
                 {t('section7.email')}
               </Link>
@@ -352,7 +352,7 @@ export default function TermsPage() {
               {t('section19.email').replace('Email: ', '')}
               <Link
                 href={`mailto:${t('section7.email')}`}
-                className="text-primary-700 hover:text-primary-600 underline"
+                className="text-primary-800 hover:text-primary-800 underline"
               >
                 {t('section7.email')}
               </Link>

@@ -574,7 +574,7 @@
         "success": "Your account has been successfully created!"
       },
       "addStore": {
-        "title": "Choose how to integrate your data",
+        "title": "Connect your Square account",
         "description": "Track Product by Expiry Dates. Create batches, review expiring items, and receive notifications on expiring batches.",
         "realTime": "Real time",
         "integration": "Integration",

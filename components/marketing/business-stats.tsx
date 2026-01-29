@@ -78,7 +78,7 @@ export function BusinessStats() {
             label={t('revenue.label')}
             description={t('revenue.description')}
             subtext={t('revenue.subtext')}
-            accentColor="text-primary-700"
+            accentColor="text-primary-800"
           />
 
           <Stat
@@ -86,7 +86,7 @@ export function BusinessStats() {
             label={t('lossReduction.label')}
             description={t('lossReduction.description')}
             subtext={t('lossReduction.subtext')}
-            accentColor="text-primary-700"
+            accentColor="text-primary-800"
           />
 
           <Stat

@@ -37,7 +37,7 @@ const URGENCY_CONFIG = {
   },
   medium: {
     color: 'bg-primary-500',
-    textColor: 'text-primary-700',
+    textColor: 'text-primary-800',
     bgColor: 'group-hover:bg-primary-50 bg-primary-500',
     badge: 'bg-primary-100 text-primary-800 border-primary-500',
     badgeVariant: 'primary' as const,

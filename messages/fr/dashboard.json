@@ -575,7 +575,7 @@
         "success": "Votre compte a été créé avec succès !"
       },
       "addStore": {
-        "title": "Choisissez comment intégrer vos données",
+        "title": "Connectez votre compte Square",
         "description": "Suivez les produits par dates d'expiration. Créez des lots, consultez les articles qui expirent et recevez des notifications sur les lots qui expirent.",
         "realTime": "Temps réel",
         "recommended": "Recommandé",

@@ -69,7 +69,7 @@ export function SetupStepsSidebar() {
               )}
             >
               {/* Step icon */}
-              <div className="flex-shrink-0">
+              <div className="shrink-0">
                 {completed ? (
                   <CheckCircle2 className="h-5 w-5 text-primary stroke-2" />
                 ) : (
@@ -87,8 +87,8 @@ export function SetupStepsSidebar() {
                 variant="p"
                 className={cn(
                   '',
-                  isCurrent && 'text-secondary-900',
-                  completed && 'text-secondary-900',
+                  isCurrent && 'font-bold font-heading text-primary-800',
+                  completed && 'font-bold font-heading text-primary-800',
                 )}
               >
                 {t(STEP_LABELS[step])}

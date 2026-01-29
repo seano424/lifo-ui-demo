@@ -220,7 +220,7 @@ export default function ScanningCamera({
               )}
 
               {autoOCRState?.isAnalyzing && process.env.NEXT_PUBLIC_DEBUG_OCR !== 'true' && (
-                <div className="text-xs text-primary-600 text-center bg-primary-50 p-2 rounded animate-pulse">
+                <div className="text-xs text-primary-800 text-center bg-primary-50 p-2 rounded animate-pulse">
                   🤖 Auto-scanning active... Hold camera steady on expiry date
                 </div>
               )}

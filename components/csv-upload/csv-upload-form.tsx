@@ -302,7 +302,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
 
           {selectedFile ? (
             <div className="space-y-4">
-              <FileCheck className="h-12 w-12 text-primary-500 mx-auto" />
+              <FileCheck className="h-12 w-12 text-primary-800 mx-auto" />
               <div>
                 <h3 className="font-semibold text-lg">{selectedFile.name}</h3>
                 <p className="text-gray-600">{(selectedFile.size / 1024).toFixed(1)} KB</p>

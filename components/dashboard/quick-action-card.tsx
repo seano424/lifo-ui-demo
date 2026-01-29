@@ -53,7 +53,7 @@ export function QuickActionCard({
             className={cn(
               'p-2 rounded-md w-fit',
               variant === 'primary'
-                ? 'bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300'
+                ? 'bg-primary-100 text-primary-800 dark:bg-primary-900/30 dark:text-primary-300'
                 : 'bg-secondary-100 text-secondary-700 dark:bg-secondary-900/30 dark:text-secondary-300',
             )}
           >
@@ -69,7 +69,7 @@ export function QuickActionCard({
                 className={cn(
                   'h-4 w-4 transform transition-transform group-hover:translate-x-1 flex-shrink-0',
                   variant === 'primary'
-                    ? 'text-primary group-hover:text-primary-700'
+                    ? 'text-primary group-hover:text-primary-800'
                     : 'text-secondary group-hover:text-secondary-700',
                 )}
               />

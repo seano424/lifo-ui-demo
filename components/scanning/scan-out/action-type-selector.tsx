@@ -39,7 +39,7 @@ export default function ActionTypeSelector({
       label: t('sell'),
       icon: ShoppingCart,
       color: 'text-gray-600',
-      activeColor: 'text-primary-700 bg-primary-100 border-primary-700',
+      activeColor: 'text-primary-800 bg-primary-100 border-primary-700',
     },
     {
       type: 'donate',

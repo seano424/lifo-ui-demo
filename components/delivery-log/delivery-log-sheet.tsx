@@ -346,7 +346,7 @@ export function DeliveryLogSheet({ open, onOpenChange, onComplete }: DeliveryLog
                     const scrollArea = document.querySelector('[data-radix-scroll-area-viewport]')
                     scrollArea?.scrollTo({ top: scrollArea.scrollHeight, behavior: 'smooth' })
                   }}
-                  className="text-primary-600 dark:text-primary-400"
+                  className="text-primary-800 dark:text-primary-400"
                 >
                   View Summary
                 </Button>

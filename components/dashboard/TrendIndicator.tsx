@@ -83,7 +83,7 @@ export function TrendIndicator({
   const getTrendColor = () => {
     switch (trend) {
       case 'up':
-        return 'text-primary-600'
+        return 'text-primary-800'
       case 'down':
         return 'text-red-600'
       case 'stable':

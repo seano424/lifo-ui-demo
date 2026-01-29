@@ -35,7 +35,7 @@ function FeatureCard({ title, description, icon, image, reversed = false }: Feat
         {/* Content */}
         <div className="flex-1 space-y-6 text-center xl:text-left">
           <div className="flex flex-col sm:flex-row items-center justify-center xl:justify-start gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary-100 to-secondary-100 flex items-center justify-center text-primary-700 shadow-lg flex-shrink-0">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary-100 to-secondary-100 flex items-center justify-center text-primary-800 shadow-lg flex-shrink-0">
               {icon}
             </div>
             <Typography
@@ -78,13 +78,13 @@ function MockDashboard() {
           <Typography variant="p" className="text-sm sm:text-base  text-primary-800">
             {t('inventoryOverview')}
           </Typography>
-          <TrendingUp size={20} className="text-primary-600" />
+          <TrendingUp size={20} className="text-primary-800" />
         </div>
         <div className="flex flex-col justify-between gap-2">
-          <Typography variant="h3" className="text-2xl sm:text-3xl font-bold text-primary-900">
+          <Typography variant="h3" className="text-2xl sm:text-3xl font-bold text-primary-800">
             1,247 {t('items')}
           </Typography>
-          <Typography variant="p" className="text-sm text-primary-700">
+          <Typography variant="p" className="text-sm text-primary-800">
             ↗ +12% {t('fromLastMonth')}
           </Typography>
         </div>
@@ -208,7 +208,7 @@ function MockAnalytics() {
             <Typography variant="p" className="text-sm sm:text-base text-gray-600">
               {t('revenueIncrease')}
             </Typography>
-            <Typography variant="p" className="text-sm sm:text-base font-bold text-primary-600">
+            <Typography variant="p" className="text-sm sm:text-base font-bold text-primary-800">
               +28%
             </Typography>
           </div>
@@ -231,7 +231,7 @@ function MockAI() {
     <div className="w-full space-y-4">
       <div className="bg-gradient-to-br from-primary-50 to-secondary-50 rounded-2xl p-6 border border-primary-100">
         <div className="flex items-center gap-3 mb-4">
-          <Bot size={24} className="text-primary-600" />
+          <Bot size={24} className="text-primary-800" />
           <Typography variant="h4" className="text-lg font-bold text-primary-800">
             {t('title')}
           </Typography>
@@ -242,7 +242,7 @@ function MockAI() {
               <Typography variant="p" className="text-sm  text-primary-800">
                 📦 {t('reorderMilk')}
               </Typography>
-              <Typography variant="p" className="text-xs text-primary-600">
+              <Typography variant="p" className="text-xs text-primary-800">
                 {t('reorderMilkDesc')}
               </Typography>
             </div>
@@ -252,7 +252,7 @@ function MockAI() {
               <Typography variant="p" className="text-sm  text-primary-800">
                 ⚡ {t('promoteExpiring')}
               </Typography>
-              <Typography variant="p" className="text-xs text-primary-600">
+              <Typography variant="p" className="text-xs text-primary-800">
                 {t('promoteExpiringDesc')}
               </Typography>
             </div>
@@ -377,7 +377,7 @@ export default function FeaturesPage() {
                 key={feature.title}
                 className="group p-6 rounded-3xl bg-card/90 backdrop-blur-sm border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300"
               >
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary-100 to-secondary-100 flex items-center justify-center text-primary-700 mb-4 group-hover:scale-110 transition-transform duration-300">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary-100 to-secondary-100 flex items-center justify-center text-primary-800 mb-4 group-hover:scale-110 transition-transform duration-300">
                   {feature.icon}
                 </div>
                 <div className="flex flex-col gap-1">
