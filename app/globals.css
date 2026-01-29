@@ -269,9 +269,9 @@
   --breakpoint-3xl: 1920px;
 
   /* Animation definitions for Tailwind 4 - Balanced, noticeable animations */
-  --animate-float-slow: float-slow 12s ease-in-out infinite;
-  --animate-float-slower: float-slower 15s ease-in-out infinite;
-  --animate-float-slowest: float-slowest 18s ease-in-out infinite;
+  --animate-float-slow: float-slow 10s ease-in-out infinite;
+  --animate-float-slower: float-slower 12s ease-in-out infinite;
+  --animate-float-slowest: float-slowest 15s ease-in-out infinite;
 
   /* Smooth floating animations for gradient blobs - Elegant movement */
   @keyframes float-slow {
