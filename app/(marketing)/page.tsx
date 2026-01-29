@@ -8,14 +8,14 @@ import { RevealAnimation } from '@/components/ui/reveal-animation'
 export default function Home() {
   return (
     <main className="min-h-screen flex flex-col items-center relative">
-      {/* Gradient Background - Spans multiple sections with natural fade */}
+      {/* Gradient Background - Fades to white quickly in upper hero */}
       <div className="absolute inset-0 -z-10 bg-white pointer-events-none">
-        {/* Gradient fade mask - creates smooth transition to white at bottom */}
+        {/* Gradient fade mask - rapid transition to white */}
         <div
           className="absolute inset-0"
           style={{
             background:
-              'linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0) 60%, rgba(255,255,255,0.8) 85%, rgba(255,255,255,1) 100%)',
+              'linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0) 30%, rgba(255,255,255,0.7) 50%, rgba(255,255,255,0.95) 65%, rgba(255,255,255,1) 75%)',
           }}
         />
 
@@ -30,9 +30,9 @@ export default function Home() {
           />
         </div>
 
-        {/* Bottom-left gradient blob - extends into features section */}
+        {/* Bottom-left gradient blob - positioned in upper-mid hero */}
         <div
-          className="absolute top-[60vh] -left-40 w-[700px] h-[700px] animate-float-slower"
+          className="absolute top-[45vh] -left-40 w-[700px] h-[700px] animate-float-slower"
           style={{ animationDelay: '2s' }}
         >
           <Image
@@ -46,7 +46,7 @@ export default function Home() {
 
         {/* Subtle center accent */}
         <div
-          className="absolute top-[40vh] left-1/2 -translate-x-1/2 w-[600px] h-[600px] animate-float-slowest"
+          className="absolute top-[20vh] left-1/2 -translate-x-1/2 w-[600px] h-[600px] animate-float-slowest"
           style={{ animationDelay: '4s' }}
         >
           <Image
