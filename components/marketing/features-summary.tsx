@@ -32,7 +32,7 @@ export function FeaturesSummary() {
   return (
     <section className="w-full px-4 rounded-2xl">
       <div className="max-w-5xl mx-auto flex flex-col gap-10">
-        <Typography variant="h2" color="primary" className="text-center">
+        <Typography variant="h2" className="text-center">
           {t('title')}
         </Typography>
 

@@ -9,14 +9,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { CompactLanguageSwitcher } from '@/components/ui/compact-language-switcher'
 import { Logo } from '@/components/ui/logo'
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-} from '@/components/ui/navigation-menu'
+
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import { hasEnvVars } from '@/lib/utils'
 import { Menu } from 'lucide-react'
@@ -133,9 +126,6 @@ const MarketingNav = ({ menu }: MarketingNavProps) => {
           {/* <NavbarLogo variant="text" href="/" /> */}
 
           <Logo variant="svg" size="sm" priority href="/" withText />
-          {/* <NavigationMenu>
-            <NavigationMenuList>{menuItems.map(item => renderMenuItem(item))}</NavigationMenuList>
-          </NavigationMenu> */}
           <div className="flex items-center gap-8 px-4">
             {menuItems.map(item => (
               <Link key={item.title} href={item.url} className="hover:text-brand-primary">
@@ -189,36 +179,6 @@ const MarketingNav = ({ menu }: MarketingNavProps) => {
         </div>
       </div>
     </section>
-  )
-}
-
-const renderMenuItem = (item: MenuItem) => {
-  if (item.items) {
-    return (
-      <NavigationMenuItem key={item.title}>
-        <NavigationMenuTrigger className="rounded-2xl tracking-wide  font-heading text-sm">
-          {item.title}
-        </NavigationMenuTrigger>
-        <NavigationMenuContent className="bg-popover text-popover-foreground w-full min-w-80">
-          {item.items.map(subItem => (
-            <NavigationMenuLink asChild key={subItem.title}>
-              <SubMenuLink item={subItem} />
-            </NavigationMenuLink>
-          ))}
-        </NavigationMenuContent>
-      </NavigationMenuItem>
-    )
-  }
-
-  return (
-    <NavigationMenuItem key={item.title}>
-      <NavigationMenuLink
-        href={item.url}
-        className="group inline-flex h-10 w-max items-center justify-center bg-background px-4 py-2 transition-colors hover:text-brand-primary dark:hover:text-white rounded-2xl font-sans font-semibold text-sm"
-      >
-        {item.title}
-      </NavigationMenuLink>
-    </NavigationMenuItem>
   )
 }
 

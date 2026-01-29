@@ -65,7 +65,7 @@ export function BusinessStats() {
     <section className="w-full py-20 px-4 relative overflow-hidden">
       <div className="sm:max-w-7xl mx-auto relative z-10 flex flex-col gap-10">
         <div className="text-center items-center justify-center flex flex-col gap-6 mx-auto">
-          <Typography variant="h2" color="primary" className="text-center">
+          <Typography variant="h2" className="text-center">
             {t('title')}
           </Typography>
 
