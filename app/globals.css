@@ -267,6 +267,57 @@
   --breakpoint-xl: 1280px;
   --breakpoint-2xl: 1536px;
   --breakpoint-3xl: 1920px;
+
+  /* Animation variables */
+  --animate-float-slow: float-slow 20s ease-in-out infinite;
+  --animate-float-slower: float-slower 25s ease-in-out infinite;
+  --animate-float-slowest: float-slowest 30s ease-in-out infinite;
+
+  /* Smooth floating animations for gradient blobs */
+  @keyframes float-slow {
+    0%,
+    100% {
+      transform: translate(0, 0) scale(1);
+    }
+    25% {
+      transform: translate(60px, -60px) scale(1.1);
+    }
+    50% {
+      transform: translate(-40px, 40px) scale(0.95);
+    }
+    75% {
+      transform: translate(80px, 60px) scale(1.05);
+    }
+  }
+
+  @keyframes float-slower {
+    0%,
+    100% {
+      transform: translate(0, 0) scale(1);
+    }
+    25% {
+      transform: translate(-80px, 60px) scale(1.08);
+    }
+    50% {
+      transform: translate(60px, -40px) scale(0.97);
+    }
+    75% {
+      transform: translate(-60px, -80px) scale(1.1);
+    }
+  }
+
+  @keyframes float-slowest {
+    0%,
+    100% {
+      transform: translate(0, 0) scale(1) rotate(0deg);
+    }
+    33% {
+      transform: translate(40px, 80px) scale(1.08) rotate(3deg);
+    }
+    66% {
+      transform: translate(-60px, -60px) scale(0.96) rotate(-3deg);
+    }
+  }
 }
 
 /* Container utility with auto-centering and responsive padding */
