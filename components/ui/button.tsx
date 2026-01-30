@@ -7,7 +7,7 @@ import * as React from 'react'
 import { cn } from '@/lib/utils'
 
 const buttonVariants = cva(
-  'rounded-xl font-sans font-semibold transition-transform duration-75 focus:outline-none disabled:opacity-50 disabled:pointer-events-none overflow-hidden cursor-pointer inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors duration-200 ease-in-out focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0',
+  'rounded-xl transition-all duration-100 focus:outline-none disabled:opacity-50 disabled:pointer-events-none overflow-hidden cursor-pointer inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors duration-200 ease-in-out focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0',
   {
     variants: {
       variant: {
@@ -18,8 +18,7 @@ const buttonVariants = cva(
           'bg-destructive text-destructive-foreground shadow-xs hover:bg-destructive/90 dark:bg-destructive dark:hover:bg-destructive',
         subtleDestructive: 'bg-destructive text-destructive shadow-xs hover:bg-destructive',
         outline: 'border border-input bg-background shadow-xs hover:border-border',
-        secondary:
-          'bg-secondary-900 text-white shadow-xs hover:bg-secondary-800 dark:bg-secondary-700 dark:hover:bg-secondary-600',
+        secondary: 'bg-secondary-900 text-white shadow-xs hover:bg-secondary-800',
         ghost:
           'hover:bg-primary-50 hover:text-primary-800 dark:hover:bg-primary-900/0 dark:text-primary-300 font-normal',
         subtleTertiary:

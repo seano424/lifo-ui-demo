@@ -24,11 +24,13 @@ export function AuthButton({ isMobile }: AuthButtonProps) {
   }
 
   return user ? (
-    <div className={cn('flex items-center gap-2', isMobile && 'flex-col gap-4 items-start')}>
+    <div
+      className={cn('flex items-center font-mono gap-2', isMobile && 'flex-col gap-4 items-start')}
+    >
       <Button
         asChild
         size="default"
-        variant={'default'}
+        variant={'secondary'}
         asLink
         href="/dashboard"
         className={cn(isMobile && 'w-full')}
@@ -36,13 +38,13 @@ export function AuthButton({ isMobile }: AuthButtonProps) {
         {t('goToDashboard')}
       </Button>
 
-      <LogoutButton variant="gray" className={cn(isMobile && 'w-full')} />
+      <LogoutButton variant="gray" className={cn(isMobile && 'w-full font-mono')} />
     </div>
   ) : (
     <>
       {/* Desktop */}
-      <div className={cn('flex gap-2 items-center', isMobile && 'hidden')}>
-        <Button asChild variant={'default'} asLink href="/auth/sign-up">
+      <div className={cn('flex gap-2 items-center font-mono', isMobile && 'hidden')}>
+        <Button asChild variant={'secondary'} asLink href="/auth/sign-up">
           {t('signup')}
         </Button>
         <Button asChild variant="gray" asLink href="/auth/login">
