@@ -17,13 +17,13 @@ export default function Home() {
             <FeaturesSummary />
           </RevealAnimation>
 
-          <RevealAnimation delay={0.4} direction="left">
+          {/* <RevealAnimation delay={0.4} direction="left">
             <BusinessStats />
           </RevealAnimation>
 
           <RevealAnimation delay={0.6} direction="up">
             <CtaSection />
-          </RevealAnimation>
+          </RevealAnimation> */}
         </div>
       </div>
     </main>
