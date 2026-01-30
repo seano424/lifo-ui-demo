@@ -7,7 +7,7 @@ import * as React from 'react'
 import { cn } from '@/lib/utils'
 
 const buttonVariants = cva(
-  'rounded-4xl font-sans font-semibold transition-transform duration-75 focus:outline-none disabled:opacity-50 disabled:pointer-events-none overflow-hidden cursor-pointer inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors duration-200 ease-in-out focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0',
+  'rounded-xl font-sans font-semibold transition-transform duration-75 focus:outline-none disabled:opacity-50 disabled:pointer-events-none overflow-hidden cursor-pointer inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors duration-200 ease-in-out focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0',
   {
     variants: {
       variant: {
@@ -46,7 +46,7 @@ const buttonVariants = cva(
       size: {
         sm: 'px-4 py-2 text-sm',
         default: 'px-6 py-3 text-sm',
-        lg: 'px-6 py-4 text-base',
+        lg: 'px-4 sm:px-6 py-3 sm:py-4 sm:text-base text-sm',
         xl: 'px-8 py-4 text-lg',
         icon: 'h-9 w-9',
       },

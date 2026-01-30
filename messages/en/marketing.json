@@ -81,12 +81,15 @@
       "buttons": {
         "freeTrial": "Start free trial",
         "explore": "Explore the platform",
-        "dashboard": "View your dashboard"
+        "dashboard": "View your dashboard",
+        "bookDemo": "Book a demo"
       },
       "badge": {
         "text": "Enjoy a one month free trial",
         "welcomeBack": "Your dashboard is ready",
-        "square": "Works with Square"
+        "square": "Works with Square",
+        "noCreditCard": "No credit card required",
+        "connectSquare": "Connect through Square"
       }
     },
     "features": {
