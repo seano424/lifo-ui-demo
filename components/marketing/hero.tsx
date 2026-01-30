@@ -12,7 +12,7 @@ export function Hero() {
   return (
     <section
       aria-label="Hero section with LIFO introduction"
-      className="flex flex-col sm:gap-6 gap-4 items-center overflow-hidden w-full sm:min-h-screen justify-center py-20 sm:pb-40"
+      className="flex flex-col sm:gap-6 gap-4 items-center overflow-hidden w-full sm:min-h-[calc(100vh-100px)] justify-center"
     >
       {/* <Logo variant="svg" size="xl" /> */}
       {/* <a
