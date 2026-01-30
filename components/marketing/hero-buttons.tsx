@@ -33,7 +33,9 @@ export function HeroButtons() {
           <Button
             variant="outline"
             asLink
-            href="/contact"
+            target="_blank"
+            rel="noopener noreferrer"
+            href="https://calendar.app.google/on8fX3nrWppW7qow7"
             size="lg"
             className="group flex items-center gap-1 capitalize"
           >
