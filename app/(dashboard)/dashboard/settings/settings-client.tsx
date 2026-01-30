@@ -94,7 +94,7 @@ export default function UnifiedSettingsPage() {
     return (
       <div className="flex flex-col gap-6">
         <DashboardInsetHeader title={t('title')} description={t('description')} />
-        <div className="space-y-4">
+        <div className="flex flex-col gap-4">
           <Skeleton className="h-10 w-full" />
           <Skeleton className="h-32 w-full" />
           <Skeleton className="h-32 w-full" />

@@ -230,7 +230,7 @@ export default function ManualDeliveryEntry({
   return (
     <div className={`space-y-6 ${className}`}>
       <div className="space-y-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="space-y-6">
+        <div className="flex flex-col gap-6">
           {/* Product Selection Section */}
           {!selectedProduct ? (
             <ManualBarcodeEntry
@@ -366,7 +366,7 @@ export default function ManualDeliveryEntry({
             <DialogDescription>{t('confirmation.description')}</DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-4">
+          <div className="flex flex-col gap-4">
             <Typography variant="p">
               {t('confirmation.submitText', { count: scannedItems.length })}
             </Typography>

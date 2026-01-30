@@ -172,7 +172,7 @@ export function ProductsListPresentation({
     return (
       <Card className="w-full">
         <CardContent>
-          <div className="space-y-3">
+          <div className="flex flex-col gap-4">
             {[...Array(8)].map((_, i) => (
               <div
                 key={`skeleton-${i + 1}`}
@@ -192,7 +192,7 @@ export function ProductsListPresentation({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col gap-6">
       <Card className="w-full overflow-x-auto">
         <CardContent>
           {products.length === 0 ? (

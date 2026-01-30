@@ -123,8 +123,8 @@ export function ConfirmDetailsStep() {
         <CardHeader>
           <CardTitle>{selectedStoreForm.store_name}</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-3">
+        <CardContent className="flex flex-col gap-4">
+          <div className="flex flex-col gap-4">
             <div>
               <div className="text-sm  text-muted-foreground">{t('fields.type')}</div>
               <div>
@@ -170,7 +170,7 @@ export function ConfirmDetailsStep() {
           {/* Business Check Section */}
           <div className="pt-4 border-t">
             {!hasCheckedBusiness && (
-              <div className="space-y-3">
+              <div className="flex flex-col gap-4">
                 <Typography variant="p" color="muted">
                   {t('businessCheck.verifyPrompt')}
                 </Typography>
@@ -187,12 +187,12 @@ export function ConfirmDetailsStep() {
             )}
 
             {hasCheckedBusiness && businessCheckResult && (
-              <div className="space-y-3">
+              <div className="flex flex-col gap-4">
                 {businessCheckResult.exists ? (
                   <Alert variant="destructive">
                     <AlertTriangle className="h-4 w-4" />
                     <AlertDescription>
-                      <div className="space-y-2">
+                      <div className="flex flex-col gap-2">
                         <p>
                           <strong>{t('businessCheck.alreadyRegistered')}</strong>
                         </p>

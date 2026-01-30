@@ -77,7 +77,7 @@ export default function ScanInProcessPage() {
       readTime={t('readTime')}
       intro={t('intro')}
     >
-      <div className="space-y-6">
+      <div className="flex flex-col gap-6">
         <ContentCard
           title={t('basicSteps.title')}
           icon={ScanLine}

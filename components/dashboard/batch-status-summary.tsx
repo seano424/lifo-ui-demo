@@ -14,10 +14,10 @@ export function BatchStatusSummary() {
   if (isLoading) {
     return (
       <div className="bg-white dark:bg-brand-dark rounded-2xl border p-6">
-        <div className="space-y-4">
+        <div className="flex flex-col gap-4">
           <Skeleton className="h-6 w-48" />
           <Skeleton className="h-8 w-24" />
-          <div className="space-y-3">
+          <div className="flex flex-col gap-4">
             <Skeleton className="h-5 w-full" />
             <Skeleton className="h-5 w-full" />
             <Skeleton className="h-5 w-full" />
@@ -97,7 +97,7 @@ export function BatchStatusSummary() {
 
         {/* Status Breakdown */}
         <div className="p-6">
-          <div className="space-y-3">
+          <div className="flex flex-col gap-4">
             {/* Critical */}
             {criticalCount > 0 && (
               <div className="flex items-center justify-between py-2">
@@ -148,7 +148,7 @@ export function BatchStatusSummary() {
         </div>
         <div className="p-6 flex flex-col gap-4">
           {/* Show Medium and Low priority items in OK section */}
-          <div className="space-y-3">
+          <div className="flex flex-col gap-4">
             {/* Medium */}
             {mediumCount > 0 && (
               <div className="flex items-center justify-between py-2">

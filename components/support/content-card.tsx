@@ -55,14 +55,14 @@ export function ContentCard({
     switch (variant) {
       case 'feature':
         return (
-          <div className="space-y-3">
+          <div className="flex flex-col gap-4">
             {description && (
               <Typography variant="p" className="text-sm text-muted-foreground">
                 {description}
               </Typography>
             )}
             {features.length > 0 && (
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 {features.map(feature => (
                   <div key={feature.title} className="space-y-1 flex gap-2 items-center mt-2">
                     <Typography variant="h4" className="text-sm font-semibold">

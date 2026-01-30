@@ -114,7 +114,7 @@ export function BatchCreationExample() {
         <CardHeader>
           <CardTitle>1. QuantitySelector</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="flex flex-col gap-4">
           <Typography variant="p" color="muted">
             Touch-friendly quantity selector with +/- buttons
           </Typography>
@@ -138,7 +138,7 @@ export function BatchCreationExample() {
         <CardHeader>
           <CardTitle>2. ExpiryPresetButtons</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="flex flex-col gap-4">
           <Typography variant="p" color="muted">
             Preset expiry date buttons with suggested days highlighting
           </Typography>
@@ -173,7 +173,7 @@ export function BatchCreationExample() {
         <CardHeader>
           <CardTitle>3. DraftBatchCard</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="flex flex-col gap-4">
           <Typography variant="p" color="muted">
             Product card with draft batches and quick actions
           </Typography>
@@ -191,7 +191,7 @@ export function BatchCreationExample() {
         <CardHeader>
           <CardTitle>4. BatchSuccessCard</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="flex flex-col gap-4">
           <Typography variant="p" color="muted">
             Success card with checkmark animation and split batch handling
           </Typography>
@@ -227,12 +227,12 @@ export function BatchCreationExample() {
         <CardHeader>
           <CardTitle>Complete Workflow</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="flex flex-col gap-6">
           <Typography variant="p" color="muted">
             Example showing all components working together in a batch creation flow
           </Typography>
 
-          <div className="space-y-4">
+          <div className="flex flex-col gap-4">
             <DraftBatchCard
               product={mockProduct}
               onClick={() => {

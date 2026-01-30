@@ -192,7 +192,7 @@ export function UnifiedSortModal({
         </div>
 
         {/* Current Sort Display */}
-        <div className="space-y-2">
+        <div className="flex flex-col gap-2">
           <Typography variant="h4" color="muted">
             {t('filters.currentSort')}
           </Typography>

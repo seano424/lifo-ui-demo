@@ -39,7 +39,7 @@ export function SquareConnectionCard({ status, isLoading, onConnect }: SquareCon
   if (isLoading) {
     return (
       <Card className="p-6">
-        <div className="space-y-4">
+        <div className="flex flex-col gap-4">
           <div className="flex items-center gap-4">
             <div className="h-10 w-10 animate-pulse rounded bg-gray-200" />
             <div className="flex-1 space-y-4">
@@ -91,7 +91,7 @@ export function SquareConnectionCard({ status, isLoading, onConnect }: SquareCon
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center justify-between">
           <div className="flex items-center gap-2">
             <Image src="/square/square-icon.svg" alt="Square" width={32} height={32} />
-            <div className="space-y-1">
+            <div className="flex flex-col gap-1">
               <div className="flex items-center gap-4 flex-wrap">
                 <Typography variant="h2">Square</Typography>
                 <Badge variant="secondary">{t('connected')}</Badge>
@@ -112,7 +112,7 @@ export function SquareConnectionCard({ status, isLoading, onConnect }: SquareCon
 
         {/* Connected Locations Section */}
         {stores.length > 0 && (
-          <div className="space-y-4">
+          <div className="flex flex-col gap-4">
             <div className="flex items-center gap-1">
               <MapPin className="h-4 w-4 text-muted-foreground" />
               <Typography variant="muted">
@@ -122,7 +122,7 @@ export function SquareConnectionCard({ status, isLoading, onConnect }: SquareCon
               </Typography>
             </div>
 
-            <div className="space-y-4">
+            <div className="flex flex-col gap-4">
               {stores.map(store => {
                 const isCurrentStore = activeStore?.store_id === store.store_id
 

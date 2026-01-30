@@ -133,7 +133,7 @@ export function AlertSensitivityControls({
           </div>
           <CardDescription>{t('description')}</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="flex flex-col gap-6">
           {/* Current Status */}
           <div className="flex items-center justify-between p-3 bg-muted/50 rounded-2xl">
             <div className="flex items-center gap-3">
@@ -162,7 +162,7 @@ export function AlertSensitivityControls({
           </div>
 
           {/* Alert Level Selection */}
-          <div className="space-y-4">
+          <div className="flex flex-col gap-4">
             <Label className="text-sm ">{t('currentPreference')}</Label>
 
             <Select
@@ -232,14 +232,14 @@ export function AlertSensitivityControls({
               <div className="text-sm space-y-3">
                 <p className="">{t('technical.thresholds')}</p>
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1">
+                  <div className="flex flex-col gap-1">
                     <p className="text-xs  text-yellow-700">{t('technical.warningLevel')}</p>
                     <p className="text-lg font-mono">{thresholds.warning.toFixed(2)}</p>
                     <p className="text-xs text-muted-foreground">
                       {Math.round(thresholds.warning * 100)}% {t('technical.compositeScore')}
                     </p>
                   </div>
-                  <div className="space-y-1">
+                  <div className="flex flex-col gap-1">
                     <p className="text-xs  text-destructive">{t('technical.criticalLevel')}</p>
                     <p className="text-lg font-mono">{thresholds.critical.toFixed(2)}</p>
                     <p className="text-xs text-muted-foreground">
@@ -248,7 +248,7 @@ export function AlertSensitivityControls({
                   </div>
                 </div>
                 <Separator />
-                <div className="space-y-1">
+                <div className="flex flex-col gap-1">
                   <p className="text-xs ">{t('technical.howScoringWorks')}</p>
                   <ul className="text-xs text-muted-foreground space-y-1">
                     <li>• {t('technical.expiryScore')}</li>

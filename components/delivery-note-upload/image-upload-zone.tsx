@@ -81,7 +81,7 @@ export function ImageUploadZone({
           disabled={disabled}
         />
 
-        <div className="space-y-4">
+        <div className="flex flex-col gap-4">
           <FileImage className="h-12 w-12 text-primary-400 mx-auto" />
           <div>
             <Typography variant="h3">Upload delivery note image</Typography>

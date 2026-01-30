@@ -19,13 +19,13 @@ export default function PrivacyPage() {
         {/* Content */}
         <div className="rounded-3xl bg-card border-white/20 shadow-lg p-8 space-y-8">
           {/* Section 1 */}
-          <section className="space-y-4">
+          <section className="flex flex-col gap-4">
             <Typography variant="h2">{t('section1.title')}</Typography>
             <Typography variant="p">{t('section1.content')}</Typography>
           </section>
 
           {/* Section 2 */}
-          <section className="space-y-4">
+          <section className="flex flex-col gap-4">
             <Typography variant="h2">{t('section2.title')}</Typography>
             <Typography variant="p">{t('section2.intro')}</Typography>
             <ul className="list-disc list-inside space-y-2 ml-6">
@@ -37,7 +37,7 @@ export default function PrivacyPage() {
           </section>
 
           {/* Section 3 */}
-          <section className="space-y-4">
+          <section className="flex flex-col gap-4">
             <Typography variant="h2">{t('section3.title')}</Typography>
             <Typography variant="p">{t('section3.intro')}</Typography>
             <ul className="list-disc list-inside space-y-2 ml-6">
@@ -49,7 +49,7 @@ export default function PrivacyPage() {
           </section>
 
           {/* Section 4 */}
-          <section className="space-y-4">
+          <section className="flex flex-col gap-4">
             <Typography variant="h2">{t('section4.title')}</Typography>
             <Typography variant="p">{t('section4.legalBasis.title')}</Typography>
             <ul className="list-disc list-inside space-y-2 ml-6">
@@ -61,7 +61,7 @@ export default function PrivacyPage() {
           </section>
 
           {/* Section 5 */}
-          <section className="space-y-4">
+          <section className="flex flex-col gap-4">
             <Typography variant="h2">{t('section5.title')}</Typography>
             <ul className="list-disc list-inside space-y-2 ml-6">
               <li>{t('section5.items.0')}</li>
@@ -71,9 +71,9 @@ export default function PrivacyPage() {
           </section>
 
           {/* Section 6 */}
-          <section className="space-y-4">
+          <section className="flex flex-col gap-4">
             <Typography variant="h2">{t('section6.title')}</Typography>
-            <div className="space-y-4">
+            <div className="flex flex-col gap-4">
               <div>
                 <Typography variant="h3">{t('section6.storage.title')}</Typography>
                 <Typography variant="p">{t('section6.storage.content')}</Typography>
@@ -86,7 +86,7 @@ export default function PrivacyPage() {
           </section>
 
           {/* Section 7 */}
-          <section className="space-y-4">
+          <section className="flex flex-col gap-4">
             <Typography variant="h2">{t('section7.title')}</Typography>
             <Typography variant="p">{t('section7.intro')}</Typography>
             <ul className="list-disc list-inside space-y-2 ml-6">
@@ -106,7 +106,7 @@ export default function PrivacyPage() {
           </section>
 
           {/* Section 8 */}
-          <section className="space-y-4">
+          <section className="flex flex-col gap-4">
             <Typography variant="h2">{t('section8.title')}</Typography>
             <Typography variant="p">{t('section8.intro')}</Typography>
 
@@ -164,7 +164,7 @@ export default function PrivacyPage() {
           </section>
 
           {/* Section 9 */}
-          <section className="space-y-4">
+          <section className="flex flex-col gap-4">
             <Typography variant="h2">{t('section9.title')}</Typography>
             <Typography variant="p">{t('section9.intro')}</Typography>
             <ul className="list-disc list-inside space-y-2 ml-6">
@@ -176,13 +176,13 @@ export default function PrivacyPage() {
           </section>
 
           {/* Section 10 */}
-          <section className="space-y-4">
+          <section className="flex flex-col gap-4">
             <Typography variant="h2">{t('section10.title')}</Typography>
             <Typography variant="p">{t('section10.content')}</Typography>
           </section>
 
           {/* Section 11 */}
-          <section className="space-y-4">
+          <section className="flex flex-col gap-4">
             <Typography variant="h2">{t('section11.title')}</Typography>
             <Typography variant="p">{t('section11.intro')}</Typography>
             <ul className="list-disc list-inside space-y-2 ml-6">
@@ -191,19 +191,19 @@ export default function PrivacyPage() {
           </section>
 
           {/* Section 12 */}
-          <section className="space-y-4">
+          <section className="flex flex-col gap-4">
             <Typography variant="h2">{t('section12.title')}</Typography>
             <Typography variant="p">{t('section12.content')}</Typography>
           </section>
 
           {/* Section 13 */}
-          <section className="space-y-4">
+          <section className="flex flex-col gap-4">
             <Typography variant="h2">{t('section13.title')}</Typography>
             <Typography variant="p">{t('section13.content')}</Typography>
           </section>
 
           {/* Section 14 */}
-          <section className="space-y-4">
+          <section className="flex flex-col gap-4">
             <Typography variant="h2">{t('section14.title')}</Typography>
             <Typography variant="p">{t('section14.intro')}</Typography>
             <div className="space-y-4 ml-4">
@@ -246,13 +246,13 @@ export default function PrivacyPage() {
           </section>
 
           {/* Section 15 */}
-          <section className="space-y-4">
+          <section className="flex flex-col gap-4">
             <Typography variant="h2">{t('section15.title')}</Typography>
             <Typography variant="p">{t('section15.content')}</Typography>
           </section>
 
           {/* Section 16 */}
-          <section className="space-y-4">
+          <section className="flex flex-col gap-4">
             <Typography variant="h2">{t('section16.title')}</Typography>
             <Typography variant="p">{t('section16.intro')}</Typography>
             <Typography variant="p">

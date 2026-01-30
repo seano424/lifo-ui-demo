@@ -19,19 +19,19 @@ export default function TermsPage() {
         {/* Content */}
         <div className="rounded-3xl bg-card border border-white/20 shadow-lg p-8 md:p-12 space-y-8">
           {/* Section 1 */}
-          <section className="space-y-4">
+          <section className="flex flex-col gap-4">
             <Typography variant="h2">{t('section1.title')}</Typography>
             <Typography variant="p">{t('section1.content')}</Typography>
           </section>
 
           {/* Section 2 */}
-          <section className="space-y-4">
+          <section className="flex flex-col gap-4">
             <Typography variant="h2">{t('section2.title')}</Typography>
             <Typography variant="p">{t('section2.content')}</Typography>
           </section>
 
           {/* Section 3 */}
-          <section className="space-y-4">
+          <section className="flex flex-col gap-4">
             <Typography variant="h2">{t('section3.title')}</Typography>
             <Typography variant="p">{t('section3.intro')}</Typography>
             <ul className="list-disc list-inside space-y-2 ml-6">
@@ -44,9 +44,9 @@ export default function TermsPage() {
           </section>
 
           {/* Section 4 */}
-          <section className="space-y-4">
+          <section className="flex flex-col gap-4">
             <Typography variant="h2">{t('section4.title')}</Typography>
-            <div className="space-y-4">
+            <div className="flex flex-col gap-4">
               <div>
                 <Typography variant="h3">{t('section4.whatWeCollect.title')}</Typography>
                 <ul className="list-disc list-inside space-y-2 ml-6">
@@ -81,9 +81,9 @@ export default function TermsPage() {
           </section>
 
           {/* Section 5 */}
-          <section className="space-y-4">
+          <section className="flex flex-col gap-4">
             <Typography variant="h2">{t('section5.title')}</Typography>
-            <div className="space-y-4">
+            <div className="flex flex-col gap-4">
               <div>
                 <Typography variant="h3">{t('section5.yourData.title')}</Typography>
                 <Typography variant="p">{t('section5.yourData.content')}</Typography>
@@ -96,7 +96,7 @@ export default function TermsPage() {
           </section>
 
           {/* Section 6 */}
-          <section className="space-y-4">
+          <section className="flex flex-col gap-4">
             <Typography variant="h2">{t('section6.title')}</Typography>
             <Typography variant="p">{t('section6.intro')}</Typography>
             <ul className="list-disc list-inside space-y-2 ml-6">
@@ -109,7 +109,7 @@ export default function TermsPage() {
           </section>
 
           {/* Section 7 */}
-          <section className="space-y-4">
+          <section className="flex flex-col gap-4">
             <Typography variant="h2">{t('section7.title')}</Typography>
             <Typography variant="p">{t('section7.intro')}</Typography>
             <ul className="list-disc list-inside space-y-2 ml-6">
@@ -128,7 +128,7 @@ export default function TermsPage() {
           </section>
 
           {/* Section 8 */}
-          <section className="space-y-4">
+          <section className="flex flex-col gap-4">
             <Typography variant="h2">{t('section8.title')}</Typography>
             <Typography variant="p">{t('section8.intro')}</Typography>
             <ul className="list-disc list-inside space-y-2 ml-6">
@@ -140,7 +140,7 @@ export default function TermsPage() {
           </section>
 
           {/* Section 9 */}
-          <section className="space-y-4">
+          <section className="flex flex-col gap-4">
             <Typography variant="h2">{t('section9.title')}</Typography>
             <Typography variant="p">{t('section9.intro')}</Typography>
             <ul className="list-disc list-inside space-y-2 ml-6">
@@ -154,19 +154,19 @@ export default function TermsPage() {
           </section>
 
           {/* Section 10 */}
-          <section className="space-y-4">
+          <section className="flex flex-col gap-4">
             <Typography variant="h2">{t('section10.title')}</Typography>
             <Typography variant="p">{t('section10.content')}</Typography>
           </section>
 
           {/* Section 11 */}
-          <section className="space-y-4">
+          <section className="flex flex-col gap-4">
             <Typography variant="h2">{t('section11.title')}</Typography>
             <Typography variant="p">{t('section11.content')}</Typography>
           </section>
 
           {/* Section 12 */}
-          <section className="space-y-4">
+          <section className="flex flex-col gap-4">
             <Typography variant="h2">{t('section12.title')}</Typography>
             <Typography variant="p">{t('section12.intro')}</Typography>
             <ul className="list-disc list-inside space-y-2 ml-6">
@@ -179,7 +179,7 @@ export default function TermsPage() {
           </section>
 
           {/* Section 13 */}
-          <section className="space-y-4">
+          <section className="flex flex-col gap-4">
             <Typography variant="h2">{t('section13.title')}</Typography>
             <Typography variant="p">{t('section13.intro')}</Typography>
             <ul className="list-disc list-inside space-y-2 ml-6">
@@ -193,7 +193,7 @@ export default function TermsPage() {
           </section>
 
           {/* Section 14 */}
-          <section className="space-y-4">
+          <section className="flex flex-col gap-4">
             <Typography variant="h2">{t('section14.title')}</Typography>
             <Typography variant="p">{t('section14.intro')}</Typography>
             <ul className="list-disc list-inside space-y-2 ml-6">
@@ -205,13 +205,13 @@ export default function TermsPage() {
           </section>
 
           {/* Section 15 */}
-          <section className="space-y-4">
+          <section className="flex flex-col gap-4">
             <Typography variant="h2">{t('section15.title')}</Typography>
             <Typography variant="p">{t('section15.content')}</Typography>
           </section>
 
           {/* Section 16 */}
-          <section className="space-y-4">
+          <section className="flex flex-col gap-4">
             <Typography variant="h2">{t('section16.title')}</Typography>
             <Typography variant="p">{t('section16.intro')}</Typography>
             <ul className="list-disc list-inside space-y-2 ml-6">
@@ -222,19 +222,19 @@ export default function TermsPage() {
           </section>
 
           {/* Section 17 */}
-          <section className="space-y-4">
+          <section className="flex flex-col gap-4">
             <Typography variant="h2">{t('section17.title')}</Typography>
             <Typography variant="p">{t('section17.content')}</Typography>
           </section>
 
           {/* Section 18 */}
-          <section className="space-y-4">
+          <section className="flex flex-col gap-4">
             <Typography variant="h2">{t('section18.title')}</Typography>
             <Typography variant="p">{t('section18.content')}</Typography>
           </section>
 
           {/* Section 19 */}
-          <section className="space-y-4">
+          <section className="flex flex-col gap-4">
             <Typography variant="h2">{t('section19.title')}</Typography>
             <Typography variant="p">{t('section19.intro')}</Typography>
             <Typography variant="p">
@@ -244,7 +244,7 @@ export default function TermsPage() {
           </section>
 
           {/* Section 20 */}
-          <section className="space-y-4">
+          <section className="flex flex-col gap-4">
             <Typography variant="h2">{t('section20.title')}</Typography>
             <Typography variant="p">{t('section20.content')}</Typography>
           </section>

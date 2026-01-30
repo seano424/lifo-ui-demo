@@ -85,7 +85,7 @@ export function DeliverySummary({
 
         {/* Items List */}
         <ScrollArea className="max-h-[200px] -mx-4 px-4">
-          <div className="space-y-2">
+          <div className="flex flex-col gap-2">
             {items.map(item => (
               <div
                 key={item.product_id}

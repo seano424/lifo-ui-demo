@@ -301,7 +301,7 @@ export default function ManualBarcodeEntry({
           </div>
         </CardHeader>
 
-        <CardContent className="space-y-4">
+        <CardContent className="flex flex-col gap-4">
           {selectedProduct && (
             <Card>
               <CardContent className="p-4">
@@ -354,9 +354,9 @@ export default function ManualBarcodeEntry({
 
           {!selectedProduct && (
             <>
-              <div className="space-y-4">
+              <div className="flex flex-col gap-4">
                 {/* Barcode Lookup */}
-                <div className="space-y-2">
+                <div className="flex flex-col gap-2">
                   <Label>{t('searchByBarcode')}</Label>
                   <div className="flex flex-col sm:flex-row gap-2">
                     <Input
@@ -405,7 +405,7 @@ export default function ManualBarcodeEntry({
                 </div>
 
                 {/* Product Name Search */}
-                <div className="space-y-2">
+                <div className="flex flex-col gap-2">
                   <Label>
                     {t('searchByProductName')}
                     {mode === 'scan-out' && (
@@ -612,7 +612,7 @@ export default function ManualBarcodeEntry({
               )}
 
               {lookupResult && (
-                <div className="space-y-3">
+                <div className="flex flex-col gap-4">
                   {lookupResult.found ? (
                     <Card>
                       <CardContent className="p-4">
@@ -750,7 +750,7 @@ export default function ManualBarcodeEntry({
                       {t('addProductManually')}
                     </div>
                   </div>
-                  <div className="space-y-3">
+                  <div className="flex flex-col gap-4">
                     <div className="grid grid-cols-1 gap-3">
                       <div>
                         <Label>{tFields('barcode')} *</Label>

@@ -185,7 +185,7 @@ export default function ScanningCamera({
 
           {/* OCR Action Buttons */}
           {isBackendHealthy !== false && (
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               {/* Manual Capture Button (always available as fallback) */}
               <div className="flex gap-2">
                 <Button onClick={handleOCRCapture} className="flex-1" disabled={isOCRProcessing}>
@@ -234,7 +234,7 @@ export default function ScanningCamera({
         <>
           {/* Manual Barcode Entry */}
           {showManualEntry && onManualProductSelected && onCloseManualEntry && (
-            <div className="space-y-4">
+            <div className="flex flex-col gap-4">
               <ManualBarcodeEntry
                 onProductSelected={onManualProductSelected}
                 mode={manualEntryMode}

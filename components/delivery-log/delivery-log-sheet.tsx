@@ -274,7 +274,7 @@ export function DeliveryLogSheet({ open, onOpenChange, onComplete }: DeliveryLog
 
                   {/* Loading State */}
                   {isLoadingRecent && (
-                    <div className="space-y-3">
+                    <div className="flex flex-col gap-4">
                       <Skeleton className="h-20 w-full" />
                       <Skeleton className="h-20 w-full" />
                       <Skeleton className="h-20 w-full" />
@@ -295,7 +295,7 @@ export function DeliveryLogSheet({ open, onOpenChange, onComplete }: DeliveryLog
 
                   {/* Products List */}
                   {!isLoadingRecent && filteredRecentProducts.length > 0 && (
-                    <div className="space-y-3">
+                    <div className="flex flex-col gap-4">
                       {filteredRecentProducts.map(product => (
                         <RecentProductCard
                           key={product.product_id}

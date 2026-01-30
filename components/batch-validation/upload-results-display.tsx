@@ -33,7 +33,7 @@ export function UploadResultsDisplay({ result, onUploadAnother }: UploadResultsD
 
   return (
     <Card className="p-6 bg-primary-50 border-none">
-      <div className="space-y-4">
+      <div className="flex flex-col gap-4">
         <div className="flex items-center gap-2 justify-center">
           <div className="text-center flex items-center gap-2">
             <Check className="w-6 h-6 text-secondary-900 stroke-5 border-2 border-secondary-900 rounded-full p-[3px] bg-primary-100" />

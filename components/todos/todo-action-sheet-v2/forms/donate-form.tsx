@@ -30,9 +30,9 @@ export function DonateForm({ batch, isLoading, onConfirm }: DonateFormProps) {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="flex flex-col gap-4">
       {/* Recipient Selection */}
-      <div className="space-y-2">
+      <div className="flex flex-col gap-2">
         <RecipientSelector
           storeId={activeStoreId || undefined}
           selectedRecipientId={selectedRecipient || undefined}
@@ -42,7 +42,7 @@ export function DonateForm({ batch, isLoading, onConfirm }: DonateFormProps) {
       </div>
 
       {/* Quantity Selector */}
-      <div className="space-y-2">
+      <div className="flex flex-col gap-2">
         <Typography variant="small">Quantity</Typography>
         <div className="flex justify-center">
           <QuantitySelector

@@ -109,7 +109,7 @@ export function StoreInsightsDashboard({ storeId: propStoreId }: StoreInsightsDa
           </Button>
         </div>
       </div>
-      <div className="space-y-6">
+      <div className="flex flex-col gap-6">
         <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-5 text-center sm:text-left">
           <div className="flex flex-col gap-2 border rounded-2xl p-4">
             <Typography variant="h4">{t('metrics.urgentItems')}</Typography>
@@ -164,7 +164,7 @@ export function StoreInsightsDashboard({ storeId: propStoreId }: StoreInsightsDa
               )}
 
               {/* Analytics Summary */}
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <Typography variant="h4" color="primary">
                   {t('overview.recentActivity')}
                 </Typography>

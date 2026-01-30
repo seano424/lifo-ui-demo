@@ -51,7 +51,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
               Something went wrong
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="flex flex-col gap-4">
             <p className="text-muted-foreground">
               An error occurred while loading this component. Please try refreshing the page or
               contact support if the problem persists.

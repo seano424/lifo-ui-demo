@@ -123,7 +123,7 @@ export function TrendIndicator({
       </div>
 
       {showDetails && (
-        <div className="space-y-1">
+        <div className="flex flex-col gap-1">
           <div className="flex items-center justify-between text-xs text-gray-600">
             <span>{t('previous')}</span>
             <span className="">{formatValue(previous)}</span>

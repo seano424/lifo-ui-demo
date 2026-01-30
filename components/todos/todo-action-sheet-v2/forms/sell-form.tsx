@@ -32,9 +32,9 @@ export function SellForm({ batch, currencySymbol, isLoading, onConfirm }: SellFo
   ]
 
   return (
-    <div className="space-y-4">
+    <div className="flex flex-col gap-4">
       {/* Timing Selection */}
-      <div className="space-y-2">
+      <div className="flex flex-col gap-2">
         <Typography variant="small">When was it sold?</Typography>
         <div className="grid grid-cols-2 gap-2">
           {timingOptions.map(option => (
@@ -56,7 +56,7 @@ export function SellForm({ batch, currencySymbol, isLoading, onConfirm }: SellFo
       </div>
 
       {/* Quantity Selector */}
-      <div className="space-y-2">
+      <div className="flex flex-col gap-2">
         <Typography variant="small">Quantity</Typography>
         <div className="flex justify-center">
           <QuantitySelector

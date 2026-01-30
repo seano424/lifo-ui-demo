@@ -143,7 +143,7 @@ export function DeliveryNoteUploadForm({ storeId }: DeliveryNoteUploadFormProps)
         deliveryNoteUpload.items.length > 0 &&
         !deliveryNoteUpload.uploadResult && (
           <Card className="p-6">
-            <div className="space-y-4">
+            <div className="flex flex-col gap-4">
               <BatchValidationTable
                 items={deliveryNoteUpload.items}
                 currentPage={currentPage}

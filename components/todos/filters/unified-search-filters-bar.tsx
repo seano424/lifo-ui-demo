@@ -111,7 +111,7 @@ export function UnifiedSearchFiltersBar({
 
         {/* Active Filters Display */}
         {hasActiveFilters && onRemoveFilter && (
-          <div className="space-y-2">
+          <div className="flex flex-col gap-2">
             <div className="flex items-center justify-center gap-3">
               <Typography variant="h4" color="primary">
                 {t('filters.activeFilters')}

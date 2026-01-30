@@ -49,7 +49,7 @@ export function BatchSuccessCard({
       )}
     >
       <CardContent className="p-6">
-        <div className="space-y-4">
+        <div className="flex flex-col gap-4">
           {/* Success/Error Icon with Animation */}
           <div className="flex items-center justify-center">
             {result.success ? (

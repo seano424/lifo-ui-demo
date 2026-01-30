@@ -166,7 +166,7 @@ function MockAnalytics() {
     <div className="w-full space-y-4">
       <div className="bg-linear-to-br from-white/90 to-white/70 rounded-2xl p-4 sm:p-6 border border-gray-200">
         <Typography variant="h4">{t('performanceAnalytics')}</Typography>
-        <div className="space-y-4">
+        <div className="flex flex-col gap-4">
           <div className="flex justify-between items-center">
             <Typography variant="p">{t('wasteReduced')}</Typography>
             <Typography variant="p">-34%</Typography>
@@ -203,7 +203,7 @@ function MockAI() {
           <Bot size={24} className="text-primary-800" />
           <Typography variant="h4">{t('title')}</Typography>
         </div>
-        <div className="space-y-3">
+        <div className="flex flex-col gap-4">
           <div className="bg-white/70 rounded-xl p-3 border border-primary-100/50">
             <div className="flex flex-col gap-1">
               <Typography variant="p">📦 {t('reorderMilk')}</Typography>

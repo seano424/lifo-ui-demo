@@ -295,7 +295,7 @@ export function UnifiedFiltersModal({
 
         {/* Active Filters Display */}
         {hasActiveFilters && (
-          <div className="space-y-2">
+          <div className="flex flex-col gap-2">
             <Typography variant="h4" color="primary">
               {t('filters.activeFilters')}
             </Typography>

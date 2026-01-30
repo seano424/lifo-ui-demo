@@ -69,7 +69,7 @@ export function BatchValidationTable({
   }
 
   return (
-    <div className="space-y-4">
+    <div className="flex flex-col gap-4">
       <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
         <div className="flex flex-col sm:flex-row items-center gap-2">
           <Typography variant="h3">{t('preview.title')}</Typography>
@@ -264,7 +264,7 @@ export function BatchValidationTable({
           const actualIndex = startIndex + index
           return (
             <div key={actualIndex} className="border border-gray-200 rounded-2xl p-3 bg-white">
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <div className="flex items-center gap-2">
                   <Input
                     value={item.SKU}
@@ -313,7 +313,7 @@ export function BatchValidationTable({
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-2">
-                  <div className="space-y-1">
+                  <div className="flex flex-col gap-1">
                     <label className="text-xs  text-gray-700">{t('preview.table.costPrice')}</label>
                     <Input
                       type="number"
@@ -341,7 +341,7 @@ export function BatchValidationTable({
                       </span>
                     )}
                   </div>
-                  <div className="space-y-1">
+                  <div className="flex flex-col gap-1">
                     <label className="text-xs  text-gray-700">
                       {t('preview.table.sellingPrice')}
                     </label>
@@ -372,7 +372,7 @@ export function BatchValidationTable({
                     )}
                   </div>
                 </div>
-                <div className="space-y-1">
+                <div className="flex flex-col gap-1">
                   <label className="text-xs  text-gray-700">{t('preview.table.expiryDate')}</label>
                   {item.Expiry_Date ? (
                     <Input

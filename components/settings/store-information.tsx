@@ -289,7 +289,7 @@ export default function StoreInformation({
         <CardContent className="space-y-6 pt-4 border-t">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {skeletonCards.map(skeleton => (
-              <div key={skeleton.id} className="space-y-2">
+              <div key={skeleton.id} className="flex flex-col gap-2">
                 <Skeleton className="h-4 w-24" />
                 <Skeleton className="h-10 w-full" />
               </div>
@@ -404,8 +404,8 @@ export default function StoreInformation({
         </CardHeader>
 
         <CardContent className="space-y-6 pt-4 border-t">
-          <form onSubmit={form.handleSubmit(handleSave)} className="space-y-6">
-            <div className="space-y-4">
+          <form onSubmit={form.handleSubmit(handleSave)} className="flex flex-col gap-6">
+            <div className="flex flex-col gap-4">
               <Typography variant="h4">{t('storeInformation.sections.storeDetails')}</Typography>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
@@ -519,7 +519,7 @@ export default function StoreInformation({
               </div>
             </div>
 
-            <div className="space-y-4">
+            <div className="flex flex-col gap-4">
               <Typography variant="h4">
                 {t('storeInformation.sections.addressInformation')}
               </Typography>
@@ -603,7 +603,7 @@ export default function StoreInformation({
               </div>
             </div>
 
-            <div className="space-y-4">
+            <div className="flex flex-col gap-4">
               <Typography variant="h4">
                 {t('storeInformation.sections.contactInformation')}
               </Typography>
@@ -679,7 +679,7 @@ export default function StoreInformation({
               </div>
             </div>
 
-            <div className="space-y-4">
+            <div className="flex flex-col gap-4">
               <Typography variant="h4">
                 {t('storeInformation.sections.storeDescription')}
               </Typography>
@@ -707,7 +707,7 @@ export default function StoreInformation({
             </div>
 
             {permissions.canEditAdvancedSettings && (
-              <div className="space-y-4">
+              <div className="flex flex-col gap-4">
                 <Typography variant="h4" className="font-black">
                   {t('storeInformation.sections.businessSettings')}
                 </Typography>

@@ -82,7 +82,7 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
 
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 font-mono uppercase">
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <Label htmlFor="email">{t('email')}</Label>
               <Input
                 id="email"
@@ -98,7 +98,7 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
               )}
             </div>
 
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <Label htmlFor="password">{t('password')}</Label>
               <Input
                 id="password"
@@ -115,7 +115,7 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
               )}
             </div>
 
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <Label htmlFor="repeatPassword">{t('repeatPassword')}</Label>
               <Input
                 id="repeatPassword"

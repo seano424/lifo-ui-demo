@@ -35,7 +35,7 @@ export function NextStepsGrid({ title, items }: NextStepsGridProps) {
           <Link key={item.title} href={item.linkHref} className="block group">
             <Card className="h-full hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 border-0 bg-card hover:from-primary/5 hover:to-primary/10 cursor-pointer">
               <CardContent className="p-6">
-                <div className="space-y-4">
+                <div className="flex flex-col gap-4">
                   {/* Title with icon */}
                   <div className="flex items-start justify-between">
                     <Typography

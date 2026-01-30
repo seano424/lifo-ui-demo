@@ -35,8 +35,8 @@ export function CtaSection() {
         </Typography>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center max-w-3xl mx-auto">
           {/* Left column - Features */}
-          <div className="space-y-8">
-            <div className="space-y-6">
+          <div className="flex flex-col gap-8">
+            <div className="flex flex-col gap-6">
               <CtaFeature
                 icon={<Zap size={22} strokeWidth={1.5} />}
                 title={t('features.quickSetup.title')}

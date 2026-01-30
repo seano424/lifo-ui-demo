@@ -113,7 +113,7 @@ export function DeliveryWorkflowExample() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="flex flex-col gap-4">
       <Card>
         <CardHeader>
           <CardTitle>Delivery Workflow</CardTitle>
@@ -178,7 +178,7 @@ export function BatchCreationSheetDemo() {
         <CardHeader>
           <CardTitle>Draft Batches Summary</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="flex flex-col gap-4">
           <div className="grid grid-cols-3 gap-4">
             <div className="text-center">
               <Typography variant="h2" color="primary">

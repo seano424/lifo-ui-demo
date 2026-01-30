@@ -156,7 +156,7 @@ export function CompleteDraftBatchDialog({
 
           {/* Expiry date input */}
           {!showOCR ? (
-            <div className="space-y-3">
+            <div className="flex flex-col gap-4">
               <Label htmlFor="expiry-date" className="text-base font-semibold">
                 Expiry Date *
                 {expiryDate && (
@@ -214,7 +214,7 @@ export function CompleteDraftBatchDialog({
               )}
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="flex flex-col gap-4">
               <div className="flex items-center justify-between">
                 <Label className="text-base font-semibold">Scan Expiry Date</Label>
                 <Button

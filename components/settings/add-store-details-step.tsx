@@ -97,7 +97,7 @@ export function AddStoreDetailsStep({ onSubmit, isSubmitting = false }: AddStore
 
       <div>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="flex flex-col gap-4">
             <FormField<StoreFormData>
               control={form.control}
               name="store_name"

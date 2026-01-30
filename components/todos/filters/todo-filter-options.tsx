@@ -146,7 +146,7 @@ export function TodoFilterOptions({
         )}
       </div>
 
-      <div className="space-y-1">
+      <div className="flex flex-col gap-1">
         {/* "All" option for multi-select */}
         {isMultiSelect && (
           <label

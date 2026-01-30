@@ -139,7 +139,7 @@ export default function ScannedItemsList({
         </div>
       </div>
 
-      <div className="space-y-2">
+      <div className="flex flex-col gap-2">
         {items.map(item => (
           <div
             key={item.id}
@@ -203,7 +203,7 @@ export default function ScannedItemsList({
               </DialogDescription>
             </DialogHeader>
 
-            <div className="space-y-4">
+            <div className="flex flex-col gap-4">
               {/* Product Info - Now editable in advanced mode */}
               {!showAdvancedEdit ? (
                 <div className="p-3 bg-gray-50 rounded-2xl">
@@ -281,7 +281,7 @@ export default function ScannedItemsList({
               )}
 
               {/* Quick Edit Form - Always visible */}
-              <div className="space-y-3">
+              <div className="flex flex-col gap-4">
                 <div className="flex items-center justify-between">
                   <Typography variant="h4" color="primary">
                     {showAdvancedEdit

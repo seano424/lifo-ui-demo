@@ -122,7 +122,7 @@ export default function SupportPage() {
       {/* Support Sections */}
       <div className="space-y-12">
         {sections.map(section => (
-          <div key={section.id} className="space-y-4">
+          <div key={section.id} className="flex flex-col gap-4">
             {/* Section Header */}
             <div className="flex items-start gap-3">
               <div className="p-2 bg-primary/10 rounded-lg shrink-0">

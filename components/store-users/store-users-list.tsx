@@ -559,9 +559,9 @@ export function StoreUsersList({ storeId: propStoreId, serverPermissions }: Stor
                 <DialogDescription>{t('dialogs.resetPassword.description')}</DialogDescription>
               </DialogHeader>
 
-              <div className="space-y-4">
+              <div className="flex flex-col gap-4">
                 <div className="p-4 bg-muted rounded-2xl">
-                  <div className="space-y-2">
+                  <div className="flex flex-col gap-2">
                     <div>
                       <strong>{t('dialogs.resetPassword.employee')}:</strong>{' '}
                       {selectedUser.full_name}
@@ -622,9 +622,9 @@ export function StoreUsersList({ storeId: propStoreId, serverPermissions }: Stor
                 <DialogDescription>{t('dialogs.unlockPassword.description')}</DialogDescription>
               </DialogHeader>
 
-              <div className="space-y-4">
+              <div className="flex flex-col gap-4">
                 <div className="p-4 bg-muted rounded-2xl">
-                  <div className="space-y-1">
+                  <div className="flex flex-col gap-1">
                     <div>
                       <strong>{t('dialogs.unlockPassword.employee')}:</strong>{' '}
                       {selectedUser.full_name}

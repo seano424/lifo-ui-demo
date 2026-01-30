@@ -152,7 +152,7 @@ export default function UserAccountInformation() {
         <CardContent className="space-y-6 pt-4 border-t">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {Array.from({ length: 6 }).map((_, i) => (
-              <div key={`skeleton-${i + 1}`} className="space-y-2">
+              <div key={`skeleton-${i + 1}`} className="flex flex-col gap-2">
                 <Skeleton className="h-4 w-24" />
                 <Skeleton className="h-10 w-full" />
               </div>
@@ -189,7 +189,7 @@ export default function UserAccountInformation() {
       </CardHeader>
 
       <CardContent className="space-y-6 pt-4 border-t">
-        <div className="space-y-4">
+        <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <Typography variant="h4">{t('profile.title')}</Typography>
             {!isEditingProfile && (
@@ -206,10 +206,13 @@ export default function UserAccountInformation() {
           </div>
 
           {isEditingProfile ? (
-            <form onSubmit={profileForm.handleSubmit(handleProfileSubmit)} className="space-y-4">
+            <form
+              onSubmit={profileForm.handleSubmit(handleProfileSubmit)}
+              className="flex flex-col gap-4"
+            >
               <div className="space-y-4 p-4 border rounded-2xl">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
+                  <div className="flex flex-col gap-2">
                     <Label htmlFor="full_name">{t('profile.fullName')}</Label>
                     <Input
                       id="full_name"
@@ -223,7 +226,7 @@ export default function UserAccountInformation() {
                     )}
                   </div>
 
-                  <div className="space-y-2">
+                  <div className="flex flex-col gap-2">
                     <Label htmlFor="username">{t('profile.username')}</Label>
                     <Input
                       id="username"
@@ -309,7 +312,7 @@ export default function UserAccountInformation() {
                 </Alert>
               )}
 
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <Label htmlFor="phone">{t('phone.label')}</Label>
                 <Input
                   id="phone"

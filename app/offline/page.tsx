@@ -46,7 +46,7 @@ export default function OfflinePage() {
               : "It looks like you're not connected to the internet. Some features may not be available."}
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
             <Button onClick={handleRetry} disabled={!isOnline} className="w-full">
               <RefreshCw className="w-4 h-4 mr-2" />

@@ -36,7 +36,7 @@ export default function SquareConnectPage() {
     <ErrorBoundary>
       <div className="container max-w-4xl space-y-6 py-6 lg:py-8">
         {/* Header */}
-        <div className="space-y-2">
+        <div className="flex flex-col gap-2">
           <Button
             variant="ghost"
             size="sm"
@@ -68,7 +68,7 @@ export default function SquareConnectPage() {
               <CardTitle>{t('whatYouGet')}</CardTitle>
               <CardDescription>{t('whatYouGetDescription')}</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-3">
+            <CardContent className="flex flex-col gap-4">
               <div className="flex gap-3">
                 <CheckCircle className="h-5 w-5 shrink-0 text-primary" />
                 <div>
@@ -120,7 +120,7 @@ export default function SquareConnectPage() {
         <Card>
           <CardContent className="p-6">
             <div className="flex flex-col items-center space-y-4 text-center">
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <Typography variant="h3">{t('readyToConnect')}</Typography>
                 <Typography variant="p" color="muted">
                   {t('connectDescription')}

@@ -37,7 +37,7 @@ export function DisposeForm({ batch, currencySymbol, isLoading, onConfirm }: Dis
   const finalReason = reason === 'other' ? customReason : reason
 
   return (
-    <div className="space-y-4">
+    <div className="flex flex-col gap-4">
       {/* Reason Selection */}
       <div className="flex flex-col gap-4">
         <Typography variant="small">Reason for disposal</Typography>

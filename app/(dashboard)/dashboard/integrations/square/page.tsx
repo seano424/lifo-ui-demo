@@ -95,7 +95,7 @@ export default function SquareManagementPage() {
     <ErrorBoundary>
       <div className="container max-w-5xl space-y-6 py-6 lg:py-8">
         {/* Header */}
-        <div className="space-y-4">
+        <div className="flex flex-col gap-4">
           <Button
             variant="ghost"
             size="sm"
@@ -131,9 +131,9 @@ export default function SquareManagementPage() {
             <CardTitle>{t('connectionDetails')}</CardTitle>
             <CardDescription>{t('connectionDetailsDescription')}</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="flex flex-col gap-4">
             <div className="grid gap-4 md:grid-cols-2">
-              <div className="space-y-1">
+              <div className="flex flex-col gap-1">
                 <Typography variant="p" color="muted">
                   {t('merchantName')}
                 </Typography>
@@ -141,7 +141,7 @@ export default function SquareManagementPage() {
                   {squareStatus.merchant_name || 'N/A'}
                 </Typography>
               </div>
-              <div className="space-y-1">
+              <div className="flex flex-col gap-1">
                 <Typography variant="p" color="muted">
                   {t('merchantId')}
                 </Typography>
@@ -165,8 +165,8 @@ export default function SquareManagementPage() {
         </Card>
 
         {/* Connected Locations */}
-        <Card className="space-y-4">
-          <CardHeader className="space-y-2">
+        <Card className="flex flex-col gap-4">
+          <CardHeader className="flex flex-col gap-2">
             <div className="flex items-center gap-2">
               <MapPin className="h-5 w-5 text-primary-800" />
               <CardTitle>{t('connectedLocations')}</CardTitle>
@@ -180,7 +180,7 @@ export default function SquareManagementPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
+            <div className="flex flex-col gap-4">
               {squareStatus.stores?.map(store => {
                 const isCurrentStore = activeStore?.store_id === store.store_id
                 const fullStore = userStores.find(us => us.store.store_id === store.store_id)?.store
@@ -322,7 +322,7 @@ export default function SquareManagementPage() {
           <CardHeader>
             <CardTitle>{t('needHelp')}</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-2">
+          <CardContent className="flex flex-col gap-2">
             <Typography variant="p" color="muted">
               {t('helpDescription')}
             </Typography>

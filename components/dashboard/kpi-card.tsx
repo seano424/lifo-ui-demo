@@ -73,9 +73,9 @@ export function KPICard({
           <Skeleton className="h-5 flex-1 rounded-lg" />
         </div>
         <div className="flex-1 flex flex-col justify-between">
-          <div className="space-y-3">
+          <div className="flex flex-col gap-4">
             <Skeleton className="h-8 w-2/3 rounded-lg" />
-            <div className="space-y-1">
+            <div className="flex flex-col gap-1">
               <Skeleton className="h-4 w-full rounded-lg" />
               <Skeleton className="h-4 w-3/4 rounded-lg" />
             </div>
@@ -129,12 +129,12 @@ export function KPICard({
       {/* Main content area */}
       <div className="flex-1 flex flex-col justify-between">
         {/* Value and details */}
-        <div className="space-y-3">
+        <div className="flex flex-col gap-4">
           <Typography variant="h2" color="primary">
             {showTrends && trendData ? formatValue(trendData.current) : formatValue(value)}
           </Typography>
 
-          <div className="space-y-1">
+          <div className="flex flex-col gap-1">
             <Typography variant="p" color="muted">
               {subtitle}
             </Typography>

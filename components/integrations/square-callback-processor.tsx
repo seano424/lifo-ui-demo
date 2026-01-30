@@ -120,7 +120,7 @@ export function SquareCallbackProcessor() {
           </CardDescription>
         </CardHeader>
 
-        <CardContent className="space-y-4">
+        <CardContent className="flex flex-col gap-4">
           {status === 'processing' && (
             <div className="space-y-2 text-sm text-gray-600">
               <div className="flex items-center gap-2">
@@ -147,7 +147,7 @@ export function SquareCallbackProcessor() {
                 </div>
               )}
               {squareStatus.stores && squareStatus.stores.length > 0 && (
-                <div className="space-y-2">
+                <div className="flex flex-col gap-2">
                   <span className="text-gray-600">
                     {squareStatus.stores.length === 1
                       ? t('connectedStore')

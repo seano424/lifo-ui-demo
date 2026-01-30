@@ -301,7 +301,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
           />
 
           {selectedFile ? (
-            <div className="space-y-4">
+            <div className="flex flex-col gap-4">
               <FileCheck className="h-12 w-12 text-primary-800 mx-auto" />
               <div>
                 <Typography variant="h3">{selectedFile.name}</Typography>
@@ -309,7 +309,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
               </div>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="flex flex-col gap-4">
               <Upload className="h-12 w-12 text-gray-400 mx-auto" />
               <div>
                 <Typography variant="h3">{t('dropZone.dropHere')}</Typography>
@@ -326,7 +326,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
       {/* Simple Preview */}
       {!uploadResult && isPreviewReady && csvPreview.length > 0 && (
         <Card className="p-6">
-          <div className="space-y-4">
+          <div className="flex flex-col gap-4">
             <BatchValidationTable
               items={csvPreview}
               currentPage={currentPage}
@@ -374,7 +374,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                   {validationResult.has_validation_errors &&
                     validationResult.warnings &&
                     validationResult.warnings.length > 0 && (
-                      <div className="space-y-3">
+                      <div className="flex flex-col gap-4">
                         {validationResult.warnings.map(
                           (warning: ValidationWarning, idx: number) => (
                             <div

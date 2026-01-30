@@ -565,7 +565,7 @@ export function AddEmployeeDialog({
               onSubmit={
                 flowType === 'invite_existing' ? handleInviteExistingUser : handleCreateNewEmployee
               }
-              className="space-y-4"
+              className="flex flex-col gap-4"
             >
               {/* Email Field - Always shown first */}
               <div>
@@ -598,7 +598,7 @@ export function AddEmployeeDialog({
                 <Alert>
                   <UserCheck className="h-4 w-4" />
                   <AlertDescription>
-                    <div className="space-y-2">
+                    <div className="flex flex-col gap-2">
                       <div className="flex items-center gap-2">
                         <strong>Existing User Found:</strong>
                         <Badge variant="secondary">
@@ -784,7 +784,7 @@ export function AddEmployeeDialog({
                 <Alert>
                   <Key className="h-4 w-4" />
                   <AlertDescription>
-                    <div className="space-y-1">
+                    <div className="flex flex-col gap-1">
                       <div>
                         <strong>{t('preview.username')}</strong>{' '}
                         <code className="bg-muted px-1 rounded">{formData.username}</code>
@@ -904,11 +904,11 @@ export function AddEmployeeDialog({
               </DialogDescription>
             </DialogHeader>
 
-            <div className="space-y-4">
+            <div className="flex flex-col gap-4">
               <Alert>
                 <Mail className="h-4 w-4" />
                 <AlertDescription>
-                  <div className="space-y-2">
+                  <div className="flex flex-col gap-2">
                     <div>
                       <strong>User invited:</strong> {existingUser?.full_name || formData.email}
                     </div>

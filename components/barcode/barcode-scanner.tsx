@@ -335,7 +335,7 @@ export default function BarcodeScanner({
         <Typography variant="p">{displaySubtitle}</Typography>
       </div>
 
-      <div className="space-y-4">
+      <div className="flex flex-col gap-4">
         {/* Error Display */}
         {displayError && (
           <Alert variant="destructive" className="flex flex-col items-center justify-center gap-2">
