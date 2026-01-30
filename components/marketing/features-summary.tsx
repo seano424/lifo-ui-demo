@@ -1,5 +1,5 @@
 'use client'
-import { Bell, Calendar, ChevronRightIcon, Clock, Tablet } from 'lucide-react'
+import { Bell, Calendar, Clock, Tablet } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Typography } from '@/components/ui/typography'
