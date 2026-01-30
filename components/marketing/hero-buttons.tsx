@@ -30,7 +30,13 @@ export function HeroButtons() {
             {t('freeTrial')}
             <ChevronRightIcon className="w-5 h-5 -rotate-45 transition-transform duration-300 ease-in-out group-hover:translate-x-px group-hover:-translate-y-px" />
           </Button>
-          <Button variant="outline" size="lg" className="group flex items-center gap-1 capitalize">
+          <Button
+            variant="outline"
+            asLink
+            href="/contact"
+            size="lg"
+            className="group flex items-center gap-1 capitalize"
+          >
             {/* <Image src="/square/square-icon.svg" alt="Square" width={12} height={12} /> */}
             {t('bookDemo')}
             <ChevronRightIcon className="w-5 h-5 -rotate-45 transition-transform duration-300 ease-in-out group-hover:translate-x-px group-hover:-translate-y-px" />
