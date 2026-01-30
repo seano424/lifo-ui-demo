@@ -13,7 +13,7 @@ interface CtaFeatureProps {
 function CtaFeature({ icon, title, description }: CtaFeatureProps) {
   return (
     <div className="flex gap-4 items-start">
-      <div className="text-primary-800 bg-blue-100/70 p-2.5 rounded-2xl border border-blue-200/50 shadow-sm">
+      <div className="text-primary-900 bg-blue-100/70 p-2.5 rounded-2xl border border-blue-200/50 shadow-sm">
         {icon}
       </div>
       <div className="flex flex-col gap-1">
@@ -32,7 +32,7 @@ export function CtaSection() {
   return (
     <section className="w-full px-4 my-8 relative overflow-hidden mb-20">
       <div className="max-w-7xl mx-auto relative z-10 flex flex-col gap-10">
-        <Typography variant="h2" className="text-center">
+        <Typography variant="h2" color="primary" className="text-center">
           {t('title')}
         </Typography>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center max-w-3xl mx-auto">

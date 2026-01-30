@@ -12,15 +12,9 @@ export function HeroButtons() {
   return (
     <>
       {currentUser && (
-        <Button
-          size="lg"
-          variant={'default'}
-          asLink
-          href="/dashboard"
-          className="flex items-center gap-1 capitalize group font-bold"
-        >
+        <Button size="lg" asLink href="/dashboard" className="capitalize">
           {t('dashboard')}
-          <ChevronRightIcon className="-rotate-45 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-transform duration-300 ease-in-out h-5 w-5 stroke-2" />
+          <ChevronRightIcon className="w-4 h-4" />
         </Button>
       )}
       {!currentUser && (
@@ -28,10 +22,11 @@ export function HeroButtons() {
           asLink
           href="/onboarding/create-account"
           size="lg"
-          className="flex items-center gap-1 capitalize group font-bold"
+          className="font-semibold font-heading flex items-center gap-1 capitalize"
+          variant="black"
         >
           {t('freeTrial')}
-          <ChevronRightIcon className="-rotate-45 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-transform duration-300 ease-in-out h-5 w-5 stroke-2" />
+          <ChevronRightIcon className="w-4 h-4" />
         </Button>
       )}
     </>
