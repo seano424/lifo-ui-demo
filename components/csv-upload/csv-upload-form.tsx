@@ -359,7 +359,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                     ? 'Validation Errors Found'
                     : 'Validation Successful'}
                 </AlertTitle>
-                <AlertDescription className="space-y-3 mt-2">
+                <AlertDescription className="flex flex-col gap-3 mt-2">
                   <Typography
                     variant="p"
                     className={
@@ -379,7 +379,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                           (warning: ValidationWarning, idx: number) => (
                             <div
                               key={`validation-warning-${idx}-${warning.message.slice(0, 20)}`}
-                              className="space-y-2 border-t border-destructive pt-2"
+                              className="flex flex-col gap-2 border-t border-destructive pt-2"
                             >
                               <Typography variant="p">{warning.message}</Typography>
                               {warning.suggestion && (
@@ -393,7 +393,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                                     View affected items ({warning.total_affected} total, showing
                                     first {Math.min(5, warning.affected_items.length)})
                                   </summary>
-                                  <ul className="mt-2 space-y-1 list-disc list-inside text-destructive">
+                                  <ul className="mt-2 flex flex-col gap-1 list-disc list-inside text-destructive">
                                     {warning.affected_items
                                       .slice(0, 5)
                                       .map((item: AffectedItem, i: number) => (

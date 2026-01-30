@@ -284,7 +284,7 @@ export function DetailsTab({ selectedBatch, currencySymbol = '€', onClose }: D
               </div>
             )}
           </div>
-          <div className="bg-white rounded-2xl p-4 space-y-4 dark:bg-brand-dark">
+          <div className="bg-white rounded-2xl p-4 flex flex-col gap-4 dark:bg-brand-dark">
             <div className="flex justify-between items-start">
               <Typography variant="p">{t('details.fields.product')}</Typography>
               <Typography variant="p">
@@ -397,7 +397,7 @@ export function DetailsTab({ selectedBatch, currencySymbol = '€', onClose }: D
         {/* Inventory & Pricing */}
         <div className="flex flex-col gap-4 px-8 py-4 flex-1 justify-center">
           <Typography variant="h4">{t('details.inventoryPricing')}</Typography>
-          <div className="bg-white rounded-2xl p-4 space-y-4 dark:bg-brand-dark">
+          <div className="bg-white rounded-2xl p-4 flex flex-col gap-4 dark:bg-brand-dark">
             <div className="flex justify-between items-center gap-2 w-full">
               <Label className="shrink-0" htmlFor="quantity">
                 {t('details.fields.currentQuantity')}
@@ -518,7 +518,7 @@ export function DetailsTab({ selectedBatch, currencySymbol = '€', onClose }: D
         {/* Action History */}
         <div className="flex flex-col gap-4 px-8 py-4 flex-1 justify-center">
           <Typography variant="h4">{t('details.actionHistory')}</Typography>
-          <div className="bg-white rounded-2xl p-4 space-y-3 dark:bg-brand-dark">
+          <div className="bg-white rounded-2xl p-4 flex flex-col gap-3 dark:bg-brand-dark">
             {selectedBatch.last_action_type ? (
               <>
                 <Typography variant="p" className="flex justify-between capitalize">
@@ -542,7 +542,7 @@ export function DetailsTab({ selectedBatch, currencySymbol = '€', onClose }: D
               </Typography>
             )}
 
-            <div className="border-t pt-3 space-y-2">
+            <div className="border-t pt-3 flex flex-col gap-2">
               <Typography variant="p" className="uppercase">
                 {t('details.totalActions')}
               </Typography>
@@ -580,7 +580,7 @@ export function DetailsTab({ selectedBatch, currencySymbol = '€', onClose }: D
         {selectedBatch.ai_recommendation && (
           <div className="flex flex-col gap-4 px-8 py-4 flex-1 justify-center">
             <Typography variant="h4">{t('details.aiInsights')}</Typography>
-            <div className="bg-white rounded-2xl p-4 space-y-3 dark:bg-brand-dark">
+            <div className="bg-white rounded-2xl p-4 flex flex-col gap-3 dark:bg-brand-dark">
               <div className="flex justify-between capitalize">
                 <span>{t('details.recommendation')}</span>
                 <span>

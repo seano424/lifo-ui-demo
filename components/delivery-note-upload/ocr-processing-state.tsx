@@ -13,7 +13,7 @@ interface OCRProcessingStateProps {
 export function OCRProcessingState({ fileName, fileSize }: OCRProcessingStateProps) {
   return (
     <Card className="p-6">
-      <div className="flex flex-col items-center justify-center space-y-6 py-8">
+      <div className="flex flex-col items-center justify-center flex flex-col gap-6 py-8">
         {/* Animated spinner */}
         <div className="relative">
           <Loader2 className="h-16 w-16 text-primary-800 animate-spin" />
@@ -21,7 +21,7 @@ export function OCRProcessingState({ fileName, fileSize }: OCRProcessingStatePro
         </div>
 
         {/* Processing message */}
-        <div className="text-center space-y-2">
+        <div className="text-center flex flex-col gap-2">
           <Typography variant="h3" className="text-gray-800">
             Processing delivery note...
           </Typography>

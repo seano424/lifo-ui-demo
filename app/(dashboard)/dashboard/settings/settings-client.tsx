@@ -168,7 +168,7 @@ export default function UnifiedSettingsPage() {
 
         {/* Loading state - show skeleton while data loads */}
         {isLoading ? (
-          <div className="mt-6 space-y-4">
+          <div className="mt-6 flex flex-col gap-4">
             <Skeleton className="h-10 w-full" />
             <Skeleton className="h-32 w-full" />
             <Skeleton className="h-32 w-full" />
@@ -176,7 +176,7 @@ export default function UnifiedSettingsPage() {
         ) : (
           <>
             {/* Store Settings Tab */}
-            <TabsContent value="store" className="mt-6 space-y-6">
+            <TabsContent value="store" className="mt-6 flex flex-col gap-6">
               <StoreInformation />
               <AlertSensitivityControls storeId={storeId || undefined} />
             </TabsContent>

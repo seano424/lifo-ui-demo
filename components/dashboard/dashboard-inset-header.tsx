@@ -35,7 +35,7 @@ export default function DashboardInsetHeader({
       )}
     >
       {isLoading ? (
-        <div className="space-y-4 flex-1">
+        <div className="flex flex-col gap-4 flex-1">
           {/* Title skeleton */}
           <Skeleton className="w-[300px] h-9 rounded-lg animate-pulse" />
           {/* Description skeleton */}

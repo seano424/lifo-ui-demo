@@ -60,7 +60,7 @@ export function ExpiringSoonCard({ storeId }: ExpiringSoonCardProps) {
 
       {/* Expiry Counts */}
       <div className="py-6">
-        <div className="space-y-3 px-6">
+        <div className="flex flex-col gap-3 px-6">
           {/* Today */}
           <div className="flex items-center justify-between py-2">
             <Typography variant="p">{t('today')}</Typography>

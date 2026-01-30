@@ -849,7 +849,7 @@ export function AddEmployeeDialog({
               </DialogDescription> */}
             </DialogHeader>
 
-            <div className="space-y-4 text-primary-800 text-center">
+            <div className="flex flex-col gap-4 text-primary-800 text-center">
               {/* Email Status Alert */}
               <Alert>
                 {emailStatus.sending ? (
@@ -927,7 +927,7 @@ export function AddEmployeeDialog({
                 <Typography variant="h4" color="primary">
                   {tc('whatHappensNext')}
                 </Typography>
-                <ul className="text-sm text-blue-800 space-y-1">
+                <ul className="text-sm text-blue-800 flex flex-col gap-1">
                   <li>
                     <Typography variant="p" color="primary">
                       • User receives an email notification about the invitation

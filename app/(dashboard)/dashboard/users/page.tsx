@@ -71,7 +71,7 @@ export default async function UsersPage() {
       {/* This component will handle store switching if user has multiple stores */}
       <StoreUsersPrefetch />
 
-      <div className="space-y-6 container md:py-6 lg:py-8">
+      <div className="flex flex-col gap-6 container md:py-6 lg:py-8">
         <DashboardInsetHeader title="Team Management" />
 
         <StoreUsersList />

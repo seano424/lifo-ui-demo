@@ -116,7 +116,7 @@ export function ConfirmDetailsStep() {
   const canProceed = hasCheckedBusiness && (!businessCheckResult?.exists || false)
 
   return (
-    <div className="mx-auto space-y-6">
+    <div className="mx-auto flex flex-col gap-6">
       <StepHeader title={t('title')} subtitle={t('subtitle')} />
 
       <Card>

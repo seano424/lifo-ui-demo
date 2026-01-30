@@ -96,7 +96,7 @@ export function KPICard({
           className,
         )}
       >
-        <div className="text-center space-y-2">
+        <div className="text-center flex flex-col gap-2">
           <div className="w-12 h-12 rounded-xl bg-destructive/10 flex items-center justify-center mx-auto mb-3">
             <Typography className="text-destructive text-xl">⚠</Typography>
           </div>

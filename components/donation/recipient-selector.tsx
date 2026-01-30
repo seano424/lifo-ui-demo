@@ -229,7 +229,7 @@ export function RecipientSelector({
       </div>
 
       {/* Custom Entry - Creates Permanent DB Recipient */}
-      <div className="mt-4 space-y-2">
+      <div className="mt-4 flex flex-col gap-2">
         {!showCustomInput ? (
           <Button
             variant="outline"
@@ -241,7 +241,7 @@ export function RecipientSelector({
             {t('addCustomRecipient') || 'Add New Recipient'}
           </Button>
         ) : (
-          <div className="space-y-3 p-4">
+          <div className="flex flex-col gap-3 p-4">
             <Typography variant="small">
               {t('newRecipientDetails') || 'New Recipient Details'}
             </Typography>

@@ -149,7 +149,7 @@ export default function UserAccountInformation() {
             </div>
           </div>
         </CardHeader>
-        <CardContent className="space-y-6 pt-4 border-t">
+        <CardContent className="flex flex-col gap-6 pt-4 border-t">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {Array.from({ length: 6 }).map((_, i) => (
               <div key={`skeleton-${i + 1}`} className="flex flex-col gap-2">
@@ -188,7 +188,7 @@ export default function UserAccountInformation() {
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-6 pt-4 border-t">
+      <CardContent className="flex flex-col gap-6 pt-4 border-t">
         <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <Typography variant="h4">{t('profile.title')}</Typography>
@@ -210,7 +210,7 @@ export default function UserAccountInformation() {
               onSubmit={profileForm.handleSubmit(handleProfileSubmit)}
               className="flex flex-col gap-4"
             >
-              <div className="space-y-4 p-4 border rounded-2xl">
+              <div className="flex flex-col gap-4 p-4 border rounded-2xl">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="flex flex-col gap-2">
                     <Label htmlFor="full_name">{t('profile.fullName')}</Label>
@@ -287,7 +287,7 @@ export default function UserAccountInformation() {
           )}
         </div>
 
-        <div className="space-y-4 pt-4 border-t">
+        <div className="flex flex-col gap-4 pt-4 border-t">
           <div className="flex items-center justify-between">
             <Typography variant="h4">{t('phone.title')}</Typography>
             {!isEditingPhone && (
@@ -304,7 +304,7 @@ export default function UserAccountInformation() {
           </div>
 
           {isEditingPhone ? (
-            <div className="space-y-4 p-4 border rounded-2xl">
+            <div className="flex flex-col gap-4 p-4 border rounded-2xl">
               {phoneError && (
                 <Alert variant="destructive">
                   <AlertCircle className="h-4 w-4" />
@@ -360,7 +360,7 @@ export default function UserAccountInformation() {
           )}
         </div>
 
-        <div className="space-y-4 pt-4 border-t">
+        <div className="flex flex-col gap-4 pt-4 border-t">
           <Typography variant="h4">{t('language.title')}</Typography>
 
           <div className="flex items-center justify-between mt-2">
@@ -374,7 +374,7 @@ export default function UserAccountInformation() {
           </div>
         </div>
 
-        <div className="space-y-4 pt-4 border-t">
+        <div className="flex flex-col gap-4 pt-4 border-t">
           <Typography variant="h4">{t('status.title')}</Typography>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2">
@@ -422,7 +422,7 @@ export default function UserAccountInformation() {
           </div>
         </div>
 
-        <div className="space-y-4 pt-4 border-t">
+        <div className="flex flex-col gap-4 pt-4 border-t">
           <Typography variant="h4">{t('activity.title')}</Typography>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

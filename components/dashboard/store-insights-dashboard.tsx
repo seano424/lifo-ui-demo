@@ -150,7 +150,7 @@ export function StoreInsightsDashboard({ storeId: propStoreId }: StoreInsightsDa
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4 text-center sm:text-left">
+            <div className="flex flex-col gap-4 text-center sm:text-left">
               {false && (
                 <Alert>
                   <AlertTriangle className="h-4 w-4" />
@@ -212,7 +212,7 @@ export function StoreInsightsDashboard({ storeId: propStoreId }: StoreInsightsDa
               <CardDescription>Real-time logs from the latest scoring operation</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-1 font-mono text-sm bg-muted p-4 rounded-lg max-h-60 overflow-y-auto">
+              <div className="flex flex-col gap-1 font-mono text-sm bg-muted p-4 rounded-lg max-h-60 overflow-y-auto">
                 {scoringLogs.map((log, index) => (
                   <div key={`log-${index}-${log.slice(0, 10)}`} className="text-foreground">
                     {log}

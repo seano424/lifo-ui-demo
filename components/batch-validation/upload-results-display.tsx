@@ -42,7 +42,7 @@ export function UploadResultsDisplay({ result, onUploadAnother }: UploadResultsD
         </div>
 
         {/* Success Summary */}
-        <div className="text-center p-3 bg-white rounded-2xl space-y-2">
+        <div className="text-center p-3 bg-white rounded-2xl flex flex-col gap-2">
           <Typography variant="p" color="primary">
             {(result.processed || 0) > 0
               ? t('results.successSummary', {
@@ -97,7 +97,7 @@ export function UploadResultsDisplay({ result, onUploadAnother }: UploadResultsD
             <Typography variant="h4" className="text-destructive mb-2">
               Errors Encountered
             </Typography>
-            <div className="space-y-2 max-h-40 overflow-y-auto">
+            <div className="flex flex-col gap-2 max-h-40 overflow-y-auto">
               {result.errors.map((error, index) => {
                 const errorKey =
                   typeof error === 'string' ? `error-${index}` : `error-row-${error.row}`

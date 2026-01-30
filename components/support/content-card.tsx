@@ -64,7 +64,10 @@ export function ContentCard({
             {features.length > 0 && (
               <div className="flex flex-col gap-2">
                 {features.map(feature => (
-                  <div key={feature.title} className="space-y-1 flex gap-2 items-center mt-2">
+                  <div
+                    key={feature.title}
+                    className="flex flex-col gap-1 flex gap-2 items-center mt-2"
+                  >
                     <Typography variant="h4" className="text-sm font-semibold">
                       {feature.title}
                     </Typography>
@@ -80,7 +83,7 @@ export function ContentCard({
 
       case 'steps':
         return (
-          <div className="space-y-3 text-sm">
+          <div className="flex flex-col gap-3 text-sm">
             {steps.map(step => (
               <div key={step.number}>
                 <strong>Step {step.number}:</strong> {step.description}
@@ -91,7 +94,7 @@ export function ContentCard({
 
       case 'troubleshooting':
         return (
-          <div className="space-y-3 text-sm">
+          <div className="flex flex-col gap-3 text-sm">
             {troubleshootingItems.map(item => (
               <div key={item.problem}>
                 <strong>{item.problem}:</strong> {item.solution}
@@ -102,7 +105,7 @@ export function ContentCard({
 
       case 'checklist':
         return (
-          <div className="space-y-2 text-sm">
+          <div className="flex flex-col gap-2 text-sm">
             {checklistItems.map(item => (
               <div key={item.text} className="flex items-center gap-2">
                 <div
@@ -116,7 +119,7 @@ export function ContentCard({
 
       case 'simple':
         return (
-          <div className="flex flex-col space-y-2 text-sm">
+          <div className="flex flex-col flex flex-col gap-2 text-sm">
             {description && (
               <Typography variant="p" className="text-sm text-muted-foreground mb-3">
                 {description}

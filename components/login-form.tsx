@@ -43,18 +43,18 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
       <BackToHomeButton className="flex justify-start" />
 
       <Card>
-        <CardHeader className="text-center space-y-4 mb-4">
+        <CardHeader className="text-center flex flex-col gap-4 mb-4">
           <div className="mx-auto w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center">
             <Building2 className="w-6 h-6 text-primary" />
           </div>
-          <div className="space-y-1.5 flex flex-col">
+          <div className="flex flex-col gap-1.5 flex flex-col">
             <CardTitle>{t('welcomeTitle')}</CardTitle>
             <CardDescription>{t('description')}</CardDescription>
           </div>
         </CardHeader>
 
         <CardContent>
-          <form action={formAction} className="space-y-4 font-mono uppercase">
+          <form action={formAction} className="flex flex-col gap-4 font-mono uppercase">
             <div className="flex flex-col gap-2">
               <Label htmlFor="identifier">{t('usernameOrEmail')}</Label>
               <Input

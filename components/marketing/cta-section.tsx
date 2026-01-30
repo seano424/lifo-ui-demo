@@ -64,13 +64,13 @@ export function CtaSection() {
           </div>
 
           {/* Right column - CTA card */}
-          <div className="flex flex-col rounded-2xl bg-card border shadow-xl p-8 mb-8 space-y-6">
+          <div className="flex flex-col rounded-2xl bg-card border shadow-xl p-8 mb-8 flex flex-col gap-6">
             <div className="flex flex-col gap-1">
               <Typography variant="h3">{t('card.title')}</Typography>
               <Typography variant="p">{t('card.description')}</Typography>
             </div>
 
-            <div className="space-y-3 py-4">
+            <div className="flex flex-col gap-3 py-4">
               <div className="flex items-center gap-2">
                 <div className="text-secondary-600">
                   <Check size={20} />

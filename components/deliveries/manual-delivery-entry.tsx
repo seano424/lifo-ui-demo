@@ -228,8 +228,8 @@ export default function ManualDeliveryEntry({
     inventoryData.price > 0
 
   return (
-    <div className={`space-y-6 ${className}`}>
-      <div className="space-y-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div className={`flex flex-col gap-6 ${className}`}>
+      <div className="flex flex-col gap-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="flex flex-col gap-6">
           {/* Product Selection Section */}
           {!selectedProduct ? (
@@ -247,7 +247,7 @@ export default function ManualDeliveryEntry({
                       <Package className="w-5 h-5 text-primary-800" />
                       <Typography variant="h3">{t('selectedProduct.title')}</Typography>
                     </div>
-                    <div className="space-y-1 text-sm flex flex-col">
+                    <div className="flex flex-col gap-1 text-sm flex flex-col">
                       <Typography variant="p">
                         <span>{t('selectedProduct.fields.name')}</span>{' '}
                         {selectedProduct.productName}
@@ -371,7 +371,7 @@ export default function ManualDeliveryEntry({
               {t('confirmation.submitText', { count: scannedItems.length })}
             </Typography>
 
-            <div className="max-h-60 overflow-y-auto space-y-2 border rounded-2xl p-3 bg-gray-50">
+            <div className="max-h-60 overflow-y-auto flex flex-col gap-2 border rounded-2xl p-3 bg-gray-50">
               {scannedItems.map(item => {
                 const totalValue = item.quantity * item.price
                 return (

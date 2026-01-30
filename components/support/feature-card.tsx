@@ -27,7 +27,7 @@ export function FeatureCard({ icon: Icon, title, description, features }: Featur
         <Typography variant="p" color="muted">
           {description}
         </Typography>
-        <ul className="space-y-2 text-sm mt-2">
+        <ul className="flex flex-col gap-2 text-sm mt-2">
           {features.map(feature => (
             <li key={feature.title} className="flex items-start gap-2">
               <div className="w-1.5 h-1.5 bg-primary rounded-full mt-2 shrink-0"></div>

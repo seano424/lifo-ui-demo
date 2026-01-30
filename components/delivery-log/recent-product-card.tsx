@@ -103,7 +103,7 @@ export function RecentProductCard({
           </div>
 
           {/* Product Info */}
-          <div className="flex-1 min-w-0 space-y-1">
+          <div className="flex-1 min-w-0 flex flex-col gap-1">
             <div className="flex items-start justify-between gap-2">
               <div className="flex-1 min-w-0">
                 <Typography variant="p">{product.product_name}</Typography>

@@ -19,7 +19,7 @@ export default function DeliveriesPage() {
   const { isDesktop } = useMediaQuery()
 
   return (
-    <div className="space-y-6 container md:py-6 lg:py-8">
+    <div className="flex flex-col gap-6 container md:py-6 lg:py-8">
       <DashboardInsetHeader title={t('title')} description={t('addBatchDescription')} />
       {/* Mobile Tabs */}
       {!isDesktop && (

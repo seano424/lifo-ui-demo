@@ -77,7 +77,7 @@ export default function SquareManagementPage() {
 
   if (isLoadingStatus) {
     return (
-      <div className="container max-w-5xl space-y-6 py-6 lg:py-8">
+      <div className="container max-w-5xl flex flex-col gap-6 py-6 lg:py-8">
         <Skeleton className="h-32 w-full" />
         <div className="grid gap-6 md:grid-cols-2">
           <Skeleton className="h-64 w-full" />
@@ -93,7 +93,7 @@ export default function SquareManagementPage() {
 
   return (
     <ErrorBoundary>
-      <div className="container max-w-5xl space-y-6 py-6 lg:py-8">
+      <div className="container max-w-5xl flex flex-col gap-6 py-6 lg:py-8">
         {/* Header */}
         <div className="flex flex-col gap-4">
           <Button
@@ -197,7 +197,7 @@ export default function SquareManagementPage() {
                     className={`rounded-3xl border p-4 ${isCurrentStore ? 'border border-primary-50' : 'border-white'}`}
                   >
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                      <div className="space-y-2 flex-1">
+                      <div className="flex flex-col gap-2 flex-1">
                         <div className="flex items-center gap-2 flex-wrap">
                           <Typography variant="p">{store.store_name}</Typography>
                           <Badge
@@ -326,7 +326,7 @@ export default function SquareManagementPage() {
             <Typography variant="p" color="muted">
               {t('helpDescription')}
             </Typography>
-            <ul className="list-disc space-y-1 pl-4">
+            <ul className="list-disc flex flex-col gap-1 pl-4">
               <li>{t('helpPoint1')}</li>
               <li>{t('helpPoint2')}</li>
               <li>{t('helpPoint3')}</li>

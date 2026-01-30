@@ -286,7 +286,7 @@ export default function StoreInformation({
             <Skeleton className="h-9 w-24" />
           </div>
         </CardHeader>
-        <CardContent className="space-y-6 pt-4 border-t">
+        <CardContent className="flex flex-col gap-6 pt-4 border-t">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {skeletonCards.map(skeleton => (
               <div key={skeleton.id} className="flex flex-col gap-2">
@@ -403,7 +403,7 @@ export default function StoreInformation({
           </div>
         </CardHeader>
 
-        <CardContent className="space-y-6 pt-4 border-t">
+        <CardContent className="flex flex-col gap-6 pt-4 border-t">
           <form onSubmit={form.handleSubmit(handleSave)} className="flex flex-col gap-6">
             <div className="flex flex-col gap-4">
               <Typography variant="h4">{t('storeInformation.sections.storeDetails')}</Typography>

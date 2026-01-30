@@ -42,7 +42,7 @@ export function SquareConnectionCard({ status, isLoading, onConnect }: SquareCon
         <div className="flex flex-col gap-4">
           <div className="flex items-center gap-4">
             <div className="h-10 w-10 animate-pulse rounded bg-gray-200" />
-            <div className="flex-1 space-y-4">
+            <div className="flex-1 flex flex-col gap-4">
               <div className="h-4 w-1/3 animate-pulse rounded bg-gray-200" />
               <div className="h-3 w-2/3 animate-pulse rounded bg-gray-200" />
             </div>
@@ -134,7 +134,7 @@ export function SquareConnectionCard({ status, isLoading, onConnect }: SquareCon
                     }`}
                   >
                     <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                      <div className="space-y-4 flex-1">
+                      <div className="flex flex-col gap-4 flex-1">
                         <div className="flex items-center gap-2 flex-wrap">
                           <Typography variant="p" className="text-sm ">
                             {store.store_name}

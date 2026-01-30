@@ -94,7 +94,7 @@ export function ExpiredItemsSummary() {
               <Typography variant="p" className=" text-gray-900 dark:text-brand-white mb-3">
                 {t('actionsNeeded')}:
               </Typography>
-              <div className="space-y-2 text-sm text-gray-600 dark:text-brand-white">
+              <div className="flex flex-col gap-2 text-sm text-gray-600 dark:text-brand-white">
                 <div className="flex items-center gap-2">
                   <div className="h-1 w-1 bg-gray-400 rounded-full" />
                   <Typography variant="small">{t('reviewDiscounts')}</Typography>

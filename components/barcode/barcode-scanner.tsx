@@ -357,7 +357,7 @@ export default function BarcodeScanner({
           {/* Camera Permission Request */}
           {(hasPermission === false || hasPermission === null) && (
             <div className="absolute inset-0 flex items-center justify-center bg-gray-50 rounded-2xl">
-              <div className="text-center space-y-4">
+              <div className="text-center flex flex-col gap-4">
                 <Alert className="border-none bg-transparent shadow-none">
                   <Camera className="h-4 w-4" />
                   <AlertDescription>{displayPermissionMessage}</AlertDescription>

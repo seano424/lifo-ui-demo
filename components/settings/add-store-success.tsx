@@ -75,8 +75,8 @@ export function AddStoreSuccess({ storeName, storeId, onSuccess }: AddStoreSucce
   }
 
   return (
-    <div className="max-w-md mx-auto space-y-6">
-      <div className="text-center space-y-4 flex flex-col items-center justify-center">
+    <div className="max-w-md mx-auto flex flex-col gap-6">
+      <div className="text-center flex flex-col gap-4 flex flex-col items-center justify-center">
         <Check className="w-10 h-10 stroke-2 rounded-full p-2 bg-primary-900 text-white" />
         <Typography variant="h1">{t('title')}</Typography>
         <Typography variant="p" color="muted">
@@ -94,7 +94,7 @@ export function AddStoreSuccess({ storeName, storeId, onSuccess }: AddStoreSucce
               <div className="w-6 h-6 bg-primary/10 rounded-full flex items-center justify-center shrink-0 mt-0.5">
                 <span className="text-xs  text-primary">1</span>
               </div>
-              <div className="space-y-1 flex flex-col">
+              <div className="flex flex-col gap-1 flex flex-col">
                 <Typography variant="small" className="">
                   {t('whatsNext.steps.configure.title')}
                 </Typography>
@@ -108,7 +108,7 @@ export function AddStoreSuccess({ storeName, storeId, onSuccess }: AddStoreSucce
               <div className="w-6 h-6 bg-primary/10 rounded-full flex items-center justify-center shrink-0 mt-0.5">
                 <span className="text-xs  text-primary">2</span>
               </div>
-              <div className="space-y-1 flex flex-col">
+              <div className="flex flex-col gap-1 flex flex-col">
                 <Typography variant="small" className="">
                   {t('whatsNext.steps.inventory.title')}
                 </Typography>
@@ -122,7 +122,7 @@ export function AddStoreSuccess({ storeName, storeId, onSuccess }: AddStoreSucce
               <div className="w-6 h-6 bg-primary/10 rounded-full flex items-center justify-center shrink-0 mt-0.5">
                 <span className="text-xs  text-primary">3</span>
               </div>
-              <div className="space-y-1 flex flex-col">
+              <div className="flex flex-col gap-1 flex flex-col">
                 <Typography variant="small" className="">
                   {t('whatsNext.steps.team.title')}
                 </Typography>

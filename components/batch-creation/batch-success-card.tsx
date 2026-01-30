@@ -101,7 +101,7 @@ export function BatchSuccessCard({
 
           {/* Action Buttons */}
           {result.success && (onAddAnother || onSkip) && (
-            <div className="pt-2 space-y-2">
+            <div className="pt-2 flex flex-col gap-2">
               {/* Add Another Button - Primary action */}
               {onAddAnother && (
                 <Button

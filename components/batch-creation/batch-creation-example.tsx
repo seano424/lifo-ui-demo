@@ -96,7 +96,7 @@ export function BatchCreationExample() {
   const [successResult, setSuccessResult] = useState<ActivateDraftBatchResult | null>(null)
 
   return (
-    <div className="container max-w-2xl mx-auto py-8 px-4 space-y-8">
+    <div className="container max-w-2xl mx-auto py-8 px-4 flex flex-col gap-8">
       {/* Header */}
       <div>
         <Typography variant="h1" color="primary">

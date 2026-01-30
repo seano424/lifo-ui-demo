@@ -24,6 +24,7 @@ import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { AuthButton } from '../auth-button'
 import { EnvVarWarning } from '../env-var-warning'
+import { Typography } from '../ui/typography'
 
 interface MenuItem {
   title: string
@@ -47,66 +48,66 @@ const MarketingNav = ({ menu }: MarketingNavProps) => {
   const t = useTranslations('marketing.nav')
 
   const defaultMenu = [
-    // {
-    //   title: t('product'),
-    //   url: '#',
-    //   items: [
-    //     {
-    //       title: t('blog'),
-    //       description: t('blogDesc'),
-    //       icon: <Book className="size-5 shrink-0" />,
-    //       url: '#',
-    //     },
-    //     {
-    //       title: t('company'),
-    //       description: t('companyDesc'),
-    //       icon: <Trees className="size-5 shrink-0" />,
-    //       url: '#',
-    //     },
-    //     {
-    //       title: t('careers'),
-    //       description: t('careersDesc'),
-    //       icon: <Sunset className="size-5 shrink-0" />,
-    //       url: '#',
-    //     },
-    //     {
-    //       title: t('support'),
-    //       description: t('supportDesc'),
-    //       icon: <Zap className="size-5 shrink-0" />,
-    //       url: '#',
-    //     },
-    //   ],
-    // },
-    // {
-    //   title: t('resources'),
-    //   url: '#',
-    //   items: [
-    //     {
-    //       title: t('contactUs'),
-    //       description: t('contactUsDesc'),
-    //       icon: <Sunset className="size-5 shrink-0" />,
-    //       url: '/contact',
-    //     },
-    //     {
-    //       title: t('helpCenter'),
-    //       description: t('helpCenterDesc'),
-    //       icon: <Zap className="size-5 shrink-0" />,
-    //       url: '#',
-    //     },
-    //     {
-    //       title: t('status'),
-    //       description: t('statusDesc'),
-    //       icon: <Trees className="size-5 shrink-0" />,
-    //       url: '#',
-    //     },
-    //     {
-    //       title: t('terms'),
-    //       description: t('termsDesc'),
-    //       icon: <Book className="size-5 shrink-0" />,
-    //       url: '#',
-    //     },
-    //   ],
-    // },
+    {
+      title: t('product'),
+      url: '#',
+      items: [
+        {
+          title: t('blog'),
+          description: t('blogDesc'),
+          // icon: <Book className="size-5 shrink-0" />,
+          url: '#',
+        },
+        {
+          title: t('company'),
+          description: t('companyDesc'),
+          // icon: <Trees className="size-5 shrink-0" />,
+          url: '#',
+        },
+        {
+          title: t('careers'),
+          description: t('careersDesc'),
+          // icon: <Sunset className="size-5 shrink-0" />,
+          url: '#',
+        },
+        {
+          title: t('support'),
+          description: t('supportDesc'),
+          // icon: <Zap className="size-5 shrink-0" />,
+          url: '#',
+        },
+      ],
+    },
+    {
+      title: t('resources'),
+      url: '#',
+      items: [
+        {
+          title: t('contactUs'),
+          description: t('contactUsDesc'),
+          // icon: <Sunset className="size-5 shrink-0" />,
+          url: '/contact',
+        },
+        {
+          title: t('helpCenter'),
+          description: t('helpCenterDesc'),
+          // icon: <Zap className="size-5 shrink-0" />,
+          url: '#',
+        },
+        {
+          title: t('status'),
+          description: t('statusDesc'),
+          // icon: <Trees className="size-5 shrink-0" />,
+          url: '#',
+        },
+        {
+          title: t('terms'),
+          description: t('termsDesc'),
+          // icon: <Book className="size-5 shrink-0" />,
+          url: '#',
+        },
+      ],
+    },
     {
       title: t('features'),
       url: '/features',
@@ -128,7 +129,7 @@ const MarketingNav = ({ menu }: MarketingNavProps) => {
   const menuItems = menu || defaultMenu
   return (
     <section>
-      <nav className="hidden justify-between lg:flex container mx-auto">
+      <nav className="hidden justify-between lg:flex mx-auto px-4 max-w-7xl">
         <div className="flex items-center gap-8">
           {/* <NavbarLogo variant="text" href="/" /> */}
 
@@ -172,7 +173,9 @@ const MarketingNav = ({ menu }: MarketingNavProps) => {
                 <div className="flex flex-col gap-3">
                   <AuthButton isMobile />
                   <div className="flex items-center justify-between mt-4 pt-4 border-t">
-                    <span className="text-sm text-muted-foreground">{t('language')}</span>
+                    <Typography variant="p" color="muted">
+                      {t('language')}
+                    </Typography>
                     <CompactLanguageSwitcher />
                   </div>
                 </div>
@@ -189,7 +192,7 @@ const renderMenuItem = (item: MenuItem) => {
   if (item.items) {
     return (
       <NavigationMenuItem key={item.title}>
-        <NavigationMenuTrigger className="rounded-2xl tracking-wide  font-heading text-sm">
+        <NavigationMenuTrigger className="rounded-2xl tracking-wide font-heading text-base">
           {item.title}
         </NavigationMenuTrigger>
         <NavigationMenuContent className="bg-popover text-popover-foreground w-full min-w-80">
@@ -207,7 +210,7 @@ const renderMenuItem = (item: MenuItem) => {
     <NavigationMenuItem key={item.title}>
       <NavigationMenuLink
         href={item.url}
-        className="group inline-flex h-10 w-max items-center justify-center bg-background px-4 py-2 transition-colors hover:bg-brand-primary/10 hover:text-brand-primary dark:hover:bg-brand-secondary/10 dark:hover:text-white rounded-2xl tracking-wide  font-heading text-base"
+        className="group inline-flex h-10 w-max items-center justify-center bg-background px-4 py-2 transition-colors hover:bg-primary-100/20 hover:text-brand-primary  rounded-2xl tracking-wide font-heading text-base"
       >
         {item.title}
       </NavigationMenuLink>
@@ -232,7 +235,7 @@ const renderMobileMenuItem = (item: MenuItem) => {
   }
 
   return (
-    <Link key={item.title} href={item.url} className="text-md font-semibold">
+    <Link key={item.title} href={item.url}>
       {item.title}
     </Link>
   )

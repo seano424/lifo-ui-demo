@@ -22,7 +22,7 @@ export default function IntegrationsPage() {
   }
 
   return (
-    <div className="space-y-6 container py-6 lg:py-8">
+    <div className="flex flex-col gap-6 container py-6 lg:py-8">
       <DashboardInsetHeader page="integrations" />
 
       <div className="flex flex-col gap-4">

@@ -77,7 +77,7 @@ export function DraftBatchesList({ className, onSelectBatch }: DraftBatchesListP
   }
 
   return (
-    <div className={cn('space-y-4', className)}>
+    <div className={cn('flex flex-col gap-4', className)}>
       {/* Alert with count */}
       <Alert className="bg-linear-to-r from-amber-50 to-orange-50 dark:from-amber-950 dark:to-orange-950 border-amber-200 dark:border-amber-800">
         <AlertCircle className="h-5 w-5 text-amber-600 dark:text-amber-400" />

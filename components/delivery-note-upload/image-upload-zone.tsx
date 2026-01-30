@@ -87,7 +87,7 @@ export function ImageUploadZone({
             <Typography variant="h3">Upload delivery note image</Typography>
             <Typography variant="muted">Drag and drop or click to select an image</Typography>
           </div>
-          <div className="text-xs text-gray-500 space-y-1">
+          <div className="text-xs text-gray-500 flex flex-col gap-1">
             <Typography variant="muted">
               Supported formats: {OCR_CONFIG.supportedExtensions.join(', ')}
             </Typography>

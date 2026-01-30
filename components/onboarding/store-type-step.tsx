@@ -85,7 +85,7 @@ export function StoreTypeStep() {
   }
 
   return (
-    <div className="mx-auto space-y-4">
+    <div className="mx-auto flex flex-col gap-4">
       <StepHeader
         title={isManualEntry ? t('addStoreDetailsTitle') : t('completeStoreInformationTitle')}
       />
