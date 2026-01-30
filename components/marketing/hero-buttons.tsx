@@ -23,8 +23,8 @@ export function HeroButtons() {
           <Button
             asLink
             href="/auth/sign-up"
-            size="lg"
-            className="font-semibold font-heading flex items-center gap-1 capitalize group"
+            size="md"
+            className="font-mono flex items-center gap-1 capitalize group"
             variant="black"
           >
             {t('freeTrial')}
