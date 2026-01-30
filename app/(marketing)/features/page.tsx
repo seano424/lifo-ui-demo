@@ -28,30 +28,28 @@ interface FeatureCardProps {
 
 function FeatureCard({ title, description, icon, image, reversed = false }: FeatureCardProps) {
   return (
-    <div className="py-12">
-      <div
-        className={`flex flex-col justify-center ${reversed ? 'xl:flex-row-reverse' : 'xl:flex-row'} items-center gap-8 xl:gap-12 `}
-      >
-        {/* Content */}
-        <div className="flex-1 flex flex-col gap-6 text-center xl:text-left">
-          <div className="flex flex-col sm:flex-row items-center justify-center xl:justify-start gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-linear-to-br from-primary-100 to-secondary-100 flex items-center justify-center shrink-0">
-              {icon}
-            </div>
-            <Typography variant="h2">{title}</Typography>
+    <div
+      className={`flex flex-col justify-center ${reversed ? 'xl:flex-row-reverse' : 'xl:flex-row'} items-center gap-8 xl:gap-12 `}
+    >
+      {/* Content */}
+      <div className="flex-1 flex flex-col gap-6 text-center xl:text-left">
+        <div className="flex flex-col sm:flex-row items-center justify-center xl:justify-start gap-6">
+          <div className="w-16 h-16 rounded-2xl bg-linear-to-br from-primary-100 to-secondary-100 flex items-center justify-center shrink-0">
+            {icon}
           </div>
-          <Typography variant="p" color="muted">
-            {description}
-          </Typography>
+          <Typography variant="h2">{title}</Typography>
         </div>
+        <Typography variant="p" color="muted" className="max-w-xl mx-auto">
+          {description}
+        </Typography>
+      </div>
 
-        {/* Visual/Image */}
-        <div className="flex-1 flex justify-center w-full">
-          <div className="relative w-full max-w-md">
-            <div className="absolute inset-0 bg-linear-to-br from-primary-100/20 to-secondary-100/20 rounded-3xl blur-3xl"></div>
-            <div className="relative bg-card backdrop-blur-sm rounded-3xl p-4 sm:p-6 xl:p-8 shadow-2xl border border-white/20">
-              {image}
-            </div>
+      {/* Visual/Image */}
+      <div className="flex-1 flex justify-center w-full">
+        <div className="relative w-full max-w-md">
+          <div className="absolute inset-0 bg-linear-to-br from-primary-100/20 to-secondary-100/20 rounded-3xl blur-3xl"></div>
+          <div className="relative bg-card backdrop-blur-sm rounded-3xl p-4 sm:p-6 xl:p-8 shadow-2xl border border-white/20">
+            {image}
           </div>
         </div>
       </div>
@@ -63,7 +61,7 @@ function MockDashboard() {
   const t = useTranslations('featurespage.mockData.dashboard')
 
   return (
-    <div className="w-full flex flex-col gap-4">
+    <div className="w-full flex flex-col gap-6">
       <div className="bg-linear-to-r from-primary-50 to-secondary-50 rounded-2xl p-4 sm:p-6 border border-primary-100">
         <div className="flex items-center justify-between mb-3">
           <Typography variant="p" color="primary">
@@ -80,7 +78,7 @@ function MockDashboard() {
           </Typography>
         </div>
       </div>
-      <div className="grid grid-cols-2 gap-3 sm:gap-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-2 bg-white/80 rounded-xl p-3 sm:p-4 border border-gray-100">
           <Typography variant="p">{t('expiringSoon')}</Typography>
           <Typography variant="h4">23</Typography>
@@ -128,7 +126,7 @@ function MockScanning() {
   const t = useTranslations('featurespage.mockData.scanning')
 
   return (
-    <div className="w-full flex flex-col gap-4 flex flex-col items-center">
+    <div className="w-full gap-6 flex flex-col items-center">
       <div className="bg-linear-to-br from-secondary-50 to-primary-50 rounded-2xl p-4 sm:p-6 border border-secondary-100 w-full max-w-sm">
         <div className="flex items-center gap-3 mb-4">
           <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
@@ -138,7 +136,7 @@ function MockScanning() {
         </div>
 
         <Typography variant="h3">{t('productScanned')}</Typography>
-        <ul className="flex flex-col gap-4 max-h-80 overflow-y-auto list-none p-0">
+        <ul className="flex flex-col gap-6 max-h-80 overflow-y-auto list-none p-0">
           {PRODUCT_MOCK_DATA.map(({ name, daysUntilExpiry, stock }) => (
             <li key={name}>
               <Typography variant="p">{t(name)}</Typography>
@@ -163,10 +161,10 @@ function MockAnalytics() {
   const t = useTranslations('featurespage.mockData.dashboard')
 
   return (
-    <div className="w-full flex flex-col gap-4">
+    <div className="w-full flex flex-col gap-6">
       <div className="bg-linear-to-br from-white/90 to-white/70 rounded-2xl p-4 sm:p-6 border border-gray-200">
         <Typography variant="h4">{t('performanceAnalytics')}</Typography>
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-6">
           <div className="flex justify-between items-center">
             <Typography variant="p">{t('wasteReduced')}</Typography>
             <Typography variant="p">-34%</Typography>
@@ -197,13 +195,13 @@ function MockAI() {
   const t = useTranslations('featurespage.mockData.ai')
 
   return (
-    <div className="w-full flex flex-col gap-4">
+    <div className="w-full flex flex-col gap-6">
       <div className="bg-linear-to-br from-primary-50 to-secondary-50 rounded-2xl p-6 border border-primary-100">
         <div className="flex items-center gap-3 mb-4">
           <Bot size={24} className="text-primary-800" />
           <Typography variant="h4">{t('title')}</Typography>
         </div>
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-6">
           <div className="bg-white/70 rounded-xl p-3 border border-primary-100/50">
             <div className="flex flex-col gap-1">
               <Typography variant="p">📦 {t('reorderMilk')}</Typography>
@@ -226,18 +224,18 @@ export default function FeaturesPage() {
   const t = useTranslations('featurespage')
 
   return (
-    <div className="min-h-screen py-12 sm:py-16 lg:py-20 px-4">
-      <div className="max-w-5xl mx-auto">
+    <div className="min-h-screen relative overflow-hidden pt-32 container">
+      <div className="flex flex-col gap-12">
         {/* Header */}
-        <div className="text-center mb-16 lg:mb-20">
+        <div className="text-center flex flex-col gap-6">
           <Typography variant="h1">{t('title')}</Typography>
-          <Typography variant="p" color="muted">
+          <Typography variant="p" color="muted" className="max-w-xl mx-auto">
             {t('subtitle')}
           </Typography>
         </div>
 
         {/* Features */}
-        <div className="flex flex-col items-center flex flex-col gap-12 lg:space-y-16">
+        <div className="items-center flex flex-col gap-12 lg:space-y-16">
           <div className="w-full max-w-6xl">
             {/* Real-time Dashboard */}
             <FeatureCard
@@ -336,7 +334,7 @@ export default function FeaturesPage() {
 
         {/* CTA Section */}
         <div className="mt-16 lg:mt-24 text-center">
-          <div className="flex flex-col items-center gap-4 rounded-3xl p-6 sm:p-8 lg:p-12 ">
+          <div className="flex flex-col items-center gap-6 rounded-3xl p-6 sm:p-8 lg:p-12 ">
             <Typography variant="h2" color="primary">
               {t('cta.title')}
             </Typography>
