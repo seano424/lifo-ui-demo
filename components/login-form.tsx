@@ -55,7 +55,7 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
 
         <CardContent>
           <form action={formAction} className="space-y-4 font-mono uppercase">
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <Label htmlFor="identifier">{t('usernameOrEmail')}</Label>
               <Input
                 id="identifier"
@@ -67,7 +67,7 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
               />
             </div>
 
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="password">{t('password')}</Label>
                 <Link href="/auth/forgot-password" className="text-sm text-primary hover:underline">
@@ -86,7 +86,7 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
             </div>
 
             {state?.error && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-2xl">
+              <div className="p-3 bg-red-50 border border-destructive rounded-2xl">
                 <Typography variant="p" color="destructive" className="text-sm">
                   {state.error}
                 </Typography>

@@ -133,19 +133,19 @@ export function AlertSensitivityControls({
           </div>
           <CardDescription>{t('description')}</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="flex flex-col gap-6">
           {/* Current Status */}
           <div className="flex items-center justify-between p-3 bg-muted/50 rounded-2xl">
             <div className="flex items-center gap-3">
               {currentAlertLevel === 'conservative' && (
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-red-500 rounded-full" />
+                  <div className="w-3 h-3 bg-destructive rounded-full" />
                   <span className="">{t('levels.conservative')}</span>
                 </div>
               )}
               {currentAlertLevel === 'balanced' && (
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-yellow-500 rounded-full" />
+                  <div className="w-3 h-3 bg-primary rounded-full" />
                   <span className="">{t('levels.balanced')}</span>
                 </div>
               )}
@@ -162,7 +162,7 @@ export function AlertSensitivityControls({
           </div>
 
           {/* Alert Level Selection */}
-          <div className="space-y-4">
+          <div className="flex flex-col gap-4">
             <Label className="text-sm ">{t('currentPreference')}</Label>
 
             <Select
@@ -177,7 +177,7 @@ export function AlertSensitivityControls({
                 <SelectItem value="conservative">
                   <div className="space-y-1 flex flex-col gap-1 items-start p-2">
                     <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-red-500 rounded-full" />
+                      <div className="w-2 h-2 bg-destructive rounded-full" />
                       <Typography variant="small">{t('levels.conservativeTitle')}</Typography>
                     </div>
                     <Typography variant="small">{t('selectDescriptions.conservative')}</Typography>
@@ -186,7 +186,7 @@ export function AlertSensitivityControls({
                 <SelectItem value="balanced">
                   <div className="space-y-1 flex flex-col gap-1 items-start p-2">
                     <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-yellow-500 rounded-full" />
+                      <div className="w-2 h-2 bg-primary rounded-full" />
                       <Typography variant="small">{t('levels.balancedTitle')}</Typography>
                     </div>
                     <Typography variant="muted" className="text-muted-foreground">
@@ -210,7 +210,7 @@ export function AlertSensitivityControls({
 
             <div className="text-sm text-muted-foreground p-3 bg-blue-50 rounded-2xl border border-blue-200">
               <div className="flex items-start gap-2">
-                <AlertTriangle className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                <AlertTriangle className="h-4 w-4 text-blue-600 mt-0.5 shrink-0" />
                 <p>{getAlertDescription(currentAlertLevel)}</p>
               </div>
             </div>
@@ -232,15 +232,15 @@ export function AlertSensitivityControls({
               <div className="text-sm space-y-3">
                 <p className="">{t('technical.thresholds')}</p>
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1">
+                  <div className="flex flex-col gap-1">
                     <p className="text-xs  text-yellow-700">{t('technical.warningLevel')}</p>
                     <p className="text-lg font-mono">{thresholds.warning.toFixed(2)}</p>
                     <p className="text-xs text-muted-foreground">
                       {Math.round(thresholds.warning * 100)}% {t('technical.compositeScore')}
                     </p>
                   </div>
-                  <div className="space-y-1">
-                    <p className="text-xs  text-red-700">{t('technical.criticalLevel')}</p>
+                  <div className="flex flex-col gap-1">
+                    <p className="text-xs  text-destructive">{t('technical.criticalLevel')}</p>
                     <p className="text-lg font-mono">{thresholds.critical.toFixed(2)}</p>
                     <p className="text-xs text-muted-foreground">
                       {Math.round(thresholds.critical * 100)}% {t('technical.compositeScore')}
@@ -248,7 +248,7 @@ export function AlertSensitivityControls({
                   </div>
                 </div>
                 <Separator />
-                <div className="space-y-1">
+                <div className="flex flex-col gap-1">
                   <p className="text-xs ">{t('technical.howScoringWorks')}</p>
                   <ul className="text-xs text-muted-foreground space-y-1">
                     <li>• {t('technical.expiryScore')}</li>

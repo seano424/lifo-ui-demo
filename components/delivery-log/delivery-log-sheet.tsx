@@ -26,6 +26,7 @@ import {
 } from '@/hooks/use-draft-batches'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 import { cn } from '@/lib/utils'
+import { Typography } from '../ui/typography'
 
 interface DeliveryLogSheetProps {
   open: boolean
@@ -204,10 +205,6 @@ export function DeliveryLogSheet({ open, onOpenChange, onComplete }: DeliveryLog
     [onOpenChange],
   )
 
-  // ============================================================================
-  // RENDER
-  // ============================================================================
-
   return (
     <>
       <Sheet open={open} onOpenChange={handleOpenChange}>
@@ -227,7 +224,7 @@ export function DeliveryLogSheet({ open, onOpenChange, onComplete }: DeliveryLog
                   variant="ghost"
                   size="sm"
                   onClick={handleClearAll}
-                  className="text-gray-500 hover:text-red-600"
+                  className="text-gray-500 hover:text-destructive"
                 >
                   <X className="h-4 w-4 mr-1" />
                   Clear All
@@ -267,19 +264,17 @@ export function DeliveryLogSheet({ open, onOpenChange, onComplete }: DeliveryLog
                 {/* Recent Products Section */}
                 <div>
                   <div className="flex items-center justify-between mb-3">
-                    <h3 className="font-semibold text-sm text-gray-700 dark:text-gray-300">
+                    <Typography variant="h3">
                       {searchQuery ? 'Search Results' : 'Recent / Frequent'}
-                    </h3>
+                    </Typography>
                     {!searchQuery && recentProducts && (
-                      <span className="text-xs text-gray-500 dark:text-gray-400">
-                        {recentProducts.length} products
-                      </span>
+                      <Typography variant="small">{recentProducts.length} products</Typography>
                     )}
                   </div>
 
                   {/* Loading State */}
                   {isLoadingRecent && (
-                    <div className="space-y-3">
+                    <div className="flex flex-col gap-4">
                       <Skeleton className="h-20 w-full" />
                       <Skeleton className="h-20 w-full" />
                       <Skeleton className="h-20 w-full" />
@@ -300,7 +295,7 @@ export function DeliveryLogSheet({ open, onOpenChange, onComplete }: DeliveryLog
 
                   {/* Products List */}
                   {!isLoadingRecent && filteredRecentProducts.length > 0 && (
-                    <div className="space-y-3">
+                    <div className="flex flex-col gap-4">
                       {filteredRecentProducts.map(product => (
                         <RecentProductCard
                           key={product.product_id}
@@ -334,10 +329,10 @@ export function DeliveryLogSheet({ open, onOpenChange, onComplete }: DeliveryLog
           {deliveryItems.size > 0 && (
             <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 shrink-0">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-600 dark:text-gray-400">
+                <Typography variant="small">
                   {deliveryItems.size} product{deliveryItems.size !== 1 ? 's' : ''} •{' '}
                   {deliveryItemsArray.reduce((sum, item) => sum + item.quantity, 0)} units
-                </span>
+                </Typography>
                 <Button
                   variant="link"
                   size="sm"
@@ -346,7 +341,7 @@ export function DeliveryLogSheet({ open, onOpenChange, onComplete }: DeliveryLog
                     const scrollArea = document.querySelector('[data-radix-scroll-area-viewport]')
                     scrollArea?.scrollTo({ top: scrollArea.scrollHeight, behavior: 'smooth' })
                   }}
-                  className="text-primary-600 dark:text-primary-400"
+                  className="text-primary-800 dark:text-primary-400"
                 >
                   View Summary
                 </Button>

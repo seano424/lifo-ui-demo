@@ -95,7 +95,7 @@ export default function SquareManagementPage() {
     <ErrorBoundary>
       <div className="container max-w-5xl space-y-6 py-6 lg:py-8">
         {/* Header */}
-        <div className="space-y-4">
+        <div className="flex flex-col gap-4">
           <Button
             variant="ghost"
             size="sm"
@@ -112,8 +112,12 @@ export default function SquareManagementPage() {
                 <Square className="h-6 w-6 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">{t('title')}</h1>
-                <p className="text-sm text-gray-600 sm:text-base">{t('manageSubtitle')}</p>
+                <Typography as="h1" color="primary">
+                  {t('title')}
+                </Typography>
+                <Typography variant="p" color="muted">
+                  {t('manageSubtitle')}
+                </Typography>
               </div>
             </div>
 
@@ -127,38 +131,44 @@ export default function SquareManagementPage() {
             <CardTitle>{t('connectionDetails')}</CardTitle>
             <CardDescription>{t('connectionDetailsDescription')}</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="flex flex-col gap-4">
             <div className="grid gap-4 md:grid-cols-2">
-              <div className="space-y-1">
-                <p className="text-sm text-gray-600">{t('merchantName')}</p>
-                <p className="">{squareStatus.merchant_name || 'N/A'}</p>
+              <div className="flex flex-col gap-1">
+                <Typography variant="p" color="muted">
+                  {t('merchantName')}
+                </Typography>
+                <Typography variant="p" color="muted">
+                  {squareStatus.merchant_name || 'N/A'}
+                </Typography>
               </div>
-              <div className="space-y-1">
-                <p className="text-sm text-gray-600">{t('merchantId')}</p>
-                <p className="font-mono text-sm">{squareStatus.merchant_id || 'N/A'}</p>
+              <div className="flex flex-col gap-1">
+                <Typography variant="p" color="muted">
+                  {t('merchantId')}
+                </Typography>
+                <Typography variant="p" color="muted">
+                  {squareStatus.merchant_id || 'N/A'}
+                </Typography>
               </div>
             </div>
 
             {squareStatus.last_sync_at && (
               <div className="rounded-lg bg-gray-50 p-3">
-                <p className="text-sm text-gray-600">
+                <Typography variant="p" color="muted">
                   {t('lastSync')}:{' '}
-                  <span className=" text-gray-900">
-                    {formatDistanceToNow(new Date(squareStatus.last_sync_at), {
-                      addSuffix: true,
-                    })}
-                  </span>
-                </p>
+                  {formatDistanceToNow(new Date(squareStatus.last_sync_at), {
+                    addSuffix: true,
+                  })}
+                </Typography>
               </div>
             )}
           </CardContent>
         </Card>
 
         {/* Connected Locations */}
-        <Card className="space-y-4">
-          <CardHeader className="space-y-2">
+        <Card className="flex flex-col gap-4">
+          <CardHeader className="flex flex-col gap-2">
             <div className="flex items-center gap-2">
-              <MapPin className="h-5 w-5 text-primary-600" />
+              <MapPin className="h-5 w-5 text-primary-800" />
               <CardTitle>{t('connectedLocations')}</CardTitle>
             </div>
             <CardDescription className="px-1">
@@ -170,7 +180,7 @@ export default function SquareManagementPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
+            <div className="flex flex-col gap-4">
               {squareStatus.stores?.map(store => {
                 const isCurrentStore = activeStore?.store_id === store.store_id
                 const fullStore = userStores.find(us => us.store.store_id === store.store_id)?.store
@@ -238,7 +248,7 @@ export default function SquareManagementPage() {
           <Card>
             <CardHeader>
               <div className="flex items-center gap-2">
-                <Package className="h-5 w-5 text-primary-600" />
+                <Package className="h-5 w-5 text-primary-800" />
                 <CardTitle className="text-base sm:text-lg">{t('syncCatalog')}</CardTitle>
               </div>
               <CardDescription className="text-sm">{t('syncCatalogDescription')}</CardDescription>
@@ -262,10 +272,10 @@ export default function SquareManagementPage() {
           <Card>
             <CardHeader>
               <div className="flex items-center gap-2">
-                <Boxes className="h-5 w-5 text-primary-600" />
-                <CardTitle className="text-base sm:text-lg">{t('syncInventory')}</CardTitle>
+                <Boxes className="h-5 w-5 text-primary-800" />
+                <CardTitle>{t('syncInventory')}</CardTitle>
               </div>
-              <CardDescription className="text-sm">{t('syncInventoryDescription')}</CardDescription>
+              <CardDescription>{t('syncInventoryDescription')}</CardDescription>
             </CardHeader>
             <CardContent>
               <Button
@@ -286,10 +296,10 @@ export default function SquareManagementPage() {
           <Card>
             <CardHeader>
               <div className="flex items-center gap-2">
-                <ShoppingCart className="h-5 w-5 text-primary-600" />
-                <CardTitle className="text-base sm:text-lg">{t('syncOrders')}</CardTitle>
+                <ShoppingCart className="h-5 w-5 text-primary-800" />
+                <CardTitle>{t('syncOrders')}</CardTitle>
               </div>
-              <CardDescription className="text-sm">{t('syncOrdersDescription')}</CardDescription>
+              <CardDescription>{t('syncOrdersDescription')}</CardDescription>
             </CardHeader>
             <CardContent>
               <Button
@@ -312,8 +322,10 @@ export default function SquareManagementPage() {
           <CardHeader>
             <CardTitle>{t('needHelp')}</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-2 text-sm text-gray-600">
-            <p>{t('helpDescription')}</p>
+          <CardContent className="flex flex-col gap-2">
+            <Typography variant="p" color="muted">
+              {t('helpDescription')}
+            </Typography>
             <ul className="list-disc space-y-1 pl-4">
               <li>{t('helpPoint1')}</li>
               <li>{t('helpPoint2')}</li>

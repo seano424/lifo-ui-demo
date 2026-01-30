@@ -271,7 +271,7 @@ export function OnboardingSignUpForm({
         <Alert variant="destructive">
           <AlertTriangle className="h-4 w-4" />
           <AlertDescription>
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <p>
                 <strong>{t('businessRegistered')}</strong>
               </p>
@@ -373,7 +373,7 @@ export function OnboardingSignUpForm({
               {error && (
                 <Alert variant="destructive">
                   <AlertDescription className="flex justify-center">
-                    <div className="space-y-3">
+                    <div className="flex flex-col gap-4">
                       <div className="flex items-center gap-2">
                         <AlertTriangle className="h-4 w-4" />
                         <p>{error}</p>

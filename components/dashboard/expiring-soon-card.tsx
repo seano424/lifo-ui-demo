@@ -16,9 +16,9 @@ export function ExpiringSoonCard({ storeId }: ExpiringSoonCardProps) {
   if (isLoading) {
     return (
       <div className="bg-white dark:bg-brand-dark rounded-2xl border p-6">
-        <div className="space-y-4">
+        <div className="flex flex-col gap-4">
           <Skeleton className="h-6 w-48" />
-          <div className="space-y-3">
+          <div className="flex flex-col gap-4">
             <Skeleton className="h-12 w-full" />
             <Skeleton className="h-12 w-full" />
             <Skeleton className="h-12 w-full" />

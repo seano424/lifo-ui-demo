@@ -14,13 +14,9 @@ export function DashboardWelcome() {
 
   return (
     <div className="flex flex-col gap-6">
-      <Typography variant="h2" className="font-bold">
-        {t('welcome.title')}
-      </Typography>
+      <Typography variant="h3">{t('welcome.title')}</Typography>
 
-      <Typography variant="p" className="text-muted-foreground">
-        {t('welcome.description')}
-      </Typography>
+      <Typography variant="p">{t('welcome.description')}</Typography>
 
       {/* Action cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-2">
@@ -58,7 +54,7 @@ export function DashboardWelcome() {
           {/* Left side with icon and text */}
           <div className="flex flex-col justify-center items-center md:items-start gap-3 md:gap-4 flex-1 text-center md:text-left">
             <div className="flex items-center gap-2 justify-center md:justify-start">
-              <BarChart3 className="text-secondary h-5 w-5 flex-shrink-0" />
+              <BarChart3 className="text-secondary h-5 w-5 shrink-0" />
               <Typography variant="h4" className="font-semibold text-base sm:text-lg">
                 {t('welcome.help.title')}
               </Typography>
@@ -83,7 +79,7 @@ export function DashboardWelcome() {
           </div>
 
           {/* Right side with illustration */}
-          <div className="flex-shrink-0 relative w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48">
+          <div className="shrink-0 relative w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48">
             <Logo variant="svg" size="xl" className="w-full h-full opacity-30" />
           </div>
         </div>
@@ -118,7 +114,7 @@ function WelcomeActionCard({
             className={cn(
               'p-2 rounded-md w-fit',
               variant === 'primary'
-                ? 'bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300'
+                ? 'bg-primary-100 text-primary-800 dark:bg-primary-900/30 dark:text-primary-300'
                 : 'bg-secondary-100 text-secondary-700 dark:bg-secondary-900/30 dark:text-secondary-300',
             )}
           >
@@ -140,7 +136,7 @@ function WelcomeActionCard({
               className={cn(
                 'flex items-center gap-1 text-sm  transition-all',
                 variant === 'primary'
-                  ? 'text-primary group-hover:text-primary-700'
+                  ? 'text-primary group-hover:text-primary-800'
                   : 'text-secondary group-hover:text-secondary-700',
               )}
             >

@@ -25,7 +25,7 @@ export default function IntegrationsPage() {
     <div className="space-y-6 container py-6 lg:py-8">
       <DashboardInsetHeader page="integrations" />
 
-      <div className="space-y-4">
+      <div className="flex flex-col gap-4">
         {/* Square POS Integration */}
         <SquareConnectionCard
           status={squareStatus}

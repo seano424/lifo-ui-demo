@@ -581,7 +581,7 @@ export default function BaseScanningInterface({ config, callbacks, className }: 
 
           {/* Step 2: Product Display */}
           {logic.state.currentUIStep === 'product' && logic.scannedProduct && (
-            <div className="space-y-4">
+            <div className="flex flex-col gap-4">
               {/* Auto-advancing to next step */}
               {!logic.isLookingUp && !logic.lookupError && logic.scannedProduct.lookupResult && (
                 <Alert>
@@ -601,7 +601,7 @@ export default function BaseScanningInterface({ config, callbacks, className }: 
 
           {/* Step 3: Processing/Form */}
           {(logic.state.currentUIStep === 'processing' || logic.state.currentUIStep === 'form') && (
-            <div className="space-y-4">
+            <div className="flex flex-col gap-4">
               {/* Product Context */}
               {logic.scannedProduct && (
                 <ProductCard

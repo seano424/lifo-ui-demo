@@ -81,12 +81,15 @@
       "buttons": {
         "freeTrial": "Start mijn gratis proefperiode",
         "explore": "Verken het platform",
-        "dashboard": "Naar mijn dashboard"
+        "dashboard": "Bekijk uw dashboard",
+        "bookDemo": "Boek een demo"
       },
       "badge": {
         "text": "Geniet van een gratis proefperiode van een maand",
         "welcomeBack": "Uw dashboard is klaar",
-        "square": "Werkt met Square"
+        "square": "Werkt met Square",
+        "noCreditCard": "Geen creditcard vereist",
+        "connectSquare": "Verbind via Square"
       }
     },
     "features": {

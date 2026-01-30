@@ -32,7 +32,7 @@ export default function BatchSelectionList({
 
   if (batches.length === 0) {
     return (
-      <div className={`text-center py-8 text-gray-500 ${className}`}>
+      <div className={`text-center py-8 ${className}`}>
         <div className="text-lg">📦</div>
         <div className="mt-2">{t('noBatchesAvailable')}</div>
       </div>
@@ -41,9 +41,7 @@ export default function BatchSelectionList({
 
   return (
     <div className={`flex flex-col gap-4 mt-8 ${className}`}>
-      <Typography variant="h3" className="font-black">
-        Available Batches ({batches.length})
-      </Typography>
+      <Typography variant="h3">Available Batches ({batches.length})</Typography>
 
       <div className="flex flex-col gap-4 max-h-80 bg-secondary-50/10 rounded-2xl px-4 overflow-y-auto">
         {batches.map((availableBatch, index) => {
@@ -79,7 +77,7 @@ export default function BatchSelectionList({
                 <div className="absolute bottom-4 right-4">
                   <Typography
                     variant="small"
-                    className="p-2 border border-blue-500 bg-blue-50 text-blue-500 text-xs rounded-2xl"
+                    className="p-2 border border-blue-500 bg-blue-50 rounded-2xl"
                   >
                     Recommended
                   </Typography>

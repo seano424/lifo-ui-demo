@@ -14,10 +14,10 @@ export function BatchStatusSummary() {
   if (isLoading) {
     return (
       <div className="bg-white dark:bg-brand-dark rounded-2xl border p-6">
-        <div className="space-y-4">
+        <div className="flex flex-col gap-4">
           <Skeleton className="h-6 w-48" />
           <Skeleton className="h-8 w-24" />
-          <div className="space-y-3">
+          <div className="flex flex-col gap-4">
             <Skeleton className="h-5 w-full" />
             <Skeleton className="h-5 w-full" />
             <Skeleton className="h-5 w-full" />
@@ -91,18 +91,13 @@ export function BatchStatusSummary() {
               <Typography variant="h4">{t('needsAttention')}</Typography>
               <Typography variant="small">{t('activeInventory')}</Typography>
             </div>
-            <Typography
-              variant="h2"
-              className="text-3xl font-bold text-gray-900 dark:text-brand-white mt-1"
-            >
-              {totalNeedsAttention}
-            </Typography>
+            <Typography variant="h2">{totalNeedsAttention}</Typography>
           </div>
         </div>
 
         {/* Status Breakdown */}
         <div className="p-6">
-          <div className="space-y-3">
+          <div className="flex flex-col gap-4">
             {/* Critical */}
             {criticalCount > 0 && (
               <div className="flex items-center justify-between py-2">
@@ -148,17 +143,12 @@ export function BatchStatusSummary() {
         <div className="p-6 border-b">
           <div className="flex justify-between items-center gap-2">
             <Typography variant="h4">{t('status.ok')}</Typography>
-            <Typography
-              variant="h2"
-              className="text-3xl font-bold text-gray-900 dark:text-brand-white mt-1"
-            >
-              {totalActiveBatchesCount - totalNeedsAttention}
-            </Typography>
+            <Typography variant="h2">{totalActiveBatchesCount - totalNeedsAttention}</Typography>
           </div>
         </div>
         <div className="p-6 flex flex-col gap-4">
           {/* Show Medium and Low priority items in OK section */}
-          <div className="space-y-3">
+          <div className="flex flex-col gap-4">
             {/* Medium */}
             {mediumCount > 0 && (
               <div className="flex items-center justify-between py-2">
@@ -200,7 +190,7 @@ export function BatchStatusSummary() {
           </div>
 
           <div className="flex flex-col gap-2 flex-1 justify-end text-right mt-4">
-            <Typography variant="h4" className="lowercase text-primary-900 dark:text-brand-white">
+            <Typography variant="h4" className="lowercase text-primary-800 dark:text-brand-white">
               {attentionPercentage}% {t('needsAttention')}
             </Typography>
             <div className="h-2 bg-gray-200 dark:bg-brand-dark rounded-full mt-2">

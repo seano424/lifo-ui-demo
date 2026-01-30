@@ -22,11 +22,11 @@ export function NextStepsGrid({ title, items }: NextStepsGridProps) {
       <div className="text-center space-y-2">
         <Typography
           variant="h2"
-          className="text-2xl font-bold bg-gradient-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent"
+          className="text-2xl font-bold bg-linear-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent"
         >
           {title}
         </Typography>
-        <div className="w-16 h-1 bg-gradient-to-r from-primary-400 to-primary-600 rounded-full mx-auto"></div>
+        <div className="w-16 h-1 bg-linear-to-r from-primary-400 to-primary-600 rounded-full mx-auto"></div>
       </div>
 
       {/* Cards Grid */}
@@ -35,7 +35,7 @@ export function NextStepsGrid({ title, items }: NextStepsGridProps) {
           <Link key={item.title} href={item.linkHref} className="block group">
             <Card className="h-full hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 border-0 bg-card hover:from-primary/5 hover:to-primary/10 cursor-pointer">
               <CardContent className="p-6">
-                <div className="space-y-4">
+                <div className="flex flex-col gap-4">
                   {/* Title with icon */}
                   <div className="flex items-start justify-between">
                     <Typography

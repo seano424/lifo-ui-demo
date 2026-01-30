@@ -483,7 +483,7 @@ export function BatchCreationSheet({
                     Custom Expiry Date
                   </Label>
                   <div className="relative">
-                    <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-primary-600 dark:text-primary-400" />
+                    <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-primary-800 dark:text-primary-400" />
                     <Input
                       id="custom-expiry-date"
                       type="date"
@@ -499,7 +499,7 @@ export function BatchCreationSheet({
                     />
                   </div>
                   {customDate && (
-                    <p className="text-xs text-green-600 dark:text-green-400">
+                    <p className="text-xs text-primary dark:text-primary-400">
                       ✓ Custom date selected
                     </p>
                   )}

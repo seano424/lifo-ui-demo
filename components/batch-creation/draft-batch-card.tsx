@@ -68,7 +68,7 @@ export function DraftBatchCard({ product, onClick, className }: DraftBatchCardPr
           <div className="flex-1 min-w-0 space-y-2">
             {/* Product Name & Brand */}
             <div>
-              <Typography variant="h5" className="truncate font-bold">
+              <Typography variant="h5" color="primary" className="truncate">
                 {product.product_name}
               </Typography>
               {/* {product.product_brand && (

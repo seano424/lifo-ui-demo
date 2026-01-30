@@ -7,6 +7,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Badge } from '@/components/ui/badge'
 import type { DeliveryItem } from '@/hooks/use-draft-batches'
 import { cn } from '@/lib/utils'
+import { Typography } from '../ui/typography'
 
 export interface DeliveryItemWithName extends DeliveryItem {
   product_name: string
@@ -72,12 +73,10 @@ export function DeliverySummary({
         {/* Summary Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="font-semibold text-base text-gray-900 dark:text-gray-100">
-              Delivery Summary
-            </h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+            <Typography variant="h3">Delivery Summary</Typography>
+            <Typography variant="muted">
               {totalProducts} product{totalProducts !== 1 ? 's' : ''} • {totalUnits} units
-            </p>
+            </Typography>
           </div>
           <Badge variant="secondary" className="text-base font-bold px-3 py-1">
             {totalUnits}
@@ -86,17 +85,15 @@ export function DeliverySummary({
 
         {/* Items List */}
         <ScrollArea className="max-h-[200px] -mx-4 px-4">
-          <div className="space-y-2">
+          <div className="flex flex-col gap-2">
             {items.map(item => (
               <div
                 key={item.product_id}
                 className="flex items-center justify-between gap-3 p-2 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800"
               >
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
-                    {item.product_name}
-                  </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">{item.quantity} units</p>
+                  <Typography variant="p">{item.product_name}</Typography>
+                  <Typography variant="muted">{item.quantity} units</Typography>
                 </div>
                 {onRemoveItem && (
                   <Button
@@ -104,7 +101,7 @@ export function DeliverySummary({
                     variant="ghost"
                     size="icon"
                     onClick={() => onRemoveItem(item.product_id)}
-                    className="shrink-0 h-8 w-8 text-gray-500 hover:text-red-600 dark:hover:text-red-400"
+                    className="shrink-0 h-8 w-8 text-gray-500 hover:text-destructive dark:hover:text-destructive"
                     aria-label="Remove item"
                   >
                     <Trash2 className="h-4 w-4" />
@@ -137,9 +134,9 @@ export function DeliverySummary({
         </Button>
 
         {/* Helper Text */}
-        <p className="text-xs text-center text-gray-500 dark:text-gray-400">
+        <Typography variant="muted">
           Draft batches will be created. You'll add expiry dates next.
-        </p>
+        </Typography>
       </CardContent>
     </Card>
   )

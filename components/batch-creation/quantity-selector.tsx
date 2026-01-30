@@ -62,13 +62,13 @@ export function QuantitySelector({
         className={cn(
           // 44px minimum tap target for mobile
           'h-11 w-11 shrink-0 rounded-2xl',
-          'border-none bg-primary-50 text-primary-600',
+          'border-none bg-primary-50 text-primary-800',
           'active:scale-95 transition-transform',
           'disabled:opacity-40 disabled:cursor-not-allowed',
         )}
         aria-label="Decrease quantity"
       >
-        <Minus className="h-5 w-5 text-primary-600" />
+        <Minus className="h-5 w-5 text-primary-800" />
       </Button>
 
       {/* Current Value Display */}
@@ -100,13 +100,13 @@ export function QuantitySelector({
         className={cn(
           // 44px minimum tap target for mobile
           'h-11 w-11 shrink-0 rounded-2xl',
-          'border-none bg-primary-50 text-primary-600',
+          'border-none bg-primary-50 text-primary-800',
           'active:scale-95 transition-transform',
           'disabled:bg-opacity-50 disabled:cursor-not-allowed',
         )}
         aria-label="Increase quantity"
       >
-        <Plus className="h-5 w-5 text-primary-600" />
+        <Plus className="h-5 w-5 text-primary-800" />
       </Button>
     </div>
   )

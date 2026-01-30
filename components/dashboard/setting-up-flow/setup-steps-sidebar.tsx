@@ -29,23 +29,19 @@ export function SetupStepsSidebar() {
     <div className="flex flex-col gap-6 p-6 rounded-2xl bg-muted/30 dark:bg-muted/10 min-w-[280px] h-full lg:min-w-[320px] shadow-xs lg:rounded-none">
       {/* Header */}
       <div className="flex flex-col gap-2">
-        <Typography variant="h3" className="font-semibold">
-          {t('setupFlow.sidebar.title')}
-        </Typography>
-        <Typography variant="p" className="text-sm text-muted-foreground">
-          {t('setupFlow.sidebar.subtitle')}
-        </Typography>
+        <Typography variant="h3">{t('setupFlow.sidebar.title')}</Typography>
+        <Typography variant="small">{t('setupFlow.sidebar.subtitle')}</Typography>
       </div>
 
       {/* Progress bar */}
       <div className="flex flex-col gap-2">
         <div className="h-2 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden">
           <div
-            className="h-full bg-gradient-to-r from-primary via-purple-600 to-indigo-600 transition-all duration-500 ease-out"
+            className="h-full bg-linear-to-r from-primary-900 to-primary-800 transition-all duration-500 ease-out"
             style={{ width: `${progressPercentage}%` }}
           />
         </div>
-        <Typography variant="p" className="text-xs text-muted-foreground text-right">
+        <Typography variant="small" className="text-right">
           {progressPercentage}% {t('setupFlow.sidebar.complete')}
         </Typography>
       </div>
@@ -69,7 +65,7 @@ export function SetupStepsSidebar() {
               )}
             >
               {/* Step icon */}
-              <div className="flex-shrink-0">
+              <div className="shrink-0">
                 {completed ? (
                   <CheckCircle2 className="h-5 w-5 text-primary stroke-2" />
                 ) : (
@@ -87,8 +83,8 @@ export function SetupStepsSidebar() {
                 variant="p"
                 className={cn(
                   '',
-                  isCurrent && 'text-secondary-900',
-                  completed && 'text-secondary-900',
+                  isCurrent && 'font-semibold font-heading text-primary-900',
+                  completed && 'font-semibold font-heading text-primary-900',
                 )}
               >
                 {t(STEP_LABELS[step])}

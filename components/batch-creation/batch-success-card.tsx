@@ -44,12 +44,12 @@ export function BatchSuccessCard({
         'overflow-hidden border-2',
         result.success
           ? 'border-primary/20 dark:border-primary-800'
-          : 'border-red-200 dark:border-red-800',
+          : 'border-destructive dark:border-destructive',
         className,
       )}
     >
       <CardContent className="p-6">
-        <div className="space-y-4">
+        <div className="flex flex-col gap-4">
           {/* Success/Error Icon with Animation */}
           <div className="flex items-center justify-center">
             {result.success ? (

@@ -33,7 +33,7 @@ export function UploadResultsDisplay({ result, onUploadAnother }: UploadResultsD
 
   return (
     <Card className="p-6 bg-primary-50 border-none">
-      <div className="space-y-4">
+      <div className="flex flex-col gap-4">
         <div className="flex items-center gap-2 justify-center">
           <div className="text-center flex items-center gap-2">
             <Check className="w-6 h-6 text-secondary-900 stroke-5 border-2 border-secondary-900 rounded-full p-[3px] bg-primary-100" />
@@ -59,7 +59,7 @@ export function UploadResultsDisplay({ result, onUploadAnother }: UploadResultsD
         {/* Performance Metrics */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="text-center">
-            <div className="text-2xl font-bold text-primary-600">{result.processed || 0}</div>
+            <div className="text-2xl font-bold text-primary-800">{result.processed || 0}</div>
             <Typography variant="p" color="muted">
               {t('results.metrics.processed')}
             </Typography>
@@ -93,8 +93,8 @@ export function UploadResultsDisplay({ result, onUploadAnother }: UploadResultsD
 
         {/* Error Display */}
         {result.errors && result.errors.length > 0 && (
-          <div className="bg-red-50 border border-red-200 rounded-2xl p-4">
-            <Typography variant="h4" className="text-red-700 mb-2">
+          <div className="bg-red-50 border border-destructive rounded-2xl p-4">
+            <Typography variant="h4" className="text-destructive mb-2">
               Errors Encountered
             </Typography>
             <div className="space-y-2 max-h-40 overflow-y-auto">
@@ -104,13 +104,13 @@ export function UploadResultsDisplay({ result, onUploadAnother }: UploadResultsD
                 return (
                   <div
                     key={errorKey}
-                    className="text-sm p-2 bg-white rounded border-l-4 border-red-400"
+                    className="text-sm p-2 bg-white rounded border-l-4 border-destructive"
                   >
                     {typeof error === 'string' ? (
                       <div className="text-gray-700">{error}</div>
                     ) : (
                       <>
-                        <div className="font-semibold text-red-700">Row {error.row}</div>
+                        <div className="font-semibold text-destructive">Row {error.row}</div>
                         <div className="text-gray-700">{error.message}</div>
                       </>
                     )}

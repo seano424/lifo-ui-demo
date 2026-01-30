@@ -55,14 +55,14 @@ export function ContentCard({
     switch (variant) {
       case 'feature':
         return (
-          <div className="space-y-3">
+          <div className="flex flex-col gap-4">
             {description && (
               <Typography variant="p" className="text-sm text-muted-foreground">
                 {description}
               </Typography>
             )}
             {features.length > 0 && (
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 {features.map(feature => (
                   <div key={feature.title} className="space-y-1 flex gap-2 items-center mt-2">
                     <Typography variant="h4" className="text-sm font-semibold">
@@ -106,7 +106,7 @@ export function ContentCard({
             {checklistItems.map(item => (
               <div key={item.text} className="flex items-center gap-2">
                 <div
-                  className={`h-4 w-4 rounded border ${item.completed ? 'bg-green-500 border-green-500' : 'border-gray-300'}`}
+                  className={`h-4 w-4 rounded border ${item.completed ? 'bg-primary-500 border-primary-500' : 'border-gray-300'}`}
                 />
                 <span>{item.text}</span>
               </div>
@@ -142,9 +142,7 @@ export function ContentCard({
           ) : (
             <Icon className="h-5 w-5 text-primary" />
           )}
-          <Typography variant="h3" className="text-lg font-semibold">
-            {title}
-          </Typography>
+          <Typography variant="h3">{title}</Typography>
         </div>
       </CardHeader>
       <CardContent>{renderContent()}</CardContent>

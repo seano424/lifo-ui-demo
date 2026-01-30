@@ -79,14 +79,17 @@
       "subtitle": "LIFO helps food retailers turn expiration data into clear next steps, before it becomes waste.",
       "subtitle2": "LIFO shows your team exactly which food batches need attention so you can discount, donate, or sell before it's too late.",
       "buttons": {
-        "freeTrial": "Start my free trial",
+        "freeTrial": "Start free trial",
         "explore": "Explore the platform",
-        "dashboard": "Go to my Dashboard"
+        "dashboard": "View your dashboard",
+        "bookDemo": "Book a demo"
       },
       "badge": {
         "text": "Enjoy a one month free trial",
         "welcomeBack": "Your dashboard is ready",
-        "square": "Works with Square"
+        "square": "Works with Square",
+        "noCreditCard": "No credit card required",
+        "connectSquare": "Connect through Square"
       }
     },
     "features": {

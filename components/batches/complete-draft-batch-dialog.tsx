@@ -133,7 +133,7 @@ export function CompleteDraftBatchDialog({
 
         <div className="space-y-5 py-4">
           {/* Batch info */}
-          <div className="rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 p-5 space-y-4 shadow-sm">
+          <div className="rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-linear-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 p-5 space-y-4 shadow-sm">
             <div className="flex gap-4">
               <div className="flex-1 bg-white dark:bg-slate-950 rounded-lg p-3 border border-slate-200 dark:border-slate-700">
                 <Label className="text-xs uppercase tracking-wide text-muted-foreground font-semibold">
@@ -156,18 +156,18 @@ export function CompleteDraftBatchDialog({
 
           {/* Expiry date input */}
           {!showOCR ? (
-            <div className="space-y-3">
+            <div className="flex flex-col gap-4">
               <Label htmlFor="expiry-date" className="text-base font-semibold">
                 Expiry Date *
                 {expiryDate && (
-                  <span className="ml-2 text-xs font-normal text-green-600 dark:text-green-400">
+                  <span className="ml-2 text-xs font-normal text-primary dark:text-primary-400">
                     ✓ Date set
                   </span>
                 )}
               </Label>
               <div className="flex gap-3">
                 <div className="relative flex-1">
-                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-primary-600 dark:text-primary-400" />
+                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-primary-800 dark:text-primary-400" />
                   <Input
                     id="expiry-date"
                     type="date"
@@ -191,11 +191,11 @@ export function CompleteDraftBatchDialog({
                 </Button>
               </div>
               {expiryDate && (
-                <div className="bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-lg p-3">
-                  <p className="text-sm  text-green-800 dark:text-green-200">
+                <div className="bg-primary-50 dark:bg-primary-950 border border-primary-200 dark:border-primary-800 rounded-lg p-3">
+                  <p className="text-sm  text-primary-800 dark:text-primary-200">
                     Captured date: <span className="font-bold">{expiryDate}</span>
                   </p>
-                  <p className="text-xs text-green-700 dark:text-green-300 mt-1">
+                  <p className="text-xs text-primary-700 dark:text-primary-300 mt-1">
                     You can modify this date using the calendar above
                   </p>
                 </div>
@@ -214,7 +214,7 @@ export function CompleteDraftBatchDialog({
               )}
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="flex flex-col gap-4">
               <div className="flex items-center justify-between">
                 <Label className="text-base font-semibold">Scan Expiry Date</Label>
                 <Button
@@ -225,7 +225,7 @@ export function CompleteDraftBatchDialog({
                     setShowOCR(false)
                     autoOCRState.stopAutoScan()
                   }}
-                  className="hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950 transition-colors"
+                  className="hover:bg-red-50 hover:text-destructive dark:hover:bg-red-950 transition-colors"
                 >
                   <X className="h-4 w-4 mr-1" />
                   Cancel
@@ -270,7 +270,7 @@ export function CompleteDraftBatchDialog({
             type="button"
             onClick={handleComplete}
             disabled={!expiryDate || isPending}
-            className="flex-1 sm:flex-none h-11 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold shadow-lg hover:shadow-xl transition-all"
+            className="flex-1 sm:flex-none h-11 bg-linear-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-semibold shadow-lg hover:shadow-xl transition-all"
           >
             {isPending ? (
               <>

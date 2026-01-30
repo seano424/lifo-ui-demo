@@ -20,10 +20,17 @@ interface LogoProps {
 }
 
 const sizeMap = {
-  sm: 'h-8',
-  md: 'h-12',
-  lg: 'h-16',
-  xl: 'h-24',
+  sm: 'h-6',
+  md: 'h-8',
+  lg: 'h-10',
+  xl: 'h-12',
+}
+
+const textSizeMap = {
+  sm: 'text-2xl font-heading font-extrabold lowercase',
+  md: 'text-3xl font-heading font-extrabold lowercase',
+  lg: 'text-4xl font-heading font-extrabold lowercase',
+  xl: 'text-5xl font-heading font-extrabold lowercase',
 }
 
 export function Logo({
@@ -95,11 +102,11 @@ export function Logo({
         href={href}
         className={cn(
           'inline-block',
-          withText && 'flex items-center gap-2 font-heading font-black text-4xl',
+          withText && 'flex items-center gap-2 font-heading font-extrabold lowercase',
         )}
       >
         {logoElement}
-        {withText && 'LIFO'}
+        <span className={cn(textSizeMap[size])}>{withText && 'LIFO'}</span>
       </Link>
     )
   }
@@ -108,11 +115,11 @@ export function Logo({
     <div
       className={cn(
         'inline-block',
-        withText && 'flex items-center gap-2 font-heading font-black text-4xl',
+        withText && 'flex items-center gap-2 font-heading text-2xl font-extrabold lowercase',
       )}
     >
       {logoElement}
-      {withText && 'LIFO'}
+      <span className={cn(textSizeMap[size])}>{withText && 'LIFO'}</span>
     </div>
   )
 }

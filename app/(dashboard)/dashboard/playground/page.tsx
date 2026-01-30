@@ -1,3 +1,4 @@
+import { Typography } from '@/components/ui/typography'
 import { notFound } from 'next/navigation'
 
 export default function PlaygroundPage() {
@@ -8,10 +9,10 @@ export default function PlaygroundPage() {
 
   return (
     <div className="p-8">
-      <h1 className="text-2xl font-bold">Development Playground</h1>
-      <p className="text-muted-foreground mt-2">
+      <Typography variant="h1">Development Playground</Typography>
+      <Typography variant="p" color="muted">
         Internal testing utilities - not available in production
-      </p>
+      </Typography>
     </div>
   )
 }

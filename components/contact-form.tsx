@@ -73,9 +73,9 @@ export function ContactForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-        <div className="space-y-2">
+        <div className="flex flex-col gap-2">
           <Label htmlFor="name" required>
             {t('name')}
           </Label>
@@ -91,7 +91,7 @@ export function ContactForm() {
           />
         </div>
 
-        <div className="space-y-2">
+        <div className="flex flex-col gap-2">
           <Label htmlFor="email" required>
             {t('email')}
           </Label>
@@ -108,7 +108,7 @@ export function ContactForm() {
         </div>
       </div>
 
-      <div className="space-y-2">
+      <div className="flex flex-col gap-2">
         <Label htmlFor="subject" required>
           {t('subject')}
         </Label>
@@ -124,7 +124,7 @@ export function ContactForm() {
         />
       </div>
 
-      <div className="space-y-2">
+      <div className="flex flex-col gap-2">
         <Label htmlFor="message" required>
           {t('message')}
         </Label>
@@ -147,7 +147,7 @@ export function ContactForm() {
           disabled={status.loading}
           loading={status.loading}
           loadingText={t('sending')}
-          className="w-full md:w-auto py-3 text-lg  rounded-2xl bg-gradient-to-r from-primary-900 to-secondary-800 text-white hover:opacity-90 transition-opacity shadow-lg shadow-primary-800/20"
+          className="w-full md:w-auto py-3 text-lg  rounded-2xl bg-linear-to-r from-primary-900 to-secondary-800 text-white hover:opacity-90 transition-opacity shadow-lg shadow-primary-800/20"
         >
           {t('submit')}
         </Button>

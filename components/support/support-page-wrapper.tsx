@@ -54,7 +54,7 @@ export function SupportPageWrapper({
         </Typography>
       )}
 
-      <div className="space-y-6">{children}</div>
+      <div className="flex flex-col gap-6">{children}</div>
     </div>
   )
 }

@@ -6,7 +6,21 @@
       "searchPlaceholder": "Rechercher des lots...",
       "addBatch": "Ajouter un Lot",
       "addBatchDescription": "Ajoutez un nouveau lot à votre inventaire",
-      "addBatchButton": "Ajouter un Lot"
+      "addBatchButton": "Ajouter un Lot",
+      "desktop": {
+        "barcodeScanning": "Lecture de Code-Barres",
+        "csvBulkImport": "Import CSV en Vrac",
+        "manualEntry": "Saisie Manuelle"
+      },
+      "mobile": {
+        "barcodeScanning": "Scanner les Articles",
+        "csvBulkImport": "Import CSV",
+        "manualEntry": "Saisie Manuelle"
+      },
+      "messages": {
+        "selectStore": "Veuillez sélectionner un magasin",
+        "selectStoreInventory": "Veuillez sélectionner un magasin pour gérer l'inventaire"
+      }
     },
     "title": "Tableau de Bord Inventaire",
     "subtitle": "Suivez les dates d'expiration et gérez votre inventaire",
@@ -575,7 +589,7 @@
         "success": "Votre compte a été créé avec succès !"
       },
       "addStore": {
-        "title": "Choisissez comment intégrer vos données",
+        "title": "Connectez votre compte Square",
         "description": "Suivez les produits par dates d'expiration. Créez des lots, consultez les articles qui expirent et recevez des notifications sur les lots qui expirent.",
         "realTime": "Temps réel",
         "recommended": "Recommandé",

@@ -565,7 +565,7 @@ export function AddEmployeeDialog({
               onSubmit={
                 flowType === 'invite_existing' ? handleInviteExistingUser : handleCreateNewEmployee
               }
-              className="space-y-4"
+              className="flex flex-col gap-4"
             >
               {/* Email Field - Always shown first */}
               <div>
@@ -598,7 +598,7 @@ export function AddEmployeeDialog({
                 <Alert>
                   <UserCheck className="h-4 w-4" />
                   <AlertDescription>
-                    <div className="space-y-2">
+                    <div className="flex flex-col gap-2">
                       <div className="flex items-center gap-2">
                         <strong>Existing User Found:</strong>
                         <Badge variant="secondary">
@@ -696,7 +696,7 @@ export function AddEmployeeDialog({
                         usernameAvailable === true
                           ? 'border-primary-500'
                           : usernameAvailable === false
-                            ? 'border-red-500'
+                            ? 'border-destructive'
                             : ''
                       }`}
                     />
@@ -704,17 +704,17 @@ export function AddEmployeeDialog({
                       {isCheckingUsername ? (
                         <div className="w-4 h-4 border-2 border-gray-300 border-t-primary rounded-full animate-spin" />
                       ) : usernameAvailable === true ? (
-                        <Check className="w-4 h-4 text-primary-500" />
+                        <Check className="w-4 h-4 text-primary-800" />
                       ) : usernameAvailable === false ? (
-                        <AlertTriangle className="w-4 h-4 text-red-500" />
+                        <AlertTriangle className="w-4 h-4 text-destructive" />
                       ) : null}
                     </div>
                   </div>
                   <p className="text-xs text-muted-foreground mt-1">
                     {usernameAvailable === false ? (
-                      <span className="text-red-600">{t('form.usernameTaken')}</span>
+                      <span className="text-destructive">{t('form.usernameTaken')}</span>
                     ) : usernameAvailable === true ? (
-                      <span className="text-primary-600">{t('form.usernameAvailable')}</span>
+                      <span className="text-primary-800">{t('form.usernameAvailable')}</span>
                     ) : (
                       t('form.usernameNote')
                     )}
@@ -784,7 +784,7 @@ export function AddEmployeeDialog({
                 <Alert>
                   <Key className="h-4 w-4" />
                   <AlertDescription>
-                    <div className="space-y-1">
+                    <div className="flex flex-col gap-1">
                       <div>
                         <strong>{t('preview.username')}</strong>{' '}
                         <code className="bg-muted px-1 rounded">{formData.username}</code>
@@ -836,7 +836,7 @@ export function AddEmployeeDialog({
         ) : step === 'credentials' ? (
           <>
             <DialogHeader>
-              <DialogTitle className="flex items-center gap-2 text-primary-600">
+              <DialogTitle className="flex items-center gap-2 text-primary-800">
                 <div className="text-center flex flex-col items-center gap-2">
                   <Check className="w-10 h-10 text-secondary-900 stroke-5 border-2 border-secondary-900 rounded-full p-[3px] bg-primary-100" />
                   <Typography variant="h1">{t('success.title')}</Typography>
@@ -849,7 +849,7 @@ export function AddEmployeeDialog({
               </DialogDescription> */}
             </DialogHeader>
 
-            <div className="space-y-4 text-primary-600 text-center">
+            <div className="space-y-4 text-primary-800 text-center">
               {/* Email Status Alert */}
               <Alert>
                 {emailStatus.sending ? (
@@ -883,102 +883,7 @@ export function AddEmployeeDialog({
                   </>
                 )}
               </Alert>
-
-              {/* <div className="space-y-3">
-                <div className="flex items-center justify-between p-3 bg-muted rounded-2xl">
-                  <div>
-                    <Label className="text-sm ">
-                      {t('credentials.email')}
-                    </Label>
-                    <div className="font-mono text-sm">
-                      {createdCredentials?.email}
-                    </div>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() =>
-                      copyToClipboard(createdCredentials?.email || '', 'Email')
-                    }
-                  >
-                    {copiedField === 'Email' ? (
-                      <Check className="w-4 h-4" />
-                    ) : (
-                      <Copy className="w-4 h-4" />
-                    )}
-                  </Button>
-                </div>
-
-                <div className="flex items-center justify-between p-3 bg-muted rounded-2xl">
-                  <div>
-                    <Label className="text-sm ">
-                      {t('credentials.username')}
-                    </Label>
-                    <div className="font-mono text-sm">
-                      {createdCredentials?.username}
-                    </div>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() =>
-                      copyToClipboard(
-                        createdCredentials?.username || '',
-                        'Username'
-                      )
-                    }
-                  >
-                    {copiedField === 'Username' ? (
-                      <Check className="w-4 h-4" />
-                    ) : (
-                      <Copy className="w-4 h-4" />
-                    )}
-                  </Button>
-                </div>
-
-                <div className="flex items-center justify-between p-3 bg-muted rounded-2xl">
-                  <div>
-                    <Label className="text-sm ">
-                      {t('credentials.pin')}
-                    </Label>
-                    <div className="font-mono text-lg font-bold">
-                      {createdCredentials?.pin}
-                    </div>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() =>
-                      copyToClipboard(createdCredentials?.pin || '', 'PIN')
-                    }
-                  >
-                    {copiedField === 'PIN' ? (
-                      <Check className="w-4 h-4" />
-                    ) : (
-                      <Copy className="w-4 h-4" />
-                    )}
-                  </Button>
-                </div>
-              </div> */}
-
               <Separator />
-
-              {/* <div className="bg-blue-50 p-4 rounded-2xl">
-                <h4 className=" text-blue-900 mb-2">
-                  {t('nextSteps.title')}
-                </h4>
-                <ul className="text-sm text-blue-800 space-y-1">
-                  <li>{t('nextSteps.loginTab')}</li>
-                  <li>
-                    {t('nextSteps.useCredentials', {
-                      username: createdCredentials?.username || '',
-                      pin: createdCredentials?.pin || '',
-                    })}
-                  </li>
-                  <li>{t('nextSteps.resetPin')}</li>
-                  <li>{t('nextSteps.permissions')}</li>
-                </ul>
-              </div> */}
             </div>
 
             <DialogFooter>
@@ -990,7 +895,7 @@ export function AddEmployeeDialog({
         ) : (
           <>
             <DialogHeader>
-              <DialogTitle className="flex items-center gap-2 text-primary-600">
+              <DialogTitle className="flex items-center gap-2 text-primary-800">
                 <Check className="w-5 h-5" />
                 Invitation Sent Successfully
               </DialogTitle>
@@ -999,11 +904,11 @@ export function AddEmployeeDialog({
               </DialogDescription>
             </DialogHeader>
 
-            <div className="space-y-4">
+            <div className="flex flex-col gap-4">
               <Alert>
                 <Mail className="h-4 w-4" />
                 <AlertDescription>
-                  <div className="space-y-2">
+                  <div className="flex flex-col gap-2">
                     <div>
                       <strong>User invited:</strong> {existingUser?.full_name || formData.email}
                     </div>
@@ -1019,12 +924,30 @@ export function AddEmployeeDialog({
               </Alert>
 
               <div className="bg-blue-50 p-4 rounded-2xl">
-                <h4 className=" text-blue-900 mb-2">{tc('whatHappensNext')}</h4>
+                <Typography variant="h4" color="primary">
+                  {tc('whatHappensNext')}
+                </Typography>
                 <ul className="text-sm text-blue-800 space-y-1">
-                  <li>• User receives an email notification about the invitation</li>
-                  <li>• They can login with their existing LIFO credentials</li>
-                  <li>• They&apos;ll see your store in their store selection menu</li>
-                  <li>• You can manage their permissions from the team page</li>
+                  <li>
+                    <Typography variant="p" color="primary">
+                      • User receives an email notification about the invitation
+                    </Typography>
+                  </li>
+                  <li>
+                    <Typography variant="p" color="primary">
+                      • They can login with their existing LIFO credentials
+                    </Typography>
+                  </li>
+                  <li>
+                    <Typography variant="p" color="primary">
+                      • They&apos;ll see your store in their store selection menu
+                    </Typography>
+                  </li>
+                  <li>
+                    <Typography variant="p" color="primary">
+                      • You can manage their permissions from the team page
+                    </Typography>
+                  </li>
                 </ul>
               </div>
             </div>

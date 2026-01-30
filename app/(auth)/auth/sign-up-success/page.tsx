@@ -162,7 +162,7 @@ function SignUpSuccessContent() {
               </div>
             </CardHeader>
 
-            <CardContent className="space-y-4">
+            <CardContent className="flex flex-col gap-4">
               {/* Instructions */}
               <Typography variant="p" color="muted" className="text-center">
                 {t('instructions')}

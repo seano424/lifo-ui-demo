@@ -50,7 +50,7 @@ export function BatchTableSkeleton() {
                 style={{ width: column.width }}
               >
                 {column.hasMultipleLines ? (
-                  <div className="space-y-2">
+                  <div className="flex flex-col gap-2">
                     <Skeleton className="h-4 w-full rounded" />
                     <Skeleton className="h-3 w-3/4 rounded" />
                   </div>

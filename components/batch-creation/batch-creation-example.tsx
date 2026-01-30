@@ -30,6 +30,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import type { ActivateDraftBatchResult } from '@/hooks/use-draft-batches'
+import { Typography } from '../ui/typography'
 
 // Mock data for demonstration
 const mockProduct = {
@@ -98,12 +99,12 @@ export function BatchCreationExample() {
     <div className="container max-w-2xl mx-auto py-8 px-4 space-y-8">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+        <Typography variant="h1" color="primary">
           Batch Creation Components
-        </h1>
-        <p className="text-gray-600 dark:text-gray-400 mt-2">
+        </Typography>
+        <Typography variant="p" color="muted">
           Interactive examples of all batch creation UI components
-        </p>
+        </Typography>
       </div>
 
       <Separator />
@@ -113,10 +114,10 @@ export function BatchCreationExample() {
         <CardHeader>
           <CardTitle>1. QuantitySelector</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+        <CardContent className="flex flex-col gap-4">
+          <Typography variant="p" color="muted">
             Touch-friendly quantity selector with +/- buttons
-          </p>
+          </Typography>
           <QuantitySelector value={quantity} onChange={setQuantity} min={1} max={50} />
           <div className="flex gap-2 flex-wrap">
             <Button variant="outline" size="sm" onClick={() => setQuantity(1)}>
@@ -137,10 +138,10 @@ export function BatchCreationExample() {
         <CardHeader>
           <CardTitle>2. ExpiryPresetButtons</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+        <CardContent className="flex flex-col gap-4">
+          <Typography variant="p" color="muted">
             Preset expiry date buttons with suggested days highlighting
-          </p>
+          </Typography>
           <ExpiryPresetButtons
             onSelect={setSelectedDays}
             onPickDate={() => setShowDatePicker(!showDatePicker)}
@@ -149,9 +150,9 @@ export function BatchCreationExample() {
           />
           {showDatePicker && (
             <div className="p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
-              <p className="text-sm text-blue-900 dark:text-blue-100">
+              <Typography variant="p" color="primary">
                 Custom date picker would open here
-              </p>
+              </Typography>
             </div>
           )}
           <Button
@@ -172,10 +173,10 @@ export function BatchCreationExample() {
         <CardHeader>
           <CardTitle>3. DraftBatchCard</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+        <CardContent className="flex flex-col gap-4">
+          <Typography variant="p" color="muted">
             Product card with draft batches and quick actions
-          </p>
+          </Typography>
           <DraftBatchCard
             product={mockProduct}
             onClick={() => {
@@ -190,10 +191,10 @@ export function BatchCreationExample() {
         <CardHeader>
           <CardTitle>4. BatchSuccessCard</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+        <CardContent className="flex flex-col gap-4">
+          <Typography variant="p" color="muted">
             Success card with checkmark animation and split batch handling
-          </p>
+          </Typography>
           <div className="flex gap-2">
             <Button variant="outline" size="sm" onClick={() => setSuccessResult(mockSuccessResult)}>
               Show Success
@@ -226,12 +227,12 @@ export function BatchCreationExample() {
         <CardHeader>
           <CardTitle>Complete Workflow</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-6">
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+        <CardContent className="flex flex-col gap-6">
+          <Typography variant="p" color="muted">
             Example showing all components working together in a batch creation flow
-          </p>
+          </Typography>
 
-          <div className="space-y-4">
+          <div className="flex flex-col gap-4">
             <DraftBatchCard
               product={mockProduct}
               onClick={() => {
@@ -240,9 +241,9 @@ export function BatchCreationExample() {
             />
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <Typography variant="p" color="primary">
                 Select Quantity
-              </label>
+              </Typography>
               <QuantitySelector
                 value={quantity}
                 onChange={setQuantity}
@@ -291,12 +292,12 @@ export function BatchCreationExample() {
       {/* Documentation Link */}
       <Card>
         <CardContent className="p-6">
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+          <Typography variant="p" color="muted">
             📚 For complete documentation and API reference, see{' '}
-            <code className="px-2 py-1 rounded bg-gray-100 dark:bg-gray-800 text-xs">
+            <Typography variant="code" color="primary">
               components/batch-creation/README.md
-            </code>
-          </p>
+            </Typography>
+          </Typography>
         </CardContent>
       </Card>
     </div>

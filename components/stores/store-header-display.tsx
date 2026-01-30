@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { useStoreState } from '@/lib/stores/store-context'
+import { Typography } from '../ui/typography'
 
 // Store type styling
 const storeTypeConfig = {
@@ -24,14 +25,14 @@ const storeTypeConfig = {
     badge: 'bg-orange-100 text-orange-800',
   },
   bakery: {
-    color: 'bg-yellow-500 text-yellow-50',
+    color: 'bg-primary text-yellow-50',
     label: 'Bakery',
     badge: 'bg-yellow-100 text-yellow-800',
   },
   butcher: {
-    color: 'bg-red-500 text-red-50',
+    color: 'bg-destructive text-red-50',
     label: 'Butcher',
-    badge: 'bg-red-100 text-red-800',
+    badge: 'bg-destructive text-destructive',
   },
   organic: {
     color: 'bg-emerald-500 text-emerald-50',
@@ -101,13 +102,19 @@ export function StoreHeaderDisplay({
           <Store className="size-4" />
         </div>
         <div className="min-w-0 flex-1">
-          <h1 className="truncate font-semibold text-lg">{activeStore.store_name}</h1>
-          <div className="flex items-center gap-1 text-sm text-muted-foreground">
+          <Typography variant="h1" color="primary">
+            {activeStore.store_name}
+          </Typography>
+          <div className="flex items-center gap-1">
             <MapPin className="size-3 shrink-0" />
-            <span className="truncate">{activeStore.city}</span>
+            <Typography variant="p" color="muted">
+              {activeStore.city}
+            </Typography>
             {activeStore.store_type && (
-              <Badge variant="secondary" className="ml-1 text-xs">
-                {storeConfig.label}
+              <Badge variant="secondary" className="ml-1">
+                <Typography variant="p" color="muted">
+                  {storeConfig.label}
+                </Typography>
               </Badge>
             )}
           </div>
@@ -117,7 +124,7 @@ export function StoreHeaderDisplay({
   }
 
   return (
-    <Card className={`border-0 bg-gradient-to-r from-background to-muted/20 ${className}`}>
+    <Card className={`border-0 bg-linear-to-r from-background to-muted/20 ${className}`}>
       <CardContent className="p-6">
         <div className="flex items-start gap-4">
           <div
@@ -128,31 +135,41 @@ export function StoreHeaderDisplay({
 
           <div className="min-w-0 flex-1 space-y-2">
             <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-bold">{activeStore.store_name}</h1>
+              <Typography variant="h1" color="primary">
+                {activeStore.store_name}
+              </Typography>
               {activeStore.store_type && (
                 <Badge className={storeConfig.badge}>{storeConfig.label}</Badge>
               )}
             </div>
 
             {activeStore.business_name && activeStore.business_name !== activeStore.store_name && (
-              <div className="flex items-center gap-1 text-muted-foreground">
+              <div className="flex items-center gap-1">
                 <Building2 className="size-4" />
-                <span>{activeStore.business_name}</span>
+                <Typography variant="p" color="muted">
+                  {activeStore.business_name}
+                </Typography>
               </div>
             )}
 
             {showAddress && (activeStore.address || activeStore.city) && (
-              <div className="flex items-start gap-1 text-sm text-muted-foreground">
+              <div className="flex items-start gap-1">
                 <MapPin className="size-4 mt-0.5 shrink-0" />
                 <div className="min-w-0">
-                  {activeStore.address && <p className="leading-relaxed">{activeStore.address}</p>}
+                  {activeStore.address && (
+                    <Typography variant="p" color="muted">
+                      {activeStore.address}
+                    </Typography>
+                  )}
                   {!activeStore.address && activeStore.city && (
-                    <p>
+                    <Typography variant="p" color="muted">
                       {activeStore.city}, {activeStore.country}
-                    </p>
+                    </Typography>
                   )}
                   {activeStore.store_code && (
-                    <p className="mt-1 font-mono text-xs">Store Code: {activeStore.store_code}</p>
+                    <Typography variant="code" color="primary">
+                      Store Code: {activeStore.store_code}
+                    </Typography>
                   )}
                 </div>
               </div>

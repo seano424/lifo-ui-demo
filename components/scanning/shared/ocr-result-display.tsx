@@ -62,8 +62,8 @@ export default function OCRResultDisplay({
     <div
       className={cn(
         'rounded-lg border p-4 space-y-3',
-        isSuccess && 'border-green-500/50 bg-green-50 dark:bg-green-950/20',
-        hasWarning && 'border-yellow-500/50 bg-yellow-50 dark:bg-yellow-950/20',
+        isSuccess && 'border-primary-500/50 bg-primary-50 dark:bg-primary-950/20',
+        hasWarning && 'border-primary/50 bg-yellow-50 dark:bg-yellow-950/20',
         hasInfo && 'border-blue-500/50 bg-blue-50 dark:bg-blue-950/20',
         className,
       )}
@@ -72,8 +72,8 @@ export default function OCRResultDisplay({
     >
       {/* Header with icon */}
       <div className="flex items-center gap-2">
-        {isSuccess && <CheckCircle2 className="w-5 h-5 text-green-600 dark:text-green-400" />}
-        {hasWarning && <AlertCircle className="w-5 h-5 text-yellow-600 dark:text-yellow-500" />}
+        {isSuccess && <CheckCircle2 className="w-5 h-5 text-primary dark:text-primary-400" />}
+        {hasWarning && <AlertCircle className="w-5 h-5 text-yellow-600 dark:text-primary" />}
         {hasInfo && <Info className="w-5 h-5 text-blue-600 dark:text-blue-400" />}
 
         <span className="font-semibold text-sm">
@@ -128,9 +128,9 @@ export default function OCRResultDisplay({
               <div
                 className={cn(
                   'h-full transition-all',
-                  confidence >= 0.8 && 'bg-green-500',
-                  confidence >= 0.6 && confidence < 0.8 && 'bg-yellow-500',
-                  confidence < 0.6 && 'bg-red-500',
+                  confidence >= 0.8 && 'bg-primary-500',
+                  confidence >= 0.6 && confidence < 0.8 && 'bg-primary',
+                  confidence < 0.6 && 'bg-destructive',
                 )}
                 style={{ width: `${Math.round(confidence * 100)}%` }}
               />
@@ -205,7 +205,7 @@ export function OCRResultCompact({
       className={cn(
         'flex items-center gap-2 px-3 py-2 rounded-md',
         validation.valid
-          ? 'bg-green-50 dark:bg-green-950/20 text-green-900 dark:text-green-100'
+          ? 'bg-primary-50 dark:bg-primary-950/20 text-primary-900 dark:text-primary-100'
           : 'bg-yellow-50 dark:bg-yellow-950/20 text-yellow-900 dark:text-yellow-100',
         className,
       )}

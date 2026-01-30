@@ -17,14 +17,14 @@ const defaultUrl = process.env.VERCEL_URL
 
 export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
-  title: 'LIFO - Expiry Tracking for Food Retailers',
+  title: 'Expiry Tracking for Retailers | lifo',
   description:
-    "LIFO helps food retailers reduce waste by tracking what's expiring and when to act—discount, donate, or sell in time.",
+    "lifo helps retailers reduce waste by tracking what's expiring and when to act—discount, donate, or sell in time.",
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: 'LIFO',
+    title: 'lifo',
   },
 }
 

@@ -11,6 +11,7 @@ import {
 } from '@/lib/todo-filter-config'
 import type { TodoFiltersState } from './types'
 import { useTranslations } from 'next-intl'
+import { Typography } from '@/components/ui/typography'
 
 interface TodoFilterOptionsProps {
   categoryId: string
@@ -131,7 +132,9 @@ export function TodoFilterOptions({
   return (
     <div className="flex-1 p-3 bg-white">
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm  text-gray-900">{category.label}</h3>
+        <Typography variant="h3" color="primary">
+          {category.label}
+        </Typography>
         {!hasNoSelections && (
           <button
             type="button"
@@ -143,7 +146,7 @@ export function TodoFilterOptions({
         )}
       </div>
 
-      <div className="space-y-1">
+      <div className="flex flex-col gap-1">
         {/* "All" option for multi-select */}
         {isMultiSelect && (
           <label
@@ -169,9 +172,9 @@ export function TodoFilterOptions({
                 {hasNoSelections && <Check className="w-3 h-3 text-white" strokeWidth={3} />}
               </div>
             </div>
-            <span className={cn('text-sm', hasNoSelections ? ' text-violet-700' : 'text-gray-700')}>
+            <Typography variant="p" color={hasNoSelections ? 'primary' : 'muted'}>
               {t('all')}
-            </span>
+            </Typography>
           </label>
         )}
 
@@ -205,14 +208,9 @@ export function TodoFilterOptions({
                     {isSelected && <Check className="w-3 h-3 text-white" strokeWidth={3} />}
                   </div>
                 </div>
-                <span
-                  className={cn(
-                    'text-sm flex-1',
-                    isSelected ? ' text-violet-700' : 'text-gray-700',
-                  )}
-                >
+                <Typography variant="p" color={isSelected ? 'primary' : 'muted'}>
                   {option.label}
-                </span>
+                </Typography>
               </label>
             )
           }
@@ -243,11 +241,9 @@ export function TodoFilterOptions({
                   {isSelected && <div className="w-2 h-2 rounded-full bg-violet-500" />}
                 </div>
               </div>
-              <span
-                className={cn('text-sm flex-1', isSelected ? ' text-violet-700' : 'text-gray-700')}
-              >
+              <Typography variant="p" color={isSelected ? 'primary' : 'muted'}>
                 {option.label}
-              </span>
+              </Typography>
             </label>
           )
         })}

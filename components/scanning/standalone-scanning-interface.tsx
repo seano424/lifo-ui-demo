@@ -524,7 +524,7 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
 
           {/* Step 2: Product Success */}
           {uiStep === 'product-success' && scannedProduct && (
-            <div className="space-y-4">
+            <div className="flex flex-col gap-4">
               {/* Lookup Status */}
               {lookupError && (
                 <Alert variant="destructive">
@@ -570,7 +570,7 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
 
           {/* Step 3: Expiry Date Scanning */}
           {uiStep === 'camera-expiry' && (
-            <div className="space-y-4">
+            <div className="flex flex-col gap-4">
               {/* Camera for OCR */}
               {!inventoryData.expiryDate && (
                 <ScanningCamera
@@ -679,7 +679,7 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
               <DialogDescription>{t('submission.description')}</DialogDescription>
             </DialogHeader>
 
-            <div className="space-y-4">
+            <div className="flex flex-col gap-4">
               <div className="text-sm text-gray-600">
                 {t('submission.submitText', { count: scannedItems.length })}
               </div>

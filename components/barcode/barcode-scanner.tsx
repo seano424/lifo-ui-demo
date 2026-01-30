@@ -335,7 +335,7 @@ export default function BarcodeScanner({
         <Typography variant="p">{displaySubtitle}</Typography>
       </div>
 
-      <div className="space-y-4">
+      <div className="flex flex-col gap-4">
         {/* Error Display */}
         {displayError && (
           <Alert variant="destructive" className="flex flex-col items-center justify-center gap-2">
@@ -393,7 +393,7 @@ export default function BarcodeScanner({
               {isScanning && isInitialized && (
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                   <div className="border-2 border-primary-400 w-64 h-32 rounded-2xl relative">
-                    <div className="absolute inset-x-0 top-1/2 h-0.5 bg-red-500 transform -translate-y-1/2 animate-pulse" />
+                    <div className="absolute inset-x-0 top-1/2 h-0.5 bg-destructive transform -translate-y-1/2 animate-pulse" />
                     {detectedBarcode && (
                       <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-primary-500 text-white px-2 py-1 rounded-2xl text-sm">
                         <CheckCircle className="w-3 h-3 inline mr-1" />

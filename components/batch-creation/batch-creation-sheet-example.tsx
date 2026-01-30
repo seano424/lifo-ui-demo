@@ -17,7 +17,7 @@ import { Badge } from '@/components/ui/badge'
 import { BatchCreationSheet } from '@/components/batch-creation'
 import { useDraftBatchesByProduct, useDraftBatchesSummary } from '@/hooks/use-draft-batches'
 import { useActiveStoreId } from '@/lib/stores/store-context'
-
+import { Typography } from '../ui/typography'
 // ============================================================================
 // Example 1: Dashboard Button
 // Opens sheet showing all products with draft batches
@@ -40,7 +40,7 @@ export function DashboardBatchButton() {
         {summary.total_draft_batches > 0 && (
           <Badge
             variant="secondary"
-            className="ml-2 bg-white dark:bg-gray-900 text-primary-600 dark:text-primary-400"
+            className="ml-2 bg-white dark:bg-gray-900 text-primary-800 dark:text-primary-400"
           >
             {summary.total_draft_batches}
           </Badge>
@@ -113,7 +113,7 @@ export function DeliveryWorkflowExample() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="flex flex-col gap-4">
       <Card>
         <CardHeader>
           <CardTitle>Delivery Workflow</CardTitle>
@@ -153,10 +153,10 @@ export function BatchCreationSheetDemo() {
     return (
       <Card>
         <CardContent className="p-8 text-center">
-          <Package className="h-12 w-12 mx-auto text-gray-400 mb-4" />
-          <p className="text-gray-600 dark:text-gray-400">
+          <Package className="h-12 w-12 mx-auto text-muted mb-4" />
+          <Typography variant="p" color="muted">
             No new deliveries found. All batches have expiry dates assigned.
-          </p>
+          </Typography>
         </CardContent>
       </Card>
     )
@@ -165,12 +165,12 @@ export function BatchCreationSheetDemo() {
   return (
     <div className="container max-w-4xl mx-auto py-8 space-y-8">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+        <Typography variant="h1" color="primary">
           Batch Creation Sheet Examples
-        </h1>
-        <p className="text-gray-600 dark:text-gray-400 mt-2">
+        </Typography>
+        <Typography variant="p" color="muted">
           Interactive examples showing different ways to use the BatchCreationSheet component
-        </p>
+        </Typography>
       </div>
 
       {/* Summary Card */}
@@ -178,25 +178,31 @@ export function BatchCreationSheetDemo() {
         <CardHeader>
           <CardTitle>Draft Batches Summary</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="flex flex-col gap-4">
           <div className="grid grid-cols-3 gap-4">
             <div className="text-center">
-              <p className="text-3xl font-bold text-primary-600 dark:text-primary-400">
+              <Typography variant="h2" color="primary">
                 {summary.total_draft_batches}
-              </p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Draft Batches</p>
+              </Typography>
+              <Typography variant="p" color="muted">
+                Draft Batches
+              </Typography>
             </div>
             <div className="text-center">
-              <p className="text-3xl font-bold text-primary-600 dark:text-primary-400">
+              <Typography variant="h2" color="primary">
                 {summary.total_units}
-              </p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Total Units</p>
+              </Typography>
+              <Typography variant="p" color="muted">
+                Total Units
+              </Typography>
             </div>
             <div className="text-center">
-              <p className="text-3xl font-bold text-primary-600 dark:text-primary-400">
+              <Typography variant="h2" color="primary">
                 {summary.products_with_drafts}
-              </p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Products</p>
+              </Typography>
+              <Typography variant="p" color="muted">
+                Products
+              </Typography>
             </div>
           </div>
         </CardContent>

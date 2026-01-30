@@ -81,12 +81,15 @@
       "buttons": {
         "freeTrial": "Démarrer mon essai gratuit",
         "explore": "Explorer la plateforme",
-        "dashboard": "Accéder à mon tableau de bord"
+        "dashboard": "Voir votre tableau de bord",
+        "bookDemo": "Réserver une démo"
       },
       "badge": {
         "text": "Profitez d'un mois d'essai gratuit",
         "welcomeBack": "Votre tableau de bord est prêt",
-        "square": "Fonctionne avec Square"
+        "square": "Fonctionne avec Square",
+        "noCreditCard": "Aucune carte de crédit requise",
+        "connectSquare": "Connectez-vous via Square"
       }
     },
     "features": {

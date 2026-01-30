@@ -13,6 +13,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { ErrorBoundary } from '@/components/ui/error-boundary'
 import { useInitiateSquareConnect } from '@/hooks/use-square-integration'
+import { Typography } from '@/components/ui/typography'
 
 export default function SquareConnectPage() {
   const router = useRouter()
@@ -35,7 +36,7 @@ export default function SquareConnectPage() {
     <ErrorBoundary>
       <div className="container max-w-4xl space-y-6 py-6 lg:py-8">
         {/* Header */}
-        <div className="space-y-2">
+        <div className="flex flex-col gap-2">
           <Button
             variant="ghost"
             size="sm"
@@ -51,8 +52,10 @@ export default function SquareConnectPage() {
               <Square className="h-6 w-6 text-white" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold tracking-tight">{t('connectTitle')}</h1>
-              <p className="text-gray-600">{t('connectSubtitle')}</p>
+              <Typography variant="h3">{t('connectTitle')}</Typography>
+              <Typography variant="p" color="muted">
+                {t('connectSubtitle')}
+              </Typography>
             </div>
           </div>
         </div>
@@ -65,26 +68,32 @@ export default function SquareConnectPage() {
               <CardTitle>{t('whatYouGet')}</CardTitle>
               <CardDescription>{t('whatYouGetDescription')}</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-3">
+            <CardContent className="flex flex-col gap-4">
               <div className="flex gap-3">
-                <CheckCircle className="h-5 w-5 flex-shrink-0 text-green-600" />
+                <CheckCircle className="h-5 w-5 shrink-0 text-primary" />
                 <div>
-                  <p className="">{t('benefit1Title')}</p>
-                  <p className="text-sm text-gray-600">{t('benefit1Description')}</p>
+                  <Typography variant="p">{t('benefit1Title')}</Typography>
+                  <Typography variant="p" color="muted">
+                    {t('benefit1Description')}
+                  </Typography>
                 </div>
               </div>
               <div className="flex gap-3">
-                <CheckCircle className="h-5 w-5 flex-shrink-0 text-green-600" />
+                <CheckCircle className="h-5 w-5 shrink-0 text-primary" />
                 <div>
-                  <p className="">{t('benefit2Title')}</p>
-                  <p className="text-sm text-gray-600">{t('benefit2Description')}</p>
+                  <Typography variant="p">{t('benefit2Title')}</Typography>
+                  <Typography variant="p" color="muted">
+                    {t('benefit2Description')}
+                  </Typography>
                 </div>
               </div>
               <div className="flex gap-3">
-                <CheckCircle className="h-5 w-5 flex-shrink-0 text-green-600" />
+                <CheckCircle className="h-5 w-5 shrink-0 text-primary" />
                 <div>
-                  <p className="">{t('benefit3Title')}</p>
-                  <p className="text-sm text-gray-600">{t('benefit3Description')}</p>
+                  <Typography variant="p">{t('benefit3Title')}</Typography>
+                  <Typography variant="p" color="muted">
+                    {t('benefit3Description')}
+                  </Typography>
                 </div>
               </div>
             </CardContent>
@@ -94,15 +103,15 @@ export default function SquareConnectPage() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <ShieldCheck className="h-5 w-5 text-green-600" />
+                <ShieldCheck className="h-5 w-5 text-primary" />
                 {t('security')}
               </CardTitle>
               <CardDescription>{t('securityDescription')}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-3 text-sm text-gray-600">
-              <p>{t('securityPoint1')}</p>
-              <p>{t('securityPoint2')}</p>
-              <p>{t('securityPoint3')}</p>
+              <Typography variant="p">{t('securityPoint1')}</Typography>
+              <Typography variant="p">{t('securityPoint2')}</Typography>
+              <Typography variant="p">{t('securityPoint3')}</Typography>
             </CardContent>
           </Card>
         </div>
@@ -111,9 +120,11 @@ export default function SquareConnectPage() {
         <Card>
           <CardContent className="p-6">
             <div className="flex flex-col items-center space-y-4 text-center">
-              <div className="space-y-2">
-                <h3 className="text-lg font-semibold">{t('readyToConnect')}</h3>
-                <p className="text-sm text-gray-600">{t('connectDescription')}</p>
+              <div className="flex flex-col gap-2">
+                <Typography variant="h3">{t('readyToConnect')}</Typography>
+                <Typography variant="p" color="muted">
+                  {t('connectDescription')}
+                </Typography>
               </div>
 
               <Button
@@ -128,9 +139,7 @@ export default function SquareConnectPage() {
               </Button>
 
               <Alert>
-                <AlertDescription className="text-sm text-gray-600">
-                  {t('redirectNotice')}
-                </AlertDescription>
+                <AlertDescription>{t('redirectNotice')}</AlertDescription>
               </Alert>
             </div>
           </CardContent>

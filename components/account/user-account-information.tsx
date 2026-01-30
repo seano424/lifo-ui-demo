@@ -152,7 +152,7 @@ export default function UserAccountInformation() {
         <CardContent className="space-y-6 pt-4 border-t">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {Array.from({ length: 6 }).map((_, i) => (
-              <div key={`skeleton-${i + 1}`} className="space-y-2">
+              <div key={`skeleton-${i + 1}`} className="flex flex-col gap-2">
                 <Skeleton className="h-4 w-24" />
                 <Skeleton className="h-10 w-full" />
               </div>
@@ -183,19 +183,15 @@ export default function UserAccountInformation() {
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
-            <Typography variant="h3" className="font-black">
-              {t('title')}
-            </Typography>
+            <Typography variant="h3">{t('title')}</Typography>
           </div>
         </div>
       </CardHeader>
 
       <CardContent className="space-y-6 pt-4 border-t">
-        <div className="space-y-4">
+        <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between">
-            <Typography variant="h4" className="font-black">
-              {t('profile.title')}
-            </Typography>
+            <Typography variant="h4">{t('profile.title')}</Typography>
             {!isEditingProfile && (
               <Button
                 variant="subtleSecondary"
@@ -210,10 +206,13 @@ export default function UserAccountInformation() {
           </div>
 
           {isEditingProfile ? (
-            <form onSubmit={profileForm.handleSubmit(handleProfileSubmit)} className="space-y-4">
+            <form
+              onSubmit={profileForm.handleSubmit(handleProfileSubmit)}
+              className="flex flex-col gap-4"
+            >
               <div className="space-y-4 p-4 border rounded-2xl">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
+                  <div className="flex flex-col gap-2">
                     <Label htmlFor="full_name">{t('profile.fullName')}</Label>
                     <Input
                       id="full_name"
@@ -227,7 +226,7 @@ export default function UserAccountInformation() {
                     )}
                   </div>
 
-                  <div className="space-y-2">
+                  <div className="flex flex-col gap-2">
                     <Label htmlFor="username">{t('profile.username')}</Label>
                     <Input
                       id="username"
@@ -280,7 +279,7 @@ export default function UserAccountInformation() {
               <div className="flex flex-col gap-2">
                 <Typography variant="p">{t('profile.email')}</Typography>
                 <Typography variant="p">{user.email}</Typography>
-                <Typography className="mt-1 text-primary-900" variant="p">
+                <Typography className="mt-1 text-primary-800" variant="p">
                   {t('profile.emailNotice')}
                 </Typography>
               </div>
@@ -290,9 +289,7 @@ export default function UserAccountInformation() {
 
         <div className="space-y-4 pt-4 border-t">
           <div className="flex items-center justify-between">
-            <Typography variant="h4" className="font-black">
-              {t('phone.title')}
-            </Typography>
+            <Typography variant="h4">{t('phone.title')}</Typography>
             {!isEditingPhone && (
               <Button
                 variant="subtleSecondary"
@@ -315,7 +312,7 @@ export default function UserAccountInformation() {
                 </Alert>
               )}
 
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <Label htmlFor="phone">{t('phone.label')}</Label>
                 <Input
                   id="phone"
@@ -351,7 +348,7 @@ export default function UserAccountInformation() {
               <Typography variant="p" className="flex items-center gap-2">
                 {user.phone ? formatPhoneNumber(user.phone) : t('phone.noPhone')}
                 {user.phone_verified && (
-                  <span className="text-primary-600 text-sm">✓ {t('phone.verified')}</span>
+                  <span className="text-primary-800 text-sm">✓ {t('phone.verified')}</span>
                 )}
               </Typography>
               {!user.phone && (
@@ -364,9 +361,7 @@ export default function UserAccountInformation() {
         </div>
 
         <div className="space-y-4 pt-4 border-t">
-          <Typography variant="h4" className="font-black">
-            {t('language.title')}
-          </Typography>
+          <Typography variant="h4">{t('language.title')}</Typography>
 
           <div className="flex items-center justify-between mt-2">
             <div className="flex flex-col gap-2">
@@ -379,33 +374,8 @@ export default function UserAccountInformation() {
           </div>
         </div>
 
-        {/*
-          Dark mode is currently disabled - controlled by NEXT_PUBLIC_ENABLE_DARK_MODE=false in .env
-          Uncomment this section when dark mode feature is re-enabled
-
-          <div className="space-y-4 pt-4 border-t">
-            <Typography variant="h4" className="font-black">
-              {t('theme.title')}
-            </Typography>
-
-            <div className="flex items-center justify-between mt-2">
-              <div className="flex flex-col gap-2">
-                <Typography variant="p">{t('theme.description')}</Typography>
-                <Typography variant="p">
-                  {t('theme.currentTheme')}: {getCurrentThemeDisplay()}
-                </Typography>
-              </div>
-              <div className="flex items-center gap-2">
-                <ThemeSwitcherSelect />
-              </div>
-            </div>
-          </div>
-        */}
-
         <div className="space-y-4 pt-4 border-t">
-          <Typography variant="h4" className="font-black">
-            {t('status.title')}
-          </Typography>
+          <Typography variant="h4">{t('status.title')}</Typography>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2">
             <div className="flex items-center justify-between p-3 border rounded-2xl">
@@ -416,7 +386,7 @@ export default function UserAccountInformation() {
                     {user.is_active ? t('status.active') : t('status.inactive')}
                   </Typography>
                   <div
-                    className={`w-3 h-3 rounded-full ${user.is_active ? 'bg-primary-500' : 'bg-red-500'}`}
+                    className={`w-3 h-3 rounded-full ${user.is_active ? 'bg-primary-500' : 'bg-destructive'}`}
                   />
                 </div>
               </div>
@@ -430,7 +400,7 @@ export default function UserAccountInformation() {
                     {user.email_verified ? t('status.verified') : t('status.unverified')}
                   </Typography>
                   <div
-                    className={`w-3 h-3 rounded-full ${user.email_verified ? 'bg-primary-500' : 'bg-yellow-500'}`}
+                    className={`w-3 h-3 rounded-full ${user.email_verified ? 'bg-primary-500' : 'bg-primary'}`}
                   />
                 </div>
               </div>
@@ -444,7 +414,7 @@ export default function UserAccountInformation() {
                     {user.phone_verified ? t('status.verified') : t('status.unverified')}
                   </Typography>
                   <div
-                    className={`w-3 h-3 rounded-full ${user.phone_verified ? 'bg-primary-500' : 'bg-yellow-500'}`}
+                    className={`w-3 h-3 rounded-full ${user.phone_verified ? 'bg-primary-500' : 'bg-primary'}`}
                   />
                 </div>
               </div>
@@ -453,9 +423,7 @@ export default function UserAccountInformation() {
         </div>
 
         <div className="space-y-4 pt-4 border-t">
-          <Typography variant="h4" className="font-black">
-            {t('activity.title')}
-          </Typography>
+          <Typography variant="h4">{t('activity.title')}</Typography>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="flex flex-col gap-2 mt-2">

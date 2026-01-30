@@ -185,7 +185,7 @@ export default function ScanningCamera({
 
           {/* OCR Action Buttons */}
           {isBackendHealthy !== false && (
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               {/* Manual Capture Button (always available as fallback) */}
               <div className="flex gap-2">
                 <Button onClick={handleOCRCapture} className="flex-1" disabled={isOCRProcessing}>
@@ -220,7 +220,7 @@ export default function ScanningCamera({
               )}
 
               {autoOCRState?.isAnalyzing && process.env.NEXT_PUBLIC_DEBUG_OCR !== 'true' && (
-                <div className="text-xs text-primary-600 text-center bg-primary-50 p-2 rounded animate-pulse">
+                <div className="text-xs text-primary-800 text-center bg-primary-50 p-2 rounded animate-pulse">
                   🤖 Auto-scanning active... Hold camera steady on expiry date
                 </div>
               )}
@@ -234,7 +234,7 @@ export default function ScanningCamera({
         <>
           {/* Manual Barcode Entry */}
           {showManualEntry && onManualProductSelected && onCloseManualEntry && (
-            <div className="space-y-4">
+            <div className="flex flex-col gap-4">
               <ManualBarcodeEntry
                 onProductSelected={onManualProductSelected}
                 mode={manualEntryMode}
@@ -259,7 +259,7 @@ export default function ScanningCamera({
       {mode === 'barcode' && !showManualEntry && (
         <Alert className="flex items-center gap-4">
           <div>
-            <Camera className="text-secondary-900 rounded-full p-[8px] border border-secondary-900 bg-primary-100 flex-shrink-0 h-8 w-8" />
+            <Camera className="text-secondary-900 rounded-full p-[8px] border border-secondary-900 bg-primary-100 shrink-0 h-8 w-8" />
           </div>
           <AlertDescription>{t('alerts.scanInstructions')}</AlertDescription>
         </Alert>

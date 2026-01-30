@@ -16,8 +16,8 @@ export function OCRProcessingState({ fileName, fileSize }: OCRProcessingStatePro
       <div className="flex flex-col items-center justify-center space-y-6 py-8">
         {/* Animated spinner */}
         <div className="relative">
-          <Loader2 className="h-16 w-16 text-primary-500 animate-spin" />
-          <FileImage className="h-8 w-8 text-primary-600 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
+          <Loader2 className="h-16 w-16 text-primary-800 animate-spin" />
+          <FileImage className="h-8 w-8 text-primary-800 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
         </div>
 
         {/* Processing message */}
@@ -35,7 +35,7 @@ export function OCRProcessingState({ fileName, fileSize }: OCRProcessingStatePro
         {/* File info */}
         <div className="bg-gray-50 rounded-lg p-4 w-full max-w-md">
           <div className="flex items-center gap-3">
-            <FileImage className="h-10 w-10 text-gray-400 flex-shrink-0" />
+            <FileImage className="h-10 w-10 text-gray-400 shrink-0" />
             <div className="flex-1 min-w-0">
               <p className="text-sm  text-gray-800 truncate">{fileName}</p>
               <p className="text-xs text-gray-500">{(fileSize / 1024).toFixed(1)} KB</p>

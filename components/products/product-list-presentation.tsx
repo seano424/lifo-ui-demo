@@ -29,7 +29,7 @@ import { useCallback, useMemo } from 'react'
 const getCategoryBadgeColor = (category: string) => {
   const colors = {
     fresh_produce: 'bg-primary-100 text-primary-800 border-primary-200',
-    fresh_meat_fish: 'bg-red-100 text-red-800 border-red-200',
+    fresh_meat_fish: 'bg-destructive text-destructive border-destructive',
     bakery_fresh: 'bg-orange-100 text-orange-800 border-orange-200',
     dairy: 'bg-yellow-100 text-yellow-800 border-yellow-200',
     deli_prepared: 'bg-pink-100 text-pink-800 border-pink-200',
@@ -172,7 +172,7 @@ export function ProductsListPresentation({
     return (
       <Card className="w-full">
         <CardContent>
-          <div className="space-y-3">
+          <div className="flex flex-col gap-4">
             {[...Array(8)].map((_, i) => (
               <div
                 key={`skeleton-${i + 1}`}
@@ -192,7 +192,7 @@ export function ProductsListPresentation({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col gap-6">
       <Card className="w-full overflow-x-auto">
         <CardContent>
           {products.length === 0 ? (
@@ -200,7 +200,7 @@ export function ProductsListPresentation({
               <div className="text-center">
                 <Package className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                 <Typography variant="h3">{t('empty.title')}</Typography>
-                <Typography variant="p" color="muted" className="mt-2">
+                <Typography variant="p" color="muted">
                   {t('empty.description')}
                 </Typography>
               </div>
@@ -237,12 +237,8 @@ export function ProductsListPresentation({
                   <TableRow key={product.product_id}>
                     <TableCell className="">
                       <div>
-                        <div className="font-semibold">
-                          {product.name || t('table.unnamedProduct')}
-                        </div>
-                        <div className="text-sm text-muted-foreground font-mono">
-                          SKU: {product.sku || 'N/A'}
-                        </div>
+                        <div>{product.name || t('table.unnamedProduct')}</div>
+                        <div>SKU: {product.sku || 'N/A'}</div>
                       </div>
                     </TableCell>
                     <TableCell>
@@ -254,43 +250,39 @@ export function ProductsListPresentation({
                           {getCategoryName(product)}
                         </Badge>
                       ) : (
-                        <span className="text-muted-foreground text-sm">
-                          {t('table.uncategorized')}
-                        </span>
+                        <span>{t('table.uncategorized')}</span>
                       )}
                     </TableCell>
                     <TableCell>
-                      <span className="text-sm">{product.brand || 'N/A'}</span>
+                      <span>{product.brand || 'N/A'}</span>
                     </TableCell>
                     <TableCell>
-                      <div className="text-sm">
+                      <Typography variant="muted">
                         <span className="">{product.total_stock || 0}</span>
-                        <span className="text-muted-foreground ml-1">
-                          {product.unit_type || t('table.units')}
-                        </span>
-                      </div>
+                        <span>{product.unit_type || t('table.units')}</span>
+                      </Typography>
                     </TableCell>
                     <TableCell className="text-right">
-                      <div>
-                        <div className="font-bold text-lg">
+                      <Typography variant="p">
+                        <div>
                           {currencySymbol}
                           {product.base_selling_price?.toFixed(2) || '0.00'}
                         </div>
-                        <div className="text-xs text-muted-foreground">
+                        <div>
                           {t('table.cost')}: {currencySymbol}
                           {product.base_cost_price?.toFixed(2) || '0.00'}
                         </div>
-                      </div>
+                      </Typography>
                     </TableCell>
                     <TableCell>
-                      <div className="text-sm">
-                        <span className="">{product.active_batches_count || 0}</span>
-                        <span className="text-muted-foreground ml-1">
+                      <Typography variant="p">
+                        <span>{product.active_batches_count || 0}</span>
+                        <span>
                           {(product.active_batches_count || 0) === 1
                             ? t('table.batch')
                             : t('table.batches')}
                         </span>
-                      </div>
+                      </Typography>
                     </TableCell>
                     <TableCell className="text-right">
                       <DropdownMenu>

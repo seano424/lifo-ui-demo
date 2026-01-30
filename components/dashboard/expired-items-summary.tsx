@@ -13,10 +13,10 @@ export function ExpiredItemsSummary() {
   if (isLoading) {
     return (
       <div className="bg-white dark:bg-brand-dark rounded-2xl border p-6">
-        <div className="space-y-4">
+        <div className="flex flex-col gap-4">
           <Skeleton className="h-6 w-48" />
           <Skeleton className="h-8 w-24" />
-          <div className="space-y-3">
+          <div className="flex flex-col gap-4">
             <Skeleton className="h-5 w-full" />
             <Skeleton className="h-5 w-full" />
             <Skeleton className="h-5 w-full" />
@@ -70,11 +70,11 @@ export function ExpiredItemsSummary() {
             </Typography>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="flex flex-col gap-4">
             {/* Expired Summary */}
             <div className="flex items-center justify-between py-2">
               <div className="flex items-center gap-3">
-                <AlertTriangle className="h-4 w-4 text-red-500" />
+                <AlertTriangle className="h-4 w-4 text-destructive" />
                 <Typography variant="p" className="text-gray-700 dark:text-brand-white">
                   {t('totalExpired')}
                 </Typography>

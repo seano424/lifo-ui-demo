@@ -94,7 +94,7 @@ export default function UnifiedSettingsPage() {
     return (
       <div className="flex flex-col gap-6">
         <DashboardInsetHeader title={t('title')} description={t('description')} />
-        <div className="space-y-4">
+        <div className="flex flex-col gap-4">
           <Skeleton className="h-10 w-full" />
           <Skeleton className="h-32 w-full" />
           <Skeleton className="h-32 w-full" />
@@ -124,19 +124,19 @@ export default function UnifiedSettingsPage() {
           >
             {visibleTabs()?.includes('store') && (
               <TabsTrigger value="store" className="flex items-center justify-center gap-2 px-1">
-                <Store className="h-4 w-4 flex-shrink-0" />
+                <Store className="h-4 w-4 shrink-0" />
                 <span className="hidden sm:inline whitespace-nowrap">{t('tabs.store')}</span>
               </TabsTrigger>
             )}
             {visibleTabs()?.includes('account') && (
               <TabsTrigger value="account" className="flex items-center justify-center gap-2 px-1">
-                <User className="h-4 w-4 flex-shrink-0" />
+                <User className="h-4 w-4 shrink-0" />
                 <span className="hidden sm:inline whitespace-nowrap">{t('tabs.account')}</span>
               </TabsTrigger>
             )}
             {visibleTabs()?.includes('team') && (
               <TabsTrigger value="team" className="flex items-center justify-center gap-2 px-1">
-                <Users className="h-4 w-4 flex-shrink-0" />
+                <Users className="h-4 w-4 shrink-0" />
                 <span className="hidden sm:inline whitespace-nowrap">{t('tabs.team')}</span>
               </TabsTrigger>
             )}
@@ -145,7 +145,7 @@ export default function UnifiedSettingsPage() {
                 value="notifications"
                 className="flex items-center justify-center gap-2 px-1"
               >
-                <Bell className="h-4 w-4 flex-shrink-0" />
+                <Bell className="h-4 w-4 shrink-0" />
                 <span className="hidden sm:inline whitespace-nowrap">
                   {t('tabs.notifications')}
                 </span>
@@ -153,13 +153,13 @@ export default function UnifiedSettingsPage() {
             )}
             {visibleTabs()?.includes('billing') && (
               <TabsTrigger value="billing" className="flex items-center justify-center gap-2 px-1">
-                <CreditCard className="h-4 w-4 flex-shrink-0" />
+                <CreditCard className="h-4 w-4 shrink-0" />
                 <span className="hidden sm:inline whitespace-nowrap">{t('tabs.billing')}</span>
               </TabsTrigger>
             )}
             {visibleTabs()?.includes('security') && (
               <TabsTrigger value="security" className="flex items-center justify-center gap-2 px-1">
-                <Lock className="h-4 w-4 flex-shrink-0" />
+                <Lock className="h-4 w-4 shrink-0" />
                 <span className="hidden sm:inline whitespace-nowrap">{t('tabs.security')}</span>
               </TabsTrigger>
             )}

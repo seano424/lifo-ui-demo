@@ -17,7 +17,7 @@ export function MarketingFooter() {
       <div className="container mx-auto max-w-7xl">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-10">
           {/* Logo and Description */}
-          <div className="space-y-4">
+          <div className="flex flex-col gap-4">
             <div className="flex items-center gap-2">
               <Logo variant="svg" size="sm" className="w-10 h-auto" />
               <Typography variant="h4" className="font-heading font-black text-xl">
@@ -73,7 +73,7 @@ export function MarketingFooter() {
             <Typography variant="h4" className="text-base font-bold">
               {t('contactUs')}
             </Typography>
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <a
                 href="mailto:contact@lifo-app.com"
                 className="hover:text-foreground transition-colors"

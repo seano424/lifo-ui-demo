@@ -139,7 +139,7 @@ export default function ScannedItemsList({
         </div>
       </div>
 
-      <div className="space-y-2">
+      <div className="flex flex-col gap-2">
         {items.map(item => (
           <div
             key={item.id}
@@ -180,7 +180,7 @@ export default function ScannedItemsList({
                   onClick={() => onDeleteItem(item.id)}
                   variant="ghost"
                   size="sm"
-                  className="h-6 w-6 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
+                  className="h-6 w-6 p-0 text-destructive hover:text-destructive hover:bg-red-50"
                 >
                   <Trash2 className="w-4 h-4" />
                 </Button>
@@ -203,7 +203,7 @@ export default function ScannedItemsList({
               </DialogDescription>
             </DialogHeader>
 
-            <div className="space-y-4">
+            <div className="flex flex-col gap-4">
               {/* Product Info - Now editable in advanced mode */}
               {!showAdvancedEdit ? (
                 <div className="p-3 bg-gray-50 rounded-2xl">
@@ -281,13 +281,13 @@ export default function ScannedItemsList({
               )}
 
               {/* Quick Edit Form - Always visible */}
-              <div className="space-y-3">
+              <div className="flex flex-col gap-4">
                 <div className="flex items-center justify-between">
-                  <h4 className="text-sm ">
+                  <Typography variant="h4" color="primary">
                     {showAdvancedEdit
                       ? t('editDialog.sections.inventoryDetails')
                       : t('editDialog.sections.quickEdit')}
-                  </h4>
+                  </Typography>
                   <Button
                     variant="ghost"
                     size="sm"

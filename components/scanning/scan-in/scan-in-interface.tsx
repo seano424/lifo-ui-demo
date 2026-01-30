@@ -133,7 +133,7 @@ export default function ScanInInterface({ onItemAdded, className }: ScanInInterf
               </DialogDescription>
             </DialogHeader>
 
-            <div className="space-y-4">
+            <div className="flex flex-col gap-4">
               <div className="text-sm text-gray-600">
                 You are about to submit {pendingItems.length} item
                 {pendingItems.length > 1 ? 's' : ''} to inventory:

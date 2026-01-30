@@ -13,13 +13,11 @@ interface FeatureProps {
 function Feature({ icon, title, description }: FeatureProps) {
   return (
     <div className="flex flex-col md:flex-row gap-4 items-start group">
-      <div className="text-secondary-900 bg-secondary-100/70 p-3 rounded-2xl border border-secondary-200/50 shadow-sm group-hover:shadow-md group-hover:shadow-secondary-500/10 transition-all duration-300">
+      <div className="p-3 rounded-2xl border border-secondary-200/50 shadow-sm group-hover:shadow-md group-hover:shadow-secondary-500/10 transition-all duration-300">
         {icon}
       </div>
       <div className="flex flex-col gap-2">
-        <Typography variant="h3" className="font-semibold mb-2 ">
-          {title}
-        </Typography>
+        <Typography variant="h3">{title}</Typography>
         <Typography variant="p">{description}</Typography>
       </div>
     </div>
@@ -63,12 +61,7 @@ export function FeaturesSummary() {
         </div>
 
         <div className="flex flex-col gap-4 items-center justify-center">
-          <Button
-            asLink
-            href="/features"
-            size="xl"
-            className="bg-gradient-to-r from-primary-900 to-secondary-800 text-white hover:opacity-90 transition-opacity shadow-lg shadow-blue-500/20"
-          >
+          <Button asLink href="/features" size="xl">
             {t('discoverButton')}
           </Button>
           <Typography variant="muted">{t('noCommitment')}</Typography>

@@ -301,7 +301,7 @@ export default function ManualBarcodeEntry({
           </div>
         </CardHeader>
 
-        <CardContent className="space-y-4">
+        <CardContent className="flex flex-col gap-4">
           {selectedProduct && (
             <Card>
               <CardContent className="p-4">
@@ -354,9 +354,9 @@ export default function ManualBarcodeEntry({
 
           {!selectedProduct && (
             <>
-              <div className="space-y-4">
+              <div className="flex flex-col gap-4">
                 {/* Barcode Lookup */}
-                <div className="space-y-2">
+                <div className="flex flex-col gap-2">
                   <Label>{t('searchByBarcode')}</Label>
                   <div className="flex flex-col sm:flex-row gap-2">
                     <Input
@@ -405,7 +405,7 @@ export default function ManualBarcodeEntry({
                 </div>
 
                 {/* Product Name Search */}
-                <div className="space-y-2">
+                <div className="flex flex-col gap-2">
                   <Label>
                     {t('searchByProductName')}
                     {mode === 'scan-out' && (
@@ -487,11 +487,11 @@ export default function ManualBarcodeEntry({
                                   <Typography variant="p">{product.brand}</Typography>
                                 )}
                                 {product.isOutOfStock ? (
-                                  <Typography variant="small" className="text-red-600">
+                                  <Typography variant="small" className="text-destructive">
                                     {t('outOfStock')}
                                   </Typography>
                                 ) : product.total_available_quantity ? (
-                                  <Typography variant="small" className="text-primary-900">
+                                  <Typography variant="small" className="text-primary-800">
                                     {product.total_available_quantity} {t('unitsAvailable')}
                                     {product.batch_count &&
                                       product.batch_count > 1 &&
@@ -612,7 +612,7 @@ export default function ManualBarcodeEntry({
               )}
 
               {lookupResult && (
-                <div className="space-y-3">
+                <div className="flex flex-col gap-4">
                   {lookupResult.found ? (
                     <Card>
                       <CardContent className="p-4">
@@ -627,8 +627,8 @@ export default function ManualBarcodeEntry({
                             </div>
                           ) : (
                             <div className="flex justify-center items-center gap-2">
-                              <AlertCircle className="w-6 h-6 text-red-600" />
-                              <Typography variant="h3" className="text-red-600 font-black">
+                              <AlertCircle className="w-6 h-6 text-destructive" />
+                              <Typography variant="h3" className="text-destructive font-black">
                                 {t('outOfStock')}
                               </Typography>
                             </div>
@@ -666,11 +666,11 @@ export default function ManualBarcodeEntry({
                               <div>
                                 <strong>Stock:</strong>{' '}
                                 {barcodeStockStatus.hasStock ? (
-                                  <span className="text-primary-600">
+                                  <span className="text-primary-800">
                                     {barcodeStockStatus.availableQuantity} {t('unitsAvailable')}
                                   </span>
                                 ) : (
-                                  <span className="text-red-600">{t('noStockAvailable')}</span>
+                                  <span className="text-destructive">{t('noStockAvailable')}</span>
                                 )}
                               </div>
                             )}
@@ -750,7 +750,7 @@ export default function ManualBarcodeEntry({
                       {t('addProductManually')}
                     </div>
                   </div>
-                  <div className="space-y-3">
+                  <div className="flex flex-col gap-4">
                     <div className="grid grid-cols-1 gap-3">
                       <div>
                         <Label>{tFields('barcode')} *</Label>

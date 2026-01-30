@@ -92,17 +92,17 @@ export function SquareCallbackProcessor() {
           <div className="flex items-center justify-center">
             {status === 'processing' && (
               <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary-100">
-                <Loader2 className="h-8 w-8 animate-spin text-primary-900" />
+                <Loader2 className="h-8 w-8 animate-spin text-primary-800" />
               </div>
             )}
             {status === 'success' && (
-              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
-                <CheckCircle2 className="h-8 w-8 text-green-600" />
+              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary-100">
+                <CheckCircle2 className="h-8 w-8 text-primary" />
               </div>
             )}
             {status === 'error' && (
-              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
-                <XCircle className="h-8 w-8 text-red-600" />
+              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-destructive">
+                <XCircle className="h-8 w-8 text-destructive" />
               </div>
             )}
           </div>
@@ -120,7 +120,7 @@ export function SquareCallbackProcessor() {
           </CardDescription>
         </CardHeader>
 
-        <CardContent className="space-y-4">
+        <CardContent className="flex flex-col gap-4">
           {status === 'processing' && (
             <div className="space-y-2 text-sm text-gray-600">
               <div className="flex items-center gap-2">
@@ -139,7 +139,7 @@ export function SquareCallbackProcessor() {
           )}
 
           {status === 'success' && squareStatus && (
-            <div className="space-y-3 rounded-lg bg-green-50 p-4 text-sm">
+            <div className="space-y-3 rounded-lg bg-primary-50 p-4 text-sm">
               {squareStatus.merchant_name && (
                 <div className="flex justify-between">
                   <span className="text-gray-600">{t('merchant')}:</span>
@@ -147,7 +147,7 @@ export function SquareCallbackProcessor() {
                 </div>
               )}
               {squareStatus.stores && squareStatus.stores.length > 0 && (
-                <div className="space-y-2">
+                <div className="flex flex-col gap-2">
                   <span className="text-gray-600">
                     {squareStatus.stores.length === 1
                       ? t('connectedStore')
