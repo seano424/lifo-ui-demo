@@ -106,7 +106,7 @@ export function Logo({
         )}
       >
         {logoElement}
-        <span className={cn(textSizeMap[size])}>{withText && 'leafo'}</span>
+        <span className={cn(textSizeMap[size])}>{withText && 'lifo'}</span>
       </Link>
     )
   }
@@ -119,7 +119,7 @@ export function Logo({
       )}
     >
       {logoElement}
-      <span className={cn(textSizeMap[size])}>{withText && 'leafo'}</span>
+      <span className={cn(textSizeMap[size])}>{withText && 'lifo'}</span>
     </div>
   )
 }
