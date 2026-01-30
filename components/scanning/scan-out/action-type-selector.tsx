@@ -53,7 +53,7 @@ export default function ActionTypeSelector({
       label: t('dispose'),
       icon: ClipboardXIcon,
       color: 'text-gray-600',
-      activeColor: 'text-red-700 bg-red-100 border-red-700',
+      activeColor: 'text-destructive bg-destructive border-destructive',
     },
   ]
 

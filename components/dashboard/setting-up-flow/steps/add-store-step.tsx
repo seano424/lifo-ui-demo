@@ -44,13 +44,9 @@ export function AddStoreStep() {
   return (
     <>
       <div className="flex flex-col gap-6">
-        <Typography variant="h2" className="font-bold">
-          {t('steps.addStore.title')}
-        </Typography>
+        <Typography variant="h3">{t('steps.addStore.title')}</Typography>
 
-        <Typography variant="p" className="text-muted-foreground">
-          {t('steps.addStore.description')}
-        </Typography>
+        <Typography variant="p">{t('steps.addStore.description')}</Typography>
 
         <Card
           className={cn(
@@ -70,9 +66,7 @@ export function AddStoreStep() {
               <Image src="/square/square-icon.svg" alt="Square" width={40} height={40} />
               <div>
                 <div className="flex items-center gap-2 pb-2">
-                  <Typography variant="h3" className="font-semibold">
-                    Square
-                  </Typography>
+                  <Typography variant="h3">Square</Typography>
                   {isSquareConnected ? (
                     <Badge variant="primary" className="gap-1">
                       <CheckCircle2 className="h-5 w-5 text-primary stroke-2" />
@@ -84,9 +78,7 @@ export function AddStoreStep() {
                     </Badge>
                   )}
                 </div>
-                <Typography variant="p" className="text-sm text-muted-foreground">
-                  {t('steps.addStore.squareDescription')}
-                </Typography>
+                <Typography variant="p">{t('steps.addStore.squareDescription')}</Typography>
               </div>
             </div>
             <Button
@@ -107,38 +99,6 @@ export function AddStoreStep() {
             </Button>
           </div>
         </Card>
-
-        {/* One-time import */}
-        {/* <div className="flex flex-col gap-4 mt-4">
-          <Typography variant="h3" className="font-semibold">
-            {t('steps.addStore.manual')}
-          </Typography>
-
-          <Card
-            className="p-6 border-dashed transition-colors cursor-pointer group"
-            onClick={() => setIsAddStoreOpen(true)}
-          >
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center justify-between">
-              <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                <Image src="/logos/lifo-logo-icon.svg" alt="Square" width={40} height={40} />
-                <div>
-                  <Typography variant="h4" className="font-semibold">
-                    {t('steps.addStore.manualEntry')}
-                  </Typography>
-                  <Typography variant="p" className="text-sm text-muted-foreground">
-                    {t('steps.addStore.manualEntryDescription')}
-                  </Typography>
-                </div>
-              </div>
-              <Button
-                variant="outline"
-                className="w-fit group-hover:bg-white group-hover:text-primary-800 hover:bg-white hover:text-primary-800 pointer-events-none"
-              >
-                {t('steps.addStore.manualEntryButton')}
-              </Button>
-            </div>
-          </Card>
-        </div> */}
       </div>
 
       <BottomSheet

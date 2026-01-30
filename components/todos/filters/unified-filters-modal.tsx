@@ -9,6 +9,7 @@ import type { BatchStatus, TodoActionType, TodoUrgencyLevel } from '@/lib/querie
 import { Filter, X } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import type { TodoFilterValues } from './types'
+import { Typography } from '@/components/ui/typography'
 
 const URGENCY_OPTIONS: {
   value: TodoUrgencyLevel | 'all'
@@ -172,9 +173,9 @@ export function UnifiedFiltersModal({
       <div className={`space-y-8 ${padding}`}>
         {/* Urgency Filter */}
         <div className={spacing}>
-          <h4 className={`${isMobile ? 'text-sm' : 'text-base'}  text-muted-foreground`}>
+          <Typography variant="h4" color="muted">
             {t('filters.urgency.title')}
-          </h4>
+          </Typography>
           <div className={`grid ${gridCols} gap-3`}>
             {URGENCY_OPTIONS.map(option => {
               const isSelected =
@@ -203,9 +204,9 @@ export function UnifiedFiltersModal({
 
         {/* Action Type Filter */}
         <div className={spacing}>
-          <h4 className={`${isMobile ? 'text-sm' : 'text-base'}  text-muted-foreground`}>
+          <Typography variant="h4" color="muted">
             {t('filters.action.title')}
-          </h4>
+          </Typography>
           <div className={`grid ${gridCols} gap-3`}>
             {ACTION_OPTIONS.map(option => {
               const isSelected =
@@ -234,9 +235,9 @@ export function UnifiedFiltersModal({
 
         {/* Batch Status Filter */}
         <div className={spacing}>
-          <h4 className={`${isMobile ? 'text-sm' : 'text-base'}  text-muted-foreground`}>
+          <Typography variant="h4" color="muted">
             {t('filters.batchStatus.title')}
-          </h4>
+          </Typography>
           <div className={`grid ${gridCols} gap-3`}>
             {BATCH_STATUS_OPTIONS.map(option => {
               const isSelected =
@@ -265,9 +266,9 @@ export function UnifiedFiltersModal({
 
         {/* Expiry Filter */}
         <div className={spacing}>
-          <h4 className={`${isMobile ? 'text-sm' : 'text-base'}  text-muted-foreground`}>
+          <Typography variant="h4" color="muted">
             {t('filters.expiry.title')}
-          </h4>
+          </Typography>
           <div className={`grid ${gridCols} gap-3`}>
             {EXPIRY_OPTIONS.map(option => {
               const isSelected =
@@ -295,9 +296,9 @@ export function UnifiedFiltersModal({
         {/* Active Filters Display */}
         {hasActiveFilters && (
           <div className="space-y-2">
-            <h4 className={`${isMobile ? 'text-sm' : 'text-base'}  text-muted-foreground`}>
+            <Typography variant="h4" color="primary">
               {t('filters.activeFilters')}
-            </h4>
+            </Typography>
             <div className="flex flex-wrap gap-2">
               {filters.urgency_level?.map((urgency: TodoUrgencyLevel) => {
                 const option = URGENCY_OPTIONS.find(opt => opt.value === urgency)

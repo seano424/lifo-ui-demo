@@ -12,7 +12,7 @@ import type { Product, ProductSort, SortField } from '@/lib/queries/products'
 const getCategoryBadgeColor = (category: string) => {
   const colors = {
     fresh_produce: 'bg-primary-100 text-primary-800 border-primary-200',
-    fresh_meat_fish: 'bg-red-100 text-red-800 border-red-200',
+    fresh_meat_fish: 'bg-destructive text-destructive border-destructive',
     bakery_fresh: 'bg-orange-100 text-orange-800 border-orange-200',
     dairy: 'bg-yellow-100 text-yellow-800 border-yellow-200',
     deli_prepared: 'bg-pink-100 text-pink-800 border-pink-200',
@@ -144,7 +144,7 @@ export function createProductTableColumns({
       ),
       cell: ({ row }) => (
         <div className="flex items-center gap-2 justify-end text-right">
-          <Tag className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+          <Tag className="h-4 w-4 text-muted-foreground shrink-0" />
           {row.original.category_code ? (
             <Badge
               variant="outline"
@@ -174,7 +174,7 @@ export function createProductTableColumns({
       ),
       cell: ({ row }) => (
         <div className="flex items-center gap-2 justify-end text-right">
-          <Building2 className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+          <Building2 className="h-4 w-4 text-muted-foreground shrink-0" />
           <span className="truncate" title={row.original.brand || t('notAvailable')}>
             {row.original.brand || t('notAvailable')}
           </span>

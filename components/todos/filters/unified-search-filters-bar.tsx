@@ -7,6 +7,7 @@ import type { BatchStatus, TodoActionType, TodoUrgencyLevel } from '@/lib/querie
 import { ArrowUpDown, Filter, X } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { TodoSearchBar } from './todo-search-bar'
+import { Typography } from '@/components/ui/typography'
 
 interface UnifiedSearchFiltersBarProps {
   searchTerm?: string
@@ -112,7 +113,9 @@ export function UnifiedSearchFiltersBar({
         {hasActiveFilters && onRemoveFilter && (
           <div className="space-y-2">
             <div className="flex items-center justify-center gap-3">
-              <h4 className="text-sm  text-muted-foreground">{t('filters.activeFilters')}</h4>
+              <Typography variant="h4" color="primary">
+                {t('filters.activeFilters')}
+              </Typography>
               {onClearAll && (
                 <Button
                   variant="outline"
@@ -244,7 +247,9 @@ export function UnifiedSearchFiltersBar({
               <div className="w-1/2 border-t border-border" />
             </div>
             <div className="flex items-center justify-center gap-3">
-              <h4 className="text-sm  text-muted-foreground">{t('filters.activeFilters')}</h4>
+              <Typography variant="h4" color="primary">
+                {t('filters.activeFilters')}
+              </Typography>
               {onClearAll && (
                 <Button
                   variant="outline"

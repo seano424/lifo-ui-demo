@@ -74,7 +74,7 @@ export function ExpiredItemsSummary() {
             {/* Expired Summary */}
             <div className="flex items-center justify-between py-2">
               <div className="flex items-center gap-3">
-                <AlertTriangle className="h-4 w-4 text-red-500" />
+                <AlertTriangle className="h-4 w-4 text-destructive" />
                 <Typography variant="p" className="text-gray-700 dark:text-brand-white">
                   {t('totalExpired')}
                 </Typography>

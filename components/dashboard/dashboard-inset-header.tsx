@@ -3,6 +3,7 @@
 import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
 import { useTranslations } from 'next-intl'
+import { Typography } from '../ui/typography'
 
 export default function DashboardInsetHeader({
   page,
@@ -41,12 +42,14 @@ export default function DashboardInsetHeader({
           <Skeleton className="w-[500px] h-5 rounded-lg animate-pulse" />
         </div>
       ) : (
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
+        <div className="flex flex-col gap-2">
+          <Typography variant="h2" color="primary">
             {displayTitle}
-          </h1>
+          </Typography>
           {displayDescription && (
-            <p className="text-base text-gray-500 dark:text-gray-400 mt-1">{displayDescription}</p>
+            <Typography variant="p" color="muted">
+              {displayDescription}
+            </Typography>
           )}
         </div>
       )}

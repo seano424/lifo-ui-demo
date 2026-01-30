@@ -15,8 +15,8 @@ const buttonVariants = cva(
         default:
           'bg-primary-900 text-white hover:bg-primary-800 dark:bg-primary-700 dark:hover:bg-primary-600',
         destructive:
-          'bg-destructive text-destructive-foreground shadow-xs hover:bg-destructive/90 dark:bg-red-700 dark:hover:bg-red-700',
-        subtleDestructive: 'bg-red-100 text-red-900 shadow-xs hover:bg-red-200',
+          'bg-destructive text-destructive-foreground shadow-xs hover:bg-destructive/90 dark:bg-destructive dark:hover:bg-destructive',
+        subtleDestructive: 'bg-destructive text-destructive shadow-xs hover:bg-destructive',
         outline: 'border border-input bg-background shadow-xs hover:border-border',
         secondary:
           'bg-secondary-900 text-white shadow-xs hover:bg-secondary-800 dark:bg-secondary-700 dark:hover:bg-secondary-600',
@@ -44,8 +44,8 @@ const buttonVariants = cva(
         white: 'bg-white text-primary-800 hover:bg-white/90',
       },
       size: {
-        sm: 'px-4 py-1.5 text-sm',
-        default: 'px-6 py-2.5 text-sm',
+        sm: 'px-4 py-2 text-sm',
+        default: 'px-6 py-3 text-sm',
         lg: 'px-6 py-4 text-base',
         xl: 'px-8 py-4 text-lg',
         icon: 'h-9 w-9',

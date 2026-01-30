@@ -96,13 +96,13 @@ export function SquareCallbackProcessor() {
               </div>
             )}
             {status === 'success' && (
-              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
-                <CheckCircle2 className="h-8 w-8 text-green-600" />
+              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary-100">
+                <CheckCircle2 className="h-8 w-8 text-primary" />
               </div>
             )}
             {status === 'error' && (
-              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
-                <XCircle className="h-8 w-8 text-red-600" />
+              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-destructive">
+                <XCircle className="h-8 w-8 text-destructive" />
               </div>
             )}
           </div>
@@ -139,7 +139,7 @@ export function SquareCallbackProcessor() {
           )}
 
           {status === 'success' && squareStatus && (
-            <div className="space-y-3 rounded-lg bg-green-50 p-4 text-sm">
+            <div className="space-y-3 rounded-lg bg-primary-50 p-4 text-sm">
               {squareStatus.merchant_name && (
                 <div className="flex justify-between">
                   <span className="text-gray-600">{t('merchant')}:</span>

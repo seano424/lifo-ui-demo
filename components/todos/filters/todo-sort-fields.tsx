@@ -57,7 +57,7 @@ export function TodoSortFields({ selectedField, onFieldSelect }: TodoSortFieldsP
               !isSelected && 'text-gray-700',
             )}
           >
-            {Icon && <Icon className="h-4 w-4 flex-shrink-0" />}
+            {Icon && <Icon className="h-4 w-4 shrink-0" />}
             <div className="flex flex-col min-w-0">
               <span className="text-sm truncate">{t(`${translationKey}.label`)}</span>
               <span className="text-xs text-gray-500 truncate">

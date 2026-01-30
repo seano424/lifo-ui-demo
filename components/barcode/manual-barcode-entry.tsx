@@ -487,7 +487,7 @@ export default function ManualBarcodeEntry({
                                   <Typography variant="p">{product.brand}</Typography>
                                 )}
                                 {product.isOutOfStock ? (
-                                  <Typography variant="small" className="text-red-600">
+                                  <Typography variant="small" className="text-destructive">
                                     {t('outOfStock')}
                                   </Typography>
                                 ) : product.total_available_quantity ? (
@@ -627,8 +627,8 @@ export default function ManualBarcodeEntry({
                             </div>
                           ) : (
                             <div className="flex justify-center items-center gap-2">
-                              <AlertCircle className="w-6 h-6 text-red-600" />
-                              <Typography variant="h3" className="text-red-600 font-black">
+                              <AlertCircle className="w-6 h-6 text-destructive" />
+                              <Typography variant="h3" className="text-destructive font-black">
                                 {t('outOfStock')}
                               </Typography>
                             </div>
@@ -670,7 +670,7 @@ export default function ManualBarcodeEntry({
                                     {barcodeStockStatus.availableQuantity} {t('unitsAvailable')}
                                   </span>
                                 ) : (
-                                  <span className="text-red-600">{t('noStockAvailable')}</span>
+                                  <span className="text-destructive">{t('noStockAvailable')}</span>
                                 )}
                               </div>
                             )}

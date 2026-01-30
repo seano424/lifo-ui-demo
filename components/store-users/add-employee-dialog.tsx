@@ -696,7 +696,7 @@ export function AddEmployeeDialog({
                         usernameAvailable === true
                           ? 'border-primary-500'
                           : usernameAvailable === false
-                            ? 'border-red-500'
+                            ? 'border-destructive'
                             : ''
                       }`}
                     />
@@ -706,13 +706,13 @@ export function AddEmployeeDialog({
                       ) : usernameAvailable === true ? (
                         <Check className="w-4 h-4 text-primary-800" />
                       ) : usernameAvailable === false ? (
-                        <AlertTriangle className="w-4 h-4 text-red-500" />
+                        <AlertTriangle className="w-4 h-4 text-destructive" />
                       ) : null}
                     </div>
                   </div>
                   <p className="text-xs text-muted-foreground mt-1">
                     {usernameAvailable === false ? (
-                      <span className="text-red-600">{t('form.usernameTaken')}</span>
+                      <span className="text-destructive">{t('form.usernameTaken')}</span>
                     ) : usernameAvailable === true ? (
                       <span className="text-primary-800">{t('form.usernameAvailable')}</span>
                     ) : (
@@ -883,102 +883,7 @@ export function AddEmployeeDialog({
                   </>
                 )}
               </Alert>
-
-              {/* <div className="space-y-3">
-                <div className="flex items-center justify-between p-3 bg-muted rounded-2xl">
-                  <div>
-                    <Label className="text-sm ">
-                      {t('credentials.email')}
-                    </Label>
-                    <div className="font-mono text-sm">
-                      {createdCredentials?.email}
-                    </div>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() =>
-                      copyToClipboard(createdCredentials?.email || '', 'Email')
-                    }
-                  >
-                    {copiedField === 'Email' ? (
-                      <Check className="w-4 h-4" />
-                    ) : (
-                      <Copy className="w-4 h-4" />
-                    )}
-                  </Button>
-                </div>
-
-                <div className="flex items-center justify-between p-3 bg-muted rounded-2xl">
-                  <div>
-                    <Label className="text-sm ">
-                      {t('credentials.username')}
-                    </Label>
-                    <div className="font-mono text-sm">
-                      {createdCredentials?.username}
-                    </div>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() =>
-                      copyToClipboard(
-                        createdCredentials?.username || '',
-                        'Username'
-                      )
-                    }
-                  >
-                    {copiedField === 'Username' ? (
-                      <Check className="w-4 h-4" />
-                    ) : (
-                      <Copy className="w-4 h-4" />
-                    )}
-                  </Button>
-                </div>
-
-                <div className="flex items-center justify-between p-3 bg-muted rounded-2xl">
-                  <div>
-                    <Label className="text-sm ">
-                      {t('credentials.pin')}
-                    </Label>
-                    <div className="font-mono text-lg font-bold">
-                      {createdCredentials?.pin}
-                    </div>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() =>
-                      copyToClipboard(createdCredentials?.pin || '', 'PIN')
-                    }
-                  >
-                    {copiedField === 'PIN' ? (
-                      <Check className="w-4 h-4" />
-                    ) : (
-                      <Copy className="w-4 h-4" />
-                    )}
-                  </Button>
-                </div>
-              </div> */}
-
               <Separator />
-
-              {/* <div className="bg-blue-50 p-4 rounded-2xl">
-                <h4 className=" text-blue-900 mb-2">
-                  {t('nextSteps.title')}
-                </h4>
-                <ul className="text-sm text-blue-800 space-y-1">
-                  <li>{t('nextSteps.loginTab')}</li>
-                  <li>
-                    {t('nextSteps.useCredentials', {
-                      username: createdCredentials?.username || '',
-                      pin: createdCredentials?.pin || '',
-                    })}
-                  </li>
-                  <li>{t('nextSteps.resetPin')}</li>
-                  <li>{t('nextSteps.permissions')}</li>
-                </ul>
-              </div> */}
             </div>
 
             <DialogFooter>
@@ -1019,12 +924,30 @@ export function AddEmployeeDialog({
               </Alert>
 
               <div className="bg-blue-50 p-4 rounded-2xl">
-                <h4 className=" text-blue-900 mb-2">{tc('whatHappensNext')}</h4>
+                <Typography variant="h4" color="primary">
+                  {tc('whatHappensNext')}
+                </Typography>
                 <ul className="text-sm text-blue-800 space-y-1">
-                  <li>• User receives an email notification about the invitation</li>
-                  <li>• They can login with their existing LIFO credentials</li>
-                  <li>• They&apos;ll see your store in their store selection menu</li>
-                  <li>• You can manage their permissions from the team page</li>
+                  <li>
+                    <Typography variant="p" color="primary">
+                      • User receives an email notification about the invitation
+                    </Typography>
+                  </li>
+                  <li>
+                    <Typography variant="p" color="primary">
+                      • They can login with their existing LIFO credentials
+                    </Typography>
+                  </li>
+                  <li>
+                    <Typography variant="p" color="primary">
+                      • They&apos;ll see your store in their store selection menu
+                    </Typography>
+                  </li>
+                  <li>
+                    <Typography variant="p" color="primary">
+                      • You can manage their permissions from the team page
+                    </Typography>
+                  </li>
                 </ul>
               </div>
             </div>

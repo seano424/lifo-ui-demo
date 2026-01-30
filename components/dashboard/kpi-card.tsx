@@ -69,7 +69,7 @@ export function KPICard({
     return (
       <div className={cn('bg-background border rounded-2xl p-5 flex flex-col h-full', className)}>
         <div className="flex items-start gap-3 mb-4">
-          <Skeleton className="h-10 w-10 rounded-xl flex-shrink-0" />
+          <Skeleton className="h-10 w-10 rounded-xl shrink-0" />
           <Skeleton className="h-5 flex-1 rounded-lg" />
         </div>
         <div className="flex-1 flex flex-col justify-between">
@@ -114,7 +114,7 @@ export function KPICard({
           (() => {
             const IconComponent = iconMap[icon as keyof typeof iconMap]
             return IconComponent ? (
-              <div className="p-2.5 rounded-xl bg-primary/10 text-primary flex-shrink-0">
+              <div className="p-2.5 rounded-xl bg-primary/10 text-primary shrink-0">
                 <IconComponent className="w-5 h-5" />
               </div>
             ) : null
@@ -130,16 +130,16 @@ export function KPICard({
       <div className="flex-1 flex flex-col justify-between">
         {/* Value and details */}
         <div className="space-y-3">
-          <Typography variant="h2" className="font-bold text-foreground text-2xl">
+          <Typography variant="h2" color="primary">
             {showTrends && trendData ? formatValue(trendData.current) : formatValue(value)}
           </Typography>
 
           <div className="space-y-1">
-            <Typography variant="p" className="text-muted-foreground text-sm leading-relaxed">
+            <Typography variant="p" color="muted">
               {subtitle}
             </Typography>
             {productCount && (
-              <Typography variant="p" className="text-muted-foreground text-sm">
+              <Typography variant="p" color="muted">
                 {productCount} product{productCount > 1 ? 's' : ''}
               </Typography>
             )}

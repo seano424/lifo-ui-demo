@@ -91,12 +91,7 @@ export function BatchStatusSummary() {
               <Typography variant="h4">{t('needsAttention')}</Typography>
               <Typography variant="small">{t('activeInventory')}</Typography>
             </div>
-            <Typography
-              variant="h2"
-              className="text-3xl font-bold text-gray-900 dark:text-brand-white mt-1"
-            >
-              {totalNeedsAttention}
-            </Typography>
+            <Typography variant="h2">{totalNeedsAttention}</Typography>
           </div>
         </div>
 
@@ -148,12 +143,7 @@ export function BatchStatusSummary() {
         <div className="p-6 border-b">
           <div className="flex justify-between items-center gap-2">
             <Typography variant="h4">{t('status.ok')}</Typography>
-            <Typography
-              variant="h2"
-              className="text-3xl font-bold text-gray-900 dark:text-brand-white mt-1"
-            >
-              {totalActiveBatchesCount - totalNeedsAttention}
-            </Typography>
+            <Typography variant="h2">{totalActiveBatchesCount - totalNeedsAttention}</Typography>
           </div>
         </div>
         <div className="p-6 flex flex-col gap-4">

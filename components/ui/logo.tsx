@@ -26,6 +26,13 @@ const sizeMap = {
   xl: 'h-12',
 }
 
+const textSizeMap = {
+  sm: 'text-2xl font-heading font-extrabold lowercase',
+  md: 'text-3xl font-heading font-extrabold lowercase',
+  lg: 'text-4xl font-heading font-extrabold lowercase',
+  xl: 'text-5xl font-heading font-extrabold lowercase',
+}
+
 export function Logo({
   variant = 'svg',
   size = 'md',
@@ -95,11 +102,11 @@ export function Logo({
         href={href}
         className={cn(
           'inline-block',
-          withText && 'flex items-center gap-2 font-heading font-bold text-2xl',
+          withText && 'flex items-center gap-2 font-heading font-extrabold lowercase',
         )}
       >
         {logoElement}
-        {withText && 'LIFO'}
+        <span className={cn(textSizeMap[size])}>{withText && 'LIFO'}</span>
       </Link>
     )
   }
@@ -108,11 +115,11 @@ export function Logo({
     <div
       className={cn(
         'inline-block',
-        withText && 'flex items-center gap-2 font-heading font-bold text-2xl',
+        withText && 'flex items-center gap-2 font-heading text-2xl font-extrabold lowercase',
       )}
     >
       {logoElement}
-      {withText && 'LIFO'}
+      <span className={cn(textSizeMap[size])}>{withText && 'LIFO'}</span>
     </div>
   )
 }

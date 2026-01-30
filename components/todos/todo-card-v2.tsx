@@ -28,7 +28,7 @@ interface TodoCardV2Props {
 
 // Status badge colors
 const STATUS_COLORS = {
-  expired: 'text-red-600',
+  expired: 'text-destructive',
   today: 'text-primary',
   tomorrow: 'text-secondary',
   thisWeek: 'text-secondary',
@@ -226,7 +226,7 @@ export function TodoCardV2({ todo, onClick }: TodoCardV2Props) {
 
   //   // Expired - red accent with shadow
   //   if (isExpiring) {
-  //     return 'border-red-500 sm:hover:shadow-red-400/50 border-l-8 border-y-gray-200 border-r-gray-200'
+  //     return 'border-destructive sm:hover:shadow-destructive/50 border-l-8 border-y-gray-200 border-r-gray-200'
   //   }
 
   //   // Critical/high urgency - primary accent

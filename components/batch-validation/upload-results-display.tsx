@@ -93,8 +93,8 @@ export function UploadResultsDisplay({ result, onUploadAnother }: UploadResultsD
 
         {/* Error Display */}
         {result.errors && result.errors.length > 0 && (
-          <div className="bg-red-50 border border-red-200 rounded-2xl p-4">
-            <Typography variant="h4" className="text-red-700 mb-2">
+          <div className="bg-red-50 border border-destructive rounded-2xl p-4">
+            <Typography variant="h4" className="text-destructive mb-2">
               Errors Encountered
             </Typography>
             <div className="space-y-2 max-h-40 overflow-y-auto">
@@ -104,13 +104,13 @@ export function UploadResultsDisplay({ result, onUploadAnother }: UploadResultsD
                 return (
                   <div
                     key={errorKey}
-                    className="text-sm p-2 bg-white rounded border-l-4 border-red-400"
+                    className="text-sm p-2 bg-white rounded border-l-4 border-destructive"
                   >
                     {typeof error === 'string' ? (
                       <div className="text-gray-700">{error}</div>
                     ) : (
                       <>
-                        <div className="font-semibold text-red-700">Row {error.row}</div>
+                        <div className="font-semibold text-destructive">Row {error.row}</div>
                         <div className="text-gray-700">{error.message}</div>
                       </>
                     )}

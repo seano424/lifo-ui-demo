@@ -5,6 +5,8 @@ import { ArrowDown, ArrowUp } from 'lucide-react'
 import { sortFieldOptions } from '@/lib/todo-filter-config'
 import type { SortConfig, SortDirection } from './types'
 import { useTranslations } from 'next-intl'
+import { Typography } from '@/components/ui/typography'
+import { Button } from '@/components/ui/button'
 
 // Helper to convert snake_case to camelCase for translation keys
 const toCamelCase = (str: string): string => {
@@ -30,15 +32,13 @@ export function TodoSortDirection({
   return (
     <div className="flex-1 p-3 bg-white">
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm  text-gray-900">{t('filters.sortDirection')}</h3>
+        <Typography color="primary" variant="p">
+          {t('filters.sortDirection')}
+        </Typography>
         {!isDefaultSort && (
-          <button
-            type="button"
-            onClick={onReset}
-            className="text-xs text-violet-600 hover:text-violet-700 "
-          >
+          <Button variant="link" onClick={onReset}>
             {t('filters.reset')}
-          </button>
+          </Button>
         )}
       </div>
 
@@ -118,15 +118,21 @@ export function TodoSortDirection({
 
       {/* Current Sort Display */}
       <div className="mt-4">
-        <h4 className="text-xs  text-gray-500 mb-2">{t('filters.currentSort')}</h4>
+        <Typography variant="h4" color="muted">
+          {t('filters.currentSort')}
+        </Typography>
         <div className="p-3 bg-violet-50 rounded-lg border border-violet-100">
           <div className="flex items-center gap-2 text-sm">
-            <span className="text-lg">{selectedOption?.emoji}</span>
+            <Typography variant="h4" color="primary">
+              {selectedOption?.emoji}
+            </Typography>
             <div className="flex-1 min-w-0">
-              <div className=" text-violet-900 truncate">{tSort(`${translationKey}.label`)}</div>
-              <div className="text-xs text-violet-700">
+              <Typography variant="h4" color="primary">
+                {tSort(`${translationKey}.label`)}
+              </Typography>
+              <Typography variant="h4" color="primary">
                 {tSort(`${translationKey}.description`)}
-              </div>
+              </Typography>
             </div>
           </div>
         </div>

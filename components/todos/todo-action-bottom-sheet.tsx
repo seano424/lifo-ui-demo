@@ -73,7 +73,7 @@ export function TodoActionBottomSheet({
         return {
           icon: CheckCircle2Icon,
           label: t('completionStatus.completed'),
-          className: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+          className: 'bg-primary-100 text-primary-800 dark:bg-primary-900/30 dark:text-primary-400',
         }
       case 'in_progress':
         return {
@@ -135,7 +135,7 @@ export function TodoActionBottomSheet({
             </div>
             <div
               className={cn(
-                'flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs  whitespace-nowrap flex-shrink-0',
+                'flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs  whitespace-nowrap shrink-0',
                 statusConfig.className,
               )}
             >
@@ -199,7 +199,7 @@ export function TodoActionBottomSheet({
               type="button"
               onClick={() => setActiveTab(tab.id)}
               className={cn(
-                'transition-all flex flex-col items-center gap-1  font-heading flex-1 text-xs sm:text-base hover:bg-opacity-0 flex-shrink-0 py-2 rounded-2xl',
+                'transition-all flex flex-col items-center gap-1  font-heading flex-1 text-xs sm:text-base hover:bg-opacity-0 shrink-0 py-2 rounded-2xl',
                 activeTab === tab.id &&
                   'text-primary bg-primary-50 dark:bg-brand-dark dark:text-secondary-600',
               )}

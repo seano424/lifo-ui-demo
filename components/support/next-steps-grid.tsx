@@ -22,11 +22,11 @@ export function NextStepsGrid({ title, items }: NextStepsGridProps) {
       <div className="text-center space-y-2">
         <Typography
           variant="h2"
-          className="text-2xl font-bold bg-gradient-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent"
+          className="text-2xl font-bold bg-linear-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent"
         >
           {title}
         </Typography>
-        <div className="w-16 h-1 bg-gradient-to-r from-primary-400 to-primary-600 rounded-full mx-auto"></div>
+        <div className="w-16 h-1 bg-linear-to-r from-primary-400 to-primary-600 rounded-full mx-auto"></div>
       </div>
 
       {/* Cards Grid */}

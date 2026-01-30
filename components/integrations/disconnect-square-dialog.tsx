@@ -68,8 +68,8 @@ export function DisconnectSquareDialog({ connectionId, trigger }: DisconnectSqua
       <AlertDialogContent>
         <AlertDialogHeader>
           <div className="mb-2 flex items-center gap-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-100">
-              <AlertTriangle className="h-5 w-5 text-red-600" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-destructive">
+              <AlertTriangle className="h-5 w-5 text-destructive" />
             </div>
             <AlertDialogTitle>{t('title')}</AlertDialogTitle>
           </div>
@@ -96,7 +96,7 @@ export function DisconnectSquareDialog({ connectionId, trigger }: DisconnectSqua
               handleDisconnect()
             }}
             disabled={disconnectMutation.isPending}
-            className="bg-red-600 hover:bg-red-700"
+            className="bg-destructive hover:bg-destructive"
           >
             {disconnectMutation.isPending ? (
               <>

@@ -85,7 +85,7 @@ export function TrendIndicator({
       case 'up':
         return 'text-primary-800'
       case 'down':
-        return 'text-red-600'
+        return 'text-destructive'
       case 'stable':
         return 'text-gray-500'
     }
@@ -96,7 +96,7 @@ export function TrendIndicator({
       case 'up':
         return 'bg-primary-50 border-primary-200'
       case 'down':
-        return 'bg-red-50 border-red-200'
+        return 'bg-red-50 border-destructive'
       case 'stable':
         return 'bg-gray-50 border-gray-200'
     }
@@ -174,7 +174,7 @@ function PositionIndicator({ current, min, max, className }: PositionIndicatorPr
 
   return (
     <div className={cn('relative h-2 bg-gray-200 rounded-full overflow-hidden', className)}>
-      <div className="absolute inset-0 bg-gradient-to-r from-red-200 via-yellow-200 to-green-200" />
+      <div className="absolute inset-0 bg-linear-to-r from-destructive via-yellow-200 to-primary-200" />
       <div
         className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-primary-600 rounded-full border-2 border-white shadow-sm"
         style={{ left: `${clampedPosition}%`, transform: 'translateX(-50%) translateY(-50%)' }}

@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button'
 import { Typography } from '@/components/ui/typography'
-import { ArrowRight, Check, Sparkles } from 'lucide-react'
+import { ArrowRight, Sparkles } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
 // import {Building2, Users} from 'lucide-react' --- IGNORE (It's when we're putting back the others pricing cards) ---
@@ -27,7 +27,6 @@ function PricingCard({
   price,
   period,
   description,
-  features,
   fees,
   sellingPoint,
   isPopular = false,
@@ -41,7 +40,7 @@ function PricingCard({
       {/* Popular badge */}
       {isPopular && (
         <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-50">
-          <div className="text-center bg-gradient-to-r from-primary-700 to-secondary-700 text-white px-4 py-2 rounded-full text-sm font-semibold flex items-center gap-2 whitespace-nowrap">
+          <div className="text-center bg-linear-to-r from-primary-700 to-secondary-700 text-white px-4 py-2 rounded-full text-sm font-semibold flex items-center gap-2 whitespace-nowrap">
             <Sparkles size={16} />
             {t('badges.mostPopular')}
           </div>
@@ -51,7 +50,7 @@ function PricingCard({
       {/* Coming Soon badge */}
       {isComingSoon && (
         <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-50">
-          <div className="bg-gradient-to-r from-gray-400 to-gray-500 text-white px-4 py-2 rounded-full text-xs  whitespace-nowrap">
+          <div className="bg-linear-to-r from-gray-400 to-gray-500 text-white px-4 py-2 rounded-full text-xs  whitespace-nowrap">
             {t('badges.comingSoon')}
           </div>
         </div>
@@ -59,64 +58,34 @@ function PricingCard({
 
       {/* Icon and Title */}
       <div className="flex items-center gap-4 mb-6">
-        <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm bg-gradient-to-br from-primary-50 to-secondary-50 text-secondary-700">
+        <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm bg-linear-to-br from-primary-50 to-secondary-50 text-secondary-700">
           {icon}
         </div>
         <div className="flex flex-col gap-1">
-          <Typography variant="h3" className="text-2xl font-bold text-foreground">
-            {title}
-          </Typography>
-          <Typography variant="p" className="text-foreground/70 text-sm">
-            {subtitle}
-          </Typography>
+          <Typography variant="h3">{title}</Typography>
+          <Typography variant="p">{subtitle}</Typography>
         </div>
       </div>
 
       {/* Price */}
       <div className="mb-6">
         <div className="flex items-baseline gap-2">
-          <Typography variant="h2" className="text-4xl font-bold text-foreground">
-            {price}
-          </Typography>
-          {period && (
-            <Typography variant="p" className="text-foreground/60">
-              {period}
-            </Typography>
-          )}
+          <Typography variant="h2">{price}</Typography>
+          {period && <Typography variant="p">{period}</Typography>}
         </div>
       </div>
 
       {/* Description */}
-      <Typography variant="p" className="text-foreground/80 mb-6 leading-relaxed">
-        {description}
-      </Typography>
-
-      {/* Features */}
-      <div className="flex-grow mb-6">
-        <ul className="space-y-3">
-          {features.map(feature => (
-            <li key={feature} className="flex items-start gap-3">
-              <Check size={18} className="text-primary-800 mt-0.5 flex-shrink-0" />
-              <Typography variant="p" className="text-foreground/80 text-sm">
-                {feature}
-              </Typography>
-            </li>
-          ))}
-        </ul>
-      </div>
+      <Typography variant="p">{description}</Typography>
 
       {/* Fees */}
       {fees.length > 0 && (
-        <div className="mb-6 p-4 rounded-2xl bg-gradient-to-r from-primary-50/50 to-secondary-50/50 border border-primary-100/50">
-          <Typography variant="h4" className="text-sm font-semibold text-foreground/80 mb-2">
-            {t('common.winWinFees')}
-          </Typography>
+        <div className="mb-6 p-4 rounded-2xl bg-linear-to-r from-primary-50/50 to-secondary-50/50 border border-primary-100/50">
+          <Typography variant="h4">{t('common.winWinFees')}</Typography>
           {fees.map(fee => (
             <div key={fee.type} className="flex justify-between items-center">
-              <Typography variant="p" className="text-sm text-foreground/70">
-                {fee.type}
-              </Typography>
-              <Typography variant="p" className="text-xs  text-primary-800">
+              <Typography variant="p">{fee.type}</Typography>
+              <Typography variant="p" color="primary">
                 {fee.percentage}
               </Typography>
             </div>
@@ -126,26 +95,21 @@ function PricingCard({
 
       {/* Selling Point */}
       <div className="mb-6 p-4 rounded-2xl bg-card border border-secondary-100/50">
-        <Typography variant="p" className="text-sm  text-secondary-800">
+        <Typography variant="p" color="secondary">
           💡 {sellingPoint}
         </Typography>
       </div>
 
       {/* CTA Button */}
       {isComingSoon ? (
-        <Button
-          className="w-full bg-gradient-to-r from-gray-400 to-gray-500 text-white cursor-not-allowed transition-transform duration-300 hover:from-gray-400 hover:to-gray-500"
-          disabled={true}
-        >
+        <Button disabled={true} variant="subtle">
           {t('common.comingSoon')}
         </Button>
       ) : (
         <Button
-          className={`w-full group-hover:scale-105 transition-transform duration-300 ${
-            isPopular ? 'hover:from-primary-700 hover:to-secondary-700' : ''
-          }`}
           asLink={true}
           href="/onboarding/create-account"
+          variant={isPopular ? 'secondary' : 'default'}
         >
           {t('common.getStarted')}
           <ArrowRight size={16} className="ml-2" />
@@ -163,27 +127,13 @@ export default function PricingPage() {
       <div className="max-w-7xl mx-auto relative z-10">
         {/* Header */}
         <div className="flex flex-col items-center justify-center mb-16">
-          <Typography
-            as="h1"
-            className="text-center text-4xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary-800 via-primary-700 to-secondary-900 mb-6"
-          >
+          <Typography variant="h1" color="primary">
             {t('title')}
           </Typography>
-          <Typography
-            variant="p"
-            className="text-center text-xl text-foreground/70 max-w-2xl mx-auto leading-relaxed"
-          >
+          <Typography variant="p" color="muted">
             {t('subtitle')}
           </Typography>
         </div>
-        {/* Contact Message */}
-        {/* <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-primary-600/90 via-primary-700/90 to-secondary-700/90 shadow-lg hover:shadow-xl transition-all duration-300 border border-primary-400/20 backdrop-blur-sm">
-            <Typography variant="p" className="text-sm text-white ">
-              📧 {t("contactUs")}: <strong> contact@lifo-app.com </strong>
-            </Typography>
-          </div>
-        </div> */}
 
         {/* Pricing Cards */}
         <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-8 mb-16 mt-20 max-w-lg mx-auto">

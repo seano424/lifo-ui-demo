@@ -22,7 +22,7 @@ export default function ScanOutPage() {
 
         {removedItems.length > 0 && (
           <div className="mt-8 flex flex-col gap-8">
-            <Typography variant="h3" className="text-center font-black text-primary-800">
+            <Typography variant="h3" color="primary" className="text-center">
               {t('recentlyRemoved', { count: removedItems.length })}
             </Typography>
             <div className="flex flex-col gap-2">
@@ -31,10 +31,8 @@ export default function ScanOutPage() {
                   key={`${item.id}-${index}-${item.expiryDate}`}
                   className="py-4 px-8 bg-primary-900 text-white rounded-2xl border border-primary-200 w-max mx-auto flex flex-col gap-2"
                 >
-                  <Typography variant="p" className="font-bold text-white">
-                    {item.productName}
-                  </Typography>
-                  <Typography variant="p" className="text-sm text-white">
+                  <Typography variant="p">{item.productName}</Typography>
+                  <Typography variant="p">
                     {t('removedQuantityExpires', {
                       quantity: item.quantity,
                       date: item.expiryDate

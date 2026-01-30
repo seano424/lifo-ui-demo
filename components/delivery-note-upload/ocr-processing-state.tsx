@@ -35,7 +35,7 @@ export function OCRProcessingState({ fileName, fileSize }: OCRProcessingStatePro
         {/* File info */}
         <div className="bg-gray-50 rounded-lg p-4 w-full max-w-md">
           <div className="flex items-center gap-3">
-            <FileImage className="h-10 w-10 text-gray-400 flex-shrink-0" />
+            <FileImage className="h-10 w-10 text-gray-400 shrink-0" />
             <div className="flex-1 min-w-0">
               <p className="text-sm  text-gray-800 truncate">{fileName}</p>
               <p className="text-xs text-gray-500">{(fileSize / 1024).toFixed(1)} KB</p>

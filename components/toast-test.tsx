@@ -2,11 +2,14 @@
 
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
+import { Typography } from './ui/typography'
 
 export function ToastTest() {
   return (
     <div className="fixed bottom-4 left-4 flex flex-col gap-2 p-4 bg-white border rounded-lg shadow-lg z-50">
-      <h3 className="font-semibold text-sm">Toast Tests</h3>
+      <Typography variant="h3" color="primary">
+        Toast Tests
+      </Typography>
       <div className="flex flex-col gap-2">
         <Button
           onClick={() =>

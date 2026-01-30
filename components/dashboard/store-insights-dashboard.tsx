@@ -165,34 +165,40 @@ export function StoreInsightsDashboard({ storeId: propStoreId }: StoreInsightsDa
 
               {/* Analytics Summary */}
               <div className="space-y-2">
-                <h4 className="font-semibold text-sm">{t('overview.recentActivity')}</h4>
+                <Typography variant="h4" color="primary">
+                  {t('overview.recentActivity')}
+                </Typography>
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div className="p-3 bg-blue-50 rounded">
-                    <p className="">{t('overview.actionsTaken')}</p>
-                    <p className="text-blue-600">
+                    <Typography variant="p" color="muted">
+                      {t('overview.actionsTaken')}
+                    </Typography>
+                    <Typography variant="p" color="primary">
                       {t('overview.actionsTakenPeriod', {
                         totalActions: t('comingSoon'),
                       })}
-                    </p>
+                    </Typography>
                   </div>
                   <div className="p-3 bg-primary-50 rounded">
-                    <p className="">{t('overview.discountsApplied')}</p>
-                    <p className="text-primary-800">
+                    <Typography variant="p" color="muted">
+                      {t('overview.discountsApplied')}
+                    </Typography>
+                    <Typography variant="p" color="primary">
                       {t('overview.saved', {
                         discountValue: t('comingSoon'),
                       })}
-                    </p>
+                    </Typography>
                   </div>
                 </div>
               </div>
 
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                <p className="text-sm text-muted-foreground">
+                <Typography variant="p" color="muted">
                   {t('overview.averageScore', {
                     avgScore: t('comingSoon'),
                     discountValue: t('comingSoon'),
                   })}
-                </p>
+                </Typography>
               </div>
             </div>
           </CardContent>
@@ -202,7 +208,7 @@ export function StoreInsightsDashboard({ storeId: propStoreId }: StoreInsightsDa
         {scoringLogs.length > 0 && (
           <Card>
             <CardHeader>
-              <CardTitle>🔍 Scoring Debug Logs</CardTitle>
+              <CardTitle>Scoring Debug Logs</CardTitle>
               <CardDescription>Real-time logs from the latest scoring operation</CardDescription>
             </CardHeader>
             <CardContent>

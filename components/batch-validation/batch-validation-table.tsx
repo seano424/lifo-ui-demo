@@ -195,7 +195,7 @@ export function BatchValidationTable({
                       className={cn(
                         'font-mono text-xs h-7 min-w-[80px]',
                         item.Cost_Price < PRICE_CONSTRAINTS.MIN_PRICE &&
-                          'border-red-500 focus:border-red-500',
+                          'border-destructive focus:border-destructive',
                       )}
                       min={PRICE_CONSTRAINTS.MIN_PRICE}
                       max={PRICE_CONSTRAINTS.MAX_PRICE}
@@ -217,7 +217,7 @@ export function BatchValidationTable({
                       className={cn(
                         'font-mono text-xs h-7 min-w-[80px]',
                         item.Selling_Price < PRICE_CONSTRAINTS.MIN_PRICE &&
-                          'border-red-500 focus:border-red-500',
+                          'border-destructive focus:border-destructive',
                       )}
                       min={PRICE_CONSTRAINTS.MIN_PRICE}
                       max={PRICE_CONSTRAINTS.MAX_PRICE}
@@ -328,7 +328,7 @@ export function BatchValidationTable({
                       className={cn(
                         'text-sm h-8',
                         item.Cost_Price < PRICE_CONSTRAINTS.MIN_PRICE &&
-                          'border-red-500 focus:border-red-500',
+                          'border-destructive focus:border-destructive',
                       )}
                       min={PRICE_CONSTRAINTS.MIN_PRICE}
                       max={PRICE_CONSTRAINTS.MAX_PRICE}
@@ -336,7 +336,7 @@ export function BatchValidationTable({
                       disabled={disabled}
                     />
                     {item.Cost_Price < PRICE_CONSTRAINTS.MIN_PRICE && (
-                      <span className="text-xs text-red-600">
+                      <span className="text-xs text-destructive">
                         {t('csvUpload.errors.priceTooLow')}
                       </span>
                     )}
@@ -358,7 +358,7 @@ export function BatchValidationTable({
                       className={cn(
                         'text-sm h-8',
                         item.Selling_Price < PRICE_CONSTRAINTS.MIN_PRICE &&
-                          'border-red-500 focus:border-red-500',
+                          'border-destructive focus:border-destructive',
                       )}
                       min={PRICE_CONSTRAINTS.MIN_PRICE}
                       max={PRICE_CONSTRAINTS.MAX_PRICE}
@@ -366,7 +366,7 @@ export function BatchValidationTable({
                       disabled={disabled}
                     />
                     {item.Selling_Price < PRICE_CONSTRAINTS.MIN_PRICE && (
-                      <span className="text-xs text-red-600">
+                      <span className="text-xs text-destructive">
                         {t('csvUpload.errors.priceTooLow')}
                       </span>
                     )}

@@ -17,9 +17,7 @@ function CtaFeature({ icon, title, description }: CtaFeatureProps) {
         {icon}
       </div>
       <div className="flex flex-col gap-1">
-        <Typography variant="h4" className="font-bold mb-1">
-          {title}
-        </Typography>
+        <Typography variant="h4">{title}</Typography>
         <Typography variant="p">{description}</Typography>
       </div>
     </div>
@@ -68,12 +66,8 @@ export function CtaSection() {
           {/* Right column - CTA card */}
           <div className="flex flex-col rounded-2xl bg-card border shadow-xl p-8 mb-8 space-y-6">
             <div className="flex flex-col gap-1">
-              <Typography variant="h3" className="text-2xl font-bold text-secondary-900 mb-4">
-                {t('card.title')}
-              </Typography>
-              <Typography variant="p" className="text-secondary-900">
-                {t('card.description')}
-              </Typography>
+              <Typography variant="h3">{t('card.title')}</Typography>
+              <Typography variant="p">{t('card.description')}</Typography>
             </div>
 
             <div className="space-y-3 py-4">
@@ -81,34 +75,23 @@ export function CtaSection() {
                 <div className="text-secondary-600">
                   <Check size={20} />
                 </div>
-                <Typography variant="p" className=" font-semibold">
-                  {t('card.benefits.noCommitment')}
-                </Typography>
+                <Typography variant="p">{t('card.benefits.noCommitment')}</Typography>
               </div>
               <div className="flex items-center gap-2">
                 <div className="text-secondary-600">
                   <Check size={20} />
                 </div>
-                <Typography variant="p" className="font-semibold">
-                  {t('card.benefits.instantSetup')}
-                </Typography>
+                <Typography variant="p">{t('card.benefits.instantSetup')}</Typography>
               </div>
               <div className="flex items-center gap-2">
                 <div className="text-secondary-600">
                   <Check size={20} />
                 </div>
-                <Typography variant="p" className="font-semibold">
-                  {t('card.benefits.support')}
-                </Typography>
+                <Typography variant="p">{t('card.benefits.support')}</Typography>
               </div>
             </div>
 
-            <Button
-              asLink
-              href="/contact"
-              size="xl"
-              className="w-full bg-gradient-to-r from-primary-900 to-secondary-800 text-white hover:opacity-90 transition-opacity shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2 whitespace-normal sm:whitespace-nowrap"
-            >
+            <Button asLink href="/contact" size="xl">
               <span className="text-center">{t('card.button')}</span>{' '}
               <ArrowRight size={18} className="shrink-0" />
             </Button>

@@ -6,7 +6,21 @@
       "searchPlaceholder": "Search batches...",
       "addBatch": "Add Batch",
       "addBatchDescription": "Add a new batch to your inventory",
-      "addBatchButton": "Add Batch"
+      "addBatchButton": "Add Batch",
+      "desktop": {
+        "barcodeScanning": "Barcode Scanning",
+        "csvBulkImport": "CSV Bulk Import",
+        "manualEntry": "Manual Entry"
+      },
+      "mobile": {
+        "barcodeScanning": "Scan Items",
+        "csvBulkImport": "CSV Import",
+        "manualEntry": "Manual Entry"
+      },
+      "messages": {
+        "selectStore": "Please select a store",
+        "selectStoreInventory": "Please select a store to manage inventory"
+      }
     },
     "title": "Inventory Dashboard",
     "subtitle": "Track expiry dates and manage your inventory",

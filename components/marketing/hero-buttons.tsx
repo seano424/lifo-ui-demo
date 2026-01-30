@@ -12,9 +12,9 @@ export function HeroButtons() {
   return (
     <>
       {currentUser && (
-        <Button size="lg" asLink href="/dashboard" className="capitalize">
+        <Button size="lg" asLink href="/dashboard" className="capitalize group">
           {t('dashboard')}
-          <ChevronRightIcon className="w-4 h-4" />
+          <ChevronRightIcon className="w-5 h-5 -rotate-45 transition-transform duration-300 ease-in-out group-hover:translate-x-px group-hover:-translate-y-px" />
         </Button>
       )}
       {!currentUser && (
@@ -26,7 +26,7 @@ export function HeroButtons() {
           variant="black"
         >
           {t('freeTrial')}
-          <ChevronRightIcon className="w-4 h-4" />
+          <ChevronRightIcon className="w-5 h-5 -rotate-45 transition-transform duration-300 ease-in-out group-hover:translate-x-px group-hover:-translate-y-px" />
         </Button>
       )}
     </>

@@ -499,7 +499,7 @@ export function BatchCreationSheet({
                     />
                   </div>
                   {customDate && (
-                    <p className="text-xs text-green-600 dark:text-green-400">
+                    <p className="text-xs text-primary dark:text-primary-400">
                       ✓ Custom date selected
                     </p>
                   )}

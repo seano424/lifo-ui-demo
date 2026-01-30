@@ -132,7 +132,7 @@ const MarketingNav = ({ menu }: MarketingNavProps) => {
         <div className="flex items-center gap-8">
           {/* <NavbarLogo variant="text" href="/" /> */}
 
-          <Logo variant="svg" size="sm" priority href="/" withText />
+          <Logo variant="svg" size="md" priority href="/" withText />
           <NavigationMenu>
             <NavigationMenuList>{menuItems.map(item => renderMenuItem(item))}</NavigationMenuList>
           </NavigationMenu>

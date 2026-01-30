@@ -259,7 +259,7 @@ export default function ScanningCamera({
       {mode === 'barcode' && !showManualEntry && (
         <Alert className="flex items-center gap-4">
           <div>
-            <Camera className="text-secondary-900 rounded-full p-[8px] border border-secondary-900 bg-primary-100 flex-shrink-0 h-8 w-8" />
+            <Camera className="text-secondary-900 rounded-full p-[8px] border border-secondary-900 bg-primary-100 shrink-0 h-8 w-8" />
           </div>
           <AlertDescription>{t('alerts.scanInstructions')}</AlertDescription>
         </Alert>

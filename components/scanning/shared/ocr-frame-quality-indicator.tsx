@@ -149,7 +149,7 @@ export default function OCRFrameQualityIndicator({
 
         {/* Ready Indicator */}
         {analysis.shouldTriggerOCR ? (
-          <div className="mt-2 flex items-center gap-1.5 text-green-400 font-semibold animate-pulse">
+          <div className="mt-2 flex items-center gap-1.5 text-primary-400 font-semibold animate-pulse">
             <Camera className="w-3.5 h-3.5" />
             <span>
               {t('ocrFrameQuality.readyToScan', {
@@ -194,15 +194,15 @@ function QualityIndicator({
 function StatusDot({ isGood }: { isGood: boolean }) {
   if (isGood) {
     return (
-      <div className="w-4 h-4 rounded-full bg-green-500/20 flex items-center justify-center">
-        <Check className="w-3 h-3 text-green-400" strokeWidth={3} />
+      <div className="w-4 h-4 rounded-full bg-primary-500/20 flex items-center justify-center">
+        <Check className="w-3 h-3 text-primary-400" strokeWidth={3} />
       </div>
     )
   }
 
   return (
-    <div className="w-4 h-4 rounded-full bg-red-500/20 flex items-center justify-center">
-      <X className="w-3 h-3 text-red-400" strokeWidth={3} />
+    <div className="w-4 h-4 rounded-full bg-destructive/20 flex items-center justify-center">
+      <X className="w-3 h-3 text-destructive" strokeWidth={3} />
     </div>
   )
 }

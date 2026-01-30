@@ -140,8 +140,8 @@ export function StoreUsersList({ storeId: propStoreId, serverPermissions }: Stor
 
   if (error) {
     return (
-      <div className="text-center py-12 border border-red-100 rounded-2xl p-4">
-        <div className="text-red-600 mb-4">Error loading store users: {error.message}</div>
+      <div className="text-center py-12 border border-destructive rounded-2xl p-4">
+        <div className="text-destructive mb-4">Error loading store users: {error.message}</div>
         <Button variant="outline" onClick={() => window.location.reload()}>
           Retry
         </Button>
@@ -173,9 +173,7 @@ export function StoreUsersList({ storeId: propStoreId, serverPermissions }: Stor
       <Card className="shadow-primary-300 border-t-0">
         <CardHeader>
           <div className="flex items-center justify-between">
-            <Typography variant="h3" className="font-black">
-              {t('title')}
-            </Typography>
+            <Typography variant="h3">{t('title')}</Typography>
 
             {canManageUsers && (
               <Button
@@ -387,7 +385,7 @@ export function StoreUsersList({ storeId: propStoreId, serverPermissions }: Stor
                                   setSelectedUser(storeUser)
                                   setShowRemoveDialog(true)
                                 }}
-                                className="text-red-600 focus:text-red-600"
+                                className="text-destructive focus:text-destructive"
                               >
                                 <UserMinus className="mr-2 h-4 w-4" />
                                 {t('dropdown.removeFromStore')}
@@ -406,11 +404,11 @@ export function StoreUsersList({ storeId: propStoreId, serverPermissions }: Stor
           {/* Empty State */}
           {data.length === 0 && !isLoading && (
             <div className="text-center py-12">
-              <div className="w-12 h-12 mx-auto mb-4 text-gray-400">
+              <div className="w-12 h-12 mx-auto">
                 <Users className="w-full h-full" />
               </div>
               <Typography variant="h3">{t('noUsersFound')}</Typography>
-              <Typography variant="p" color="muted" className="mb-4">
+              <Typography variant="p" color="muted">
                 {t('noUsersMessage')}
               </Typography>
             </div>
@@ -537,7 +535,7 @@ export function StoreUsersList({ storeId: propStoreId, serverPermissions }: Stor
                   setShowRemoveDialog(false)
                 }
               }}
-              className="bg-red-600 hover:bg-red-700"
+              className="bg-destructive hover:bg-destructive"
             >
               {t('dialogs.removeUser.confirm')}
             </AlertDialogAction>
@@ -578,7 +576,7 @@ export function StoreUsersList({ storeId: propStoreId, serverPermissions }: Stor
                     <div>
                       <strong>{t('dialogs.resetPassword.currentStatus')}:</strong>
                       {isPasswordLocked(selectedUser) ? (
-                        <span className="ml-2 text-red-600 flex items-center gap-1">
+                        <span className="ml-2 text-destructive flex items-center gap-1">
                           <Lock className="w-3 h-3" />
                           {t('dialogs.resetPassword.statusLocked')}
                         </span>

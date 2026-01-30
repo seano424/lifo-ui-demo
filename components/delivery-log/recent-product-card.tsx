@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import type { RecentDeliveryProduct } from '@/hooks/use-draft-batches'
 import { cn } from '@/lib/utils'
+import { Typography } from '../ui/typography'
 
 interface RecentProductCardProps {
   product: RecentDeliveryProduct
@@ -105,14 +106,12 @@ export function RecentProductCard({
           <div className="flex-1 min-w-0 space-y-1">
             <div className="flex items-start justify-between gap-2">
               <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-sm text-gray-900 dark:text-gray-100 truncate">
-                  {product.product_name}
-                </h3>
+                <Typography variant="p">{product.product_name}</Typography>
                 {product.last_expiry_days !== null && (
-                  <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
-                    <Calendar className="h-3 w-3" />
+                  <Typography variant="muted">
+                    <Calendar className="h-3 w-3 mr-1" />
                     Last: +{product.last_expiry_days}d expiry
-                  </p>
+                  </Typography>
                 )}
               </div>
               {isAdded && (
@@ -171,7 +170,6 @@ export function RecentProductCard({
                   size="sm"
                   onClick={handleCustomSubmit}
                   disabled={!customQuantity || Number.parseInt(customQuantity, 10) <= 0}
-                  className="px-3 h-9"
                 >
                   Add
                 </Button>

@@ -125,7 +125,7 @@ export default function SupportPage() {
           <div key={section.id} className="space-y-4">
             {/* Section Header */}
             <div className="flex items-start gap-3">
-              <div className="p-2 bg-primary/10 rounded-lg flex-shrink-0">
+              <div className="p-2 bg-primary/10 rounded-lg shrink-0">
                 <section.icon className="h-6 w-6 text-primary" />
               </div>
               <div className="min-w-0 flex flex-col gap-1">
@@ -171,10 +171,8 @@ export default function SupportPage() {
                     <Card className="h-full hover:shadow-md transition-shadow duration-200 cursor-pointer">
                       <CardHeader className="pb-3">
                         <div className="flex items-start justify-between gap-2">
-                          <Typography variant="h3" className="text-base  leading-tight">
-                            {article.title}
-                          </Typography>
-                          <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                          <Typography variant="h3">{article.title}</Typography>
+                          <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
                         </div>
                       </CardHeader>
                       <CardContent className="pt-0">
@@ -201,10 +199,8 @@ export default function SupportPage() {
           <CardContent className="p-6">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div className="flex flex-col gap-2">
-                <Typography variant="h3" className="text-lg font-semibold">
-                  {t('contactSupport.title')}
-                </Typography>
-                <Typography variant="p" color="muted" className="text-sm">
+                <Typography variant="h3">{t('contactSupport.title')}</Typography>
+                <Typography variant="p" color="muted">
                   {t('contactSupport.description')}
                 </Typography>
               </div>

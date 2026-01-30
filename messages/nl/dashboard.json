@@ -6,7 +6,21 @@
       "searchPlaceholder": "Zoek batches...",
       "addBatch": "Voeg Batch Toe",
       "addBatchDescription": "Voeg een nieuwe batch toe aan uw voorraad",
-      "addBatchButton": "Voeg Batch Toe"
+      "addBatchButton": "Voeg Batch Toe",
+      "desktop": {
+        "barcodeScanning": "Barcode Scannen",
+        "csvBulkImport": "CSV Bulk Import",
+        "manualEntry": "Handmatige Invoer"
+      },
+      "mobile": {
+        "barcodeScanning": "Items Scannen",
+        "csvBulkImport": "CSV Import",
+        "manualEntry": "Handmatige Invoer"
+      },
+      "messages": {
+        "selectStore": "Selecteer een winkel",
+        "selectStoreInventory": "Selecteer een winkel om de voorraad te beheren"
+      }
     },
     "title": "Voorraad Dashboard",
     "subtitle": "Volg vervaldatums en beheer uw voorraad",

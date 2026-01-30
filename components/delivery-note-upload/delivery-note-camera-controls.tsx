@@ -47,7 +47,7 @@ export function DeliveryNoteCameraControls({
       />
 
       {/* Top controls - Cancel button */}
-      <div className="absolute top-0 left-0 right-0 z-20 p-4 bg-gradient-to-b from-black/60 to-transparent">
+      <div className="absolute top-0 left-0 right-0 z-20 p-4 bg-linear-to-b from-black/60 to-transparent">
         <Button
           onClick={onCancel}
           variant="ghost"
@@ -61,7 +61,7 @@ export function DeliveryNoteCameraControls({
       </div>
 
       {/* Bottom controls - Import and Capture buttons */}
-      <div className="absolute bottom-0 left-0 right-0 z-20 bg-gradient-to-t from-black/80 via-black/60 to-transparent">
+      <div className="absolute bottom-0 left-0 right-0 z-20 bg-linear-to-t from-black/80 via-black/60 to-transparent">
         <div className="flex items-center justify-between px-6 py-8">
           {/* Import button - Left */}
           <Button

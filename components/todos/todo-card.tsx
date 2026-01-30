@@ -20,20 +20,20 @@ interface TodoCardProps {
 // Move urgency config outside component for better performance
 const URGENCY_CONFIG = {
   critical: {
-    color: 'bg-red-500',
-    textColor: 'text-red-700',
-    bgColor: 'group-hover:bg-red-500 bg-red-100',
-    badge: 'bg-red-200 text-red-800 border-red-500',
+    color: 'bg-destructive',
+    textColor: 'text-destructive',
+    bgColor: 'group-hover:bg-destructive bg-destructive',
+    badge: 'bg-destructive text-destructive border-destructive',
     badgeVariant: 'default' as const,
-    borderColor: 'border-red-500',
+    borderColor: 'border-destructive',
   },
   high: {
-    color: 'bg-red-500',
-    textColor: 'text-red-700',
-    bgColor: 'group-hover:bg-red-50 bg-red-500',
-    badge: 'bg-red-100 text-red-800 border-red-500',
+    color: 'bg-destructive',
+    textColor: 'text-destructive',
+    bgColor: 'group-hover:bg-red-50 bg-destructive',
+    badge: 'bg-destructive text-destructive border-destructive',
     badgeVariant: 'default' as const,
-    borderColor: 'border-red-500',
+    borderColor: 'border-destructive',
   },
   medium: {
     color: 'bg-primary-500',

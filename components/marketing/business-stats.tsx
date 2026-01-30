@@ -24,7 +24,7 @@ function Stat({ icon, label, description, subtext, accentColor }: StatProps) {
       {/* Icon section */}
       <div className="relative z-10 mb-6">
         <div
-          className={`w-16 h-16 rounded-2xl ${accentColor} bg-gradient-to-br from-primary-100/50 to-secondary-100/50 backdrop-blur-sm border border-primary-200/50 shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 flex items-center justify-center`}
+          className={`w-16 h-16 rounded-2xl ${accentColor} bg-linear-to-br from-primary-100/50 to-secondary-100/50 backdrop-blur-sm border border-primary-200/50 shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 flex items-center justify-center`}
         >
           {icon}
         </div>
@@ -46,7 +46,7 @@ function Stat({ icon, label, description, subtext, accentColor }: StatProps) {
         </div>
 
         <div className="mt-auto">
-          <div className="w-full h-px bg-gradient-to-r from-transparent via-foreground/20 to-transparent mb-4"></div>
+          <div className="w-full h-px bg-linear-to-r from-transparent via-foreground/20 to-transparent mb-4"></div>
           <div className="flex items-center gap-2">
             <Typography variant="p" className="text-foreground/60 text-sm ">
               {subtext}

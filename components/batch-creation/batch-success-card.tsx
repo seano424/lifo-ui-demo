@@ -44,7 +44,7 @@ export function BatchSuccessCard({
         'overflow-hidden border-2',
         result.success
           ? 'border-primary/20 dark:border-primary-800'
-          : 'border-red-200 dark:border-red-800',
+          : 'border-destructive dark:border-destructive',
         className,
       )}
     >

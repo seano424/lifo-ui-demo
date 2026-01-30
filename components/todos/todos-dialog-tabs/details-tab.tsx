@@ -222,7 +222,7 @@ export function DetailsTab({ selectedBatch, currencySymbol = '€', onClose }: D
       case 'expired':
         return {
           label: t('details.status.expired'),
-          className: 'text-red-600 bg-red-50',
+          className: 'text-destructive bg-red-50',
         }
       case 'expiring_soon':
         return {
@@ -294,7 +294,7 @@ export function DetailsTab({ selectedBatch, currencySymbol = '€', onClose }: D
             </div>
 
             <div className="flex justify-between items-center gap-2 w-full">
-              <Label className="flex-shrink-0" htmlFor="batch-number">
+              <Label className="shrink-0" htmlFor="batch-number">
                 {t('details.fields.batchNumber')}
               </Label>
               {isEditing ? (
@@ -351,7 +351,7 @@ export function DetailsTab({ selectedBatch, currencySymbol = '€', onClose }: D
             </div>
 
             <div className="flex justify-between items-center gap-2 w-full">
-              <Label className="flex-shrink-0" htmlFor="expiry-date">
+              <Label className="shrink-0" htmlFor="expiry-date">
                 {t('details.fields.expiryDate')}
               </Label>
               {isEditing ? (
@@ -376,7 +376,7 @@ export function DetailsTab({ selectedBatch, currencySymbol = '€', onClose }: D
                     className={cn(
                       'text-sm',
                       daysToExpiry < 0
-                        ? 'text-red-600'
+                        ? 'text-destructive'
                         : daysToExpiry <= 7
                           ? 'text-orange-600'
                           : 'text-primary-800',
@@ -399,7 +399,7 @@ export function DetailsTab({ selectedBatch, currencySymbol = '€', onClose }: D
           <Typography variant="h4">{t('details.inventoryPricing')}</Typography>
           <div className="bg-white rounded-2xl p-4 space-y-4 dark:bg-brand-dark">
             <div className="flex justify-between items-center gap-2 w-full">
-              <Label className="flex-shrink-0" htmlFor="quantity">
+              <Label className="shrink-0" htmlFor="quantity">
                 {t('details.fields.currentQuantity')}
               </Label>
               {isEditing ? (
@@ -417,7 +417,10 @@ export function DetailsTab({ selectedBatch, currencySymbol = '€', onClose }: D
                         current_quantity: Math.max(0, Number(e.target.value) || 0),
                       }))
                     }
-                    className={cn('w-full', editedValues.current_quantity < 0 && 'border-red-500')}
+                    className={cn(
+                      'w-full',
+                      editedValues.current_quantity < 0 && 'border-destructive',
+                    )}
                   />
                 </div>
               ) : (
@@ -426,7 +429,7 @@ export function DetailsTab({ selectedBatch, currencySymbol = '€', onClose }: D
             </div>
 
             <div className="flex justify-between items-center gap-2 w-full">
-              <Label className="flex-shrink-0" htmlFor="cost-price">
+              <Label className="shrink-0" htmlFor="cost-price">
                 {t('details.fields.costPrice')}
               </Label>
               {isEditing ? (
@@ -444,7 +447,7 @@ export function DetailsTab({ selectedBatch, currencySymbol = '€', onClose }: D
                         cost_price: formatCurrencyValue(Math.max(0, Number(e.target.value) || 0)),
                       }))
                     }
-                    className={cn('w-full', editedValues.cost_price < 0 && 'border-red-500')}
+                    className={cn('w-full', editedValues.cost_price < 0 && 'border-destructive')}
                   />
                 </div>
               ) : (
@@ -453,7 +456,7 @@ export function DetailsTab({ selectedBatch, currencySymbol = '€', onClose }: D
             </div>
 
             <div className="flex justify-between items-center gap-2 w-full">
-              <Label className="flex-shrink-0" htmlFor="selling-price">
+              <Label className="shrink-0" htmlFor="selling-price">
                 {t('details.fields.sellingPrice')}
               </Label>
               {isEditing ? (
@@ -473,7 +476,7 @@ export function DetailsTab({ selectedBatch, currencySymbol = '€', onClose }: D
                         ),
                       }))
                     }
-                    className={cn('w-full', editedValues.selling_price < 0 && 'border-red-500')}
+                    className={cn('w-full', editedValues.selling_price < 0 && 'border-destructive')}
                   />
                 </div>
               ) : (

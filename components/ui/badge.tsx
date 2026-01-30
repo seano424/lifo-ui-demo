@@ -11,8 +11,8 @@ const badgeVariants = cva(
         default: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-100',
         primary: 'bg-primary-50 text-primary-800',
         secondary: 'bg-secondary text-white',
-        destructive: 'bg-red-100 text-red-900 dark:bg-red-900/20 dark:text-red-300',
-        success: 'bg-green-100 text-green-900 dark:bg-green-900/20 dark:text-green-300',
+        destructive: 'bg-destructive text-destructive dark:bg-destructive/20 dark:text-destructive',
+        success: 'bg-primary-100 text-primary-900 dark:bg-primary-900/20 dark:text-primary-300',
         warning: 'bg-yellow-100 text-yellow-900 dark:bg-yellow-900/20 dark:text-yellow-300',
         info: 'bg-blue-100 text-blue-900 dark:bg-blue-900/20 dark:text-blue-300',
         outline: 'border border-input bg-background text-foreground',
@@ -31,7 +31,7 @@ const badgeVariants = cva(
         interactiveSecondary:
           'bg-secondary-100 text-secondary-900 hover:bg-secondary-200 dark:bg-secondary-900/20 dark:text-secondary-300 dark:hover:bg-secondary-900/30 cursor-pointer',
         interactiveDestructive:
-          'bg-red-100 text-red-900 hover:bg-red-200 dark:bg-red-900/20 dark:text-red-300 dark:hover:bg-red-900/30 cursor-pointer',
+          'bg-destructive text-destructive hover:bg-destructive dark:bg-destructive/20 dark:text-destructive dark:hover:bg-destructive/30 cursor-pointer',
       },
       size: {
         sm: 'px-3 py-1.5 text-sm',

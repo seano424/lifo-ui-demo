@@ -124,7 +124,7 @@ export function ProductsSortToolbar({
                   onClick={() => handleSortChange(option.field)}
                   className="flex items-start gap-3 py-3"
                 >
-                  <Icon className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                  <Icon className="h-4 w-4 mt-0.5 shrink-0" />
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
                       <span className="">{option.label}</span>

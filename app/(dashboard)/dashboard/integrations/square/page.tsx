@@ -112,8 +112,12 @@ export default function SquareManagementPage() {
                 <Square className="h-6 w-6 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">{t('title')}</h1>
-                <p className="text-sm text-gray-600 sm:text-base">{t('manageSubtitle')}</p>
+                <Typography as="h1" color="primary">
+                  {t('title')}
+                </Typography>
+                <Typography variant="p" color="muted">
+                  {t('manageSubtitle')}
+                </Typography>
               </div>
             </div>
 
@@ -130,25 +134,31 @@ export default function SquareManagementPage() {
           <CardContent className="space-y-4">
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-1">
-                <p className="text-sm text-gray-600">{t('merchantName')}</p>
-                <p className="">{squareStatus.merchant_name || 'N/A'}</p>
+                <Typography variant="p" color="muted">
+                  {t('merchantName')}
+                </Typography>
+                <Typography variant="p" color="muted">
+                  {squareStatus.merchant_name || 'N/A'}
+                </Typography>
               </div>
               <div className="space-y-1">
-                <p className="text-sm text-gray-600">{t('merchantId')}</p>
-                <p className="font-mono text-sm">{squareStatus.merchant_id || 'N/A'}</p>
+                <Typography variant="p" color="muted">
+                  {t('merchantId')}
+                </Typography>
+                <Typography variant="p" color="muted">
+                  {squareStatus.merchant_id || 'N/A'}
+                </Typography>
               </div>
             </div>
 
             {squareStatus.last_sync_at && (
               <div className="rounded-lg bg-gray-50 p-3">
-                <p className="text-sm text-gray-600">
+                <Typography variant="p" color="muted">
                   {t('lastSync')}:{' '}
-                  <span className=" text-gray-900">
-                    {formatDistanceToNow(new Date(squareStatus.last_sync_at), {
-                      addSuffix: true,
-                    })}
-                  </span>
-                </p>
+                  {formatDistanceToNow(new Date(squareStatus.last_sync_at), {
+                    addSuffix: true,
+                  })}
+                </Typography>
               </div>
             )}
           </CardContent>
@@ -263,9 +273,9 @@ export default function SquareManagementPage() {
             <CardHeader>
               <div className="flex items-center gap-2">
                 <Boxes className="h-5 w-5 text-primary-800" />
-                <CardTitle className="text-base sm:text-lg">{t('syncInventory')}</CardTitle>
+                <CardTitle>{t('syncInventory')}</CardTitle>
               </div>
-              <CardDescription className="text-sm">{t('syncInventoryDescription')}</CardDescription>
+              <CardDescription>{t('syncInventoryDescription')}</CardDescription>
             </CardHeader>
             <CardContent>
               <Button
@@ -287,9 +297,9 @@ export default function SquareManagementPage() {
             <CardHeader>
               <div className="flex items-center gap-2">
                 <ShoppingCart className="h-5 w-5 text-primary-800" />
-                <CardTitle className="text-base sm:text-lg">{t('syncOrders')}</CardTitle>
+                <CardTitle>{t('syncOrders')}</CardTitle>
               </div>
-              <CardDescription className="text-sm">{t('syncOrdersDescription')}</CardDescription>
+              <CardDescription>{t('syncOrdersDescription')}</CardDescription>
             </CardHeader>
             <CardContent>
               <Button
@@ -312,8 +322,10 @@ export default function SquareManagementPage() {
           <CardHeader>
             <CardTitle>{t('needHelp')}</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-2 text-sm text-gray-600">
-            <p>{t('helpDescription')}</p>
+          <CardContent className="space-y-2">
+            <Typography variant="p" color="muted">
+              {t('helpDescription')}
+            </Typography>
             <ul className="list-disc space-y-1 pl-4">
               <li>{t('helpPoint1')}</li>
               <li>{t('helpPoint2')}</li>

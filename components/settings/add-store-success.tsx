@@ -91,7 +91,7 @@ export function AddStoreSuccess({ storeName, storeId, onSuccess }: AddStoreSucce
         <CardContent className="space-y-4">
           <div className="space-y-3">
             <div className="flex items-start gap-3">
-              <div className="w-6 h-6 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+              <div className="w-6 h-6 bg-primary/10 rounded-full flex items-center justify-center shrink-0 mt-0.5">
                 <span className="text-xs  text-primary">1</span>
               </div>
               <div className="space-y-1 flex flex-col">
@@ -105,7 +105,7 @@ export function AddStoreSuccess({ storeName, storeId, onSuccess }: AddStoreSucce
             </div>
 
             <div className="flex items-start gap-3">
-              <div className="w-6 h-6 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+              <div className="w-6 h-6 bg-primary/10 rounded-full flex items-center justify-center shrink-0 mt-0.5">
                 <span className="text-xs  text-primary">2</span>
               </div>
               <div className="space-y-1 flex flex-col">
@@ -119,7 +119,7 @@ export function AddStoreSuccess({ storeName, storeId, onSuccess }: AddStoreSucce
             </div>
 
             <div className="flex items-start gap-3">
-              <div className="w-6 h-6 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+              <div className="w-6 h-6 bg-primary/10 rounded-full flex items-center justify-center shrink-0 mt-0.5">
                 <span className="text-xs  text-primary">3</span>
               </div>
               <div className="space-y-1 flex flex-col">

@@ -86,7 +86,7 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
             </div>
 
             {state?.error && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-2xl">
+              <div className="p-3 bg-red-50 border border-destructive rounded-2xl">
                 <Typography variant="p" color="destructive" className="text-sm">
                   {state.error}
                 </Typography>

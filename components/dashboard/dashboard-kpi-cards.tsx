@@ -186,7 +186,7 @@ export function DashboardKPICards() {
 
       {/* Error state message */}
       {hasAnyError && (
-        <div className="mt-4 p-3 bg-red-500/10 border border-red-500/20 rounded-2xl">
+        <div className="mt-4 p-3 bg-destructive/10 border border-destructive/20 rounded-2xl">
           <p className="text-sm text-white">{t('errorMessage')}</p>
         </div>
       )}

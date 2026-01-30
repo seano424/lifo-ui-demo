@@ -67,7 +67,7 @@ export function QuickActionCard({
               </Typography>
               <ArrowRight
                 className={cn(
-                  'h-4 w-4 transform transition-transform group-hover:translate-x-1 flex-shrink-0',
+                  'h-4 w-4 transform transition-transform group-hover:translate-x-1 shrink-0',
                   variant === 'primary'
                     ? 'text-primary group-hover:text-primary-800'
                     : 'text-secondary group-hover:text-secondary-700',
