@@ -77,7 +77,7 @@ export function UnifiedSearchFiltersBar({
 
   if (isMobile) {
     return (
-      <div className="px-4 py-6 space-y-6">
+      <div className="px-4 py-6 flex flex-col gap-6">
         {/* Filter and Sort Buttons Row */}
         <div className="flex justify-center gap-3">
           <Button
@@ -242,7 +242,7 @@ export function UnifiedSearchFiltersBar({
 
         {/* Active Filters Display */}
         {hasActiveFilters && onRemoveFilter && (
-          <div className="mt-4 space-y-2">
+          <div className="mt-4 flex flex-col gap-2">
             <div className="flex justify-center mt-8">
               <div className="w-1/2 border-t border-border" />
             </div>

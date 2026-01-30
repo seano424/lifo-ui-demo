@@ -175,7 +175,7 @@ export function AlertSensitivityControls({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="conservative">
-                  <div className="space-y-1 flex flex-col gap-1 items-start p-2">
+                  <div className="flex flex-col gap-1 flex flex-col gap-1 items-start p-2">
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 bg-destructive rounded-full" />
                       <Typography variant="small">{t('levels.conservativeTitle')}</Typography>
@@ -184,7 +184,7 @@ export function AlertSensitivityControls({
                   </div>
                 </SelectItem>
                 <SelectItem value="balanced">
-                  <div className="space-y-1 flex flex-col gap-1 items-start p-2">
+                  <div className="flex flex-col gap-1 flex flex-col gap-1 items-start p-2">
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 bg-primary rounded-full" />
                       <Typography variant="small">{t('levels.balancedTitle')}</Typography>
@@ -195,7 +195,7 @@ export function AlertSensitivityControls({
                   </div>
                 </SelectItem>
                 <SelectItem value="proactive">
-                  <div className="space-y-1 flex flex-col gap-1 items-start p-2">
+                  <div className="flex flex-col gap-1 flex flex-col gap-1 items-start p-2">
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 bg-primary-500 rounded-full" />
                       <Typography variant="small">{t('levels.proactiveTitle')}</Typography>
@@ -228,8 +228,8 @@ export function AlertSensitivityControls({
 
           {/* Advanced Technical Details */}
           {showAdvanced && (
-            <div className="space-y-4 p-4 bg-muted/30 rounded-2xl border border-dashed">
-              <div className="text-sm space-y-3">
+            <div className="flex flex-col gap-4 p-4 bg-muted/30 rounded-2xl border border-dashed">
+              <div className="text-sm flex flex-col gap-3">
                 <p className="">{t('technical.thresholds')}</p>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="flex flex-col gap-1">
@@ -250,7 +250,7 @@ export function AlertSensitivityControls({
                 <Separator />
                 <div className="flex flex-col gap-1">
                   <p className="text-xs ">{t('technical.howScoringWorks')}</p>
-                  <ul className="text-xs text-muted-foreground space-y-1">
+                  <ul className="text-xs text-muted-foreground flex flex-col gap-1">
                     <li>• {t('technical.expiryScore')}</li>
                     <li>• {t('technical.marginScore')}</li>
                     <li>• {t('technical.velocityScore')}</li>

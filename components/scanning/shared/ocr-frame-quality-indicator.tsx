@@ -46,7 +46,7 @@ export default function OCRFrameQualityIndicator({
   return (
     <div
       className={cn(
-        'absolute top-4 right-4 bg-black/80 text-white p-3 rounded-lg text-xs space-y-2 min-w-[180px] backdrop-blur-sm',
+        'absolute top-4 right-4 bg-black/80 text-white p-3 rounded-lg text-xs flex flex-col gap-2 min-w-[180px] backdrop-blur-sm',
         className,
       )}
       role="status"
@@ -62,7 +62,7 @@ export default function OCRFrameQualityIndicator({
       </div>
 
       {/* Quality Indicators */}
-      <div className="space-y-1.5">
+      <div className="flex flex-col gap-1.5">
         {/* Text Detection */}
         <QualityIndicator
           label={t('ocrFrameQuality.textDetected', {

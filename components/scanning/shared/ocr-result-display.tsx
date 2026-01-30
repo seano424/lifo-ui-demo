@@ -61,7 +61,7 @@ export default function OCRResultDisplay({
   return (
     <div
       className={cn(
-        'rounded-lg border p-4 space-y-3',
+        'rounded-lg border p-4 flex flex-col gap-3',
         isSuccess && 'border-primary-500/50 bg-primary-50 dark:bg-primary-950/20',
         hasWarning && 'border-primary/50 bg-yellow-50 dark:bg-yellow-950/20',
         hasInfo && 'border-blue-500/50 bg-blue-50 dark:bg-blue-950/20',

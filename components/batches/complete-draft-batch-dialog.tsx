@@ -131,9 +131,9 @@ export function CompleteDraftBatchDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-5 py-4">
+        <div className="flex flex-col gap-5 py-4">
           {/* Batch info */}
-          <div className="rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-linear-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 p-5 space-y-4 shadow-sm">
+          <div className="rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-linear-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 p-5 flex flex-col gap-4 shadow-sm">
             <div className="flex gap-4">
               <div className="flex-1 bg-white dark:bg-slate-950 rounded-lg p-3 border border-slate-200 dark:border-slate-700">
                 <Label className="text-xs uppercase tracking-wide text-muted-foreground font-semibold">

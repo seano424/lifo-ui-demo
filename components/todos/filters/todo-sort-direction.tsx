@@ -43,7 +43,7 @@ export function TodoSortDirection({
       </div>
 
       {/* Direction Toggle */}
-      <div className="space-y-1 mb-4">
+      <div className="flex flex-col gap-1 mb-4">
         <label
           className={cn(
             'flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer transition-colors',

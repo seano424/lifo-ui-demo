@@ -17,9 +17,9 @@ interface NextStepsGridProps {
 
 export function NextStepsGrid({ title, items }: NextStepsGridProps) {
   return (
-    <div className="space-y-6 pt-8 my-8 border-t border-border/50">
+    <div className="flex flex-col gap-6 pt-8 my-8 border-t border-border/50">
       {/* Section Header */}
-      <div className="text-center space-y-2">
+      <div className="text-center flex flex-col gap-2">
         <Typography
           variant="h2"
           className="text-2xl font-bold bg-linear-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent"

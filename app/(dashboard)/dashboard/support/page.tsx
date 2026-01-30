@@ -120,7 +120,7 @@ export default function SupportPage() {
       <DashboardInsetHeader title={t('title')} description={t('subtitle')} />
 
       {/* Support Sections */}
-      <div className="space-y-12">
+      <div className="flex flex-col gap-12">
         {sections.map(section => (
           <div key={section.id} className="flex flex-col gap-4">
             {/* Section Header */}
@@ -129,10 +129,8 @@ export default function SupportPage() {
                 <section.icon className="h-6 w-6 text-primary" />
               </div>
               <div className="min-w-0 flex flex-col gap-1">
-                <Typography variant="h2" className="text-xl font-semibold">
-                  {section.title}
-                </Typography>
-                <Typography variant="p" color="muted" className="text-sm">
+                <Typography variant="h3">{section.title}</Typography>
+                <Typography variant="p" color="muted">
                   {section.description}
                 </Typography>
               </div>
@@ -145,22 +143,17 @@ export default function SupportPage() {
                   <Card key={article.href} className="h-full opacity-60 cursor-not-allowed">
                     <CardHeader className="pb-3">
                       <div className="flex items-start justify-between gap-2">
-                        <Typography
-                          variant="h3"
-                          className="text-base  leading-tight text-muted-foreground"
-                        >
-                          {article.title}
-                        </Typography>
+                        <Typography variant="h3">{article.title}</Typography>
                         <span className="px-2 py-1 bg-orange-100 text-orange-600 text-xs  rounded-md shrink-0">
                           {t('common.comingSoon')}
                         </span>
                       </div>
                     </CardHeader>
                     <CardContent className="pt-0">
-                      <Typography variant="p" color="muted" className="text-sm mb-3 line-clamp-2">
+                      <Typography variant="p" color="muted">
                         {article.description}
                       </Typography>
-                      <div className="flex items-center gap-1 text-xs text-muted-foreground ">
+                      <div className="flex items-center gap-1">
                         <Clock className="h-3 w-3" />
                         <span>{article.readTime}</span>
                       </div>

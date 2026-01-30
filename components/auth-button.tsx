@@ -1,6 +1,5 @@
 'use client'
 
-import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 import { useCurrentUser } from '@/hooks/use-users'
 import { cn } from '@/lib/utils'
@@ -25,11 +24,16 @@ export function AuthButton({ isMobile }: AuthButtonProps) {
   }
 
   return user ? (
-    <div
-      className={cn('flex items-center gap-2', isMobile && 'flex-col-reverse gap-2 items-start')}
-    >
-      <Button asChild size="default" variant={'default'} className={cn(isMobile && 'w-full')}>
-        <Link href="/dashboard">{t('goToDashboard')}</Link>
+    <div className={cn('flex items-center gap-2', isMobile && 'flex-col gap-4 items-start')}>
+      <Button
+        asChild
+        size="default"
+        variant={'default'}
+        asLink
+        href="/dashboard"
+        className={cn(isMobile && 'w-full')}
+      >
+        {t('goToDashboard')}
       </Button>
 
       <LogoutButton variant="gray" className={cn(isMobile && 'w-full')} />
@@ -38,11 +42,11 @@ export function AuthButton({ isMobile }: AuthButtonProps) {
     <>
       {/* Desktop */}
       <div className={cn('flex gap-2 items-center', isMobile && 'hidden')}>
-        <Button asChild variant={'secondary'} className="w-full">
-          <Link href="/auth/sign-up">{t('signup')}</Link>
+        <Button asChild variant={'default'} asLink href="/auth/sign-up">
+          {t('signup')}
         </Button>
-        <Button asChild variant={'gray'}>
-          <Link href="/auth/login">{t('login')}</Link>
+        <Button asChild variant="gray" asLink href="/auth/login">
+          {t('login')}
         </Button>
       </div>
       {/* Mobile */}
@@ -53,12 +57,18 @@ export function AuthButton({ isMobile }: AuthButtonProps) {
           !isMobile && 'hidden',
         )}
       >
-        <Button asChild variant={'gray'} className="uppercase w-full">
-          <Link href="/auth/login">{t('login')}</Link>
+        <Button asChild variant={'gray'} asLink href="/auth/login" className="uppercase w-full">
+          {t('login')}
         </Button>
 
-        <Button asChild variant={'secondary'} className="uppercase w-full">
-          <Link href="/auth/sign-up">{t('signup')}</Link>
+        <Button
+          asChild
+          variant={'secondary'}
+          asLink
+          href="/auth/sign-up"
+          className="uppercase w-full"
+        >
+          {t('signup')}
         </Button>
       </div>
     </>

@@ -63,7 +63,7 @@ export default function OfflinePage() {
 
           <div className="text-sm text-muted-foreground text-center">
             <p>While offline, you can still:</p>
-            <ul className="mt-2 space-y-1">
+            <ul className="mt-2 flex flex-col gap-1">
               <li>• View cached pages</li>
               <li>• Access previously loaded data</li>
               <li>• Use basic app features</li>

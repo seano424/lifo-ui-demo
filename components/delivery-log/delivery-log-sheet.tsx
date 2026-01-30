@@ -260,7 +260,7 @@ export function DeliveryLogSheet({ open, onOpenChange, onComplete }: DeliveryLog
           {/* Content Area - Scrollable */}
           <div className="flex-1 min-h-0 overflow-hidden">
             <ScrollArea className="h-full">
-              <div className="p-6 space-y-6">
+              <div className="p-6 flex flex-col gap-6">
                 {/* Recent Products Section */}
                 <div>
                   <div className="flex items-center justify-between mb-3">

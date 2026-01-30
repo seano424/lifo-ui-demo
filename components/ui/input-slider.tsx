@@ -57,7 +57,7 @@ const InputSlider = React.forwardRef<HTMLDivElement, InputSliderProps>(
     const progressPercentage = thumbInset + progressRatio * (100 - 2 * thumbInset)
 
     return (
-      <div ref={ref} className={cn('space-y-3', className)} {...props}>
+      <div ref={ref} className={cn('flex flex-col gap-3', className)} {...props}>
         <div className="flex flex-col gap-8">
           {/* Manual Input */}
           <div

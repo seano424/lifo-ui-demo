@@ -18,7 +18,7 @@ export function ActionForm({ isOpen, children, className }: ActionFormProps) {
         className,
       )}
     >
-      <div className="bg-[rgba(0,0,0,0.02)] rounded-2xl p-5 space-y-4">{children}</div>
+      <div className="bg-[rgba(0,0,0,0.02)] rounded-2xl p-5 flex flex-col gap-4">{children}</div>
     </div>
   )
 }

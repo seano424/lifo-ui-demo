@@ -34,7 +34,7 @@ export default function SquareConnectPage() {
 
   return (
     <ErrorBoundary>
-      <div className="container max-w-4xl space-y-6 py-6 lg:py-8">
+      <div className="container max-w-4xl flex flex-col gap-6 py-6 lg:py-8">
         {/* Header */}
         <div className="flex flex-col gap-2">
           <Button
@@ -108,7 +108,7 @@ export default function SquareConnectPage() {
               </CardTitle>
               <CardDescription>{t('securityDescription')}</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-3 text-sm text-gray-600">
+            <CardContent className="flex flex-col gap-3 text-sm text-gray-600">
               <Typography variant="p">{t('securityPoint1')}</Typography>
               <Typography variant="p">{t('securityPoint2')}</Typography>
               <Typography variant="p">{t('securityPoint3')}</Typography>
@@ -119,7 +119,7 @@ export default function SquareConnectPage() {
         {/* Connection Button */}
         <Card>
           <CardContent className="p-6">
-            <div className="flex flex-col items-center space-y-4 text-center">
+            <div className="flex flex-col items-center flex flex-col gap-4 text-center">
               <div className="flex flex-col gap-2">
                 <Typography variant="h3">{t('readyToConnect')}</Typography>
                 <Typography variant="p" color="muted">

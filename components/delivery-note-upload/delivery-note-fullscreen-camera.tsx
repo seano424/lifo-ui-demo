@@ -211,7 +211,7 @@ export function DeliveryNoteFullscreenCamera({
       {/* Camera Permission Request */}
       {hasPermission === false && !error && (
         <div className="absolute inset-0 z-10 flex items-center justify-center bg-black">
-          <div className="text-center space-y-4 p-6">
+          <div className="text-center flex flex-col gap-4 p-6">
             <Camera className="h-12 w-12 text-white mx-auto" />
             <p className="text-white text-lg">Camera access required</p>
             <Button onClick={startCamera} disabled={isStartingRef.current} variant="secondary">

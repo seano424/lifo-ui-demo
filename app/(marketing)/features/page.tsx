@@ -33,7 +33,7 @@ function FeatureCard({ title, description, icon, image, reversed = false }: Feat
         className={`flex flex-col justify-center ${reversed ? 'xl:flex-row-reverse' : 'xl:flex-row'} items-center gap-8 xl:gap-12 `}
       >
         {/* Content */}
-        <div className="flex-1 space-y-6 text-center xl:text-left">
+        <div className="flex-1 flex flex-col gap-6 text-center xl:text-left">
           <div className="flex flex-col sm:flex-row items-center justify-center xl:justify-start gap-4">
             <div className="w-16 h-16 rounded-2xl bg-linear-to-br from-primary-100 to-secondary-100 flex items-center justify-center shrink-0">
               {icon}
@@ -63,7 +63,7 @@ function MockDashboard() {
   const t = useTranslations('featurespage.mockData.dashboard')
 
   return (
-    <div className="w-full space-y-4">
+    <div className="w-full flex flex-col gap-4">
       <div className="bg-linear-to-r from-primary-50 to-secondary-50 rounded-2xl p-4 sm:p-6 border border-primary-100">
         <div className="flex items-center justify-between mb-3">
           <Typography variant="p" color="primary">
@@ -128,7 +128,7 @@ function MockScanning() {
   const t = useTranslations('featurespage.mockData.scanning')
 
   return (
-    <div className="w-full space-y-4 flex flex-col items-center">
+    <div className="w-full flex flex-col gap-4 flex flex-col items-center">
       <div className="bg-linear-to-br from-secondary-50 to-primary-50 rounded-2xl p-4 sm:p-6 border border-secondary-100 w-full max-w-sm">
         <div className="flex items-center gap-3 mb-4">
           <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
@@ -163,7 +163,7 @@ function MockAnalytics() {
   const t = useTranslations('featurespage.mockData.dashboard')
 
   return (
-    <div className="w-full space-y-4">
+    <div className="w-full flex flex-col gap-4">
       <div className="bg-linear-to-br from-white/90 to-white/70 rounded-2xl p-4 sm:p-6 border border-gray-200">
         <Typography variant="h4">{t('performanceAnalytics')}</Typography>
         <div className="flex flex-col gap-4">
@@ -197,7 +197,7 @@ function MockAI() {
   const t = useTranslations('featurespage.mockData.ai')
 
   return (
-    <div className="w-full space-y-4">
+    <div className="w-full flex flex-col gap-4">
       <div className="bg-linear-to-br from-primary-50 to-secondary-50 rounded-2xl p-6 border border-primary-100">
         <div className="flex items-center gap-3 mb-4">
           <Bot size={24} className="text-primary-800" />
@@ -237,7 +237,7 @@ export default function FeaturesPage() {
         </div>
 
         {/* Features */}
-        <div className="flex flex-col items-center space-y-12 lg:space-y-16">
+        <div className="flex flex-col items-center flex flex-col gap-12 lg:space-y-16">
           <div className="w-full max-w-6xl">
             {/* Real-time Dashboard */}
             <FeatureCard

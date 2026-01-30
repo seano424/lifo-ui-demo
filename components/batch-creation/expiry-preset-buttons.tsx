@@ -52,7 +52,7 @@ export function ExpiryPresetButtons({
   }
 
   return (
-    <div className={cn('space-y-4', className)}>
+    <div className={cn('flex flex-col gap-4', className)}>
       {/* Preset Days Grid */}
       <div className="grid grid-cols-3 gap-2">
         {PRESET_DAYS.map(preset => {
@@ -104,7 +104,7 @@ export function ExpiryPresetButtons({
 
       {/* Selected Date Display */}
       {selectedDays !== null && selectedDays !== undefined && (
-        <div className="text-center space-y-1">
+        <div className="text-center flex flex-col gap-1">
           <p className="text-sm text-gray-500 dark:text-gray-400">Expiry date</p>
           <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
             {formatDate(calculateDate(selectedDays))}

@@ -13,7 +13,7 @@ export default function NotFound() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-linear-to-b from-background to-background/90">
-      <div className="max-w-md w-full space-y-8 text-center">
+      <div className="max-w-md w-full flex flex-col gap-8 text-center">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}

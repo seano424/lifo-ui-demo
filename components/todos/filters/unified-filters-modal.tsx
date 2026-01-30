@@ -153,7 +153,7 @@ export function UnifiedFiltersModal({
   const buttonSize = isMobile ? 'sm' : 'sm'
   const buttonHeight = isMobile ? 'h-7' : 'h-12'
   const textSize = isMobile ? 'text-xs' : 'text-base'
-  const spacing = isMobile ? 'space-y-2' : 'space-y-4'
+  const spacing = isMobile ? 'flex flex-col gap-2' : 'flex flex-col gap-4'
   const padding = isMobile ? 'px-6 py-4 pb-6' : 'px-8 py-6'
 
   return (
@@ -170,7 +170,7 @@ export function UnifiedFiltersModal({
         </div>
       }
     >
-      <div className={`space-y-8 ${padding}`}>
+      <div className={`flex flex-col gap-8 ${padding}`}>
         {/* Urgency Filter */}
         <div className={spacing}>
           <Typography variant="h4" color="muted">

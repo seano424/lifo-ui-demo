@@ -259,7 +259,7 @@ export function BatchValidationTable({
       </div>
 
       {/* Mobile card view */}
-      <div className="md:hidden space-y-3">
+      <div className="md:hidden flex flex-col gap-3">
         {currentItems.map((item, index) => {
           const actualIndex = startIndex + index
           return (

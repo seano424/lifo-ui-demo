@@ -69,7 +69,7 @@ export function DeliverySummary({
 
   return (
     <Card className={cn('border-2 border-primary-200 dark:border-primary-800', className)}>
-      <CardContent className="p-4 space-y-4">
+      <CardContent className="p-4 flex flex-col gap-4">
         {/* Summary Header */}
         <div className="flex items-center justify-between">
           <div>

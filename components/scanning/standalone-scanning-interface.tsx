@@ -473,7 +473,7 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
   return (
     <div className={`min-h-screen flex flex-col gap-4 ${className}`}>
       <div className="w-full">
-        <div className="px-4 space-y-4">
+        <div className="px-4 flex flex-col gap-4">
           {/* Step 1: Barcode Scanning */}
           {uiStep === 'camera-barcode' && (
             <>
@@ -685,7 +685,7 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
               </div>
 
               {/* Summary List */}
-              <div className="max-h-60 overflow-y-auto space-y-2 border rounded-2xl p-3 bg-gray-50">
+              <div className="max-h-60 overflow-y-auto flex flex-col gap-2 border rounded-2xl p-3 bg-gray-50">
                 {scannedItems.map(item => {
                   const totalValue = item.quantity * item.price
                   return (

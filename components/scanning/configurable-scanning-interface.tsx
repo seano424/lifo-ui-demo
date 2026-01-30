@@ -478,7 +478,7 @@ export default function BaseScanningInterface({ config, callbacks, className }: 
   return (
     <div className={`bg-white min-h-screen flex flex-col gap-4 ${className}`}>
       <div className="w-full">
-        <div className="px-4 space-y-4">
+        <div className="px-4 flex flex-col gap-4">
           {/* Step 1: Barcode Scanning */}
           {logic.state.currentUIStep === 'barcode' && (
             <>

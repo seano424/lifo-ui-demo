@@ -63,7 +63,7 @@ export function StoreHeaderDisplay({
             <div className="flex size-10 animate-pulse items-center justify-center rounded-2xl bg-muted">
               <Store className="size-5 text-muted-foreground" />
             </div>
-            <div className="flex-1 space-y-2">
+            <div className="flex-1 flex flex-col gap-2">
               <div className="h-4 w-32 animate-pulse rounded-2xl bg-muted"></div>
               <div className="h-3 w-24 animate-pulse rounded-2xl bg-muted"></div>
             </div>
@@ -133,7 +133,7 @@ export function StoreHeaderDisplay({
             <Store className="size-6" />
           </div>
 
-          <div className="min-w-0 flex-1 space-y-2">
+          <div className="min-w-0 flex-1 flex flex-col gap-2">
             <div className="flex items-center gap-2">
               <Typography variant="h1" color="primary">
                 {activeStore.store_name}

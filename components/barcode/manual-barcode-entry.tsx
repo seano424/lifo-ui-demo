@@ -290,7 +290,7 @@ export default function ManualBarcodeEntry({
   }
 
   return (
-    <div className={`space-y-4 max-w-2xl mx-auto ${className}`}>
+    <div className={`flex flex-col gap-4 max-w-2xl mx-auto ${className}`}>
       <Card>
         <CardHeader>
           <div className="flex justify-between">
@@ -308,7 +308,7 @@ export default function ManualBarcodeEntry({
                 <div className="flex items-start gap-3">
                   <div className="flex-1">
                     <Typography variant="h3">{t('productSelected')}</Typography>
-                    <div className="text-sm mt-1 space-y-1">
+                    <div className="text-sm mt-1 flex flex-col gap-1">
                       <div>
                         <strong>{tFields('name')}:</strong> {selectedProduct.productName}
                       </div>
@@ -643,7 +643,7 @@ export default function ManualBarcodeEntry({
                         )}
 
                         {lookupResult.product && (
-                          <div className="text-sm space-y-2">
+                          <div className="text-sm flex flex-col gap-2">
                             <div>
                               <strong>{tFields('name')}:</strong>{' '}
                               {lookupResult.product.product_name ||
@@ -863,7 +863,7 @@ export default function ManualBarcodeEntry({
                       </div>
 
                       {productSearch.data && productSearch.data.length > 0 && (
-                        <div className="mt-2 max-h-32 overflow-y-auto space-y-1">
+                        <div className="mt-2 max-h-32 overflow-y-auto flex flex-col gap-1">
                           {productSearch.data
                             .slice(0, SEARCH_CONFIG.MAX_SEARCH_RESULTS)
                             .map((product: OpenFoodFactsSearchResult) => (

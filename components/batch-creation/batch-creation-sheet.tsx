@@ -328,7 +328,7 @@ export function BatchCreationSheet({
         <div className="flex-1 overflow-y-auto">
           {/* Loading State */}
           {isLoading && !externalProducts && !singleProduct && (
-            <div className="p-6 space-y-4">
+            <div className="p-6 flex flex-col gap-4">
               <Skeleton className="h-32 w-full" />
               <Skeleton className="h-32 w-full" />
               <Skeleton className="h-32 w-full" />
@@ -348,7 +348,7 @@ export function BatchCreationSheet({
           {currentStep === 'product-selection' && !isLoading && !fetchError && (
             <div
               className={cn(
-                'px-6 space-y-4',
+                'px-6 flex flex-col gap-4',
                 'animate-in fade-in-0 slide-in-from-right-4 duration-300',
               )}
             >
@@ -376,7 +376,7 @@ export function BatchCreationSheet({
           {currentStep === 'expiry-entry' && currentProduct && (
             <div
               className={cn(
-                'px-6 space-y-6',
+                'px-6 flex flex-col gap-6',
                 'animate-in fade-in-0 slide-in-from-right-4 duration-300',
               )}
             >

@@ -214,7 +214,7 @@ export default function ScannedItemsList({
                   <div className="text-xs text-gray-500 font-mono">{editingItem?.barcode}</div>
                 </div>
               ) : (
-                <div className="space-y-3 p-3 bg-blue-50 rounded-2xl border border-blue-200">
+                <div className="flex flex-col gap-3 p-3 bg-blue-50 rounded-2xl border border-blue-200">
                   <div className="text-sm  text-blue-800 mb-2">
                     {t('editDialog.sections.productDetails')}
                   </div>

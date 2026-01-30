@@ -135,9 +135,9 @@ export default function ScanningCamera({
   }, [ocrError])
 
   return (
-    <div className={cn(className, 'space-y-4')}>
+    <div className={cn(className, 'flex flex-col gap-4')}>
       {/* Camera Scanner */}
-      <div className="space-y-2 relative">
+      <div className="flex flex-col gap-2 relative">
         <BarcodeScanner
           onScan={mode === 'barcode' && onBarcodeScanned ? onBarcodeScanned : () => {}}
           onError={onScanError || (() => {})}

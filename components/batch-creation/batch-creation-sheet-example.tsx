@@ -163,7 +163,7 @@ export function BatchCreationSheetDemo() {
   }
 
   return (
-    <div className="container max-w-4xl mx-auto py-8 space-y-8">
+    <div className="container max-w-4xl mx-auto py-8 flex flex-col gap-8">
       <div>
         <Typography variant="h1" color="primary">
           Batch Creation Sheet Examples

@@ -139,7 +139,7 @@ export default function NewBatchesPage() {
   const totalUnits = summary?.total_units || 0
 
   return (
-    <div className="container space-y-4 py-6">
+    <div className="container flex flex-col gap-4 py-6">
       {/* Page Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <Typography variant="h3">{t('title')}</Typography>
@@ -269,7 +269,7 @@ export default function NewBatchesPage() {
       {/* Products List */}
       {!isLoading && !productsError && products && products.length > 0 && (
         <>
-          <div className="space-y-4 bg-gray-50 dark:bg-gray-900 rounded-2xl p-4">
+          <div className="flex flex-col gap-4 bg-gray-50 dark:bg-gray-900 rounded-2xl p-4">
             {products.map(product => (
               <DraftBatchCard
                 key={product.product_id}
