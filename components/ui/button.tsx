@@ -21,7 +21,7 @@ const buttonVariants = cva(
         secondary:
           'bg-secondary-900 text-white shadow-xs hover:bg-secondary-800 dark:bg-secondary-700 dark:hover:bg-secondary-600',
         ghost:
-          'hover:bg-primary-50 hover:text-primary-800 dark:hover:bg-primary-900/0 dark:text-primary-300',
+          'hover:bg-primary-50 hover:text-primary-800 dark:hover:bg-primary-900/0 dark:text-primary-300 font-normal',
         subtleTertiary:
           'bg-primary-50 text-primary-800 dark:bg-primary-900/10 dark:text-primary-300',
         link: 'text-primary-800 underline-offset-4 hover:underline dark:text-primary-300',

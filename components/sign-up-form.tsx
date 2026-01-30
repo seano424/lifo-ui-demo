@@ -74,7 +74,7 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
           <div className="mx-auto w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center">
             <Building2 className="w-6 h-6 text-primary" />
           </div>
-          <div className="flex flex-col gap-1.5 flex flex-col">
+          <div className="gap-1.5 flex flex-col">
             <CardTitle>{t('title')}</CardTitle>
             <CardDescription>{t('description')}</CardDescription>
           </div>

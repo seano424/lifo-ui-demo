@@ -22,7 +22,7 @@ export function HeroButtons() {
         <div className="flex gap-2 flex-wrap">
           <Button
             asLink
-            href="/onboarding/create-account"
+            href="/auth/sign-up"
             size="lg"
             className="font-semibold font-heading flex items-center gap-1 capitalize group"
             variant="black"

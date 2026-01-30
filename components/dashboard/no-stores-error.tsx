@@ -15,7 +15,7 @@ interface NoStoresErrorProps {
 }
 
 export function NoStoresError({
-  redirectPath = '/onboarding/create-account',
+  redirectPath = '/auth/sign-up',
   className = '',
 }: NoStoresErrorProps) {
   const t = useTranslations('dashboard.errors')

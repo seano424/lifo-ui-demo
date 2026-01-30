@@ -106,11 +106,7 @@ function PricingCard({
           {t('common.comingSoon')}
         </Button>
       ) : (
-        <Button
-          asLink={true}
-          href="/onboarding/create-account"
-          variant={isPopular ? 'secondary' : 'default'}
-        >
+        <Button asLink={true} href="/auth/sign-up" variant={isPopular ? 'secondary' : 'default'}>
           {t('common.getStarted')}
           <ArrowRight size={16} className="ml-2" />
         </Button>
