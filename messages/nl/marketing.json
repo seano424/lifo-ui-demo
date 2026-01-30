@@ -76,8 +76,8 @@
   "landingpage": {
     "hero": {
       "title": "Vervaldatum tracking die actie stimuleert",
-      "subtitle": "lifo toont uw team precies wat verloopt zodat u kunt korting geven, doneren of verkopen voordat het te laat is.",
-      "subtitle2": "lifo toont uw team precies welke voedselbatches aandacht nodig hebben zodat u kunt korting geven, doneren of verkopen voordat het te laat is.",
+      "subtitle": "Lifo toont uw team precies wat verloopt zodat u kunt korting geven, doneren of verkopen voordat het te laat is.",
+      "subtitle2": "Lifo toont uw team precies welke voedselbatches aandacht nodig hebben zodat u kunt korting geven, doneren of verkopen voordat het te laat is.",
       "buttons": {
         "freeTrial": "Start mijn gratis proefperiode",
         "explore": "Verken het platform",
@@ -110,12 +110,12 @@
         "title": "Maximale compatibiliteit",
         "description": "Verbind u met uw bestaande POS-systeem en ERP in enkele minuten"
       },
-      "discoverButton": "Ontdek lifo",
+      "discoverButton": "Ontdek Lifo",
       "noCommitment": "Geen verplichtingen!"
     },
     "businessStats": {
       "title": "Maximaliseer uw winst, minimaliseer uw verlies",
-      "subtitle": "Zie de echte impact die lifo heeft op bedrijven zoals het uwe",
+      "subtitle": "Zie de echte impact die Lifo heeft op bedrijven zoals het uwe",
       "disclaimer": "Resultaten kunnen variëren. Gebaseerd op gemiddelde klantgegevens over 12 maanden.",
       "revenue": {
         "label": "Omzetstijging",
@@ -134,7 +134,7 @@
       }
     },
     "cta": {
-      "title": "Probeer lifo vandaag nog",
+      "title": "Probeer Lifo vandaag nog",
       "features": {
         "quickSetup": {
           "title": "Snelle installatie",

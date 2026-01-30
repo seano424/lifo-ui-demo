@@ -76,8 +76,8 @@
   "landingpage": {
     "hero": {
       "title": "Suivi d'expiration qui stimule l'action",
-      "subtitle": "lifo montre à votre équipe exactement ce qui expire pour que vous puissiez réduire les prix, donner ou vendre avant qu'il ne soit trop tard.",
-      "subtitle2": "lifo montre à votre équipe exactement quels lots alimentaires nécessitent attention pour que vous puissiez réduire les prix, donner ou vendre avant qu'il ne soit trop tard.",
+      "subtitle": "Lifo montre à votre équipe exactement ce qui expire pour que vous puissiez réduire les prix, donner ou vendre avant qu'il ne soit trop tard.",
+      "subtitle2": "Lifo montre à votre équipe exactement quels lots alimentaires nécessitent attention pour que vous puissiez réduire les prix, donner ou vendre avant qu'il ne soit trop tard.",
       "buttons": {
         "freeTrial": "Démarrer mon essai gratuit",
         "explore": "Explorer la plateforme",
@@ -134,7 +134,7 @@
       }
     },
     "cta": {
-      "title": "Essaye lifo aujourd'hui",
+      "title": "Essaye Lifo aujourd'hui",
       "features": {
         "quickSetup": {
           "title": "Installation rapide",
