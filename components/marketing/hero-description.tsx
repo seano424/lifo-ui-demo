@@ -7,7 +7,7 @@ export function HeroDescription() {
   const t = useTranslations('landingpage.hero')
 
   return (
-    <Typography variant="h5" className="lg:max-w-lg mx-auto text-center max-w-md">
+    <Typography variant="h4" className="lg:max-w-lg mx-auto text-center max-w-md">
       {t('subtitle')}
     </Typography>
   )

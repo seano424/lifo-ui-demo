@@ -12,15 +12,15 @@ interface FeatureProps {
 
 function Feature({ icon, title, description }: FeatureProps) {
   return (
-    <div className="flex flex-col md:flex-row gap-4 items-start group">
-      <div className="p-3 rounded-2xl border border-secondary-200/50 shadow-sm group-hover:shadow-md group-hover:shadow-secondary-500/10 transition-all duration-300">
+    <div className="flex flex-row gap-4 items-start group">
+      <div className="sm:p-2 p-1.5 rounded-xl border border-secondary-200/50 shadow-sm group-hover:shadow-md group-hover:shadow-secondary-500/10 transition-all duration-300 w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center">
         {icon}
       </div>
       <div className="flex flex-col gap-2">
         <Typography variant="h3" className="capitalize">
           {title}
         </Typography>
-        <Typography variant="p" className="font-mono">
+        <Typography variant="p" className="">
           {description}
         </Typography>
       </div>
@@ -44,25 +44,25 @@ export function FeaturesSummary() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 py-8 px-8 rounded-2xl bg-card overflow-hidden h-full">
           <Feature
-            icon={<Calendar size={28} className="text-primary-900" strokeWidth={1.5} />}
+            icon={<Calendar className="text-primary-900" strokeWidth={1.5} />}
             title={t('expiryTracking.title')}
             description={t('expiryTracking.description')}
           />
 
           <Feature
-            icon={<Bell size={28} className="text-primary-900" strokeWidth={1.5} />}
+            icon={<Bell className="text-primary-900" strokeWidth={1.5} />}
             title={t('predictiveAlerts.title')}
             description={t('predictiveAlerts.description')}
           />
 
           <Feature
-            icon={<Clock size={28} className="text-primary-900" strokeWidth={1.5} />}
+            icon={<Clock className="text-primary-900" strokeWidth={1.5} />}
             title={t('timeSaving.title')}
             description={t('timeSaving.description')}
           />
 
           <Feature
-            icon={<Tablet size={28} className="text-primary-900" strokeWidth={1.5} />}
+            icon={<Tablet className="text-primary-900" strokeWidth={1.5} />}
             title={t('compatibility.title')}
             description={t('compatibility.description')}
           />
