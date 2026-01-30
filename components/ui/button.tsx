@@ -1,13 +1,13 @@
 import { Slot } from '@radix-ui/react-slot'
 import { cva, type VariantProps } from 'class-variance-authority'
-import { Loader2 } from 'lucide-react'
+import { ChevronRightIcon, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import * as React from 'react'
 
 import { cn } from '@/lib/utils'
 
 const buttonVariants = cva(
-  'rounded-xl font-sans font-semibold transition-transform duration-75 focus:outline-none disabled:opacity-50 disabled:pointer-events-none overflow-hidden cursor-pointer inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors duration-200 ease-in-out focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0',
+  'rounded-xl transition-all duration-100 focus:outline-none disabled:opacity-50 disabled:pointer-events-none overflow-hidden cursor-pointer inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors duration-200 ease-in-out focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0',
   {
     variants: {
       variant: {
@@ -18,8 +18,7 @@ const buttonVariants = cva(
           'bg-destructive text-destructive-foreground shadow-xs hover:bg-destructive/90 dark:bg-destructive dark:hover:bg-destructive',
         subtleDestructive: 'bg-destructive text-destructive shadow-xs hover:bg-destructive',
         outline: 'border border-input bg-background shadow-xs hover:border-border',
-        secondary:
-          'bg-secondary-900 text-white shadow-xs hover:bg-secondary-800 dark:bg-secondary-700 dark:hover:bg-secondary-600',
+        secondary: 'bg-secondary-900 text-white shadow-xs hover:bg-secondary-800',
         ghost:
           'hover:bg-primary-50 hover:text-primary-800 dark:hover:bg-primary-900/0 dark:text-primary-300 font-normal',
         subtleTertiary:
@@ -73,6 +72,7 @@ type ButtonOnlyProps =
 
 type ButtonPropsBase = {
   asChild?: boolean
+  hasArrowUpIcon?: boolean
   asLink?: boolean
   href?: string
   children?: React.ReactNode
@@ -93,6 +93,7 @@ const Button = React.forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPro
       size,
       asChild = false,
       asLink = false,
+      hasArrowUpIcon = false,
       href,
       children,
       loading = false,
@@ -113,7 +114,12 @@ const Button = React.forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPro
         {loadingText || 'Loading...'}
       </>
     ) : (
-      children
+      <>
+        {children}
+        {hasArrowUpIcon && (
+          <ChevronRightIcon className="w-5 h-5 -rotate-45 transition-transform duration-300 ease-in-out group-hover:translate-x-px group-hover:-translate-y-1 -translate-y-px" />
+        )}
+      </>
     )
 
     // Disable button when loading
@@ -130,6 +136,7 @@ const Button = React.forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPro
             href={href}
             className={cn(
               buttonVariants({ variant, size, className }),
+              hasArrowUpIcon && 'group',
               isDisabled && 'opacity-50 pointer-events-none',
             )}
             ref={ref as React.Ref<HTMLAnchorElement>}
@@ -145,6 +152,7 @@ const Button = React.forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPro
             href={href}
             className={cn(
               buttonVariants({ variant, size, className }),
+              hasArrowUpIcon && 'group',
               isDisabled && 'opacity-50 pointer-events-none',
             )}
             ref={ref as React.Ref<HTMLAnchorElement>}
@@ -163,7 +171,7 @@ const Button = React.forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPro
 
     return (
       <Comp
-        className={cn(buttonVariants({ variant, size, className }))}
+        className={cn(buttonVariants({ variant, size, className }), hasArrowUpIcon && 'group')}
         ref={ref as React.Ref<HTMLButtonElement>}
         disabled={isDisabled}
         {...buttonProps}

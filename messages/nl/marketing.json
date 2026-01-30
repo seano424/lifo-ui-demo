@@ -76,8 +76,8 @@
   "landingpage": {
     "hero": {
       "title": "Vervaldatum tracking die actie stimuleert",
-      "subtitle": "LIFO toont uw team precies wat verloopt zodat u kunt korting geven, doneren of verkopen voordat het te laat is.",
-      "subtitle2": "LIFO toont uw team precies welke voedselbatches aandacht nodig hebben zodat u kunt korting geven, doneren of verkopen voordat het te laat is.",
+      "subtitle": "Lifo toont uw team precies wat verloopt zodat u kunt korting geven, doneren of verkopen voordat het te laat is.",
+      "subtitle2": "Lifo toont uw team precies welke voedselbatches aandacht nodig hebben zodat u kunt korting geven, doneren of verkopen voordat het te laat is.",
       "buttons": {
         "freeTrial": "Start mijn gratis proefperiode",
         "explore": "Verken het platform",
@@ -110,12 +110,12 @@
         "title": "Maximale compatibiliteit",
         "description": "Verbind u met uw bestaande POS-systeem en ERP in enkele minuten"
       },
-      "discoverButton": "Ontdek LIFO",
+      "discoverButton": "Ontdek Lifo",
       "noCommitment": "Geen verplichtingen!"
     },
     "businessStats": {
       "title": "Maximaliseer uw winst, minimaliseer uw verlies",
-      "subtitle": "Zie de echte impact die LIFO heeft op bedrijven zoals het uwe",
+      "subtitle": "Zie de echte impact die Lifo heeft op bedrijven zoals het uwe",
       "disclaimer": "Resultaten kunnen variëren. Gebaseerd op gemiddelde klantgegevens over 12 maanden.",
       "revenue": {
         "label": "Omzetstijging",
@@ -134,7 +134,7 @@
       }
     },
     "cta": {
-      "title": "Stap vandaag nog over op LIFO",
+      "title": "Probeer Lifo vandaag nog",
       "features": {
         "quickSetup": {
           "title": "Snelle installatie",
@@ -155,7 +155,7 @@
       },
       "card": {
         "title": "Klaar om uw voorraadbeheer te transformeren?",
-        "description": "Word lid van LIFO om veerkrachtiger te worden en sluit u aan bij andere winkels die slimme voorraadbeheer praktijken implementeren.",
+        "description": "Word lid van lifo om veerkrachtiger te worden en sluit u aan bij andere winkels die slimme voorraadbeheer praktijken implementeren.",
         "benefits": {
           "noCommitment": "Geen verplichtingen",
           "instantSetup": "Directe installatie",
@@ -190,7 +190,7 @@
       "title": "Alles wat u nodig heeft",
       "expiry": {
         "title": "Vervaldatum tracking",
-        "description": "Mis nooit vervaldatums met geautomatiseerde waarschuwingen en LIFO-beheer."
+        "description": "Mis nooit vervaldatums met geautomatiseerde waarschuwingen en lifo-beheer."
       },
       "security": {
         "title": "Gegevensbeveiliging",
@@ -246,7 +246,7 @@
     },
     "cta": {
       "title": "Klaar om uw voorraad te transformeren?",
-      "description": "Transformeer uw voorraadbeheer met LIFO en begin vandaag nog met afvalvermindering.",
+      "description": "Transformeer uw voorraadbeheer met lifo en begin vandaag nog met afvalvermindering.",
       "button": "Start gratis proefperiode"
     }
   },
@@ -358,21 +358,21 @@
   "support": {
     "mainPage": {
       "title": "Helpcentrum",
-      "subtitle": "Vind gidsen en artikelen om het meeste uit LIFO te halen",
+      "subtitle": "Vind gidsen en artikelen om het meeste uit lifo te halen",
       "sections": {
         "gettingStarted": {
           "title": "Aan de slag",
-          "description": "Alles wat u moet weten om LIFO effectief te gaan gebruiken"
+          "description": "Alles wat u moet weten om lifo effectief te gaan gebruiken"
         },
         "workflowsProcesses": {
           "title": "Workflows en processen",
-          "description": "Stap-voor-stap gidsen voor de belangrijkste LIFO workflows"
+          "description": "Stap-voor-stap gidsen voor de belangrijkste lifo workflows"
         }
       },
       "articles": {
         "quickStartGuide": {
           "title": "Snelstartgids",
-          "description": "Aan de slag met LIFO in minder dan 10 minuten",
+          "description": "Aan de slag met lifo in minder dan 10 minuten",
           "readTime": "5 min"
         },
         "inventoryManagement": {
@@ -419,9 +419,9 @@
     },
     "quickStartGuide": {
       "title": "Snelstartgids",
-      "description": "Aan de slag met LIFO in een paar eenvoudige stappen",
+      "description": "Aan de slag met lifo in een paar eenvoudige stappen",
       "readTime": "5 min lezen",
-      "intro": "Welkom bij LIFO! Deze gids helpt u bij het instellen van uw voorraadbeheer systeem en het starten met uw eerste producten in enkele minuten.",
+      "intro": "Welkom bij lifo! Deze gids helpt u bij het instellen van uw voorraadbeheer systeem en het starten met uw eerste producten in enkele minuten.",
       "steps": {
         "initialSetup": {
           "title": "Stap 1: Initiële setup",
@@ -472,9 +472,9 @@
     },
     "inventoryManagement": {
       "title": "Voorraadbeheer",
-      "description": "Beheers uw voorraad met LIFO's uitgebreide beheertools",
+      "description": "Beheers uw voorraad met lifo's uitgebreide beheertools",
       "readTime": "5 min lezen",
-      "intro": "Effectief voorraadbeheer is cruciaal voor zakelijk succes. LIFO biedt uitgebreide tools om uw voorraadniveaus te volgen, analyseren en optimaliseren.",
+      "intro": "Effectief voorraadbeheer is cruciaal voor zakelijk succes. lifo biedt uitgebreide tools om uw voorraadniveaus te volgen, analyseren en optimaliseren.",
       "features": {
         "inventoryTracking": {
           "title": "Voorraadtracking",
@@ -543,11 +543,11 @@
           ]
         },
         "lifoOptimization": {
-          "title": "LIFO-optimalisatie",
+          "title": "lifo-optimalisatie",
           "description": "Gebruik Last-In-First-Out methodologie voor optimaal voorraadbeheer",
           "items": [
             {
-              "title": "Automatische LIFO-sortering",
+              "title": "Automatische lifo-sortering",
               "description": "Systeem prioriteert nieuwste voorraad voor verwerking"
             },
             {
@@ -560,7 +560,7 @@
             },
             {
               "title": "Belastingvoordelen",
-              "description": "Optimaliseer fiscale implicaties met LIFO-boekhouding"
+              "description": "Optimaliseer fiscale implicaties met lifo-boekhouding"
             }
           ]
         }
@@ -570,7 +570,7 @@
       "title": "Inscanproces",
       "description": "Beheers het inscanproces voor het toevoegen van producten aan uw voorraad",
       "readTime": "4 min lezen",
-      "intro": "Het inscanproces is de basis van voorraadbeheer in LIFO. Gebruik dit proces bij het ontvangen van leveringen, retouren of het toevoegen van nieuwe voorraad.",
+      "intro": "Het inscanproces is de basis van voorraadbeheer in lifo. Gebruik dit proces bij het ontvangen van leveringen, retouren of het toevoegen van nieuwe voorraad.",
       "basicSteps": {
         "title": "Basis scanstappen",
         "steps": [
@@ -598,7 +598,7 @@
       },
       "newProducts": {
         "title": "Nieuwe producten toevoegen",
-        "description": "Bij het scannen van onbekende barcodes vraagt LIFO u om een nieuw product aan te maken:",
+        "description": "Bij het scannen van onbekende barcodes vraagt lifo u om een nieuw product aan te maken:",
         "items": [
           {
             "problem": "Productinformatie",
@@ -620,7 +620,7 @@
       },
       "imageRecognition": {
         "title": "Beeldherkenning",
-        "description": "LIFO kan producten herkennen van afbeeldingen wanneer barcodes beschadigd of ontbreken. Maak simpelweg een foto van het product en het systeem zal overeenkomsten suggereren."
+        "description": "lifo kan producten herkennen van afbeeldingen wanneer barcodes beschadigd of ontbreken. Maak simpelweg een foto van het product en het systeem zal overeenkomsten suggereren."
       },
       "troubleshooting": {
         "title": "Probleemoplossing",
@@ -699,7 +699,7 @@
     },
     "contactUs": "Neem Contact Op",
     "email": "contact@lifo-app.com",
-    "copyright": "© {year} LIFO. Alle rechten voorbehouden.",
+    "copyright": "© {year} lifo. Alle rechten voorbehouden.",
     "legal": {
       "privacyPolicy": "Privacybeleid",
       "termsOfService": "Servicevoorwaarden"

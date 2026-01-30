@@ -21,7 +21,7 @@ export function MarketingFooter() {
             <div className="flex items-center gap-2">
               <Logo variant="svg" size="sm" className="w-10 h-auto" />
               <Typography variant="h4" className="font-heading font-black text-xl">
-                LIFO
+                lifo
               </Typography>
             </div>
             <Typography variant="p" className="text-sm text-muted-foreground max-w-sm">
@@ -88,7 +88,7 @@ export function MarketingFooter() {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-muted-foreground hover:text-blue-600 transition-colors"
-                  aria-label="Visit LIFO on LinkedIn"
+                  aria-label="Visit lifo on LinkedIn"
                 >
                   <Linkedin size={16} />
                 </a>

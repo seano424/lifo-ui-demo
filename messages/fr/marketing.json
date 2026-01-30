@@ -76,8 +76,8 @@
   "landingpage": {
     "hero": {
       "title": "Suivi d'expiration qui stimule l'action",
-      "subtitle": "LIFO montre à votre équipe exactement ce qui expire pour que vous puissiez réduire les prix, donner ou vendre avant qu'il ne soit trop tard.",
-      "subtitle2": "LIFO montre à votre équipe exactement quels lots alimentaires nécessitent attention pour que vous puissiez réduire les prix, donner ou vendre avant qu'il ne soit trop tard.",
+      "subtitle": "Lifo montre à votre équipe exactement ce qui expire pour que vous puissiez réduire les prix, donner ou vendre avant qu'il ne soit trop tard.",
+      "subtitle2": "Lifo montre à votre équipe exactement quels lots alimentaires nécessitent attention pour que vous puissiez réduire les prix, donner ou vendre avant qu'il ne soit trop tard.",
       "buttons": {
         "freeTrial": "Démarrer mon essai gratuit",
         "explore": "Explorer la plateforme",
@@ -110,12 +110,12 @@
         "title": "Compatibilité maximale",
         "description": "Connectez-vous avec votre système de point de vente et votre ERP en quelques minutes"
       },
-      "discoverButton": "Découvrir LIFO",
+      "discoverButton": "Découvrir lifo",
       "noCommitment": "Sans engagement !"
     },
     "businessStats": {
       "title": "Maximisez vos profits, minimisez vos pertes",
-      "subtitle": "Découvrez l'impact réel de LIFO sur des entreprises comme la vôtre",
+      "subtitle": "Découvrez l'impact réel de lifo sur des entreprises comme la vôtre",
       "disclaimer": "Les résultats peuvent varier. Basé sur les données moyennes des clients sur 12 mois.",
       "revenue": {
         "label": "Augmentation des revenus",
@@ -134,7 +134,7 @@
       }
     },
     "cta": {
-      "title": "Passez à LIFO aujourd'hui",
+      "title": "Essaye Lifo aujourd'hui",
       "features": {
         "quickSetup": {
           "title": "Installation rapide",
@@ -155,7 +155,7 @@
       },
       "card": {
         "title": "Prêt à transformer votre gestion de stock ?",
-        "description": "Rejoignez LIFO pour devenir plus résilient et rejoindre d'autres magasins implémentant des pratiques de gestion de stock intelligentes.",
+        "description": "Rejoignez lifo pour devenir plus résilient et rejoindre d'autres magasins implémentant des pratiques de gestion de stock intelligentes.",
         "benefits": {
           "noCommitment": "Sans engagement",
           "instantSetup": "Installation instantanée",
@@ -190,7 +190,7 @@
       "title": "Tout ce dont vous avez besoin",
       "expiry": {
         "title": "Suivi d'expiration",
-        "description": "Ne manquez jamais les dates d'expiration avec les alertes automatisées et la gestion LIFO."
+        "description": "Ne manquez jamais les dates d'expiration avec les alertes automatisées et la gestion lifo."
       },
       "security": {
         "title": "Sécurité des données",
@@ -246,7 +246,7 @@
     },
     "cta": {
       "title": "Prêt à transformer votre inventaire ?",
-      "description": "Transformez votre gestion d'inventaire avec LIFO et commencez à réduire les déchets dès aujourd'hui.",
+      "description": "Transformez votre gestion d'inventaire avec lifo et commencez à réduire les déchets dès aujourd'hui.",
       "button": "Commencer l'essai gratuit"
     }
   },
@@ -358,21 +358,21 @@
   "support": {
     "mainPage": {
       "title": "Centre d'aide",
-      "subtitle": "Trouvez des guides et articles pour tirer le meilleur parti de LIFO",
+      "subtitle": "Trouvez des guides et articles pour tirer le meilleur parti de lifo",
       "sections": {
         "gettingStarted": {
           "title": "Commencer",
-          "description": "Tout ce que vous devez savoir pour commencer à utiliser LIFO efficacement"
+          "description": "Tout ce que vous devez savoir pour commencer à utiliser lifo efficacement"
         },
         "workflowsProcesses": {
           "title": "Flux de travail et processus",
-          "description": "Guides étape par étape pour les flux de travail principaux de LIFO"
+          "description": "Guides étape par étape pour les flux de travail principaux de lifo"
         }
       },
       "articles": {
         "quickStartGuide": {
           "title": "Guide de démarrage rapide",
-          "description": "Soyez opérationnel avec LIFO en moins de 10 minutes",
+          "description": "Soyez opérationnel avec lifo en moins de 10 minutes",
           "readTime": "5 min"
         },
         "inventoryManagement": {
@@ -419,9 +419,9 @@
     },
     "quickStartGuide": {
       "title": "Guide de démarrage rapide",
-      "description": "Soyez opérationnel avec LIFO en quelques étapes simples",
+      "description": "Soyez opérationnel avec lifo en quelques étapes simples",
       "readTime": "5 min de lecture",
-      "intro": "Bienvenue sur LIFO ! Ce guide vous aidera à configurer votre système de gestion des stocks et à commencer avec vos premiers produits en quelques minutes.",
+      "intro": "Bienvenue sur lifo ! Ce guide vous aidera à configurer votre système de gestion des stocks et à commencer avec vos premiers produits en quelques minutes.",
       "steps": {
         "initialSetup": {
           "title": "Étape 1 : Configuration initiale",
@@ -472,9 +472,9 @@
     },
     "inventoryManagement": {
       "title": "Gestion des stocks",
-      "description": "Maîtrisez votre inventaire avec les outils complets de LIFO",
+      "description": "Maîtrisez votre inventaire avec les outils complets de lifo",
       "readTime": "5 min de lecture",
-      "intro": "Une gestion efficace des stocks est cruciale pour le succès de votre entreprise. LIFO fournit des outils complets pour suivre, analyser et optimiser vos niveaux de stock.",
+      "intro": "Une gestion efficace des stocks est cruciale pour le succès de votre entreprise. lifo fournit des outils complets pour suivre, analyser et optimiser vos niveaux de stock.",
       "features": {
         "inventoryTracking": {
           "title": "Suivi des stocks",
@@ -543,11 +543,11 @@
           ]
         },
         "lifoOptimization": {
-          "title": "Optimisation LIFO",
+          "title": "Optimisation lifo",
           "description": "Utilisez la méthode Last-In-First-Out pour une gestion optimale des stocks",
           "items": [
             {
-              "title": "Tri LIFO automatique",
+              "title": "Tri lifo automatique",
               "description": "Le système priorise les stocks les plus récents"
             },
             {
@@ -560,7 +560,7 @@
             },
             {
               "title": "Avantages fiscaux",
-              "description": "Optimisez les implications fiscales avec la comptabilité LIFO"
+              "description": "Optimisez les implications fiscales avec la comptabilité lifo"
             }
           ]
         }
@@ -570,7 +570,7 @@
       "title": "Processus de scan d'entrée",
       "description": "Maîtrisez le processus de scan pour ajouter des produits à votre inventaire",
       "readTime": "4 min de lecture",
-      "intro": "Le processus de scan d'entrée est la base de la gestion des stocks dans LIFO. Utilisez ce processus lors de la réception des livraisons, des retours ou de l'ajout de nouveaux stocks.",
+      "intro": "Le processus de scan d'entrée est la base de la gestion des stocks dans lifo. Utilisez ce processus lors de la réception des livraisons, des retours ou de l'ajout de nouveaux stocks.",
       "basicSteps": {
         "title": "Étapes de base du scan",
         "steps": [
@@ -598,7 +598,7 @@
       },
       "newProducts": {
         "title": "Ajout de nouveaux produits",
-        "description": "Lors du scan de codes-barres inconnus, LIFO vous invite à créer un nouveau produit :",
+        "description": "Lors du scan de codes-barres inconnus, lifo vous invite à créer un nouveau produit :",
         "items": [
           {
             "problem": "Informations produit",
@@ -620,7 +620,7 @@
       },
       "imageRecognition": {
         "title": "Reconnaissance d'image",
-        "description": "LIFO peut reconnaître les produits à partir d'images lorsque les codes-barres sont endommagés ou manquants. Prenez simplement une photo du produit et le système suggérera des correspondances."
+        "description": "lifo peut reconnaître les produits à partir d'images lorsque les codes-barres sont endommagés ou manquants. Prenez simplement une photo du produit et le système suggérera des correspondances."
       },
       "troubleshooting": {
         "title": "Dépannage",
@@ -699,7 +699,7 @@
     },
     "contactUs": "Contactez-Nous",
     "email": "contact@lifo-app.com",
-    "copyright": "© {year} LIFO. Tous droits réservés.",
+    "copyright": "© {year} lifo. Tous droits réservés.",
     "legal": {
       "privacyPolicy": "Politique de Confidentialité",
       "termsOfService": "Conditions d'Utilisation"

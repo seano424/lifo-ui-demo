@@ -164,13 +164,7 @@ export function DraftBatchNotification({
 
         {/* Action Button */}
         <div className="mt-3">
-          <Button
-            asChild
-            asLink
-            href="/dashboard/inventory/new"
-            variant="black"
-            className="rounded-4xl font-bold tracking-tight px-3"
-          >
+          <Button asChild asLink href="/dashboard/inventory/new" variant="black">
             Add Expiry Dates
           </Button>
         </div>

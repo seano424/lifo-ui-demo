@@ -11,19 +11,30 @@ export function Hero() {
   const t = useTranslations('landingpage.hero.badge')
   return (
     <section
-      aria-label="Hero section with LIFO introduction"
-      className="flex flex-col sm:gap-6 gap-4 items-center overflow-hidden w-full sm:min-h-[calc(100vh-100px)] justify-center"
+      aria-label="Hero section with lifo introduction"
+      className="flex flex-col sm:gap-6 gap-4 items-center overflow-hidden w-full min-h-[calc(100vh-200px)] sm:min-h-screen justify-center relative"
     >
+      <div className="absolute inset-0 -z-10 mask-[linear-gradient(to_bottom,black_50%,transparent)]">
+        <div className="absolute inset-0 bg-linear-to-b from-white/90 to-white/40 z-10" />
+        {/* <Image src="/images/bg.svg" alt="Background" fill className='object-cover scale-x-200' /> */}
+        <Image
+          src="/images/bg.svg"
+          alt="Background"
+          fill
+          className="object-cover rotate-180 scale-x-200"
+        />
+        {/* <Image src="/images/bg.svg" alt="Background" fill className='object-cover rotate-180 scale-x-[-1] -z-10' /> */}
+      </div>
       {/* <Logo variant="svg" size="xl" /> */}
       {/* <a
         href="https://www.producthunt.com/products/lifo-mvp-v1?embed=true&utm_source=badge-featured&utm_medium=badge"
         target="_blank"
         rel="noopener noreferrer"
-        aria-label="View LIFO on Product Hunt"
+        aria-label="View lifo on Product Hunt"
       >
         <Image
           src="/badges/product-hunt-featured.svg"
-          alt="LIFO MVP v1 - Our MVP v1 launches in ENG, FR and NL | Product Hunt"
+          alt="lifo MVP v1 - Our MVP v1 launches in ENG, FR and NL | Product Hunt"
           width={250}
           height={54}
           loading="lazy"

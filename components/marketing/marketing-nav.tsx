@@ -25,6 +25,7 @@ import Link from 'next/link'
 import { AuthButton } from '../auth-button'
 import { EnvVarWarning } from '../env-var-warning'
 import { Typography } from '../ui/typography'
+import { useCurrentUser } from '@/hooks/use-users'
 
 interface MenuItem {
   title: string
@@ -46,6 +47,7 @@ interface MarketingNavProps {
 
 const MarketingNav = ({ menu }: MarketingNavProps) => {
   const t = useTranslations('marketing.nav')
+  const { data: currentUser } = useCurrentUser()
 
   const defaultMenu = [
     // {
@@ -129,7 +131,7 @@ const MarketingNav = ({ menu }: MarketingNavProps) => {
   const menuItems = menu || defaultMenu
   return (
     <section>
-      <nav className="hidden justify-between lg:flex mx-auto px-4 max-w-7xl">
+      <nav className="hidden justify-between md:flex mx-auto px-4 max-w-7xl">
         <div className="flex items-center gap-8">
           {/* <NavbarLogo variant="text" href="/" /> */}
 
@@ -146,11 +148,23 @@ const MarketingNav = ({ menu }: MarketingNavProps) => {
       </nav>
 
       {/* Mobile */}
-      <div className="block lg:hidden container mx-auto">
+      <div className="block md:hidden container mx-auto">
         <div className="flex items-center justify-between">
           <Link href="/">
             <Logo variant="svg" size="sm" priority />
           </Link>
+          <div className="items-center gap-12 hidden sm:flex">
+            {menuItems.map(item => (
+              <Link key={item.title} href={item.url}>
+                {item.title}
+              </Link>
+            ))}
+            {currentUser ? (
+              <Link href={'/dashboard'}>Dashboard</Link>
+            ) : (
+              <Link href={'/auth/sign-up'}>Sign Up</Link>
+            )}
+          </div>
           <Sheet>
             <SheetTrigger asChild>
               <Button variant="outline" size="icon" aria-label={t('menuButton')}>

@@ -1,5 +1,5 @@
 // hooks/use-draft-batches.ts
-// React Query hooks for LIFO batch creation and draft batch management
+// React Query hooks for lifo batch creation and draft batch management
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'

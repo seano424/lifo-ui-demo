@@ -3,16 +3,16 @@
     "title": "Conditions Générales",
     "lastUpdated": "Dernière mise à jour : 16 octobre 2025",
     "metadata": {
-      "title": "Conditions Générales | LIFO",
-      "description": "Conditions d'utilisation et politique de confidentialité pour la plateforme de gestion du gaspillage alimentaire LIFO"
+      "title": "Conditions Générales | lifo",
+      "description": "Conditions d'utilisation et politique de confidentialité pour la plateforme de gestion du gaspillage alimentaire lifo"
     },
     "section1": {
       "title": "1. Acceptation des Conditions",
-      "content": "En créant un compte et en utilisant l'application et le site web LIFO (collectivement, le \"Service\"), vous acceptez d'être lié par ces Conditions Générales, y compris nos pratiques de confidentialité décrites ci-après. Si vous n'acceptez pas ces conditions, veuillez ne pas utiliser le Service."
+      "content": "En créant un compte et en utilisant l'application et le site web lifo (collectivement, le \"Service\"), vous acceptez d'être lié par ces Conditions Générales, y compris nos pratiques de confidentialité décrites ci-après. Si vous n'acceptez pas ces conditions, veuillez ne pas utiliser le Service."
     },
     "section2": {
       "title": "2. Description du Service",
-      "content": "LIFO fournit un logiciel de gestion des stocks au niveau des lots conçu pour aider les magasins de détail à suivre les dates de péremption des produits, à réduire le gaspillage alimentaire et à optimiser les décisions de réduction et de don grâce à la technologie de reconnaissance d'images et à l'analyse de données."
+      "content": "lifo fournit un logiciel de gestion des stocks au niveau des lots conçu pour aider les magasins de détail à suivre les dates de péremption des produits, à réduire le gaspillage alimentaire et à optimiser les décisions de réduction et de don grâce à la technologie de reconnaissance d'images et à l'analyse de données."
     },
     "section3": {
       "title": "3. Comptes Utilisateurs",
@@ -111,7 +111,7 @@
       "items": [
         "Utiliser le Service conformément à toutes les lois applicables et aux réglementations sur la sécurité alimentaire",
         "Assurer l'exactitude des dates de péremption et des informations sur les produits saisies",
-        "Vérifier la sécurité des produits de manière indépendante ; les recommandations LIFO sont uniquement consultatives",
+        "Vérifier la sécurité des produits de manière indépendante ; les recommandations lifo sont uniquement consultatives",
         "Ne pas abuser, perturber ou tenter d'accéder de manière non autorisée au Service",
         "Ne pas utiliser le Service à des fins illégales ou frauduleuses",
         "Maintenir des systèmes de sauvegarde appropriés pour les données commerciales critiques"
@@ -123,7 +123,7 @@
     },
     "section11": {
       "title": "11. Propriété Intellectuelle",
-      "content": "Le Service, y compris sa conception, ses fonctionnalités, sa technologie de reconnaissance d'images et son logiciel sous-jacent, appartient à LIFO et est protégé par les lois sur la propriété intellectuelle. Vous ne pouvez pas copier, modifier, procéder à l'ingénierie inverse ou créer des œuvres dérivées à partir de toute partie du Service."
+      "content": "Le Service, y compris sa conception, ses fonctionnalités, sa technologie de reconnaissance d'images et son logiciel sous-jacent, appartient à lifo et est protégé par les lois sur la propriété intellectuelle. Vous ne pouvez pas copier, modifier, procéder à l'ingénierie inverse ou créer des œuvres dérivées à partir de toute partie du Service."
     },
     "section12": {
       "title": "12. Sécurité des Données",
@@ -138,7 +138,7 @@
     },
     "section13": {
       "title": "13. Limitation de Responsabilité",
-      "intro": "Le Service est fourni « en l'état » sans garanties d'aucune sorte. LIFO n'est pas responsable de :",
+      "intro": "Le Service est fourni « en l'état » sans garanties d'aucune sorte. lifo n'est pas responsable de :",
       "items": [
         "Les décisions commerciales prises sur la base des recommandations du Service",
         "Les incidents de sécurité alimentaire ou les problèmes de conformité réglementaire",
@@ -189,7 +189,7 @@
       "content": "Vous avez le droit de déposer une plainte auprès de votre autorité locale de protection des données si vous estimez que nous avons violé le RGPD ou vos droits à la vie privée."
     },
     "finalStatement": {
-      "content": "En utilisant LIFO, vous reconnaissez avoir lu, compris et accepté d'être lié par ces Conditions Générales, y compris nos pratiques de collecte de données et de confidentialité."
+      "content": "En utilisant lifo, vous reconnaissez avoir lu, compris et accepté d'être lié par ces Conditions Générales, y compris nos pratiques de collecte de données et de confidentialité."
     }
   }
 }

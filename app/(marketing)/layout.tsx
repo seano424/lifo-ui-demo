@@ -4,7 +4,7 @@ import { PostHogProvider } from '@/app/providers/posthog-provider'
 import { CookieConsentBanner } from '@/components/cookie-consent-banner'
 import { MarketingFooter } from '@/components/marketing/marketing-footer'
 import { MarketingNav } from '@/components/marketing/marketing-nav'
-import { GridBackground } from '@/components/ui/grid-background'
+// import Image from 'next/image'
 
 export default function MarketingLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -14,13 +14,16 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
       </Suspense>
       <CookieConsentBanner />
       <div className="relative">
-        <GridBackground gridSize={40} transparencyLevel="medium" dotSize={1.5} />
+        {/* <div className='absolute inset-0 -z-10 mask-[linear-gradient(to_bottom,black_10%,transparent)]'>
 
-        <div className="h-20 border-b border-foreground/10 py-4 px-4 fixed top-0 left-0 right-0 z-50 flex flex-col justify-center bg-background ">
+          <Image src="/images/bg.svg" alt="Background" fill className='object-cover rotate-180 scale-x-[-1]' />
+        </div> */}
+
+        <div className="py-6 px-4 absolute top-0 left-0 right-0 z-50 flex flex-col justify-center">
           <MarketingNav />
         </div>
 
-        <div className="relative top-20 z-10">{children}</div>
+        <div>{children}</div>
 
         <MarketingFooter />
       </div>

@@ -3,12 +3,12 @@
     "title": "Politique de Confidentialité",
     "lastUpdated": "Dernière mise à jour : 16 octobre 2025",
     "metadata": {
-      "title": "Politique de Confidentialité | LIFO",
-      "description": "Politique de Confidentialité pour la plateforme de gestion des déchets alimentaires LIFO"
+      "title": "Politique de Confidentialité | lifo",
+      "description": "Politique de Confidentialité pour la plateforme de gestion des déchets alimentaires lifo"
     },
     "section1": {
       "title": "1. Qui Sommes-Nous",
-      "content": "LIFO fournit un logiciel de gestion d'inventaire par lots pour les magasins de détail. Nous vous aidons à suivre les dates d'expiration des produits, à réduire le gaspillage alimentaire et à prendre des décisions basées sur les données concernant les rabais et les dons. Contactez-nous : Email : contact@lifo-app.com | Pour les demandes de droits RGPD : contact@lifo-app.com"
+      "content": "lifo fournit un logiciel de gestion d'inventaire par lots pour les magasins de détail. Nous vous aidons à suivre les dates d'expiration des produits, à réduire le gaspillage alimentaire et à prendre des décisions basées sur les données concernant les rabais et les dons. Contactez-nous : Email : contact@lifo-app.com | Pour les demandes de droits RGPD : contact@lifo-app.com"
     },
     "section2": {
       "title": "2. Quelles Données Nous Collectons",
@@ -79,7 +79,7 @@
     },
     "section8": {
       "title": "8. Analytiques et Cookies",
-      "intro": "Nous utilisons Google Analytics pour comprendre comment les utilisateurs interagissent avec LIFO et améliorer notre service.",
+      "intro": "Nous utilisons Google Analytics pour comprendre comment les utilisateurs interagissent avec lifo et améliorer notre service.",
       "whatWeCollect": {
         "title": "Ce que nous collectons :",
         "items": [
@@ -141,7 +141,7 @@
     },
     "section11": {
       "title": "11. Confidentialité des Enfants",
-      "intro": "Le service LIFO n'est pas destiné aux personnes de moins de 16 ans. Nous ne collectons pas sciemment de données personnelles auprès d'enfants. Si nous découvrons que nous avons collecté par inadvertance des données d'un enfant, nous les supprimerons immédiatement.",
+      "intro": "Le service lifo n'est pas destiné aux personnes de moins de 16 ans. Nous ne collectons pas sciemment de données personnelles auprès d'enfants. Si nous découvrons que nous avons collecté par inadvertance des données d'un enfant, nous les supprimerons immédiatement.",
       "items": [
         "Si vous pensez que nous avons collecté des données d'un enfant, veuillez nous contacter à : contact@lifo-app.com"
       ]
@@ -171,7 +171,7 @@
     },
     "section15": {
       "title": "15. Propriété des Données",
-      "content": "Vous êtes propriétaire de vos données. Toutes les données d'inventaire, les informations sur les produits et les informations commerciales générées via LIFO restent votre propriété. Nous ne sommes que des processeurs de ces données en votre nom. Vous pouvez exporter vos données à tout moment dans des formats standard (CSV, JSON) via les paramètres de votre compte."
+      "content": "Vous êtes propriétaire de vos données. Toutes les données d'inventaire, les informations sur les produits et les informations commerciales générées via lifo restent votre propriété. Nous ne sommes que des processeurs de ces données en votre nom. Vous pouvez exporter vos données à tout moment dans des formats standard (CSV, JSON) via les paramètres de votre compte."
     },
     "section16": {
       "title": "16. Nous Contacter",
@@ -180,7 +180,7 @@
       "responseTime": "Nous nous efforçons de répondre à toutes les demandes de confidentialité dans les 2 jours ouvrables."
     },
     "finalStatement": {
-      "content": "En utilisant LIFO, vous reconnaissez avoir lu et compris cette politique de confidentialité."
+      "content": "En utilisant lifo, vous reconnaissez avoir lu et compris cette politique de confidentialité."
     }
   }
 }

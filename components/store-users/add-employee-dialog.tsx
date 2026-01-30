@@ -556,7 +556,7 @@ export function AddEmployeeDialog({
               </DialogTitle>
               <DialogDescription>
                 {flowType === 'invite_existing'
-                  ? t('description') || 'Invite an existing LIFO user to join your store'
+                  ? t('description') || 'Invite an existing lifo user to join your store'
                   : t('description')}
               </DialogDescription>
             </DialogHeader>
@@ -935,7 +935,7 @@ export function AddEmployeeDialog({
                   </li>
                   <li>
                     <Typography variant="p" color="primary">
-                      • They can login with their existing LIFO credentials
+                      • They can login with their existing lifo credentials
                     </Typography>
                   </li>
                   <li>

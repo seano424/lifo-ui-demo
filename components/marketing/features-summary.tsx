@@ -17,8 +17,12 @@ function Feature({ icon, title, description }: FeatureProps) {
         {icon}
       </div>
       <div className="flex flex-col gap-2">
-        <Typography variant="h3">{title}</Typography>
-        <Typography variant="p">{description}</Typography>
+        <Typography variant="h3" className="capitalize">
+          {title}
+        </Typography>
+        <Typography variant="p" className="font-mono">
+          {description}
+        </Typography>
       </div>
     </div>
   )
@@ -28,13 +32,17 @@ export function FeaturesSummary() {
   const t = useTranslations('landingpage.features')
 
   return (
-    <section className="w-full px-4 rounded-2xl">
+    <section className="w-full py-12 px-4 rounded-2xl relative z-10">
+      <div className="absolute inset-0 -z-10 mask-[linear-gradient(to_top,black_80%,transparent)]">
+        {/* <Image src="/images/bg.svg" alt="Background" fill className='object-cover  scale-x-200 rotate-180' /> */}
+        {/* <Image src="/images/bg.svg" alt="Background" fill className='object-cover rotate-180 scale-x-[-1] -z-10' /> */}
+      </div>
       <div className="max-w-5xl mx-auto flex flex-col gap-10">
-        <Typography variant="h2" color="primary" className="text-center">
+        <Typography variant="h2" className="text-center">
           {t('title')}
         </Typography>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 py-8 px-8 rounded-2xl bg-card border shadow-lg overflow-hidden h-full">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 py-8 px-8 rounded-2xl bg-card overflow-hidden h-full">
           <Feature
             icon={<Calendar size={28} className="text-primary-900" strokeWidth={1.5} />}
             title={t('expiryTracking.title')}
@@ -61,10 +69,10 @@ export function FeaturesSummary() {
         </div>
 
         <div className="flex flex-col gap-4 items-center justify-center">
-          <Button asLink href="/features" size="xl">
+          <Button asLink href="/features" size="xl" hasArrowUpIcon className="capitalize">
             {t('discoverButton')}
           </Button>
-          <Typography variant="muted">{t('noCommitment')}</Typography>
+          <Typography variant="p">{t('noCommitment')}</Typography>
         </div>
       </div>
     </section>

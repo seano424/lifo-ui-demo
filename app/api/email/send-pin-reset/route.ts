@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
 
     const emailCredentials: EmailCredentials = {
       ...credentials,
-      store_name: store?.store_name || 'LIFO',
+      store_name: store?.store_name || 'lifo',
     }
 
     // Send the PIN reset email

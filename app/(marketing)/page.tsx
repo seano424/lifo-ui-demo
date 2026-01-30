@@ -1,6 +1,4 @@
 import { Hero } from '@/components/marketing/hero'
-import { BusinessStats } from '@/components/marketing/business-stats'
-import { CtaSection } from '@/components/marketing/cta-section'
 import { FeaturesSummary } from '@/components/marketing/features-summary'
 import { RevealAnimation } from '@/components/ui/reveal-animation'
 
@@ -17,13 +15,13 @@ export default function Home() {
             <FeaturesSummary />
           </RevealAnimation>
 
-          <RevealAnimation delay={0.4} direction="left">
+          {/* <RevealAnimation delay={0.4} direction="left">
             <BusinessStats />
           </RevealAnimation>
 
           <RevealAnimation delay={0.6} direction="up">
             <CtaSection />
-          </RevealAnimation>
+          </RevealAnimation> */}
         </div>
       </div>
     </main>

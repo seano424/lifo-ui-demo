@@ -48,11 +48,11 @@ export async function POST(request: NextRequest) {
       .eq('store_id', storeId)
       .single()
 
-    const storeName = store?.store_name || 'LIFO'
+    const storeName = store?.store_name || 'lifo'
 
     // Send the welcome email using Resend
     const { data, error: emailError } = await resend.emails.send({
-      from: 'LIFO <noreply@lifo-app.com>', // Use resend.dev for testing
+      from: 'lifo <noreply@lifo-app.com>', // Use resend.dev for testing
       to: [credentials.email],
       subject: `Welcome to ${storeName} - Your Login Credentials`,
       html: generateWelcomeEmailHTML(credentials, storeName),
@@ -116,10 +116,10 @@ function generateWelcomeEmailHTML(
                     <!-- Header -->
                     <tr>
                         <td style="padding: 40px 40px 20px 40px; text-align: center;">
-                            <img src="https://jrgmetdsohowtxickqij.supabase.co/storage/v1/object/public/brand-assets/logo-white-bg.png" alt="LIFO" style="height: 80px;">
+                            <img src="https://jrgmetdsohowtxickqij.supabase.co/storage/v1/object/public/brand-assets/logo-white-bg.png" alt="lifo" style="height: 80px;">
                           
                             <h1 style="color: hsl(225 42% 8%); font-size: 28px; font-weight: 700; margin: 0; letter-spacing: -0.5px; font-family: 'Raleway', sans-serif;">
-                                Welcome to LIFO!
+                                Welcome to lifo!
                             </h1>
                             <p style="color: hsl(225 42% 8%); font-size: 18px; font-weight: 600; line-height: 24px; margin: 8px 0 0 0;">
                                 Join your team, ${storeName}!
@@ -138,7 +138,7 @@ function generateWelcomeEmailHTML(
                             </p>
                             
                             <p style="color: #374151; font-size: 16px; line-height: 24px; margin: 0 0 24px 0;">
-                                Welcome to the team! Your LIFO account has been created and you can now access the inventory management system. 🚀
+                                Welcome to the team! Your lifo account has been created and you can now access the inventory management system. 🚀
                             </p>
                             
                             <!-- Credentials Box -->
@@ -187,7 +187,7 @@ function generateWelcomeEmailHTML(
                                     How to Log In:
                                 </p>
                                 <ol style="color: hsl(227 100% 35%); font-size: 14px; line-height: 20px; margin: 0; padding-left: 20px;">
-                                    <li>Open the LIFO app on the store tablet</li>
+                                    <li>Open the lifo app on the store tablet</li>
                                     <li>Select the <strong>"Employee"</strong> tab</li>
                                     <li>Enter your username and PIN code</li>
                                     <li>Start scanning products and managing inventory</li>
@@ -210,7 +210,7 @@ function generateWelcomeEmailHTML(
                                 Need help? Contact your manager
                             </p>
                             <p style="color: hsl(220 8% 46%); font-size: 12px; margin: 0;">
-                                © 2025 LIFO - Smart Food Surplus Management
+                                © 2025 lifo - Smart Food Surplus Management
                             </p>
                         </td>
                     </tr>
@@ -232,7 +232,7 @@ Welcome to ${storeName}
 
 Hello ${credentials.full_name},
 
-Welcome to the team! Your LIFO account has been successfully created.
+Welcome to the team! Your lifo account has been successfully created.
 
 YOUR LOGIN CREDENTIALS:
 • Username: ${credentials.username}
@@ -240,7 +240,7 @@ YOUR LOGIN CREDENTIALS:
 • Email: ${credentials.email}
 
 HOW TO LOG IN:
-1. Open the LIFO app on the store tablet
+1. Open the lifo app on the store tablet
 2. Select the "Employee" tab
 3. Enter your username and PIN code
 4. Start scanning products and managing inventory
@@ -249,7 +249,7 @@ Important: Keep your credentials secure and don't share them with anyone. Your P
 
 Need help? Contact your manager
 
-© 2025 LIFO - Intelligent Food Waste Reduction
+© 2025 lifo - Intelligent Food Waste Reduction
   `
 }
 
