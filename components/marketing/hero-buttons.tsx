@@ -23,8 +23,8 @@ export function HeroButtons() {
           <Button
             asLink
             href="/auth/sign-up"
-            size="md"
-            className="font-mono flex items-center gap-1 capitalize group"
+            size="lg"
+            className="flex items-center gap-1 group"
             variant="black"
           >
             {t('freeTrial')}
@@ -37,7 +37,7 @@ export function HeroButtons() {
             rel="noopener noreferrer"
             href="https://calendar.app.google/on8fX3nrWppW7qow7"
             size="lg"
-            className="group flex items-center gap-1 capitalize"
+            className="group flex items-center gap-1"
           >
             {/* <Image src="/square/square-icon.svg" alt="Square" width={12} height={12} /> */}
             {t('bookDemo')}
