@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get store information for email context
-    let storeName = 'LIFO'
+    let storeName = 'lifo'
     if (store_id) {
       const { data: storeData } = await supabase
         .from('business.stores')
@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
         .single()
 
       if (storeData) {
-        storeName = storeData.business_name || storeData.store_name || 'LIFO'
+        storeName = storeData.business_name || storeData.store_name || 'lifo'
       }
     }
 

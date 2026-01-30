@@ -1,7 +1,7 @@
 {
   "id": "/",
-  "name": "LIFO",
-  "short_name": "LIFO",
+  "name": "lifo",
+  "short_name": "lifo",
   "description": "Reduce food waste through AI-driven inventory management",
   "start_url": "/",
   "scope": "/",

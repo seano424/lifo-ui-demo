@@ -1,5 +1,5 @@
 'use client'
-import { Bell, Calendar, Clock, Tablet } from 'lucide-react'
+import { Bell, Calendar, ChevronRightIcon, Clock, Tablet } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Typography } from '@/components/ui/typography'
@@ -65,10 +65,10 @@ export function FeaturesSummary() {
         </div>
 
         <div className="flex flex-col gap-4 items-center justify-center">
-          <Button asLink href="/features" size="xl">
+          <Button asLink href="/features" size="xl" hasArrowUpIcon className="capitalize">
             {t('discoverButton')}
           </Button>
-          <Typography variant="muted">{t('noCommitment')}</Typography>
+          <Typography variant="p">{t('noCommitment')}</Typography>
         </div>
       </div>
     </section>

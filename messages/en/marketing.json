@@ -76,8 +76,8 @@
   "landingpage": {
     "hero": {
       "title": "Expiry tracking that drives action",
-      "subtitle": "LIFO helps food retailers turn expiration data into clear next steps, before it becomes waste.",
-      "subtitle2": "LIFO shows your team exactly which food batches need attention so you can discount, donate, or sell before it's too late.",
+      "subtitle": "lifo helps food retailers turn expiration data into clear next steps, before it becomes waste.",
+      "subtitle2": "lifo shows your team exactly which food batches need attention so you can discount, donate, or sell before it's too late.",
       "buttons": {
         "freeTrial": "Start free trial",
         "explore": "Explore the platform",
@@ -110,12 +110,12 @@
         "title": "Maximal Compatibility",
         "description": "Connect with your existing POS system and ERP in minutes"
       },
-      "discoverButton": "Discover LIFO",
+      "discoverButton": "Discover lifo",
       "noCommitment": "No commitment!"
     },
     "businessStats": {
       "title": "Maximize Your Profits, Minimize Your Losses",
-      "subtitle": "See the real impact LIFO has on businesses like yours",
+      "subtitle": "See the real impact lifo has on businesses like yours",
       "disclaimer": "Results may vary. Based on average customer data over 12 months.",
       "revenue": {
         "label": "Revenue Increase",
@@ -134,7 +134,7 @@
       }
     },
     "cta": {
-      "title": "Switch to LIFO today",
+      "title": "Switch to lifo today",
       "features": {
         "quickSetup": {
           "title": "Quick Setup",
@@ -155,7 +155,7 @@
       },
       "card": {
         "title": "Ready to transform your inventory management?",
-        "description": "Join LIFO to become more resilient and join other stores implementing smart inventory management practices.",
+        "description": "Join lifo to become more resilient and join other stores implementing smart inventory management practices.",
         "benefits": {
           "noCommitment": "No commitment",
           "instantSetup": "Instant setup",
@@ -190,7 +190,7 @@
       "title": "Everything You Need",
       "expiry": {
         "title": "Expiry Tracking",
-        "description": "Never miss expiration dates with automated alerts and LIFO management."
+        "description": "Never miss expiration dates with automated alerts and lifo management."
       },
       "security": {
         "title": "Data Security",
@@ -246,7 +246,7 @@
     },
     "cta": {
       "title": "Ready to Transform Your Inventory?",
-      "description": "Transform your inventory management with LIFO and start reducing waste today.",
+      "description": "Transform your inventory management with lifo and start reducing waste today.",
       "button": "Start Free Trial"
     }
   },
@@ -340,21 +340,21 @@
   "support": {
     "mainPage": {
       "title": "Support Center",
-      "subtitle": "Find guides and articles to help you get the most out of LIFO",
+      "subtitle": "Find guides and articles to help you get the most out of lifo",
       "sections": {
         "gettingStarted": {
           "title": "Getting Started",
-          "description": "Everything you need to know to start using LIFO effectively"
+          "description": "Everything you need to know to start using lifo effectively"
         },
         "workflowsProcesses": {
           "title": "Workflows & Processes",
-          "description": "Step-by-step guides for core LIFO workflows"
+          "description": "Step-by-step guides for core lifo workflows"
         }
       },
       "articles": {
         "quickStartGuide": {
           "title": "Quick Start Guide",
-          "description": "Get up and running with LIFO in under 10 minutes",
+          "description": "Get up and running with lifo in under 10 minutes",
           "readTime": "5 min"
         },
         "inventoryManagement": {
@@ -401,9 +401,9 @@
     },
     "quickStartGuide": {
       "title": "Quick Start Guide",
-      "description": "Get up and running with LIFO in just a few simple steps",
+      "description": "Get up and running with lifo in just a few simple steps",
       "readTime": "5 min read",
-      "intro": "Welcome to LIFO! This guide will help you set up your inventory management system and get started with your first products in minutes.",
+      "intro": "Welcome to lifo! This guide will help you set up your inventory management system and get started with your first products in minutes.",
       "steps": {
         "initialSetup": {
           "title": "Step 1: Initial Setup",
@@ -454,9 +454,9 @@
     },
     "inventoryManagement": {
       "title": "Inventory Management",
-      "description": "Master your inventory with LIFO's comprehensive management tools",
+      "description": "Master your inventory with lifo's comprehensive management tools",
       "readTime": "5 min read",
-      "intro": "Effective inventory management is crucial for business success. LIFO provides comprehensive tools to track, analyze, and optimize your inventory levels.",
+      "intro": "Effective inventory management is crucial for business success. lifo provides comprehensive tools to track, analyze, and optimize your inventory levels.",
       "features": {
         "inventoryTracking": {
           "title": "Inventory Tracking",
@@ -525,11 +525,11 @@
           ]
         },
         "lifoOptimization": {
-          "title": "LIFO Optimization",
+          "title": "lifo Optimization",
           "description": "Leverage Last-In-First-Out methodology for optimal inventory management",
           "items": [
             {
-              "title": "Automatic LIFO Sorting",
+              "title": "Automatic lifo Sorting",
               "description": "System prioritizes newest inventory for fulfillment"
             },
             {
@@ -542,7 +542,7 @@
             },
             {
               "title": "Tax Benefits",
-              "description": "Optimize tax implications with LIFO accounting"
+              "description": "Optimize tax implications with lifo accounting"
             }
           ]
         }
@@ -552,7 +552,7 @@
       "title": "Scan-In Process",
       "description": "Master the scan-in workflow for adding products to your inventory",
       "readTime": "4 min read",
-      "intro": "The scan-in process is the foundation of inventory management in LIFO. Use this process when receiving deliveries, returns, or adding new inventory.",
+      "intro": "The scan-in process is the foundation of inventory management in lifo. Use this process when receiving deliveries, returns, or adding new inventory.",
       "basicSteps": {
         "title": "Basic Scan-In Steps",
         "steps": [
@@ -580,7 +580,7 @@
       },
       "newProducts": {
         "title": "Adding New Products",
-        "description": "When scanning unknown barcodes, LIFO will prompt you to create a new product:",
+        "description": "When scanning unknown barcodes, lifo will prompt you to create a new product:",
         "items": [
           {
             "problem": "Product Information",
@@ -602,7 +602,7 @@
       },
       "imageRecognition": {
         "title": "Image Recognition",
-        "description": "LIFO can recognize products from images when barcodes are damaged or missing. Simply take a photo of the product and the system will suggest matches."
+        "description": "lifo can recognize products from images when barcodes are damaged or missing. Simply take a photo of the product and the system will suggest matches."
       },
       "troubleshooting": {
         "title": "Troubleshooting",
@@ -681,7 +681,7 @@
     },
     "contactUs": "Contact Us",
     "email": "contact@lifo-app.com",
-    "copyright": "© {year} LIFO. All rights reserved.",
+    "copyright": "© {year} lifo. All rights reserved.",
     "legal": {
       "privacyPolicy": "Privacy Policy",
       "termsOfService": "Terms of Service"

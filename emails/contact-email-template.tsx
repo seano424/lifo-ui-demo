@@ -65,7 +65,7 @@ export default function ContactEmailTemplate({
             >
               <Img
                 src={logoUrl}
-                alt="LIFO.AI - Smart Food Management System Logo"
+                alt="lifo.AI - Smart Food Management System Logo"
                 width="120"
                 height="120"
                 style={{
@@ -301,7 +301,7 @@ export default function ContactEmailTemplate({
                   margin: '0',
                 }}
               >
-                © {new Date().getFullYear()} LIFO.AI - Smart Food Surplus Management
+                © {new Date().getFullYear()} lifo.AI - Smart Food Surplus Management
               </Text>
             </Section>
           </Section>

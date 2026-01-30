@@ -87,7 +87,7 @@ export function Logo({
   const logoElement = (
     <Image
       src={getImageSrc()}
-      alt="LIFO"
+      alt="lifo"
       className={cn(sizeClass, 'w-auto', className)}
       priority={priority}
       width={600}

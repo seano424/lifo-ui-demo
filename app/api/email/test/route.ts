@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
       password: '1234',
       email: email,
       full_name: name,
-      store_name: 'Test Store LIFO',
+      store_name: 'Test Store lifo',
     }
 
     let result: { data?: unknown; error?: unknown; success?: boolean; messageId?: string }

@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 
 export type Language = 'fr' | 'en' | 'nl'
 
-const LIFO_SUPPORTED_LANGUAGES = ['fr', 'en', 'nl'] as const
+const lifo_SUPPORTED_LANGUAGES = ['fr', 'en', 'nl'] as const
 
 interface LanguageState {
   currentLanguage: Language
@@ -61,7 +61,7 @@ export const useLanguageStore = create<LanguageState>()(
             const metadata = user.user_metadata || {}
             const savedLanguage = metadata.language_preference as Language
 
-            if (savedLanguage && LIFO_SUPPORTED_LANGUAGES.includes(savedLanguage as Language)) {
+            if (savedLanguage && lifo_SUPPORTED_LANGUAGES.includes(savedLanguage as Language)) {
               set({ currentLanguage: savedLanguage as Language })
             } else {
               // Default to French if no preference found
@@ -74,7 +74,7 @@ export const useLanguageStore = create<LanguageState>()(
               try {
                 const parsed = JSON.parse(stored)
                 const storedLang = parsed.state?.currentLanguage as Language
-                if (storedLang && LIFO_SUPPORTED_LANGUAGES.includes(storedLang)) {
+                if (storedLang && lifo_SUPPORTED_LANGUAGES.includes(storedLang)) {
                   set({ currentLanguage: storedLang })
                   return
                 }
@@ -85,7 +85,7 @@ export const useLanguageStore = create<LanguageState>()(
 
             // Use browser language or default to French
             const browserLang = navigator.language.split('-')[0] as Language
-            const supportedLanguage = LIFO_SUPPORTED_LANGUAGES.includes(browserLang)
+            const supportedLanguage = lifo_SUPPORTED_LANGUAGES.includes(browserLang)
               ? browserLang
               : 'fr'
 

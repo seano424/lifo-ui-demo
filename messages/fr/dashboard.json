@@ -94,7 +94,7 @@
       },
       "todoSuggestions": {
         "title": "Suggestions de Todo",
-        "description": "Afficher et gérer les tâches suggérées par LIFO pour optimiser votre inventaire.",
+        "description": "Afficher et gérer les tâches suggérées par lifo pour optimiser votre inventaire.",
         "action": "Afficher les todos"
       },
       "removeProducts": {
@@ -123,7 +123,7 @@
     },
     "scanOut": {
       "title": "Sortie des produits",
-      "description": "Scannez les articles à retirer de votre inventaire. Chaque scan retire automatiquement le lot le plus récent du produit scanné, selon le principe LIFO.",
+      "description": "Scannez les articles à retirer de votre inventaire. Chaque scan retire automatiquement le lot le plus récent du produit scanné, selon le principe lifo.",
       "recentlyRemoved": "{count, plural, =0 {Aucun article retiré} =1 {1 article retiré} other {# articles retirés}}",
       "removedQuantityExpires": "Retiré {quantity}x • Expire le : {date}",
       "andMoreItems": "... et {count} autres articles",
@@ -569,7 +569,7 @@
   },
   "setupFlow": {
     "welcome": {
-      "title": "Bienvenue sur LIFO AI, {name} !",
+      "title": "Bienvenue sur lifo AI, {name} !",
       "subtitle": "Suivez les produits par dates d'expiration. Créez des lots, consultez les articles qui expirent et recevez des notifications sur les lots qui expirent."
     },
     "sidebar": {

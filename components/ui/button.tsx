@@ -1,6 +1,6 @@
 import { Slot } from '@radix-ui/react-slot'
 import { cva, type VariantProps } from 'class-variance-authority'
-import { Loader2 } from 'lucide-react'
+import { ChevronRightIcon, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import * as React from 'react'
 
@@ -72,6 +72,7 @@ type ButtonOnlyProps =
 
 type ButtonPropsBase = {
   asChild?: boolean
+  hasArrowUpIcon?: boolean
   asLink?: boolean
   href?: string
   children?: React.ReactNode
@@ -92,6 +93,7 @@ const Button = React.forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPro
       size,
       asChild = false,
       asLink = false,
+      hasArrowUpIcon = false,
       href,
       children,
       loading = false,
@@ -112,7 +114,12 @@ const Button = React.forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPro
         {loadingText || 'Loading...'}
       </>
     ) : (
-      children
+      <>
+        {children}
+        {hasArrowUpIcon && (
+          <ChevronRightIcon className="w-5 h-5 -rotate-45 transition-transform duration-300 ease-in-out group-hover:translate-x-px group-hover:-translate-y-1 -translate-y-px" />
+        )}
+      </>
     )
 
     // Disable button when loading
@@ -129,6 +136,7 @@ const Button = React.forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPro
             href={href}
             className={cn(
               buttonVariants({ variant, size, className }),
+              hasArrowUpIcon && 'group',
               isDisabled && 'opacity-50 pointer-events-none',
             )}
             ref={ref as React.Ref<HTMLAnchorElement>}
@@ -144,6 +152,7 @@ const Button = React.forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPro
             href={href}
             className={cn(
               buttonVariants({ variant, size, className }),
+              hasArrowUpIcon && 'group',
               isDisabled && 'opacity-50 pointer-events-none',
             )}
             ref={ref as React.Ref<HTMLAnchorElement>}
@@ -162,7 +171,7 @@ const Button = React.forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPro
 
     return (
       <Comp
-        className={cn(buttonVariants({ variant, size, className }))}
+        className={cn(buttonVariants({ variant, size, className }), hasArrowUpIcon && 'group')}
         ref={ref as React.Ref<HTMLButtonElement>}
         disabled={isDisabled}
         {...buttonProps}
