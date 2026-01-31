@@ -1,5 +1,6 @@
 import fs from 'node:fs'
 import path from 'node:path'
+import { SUPPORTED_LOCALES } from '@/types/i18n'
 
 // Type for translation objects
 interface TranslationObject {
@@ -28,7 +29,7 @@ function getAllKeysInOrder(obj: TranslationObject, prefix = ''): string[] {
 // Helper function to get all translation files
 function getTranslationFiles() {
   const messagesDir = path.join(process.cwd(), 'messages')
-  const languages = ['en', 'fr', 'nl']
+  const languages = [...SUPPORTED_LOCALES]
   const files: string[] = []
 
   for (const lang of languages) {

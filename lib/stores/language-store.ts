@@ -2,10 +2,9 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { updateUserLanguagePreference } from '@/lib/queries/users'
 import { createClient } from '@/lib/supabase/client'
+import { isSupportedLocale, type SupportedLocale } from '@/types/i18n'
 
-export type Language = 'fr' | 'en' | 'nl'
-
-const lifo_SUPPORTED_LANGUAGES = ['fr', 'en', 'nl'] as const
+export type Language = SupportedLocale
 
 interface LanguageState {
   currentLanguage: Language
@@ -59,10 +58,10 @@ export const useLanguageStore = create<LanguageState>()(
           if (user) {
             // Get user's language preference from user_metadata
             const metadata = user.user_metadata || {}
-            const savedLanguage = metadata.language_preference as Language
+            const savedLanguage = metadata.language_preference
 
-            if (savedLanguage && lifo_SUPPORTED_LANGUAGES.includes(savedLanguage as Language)) {
-              set({ currentLanguage: savedLanguage as Language })
+            if (savedLanguage && isSupportedLocale(savedLanguage)) {
+              set({ currentLanguage: savedLanguage })
             } else {
               // Default to French if no preference found
               set({ currentLanguage: 'fr' })
@@ -73,8 +72,8 @@ export const useLanguageStore = create<LanguageState>()(
             if (stored) {
               try {
                 const parsed = JSON.parse(stored)
-                const storedLang = parsed.state?.currentLanguage as Language
-                if (storedLang && lifo_SUPPORTED_LANGUAGES.includes(storedLang)) {
+                const storedLang = parsed.state?.currentLanguage
+                if (storedLang && isSupportedLocale(storedLang)) {
                   set({ currentLanguage: storedLang })
                   return
                 }
@@ -84,10 +83,8 @@ export const useLanguageStore = create<LanguageState>()(
             }
 
             // Use browser language or default to French
-            const browserLang = navigator.language.split('-')[0] as Language
-            const supportedLanguage = lifo_SUPPORTED_LANGUAGES.includes(browserLang)
-              ? browserLang
-              : 'fr'
+            const browserLang = navigator.language.split('-')[0]
+            const supportedLanguage = isSupportedLocale(browserLang) ? browserLang : 'fr'
 
             set({ currentLanguage: supportedLanguage })
           }
