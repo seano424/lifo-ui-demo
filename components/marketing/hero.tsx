@@ -41,7 +41,7 @@ export function Hero() {
         />
       </div>
 
-      <div className="relative z-10 flex flex-col gap-4 items-center justify-center">
+      <div className="relative z-10 flex flex-col gap-4 items-center justify-center container">
         <Badge font="mono" className="flex gap-1 items-center">
           <div className="mr-1 bg-white dark:bg-linear-to-br from-secondary-500 to-secondary-500 rounded p-1">
             <Image src="/square/square-icon.svg" alt="Square" width={12} height={12} />

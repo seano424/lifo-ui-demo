@@ -145,7 +145,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           href="/"
           className="group-data-[collapsible=icon]:hidden sm:hidden hover:opacity-80 transition-opacity duration-200 ease-in-out"
         >
-          <Logo variant="svg" size="sm" priority />
+          <Logo variant="svg" size="sm" priority withText />
         </Link>
 
         {/* Collapsed icon logo */}

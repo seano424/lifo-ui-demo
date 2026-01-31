@@ -1,6 +1,6 @@
 'use client'
 
-import { Badge } from '@/components/ui/badge'
+// import { Badge } from '@/components/ui/badge'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,13 +13,13 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  useSidebar,
+  // useSidebar,
 } from '@/components/ui/sidebar'
 import { useStoreActions, useUserStores } from '@/hooks/use-stores'
 import type { Store } from '@/lib/queries/stores'
 import { useStoreState } from '@/lib/stores/store-context'
 import { cn } from '@/lib/utils'
-import { MapPin, Settings, Store as StoreIcon } from 'lucide-react'
+import { Settings, Store as StoreIcon } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { Button } from './ui/button'
 import { Skeleton } from './ui/skeleton'
@@ -29,12 +29,12 @@ interface TeamSwitcherProps {
 }
 
 export function TeamSwitcher({ compact = false }: TeamSwitcherProps) {
-  const { isMobile } = useSidebar()
+  // const { isMobile } = useSidebar()
   const { userStores, isLoading } = useUserStores()
   const { switchStore, isChangingStore } = useStoreActions()
   const { activeStore } = useStoreState()
   const t = useTranslations('teamSwitcher')
-  const tRoles = useTranslations('users.roles')
+  // const tRoles = useTranslations('users.roles')
 
   const handleStoreSwitch = (store: Store, makePrimary: boolean = false) => {
     if (store.store_id !== activeStore?.store_id) {
@@ -110,9 +110,9 @@ export function TeamSwitcher({ compact = false }: TeamSwitcherProps) {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent
-              className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-2xl mr-1"
+              className="w-[--radix-dropdown-menu-trigger-width] sm:min-w-56 rounded-2xl mr-2 mt-4 border-4 border-muted"
               align="start"
-              side={isMobile ? 'bottom' : 'right'}
+              // side={isMobile ? 'bottom' : 'right'}
               sideOffset={4}
             >
               <DropdownMenuLabel className="text-xs text-muted-foreground">
@@ -121,7 +121,7 @@ export function TeamSwitcher({ compact = false }: TeamSwitcherProps) {
 
               {userStores.map((userStore, index) => {
                 const store = userStore.store
-                const isActive = activeStore ? store.store_id === activeStore.store_id : false
+                // const isActive = activeStore ? store.store_id === activeStore.store_id : false
 
                 return (
                   <DropdownMenuItem
@@ -139,11 +139,11 @@ export function TeamSwitcher({ compact = false }: TeamSwitcherProps) {
                         <span className="">{store.store_name}</span>
 
                         <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                          <MapPin className="size-3" />
+                          {/* <MapPin className="size-3" /> */}
                           <span>{store.address}</span>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2">
+                      {/* <div className="flex items-center gap-2">
                         {isActive && (
                           <Badge variant="primary" className="text-xs">
                             {t('active')}
@@ -152,7 +152,7 @@ export function TeamSwitcher({ compact = false }: TeamSwitcherProps) {
                         <Badge variant="outline" className="text-xs capitalize">
                           {tRoles(userStore.role)}
                         </Badge>
-                      </div>
+                      </div> */}
                     </div>
 
                     {/* <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut> */}
