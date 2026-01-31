@@ -15,7 +15,7 @@ export function NotificationBellExpiry() {
         asLink
         variant="secondary"
         href={'/dashboard/expiring'}
-        className="rounded-full aspect-square p-2.5 flex items-center justify-center"
+        className="rounded-full aspect-square p-2.5 flex items-center justify-center bg-linear-to-br from-secondary-900 via-primary-900 to-transparent"
       >
         <BellIcon size={16} className="text-white" />
       </Button>

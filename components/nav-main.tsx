@@ -27,7 +27,10 @@ function NavBadge({ count, className }: { count: number; className?: string }) {
     <NotificationCount
       count={count}
       variant="sidebar"
-      className={cn('ml-auto shrink-0', className)}
+      className={cn(
+        'ml-auto shrink-0 bg-linear-to-br from-secondary-900 via-primary-900 to-transparent',
+        className,
+      )}
     />
   )
 }
