@@ -25,7 +25,7 @@ import Link from 'next/link'
 import { AuthButton } from '../auth-button'
 import { EnvVarWarning } from '../env-var-warning'
 import { Typography } from '../ui/typography'
-import { useCurrentUser } from '@/hooks/use-users'
+// import { useCurrentUser } from '@/hooks/use-users'
 
 interface MenuItem {
   title: string
@@ -47,7 +47,7 @@ interface MarketingNavProps {
 
 const MarketingNav = ({ menu }: MarketingNavProps) => {
   const t = useTranslations('marketing.nav')
-  const { data: currentUser } = useCurrentUser()
+  // const { data: currentUser } = useCurrentUser()
 
   // const defaultMenu = [
   //   // {
@@ -153,7 +153,7 @@ const MarketingNav = ({ menu }: MarketingNavProps) => {
           <Link href="/">
             <Logo variant="svg" size="sm" priority />
           </Link>
-          <div className="items-center gap-12 hidden sm:flex">
+          {/* <div className="items-center gap-12 hidden sm:flex">
             {menuItems.map(item => (
               <Link key={item.title} href={item.url}>
                 {item.title}
@@ -164,7 +164,7 @@ const MarketingNav = ({ menu }: MarketingNavProps) => {
             ) : (
               <Link href={'/auth/sign-up'}>Sign Up</Link>
             )}
-          </div>
+          </div> */}
           <Sheet>
             <SheetTrigger asChild>
               <Button variant="outline" size="icon" aria-label={t('menuButton')}>
