@@ -38,7 +38,7 @@ const buttonVariants = cva(
         brandSecondaryOutline:
           'border border-brand-secondary bg-background shadow-xs hover:bg-secondary-50 hover:text-brand-secondary dark:hover:bg-secondary-900/10 dark:hover:text-secondary-300',
         black: 'bg-black text-white hover:bg-black/90',
-        gray: 'bg-gray-50 hover:bg-gray-50/90 dark:bg-background dark:hover:bg-gray-900/90',
+        gray: 'bg-gray-50 hover:bg-gray-50/90 dark:bg-secondary-100/10 dark:hover:bg-opacity-20',
         subtleGray: 'bg-gray-100 text-foreground hover:bg-gray-200',
         white: 'bg-white text-primary-800 hover:bg-white/90',
       },

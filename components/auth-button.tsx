@@ -3,7 +3,7 @@
 import { useTranslations } from 'next-intl'
 import { useCurrentUser } from '@/hooks/use-users'
 import { cn } from '@/lib/utils'
-import { LogoutButton } from './logout-button'
+import { createClient } from '@/lib/supabase/client'
 import { Button } from './ui/button'
 
 type AuthButtonProps = {
@@ -13,6 +13,12 @@ type AuthButtonProps = {
 export function AuthButton({ isMobile }: AuthButtonProps) {
   const t = useTranslations('marketing.auth')
   const { data: user, isLoading } = useCurrentUser()
+
+  const logout = async () => {
+    const supabase = createClient()
+    await supabase.auth.signOut()
+    window.location.href = '/'
+  }
 
   if (isLoading) {
     return (
@@ -38,7 +44,15 @@ export function AuthButton({ isMobile }: AuthButtonProps) {
         {t('goToDashboard')}
       </Button>
 
-      <LogoutButton variant="gray" className={cn(isMobile && 'w-full font-mono')} />
+      <Button
+        // asChild
+        size="default"
+        variant={'gray'}
+        onClick={logout}
+        className={cn(isMobile && 'w-full')}
+      >
+        {t('logout')}
+      </Button>
     </div>
   ) : (
     <>

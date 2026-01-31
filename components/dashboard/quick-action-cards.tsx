@@ -15,7 +15,7 @@ export function QuickActionCards() {
         <Typography variant="h4" className="font-bold">
           {t('quickActions.title')}
         </Typography>
-        <Typography variant="p" className="text-muted-foreground">
+        <Typography variant="p" className="text-muted-foreground dark:text-muted-foreground">
           {t('quickActions.description')}
         </Typography>
       </div>
