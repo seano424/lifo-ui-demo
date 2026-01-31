@@ -1,5 +1,5 @@
 import { AuthButton } from '@/components/auth-button'
-// import { CompactThemeSwitcher } from '@/components/compact-theme-switcher'
+import { CompactThemeSwitcher } from '@/components/compact-theme-switcher'
 import { EnvVarWarning } from '@/components/env-var-warning'
 import { Typography } from '@/components/ui/typography'
 import { hasEnvVars } from '@/lib/utils'
@@ -34,7 +34,7 @@ export default function ProtectedLayout({ children }: { children: React.ReactNod
               Supabase
             </a>
           </Typography>
-          {/* <CompactThemeSwitcher /> */}
+          <CompactThemeSwitcher />
         </footer>
       </div>
     </main>

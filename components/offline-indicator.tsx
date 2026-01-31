@@ -27,8 +27,8 @@ export function OfflineIndicator() {
       <div
         className={`rounded-lg border px-4 py-3 shadow-lg backdrop-blur-sm ${
           isOffline
-            ? 'border-orange-200 bg-orange-50/95 text-orange-800'
-            : 'border-primary-200 bg-primary-50/95 text-primary-800'
+            ? 'border-orange-200 dark:border-orange-700 bg-orange-50/95 dark:bg-orange-900/95 text-orange-800 dark:text-orange-200'
+            : 'border-primary-200 dark:border-primary-700 bg-primary-50/95 dark:bg-background/95 text-primary-800 dark:text-primary-200'
         }`}
       >
         <div className="flex items-center gap-3">

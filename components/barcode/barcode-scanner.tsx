@@ -353,7 +353,7 @@ export default function BarcodeScanner({
         )}
 
         {/* Camera container - fixed size matching camera's native 638×358 */}
-        <div className="relative w-full aspect-[638/358] border border-black rounded-2xl bg-gray-100 dark:bg-brand-dark">
+        <div className="relative w-full aspect-[638/358] border border-black rounded-2xl bg-gray-100 dark:bg-background">
           {/* Camera Permission Request */}
           {(hasPermission === false || hasPermission === null) && (
             <div className="absolute inset-0 flex items-center justify-center bg-gray-50 rounded-2xl">

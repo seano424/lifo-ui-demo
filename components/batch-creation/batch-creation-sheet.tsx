@@ -354,9 +354,9 @@ export function BatchCreationSheet({
             >
               {effectiveProducts.length === 0 ? (
                 <div className="text-center py-12">
-                  <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-600 dark:text-gray-400">No new deliveries found</p>
-                  <p className="text-sm text-gray-500 dark:text-gray-500 mt-2">
+                  <Package className="h-12 w-12 text-foreground mx-auto mb-4" />
+                  <p className="text-foreground dark:text-foreground">No new deliveries found</p>
+                  <p className="text-sm text-foreground dark:text-foreground mt-2">
                     All batches have expiry dates assigned
                   </p>
                 </div>
@@ -381,9 +381,9 @@ export function BatchCreationSheet({
               )}
             >
               {/* Product Header */}
-              <div className="flex gap-4 p-4 rounded-lg bg-gray-50 dark:bg-gray-900">
+              <div className="flex gap-4 p-4 rounded-lg bg-gray-50 dark:bg-background">
                 <div className="shrink-0">
-                  <div className="relative h-16 w-16 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800">
+                  <div className="relative h-16 w-16 rounded-lg overflow-hidden bg-gray-100 dark:bg-background">
                     {currentProduct.product_name ? (
                       <Image
                         src={`https://placehold.co/200x200/e5e7eb/6b7280?text=${encodeURIComponent(
@@ -397,7 +397,7 @@ export function BatchCreationSheet({
                       />
                     ) : (
                       <div className="flex items-center justify-center h-full">
-                        <Package className="h-6 w-6 text-gray-400" />
+                        <Package className="h-6 w-6 text-foreground" />
                       </div>
                     )}
                   </div>
@@ -526,7 +526,7 @@ export function BatchCreationSheet({
                   disabled={isActivating || isIgnoring}
                   className={cn(
                     'w-full min-h-[44px]',
-                    'text-gray-600 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300',
+                    'text-foreground hover:text-foreground dark:text-foreground dark:hover:text-foreground',
                     'hover:bg-gray-100 dark:hover:bg-gray-800',
                   )}
                 >
@@ -568,7 +568,7 @@ export function BatchCreationSheet({
             <Button
               size="lg"
               variant="ghost"
-              className="w-full min-h-[44px] font-medium text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+              className="w-full min-h-[44px] font-medium text-foreground hover:text-foreground dark:text-foreground dark:hover:text-foreground"
               onClick={handleSkipProduct}
             >
               Skip This Product

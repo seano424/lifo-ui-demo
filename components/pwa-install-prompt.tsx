@@ -168,7 +168,7 @@ export default function PWAInstallPrompt() {
               <button
                 type="button"
                 onClick={handleDismiss}
-                className="text-gray-400 hover:text-gray-600 p-1"
+                className="text-foreground hover:text-foreground p-1"
                 aria-label={t('closeAriaLabel')}
               >
                 <X size={12} />

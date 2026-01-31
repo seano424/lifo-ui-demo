@@ -214,7 +214,7 @@ export function IgnoredBatchesFilteredList({
       </div>
 
       {/* Control bar - Search and Filters */}
-      <div className="flex flex-row flex-wrap lg:items-center lg:gap-4 gap-3 bg-gray-50 dark:bg-gray-900 rounded-2xl p-4">
+      <div className="flex flex-row flex-wrap lg:items-center lg:gap-4 gap-3 bg-gray-50 dark:bg-background rounded-2xl p-4">
         {/* Search Bar */}
         <div className="flex-1">
           <TodoSearchBar
@@ -316,7 +316,7 @@ export function IgnoredBatchesFilteredList({
       {!isLoading && !productsError && totalIgnored === 0 && (
         <Card className="border-2 border-dashed border-gray-200 dark:border-gray-800">
           <CardContent className="flex flex-col items-center justify-center py-16 px-6 text-center">
-            <div className="rounded-full bg-primary-50 dark:bg-primary-900/20 p-4 mb-4">
+            <div className="rounded-full bg-primary-50 dark:bg-background/20 p-4 mb-4">
               <CheckCircle className="h-12 w-12 text-primary dark:text-primary-400" />
             </div>
             <Typography variant="h3">No ignored batches</Typography>
@@ -330,7 +330,7 @@ export function IgnoredBatchesFilteredList({
       {/* Products List */}
       {!isLoading && !productsError && products && products.length > 0 && (
         <>
-          <div className="flex flex-col gap-4 bg-gray-50 dark:bg-gray-900 rounded-2xl p-4">
+          <div className="flex flex-col gap-4 bg-gray-50 dark:bg-background rounded-2xl p-4">
             {products.map(product => (
               <DraftBatchCard
                 key={product.product_id}

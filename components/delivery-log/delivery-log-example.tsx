@@ -70,10 +70,10 @@ export function DeliveryDashboardCard() {
         <CardContent>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+              <p className="text-2xl font-bold text-foreground dark:text-foreground">
                 {recentProducts?.length || 0}
               </p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Recent products</p>
+              <p className="text-sm text-foreground dark:text-foreground">Recent products</p>
             </div>
             {draftSummary && draftSummary.total_draft_batches > 0 && (
               <Badge variant="secondary" className="text-base px-3 py-1">

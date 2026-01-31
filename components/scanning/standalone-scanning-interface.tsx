@@ -680,7 +680,7 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
             </DialogHeader>
 
             <div className="flex flex-col gap-4">
-              <div className="text-sm text-gray-600">
+              <div className="text-sm text-foreground">
                 {t('submission.submitText', { count: scannedItems.length })}
               </div>
 
@@ -695,8 +695,8 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
                     >
                       <div className="flex-1">
                         <div className="">{item.productName}</div>
-                        {item.brand && <div className="text-xs text-gray-600">{item.brand}</div>}
-                        <div className="text-xs text-gray-500">
+                        {item.brand && <div className="text-xs text-foreground">{item.brand}</div>}
+                        <div className="text-xs text-foreground">
                           {t('submission.totals.expires')}{' '}
                           {item.expiryDate
                             ? new Date(item.expiryDate).toLocaleDateString()
@@ -707,7 +707,7 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
                         <div className="">
                           {item.quantity}x {formatPrice(item.price)}
                         </div>
-                        <div className="text-xs text-gray-600">
+                        <div className="text-xs text-foreground">
                           Total: {formatPrice(totalValue)}
                         </div>
                       </div>

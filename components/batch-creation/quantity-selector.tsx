@@ -76,13 +76,13 @@ export function QuantitySelector({
         className={cn(
           'flex-1 min-w-[80px] text-center',
           'px-4 py-2.5 rounded-2xl',
-          'bg-gray-50 dark:bg-gray-800',
+          'bg-gray-50 dark:bg-background',
         )}
       >
         <span
           className={cn(
             'text-2xl font-bold tabular-nums',
-            'text-gray-900 dark:text-gray-100',
+            'text-foreground dark:text-foreground',
             disabled && 'opacity-50',
           )}
         >

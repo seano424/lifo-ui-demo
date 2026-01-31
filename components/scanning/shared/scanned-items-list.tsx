@@ -134,7 +134,7 @@ export default function ScannedItemsList({
     <div className={`p-4 ${className}`}>
       <div className="flex items-center justify-between mb-3">
         <Typography variant="p">{finalTitle}</Typography>
-        <div className="text-sm  text-gray-500 bg-gray-100 p-2 w-10 h-10 flex items-center justify-center rounded-full">
+        <div className="text-sm  text-foreground bg-gray-100 p-2 w-10 h-10 flex items-center justify-center rounded-full">
           {items.length > 99 ? '99+' : items.length}
         </div>
       </div>
@@ -147,18 +147,19 @@ export default function ScannedItemsList({
           >
             <div className="flex-1 flex flex-col gap-2">
               <Typography variant="p">
-                <span className="text-gray-500">{item.productName}</span>
+                <span className="text-foreground">{item.productName}</span>
               </Typography>
               <div className="flex flex-col gap-2">
                 <Typography variant="p">
-                  <span className="text-gray-500">{t('itemLabels.quantity')}</span> {item.quantity}
+                  <span className="text-foreground">{t('itemLabels.quantity')}</span>{' '}
+                  {item.quantity}
                 </Typography>
                 <Typography variant="p">
-                  <span className="text-gray-500">{t('itemLabels.price')}</span>{' '}
+                  <span className="text-foreground">{t('itemLabels.price')}</span>{' '}
                   {formatPrice(item.price)}
                 </Typography>
                 <Typography variant="p">
-                  <span className="text-gray-500">{t('itemLabels.expiry')}</span>{' '}
+                  <span className="text-foreground">{t('itemLabels.expiry')}</span>{' '}
                   {formatExpiryDate(item.expiryDate)}
                 </Typography>
               </div>
@@ -209,9 +210,9 @@ export default function ScannedItemsList({
                 <div className="p-3 bg-gray-50 rounded-2xl">
                   <div className="text-sm ">{editingItem?.productName}</div>
                   {editingItem?.brand && (
-                    <div className="text-xs text-gray-600">{editingItem.brand}</div>
+                    <div className="text-xs text-foreground">{editingItem.brand}</div>
                   )}
-                  <div className="text-xs text-gray-500 font-mono">{editingItem?.barcode}</div>
+                  <div className="text-xs text-foreground font-mono">{editingItem?.barcode}</div>
                 </div>
               ) : (
                 <div className="flex flex-col gap-3 p-3 bg-blue-50 rounded-2xl border border-blue-200">
@@ -352,7 +353,7 @@ export default function ScannedItemsList({
                       {t('editDialog.formLabels.price')}
                     </Label>
                     <div className="relative mt-1">
-                      <Euro className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                      <Euro className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-foreground" />
                       <Input
                         id="edit-price"
                         type="number"

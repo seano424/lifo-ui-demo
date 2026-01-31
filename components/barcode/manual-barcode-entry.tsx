@@ -409,7 +409,7 @@ export default function ManualBarcodeEntry({
                   <Label>
                     {t('searchByProductName')}
                     {mode === 'scan-out' && (
-                      <span className="text-xs text-gray-500 ml-2">{t('inStockItemsOnly')}</span>
+                      <span className="text-xs text-foreground ml-2">{t('inStockItemsOnly')}</span>
                     )}
                   </Label>
                   <div className="relative">
@@ -541,7 +541,9 @@ export default function ManualBarcodeEntry({
                                     <div className="flex-1">
                                       <div className="">{product.name}</div>
                                       {product.brand && (
-                                        <div className="text-sm text-gray-500">{product.brand}</div>
+                                        <div className="text-sm text-foreground">
+                                          {product.brand}
+                                        </div>
                                       )}
                                     </div>
                                   </Button>
@@ -580,7 +582,9 @@ export default function ManualBarcodeEntry({
                                       {product.product_name || 'Unknown Product'}
                                     </div>
                                     {product.brands && (
-                                      <div className="text-sm text-gray-500">{product.brands}</div>
+                                      <div className="text-sm text-foreground">
+                                        {product.brands}
+                                      </div>
                                     )}
                                   </div>
                                 </Button>
@@ -595,7 +599,7 @@ export default function ManualBarcodeEntry({
                       (mode === 'deliveries' &&
                         (!supabaseSearch.data || supabaseSearch.data.length === 0) &&
                         (!productSearch.data || productSearch.data.length === 0))) && (
-                      <div className="text-sm text-gray-500 p-3 border rounded-2xl">
+                      <div className="text-sm text-foreground p-3 border rounded-2xl">
                         {t('noProductsFound')} "{productNameQuery}"
                       </div>
                     )}
@@ -902,7 +906,7 @@ export default function ManualBarcodeEntry({
                                     {product.product_name || 'Unknown Product'}
                                   </div>
                                   {product.brands && (
-                                    <div className="text-gray-500">{product.brands}</div>
+                                    <div className="text-foreground">{product.brands}</div>
                                   )}
                                 </div>
                               </Button>

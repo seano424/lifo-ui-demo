@@ -128,10 +128,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar
       collapsible="icon"
-      className="bg-secondary-100/10 dark:bg-brand-dark border-l-none"
+      className="bg-secondary-100/10 dark:bg-background border-l-none"
       {...props}
     >
-      <SidebarHeader className="flex gap-2 justify-center items-center h-16 border-b dark:bg-brand-dark">
+      <SidebarHeader className="flex gap-2 justify-center items-center h-16 border-b dark:bg-background">
         {/* Desktop logo with text */}
         <Link
           href="/"

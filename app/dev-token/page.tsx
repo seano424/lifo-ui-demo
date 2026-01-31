@@ -98,7 +98,7 @@ export default function DevTokenPage() {
             className={`px-6 py-3 rounded-lg  transition ${
               isValidToken
                 ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                : 'bg-gray-300 text-foreground cursor-not-allowed'
             }`}
           >
             {copied ? `✓ ${t('copied')}` : t('copyToClipboard')}

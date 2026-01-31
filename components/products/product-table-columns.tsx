@@ -23,7 +23,7 @@ const getCategoryBadgeColor = (category: string) => {
     canned_jarred: 'bg-stone-100 text-stone-800 border-stone-200',
     chilled_packaged: 'bg-teal-100 text-teal-800 border-teal-200',
     pantry_staples: 'bg-slate-100 text-slate-800 border-slate-200',
-    other: 'bg-gray-100 text-gray-800 border-gray-200',
+    other: 'bg-gray-100 text-foreground border-gray-200',
   }
   return colors[category?.toLowerCase() as keyof typeof colors] || colors.other
 }

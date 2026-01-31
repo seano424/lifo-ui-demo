@@ -53,17 +53,17 @@ const URGENCY_CONFIG = {
   },
   none: {
     color: 'bg-gray-500',
-    textColor: 'text-gray-700',
+    textColor: 'text-foreground',
     bgColor: 'group-hover:bg-gray-50 bg-gray-500',
-    badge: 'bg-gray-100 text-gray-800 border-gray-200',
+    badge: 'bg-gray-100 text-foreground border-gray-200',
     badgeVariant: 'secondary' as const,
     borderColor: 'border-gray-500',
   },
   default: {
     color: 'bg-gray-500',
-    textColor: 'text-gray-700',
+    textColor: 'text-foreground',
     bgColor: 'group-hover:bg-gray-50 bg-gray-500',
-    badge: 'bg-gray-100 text-gray-800 border-gray-200',
+    badge: 'bg-gray-100 text-foreground border-gray-200',
     badgeVariant: 'secondary' as const,
     borderColor: 'border-gray-500',
   },
@@ -172,7 +172,7 @@ export function TodoCard({ todo, onClick }: TodoCardProps) {
           variant="outline"
           className={cn(
             'border-2 rounded-full cursor-pointer',
-            'sm:h-6 sm:w-6 h-5 w-5 p-0 bg-brand-white dark:bg-brand-dark transition-all duration-200 items-center justify-center',
+            'sm:h-6 sm:w-6 h-5 w-5 p-0 bg-brand-white dark:bg-background transition-all duration-200 items-center justify-center',
             urgencyConfig.badge,
           )}
         >

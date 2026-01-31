@@ -13,21 +13,21 @@ const buttonVariants = cva(
       variant: {
         // Enhanced variants using new color palettes
         default:
-          'bg-primary-900 text-white hover:bg-primary-800 dark:bg-primary-700 dark:hover:bg-primary-600',
+          'bg-primary-900 text-white hover:bg-primary-800 dark:bg-primary-900/80 dark:hover:bg-primary-900',
         destructive:
           'bg-destructive text-destructive-foreground shadow-xs hover:bg-destructive/90 dark:bg-destructive dark:hover:bg-destructive',
         subtleDestructive: 'bg-destructive text-destructive shadow-xs hover:bg-destructive',
         outline: 'border border-input bg-background shadow-xs hover:border-border',
         secondary: 'bg-secondary-900 text-white shadow-xs hover:bg-secondary-800',
         ghost:
-          'hover:bg-primary-50 hover:text-primary-800 dark:hover:bg-primary-900/0 dark:text-primary-300 font-normal',
+          'hover:bg-primary-50 hover:text-primary-800 dark:hover:bg-primary-900/0 dark:text-foreground font-normal',
         subtleTertiary:
-          'bg-primary-50 text-primary-800 dark:bg-primary-900/10 dark:text-primary-300',
+          'bg-primary-50 text-primary-800 dark:bg-background/10 dark:text-primary-300',
         link: 'text-primary-800 underline-offset-4 hover:underline dark:text-primary-300',
 
         // New subtle variants using lighter shades
         subtle:
-          'bg-primary-600 text-white hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600',
+          'bg-primary-600 text-white hover:bg-primary-700 dark:bg-background dark:hover:bg-primary-600',
         subtleSecondary:
           'bg-secondary-100/10 text-sky-700 shadow-xs hover:bg-secondary-100/80 dark:bg-secondary-900 dark:text-secondary-100 dark:hover:bg-secondary-900',
 
@@ -38,14 +38,14 @@ const buttonVariants = cva(
         brandSecondaryOutline:
           'border border-brand-secondary bg-background shadow-xs hover:bg-secondary-50 hover:text-brand-secondary dark:hover:bg-secondary-900/10 dark:hover:text-secondary-300',
         black: 'bg-black text-white hover:bg-black/90',
-        gray: 'bg-gray-50 hover:bg-gray-50/90',
-        subtleGray: 'bg-gray-100 text-gray-900 hover:bg-gray-200',
+        gray: 'bg-gray-50 hover:bg-gray-50/90 dark:bg-background dark:hover:bg-gray-900/90',
+        subtleGray: 'bg-gray-100 text-foreground hover:bg-gray-200',
         white: 'bg-white text-primary-800 hover:bg-white/90',
       },
       size: {
         sm: 'px-4 py-2 text-sm',
-        default: 'px-6 py-3 text-sm',
-        lg: 'px-4 sm:px-6 py-3 sm:py-4 sm:text-base text-sm',
+        default: 'px-4 py-2 text-sm',
+        lg: 'px-4 sm:px-6 py-3 sm:py-3.5 sm:text-base text-sm rounded-2xl',
         xl: 'px-8 py-4 text-lg',
         icon: 'h-9 w-9',
       },

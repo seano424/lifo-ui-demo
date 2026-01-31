@@ -73,7 +73,7 @@ export function TodoActionBottomSheet({
         return {
           icon: CheckCircle2Icon,
           label: t('completionStatus.completed'),
-          className: 'bg-primary-100 text-primary-800 dark:bg-primary-900/30 dark:text-primary-400',
+          className: 'bg-primary-100 text-primary-800 dark:bg-background/30 dark:text-primary-400',
         }
       case 'in_progress':
         return {
@@ -85,7 +85,7 @@ export function TodoActionBottomSheet({
         return {
           icon: CircleDashedIcon,
           label: t('completionStatus.pending'),
-          className: 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300',
+          className: 'bg-gray-100 text-foreground dark:bg-background dark:text-foreground',
         }
     }
   }
@@ -201,7 +201,7 @@ export function TodoActionBottomSheet({
               className={cn(
                 'transition-all flex flex-col items-center gap-1  font-heading flex-1 text-xs sm:text-base hover:bg-opacity-0 shrink-0 py-2 rounded-2xl',
                 activeTab === tab.id &&
-                  'text-primary bg-primary-50 dark:bg-brand-dark dark:text-secondary-600',
+                  'text-primary bg-primary-50 dark:bg-background dark:text-secondary-600',
               )}
             >
               <tab.icon className="size-4" />

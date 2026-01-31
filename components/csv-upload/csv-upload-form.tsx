@@ -310,7 +310,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
             </div>
           ) : (
             <div className="flex flex-col gap-4">
-              <Upload className="h-12 w-12 text-gray-400 mx-auto" />
+              <Upload className="h-12 w-12 text-foreground mx-auto" />
               <div>
                 <Typography variant="h3">{t('dropZone.dropHere')}</Typography>
                 <Typography variant="p">{t('dropZone.orBrowse')}</Typography>

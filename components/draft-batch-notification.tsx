@@ -175,7 +175,7 @@ export function DraftBatchNotification({
         variant="ghost"
         size="icon"
         onClick={handleDismiss}
-        className="shrink-0 h-8 w-8 shadow-secondary-100 shadow-xl"
+        className="shrink-0 h-8 w-8"
         aria-label="Dismiss notification"
       >
         <X className="h-4 w-4" />

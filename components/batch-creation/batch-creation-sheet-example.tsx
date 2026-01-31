@@ -40,7 +40,7 @@ export function DashboardBatchButton() {
         {summary.total_draft_batches > 0 && (
           <Badge
             variant="secondary"
-            className="ml-2 bg-white dark:bg-gray-900 text-primary-800 dark:text-primary-400"
+            className="ml-2 bg-white dark:bg-background text-primary-800 dark:text-primary-400"
           >
             {summary.total_draft_batches}
           </Badge>

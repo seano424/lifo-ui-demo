@@ -115,8 +115,8 @@ export function NavUser({ user }: { user: User }) {
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem className="flex-col items-start p-0 cursor-default hover:!bg-transparent">
-                <div className="flex items-center gap-2 px-2 py-1.5 w-full hover:text-black group-hover:text-black">
+              <DropdownMenuItem className="flex-col items-start p-0 cursor-default">
+                <div className="flex items-center gap-2 px-2 py-1.5 w-full">
                   <Globe className="h-4 w-4" />
                   <span className="text-sm">{t('language')}</span>
                 </div>
@@ -138,7 +138,7 @@ export function NavUser({ user }: { user: User }) {
               </DropdownMenuItem>
             </DropdownMenuGroup> */}
             {/* <DropdownMenuSeparator /> */}
-            <DropdownMenuItem className="cursor-default hover:!bg-transparent">
+            <DropdownMenuItem className="cursor-default dark:text-foreground">
               <LogoutButton className="w-full bg-transparent text-foreground" />
             </DropdownMenuItem>
           </DropdownMenuContent>

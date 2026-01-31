@@ -56,7 +56,7 @@ function ProductCard({
               {mode === 'selected' ? t('titles.selectedProduct') : t('titles.productInformation')}
             </Typography>
             <div className="flex flex-wrap text-center justify-center items-center gap-2 text-sm">
-              <Package className="w-4 h-4 text-gray-500" />
+              <Package className="w-4 h-4 text-foreground" />
 
               {product.brand && (
                 <>

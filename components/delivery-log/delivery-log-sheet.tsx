@@ -224,7 +224,7 @@ export function DeliveryLogSheet({ open, onOpenChange, onComplete }: DeliveryLog
                   variant="ghost"
                   size="sm"
                   onClick={handleClearAll}
-                  className="text-gray-500 hover:text-destructive"
+                  className="text-foreground hover:text-destructive"
                 >
                   <X className="h-4 w-4 mr-1" />
                   Clear All
@@ -236,7 +236,7 @@ export function DeliveryLogSheet({ open, onOpenChange, onComplete }: DeliveryLog
           {/* Search Input - Fixed */}
           <div className="px-6 pt-4 pb-3 border-b border-gray-200 dark:border-gray-800 shrink-0">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-foreground" />
               <Input
                 type="text"
                 placeholder="Search products..."
@@ -327,7 +327,7 @@ export function DeliveryLogSheet({ open, onOpenChange, onComplete }: DeliveryLog
 
           {/* Footer - Always visible summary - Fixed */}
           {deliveryItems.size > 0 && (
-            <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 shrink-0">
+            <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-background shrink-0">
               <div className="flex items-center justify-between text-sm">
                 <Typography variant="small">
                   {deliveryItems.size} product{deliveryItems.size !== 1 ? 's' : ''} •{' '}

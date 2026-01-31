@@ -69,11 +69,11 @@ export function TodoSortDirection({
               )}
             </div>
           </div>
-          <ArrowUp className="h-4 w-4 text-gray-600" />
+          <ArrowUp className="h-4 w-4 text-foreground" />
           <span
             className={cn(
               'text-sm flex-1',
-              sortConfig.direction === 'asc' ? ' text-violet-700' : 'text-gray-700',
+              sortConfig.direction === 'asc' ? ' text-violet-700' : 'text-foreground',
             )}
           >
             {t('filters.ascending')}
@@ -104,11 +104,11 @@ export function TodoSortDirection({
               )}
             </div>
           </div>
-          <ArrowDown className="h-4 w-4 text-gray-600" />
+          <ArrowDown className="h-4 w-4 text-foreground" />
           <span
             className={cn(
               'text-sm flex-1',
-              sortConfig.direction === 'desc' ? ' text-violet-700' : 'text-gray-700',
+              sortConfig.direction === 'desc' ? ' text-violet-700' : 'text-foreground',
             )}
           >
             {t('filters.descending')}

@@ -72,7 +72,7 @@ export function SquareConnectionCard({ status, isLoading, onConnect }: SquareCon
           </div>
           <Button
             variant="outline"
-            className="w-fit group-hover:bg-white group-hover:text-primary-800 hover:bg-white hover:text-primary-800 pointer-events-none"
+            className="w-fit group-hover:bg-white dark:group-hover:bg-gray-800 group-hover:text-primary-800 dark:group-hover:text-primary-200 hover:bg-white dark:hover:bg-gray-800 hover:text-primary-800 dark:hover:text-primary-200 pointer-events-none"
           >
             {t('connect')}
           </Button>
@@ -103,7 +103,7 @@ export function SquareConnectionCard({ status, isLoading, onConnect }: SquareCon
           </div>
           <Button
             variant="outline"
-            className="sm:w-fit group-hover:bg-white group-hover:text-primary-800 hover:bg-white hover:text-primary-800 pointer-events-none"
+            className="sm:w-fit group-hover:bg-white dark:group-hover:bg-gray-800 group-hover:text-primary-800 dark:group-hover:text-primary-200 hover:bg-white dark:hover:bg-gray-800 hover:text-primary-800 dark:hover:text-primary-200 pointer-events-none"
           >
             <Settings className="h-4 w-4" />
             {t('manage')}

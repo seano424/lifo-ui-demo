@@ -92,11 +92,11 @@ export default function BatchSelectionList({
                     Expires: {batch.expiry_date ? formatDate(batch.expiry_date) : 'N/A'}
                   </Typography>{' '}
                   {/* ← Use batch */}
-                  <Typography variant="small" className="text-gray-600">
+                  <Typography variant="small" className="text-foreground">
                     Available: {batch.available_quantity || batch.current_quantity} units{' '}
                     {/* ← Use batch */}
                   </Typography>
-                  <Typography variant="small" className="text-gray-600">
+                  <Typography variant="small" className="text-foreground">
                     Cost: {formatPrice(Number(batch.cost_price))}{' '}
                     {/* ← Use batch and cast to number */}
                   </Typography>
@@ -125,7 +125,7 @@ export default function BatchSelectionList({
       </div>
 
       {/* Helper Text */}
-      <div className="text-xs text-gray-500 mt-3 p-2 bg-gray-50 rounded-2xl">
+      <div className="text-xs text-foreground mt-3 p-2 bg-gray-50 rounded-2xl">
         💡 <strong>Tip:</strong> Select a batch directly, or scan/enter the expiry date below to
         auto-match
       </div>

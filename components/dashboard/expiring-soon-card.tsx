@@ -15,7 +15,7 @@ export function ExpiringSoonCard({ storeId }: ExpiringSoonCardProps) {
 
   if (isLoading) {
     return (
-      <div className="bg-white dark:bg-brand-dark rounded-2xl border p-6">
+      <div className="bg-white dark:bg-background rounded-2xl border p-6">
         <div className="flex flex-col gap-4">
           <Skeleton className="h-6 w-48" />
           <div className="flex flex-col gap-4">
@@ -30,7 +30,7 @@ export function ExpiringSoonCard({ storeId }: ExpiringSoonCardProps) {
 
   if (error || !data) {
     return (
-      <div className="bg-white dark:bg-brand-dark rounded-2xl border p-6">
+      <div className="bg-white dark:bg-background rounded-2xl border p-6">
         <div className="text-center">
           <Typography variant="p">{t('errors.loadingError')}</Typography>
         </div>
@@ -47,7 +47,7 @@ export function ExpiringSoonCard({ storeId }: ExpiringSoonCardProps) {
     totalActiveBatches > 0 ? Math.round((expiringThisWeek / totalActiveBatches) * 100) : 0
 
   return (
-    <div className="bg-white dark:bg-brand-dark rounded-2xl border">
+    <div className="bg-white dark:bg-background rounded-2xl border">
       {/* Header */}
       <div className="p-6 border-b h-24 flex flex-col justify-center w-full">
         <div className="flex justify-between items-center gap-2">
@@ -96,7 +96,7 @@ export function ExpiringSoonCard({ storeId }: ExpiringSoonCardProps) {
           <Typography variant="p" className="capitalize">
             {expiringPercentage}% {t('expiringWithinWeek')}
           </Typography>
-          <div className="h-2 bg-gray-200 dark:bg-brand-dark rounded-full mt-4">
+          <div className="h-2 bg-gray-200 dark:bg-background rounded-full mt-4">
             <div
               className="h-2 bg-primary-900 rounded-full transition-all duration-300"
               style={{ width: `${expiringPercentage}%` }}

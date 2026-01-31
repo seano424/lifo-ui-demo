@@ -206,14 +206,14 @@ export default function ScanningCamera({
 
               {/* Mode Indicator */}
               {!autoOCRState && (
-                <div className="text-xs text-gray-600 text-center bg-gray-50 p-2 rounded">
+                <div className="text-xs text-foreground text-center bg-gray-50 p-2 rounded">
                   📸 Manual mode: Click button to capture expiry date
                 </div>
               )}
 
               {/* Auto-Scan Stats (Debug) */}
               {autoOCRState?.isAnalyzing && process.env.NEXT_PUBLIC_DEBUG_OCR === 'true' && (
-                <div className="text-xs text-gray-500 text-center">
+                <div className="text-xs text-foreground text-center">
                   Auto-scanning... Frames: {autoOCRState.totalFramesAnalyzed} | OCR:{' '}
                   {autoOCRState.ocrTriggeredCount}
                 </div>

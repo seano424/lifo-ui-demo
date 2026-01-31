@@ -13,7 +13,7 @@ interface CtaFeatureProps {
 function CtaFeature({ icon, title, description }: CtaFeatureProps) {
   return (
     <div className="flex gap-4 items-start">
-      <div className="text-primary-900 bg-blue-100/70 p-2.5 rounded-2xl border border-blue-200/50 shadow-sm">
+      <div className="text-primary dark:text-primary-300 bg-primary-100/70 dark:bg-background/30 p-2.5 rounded-2xl border border-primary-200/50 dark:border-primary-700/50 shadow-sm">
         {icon}
       </div>
       <div className="flex flex-col gap-1">
@@ -72,19 +72,19 @@ export function CtaSection() {
 
             <div className="flex flex-col gap-3 py-4">
               <div className="flex items-center gap-2">
-                <div className="text-secondary-600">
+                <div className="text-secondary dark:text-secondary-400">
                   <Check size={20} />
                 </div>
                 <Typography variant="p">{t('card.benefits.noCommitment')}</Typography>
               </div>
               <div className="flex items-center gap-2">
-                <div className="text-secondary-600">
+                <div className="text-secondary dark:text-secondary-400">
                   <Check size={20} />
                 </div>
                 <Typography variant="p">{t('card.benefits.instantSetup')}</Typography>
               </div>
               <div className="flex items-center gap-2">
-                <div className="text-secondary-600">
+                <div className="text-secondary dark:text-secondary-400">
                   <Check size={20} />
                 </div>
                 <Typography variant="p">{t('card.benefits.support')}</Typography>

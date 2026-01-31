@@ -122,7 +122,7 @@ export function SquareCallbackProcessor() {
 
         <CardContent className="flex flex-col gap-4">
           {status === 'processing' && (
-            <div className="flex flex-col gap-2 text-sm text-gray-600">
+            <div className="flex flex-col gap-2 text-sm text-foreground">
               <div className="flex items-center gap-2">
                 <div className="h-2 w-2 animate-pulse rounded-full bg-primary-600" />
                 <span>{t('verifyingAuthorization')}</span>
@@ -142,13 +142,13 @@ export function SquareCallbackProcessor() {
             <div className="flex flex-col gap-3 rounded-lg bg-primary-50 p-4 text-sm">
               {squareStatus.merchant_name && (
                 <div className="flex justify-between">
-                  <span className="text-gray-600">{t('merchant')}:</span>
-                  <span className=" text-gray-900">{squareStatus.merchant_name}</span>
+                  <span className="text-foreground">{t('merchant')}:</span>
+                  <span className=" text-foreground">{squareStatus.merchant_name}</span>
                 </div>
               )}
               {squareStatus.stores && squareStatus.stores.length > 0 && (
                 <div className="flex flex-col gap-2">
-                  <span className="text-gray-600">
+                  <span className="text-foreground">
                     {squareStatus.stores.length === 1
                       ? t('connectedStore')
                       : t('connectedStores', {
@@ -158,7 +158,7 @@ export function SquareCallbackProcessor() {
                   </span>
                   <ul className="ml-4 flex flex-col gap-1">
                     {squareStatus.stores.map((store: ConnectedStoreInfo) => (
-                      <li key={store.store_id} className=" text-gray-900">
+                      <li key={store.store_id} className=" text-foreground">
                         {store.store_name}
                       </li>
                     ))}

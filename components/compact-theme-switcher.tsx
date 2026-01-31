@@ -37,7 +37,12 @@ const CompactThemeSwitcher = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size={'sm'} aria-label={t('title')}>
+        <Button
+          variant="outline"
+          className="rounded-full border aspect-square p-2.5 flex items-center justify-center"
+          size={'sm'}
+          aria-label={t('title')}
+        >
           {theme === 'light' ? (
             <Sun key="light" size={ICON_SIZE} className={'text-muted-foreground'} />
           ) : theme === 'dark' ? (

@@ -4,7 +4,7 @@ import { RevealAnimation } from '@/components/ui/reveal-animation'
 
 export default function Home() {
   return (
-    <main className="min-h-screen flex flex-col items-center">
+    <main className="min-h-screen flex flex-col items-center bg-background">
       <div className="flex-1 w-full flex flex-col gap-24 items-center">
         <div className="flex-1 flex flex-col gap-12 w-full">
           <RevealAnimation direction="none">

@@ -335,7 +335,7 @@ export function TodoCardV2({ todo, onClick }: TodoCardV2Props) {
                 className={cn(
                   statusBadge && todo.available_quantity != null && todo.available_quantity > 0
                     ? statusBadge.color
-                    : 'text-gray-600',
+                    : 'text-foreground',
                   'flex items-center gap-1 text-xs sm:text-sm',
                 )}
               >
@@ -346,9 +346,9 @@ export function TodoCardV2({ todo, onClick }: TodoCardV2Props) {
             </div>
 
             {/* Units + action summary */}
-            <div className="flex items-center gap-1 text-sm text-gray-600">
+            <div className="flex items-center gap-1 text-sm text-foreground">
               <Typography variant="small" className="flex items-center gap-1">
-                <PackageIcon className="h-4 w-4 text-gray-400" />
+                <PackageIcon className="h-4 w-4 text-foreground" />
                 <span>{unitsSummary}</span>
               </Typography>
             </div>

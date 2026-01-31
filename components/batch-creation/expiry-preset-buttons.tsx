@@ -78,7 +78,7 @@ export function ExpiryPresetButtons({
               {preset.label}
               {/* Suggested indicator */}
               {isSuggested && !isSelected && (
-                <span className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-primary-600 dark:bg-primary-500 ring-2 ring-white dark:ring-gray-900" />
+                <span className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-primary-600 dark:bg-background ring-2 ring-white dark:ring-gray-900" />
               )}
             </Button>
           )
@@ -105,8 +105,8 @@ export function ExpiryPresetButtons({
       {/* Selected Date Display */}
       {selectedDays !== null && selectedDays !== undefined && (
         <div className="text-center flex flex-col gap-1">
-          <p className="text-sm text-gray-500 dark:text-gray-400">Expiry date</p>
-          <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+          <p className="text-sm text-foreground dark:text-foreground">Expiry date</p>
+          <p className="text-lg font-semibold text-foreground dark:text-foreground">
             {formatDate(calculateDate(selectedDays))}
           </p>
         </div>
@@ -114,8 +114,8 @@ export function ExpiryPresetButtons({
 
       {/* Suggested indicator text */}
       {suggestedDays !== null && suggestedDays !== undefined && (
-        <p className="text-xs text-center text-gray-500 dark:text-gray-400">
-          <span className="inline-block h-2 w-2 rounded-full bg-primary-600 dark:bg-primary-500 mr-1.5" />
+        <p className="text-xs text-center text-foreground dark:text-foreground">
+          <span className="inline-block h-2 w-2 rounded-full bg-primary-600 dark:bg-background mr-1.5" />
           Suggested based on previous deliveries
         </p>
       )}

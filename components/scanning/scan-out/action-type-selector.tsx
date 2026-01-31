@@ -38,21 +38,21 @@ export default function ActionTypeSelector({
       type: 'sold',
       label: t('sell'),
       icon: ShoppingCart,
-      color: 'text-gray-600',
+      color: 'text-foreground',
       activeColor: 'text-primary-800 bg-primary-100 border-primary-700',
     },
     {
       type: 'donate',
       label: t('donate'),
       icon: HandHeart,
-      color: 'text-gray-600',
+      color: 'text-foreground',
       activeColor: 'text-blue-700 bg-blue-100 border-blue-700',
     },
     {
       type: 'dispose',
       label: t('dispose'),
       icon: ClipboardXIcon,
-      color: 'text-gray-600',
+      color: 'text-foreground',
       activeColor: 'text-destructive bg-destructive border-destructive',
     },
   ]
@@ -72,7 +72,7 @@ export default function ActionTypeSelector({
                   className={`flex items-center justify-center px-2 py-1 rounded-lg border-2 transition-all ${
                     isActive
                       ? action.activeColor
-                      : 'text-gray-400 bg-white border-gray-200 hover:border-gray-300'
+                      : 'text-foreground bg-white border-gray-200 hover:border-gray-300'
                   }`}
                   aria-label={action.label}
                 >
@@ -108,7 +108,7 @@ export default function ActionTypeSelector({
                 <Icon className="h-5 w-5" />
                 <Typography
                   className={cn(
-                    isActive ? 'text-white' : 'text-gray-600',
+                    isActive ? 'text-white' : 'text-foreground',
                     'transition-all ease-in-out',
                   )}
                 >

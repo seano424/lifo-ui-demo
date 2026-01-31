@@ -12,7 +12,7 @@ export function ExpiredItemsSummary() {
 
   if (isLoading) {
     return (
-      <div className="bg-white dark:bg-brand-dark rounded-2xl border p-6">
+      <div className="bg-white dark:bg-background rounded-2xl border p-6">
         <div className="flex flex-col gap-4">
           <Skeleton className="h-6 w-48" />
           <Skeleton className="h-8 w-24" />
@@ -28,7 +28,7 @@ export function ExpiredItemsSummary() {
 
   if (error || !data) {
     return (
-      <div className="bg-white dark:bg-brand-dark rounded-2xl border p-6">
+      <div className="bg-white dark:bg-background rounded-2xl border p-6">
         <div className="text-center">
           <Typography variant="p">{t('errors.loadingError')}</Typography>
         </div>
@@ -41,17 +41,17 @@ export function ExpiredItemsSummary() {
   const expiredValue = data.expired_items_value
 
   return (
-    <div className="bg-white dark:bg-brand-dark rounded-2xl border">
+    <div className="bg-white dark:bg-background rounded-2xl border">
       {/* Header */}
       <div className="p-6 border-b">
         <div className="flex justify-between items-center gap-2">
-          <div className="text-gray-500 dark:text-brand-white flex flex-col gap-1">
+          <div className="text-foreground dark:text-brand-white flex flex-col gap-1">
             <Typography variant="h4">{t('title')}</Typography>
-            <Typography variant="small" className="text-gray-500 dark:text-brand-white">
+            <Typography variant="small" className="text-foreground dark:text-brand-white">
               {t('subtitle')}
             </Typography>
           </div>
-          <div className="text-right text-gray-500 dark:text-brand-white flex items-center gap-1">
+          <div className="text-right text-foreground dark:text-brand-white flex items-center gap-1">
             <Typography variant="h2">{expiredCount}</Typography>
             <Typography variant="p">€{Math.round(expiredValue).toLocaleString()}</Typography>
           </div>
@@ -75,7 +75,7 @@ export function ExpiredItemsSummary() {
             <div className="flex items-center justify-between py-2">
               <div className="flex items-center gap-3">
                 <AlertTriangle className="h-4 w-4 text-destructive" />
-                <Typography variant="p" className="text-gray-700 dark:text-brand-white">
+                <Typography variant="p" className="text-foreground dark:text-brand-white">
                   {t('totalExpired')}
                 </Typography>
               </div>
@@ -83,7 +83,7 @@ export function ExpiredItemsSummary() {
                 <Typography variant="p" className="font-semibold">
                   {expiredCount}
                 </Typography>
-                <Typography variant="small" className="text-gray-500">
+                <Typography variant="small" className="text-foreground">
                   €{Math.round(expiredValue).toLocaleString()}
                 </Typography>
               </div>
@@ -91,10 +91,10 @@ export function ExpiredItemsSummary() {
 
             {/* Actions Needed */}
             <div className="border-t pt-4 mt-4">
-              <Typography variant="p" className=" text-gray-900 dark:text-brand-white mb-3">
+              <Typography variant="p" className=" text-foreground dark:text-brand-white mb-3">
                 {t('actionsNeeded')}:
               </Typography>
-              <div className="flex flex-col gap-2 text-sm text-gray-600 dark:text-brand-white">
+              <div className="flex flex-col gap-2 text-sm text-foreground dark:text-brand-white">
                 <div className="flex items-center gap-2">
                   <div className="h-1 w-1 bg-gray-400 rounded-full" />
                   <Typography variant="small">{t('reviewDiscounts')}</Typography>
