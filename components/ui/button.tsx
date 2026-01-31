@@ -110,17 +110,17 @@ const Button = React.forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPro
 
     // Show loading content when loading is true
     const content = loading ? (
-      <>
+      <span className="contents">
         <Loader2 className="animate-spin" />
         {loadingText || 'Loading...'}
-      </>
+      </span>
     ) : (
-      <>
+      <span className="contents">
         {children}
         {hasArrowUpIcon && (
           <ChevronRightIcon className="w-5 h-5 -rotate-45 transition-transform duration-300 ease-in-out group-hover:translate-x-px group-hover:-translate-y-1 -translate-y-px" />
         )}
-      </>
+      </span>
     )
 
     // Disable button when loading
