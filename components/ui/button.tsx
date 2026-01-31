@@ -13,12 +13,12 @@ const buttonVariants = cva(
       variant: {
         // Enhanced variants using new color palettes
         default:
-          'bg-primary-900 text-white hover:bg-primary-800 dark:bg-primary-900/80 dark:hover:bg-primary-900',
+          'bg-primary-900 hover:bg-primary-800 dark:bg-primary-900/80 dark:hover:bg-primary-900',
         destructive:
           'bg-destructive text-destructive-foreground shadow-xs hover:bg-destructive/90 dark:bg-destructive dark:hover:bg-destructive',
         subtleDestructive: 'bg-destructive text-destructive shadow-xs hover:bg-destructive',
         outline: 'border border-input bg-background shadow-xs hover:border-border',
-        secondary: 'bg-secondary-900 text-white shadow-xs hover:bg-secondary-800',
+        secondary: 'bg-secondary-900 shadow-xs hover:bg-secondary-800',
         ghost:
           'hover:bg-primary-50 hover:text-primary-800 dark:hover:bg-primary-900/0 dark:text-foreground font-normal',
         subtleTertiary:
@@ -26,18 +26,17 @@ const buttonVariants = cva(
         link: 'text-primary-800 underline-offset-4 hover:underline dark:text-primary-300',
 
         // New subtle variants using lighter shades
-        subtle:
-          'bg-primary-600 text-white hover:bg-primary-700 dark:bg-background dark:hover:bg-primary-600',
+        subtle: 'bg-primary-600 hover:bg-primary-700 dark:bg-background dark:hover:bg-primary-600',
         subtleSecondary:
           'bg-secondary-100/10 text-sky-700 shadow-xs hover:bg-secondary-100/80 dark:bg-secondary-900 dark:text-secondary-100 dark:hover:bg-secondary-900',
 
         // Brand variants (preserved for backward compatibility)
-        brand: 'bg-brand-primary text-white hover:bg-primary-800 dark:hover:bg-primary-600',
+        brand: 'bg-brand-primary hover:bg-primary-800 dark:hover:bg-primary-600',
         brandOutline:
           'border border-brand-primary bg-background shadow-xs hover:bg-primary-50 hover:text-brand-primary dark:hover:bg-primary-900/10 dark:hover:text-primary-300',
         brandSecondaryOutline:
           'border border-brand-secondary bg-background shadow-xs hover:bg-secondary-50 hover:text-brand-secondary dark:hover:bg-secondary-900/10 dark:hover:text-secondary-300',
-        black: 'bg-black text-white hover:bg-black/90',
+        black: 'bg-black hover:bg-black/90',
         gray: 'bg-gray-50 hover:bg-gray-50/90 dark:bg-secondary-100/10 dark:hover:bg-opacity-20',
         subtleGray: 'bg-gray-100 text-foreground hover:bg-gray-200',
         white: 'bg-white text-primary-800 hover:bg-white/90',
