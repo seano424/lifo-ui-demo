@@ -1,5 +1,6 @@
 // lib/email/resend.ts
 import { Resend } from 'resend'
+import { isSupportedLocale, type SupportedLocale } from '@/types/i18n'
 
 if (!process.env.RESEND_API) {
   throw new Error('RESEND_API environment variable is required')
@@ -7,7 +8,7 @@ if (!process.env.RESEND_API) {
 
 const resend = new Resend(process.env.RESEND_API)
 
-export type SupportedLanguage = 'en' | 'fr' | 'nl'
+export type SupportedLanguage = SupportedLocale
 
 export interface EmailCredentials {
   username: string
@@ -194,11 +195,8 @@ export async function sendWelcomeEmail(
 ): Promise<EmailDeliveryResult> {
   try {
     // Validate and default language
-    const validLanguages: SupportedLanguage[] = ['en', 'fr', 'nl']
     const language: SupportedLanguage =
-      credentials.language && validLanguages.includes(credentials.language)
-        ? credentials.language
-        : 'fr' // Default to French
+      credentials.language && isSupportedLocale(credentials.language) ? credentials.language : 'fr' // Default to French
     const content = welcomeEmailTranslations[language]
     const storeName = credentials.store_name || 'lifo'
 
@@ -239,11 +237,8 @@ export async function sendPasswordResetEmail(
 ): Promise<EmailDeliveryResult> {
   try {
     // Validate and default language
-    const validLanguages: SupportedLanguage[] = ['en', 'fr', 'nl']
     const language: SupportedLanguage =
-      credentials.language && validLanguages.includes(credentials.language)
-        ? credentials.language
-        : 'fr' // Default to French
+      credentials.language && isSupportedLocale(credentials.language) ? credentials.language : 'fr' // Default to French
     const content = passwordResetEmailTranslations[language]
 
     const { data, error } = await resend.emails.send({

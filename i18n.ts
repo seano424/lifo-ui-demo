@@ -2,8 +2,9 @@ import { createServerClient } from '@supabase/ssr'
 import { getRequestConfig } from 'next-intl/server'
 import { cookies, headers } from 'next/headers'
 import { loadMessages } from './lib/load-messages'
+import { isSupportedLocale, type SupportedLocale } from './types/i18n'
 
-async function detectLanguageFromHeaders(): Promise<string> {
+async function detectLanguageFromHeaders(): Promise<SupportedLocale> {
   try {
     const headersList = await headers()
     const acceptLanguage = headersList.get('accept-language')
@@ -25,7 +26,7 @@ async function detectLanguageFromHeaders(): Promise<string> {
 
     // Find first supported language
     for (const { locale } of languages) {
-      if (['en', 'fr', 'nl'].includes(locale)) {
+      if (isSupportedLocale(locale)) {
         return locale
       }
     }
@@ -66,7 +67,7 @@ export default getRequestConfig(async () => {
     // 3. User preference takes precedence
     if (user?.user_metadata?.language_preference) {
       const userLang = user.user_metadata.language_preference
-      if (['en', 'fr', 'nl'].includes(userLang)) {
+      if (isSupportedLocale(userLang)) {
         locale = userLang
       }
     } else {
@@ -76,7 +77,7 @@ export default getRequestConfig(async () => {
         try {
           const parsed = JSON.parse(langCookie.value)
           const storedLang = parsed.state?.currentLanguage
-          if (storedLang && ['en', 'fr', 'nl'].includes(storedLang)) {
+          if (storedLang && isSupportedLocale(storedLang)) {
             locale = storedLang
           }
         } catch {
