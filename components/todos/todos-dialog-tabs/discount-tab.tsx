@@ -126,7 +126,7 @@ export function DiscountTab({ selectedBatch, currencySymbol = '€', onClose }: 
   }
 
   return (
-    <div className="flex flex-col h-full bg-muted dark:bg-brand-dark">
+    <div className="flex flex-col h-full bg-muted dark:bg-background">
       {/* content */}
       <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-primary-100 scrollbar-track-transparent flex flex-col divide-y-4 divide-white dark:divide-gray-800">
         {/* Discount Preset Options */}
@@ -140,7 +140,7 @@ export function DiscountTab({ selectedBatch, currencySymbol = '€', onClose }: 
               batch
             </Typography>
           </div>
-          <div className="grid grid-cols-2 gap-2 bg-white dark:bg-brand-dark rounded-2xl p-4">
+          <div className="grid grid-cols-2 gap-2 bg-white dark:bg-background rounded-2xl p-4">
             {[10, 20, 25, 50].map(preset => (
               <Button
                 key={preset}
@@ -166,7 +166,7 @@ export function DiscountTab({ selectedBatch, currencySymbol = '€', onClose }: 
           <Typography variant="p" className="xs:text-lg">
             {t('discount.customDiscount')}
           </Typography>
-          <div className="bg-white dark:bg-brand-dark rounded-2xl p-4">
+          <div className="bg-white dark:bg-background rounded-2xl p-4">
             <InputSlider
               value={discountPercentage}
               onChange={handleDiscountChange}
@@ -184,7 +184,7 @@ export function DiscountTab({ selectedBatch, currencySymbol = '€', onClose }: 
       </div>
 
       {/* footer */}
-      <div className="sticky bottom-0 bg-brand-white dark:bg-brand-dark px-8 py-4 flex justify-between border-t border-muted gap-4">
+      <div className="sticky bottom-0 bg-brand-white dark:bg-background px-8 py-4 flex justify-between border-t border-muted gap-4">
         <Button
           size={isMobile ? 'default' : 'lg'}
           variant="subtleGray"
@@ -216,7 +216,7 @@ export function DiscountTab({ selectedBatch, currencySymbol = '€', onClose }: 
         <Button
           size={isMobile ? 'default' : 'lg'}
           variant="black"
-          className="rounded-full flex-1 block sm:hidden dark:bg-primary-900 dark:text-white"
+          className="rounded-full flex-1 block sm:hidden dark:bg-background dark:text-white"
           onClick={handleDiscountAction}
           disabled={isDiscounting}
         >

@@ -108,7 +108,7 @@ export default function SquareConnectPage() {
               </CardTitle>
               <CardDescription>{t('securityDescription')}</CardDescription>
             </CardHeader>
-            <CardContent className="flex flex-col gap-3 text-sm text-gray-600">
+            <CardContent className="flex flex-col gap-3 text-sm text-foreground">
               <Typography variant="p">{t('securityPoint1')}</Typography>
               <Typography variant="p">{t('securityPoint2')}</Typography>
               <Typography variant="p">{t('securityPoint3')}</Typography>

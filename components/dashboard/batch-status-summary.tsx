@@ -13,7 +13,7 @@ export function BatchStatusSummary() {
 
   if (isLoading) {
     return (
-      <div className="bg-white dark:bg-brand-dark rounded-2xl border p-6">
+      <div className="bg-white dark:bg-background rounded-2xl border p-6">
         <div className="flex flex-col gap-4">
           <Skeleton className="h-6 w-48" />
           <Skeleton className="h-8 w-24" />
@@ -29,7 +29,7 @@ export function BatchStatusSummary() {
 
   if (error || !data) {
     return (
-      <div className="bg-white dark:bg-brand-dark rounded-2xl border p-6">
+      <div className="bg-white dark:bg-background rounded-2xl border p-6">
         <div className="text-center ">
           <Typography variant="p">{t('errors.loadingError')}</Typography>
         </div>
@@ -83,11 +83,11 @@ export function BatchStatusSummary() {
 
   return (
     <div className="flex flex-col lg:flex-row gap-6">
-      <div className="bg-white dark:bg-brand-dark rounded-2xl border lg:w-1/2">
+      <div className="bg-white dark:bg-background rounded-2xl border lg:w-1/2">
         {/* Header - Needs Attention */}
         <div className="p-6 border-b">
           <div className="flex justify-between items-center gap-2">
-            <div className="text-gray-500 dark:text-brand-white flex flex-col gap-1">
+            <div className="text-foreground dark:text-brand-white flex flex-col gap-1">
               <Typography variant="h4">{t('needsAttention')}</Typography>
               <Typography variant="small">{t('activeInventory')}</Typography>
             </div>
@@ -103,7 +103,7 @@ export function BatchStatusSummary() {
               <div className="flex items-center justify-between py-2">
                 <div className="flex items-center gap-3">
                   {getUrgencyIcon('critical')}
-                  <Typography variant="p" className="text-gray-700 dark:text-brand-white">
+                  <Typography variant="p" className="text-foreground dark:text-brand-white">
                     {getUrgencyLabel('critical')}
                   </Typography>
                 </div>
@@ -116,7 +116,7 @@ export function BatchStatusSummary() {
               <div className="flex items-center justify-between py-2">
                 <div className="flex items-center gap-3">
                   {getUrgencyIcon('high')}
-                  <Typography variant="p" className="text-gray-700 dark:text-brand-white">
+                  <Typography variant="p" className="text-foreground dark:text-brand-white">
                     {getUrgencyLabel('high')}
                   </Typography>
                 </div>
@@ -139,7 +139,7 @@ export function BatchStatusSummary() {
         </div>
       </div>
 
-      <div className="bg-white dark:bg-brand-dark rounded-2xl border lg:w-1/2 flex flex-col">
+      <div className="bg-white dark:bg-background rounded-2xl border lg:w-1/2 flex flex-col">
         <div className="p-6 border-b">
           <div className="flex justify-between items-center gap-2">
             <Typography variant="h4">{t('status.ok')}</Typography>
@@ -154,7 +154,7 @@ export function BatchStatusSummary() {
               <div className="flex items-center justify-between py-2">
                 <div className="flex items-center gap-3">
                   {getUrgencyIcon('medium')}
-                  <Typography variant="p" className="text-gray-700 dark:text-brand-white">
+                  <Typography variant="p" className="text-foreground dark:text-brand-white">
                     {getUrgencyLabel('medium')}
                   </Typography>
                 </div>
@@ -167,7 +167,7 @@ export function BatchStatusSummary() {
               <div className="flex items-center justify-between py-2">
                 <div className="flex items-center gap-3">
                   {getUrgencyIcon('low')}
-                  <Typography variant="p" className="text-gray-700 dark:text-brand-white">
+                  <Typography variant="p" className="text-foreground dark:text-brand-white">
                     {getUrgencyLabel('low')}
                   </Typography>
                 </div>
@@ -180,7 +180,7 @@ export function BatchStatusSummary() {
               <div className="flex items-center justify-between py-2">
                 <div className="flex items-center gap-3">
                   <div className="h-4 w-4 bg-primary-500 rounded-full" />
-                  <Typography variant="p" className="text-gray-700 dark:text-brand-white">
+                  <Typography variant="p" className="text-foreground dark:text-brand-white">
                     {t('status.ok')}
                   </Typography>
                 </div>
@@ -193,7 +193,7 @@ export function BatchStatusSummary() {
             <Typography variant="h4" className="lowercase text-primary-800 dark:text-brand-white">
               {attentionPercentage}% {t('needsAttention')}
             </Typography>
-            <div className="h-2 bg-gray-200 dark:bg-brand-dark rounded-full mt-2">
+            <div className="h-2 bg-gray-200 dark:bg-background rounded-full mt-2">
               <div
                 className="h-2 bg-primary-900 rounded-full transition-all duration-300"
                 style={{ width: `${attentionPercentage}%` }}

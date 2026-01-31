@@ -275,7 +275,7 @@ export default function ManualDeliveryEntry({
                     variant="ghost"
                     size="sm"
                     onClick={handleClearSelection}
-                    className="text-gray-500 hover:text-gray-700"
+                    className="text-foreground hover:text-foreground"
                   >
                     <Trash2 className="w-4 h-4" />
                   </Button>

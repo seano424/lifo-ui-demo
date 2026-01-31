@@ -114,7 +114,7 @@ function WelcomeActionCard({
             className={cn(
               'p-2 rounded-md w-fit',
               variant === 'primary'
-                ? 'bg-primary-100 text-primary-800 dark:bg-primary-900/30 dark:text-primary-300'
+                ? 'bg-primary-100 text-primary-800 dark:bg-background/30 dark:text-primary-300'
                 : 'bg-secondary-100 text-secondary-700 dark:bg-secondary-900/30 dark:text-secondary-300',
             )}
           >

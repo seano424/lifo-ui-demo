@@ -140,7 +140,7 @@ export default function InventoryForm({
             <div className="mt-3">
               <Label>{finalPriceLabel}</Label>
               <div className="relative">
-                <Euro className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Euro className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-foreground" />
                 <Input
                   min="0"
                   type="number"
@@ -182,7 +182,7 @@ export default function InventoryForm({
             <div>
               <Label htmlFor="expiry">
                 {finalExpiryDateLabel}{' '}
-                <span className="text-gray-500">
+                <span className="text-foreground">
                   ({t('labels.optional', { defaultValue: 'Optional' })})
                 </span>
               </Label>
@@ -214,7 +214,7 @@ export default function InventoryForm({
           <div>
             <Label htmlFor="price">{finalPriceLabel}</Label>
             <div className="relative">
-              <Euro className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Euro className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-foreground" />
               <Input
                 id="price"
                 type="number"

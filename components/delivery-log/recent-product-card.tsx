@@ -82,7 +82,7 @@ export function RecentProductCard({
         <div className="flex gap-3">
           {/* Product Image */}
           <div className="shrink-0">
-            <div className="relative h-14 w-14 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+            <div className="relative h-14 w-14 rounded-lg overflow-hidden bg-gray-100 dark:bg-background border border-gray-200 dark:border-gray-700">
               {product.product_name ? (
                 <Image
                   src={`https://placehold.co/200x200/e5e7eb/6b7280?text=${encodeURIComponent(
@@ -96,7 +96,7 @@ export function RecentProductCard({
                 />
               ) : (
                 <div className="flex items-center justify-center h-full">
-                  <Package className="h-6 w-6 text-gray-400" />
+                  <Package className="h-6 w-6 text-foreground" />
                 </div>
               )}
             </div>

@@ -44,12 +44,12 @@ export function TodoFilterSummary({ filters, onClear }: TodoFilterSummaryProps) 
 
   // No filters = no summary
   if (parts.length === 0) {
-    return <span className="text-sm text-gray-400 ml-2">{t('filters.noFiltersApplied')}</span>
+    return <span className="text-sm text-foreground ml-2">{t('filters.noFiltersApplied')}</span>
   }
 
   return (
     <div className="flex items-center gap-3 text-sm ml-2">
-      <span className="text-gray-600">{parts.join(' • ')}</span>
+      <span className="text-foreground">{parts.join(' • ')}</span>
       <button type="button" onClick={onClear} className="text-violet-600 hover:text-violet-700 ">
         {t('filters.clearAll')}
       </button>

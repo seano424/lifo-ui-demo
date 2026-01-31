@@ -35,7 +35,7 @@ export function SetupStepsSidebar() {
 
       {/* Progress bar */}
       <div className="flex flex-col gap-2">
-        <div className="h-2 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden">
+        <div className="h-2 bg-gray-200 dark:bg-background rounded-full overflow-hidden">
           <div
             className="h-full bg-linear-to-r from-primary-900 to-primary-800 transition-all duration-500 ease-out"
             style={{ width: `${progressPercentage}%` }}

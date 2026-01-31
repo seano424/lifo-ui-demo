@@ -24,18 +24,26 @@ export function Hero() {
         />
       </div>
 
-      <div className="absolute inset-0 dark:block hidden mask-[linear-gradient(to_bottom,black_50%,transparent)]">
+      <div className="absolute inset-0 dark:block hidden">
+        {/* <div className="absolute inset-0 bg-linear-to-b from-background/10 to-background/40 z-10" /> */}
+        {/* <Image
+          src="/images/bg.svg"
+          alt="Background"
+          fill
+          className="object-cover translate-x-10  rotate-180 scale-y-400 scale-x-150 brightness-30 contrast-180"
+        /> */}
         <Image
           src="/images/bg.svg"
           alt="Background"
           fill
-          className="object-cover rotate-180 scale-y-400 scale-x-150 brightness-30 contrast-150"
+          // className="object-cover rotate-180 scale-x-200 brightness-30 contrast-180"
+          className="brightness-30 contrast-180 scale-y-200 scale-x-180"
         />
       </div>
 
       <div className="relative z-10 flex flex-col gap-4 items-center justify-center">
         <Badge font="mono" className="flex gap-1 items-center">
-          <div className="mr-1 bg-white dark:bg-gray-800 rounded p-1.5">
+          <div className="mr-1 bg-white dark:bg-linear-to-br from-secondary-500 to-secondary-500 rounded p-1">
             <Image src="/square/square-icon.svg" alt="Square" width={12} height={12} />
           </div>
           {t('connectSquare')}
@@ -45,7 +53,7 @@ export function Hero() {
 
         <HeroButtons />
 
-        <Badge variant="primary" font="mono">
+        <Badge variant="ghost" font="mono">
           {t('noCreditCard')}
         </Badge>
       </div>

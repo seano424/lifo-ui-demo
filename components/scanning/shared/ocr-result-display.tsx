@@ -86,25 +86,27 @@ export default function OCRResultDisplay({
       {/* Extracted Date */}
       {europeanDate && (
         <div>
-          <div className="text-xs text-gray-600 dark:text-gray-400 mb-1">
+          <div className="text-xs text-foreground dark:text-foreground mb-1">
             {t('result.expiryDate', { defaultValue: 'Expiry Date' })}
           </div>
-          <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">{europeanDate}</div>
+          <div className="text-2xl font-bold text-foreground dark:text-foreground">
+            {europeanDate}
+          </div>
         </div>
       )}
 
       {/* Batch Number (NEW) */}
       {batchNumber && (
         <div>
-          <div className="text-xs text-gray-600 dark:text-gray-400 mb-1">
+          <div className="text-xs text-foreground dark:text-foreground mb-1">
             {t('result.batchNumber', { defaultValue: 'Batch/Lot Number' })}
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-lg font-mono font-semibold text-gray-900 dark:text-gray-100">
+            <span className="text-lg font-mono font-semibold text-foreground dark:text-foreground">
               {batchNumber}
             </span>
             {batchConfidence !== undefined && (
-              <span className="text-xs text-gray-500 dark:text-gray-400">
+              <span className="text-xs text-foreground dark:text-foreground">
                 ({Math.round(batchConfidence * 100)}%)
               </span>
             )}
@@ -120,11 +122,11 @@ export default function OCRResultDisplay({
       {/* Confidence Score */}
       {confidence !== undefined && (
         <div className="flex items-center justify-between pt-2 border-t border-gray-200 dark:border-gray-700">
-          <span className="text-xs text-gray-600 dark:text-gray-400">
+          <span className="text-xs text-foreground dark:text-foreground">
             {t('result.confidence', { defaultValue: 'Confidence' })}
           </span>
           <div className="flex items-center gap-2">
-            <div className="w-32 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+            <div className="w-32 h-2 bg-gray-200 dark:bg-background rounded-full overflow-hidden">
               <div
                 className={cn(
                   'h-full transition-all',
@@ -135,7 +137,7 @@ export default function OCRResultDisplay({
                 style={{ width: `${Math.round(confidence * 100)}%` }}
               />
             </div>
-            <span className="text-sm font-semibold text-gray-900 dark:text-gray-100 min-w-[3rem] text-right">
+            <span className="text-sm font-semibold text-foreground dark:text-foreground min-w-[3rem] text-right">
               {Math.round(confidence * 100)}%
             </span>
           </div>
@@ -166,10 +168,10 @@ export default function OCRResultDisplay({
       {/* Raw OCR Text */}
       {showRawText && rawOcrText && (
         <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
-          <div className="text-xs text-gray-600 dark:text-gray-400 mb-1">
+          <div className="text-xs text-foreground dark:text-foreground mb-1">
             {t('result.detectedText', { defaultValue: 'Detected Text' })}
           </div>
-          <div className="text-xs font-mono bg-gray-100 dark:bg-gray-800 rounded p-2 text-gray-800 dark:text-gray-300 break-all">
+          <div className="text-xs font-mono bg-gray-100 dark:bg-background rounded p-2 text-foreground dark:text-foreground break-all">
             "{rawOcrText}"
           </div>
         </div>
@@ -177,7 +179,7 @@ export default function OCRResultDisplay({
 
       {/* Helpful hint if confidence is low */}
       {confidence !== undefined && confidence < 0.7 && (
-        <div className="text-xs text-gray-600 dark:text-gray-400 italic">
+        <div className="text-xs text-foreground dark:text-foreground italic">
           {t('result.lowConfidenceHint', {
             defaultValue: 'Low confidence - please verify the date is correct',
           })}

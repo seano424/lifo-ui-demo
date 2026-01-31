@@ -57,9 +57,9 @@ export function DeliverySummary({
         className={cn('border-2 border-dashed border-gray-300 dark:border-gray-700', className)}
       >
         <CardContent className="p-6 text-center">
-          <Package className="h-12 w-12 text-gray-400 mx-auto mb-3" />
-          <p className="text-sm text-gray-500 dark:text-gray-400">No products added yet</p>
-          <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+          <Package className="h-12 w-12 text-foreground mx-auto mb-3" />
+          <p className="text-sm text-foreground dark:text-foreground">No products added yet</p>
+          <p className="text-xs text-foreground dark:text-foreground mt-1">
             Add products from the list above
           </p>
         </CardContent>
@@ -89,7 +89,7 @@ export function DeliverySummary({
             {items.map(item => (
               <div
                 key={item.product_id}
-                className="flex items-center justify-between gap-3 p-2 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800"
+                className="flex items-center justify-between gap-3 p-2 rounded-lg bg-gray-50 dark:bg-background border border-gray-200 dark:border-gray-800"
               >
                 <div className="flex-1 min-w-0">
                   <Typography variant="p">{item.product_name}</Typography>
@@ -101,7 +101,7 @@ export function DeliverySummary({
                     variant="ghost"
                     size="icon"
                     onClick={() => onRemoveItem(item.product_id)}
-                    className="shrink-0 h-8 w-8 text-gray-500 hover:text-destructive dark:hover:text-destructive"
+                    className="shrink-0 h-8 w-8"
                     aria-label="Remove item"
                   >
                     <Trash2 className="h-4 w-4" />

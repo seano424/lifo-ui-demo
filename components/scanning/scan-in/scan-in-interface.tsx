@@ -134,7 +134,7 @@ export default function ScanInInterface({ onItemAdded, className }: ScanInInterf
             </DialogHeader>
 
             <div className="flex flex-col gap-4">
-              <div className="text-sm text-gray-600">
+              <div className="text-sm text-foreground">
                 You are about to submit {pendingItems.length} item
                 {pendingItems.length > 1 ? 's' : ''} to inventory:
               </div>
@@ -150,8 +150,8 @@ export default function ScanInInterface({ onItemAdded, className }: ScanInInterf
                     >
                       <div className="flex-1">
                         <div className="">{item.productName}</div>
-                        {item.brand && <div className="text-xs text-gray-600">{item.brand}</div>}
-                        <div className="text-xs text-gray-500">
+                        {item.brand && <div className="text-xs text-foreground">{item.brand}</div>}
+                        <div className="text-xs text-foreground">
                           Expires:{' '}
                           {item.expiryDate
                             ? new Date(item.expiryDate).toLocaleDateString()
@@ -162,7 +162,7 @@ export default function ScanInInterface({ onItemAdded, className }: ScanInInterf
                         <div className="">
                           {item.quantity}x {formatPrice(item.price)}
                         </div>
-                        <div className="text-xs text-gray-600">
+                        <div className="text-xs text-foreground">
                           Total: {formatPrice(totalValue)}
                         </div>
                       </div>

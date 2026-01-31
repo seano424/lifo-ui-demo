@@ -117,7 +117,7 @@ export function DisposeTab({ selectedBatch, onClose }: DisposeTabProps) {
   }
 
   return (
-    <div className="flex flex-col h-full bg-muted dark:bg-brand-dark">
+    <div className="flex flex-col h-full bg-muted dark:bg-background">
       {/* content */}
       <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-primary-100 scrollbar-track-transparent flex flex-col divide-y-4 divide-white dark:divide-gray-800">
         {/* Disposal Reason Selection */}
@@ -125,7 +125,7 @@ export function DisposeTab({ selectedBatch, onClose }: DisposeTabProps) {
           <Typography variant="p" className="xs:text-lg">
             {t('dispose.whyDisposing')}
           </Typography>
-          <div className="bg-white rounded-2xl p-4 dark:bg-brand-dark">
+          <div className="bg-white rounded-2xl p-4 dark:bg-background">
             <div className="grid sm:grid-cols-2 grid-cols-1 gap-2">
               {DISPOSAL_REASONS.map(reason => (
                 <button
@@ -165,7 +165,7 @@ export function DisposeTab({ selectedBatch, onClose }: DisposeTabProps) {
           <Typography variant="p" className="xs:text-lg">
             {t('dispose.howMany')}
           </Typography>
-          <div className="bg-white rounded-2xl p-4 dark:bg-brand-dark">
+          <div className="bg-white rounded-2xl p-4 dark:bg-background">
             <InputSlider
               value={disposeQuantity}
               onChange={handleQuantityChange}
@@ -180,7 +180,7 @@ export function DisposeTab({ selectedBatch, onClose }: DisposeTabProps) {
       </div>
 
       {/* footer */}
-      <div className="sticky bottom-0 bg-brand-white dark:bg-brand-dark px-8 py-4 flex justify-between border-t border-muted gap-4">
+      <div className="sticky bottom-0 bg-brand-white dark:bg-background px-8 py-4 flex justify-between border-t border-muted gap-4">
         <Button
           size={isMobile ? 'default' : 'lg'}
           variant="subtleGray"

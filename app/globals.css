@@ -373,11 +373,11 @@
   .dark {
     /* Dark mode - Using your dark color as base */
     --background: 210 11% 4%;
-    --foreground: 0 0% 98%;
-    --card: 210 11% 6%;
-    --card-foreground: 0 0% 98%;
+    --foreground: 0 0% 75%;
+    --card: 210 11% 5%;
+    --card-foreground: 0 0% 85%;
     --popover: 210 11% 4%;
-    --popover-foreground: 0 0% 98%;
+    --popover-foreground: 0 0% 85%;
 
     /* Updated primary for dark mode - slightly adjusted for better contrast */
     --primary: 252 100% 65%;

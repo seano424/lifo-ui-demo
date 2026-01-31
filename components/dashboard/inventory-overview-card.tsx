@@ -21,7 +21,7 @@ export function InventoryOverviewCard({ storeId }: InventoryOverviewCardProps) {
 
   if (isLoading) {
     return (
-      <div className="bg-white dark:bg-brand-dark rounded-2xl border p-6">
+      <div className="bg-white dark:bg-background rounded-2xl border p-6">
         <div className="flex flex-col gap-4">
           <Skeleton className="h-6 w-48" />
           <div className="flex flex-col gap-4">
@@ -35,7 +35,7 @@ export function InventoryOverviewCard({ storeId }: InventoryOverviewCardProps) {
 
   if (error || !data) {
     return (
-      <div className="bg-white dark:bg-brand-dark rounded-2xl border p-6">
+      <div className="bg-white dark:bg-background rounded-2xl border p-6">
         <div className="text-center">
           <Typography variant="p">{t('errors.loadingError')}</Typography>
         </div>
@@ -44,7 +44,7 @@ export function InventoryOverviewCard({ storeId }: InventoryOverviewCardProps) {
   }
 
   return (
-    <div className="bg-white dark:bg-brand-dark rounded-2xl border flex flex-col justify-between">
+    <div className="bg-white dark:bg-background rounded-2xl border flex flex-col justify-between">
       {/* Header */}
       <div className="p-6 border-b h-24 flex items-center justify-between">
         <Typography variant="h3">{t('title')}</Typography>
@@ -93,7 +93,7 @@ export function InventoryOverviewCard({ storeId }: InventoryOverviewCardProps) {
           className="w-full group/button"
         >
           {t('viewAllProducts')}
-          {/* <ExternalLink className="w-4 h-4 text-gray-600 group-hover/button:text-gray-900 transition-colors duration-500 ease-in-out" /> */}
+          {/* <ExternalLink className="w-4 h-4 text-foreground group-hover/button:text-foreground transition-colors duration-500 ease-in-out" /> */}
         </Button>
         <Button
           asLink
@@ -103,7 +103,7 @@ export function InventoryOverviewCard({ storeId }: InventoryOverviewCardProps) {
           className="w-full group/button"
         >
           {t('viewAllBatches')}{' '}
-          {/* <ExternalLink className="w-4 h-4 text-gray-600 group-hover/button:text-gray-900 transition-colors duration-500 ease-in-out" /> */}
+          {/* <ExternalLink className="w-4 h-4 text-foreground group-hover/button:text-foreground transition-colors duration-500 ease-in-out" /> */}
         </Button>
       </div>
     </div>

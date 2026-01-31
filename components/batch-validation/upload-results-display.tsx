@@ -107,11 +107,11 @@ export function UploadResultsDisplay({ result, onUploadAnother }: UploadResultsD
                     className="text-sm p-2 bg-white rounded border-l-4 border-destructive"
                   >
                     {typeof error === 'string' ? (
-                      <div className="text-gray-700">{error}</div>
+                      <div className="text-foreground">{error}</div>
                     ) : (
                       <>
                         <div className="font-semibold text-destructive">Row {error.row}</div>
-                        <div className="text-gray-700">{error.message}</div>
+                        <div className="text-foreground">{error.message}</div>
                       </>
                     )}
                   </div>

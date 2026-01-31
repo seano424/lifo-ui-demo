@@ -87,7 +87,7 @@ export function TrendIndicator({
       case 'down':
         return 'text-destructive'
       case 'stable':
-        return 'text-gray-500'
+        return 'text-foreground'
     }
   }
 
@@ -124,21 +124,21 @@ export function TrendIndicator({
 
       {showDetails && (
         <div className="flex flex-col gap-1">
-          <div className="flex items-center justify-between text-xs text-gray-600">
+          <div className="flex items-center justify-between text-xs text-foreground">
             <span>{t('previous')}</span>
             <span className="">{formatValue(previous)}</span>
           </div>
 
           {periodMin !== undefined && periodMax !== undefined && (
             <>
-              <div className="flex items-center justify-between text-xs text-gray-600">
+              <div className="flex items-center justify-between text-xs text-foreground">
                 <span>{t('periodLow')}</span>
                 <span className="">
                   {formatValue(periodMin)}
                   {minDate && ` (${formatDate(minDate)})`}
                 </span>
               </div>
-              <div className="flex items-center justify-between text-xs text-gray-600">
+              <div className="flex items-center justify-between text-xs text-foreground">
                 <span>{t('periodHigh')}</span>
                 <span className="">
                   {formatValue(periodMax)}

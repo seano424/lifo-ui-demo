@@ -22,10 +22,10 @@ export function OCRProcessingState({ fileName, fileSize }: OCRProcessingStatePro
 
         {/* Processing message */}
         <div className="text-center flex flex-col gap-2">
-          <Typography variant="h3" className="text-gray-800">
+          <Typography variant="h3" className="text-foreground">
             Processing delivery note...
           </Typography>
-          <Typography variant="p" className="text-gray-600 text-sm">
+          <Typography variant="p" className="text-foreground text-sm">
             {OCR_CONFIG.isMock
               ? 'Extracting items from mock delivery note'
               : 'Using AI to read and extract items from your image'}
@@ -35,10 +35,10 @@ export function OCRProcessingState({ fileName, fileSize }: OCRProcessingStatePro
         {/* File info */}
         <div className="bg-gray-50 rounded-lg p-4 w-full max-w-md">
           <div className="flex items-center gap-3">
-            <FileImage className="h-10 w-10 text-gray-400 shrink-0" />
+            <FileImage className="h-10 w-10 text-foreground shrink-0" />
             <div className="flex-1 min-w-0">
-              <p className="text-sm  text-gray-800 truncate">{fileName}</p>
-              <p className="text-xs text-gray-500">{(fileSize / 1024).toFixed(1)} KB</p>
+              <p className="text-sm  text-foreground truncate">{fileName}</p>
+              <p className="text-xs text-foreground">{(fileSize / 1024).toFixed(1)} KB</p>
             </div>
           </div>
         </div>
@@ -51,7 +51,7 @@ export function OCRProcessingState({ fileName, fileSize }: OCRProcessingStatePro
               style={{ width: '60%' }}
             />
           </div>
-          <p className="text-xs text-gray-500 text-center mt-2">
+          <p className="text-xs text-foreground text-center mt-2">
             This usually takes 2-3 seconds...
           </p>
         </div>

@@ -584,7 +584,7 @@ export function AddEmployeeDialog({
                   />
                   {isCheckingEmail && (
                     <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                      <RefreshCw className="w-4 h-4 animate-spin text-gray-400" />
+                      <RefreshCw className="w-4 h-4 animate-spin text-foreground" />
                     </div>
                   )}
                 </div>
@@ -840,7 +840,7 @@ export function AddEmployeeDialog({
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2 text-primary-800 dark:text-primary-200">
                 <div className="text-center flex flex-col items-center gap-2">
-                  <Check className="w-10 h-10 text-secondary-900 dark:text-secondary-100 stroke-5 border-2 border-secondary-900 dark:border-secondary-100 rounded-full p-[3px] bg-primary-100 dark:bg-primary-900/40" />
+                  <Check className="w-10 h-10 text-secondary-900 dark:text-secondary-100 stroke-5 border-2 border-secondary-900 dark:border-secondary-100 rounded-full p-[3px] bg-primary-100 dark:bg-background/40" />
                   <Typography variant="h1">{t('success.title')}</Typography>
                 </div>
               </DialogTitle>
