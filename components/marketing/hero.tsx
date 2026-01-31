@@ -25,7 +25,7 @@ export function Hero() {
       </div>
 
       <div className="absolute inset-0 dark:block hidden">
-        {/* <div className="absolute inset-0 bg-linear-to-b from-background/10 to-background/40 z-10" /> */}
+        <div className="absolute inset-0 bg-linear-to-b from-background/90 to-background/40 z-10" />
         {/* <Image
           src="/images/bg.svg"
           alt="Background"
@@ -37,7 +37,7 @@ export function Hero() {
           alt="Background"
           fill
           // className="object-cover rotate-180 scale-x-200 brightness-30 contrast-180"
-          className="brightness-30 contrast-180 scale-y-200 scale-x-180"
+          className="brightness-30 contrast-170 scale-y-200 scale-x-200 xl:-translate-x-10"
         />
       </div>
 
