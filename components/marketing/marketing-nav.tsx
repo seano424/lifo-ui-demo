@@ -25,6 +25,7 @@ import Link from 'next/link'
 import { AuthButton } from '../auth-button'
 import { EnvVarWarning } from '../env-var-warning'
 import { Typography } from '../ui/typography'
+// import { CompactThemeSwitcher } from '../compact-theme-switcher'
 // import { useCurrentUser } from '@/hooks/use-users'
 
 interface MenuItem {
@@ -142,6 +143,7 @@ const MarketingNav = ({ menu }: MarketingNavProps) => {
         </div>
 
         <div className="flex items-center gap-2">
+          {/* <CompactThemeSwitcher /> */}
           {/* <CompactLanguageSwitcher /> */}
           {!hasEnvVars ? <EnvVarWarning /> : <AuthButton />}
         </div>
