@@ -2,12 +2,10 @@
 
 import { Card } from '@/components/ui/card'
 import { Typography } from '@/components/ui/typography'
-import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { BottomSheet } from '@/components/ui/bottom-sheet'
 import { useTranslations } from 'next-intl'
 import Image from 'next/image'
-import { ExternalLink, CheckCircle2, Settings } from 'lucide-react'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { AddStoreFlow } from '@/components/settings/add-store-flow'
@@ -62,41 +60,26 @@ export function AddStoreStep() {
           }}
         >
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center justify-between">
-            <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-              <Image src="/square/square-icon.svg" alt="Square" width={40} height={40} />
-              <div>
-                <div className="flex items-center gap-2 pb-2">
-                  <Typography variant="h3">Square</Typography>
-                  {isSquareConnected ? (
-                    <Badge variant="primary" className="gap-1">
-                      <CheckCircle2 className="h-5 w-5 text-primary stroke-2" />
-                      Connected
-                    </Badge>
-                  ) : (
-                    <Badge variant="secondary" className="gap-1">
-                      Not Connected
-                    </Badge>
-                  )}
-                </div>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="bg-white dark:bg-linear-to-br from-primary-900 rounded-lg p-1.5 h-fit mt-2">
+                <Image src="/square/square-icon.svg" alt="Square" width={32} height={32} />
+              </div>
+              <div className="flex flex-col gap-1">
+                <Typography variant="h3">Square</Typography>
                 <Typography variant="p">{t('steps.addStore.squareDescription')}</Typography>
               </div>
             </div>
-            <Button
-              variant="outline"
-              className="w-fit group-hover:bg-white group-hover:text-primary-800 hover:bg-white hover:text-primary-800 pointer-events-none"
-            >
-              {isSquareConnected ? (
-                <>
-                  <Settings className="h-4 w-4" />
-                  Manage
-                </>
-              ) : (
-                <>
-                  <ExternalLink className="h-4 w-4" />
-                  {t('steps.addStore.connect')}
-                </>
-              )}
-            </Button>
+          </div>
+          <div className="mt-4">
+            {isSquareConnected ? (
+              <Badge variant="ghost" className="gap-1 w-full">
+                Connected
+              </Badge>
+            ) : (
+              <Badge variant="ghost" className="gap-1 w-full">
+                Not Connected
+              </Badge>
+            )}
           </div>
         </Card>
       </div>

@@ -11,7 +11,7 @@ const badgeVariants = cva(
         default:
           'bg-gray-100/60 dark:bg-secondary/10 backdrop-blur-sm text-secondary-900 dark:text-secondary-100',
         primary:
-          'bg-primary-100/20 dark:bg-background/40 text-primary-700 dark:text-primary-300 dark:bg--500/20 dark:text-primary-300',
+          'bg-primary-100/20 dark:bg-background/40 text-primary-700 dark:text-primary-300 dark:bg-primary-900/5 dark:text-primary-300',
         secondary:
           'bg-secondary-100/20 dark:bg-secondary-900/40 text-secondary-700 dark:text-secondary-300',
         outline:

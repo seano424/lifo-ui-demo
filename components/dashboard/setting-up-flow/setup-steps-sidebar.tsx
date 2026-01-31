@@ -59,20 +59,22 @@ export function SetupStepsSidebar() {
               onClick={() => goToStep(step)}
               className={cn(
                 'flex items-center gap-3 p-3 rounded-2xl transition-all text-left',
-                'hover:bg-secondary-100/50',
-                isCurrent && 'bg-secondary-100/50',
+                'hover:bg-secondary-100/50 dark:hover:bg-secondary-900/5',
+                isCurrent && 'bg-secondary-100/50 dark:bg-secondary-900/5',
                 !isCurrent && 'hover:bg-muted',
               )}
             >
               {/* Step icon */}
               <div className="shrink-0">
                 {completed ? (
-                  <CheckCircle2 className="h-5 w-5 text-primary stroke-2" />
+                  <CheckCircle2 className="h-5 w-5 text-primary stroke-2 dark:text-secondary-700" />
                 ) : (
                   <Circle
                     className={cn(
                       'h-5 w-5 stroke-2',
-                      isCurrent ? 'text-primary fill-primary/20' : 'text-muted-foreground',
+                      isCurrent
+                        ? 'text-primary fill-primary/20 dark:text-secondary-700 dark:fill-secondary-700/20'
+                        : 'text-muted-foreground',
                     )}
                   />
                 )}
@@ -83,8 +85,10 @@ export function SetupStepsSidebar() {
                 variant="p"
                 className={cn(
                   '',
-                  isCurrent && 'font-semibold font-heading text-primary-900',
-                  completed && 'font-semibold font-heading text-primary-900',
+                  isCurrent &&
+                    'font-semibold font-heading text-primary-900 dark:text-secondary-700',
+                  completed &&
+                    'font-semibold font-heading text-primary-900 dark:text-secondary-700',
                 )}
               >
                 {t(STEP_LABELS[step])}
