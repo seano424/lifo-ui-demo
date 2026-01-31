@@ -142,7 +142,7 @@ const MarketingNav = ({ menu }: MarketingNavProps) => {
         </div>
 
         <div className="flex items-center gap-2">
-          <CompactLanguageSwitcher />
+          {/* <CompactLanguageSwitcher /> */}
           {!hasEnvVars ? <EnvVarWarning /> : <AuthButton />}
         </div>
       </nav>
