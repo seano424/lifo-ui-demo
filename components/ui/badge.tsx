@@ -18,7 +18,7 @@ const badgeVariants = cva(
           'border border-gray-300 dark:border-gray-600 bg-transparent text-secondary-900 dark:text-secondary-100',
         destructive: 'bg-red-100/60 dark:bg-red-900/40 text-red-700 dark:text-red-300',
         invertedSecondary: 'bg-secondary-700 text-white',
-        ghost: 'bg-transparent text-secondary-900 dark:text-secondary-100',
+        ghost: 'bg-transparent text-secondary-900 dark:text-secondary-100 border-none',
       },
       size: {
         sm: 'px-3 py-1.5 text-sm',
