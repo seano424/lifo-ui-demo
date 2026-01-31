@@ -53,7 +53,7 @@ export function Hero() {
 
         <HeroButtons />
 
-        <Badge variant="ghost" font="mono">
+        <Badge variant="outline" font="mono">
           {t('noCreditCard')}
         </Badge>
       </div>
