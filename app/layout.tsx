@@ -6,7 +6,7 @@ import ServiceWorkerRegistrar from '@/components/service-worker-registrar'
 import { Toaster } from '@/components/ui/toaster'
 import { ReactQueryProvider } from '@/lib/react-query/provider'
 import type { Metadata } from 'next'
-import { getMessages } from 'next-intl/server'
+import { getLocale, getMessages } from 'next-intl/server'
 import { ThemeProvider } from 'next-themes'
 import { Montserrat, Raleway, Roboto_Mono } from 'next/font/google'
 import './globals.css'
@@ -74,11 +74,12 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const locale = await getLocale()
   const messages = await getMessages()
 
   return (
     <html
-      lang="en"
+      lang={locale}
       suppressHydrationWarning
       data-scroll-behavior="smooth"
       className={`${raleway.variable} ${montserrat.variable} ${robotoMono.variable} ${debugScreens}`}
