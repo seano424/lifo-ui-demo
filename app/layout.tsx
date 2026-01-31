@@ -21,6 +21,18 @@ export const metadata: Metadata = {
   description:
     "lifo helps retailers reduce waste by tracking what's expiring and when to act—discount, donate, or sell in time.",
   manifest: '/manifest.json',
+  icons: {
+    icon: [
+      {
+        url: '/logos/logo-light-theme.svg',
+        media: '(prefers-color-scheme: light)',
+      },
+      {
+        url: '/logos/logo-dark-theme.svg',
+        media: '(prefers-color-scheme: dark)',
+      },
+    ],
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',

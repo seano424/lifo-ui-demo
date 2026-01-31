@@ -69,7 +69,7 @@ export function FeaturesSummary() {
         </div>
 
         <div className="flex flex-col gap-4 items-center justify-center">
-          <Button asLink href="/features" size="xl" hasArrowUpIcon className="capitalize">
+          <Button asLink href="/features" size="lg" hasArrowUpIcon className="capitalize">
             {t('discoverButton')}
           </Button>
           <Typography variant="p">{t('noCommitment')}</Typography>

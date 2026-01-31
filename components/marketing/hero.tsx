@@ -12,7 +12,7 @@ export function Hero() {
   return (
     <section
       aria-label="Hero section with lifo introduction"
-      className="flex flex-col sm:gap-6 gap-4 items-center overflow-hidden w-full min-h-[calc(100vh-200px)] sm:min-h-screen justify-center relative"
+      className="flex flex-col sm:gap-6 gap-4 items-center overflow-hidden w-full min-h-[calc(100vh-200px)] sm:min-h-screen justify-center relative xl:pt-10"
     >
       <div className="absolute inset-0 mask-[linear-gradient(to_bottom,black_50%,transparent)] dark:hidden">
         <div className="absolute inset-0 bg-linear-to-b from-white/90 to-white/40 z-10" />
