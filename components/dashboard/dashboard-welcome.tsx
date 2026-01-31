@@ -49,7 +49,7 @@ export function DashboardWelcome() {
       </div>
 
       {/* Help section with subtle design */}
-      <div className="mt-4 rounded-2xl border bg-white">
+      <div className="mt-4 rounded-2xl border bg-background">
         <div className="p-3 sm:p-6 flex flex-col md:flex-row gap-3 sm:gap-4 md:gap-6 items-center">
           {/* Left side with icon and text */}
           <div className="flex flex-col justify-center items-center md:items-start gap-3 md:gap-4 flex-1 text-center md:text-left">
