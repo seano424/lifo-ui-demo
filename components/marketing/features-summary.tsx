@@ -33,7 +33,7 @@ export function FeaturesSummary() {
 
   return (
     <section className="w-full py-12 px-4 rounded-2xl relative z-10">
-      <div className="absolute inset-0 -z-10 mask-[linear-gradient(to_top,black_80%,transparent)]">
+      <div className="absolute inset-0 -z-10">
         {/* <Image src="/images/bg.svg" alt="Background" fill className='object-cover  scale-x-200 rotate-180' /> */}
         {/* <Image src="/images/bg.svg" alt="Background" fill className='object-cover rotate-180 scale-x-[-1] -z-10' /> */}
       </div>
@@ -44,25 +44,25 @@ export function FeaturesSummary() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 py-8 px-8 rounded-2xl bg-card overflow-hidden h-full">
           <Feature
-            icon={<Calendar className="text-primary-900" strokeWidth={1.5} />}
+            icon={<Calendar className="text-primary dark:text-primary-400" strokeWidth={1.5} />}
             title={t('expiryTracking.title')}
             description={t('expiryTracking.description')}
           />
 
           <Feature
-            icon={<Bell className="text-primary-900" strokeWidth={1.5} />}
+            icon={<Bell className="text-primary dark:text-primary-400" strokeWidth={1.5} />}
             title={t('predictiveAlerts.title')}
             description={t('predictiveAlerts.description')}
           />
 
           <Feature
-            icon={<Clock className="text-primary-900" strokeWidth={1.5} />}
+            icon={<Clock className="text-primary dark:text-primary-400" strokeWidth={1.5} />}
             title={t('timeSaving.title')}
             description={t('timeSaving.description')}
           />
 
           <Feature
-            icon={<Tablet className="text-primary-900" strokeWidth={1.5} />}
+            icon={<Tablet className="text-primary dark:text-primary-400" strokeWidth={1.5} />}
             title={t('compatibility.title')}
             description={t('compatibility.description')}
           />

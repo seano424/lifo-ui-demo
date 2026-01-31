@@ -13,7 +13,7 @@ const buttonVariants = cva(
       variant: {
         // Enhanced variants using new color palettes
         default:
-          'bg-primary-900 text-white hover:bg-primary-800 dark:bg-primary-700 dark:hover:bg-primary-600',
+          'bg-primary-900 text-white hover:bg-primary-800 dark:bg-primary-900/80 dark:hover:bg-primary-900',
         destructive:
           'bg-destructive text-destructive-foreground shadow-xs hover:bg-destructive/90 dark:bg-destructive dark:hover:bg-destructive',
         subtleDestructive: 'bg-destructive text-destructive shadow-xs hover:bg-destructive',
@@ -38,7 +38,7 @@ const buttonVariants = cva(
         brandSecondaryOutline:
           'border border-brand-secondary bg-background shadow-xs hover:bg-secondary-50 hover:text-brand-secondary dark:hover:bg-secondary-900/10 dark:hover:text-secondary-300',
         black: 'bg-black text-white hover:bg-black/90',
-        gray: 'bg-gray-50 hover:bg-gray-50/90',
+        gray: 'bg-gray-50 hover:bg-gray-50/90 dark:bg-gray-900 dark:hover:bg-gray-900/90',
         subtleGray: 'bg-gray-100 text-gray-900 hover:bg-gray-200',
         white: 'bg-white text-primary-800 hover:bg-white/90',
       },

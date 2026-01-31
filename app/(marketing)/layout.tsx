@@ -14,17 +14,10 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
       </Suspense>
       <CookieConsentBanner />
       <div className="relative">
-        {/* <div className='absolute inset-0 -z-10 mask-[linear-gradient(to_bottom,black_10%,transparent)]'>
-
-          <Image src="/images/bg.svg" alt="Background" fill className='object-cover rotate-180 scale-x-[-1]' />
-        </div> */}
-
         <div className="py-6 px-4 absolute top-0 left-0 right-0 z-50 flex flex-col justify-center">
           <MarketingNav />
         </div>
-
-        <div>{children}</div>
-
+        <main>{children}</main>
         <MarketingFooter />
       </div>
     </PostHogProvider>

@@ -704,7 +704,7 @@ export function AddEmployeeDialog({
                       {isCheckingUsername ? (
                         <div className="w-4 h-4 border-2 border-gray-300 border-t-primary rounded-full animate-spin" />
                       ) : usernameAvailable === true ? (
-                        <Check className="w-4 h-4 text-primary-800" />
+                        <Check className="w-4 h-4 text-primary-800 dark:text-primary-200" />
                       ) : usernameAvailable === false ? (
                         <AlertTriangle className="w-4 h-4 text-destructive" />
                       ) : null}
@@ -714,7 +714,9 @@ export function AddEmployeeDialog({
                     {usernameAvailable === false ? (
                       <span className="text-destructive">{t('form.usernameTaken')}</span>
                     ) : usernameAvailable === true ? (
-                      <span className="text-primary-800">{t('form.usernameAvailable')}</span>
+                      <span className="text-primary-800 dark:text-primary-200">
+                        {t('form.usernameAvailable')}
+                      </span>
                     ) : (
                       t('form.usernameNote')
                     )}
@@ -836,9 +838,9 @@ export function AddEmployeeDialog({
         ) : step === 'credentials' ? (
           <>
             <DialogHeader>
-              <DialogTitle className="flex items-center gap-2 text-primary-800">
+              <DialogTitle className="flex items-center gap-2 text-primary-800 dark:text-primary-200">
                 <div className="text-center flex flex-col items-center gap-2">
-                  <Check className="w-10 h-10 text-secondary-900 stroke-5 border-2 border-secondary-900 rounded-full p-[3px] bg-primary-100" />
+                  <Check className="w-10 h-10 text-secondary-900 dark:text-secondary-100 stroke-5 border-2 border-secondary-900 dark:border-secondary-100 rounded-full p-[3px] bg-primary-100 dark:bg-primary-900/40" />
                   <Typography variant="h1">{t('success.title')}</Typography>
                 </div>
               </DialogTitle>
@@ -849,7 +851,7 @@ export function AddEmployeeDialog({
               </DialogDescription> */}
             </DialogHeader>
 
-            <div className="flex flex-col gap-4 text-primary-800 text-center">
+            <div className="flex flex-col gap-4 text-primary-800 dark:text-primary-200 text-center">
               {/* Email Status Alert */}
               <Alert>
                 {emailStatus.sending ? (
@@ -895,7 +897,7 @@ export function AddEmployeeDialog({
         ) : (
           <>
             <DialogHeader>
-              <DialogTitle className="flex items-center gap-2 text-primary-800">
+              <DialogTitle className="flex items-center gap-2 text-primary-800 dark:text-primary-200">
                 <Check className="w-5 h-5" />
                 Invitation Sent Successfully
               </DialogTitle>

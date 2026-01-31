@@ -67,7 +67,7 @@ function MockDashboard() {
           <Typography variant="p" color="primary">
             {t('inventoryOverview')}
           </Typography>
-          <TrendingUp size={20} className="text-primary-800" />
+          <TrendingUp size={20} className="text-primary-800 dark:text-primary-200" />
         </div>
         <div className="flex flex-col justify-between gap-2">
           <Typography variant="h3" color="primary">
@@ -198,7 +198,7 @@ function MockAI() {
     <div className="w-full flex flex-col gap-6">
       <div className="bg-linear-to-br from-primary-50 to-secondary-50 rounded-2xl p-6 border border-primary-100">
         <div className="flex items-center gap-3 mb-4">
-          <Bot size={24} className="text-primary-800" />
+          <Bot size={24} className="text-primary-800 dark:text-primary-200" />
           <Typography variant="h4">{t('title')}</Typography>
         </div>
         <div className="flex flex-col gap-6">
@@ -320,7 +320,7 @@ export default function FeaturesPage() {
                 key={feature.title}
                 className="group p-6 rounded-3xl bg-card/90 backdrop-blur-sm border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300"
               >
-                <div className="w-12 h-12 rounded-2xl bg-linear-to-br from-primary-100 to-secondary-100 flex items-center justify-center text-primary-800 mb-4 group-hover:scale-110 transition-transform duration-300">
+                <div className="w-12 h-12 rounded-2xl bg-linear-to-br from-primary-100 to-secondary-100 dark:from-primary-900/50 dark:to-secondary-900/50 flex items-center justify-center text-primary-800 dark:text-primary-200 mb-4 group-hover:scale-110 transition-transform duration-300">
                   {feature.icon}
                 </div>
                 <div className="flex flex-col gap-1">

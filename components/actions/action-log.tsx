@@ -16,15 +16,15 @@ import { sampleActionLog } from '@/lib/sample-data'
 const getActionColor = (action: string) => {
   switch (action) {
     case 'sold':
-      return 'bg-primary-100 text-primary-800 border-primary-200'
+      return 'bg-primary-100 dark:bg-primary-900/40 text-primary-800 dark:text-primary-300 border-primary-200 dark:border-primary-700'
     case 'discounted':
-      return 'bg-blue-100 text-blue-800 border-blue-200'
+      return 'bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-300 border-blue-200 dark:border-blue-700'
     case 'donated':
-      return 'bg-purple-100 text-purple-800 border-purple-200'
+      return 'bg-purple-100 dark:bg-purple-900/40 text-purple-800 dark:text-purple-300 border-purple-200 dark:border-purple-700'
     case 'expired':
       return 'bg-destructive text-destructive border-destructive'
     default:
-      return 'bg-gray-100 text-gray-800 border-gray-200'
+      return 'bg-gray-100 dark:bg-gray-800/60 text-gray-800 dark:text-gray-200 border-gray-200 dark:border-gray-600'
   }
 }
 

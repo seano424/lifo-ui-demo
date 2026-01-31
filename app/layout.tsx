@@ -74,9 +74,8 @@ export default async function RootLayout({
       <body className={`font-sans antialiased`}>
         <ThemeProvider
           attribute="class"
-          defaultTheme="light"
-          forcedTheme="light"
-          enableSystem={false}
+          defaultTheme="system"
+          enableSystem={true}
           disableTransitionOnChange
         >
           <ReactQueryProvider>
@@ -90,7 +89,6 @@ export default async function RootLayout({
           <Toaster
             position="top-right"
             richColors
-            theme="light"
             className="toaster"
             closeButton
             closeOnClickOutside

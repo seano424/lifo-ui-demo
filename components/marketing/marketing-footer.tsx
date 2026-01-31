@@ -1,6 +1,6 @@
 'use client'
 
-// import { CompactThemeSwitcher } from '@/components/compact-theme-switcher'
+import { CompactThemeSwitcher } from '@/components/compact-theme-switcher'
 import { LanguageSwitcher } from '@/components/ui/language-switcher'
 import { Logo } from '@/components/ui/logo'
 import { Typography } from '@/components/ui/typography'
@@ -93,7 +93,7 @@ export function MarketingFooter() {
                   <Linkedin size={16} />
                 </a>
                 <div className="flex items-center gap-2">
-                  {/* <CompactThemeSwitcher /> */}
+                  <CompactThemeSwitcher />
                   <LanguageSwitcher />
                 </div>
               </div>
