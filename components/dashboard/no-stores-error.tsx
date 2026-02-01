@@ -36,7 +36,7 @@ export function NoStoresError({
               <div className="rounded-full bg-destructive/20 dark:bg-destructive/30 p-2.5 sm:p-3.5">
                 <AlertTriangle className="h-7 w-7 sm:h-8 sm:w-8 text-destructive" />
               </div>
-              <Typography variant="h3" className="text-lg sm:text-2xl font-bold text-destructive">
+              <Typography variant="h3" className="text-lg sm:text-2xl  text-destructive">
                 {t('noStores.title')}
               </Typography>
             </div>
@@ -51,7 +51,7 @@ export function NoStoresError({
                 <div>
                   <Typography
                     variant="p"
-                    className="text-xs sm:text-lg font-bold text-primary-800 dark:text-primary-200"
+                    className="text-xs sm:text-lg  text-primary-800 dark:text-primary-200"
                   >
                     {t('noStores.tip.title')}
                   </Typography>

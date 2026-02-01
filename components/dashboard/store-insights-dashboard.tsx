@@ -79,7 +79,7 @@ export function StoreInsightsDashboard({ storeId: propStoreId }: StoreInsightsDa
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between flex-col sm:flex-row gap-4 text-center sm:text-left">
         <div className="flex flex-col gap-2">
-          <Typography variant="h4" className="font-bold">
+          <Typography variant="h4" className="">
             {t('title')}
           </Typography>
           <Typography variant="p" className="text-muted-foreground dark:text-secondary-50">

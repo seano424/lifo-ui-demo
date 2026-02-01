@@ -78,7 +78,7 @@ export function DeliverySummary({
               {totalProducts} product{totalProducts !== 1 ? 's' : ''} • {totalUnits} units
             </Typography>
           </div>
-          <Badge variant="secondary" className="text-base font-bold px-3 py-1">
+          <Badge variant="secondary" className="text-base  px-3 py-1">
             {totalUnits}
           </Badge>
         </div>
@@ -118,7 +118,7 @@ export function DeliverySummary({
           size="lg"
           onClick={onSubmit}
           disabled={isSubmitting || !hasItems}
-          className="w-full min-h-[44px] font-semibold"
+          className="w-full min-h-[44px] "
         >
           {isSubmitting ? (
             <>

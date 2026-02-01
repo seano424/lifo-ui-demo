@@ -69,7 +69,7 @@ function SortableHeader({ field, children, currentSort, onSort, className }: Sor
     <TableHead className={className}>
       <Button
         variant="ghost"
-        className="h-auto p-0 font-semibold hover:bg-transparent"
+        className="h-auto p-0  hover:bg-transparent"
         onClick={() => onSort(field)}
       >
         <div className="flex items-center">

@@ -261,7 +261,7 @@ export function AddStoreDetailsStep({ onSubmit, isSubmitting = false }: AddStore
                   {t('buttons.back')}
                 </Button>
               )}
-              <Button type="submit" className="w-full mx-auto font-bold" disabled={isSubmitting}>
+              <Button type="submit" className="w-full mx-auto " disabled={isSubmitting}>
                 {isSubmitting ? t('buttons.creating') : t('buttons.create')}
               </Button>
             </div>

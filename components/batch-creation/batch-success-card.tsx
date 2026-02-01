@@ -81,7 +81,7 @@ export function BatchSuccessCard({
               <div className="flex items-start gap-2">
                 <AlertCircle className="h-5 w-5 text-secondary-600 dark:text-secondary-400 shrink-0 mt-0.5" />
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-secondary-900 dark:text-secondary-100">
+                  <p className="text-sm  text-secondary-900 dark:text-secondary-100">
                     {result.remaining_draft_quantity} units still need expiry date
                   </p>
                   <p className="text-xs text-secondary-700 dark:text-secondary-300 mt-1">
@@ -111,7 +111,7 @@ export function BatchSuccessCard({
                   onClick={onAddAnother}
                   className={cn(
                     'w-full min-h-[44px]',
-                    'font-semibold',
+                    '',
                     result.was_split &&
                       'bg-secondary-600 hover:bg-secondary-700 dark:bg-secondary-700',
                   )}
@@ -128,7 +128,7 @@ export function BatchSuccessCard({
                   variant="outline"
                   size="lg"
                   onClick={onSkip}
-                  className="w-full min-h-[44px] font-medium"
+                  className="w-full min-h-[44px] "
                 >
                   Skip to Next Product
                 </Button>

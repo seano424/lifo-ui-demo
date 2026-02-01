@@ -81,7 +81,7 @@ const InputSlider = React.forwardRef<HTMLDivElement, InputSliderProps>(
                   value={value}
                   onChange={handleInputChange}
                   className={cn(
-                    'h-12 font-bold text-xl px-4 border rounded-2xl',
+                    'h-12  text-xl px-4 border rounded-2xl',
                     'focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary',
                     'bg-background border-border',
                     isPercentage &&

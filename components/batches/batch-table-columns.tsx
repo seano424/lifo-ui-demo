@@ -148,7 +148,7 @@ export function createBatchTableColumns({
       ),
       cell: ({ row }) => (
         <div className={alignments.product_name.cellClass}>
-          <div className="truncate font-medium" title={row.original.products?.name}>
+          <div className="truncate " title={row.original.products?.name}>
             {row.original.products?.name}
           </div>
           <div
@@ -256,9 +256,7 @@ export function createBatchTableColumns({
     {
       id: 'location',
       header: () => (
-        <div
-          className={`flex font-heading font-semibold items-center ${alignments.location.headerClass}`}
-        >
+        <div className={`flex font-heading  items-center ${alignments.location.headerClass}`}>
           {t('headers.location')}
         </div>
       ),

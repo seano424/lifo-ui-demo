@@ -328,7 +328,7 @@ export default function BarcodeScanner({
       <div className="flex items-center gap-2 flex-col justify-center">
         <div className="flex items-center gap-2">
           <Scan className="w-6 h-6  text-secondary-900 stroke-5 border-2 border-secondary-900 rounded-full p-[3px] bg-primary-100" />
-          <Typography variant="h3" className="text-primary-800 font-black">
+          <Typography variant="h3" className="text-primary-800 ">
             {displayTitle}
           </Typography>
         </div>

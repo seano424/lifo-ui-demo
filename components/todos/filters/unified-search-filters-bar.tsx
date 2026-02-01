@@ -215,7 +215,7 @@ export function UnifiedSearchFiltersBar({
             <Button
               variant="subtleTertiary"
               onClick={onFiltersClick}
-              className="flex items-center gap-2 h-12 px-4 font-semibold"
+              className="flex items-center gap-2 h-12 px-4 "
             >
               <Filter className="w-4 h-4" />
               {t('filters.filtersTitle')}
@@ -223,7 +223,7 @@ export function UnifiedSearchFiltersBar({
             <Button
               variant="subtleTertiary"
               onClick={onSortClick}
-              className="flex items-center gap-2 h-12 px-4 font-semibold"
+              className="flex items-center gap-2 h-12 px-4 "
             >
               <ArrowUpDown className="w-4 h-4" />
               {t('filters.sortTitle')}

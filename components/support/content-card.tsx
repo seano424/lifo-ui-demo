@@ -68,7 +68,7 @@ export function ContentCard({
                     key={feature.title}
                     className="flex flex-col gap-1 flex gap-2 items-center mt-2"
                   >
-                    <Typography variant="h4" className="text-sm font-semibold">
+                    <Typography variant="h4" className="text-sm ">
                       {feature.title}
                     </Typography>
                     <Typography variant="p" className="text-xs text-muted-foreground">

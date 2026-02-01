@@ -31,7 +31,7 @@ export function BatchTableSkeleton() {
               style={{ width: column.width }}
             >
               <div
-                className={`flex font-heading font-semibold items-center gap-1 ${column.align === 'right' ? 'justify-end' : ''}`}
+                className={`flex font-heading  items-center gap-1 ${column.align === 'right' ? 'justify-end' : ''}`}
               >
                 <span className="text-sm text-foreground">{t(column.headerKey)}</span>
                 {column.sortable !== false && <ArrowUpDownIcon className="h-3.5 w-3.5" />}

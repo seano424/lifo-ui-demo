@@ -56,7 +56,7 @@ export default function OCRFrameQualityIndicator({
       {/* Header */}
       <div className="flex items-center gap-2 border-b border-white/20 pb-2">
         <Camera className="w-4 h-4" />
-        <span className="font-semibold">
+        <span className="">
           Auto-Scan {attemptCount}/{maxAttempts}
         </span>
       </div>
@@ -120,7 +120,7 @@ export default function OCRFrameQualityIndicator({
 
       {/* Raw Frame Analysis Data */}
       <div className="pt-2 border-t border-white/20 text-[10px] opacity-60 space-y-0.5">
-        <div className="font-semibold opacity-80 mb-1">Frame Analysis:</div>
+        <div className=" opacity-80 mb-1">Frame Analysis:</div>
         <div>textConfidence: {analysis.textConfidence.toFixed(4)}</div>
         <div>datePatternConfidence: {analysis.datePatternConfidence.toFixed(4)}</div>
         <div>hasDateContext: {analysis.hasDateContext ? 'true' : 'false'}</div>
@@ -144,12 +144,12 @@ export default function OCRFrameQualityIndicator({
           <span className="text-xs opacity-75">
             {t('ocrFrameQuality.quality', { defaultValue: 'Quality' })}
           </span>
-          <span className="font-bold">{Math.round(analysis.overallScore * 100)}%</span>
+          <span className="">{Math.round(analysis.overallScore * 100)}%</span>
         </div>
 
         {/* Ready Indicator */}
         {analysis.shouldTriggerOCR ? (
-          <div className="mt-2 flex items-center gap-1.5 text-primary-400 font-semibold animate-pulse">
+          <div className="mt-2 flex items-center gap-1.5 text-primary-400  animate-pulse">
             <Camera className="w-3.5 h-3.5" />
             <span>
               {t('ocrFrameQuality.readyToScan', {

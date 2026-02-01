@@ -76,7 +76,7 @@ export default function OCRResultDisplay({
         {hasWarning && <AlertCircle className="w-5 h-5 text-yellow-600 dark:text-primary" />}
         {hasInfo && <Info className="w-5 h-5 text-blue-600 dark:text-blue-400" />}
 
-        <span className="font-semibold text-sm">
+        <span className=" text-sm">
           {isSuccess && t('result.success', { defaultValue: 'Date Detected' })}
           {hasWarning && t('result.warning', { defaultValue: 'Date Needs Review' })}
           {hasInfo && t('result.info', { defaultValue: 'Text Detected' })}
@@ -89,9 +89,7 @@ export default function OCRResultDisplay({
           <div className="text-xs text-foreground dark:text-foreground mb-1">
             {t('result.expiryDate', { defaultValue: 'Expiry Date' })}
           </div>
-          <div className="text-2xl font-bold text-foreground dark:text-foreground">
-            {europeanDate}
-          </div>
+          <div className="text-2xl  text-foreground dark:text-foreground">{europeanDate}</div>
         </div>
       )}
 
@@ -102,7 +100,7 @@ export default function OCRResultDisplay({
             {t('result.batchNumber', { defaultValue: 'Batch/Lot Number' })}
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-lg font-mono font-semibold text-foreground dark:text-foreground">
+            <span className="text-lg font-mono  text-foreground dark:text-foreground">
               {batchNumber}
             </span>
             {batchConfidence !== undefined && (
@@ -137,7 +135,7 @@ export default function OCRResultDisplay({
                 style={{ width: `${Math.round(confidence * 100)}%` }}
               />
             </div>
-            <span className="text-sm font-semibold text-foreground dark:text-foreground min-w-[3rem] text-right">
+            <span className="text-sm  text-foreground dark:text-foreground min-w-[3rem] text-right">
               {Math.round(confidence * 100)}%
             </span>
           </div>
@@ -147,9 +145,7 @@ export default function OCRResultDisplay({
       {/* Validation Message */}
       {showValidation && validation && !validation.valid && (
         <div className="text-sm text-yellow-700 dark:text-yellow-400 bg-yellow-100 dark:bg-yellow-900/30 rounded p-2">
-          <span className="font-semibold">
-            {t('result.validationWarning', { defaultValue: 'Warning:' })}{' '}
-          </span>
+          <span className="">{t('result.validationWarning', { defaultValue: 'Warning:' })} </span>
           {validation.reason}
         </div>
       )}
@@ -157,9 +153,7 @@ export default function OCRResultDisplay({
       {/* Alternative date suggestion from raw text */}
       {rawParsed?.isoDate && rawParsed.isoDate !== extractedDate && (
         <div className="text-sm text-blue-700 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/30 rounded p-2">
-          <span className="font-semibold">
-            {t('result.alternativeDate', { defaultValue: 'Alternative:' })}{' '}
-          </span>
+          <span className="">{t('result.alternativeDate', { defaultValue: 'Alternative:' })} </span>
           {rawParsed.europeanDate}
           {rawParsed.validationError && ` (${rawParsed.validationError})`}
         </div>
@@ -218,7 +212,7 @@ export function OCRResultCompact({
         <AlertCircle className="w-4 h-4" />
       )}
 
-      <span className="font-semibold">{europeanDate}</span>
+      <span className="">{europeanDate}</span>
 
       {confidence !== undefined && (
         <span className="text-xs opacity-75">({Math.round(confidence * 100)}%)</span>

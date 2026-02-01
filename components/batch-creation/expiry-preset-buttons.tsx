@@ -69,7 +69,7 @@ export function ExpiryPresetButtons({
               className={cn(
                 // 44px minimum tap target
                 'min-h-[44px] relative',
-                'font-semibold text-base',
+                ' text-base',
                 'transition-all duration-200',
                 isSelected && 'ring-2 ring-primary-600 ring-offset-2 dark:ring-offset-gray-900',
                 isSuggested && !isSelected && 'border-2 border-primary-600 dark:border-primary-500',
@@ -95,7 +95,7 @@ export function ExpiryPresetButtons({
           'w-full min-h-[44px]',
           'border-2 border-dashed border-gray-300 dark:border-gray-600',
           'hover:border-gray-400 dark:hover:border-gray-500',
-          'font-medium',
+          '',
         )}
       >
         <Calendar className="h-5 w-5 mr-2" />
@@ -106,7 +106,7 @@ export function ExpiryPresetButtons({
       {selectedDays !== null && selectedDays !== undefined && (
         <div className="text-center flex flex-col gap-1">
           <p className="text-sm text-foreground dark:text-foreground">Expiry date</p>
-          <p className="text-lg font-semibold text-foreground dark:text-foreground">
+          <p className="text-lg  text-foreground dark:text-foreground">
             {formatDate(calculateDate(selectedDays))}
           </p>
         </div>

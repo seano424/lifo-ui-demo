@@ -36,7 +36,7 @@ export function ProductModal({ isOpen, onClose, product }: ProductModalProps) {
       onClose={onClose}
       titleElement={
         <div className="flex flex-col gap-2 py-4">
-          <Typography className="font-black" variant="h3">
+          <Typography className="" variant="h3">
             {product.name || t('unnamedProduct')}
           </Typography>
         </div>

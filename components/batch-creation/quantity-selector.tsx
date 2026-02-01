@@ -81,7 +81,7 @@ export function QuantitySelector({
       >
         <span
           className={cn(
-            'text-2xl font-bold tabular-nums',
+            'text-2xl  tabular-nums',
             'text-foreground dark:text-foreground',
             disabled && 'opacity-50',
           )}

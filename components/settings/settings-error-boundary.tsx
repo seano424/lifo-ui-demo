@@ -51,7 +51,7 @@ export function SettingsError({
     <div className="max-w-2xl mx-auto py-12">
       <Alert variant="destructive" className="mb-6">
         <AlertCircle className="h-5 w-5" />
-        <AlertTitle className="text-lg font-semibold">{displayTitle}</AlertTitle>
+        <AlertTitle className="text-lg ">{displayTitle}</AlertTitle>
         <AlertDescription className="text-base mt-2">{displayMessage}</AlertDescription>
       </Alert>
 

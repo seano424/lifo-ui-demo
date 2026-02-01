@@ -625,14 +625,14 @@ export default function ManualBarcodeEntry({
                           barcodeStockStatus.hasStock ? (
                             <div className="flex justify-center items-center gap-2">
                               <Check className="w-6 h-6 text-secondary-900 stroke-5 border-2 border-secondary-900 rounded-full p-[3px] bg-primary-100" />
-                              <Typography variant="h3" className="text-primary-800 font-black">
+                              <Typography variant="h3" className="text-primary-800 ">
                                 {t('productFound')}
                               </Typography>
                             </div>
                           ) : (
                             <div className="flex justify-center items-center gap-2">
                               <AlertCircle className="w-6 h-6 text-destructive" />
-                              <Typography variant="h3" className="text-destructive font-black">
+                              <Typography variant="h3" className="text-destructive ">
                                 {t('outOfStock')}
                               </Typography>
                             </div>
@@ -640,7 +640,7 @@ export default function ManualBarcodeEntry({
                         ) : (
                           <div className="flex justify-center items-center gap-2">
                             <Check className="w-6 h-6 text-secondary-900 stroke-5 border-2 border-secondary-900 rounded-full p-[3px] bg-primary-100" />
-                            <Typography variant="h3" className="text-primary-800 font-black">
+                            <Typography variant="h3" className="text-primary-800 ">
                               {t('productFound')}
                             </Typography>
                           </div>

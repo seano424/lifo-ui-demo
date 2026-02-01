@@ -708,7 +708,7 @@ export default function StoreInformation({
 
             {permissions.canEditAdvancedSettings && (
               <div className="flex flex-col gap-4">
-                <Typography variant="h4" className="font-black">
+                <Typography variant="h4" className="">
                   {t('storeInformation.sections.businessSettings')}
                 </Typography>
 

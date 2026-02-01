@@ -351,8 +351,8 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                 <AlertTitle
                   className={
                     validationResult.has_validation_errors
-                      ? 'text-destructive font-semibold'
-                      : 'text-primary-800 font-semibold'
+                      ? 'text-destructive '
+                      : 'text-primary-800 '
                   }
                 >
                   {validationResult.has_validation_errors

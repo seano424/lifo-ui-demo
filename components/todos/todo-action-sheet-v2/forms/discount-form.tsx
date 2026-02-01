@@ -91,7 +91,7 @@ export function DiscountForm({ batch, currencySymbol, isLoading, onConfirm }: Di
           </div>
           <div className="flex justify-between items-center">
             <span className="text-sm  text-black">New price</span>
-            <span className="text-lg font-semibold text-black">
+            <span className="text-lg  text-black">
               {currencySymbol}
               {newPrice.toFixed(2)}
             </span>

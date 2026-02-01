@@ -12,7 +12,7 @@ export function CreateAccountStep() {
     <div className="flex flex-col gap-6">
       <div className="flex items-center gap-3">
         <CheckCircle2 className="h-8 w-8 text-primary" />
-        <Typography variant="h2" className="font-bold">
+        <Typography variant="h2" className="">
           {t('steps.createAccount.title')}
         </Typography>
       </div>

@@ -162,9 +162,7 @@ export function UnifiedFiltersModal({
       onClose={onClose}
       variant="fullHeight"
       titleElement={
-        <div
-          className={`flex items-center ${isMobile ? 'px-6' : 'px-8'} gap-2 text-primary font-bold`}
-        >
+        <div className={`flex items-center ${isMobile ? 'px-6' : 'px-8'} gap-2 text-primary `}>
           <Filter className="w-5 h-5" />
           {t('filters.filtersTitle')}
         </div>

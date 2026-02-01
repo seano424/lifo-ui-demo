@@ -15,25 +15,17 @@ export function NotificationCount({
 }: NotificationCountProps) {
   if (count <= 0) return null
 
-  const baseClasses = 'flex items-center justify-center rounded-full text-xs  text-white'
+  const baseClasses = 'flex items-center justify-center rounded text-xs text-white aspect-square'
 
   const variantClasses = {
-    sidebar: 'h-6 w-6 bg-secondary-900',
-    navbar: 'min-h-7 min-w-7 bg-secondary-900 border border-white p-1 text-[10px]  shadow-lg',
-    default: 'h-6 w-6 bg-secondary-900',
+    sidebar: 'min-w-6 bg-secondary-900/10 text-foreground',
+    navbar:
+      'min-w-7 bg-secondary-900/10 text-foreground border border-white px-1 text-[10px] shadow-lg',
+    default: 'min-w-6 bg-secondary-900/10 text-foreground',
   }
 
   return (
-    <span
-      className={cn(
-        baseClasses,
-        variantClasses[variant],
-        count > 9 && variant === 'sidebar' && 'w-6 h-6', // Make wider for double digits in sidebar
-        count > 9 && variant === 'navbar' && 'px-2', // Add more padding for double digits in navbar
-        count > 99 && 'min-h-7 min-w-7', // Add more padding for triple digits in navbar
-        className,
-      )}
-    >
+    <span className={cn(baseClasses, variantClasses[variant], className)}>
       {count > 99 ? '99+' : count}
     </span>
   )

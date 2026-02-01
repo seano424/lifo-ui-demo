@@ -43,7 +43,7 @@ export default function DashboardInsetHeader({
         </div>
       ) : (
         <div className="flex flex-col gap-2">
-          <Typography variant="h3" className="font-medium">
+          <Typography variant="h3" className="">
             {displayTitle}
           </Typography>
           {displayDescription && (

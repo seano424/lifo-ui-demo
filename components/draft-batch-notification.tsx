@@ -135,7 +135,7 @@ export function DraftBatchNotification({
         href="/dashboard/inventory/new"
         className={cn('inline-flex items-center justify-center', 'relative', className)}
       >
-        <Badge variant="destructive" className="h-5 min-w-5 px-1.5 text-xs font-semibold">
+        <Badge variant="destructive" className="h-5 min-w-5 px-1.5 text-xs ">
           {totalDrafts}
         </Badge>
       </Link>
