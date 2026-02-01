@@ -100,7 +100,10 @@ export function Logo({
     return (
       <Link
         href={href}
-        className={cn('inline-block', withText && 'flex items-center gap-2  font-extrabold')}
+        className={cn(
+          'inline-block',
+          withText && 'flex items-center gap-2  font-extrabold font-heading',
+        )}
       >
         {logoElement}
         <span className={cn(textSizeMap[size])}>{withText && 'lifo'}</span>
@@ -110,7 +113,10 @@ export function Logo({
 
   return (
     <div
-      className={cn('inline-block', withText && 'flex items-center gap-2  text-2xl font-extrabold')}
+      className={cn(
+        'inline-block',
+        withText && 'flex items-center gap-2  text-2xl font-extrabold font-heading',
+      )}
     >
       {logoElement}
       <span className={cn(textSizeMap[size])}>{withText && 'lifo'}</span>
