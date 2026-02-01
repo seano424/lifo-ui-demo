@@ -54,7 +54,7 @@ export function DraftBatchesList({ className, onSelectBatch }: DraftBatchesListP
     return (
       <Card className={cn('border-0 shadow-none', className)}>
         <CardContent className="flex flex-col items-center justify-center py-12">
-          <Clock className="h-8 w-8 animate-spin text-primary-600 mb-4" />
+          <Clock className="h-8 w-8 animate-spin text-primary-800 mb-4" />
           <CardDescription>Loading draft batches...</CardDescription>
         </CardContent>
       </Card>
@@ -77,11 +77,11 @@ export function DraftBatchesList({ className, onSelectBatch }: DraftBatchesListP
   }
 
   return (
-    <div className={cn('space-y-4', className)}>
+    <div className={cn('flex flex-col gap-4', className)}>
       {/* Alert with count */}
-      <Alert className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950 dark:to-orange-950 border-amber-200 dark:border-amber-800">
+      <Alert className="bg-linear-to-r from-amber-50 to-orange-50 dark:from-amber-950 dark:to-orange-950 border-amber-200 dark:border-amber-800">
         <AlertCircle className="h-5 w-5 text-amber-600 dark:text-amber-400" />
-        <AlertTitle className="text-amber-900 dark:text-amber-100 font-semibold">
+        <AlertTitle className="text-amber-900 dark:text-amber-100 ">
           {t('needsExpiryDate', { count })}
         </AlertTitle>
         <AlertDescription className="text-amber-800 dark:text-amber-200 mt-2">
@@ -139,9 +139,7 @@ export function DraftBatchesList({ className, onSelectBatch }: DraftBatchesListP
                     className="cursor-pointer hover:bg-muted/50 transition-colors"
                     onClick={() => onSelectBatch?.(batch)}
                   >
-                    <TableCell className="font-mono font-semibold text-sm">
-                      {batch.batch_number}
-                    </TableCell>
+                    <TableCell className="font-mono  text-sm">{batch.batch_number}</TableCell>
                     <TableCell>
                       <div className="space-y-0.5">
                         <div>{batch.products?.name || 'Unknown Product'}</div>
@@ -177,7 +175,7 @@ export function DraftBatchesList({ className, onSelectBatch }: DraftBatchesListP
                           onSelectBatch?.(batch)
                         }}
                         size="sm"
-                        className="bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary shadow-sm"
+                        className="bg-linear-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary shadow-sm"
                       >
                         <Calendar className="mr-1.5 h-3.5 w-3.5" />
                         Add Date

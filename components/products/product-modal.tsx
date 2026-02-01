@@ -36,9 +36,7 @@ export function ProductModal({ isOpen, onClose, product }: ProductModalProps) {
       onClose={onClose}
       titleElement={
         <div className="flex flex-col gap-2 py-4">
-          <Typography className="font-black" variant="h3">
-            {product.name || t('unnamedProduct')}
-          </Typography>
+          <Typography variant="h3">{product.name || t('unnamedProduct')}</Typography>
         </div>
       }
     >
@@ -93,10 +91,10 @@ export function ProductModal({ isOpen, onClose, product }: ProductModalProps) {
 
             {/* Edit in Square Note */}
             <div className="rounded-2xl px-4 py-8 flex flex-col text-center items-center gap-2">
-              <Typography variant="h4" className="text-destructive font-black">
+              <Typography variant="h4" color="destructive">
                 Edit in Square
               </Typography>
-              <Typography variant="h5" className="max-w-md font-medium">
+              <Typography variant="h5" className="max-w-md">
                 To edit product details, please use your Square dashboard or POS system.
               </Typography>
             </div>

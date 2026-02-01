@@ -57,12 +57,12 @@ const InputSlider = React.forwardRef<HTMLDivElement, InputSliderProps>(
     const progressPercentage = thumbInset + progressRatio * (100 - 2 * thumbInset)
 
     return (
-      <div ref={ref} className={cn('space-y-3', className)} {...props}>
+      <div ref={ref} className={cn('flex flex-col gap-3', className)} {...props}>
         <div className="flex flex-col gap-8">
           {/* Manual Input */}
           <div
             className={cn(
-              'flex-shrink-0 relative items-center flex gap-4',
+              'shrink-0 relative items-center flex gap-4',
               label ? 'justify-between' : 'justify-end',
             )}
           >
@@ -81,7 +81,7 @@ const InputSlider = React.forwardRef<HTMLDivElement, InputSliderProps>(
                   value={value}
                   onChange={handleInputChange}
                   className={cn(
-                    'h-12 font-bold text-xl px-4 border rounded-2xl',
+                    'h-12  text-xl px-4 border rounded-2xl',
                     'focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary',
                     'bg-background border-border',
                     isPercentage &&
@@ -110,7 +110,7 @@ const InputSlider = React.forwardRef<HTMLDivElement, InputSliderProps>(
                 width: `${progressRatio === 1 ? 100 : Math.max(6, progressPercentage)}%`,
               }}
             >
-              <div className="h-8 w-8 flex-shrink-0 rounded-full bg-brand-white shadow-lg border border-border" />
+              <div className="h-8 w-8 shrink-0 rounded-full bg-brand-white shadow-lg border border-border" />
             </div>
             <input
               type="range"

@@ -52,7 +52,7 @@ export function ExpiryPresetButtons({
   }
 
   return (
-    <div className={cn('space-y-4', className)}>
+    <div className={cn('flex flex-col gap-4', className)}>
       {/* Preset Days Grid */}
       <div className="grid grid-cols-3 gap-2">
         {PRESET_DAYS.map(preset => {
@@ -69,7 +69,7 @@ export function ExpiryPresetButtons({
               className={cn(
                 // 44px minimum tap target
                 'min-h-[44px] relative',
-                'font-semibold text-base',
+                ' text-base',
                 'transition-all duration-200',
                 isSelected && 'ring-2 ring-primary-600 ring-offset-2 dark:ring-offset-gray-900',
                 isSuggested && !isSelected && 'border-2 border-primary-600 dark:border-primary-500',
@@ -78,7 +78,7 @@ export function ExpiryPresetButtons({
               {preset.label}
               {/* Suggested indicator */}
               {isSuggested && !isSelected && (
-                <span className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-primary-600 dark:bg-primary-500 ring-2 ring-white dark:ring-gray-900" />
+                <span className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-primary-600 dark:bg-background ring-2 ring-white dark:ring-gray-900" />
               )}
             </Button>
           )
@@ -95,7 +95,7 @@ export function ExpiryPresetButtons({
           'w-full min-h-[44px]',
           'border-2 border-dashed border-gray-300 dark:border-gray-600',
           'hover:border-gray-400 dark:hover:border-gray-500',
-          'font-medium',
+          '',
         )}
       >
         <Calendar className="h-5 w-5 mr-2" />
@@ -104,9 +104,9 @@ export function ExpiryPresetButtons({
 
       {/* Selected Date Display */}
       {selectedDays !== null && selectedDays !== undefined && (
-        <div className="text-center space-y-1">
-          <p className="text-sm text-gray-500 dark:text-gray-400">Expiry date</p>
-          <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+        <div className="text-center flex flex-col gap-1">
+          <p className="text-sm text-foreground dark:text-foreground">Expiry date</p>
+          <p className="text-lg  text-foreground dark:text-foreground">
             {formatDate(calculateDate(selectedDays))}
           </p>
         </div>
@@ -114,8 +114,8 @@ export function ExpiryPresetButtons({
 
       {/* Suggested indicator text */}
       {suggestedDays !== null && suggestedDays !== undefined && (
-        <p className="text-xs text-center text-gray-500 dark:text-gray-400">
-          <span className="inline-block h-2 w-2 rounded-full bg-primary-600 dark:bg-primary-500 mr-1.5" />
+        <p className="text-xs text-center text-foreground dark:text-foreground">
+          <span className="inline-block h-2 w-2 rounded-full bg-primary-600 dark:bg-background mr-1.5" />
           Suggested based on previous deliveries
         </p>
       )}

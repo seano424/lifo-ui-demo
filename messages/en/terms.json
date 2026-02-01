@@ -3,16 +3,16 @@
     "title": "Terms and Conditions",
     "lastUpdated": "Last Updated: October 16, 2025",
     "metadata": {
-      "title": "Terms and Conditions | LIFO",
-      "description": "Terms of Service and Privacy Policy for LIFO food waste management platform"
+      "title": "Terms and Conditions | lifo",
+      "description": "Terms of Service and Privacy Policy for lifo food waste management platform"
     },
     "section1": {
       "title": "1. Acceptance of Terms",
-      "content": "By creating an account and using the LIFO application and website (collectively, the \"Service\"), you agree to be bound by these Terms and Conditions, including our privacy practices described herein. If you do not agree to these terms, please do not use the Service."
+      "content": "By creating an account and using the lifo application and website (collectively, the \"Service\"), you agree to be bound by these Terms and Conditions, including our privacy practices described herein. If you do not agree to these terms, please do not use the Service."
     },
     "section2": {
       "title": "2. Description of Service",
-      "content": "LIFO provides batch-level inventory management software designed to help retail stores track product expiration dates, reduce food waste, and optimize discount and donation decisions through image recognition technology and data analytics."
+      "content": "lifo provides batch-level inventory management software designed to help retail stores track product expiration dates, reduce food waste, and optimize discount and donation decisions through image recognition technology and data analytics."
     },
     "section3": {
       "title": "3. User Accounts",
@@ -111,7 +111,7 @@
       "items": [
         "Use the Service in compliance with all applicable laws and food safety regulations",
         "Ensure accuracy of expiration dates and product information entered",
-        "Verify product safety independently; LIFO recommendations are advisory only",
+        "Verify product safety independently; lifo recommendations are advisory only",
         "Not misuse, disrupt, or attempt to gain unauthorized access to the Service",
         "Not use the Service for any unlawful or fraudulent purpose",
         "Maintain appropriate backup systems for critical business data"
@@ -123,7 +123,7 @@
     },
     "section11": {
       "title": "11. Intellectual Property",
-      "content": "The Service, including its design, features, image recognition technology, and underlying software, is owned by LIFO and protected by intellectual property laws. You may not copy, modify, reverse engineer, or create derivative works from any part of the Service."
+      "content": "The Service, including its design, features, image recognition technology, and underlying software, is owned by lifo and protected by intellectual property laws. You may not copy, modify, reverse engineer, or create derivative works from any part of the Service."
     },
     "section12": {
       "title": "12. Data Security",
@@ -138,7 +138,7 @@
     },
     "section13": {
       "title": "13. Limitation of Liability",
-      "intro": "The Service is provided \"as is\" without warranties of any kind. LIFO is not liable for:",
+      "intro": "The Service is provided \"as is\" without warranties of any kind. lifo is not liable for:",
       "items": [
         "Business decisions made based on Service recommendations",
         "Food safety incidents or regulatory compliance issues",
@@ -189,7 +189,7 @@
       "content": "You have the right to lodge a complaint with your local data protection authority if you believe we have violated GDPR or your privacy rights."
     },
     "finalStatement": {
-      "content": "By using LIFO, you acknowledge that you have read, understood, and agree to be bound by these Terms and Conditions, including our data collection and privacy practices."
+      "content": "By using lifo, you acknowledge that you have read, understood, and agree to be bound by these Terms and Conditions, including our data collection and privacy practices."
     }
   }
 }

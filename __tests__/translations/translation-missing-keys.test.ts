@@ -1,8 +1,9 @@
 import fs from 'node:fs'
 import path from 'node:path'
+import { SUPPORTED_LOCALES } from '@/types/i18n'
 
 describe('Missing Translation Keys', () => {
-  const supportedLocales = ['en', 'fr', 'nl']
+  const supportedLocales = [...SUPPORTED_LOCALES]
 
   // Dynamically discover all translation files
   const getTranslationFiles = (): string[] => {

@@ -11,7 +11,7 @@ export default function ComingSoon({ title, description, children }: ComingSoonP
   return (
     <Card className="text-center border-dashed shadow-primary-300 shadow-xl">
       <CardHeader>
-        <CardTitle className="font-black">{title}</CardTitle>
+        <CardTitle>{title}</CardTitle>
       </CardHeader>
       <CardContent>
         <Typography variant="p" className="text-muted-foreground">

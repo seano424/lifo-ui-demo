@@ -113,15 +113,15 @@ export function StoreSearchStep() {
   const showError = localSearchState === 'error'
 
   return (
-    <div className="mx-auto space-y-6">
-      <div className="text-center space-y-2 flex flex-col items-center">
+    <div className="mx-auto flex flex-col gap-6">
+      <div className="text-center flex flex-col gap-2 flex flex-col items-center">
         <Typography variant="h1">{t('title')}</Typography>
         <Typography variant="p" color="muted">
           {t('subtitle')}
         </Typography>
       </div>
 
-      <div className="space-y-4 relative">
+      <div className="flex flex-col gap-4 relative">
         <Input
           placeholder={t('placeholder')}
           value={searchValue}
@@ -154,7 +154,7 @@ export function StoreSearchStep() {
                 disabled={isLoading}
               >
                 <CardContent className="p-4">
-                  <div className="">{place.structured_formatting.main_text}</div>
+                  <div>{place.structured_formatting.main_text}</div>
                   <div className="text-sm text-muted-foreground">
                     {place.structured_formatting.secondary_text || place.description}
                   </div>
@@ -186,7 +186,7 @@ export function StoreSearchStep() {
 
         {/* No results message */}
         {showNoResults && (
-          <div className="text-center space-y-2">
+          <div className="text-center flex flex-col gap-2">
             <Typography variant="p" color="muted">
               {t('noResultsFound', { query: debouncedSearchValue })}
             </Typography>

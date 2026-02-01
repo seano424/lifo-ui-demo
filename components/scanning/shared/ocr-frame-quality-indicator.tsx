@@ -46,7 +46,7 @@ export default function OCRFrameQualityIndicator({
   return (
     <div
       className={cn(
-        'absolute top-4 right-4 bg-black/80 text-white p-3 rounded-lg text-xs space-y-2 min-w-[180px] backdrop-blur-sm',
+        'absolute top-4 right-4 bg-black/80 text-white p-3 rounded-lg text-xs flex flex-col gap-2 min-w-[180px] backdrop-blur-sm',
         className,
       )}
       role="status"
@@ -56,13 +56,13 @@ export default function OCRFrameQualityIndicator({
       {/* Header */}
       <div className="flex items-center gap-2 border-b border-white/20 pb-2">
         <Camera className="w-4 h-4" />
-        <span className="font-semibold">
+        <span>
           Auto-Scan {attemptCount}/{maxAttempts}
         </span>
       </div>
 
       {/* Quality Indicators */}
-      <div className="space-y-1.5">
+      <div className="flex flex-col gap-1.5">
         {/* Text Detection */}
         <QualityIndicator
           label={t('ocrFrameQuality.textDetected', {
@@ -120,7 +120,7 @@ export default function OCRFrameQualityIndicator({
 
       {/* Raw Frame Analysis Data */}
       <div className="pt-2 border-t border-white/20 text-[10px] opacity-60 space-y-0.5">
-        <div className="font-semibold opacity-80 mb-1">Frame Analysis:</div>
+        <div className=" opacity-80 mb-1">Frame Analysis:</div>
         <div>textConfidence: {analysis.textConfidence.toFixed(4)}</div>
         <div>datePatternConfidence: {analysis.datePatternConfidence.toFixed(4)}</div>
         <div>hasDateContext: {analysis.hasDateContext ? 'true' : 'false'}</div>
@@ -144,12 +144,12 @@ export default function OCRFrameQualityIndicator({
           <span className="text-xs opacity-75">
             {t('ocrFrameQuality.quality', { defaultValue: 'Quality' })}
           </span>
-          <span className="font-bold">{Math.round(analysis.overallScore * 100)}%</span>
+          <span>{Math.round(analysis.overallScore * 100)}%</span>
         </div>
 
         {/* Ready Indicator */}
         {analysis.shouldTriggerOCR ? (
-          <div className="mt-2 flex items-center gap-1.5 text-green-400 font-semibold animate-pulse">
+          <div className="mt-2 flex items-center gap-1.5 text-primary-400  animate-pulse">
             <Camera className="w-3.5 h-3.5" />
             <span>
               {t('ocrFrameQuality.readyToScan', {
@@ -194,15 +194,15 @@ function QualityIndicator({
 function StatusDot({ isGood }: { isGood: boolean }) {
   if (isGood) {
     return (
-      <div className="w-4 h-4 rounded-full bg-green-500/20 flex items-center justify-center">
-        <Check className="w-3 h-3 text-green-400" strokeWidth={3} />
+      <div className="w-4 h-4 rounded-full bg-primary-500/20 flex items-center justify-center">
+        <Check className="w-3 h-3 text-primary-400" strokeWidth={3} />
       </div>
     )
   }
 
   return (
-    <div className="w-4 h-4 rounded-full bg-red-500/20 flex items-center justify-center">
-      <X className="w-3 h-3 text-red-400" strokeWidth={3} />
+    <div className="w-4 h-4 rounded-full bg-destructive/20 flex items-center justify-center">
+      <X className="w-3 h-3 text-destructive" strokeWidth={3} />
     </div>
   )
 }

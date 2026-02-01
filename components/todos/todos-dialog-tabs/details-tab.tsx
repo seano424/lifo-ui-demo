@@ -222,7 +222,7 @@ export function DetailsTab({ selectedBatch, currencySymbol = '€', onClose }: D
       case 'expired':
         return {
           label: t('details.status.expired'),
-          className: 'text-red-600 bg-red-50',
+          className: 'text-destructive bg-red-50',
         }
       case 'expiring_soon':
         return {
@@ -232,17 +232,17 @@ export function DetailsTab({ selectedBatch, currencySymbol = '€', onClose }: D
       case 'fresh':
         return {
           label: t('details.status.fresh'),
-          className: 'text-primary-600 bg-primary-50',
+          className: 'text-primary-800 bg-primary-50',
         }
       default:
-        return { label: status, className: 'text-gray-600 bg-gray-50' }
+        return { label: status, className: 'text-foreground bg-gray-50' }
     }
   }
 
   const statusDisplay = getStatusDisplay(selectedBatch.todo_state || '')
 
   return (
-    <div className="flex flex-col h-full bg-muted dark:bg-brand-dark">
+    <div className="flex flex-col h-full bg-muted dark:bg-background">
       {/* content */}
       <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-primary-100 scrollbar-track-transparent flex flex-col divide-y-4 divide-white dark:divide-gray-800">
         {/* Product Information */}
@@ -284,7 +284,7 @@ export function DetailsTab({ selectedBatch, currencySymbol = '€', onClose }: D
               </div>
             )}
           </div>
-          <div className="bg-white rounded-2xl p-4 space-y-4 dark:bg-brand-dark">
+          <div className="bg-white rounded-2xl p-4 flex flex-col gap-4 dark:bg-background">
             <div className="flex justify-between items-start">
               <Typography variant="p">{t('details.fields.product')}</Typography>
               <Typography variant="p">
@@ -294,7 +294,7 @@ export function DetailsTab({ selectedBatch, currencySymbol = '€', onClose }: D
             </div>
 
             <div className="flex justify-between items-center gap-2 w-full">
-              <Label className="flex-shrink-0" htmlFor="batch-number">
+              <Label className="shrink-0" htmlFor="batch-number">
                 {t('details.fields.batchNumber')}
               </Label>
               {isEditing ? (
@@ -351,7 +351,7 @@ export function DetailsTab({ selectedBatch, currencySymbol = '€', onClose }: D
             </div>
 
             <div className="flex justify-between items-center gap-2 w-full">
-              <Label className="flex-shrink-0" htmlFor="expiry-date">
+              <Label className="shrink-0" htmlFor="expiry-date">
                 {t('details.fields.expiryDate')}
               </Label>
               {isEditing ? (
@@ -376,10 +376,10 @@ export function DetailsTab({ selectedBatch, currencySymbol = '€', onClose }: D
                     className={cn(
                       'text-sm',
                       daysToExpiry < 0
-                        ? 'text-red-600'
+                        ? 'text-destructive'
                         : daysToExpiry <= 7
                           ? 'text-orange-600'
-                          : 'text-primary-600',
+                          : 'text-primary-800',
                     )}
                   >
                     (
@@ -397,9 +397,9 @@ export function DetailsTab({ selectedBatch, currencySymbol = '€', onClose }: D
         {/* Inventory & Pricing */}
         <div className="flex flex-col gap-4 px-8 py-4 flex-1 justify-center">
           <Typography variant="h4">{t('details.inventoryPricing')}</Typography>
-          <div className="bg-white rounded-2xl p-4 space-y-4 dark:bg-brand-dark">
+          <div className="bg-white rounded-2xl p-4 flex flex-col gap-4 dark:bg-background">
             <div className="flex justify-between items-center gap-2 w-full">
-              <Label className="flex-shrink-0" htmlFor="quantity">
+              <Label className="shrink-0" htmlFor="quantity">
                 {t('details.fields.currentQuantity')}
               </Label>
               {isEditing ? (
@@ -417,7 +417,10 @@ export function DetailsTab({ selectedBatch, currencySymbol = '€', onClose }: D
                         current_quantity: Math.max(0, Number(e.target.value) || 0),
                       }))
                     }
-                    className={cn('w-full', editedValues.current_quantity < 0 && 'border-red-500')}
+                    className={cn(
+                      'w-full',
+                      editedValues.current_quantity < 0 && 'border-destructive',
+                    )}
                   />
                 </div>
               ) : (
@@ -426,7 +429,7 @@ export function DetailsTab({ selectedBatch, currencySymbol = '€', onClose }: D
             </div>
 
             <div className="flex justify-between items-center gap-2 w-full">
-              <Label className="flex-shrink-0" htmlFor="cost-price">
+              <Label className="shrink-0" htmlFor="cost-price">
                 {t('details.fields.costPrice')}
               </Label>
               {isEditing ? (
@@ -444,7 +447,7 @@ export function DetailsTab({ selectedBatch, currencySymbol = '€', onClose }: D
                         cost_price: formatCurrencyValue(Math.max(0, Number(e.target.value) || 0)),
                       }))
                     }
-                    className={cn('w-full', editedValues.cost_price < 0 && 'border-red-500')}
+                    className={cn('w-full', editedValues.cost_price < 0 && 'border-destructive')}
                   />
                 </div>
               ) : (
@@ -453,7 +456,7 @@ export function DetailsTab({ selectedBatch, currencySymbol = '€', onClose }: D
             </div>
 
             <div className="flex justify-between items-center gap-2 w-full">
-              <Label className="flex-shrink-0" htmlFor="selling-price">
+              <Label className="shrink-0" htmlFor="selling-price">
                 {t('details.fields.sellingPrice')}
               </Label>
               {isEditing ? (
@@ -473,7 +476,7 @@ export function DetailsTab({ selectedBatch, currencySymbol = '€', onClose }: D
                         ),
                       }))
                     }
-                    className={cn('w-full', editedValues.selling_price < 0 && 'border-red-500')}
+                    className={cn('w-full', editedValues.selling_price < 0 && 'border-destructive')}
                   />
                 </div>
               ) : (
@@ -515,7 +518,7 @@ export function DetailsTab({ selectedBatch, currencySymbol = '€', onClose }: D
         {/* Action History */}
         <div className="flex flex-col gap-4 px-8 py-4 flex-1 justify-center">
           <Typography variant="h4">{t('details.actionHistory')}</Typography>
-          <div className="bg-white rounded-2xl p-4 space-y-3 dark:bg-brand-dark">
+          <div className="bg-white rounded-2xl p-4 flex flex-col gap-3 dark:bg-background">
             {selectedBatch.last_action_type ? (
               <>
                 <Typography variant="p" className="flex justify-between capitalize">
@@ -539,7 +542,7 @@ export function DetailsTab({ selectedBatch, currencySymbol = '€', onClose }: D
               </Typography>
             )}
 
-            <div className="border-t pt-3 space-y-2">
+            <div className="border-t pt-3 flex flex-col gap-2">
               <Typography variant="p" className="uppercase">
                 {t('details.totalActions')}
               </Typography>
@@ -577,7 +580,7 @@ export function DetailsTab({ selectedBatch, currencySymbol = '€', onClose }: D
         {selectedBatch.ai_recommendation && (
           <div className="flex flex-col gap-4 px-8 py-4 flex-1 justify-center">
             <Typography variant="h4">{t('details.aiInsights')}</Typography>
-            <div className="bg-white rounded-2xl p-4 space-y-3 dark:bg-brand-dark">
+            <div className="bg-white rounded-2xl p-4 flex flex-col gap-3 dark:bg-background">
               <div className="flex justify-between capitalize">
                 <span>{t('details.recommendation')}</span>
                 <span>
@@ -621,7 +624,7 @@ export function DetailsTab({ selectedBatch, currencySymbol = '€', onClose }: D
       </div>
 
       {/* footer */}
-      <div className="sticky bottom-0 bg-brand-white dark:bg-brand-dark px-8 py-4 flex justify-center border-t border-muted gap-4">
+      <div className="sticky bottom-0 bg-brand-white dark:bg-background px-8 py-4 flex justify-center border-t border-muted gap-4">
         <Button
           size="lg"
           variant={resolvedTheme === 'dark' ? 'default' : 'subtleGray'}

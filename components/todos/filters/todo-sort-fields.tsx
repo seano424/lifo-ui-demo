@@ -54,13 +54,13 @@ export function TodoSortFields({ selectedField, onFieldSelect }: TodoSortFieldsP
               'w-full px-4 py-2.5 flex items-center gap-2 text-left transition-colors',
               'hover:bg-gray-100',
               isSelected && 'bg-violet-50 text-violet-700 ',
-              !isSelected && 'text-gray-700',
+              !isSelected && 'text-foreground',
             )}
           >
-            {Icon && <Icon className="h-4 w-4 flex-shrink-0" />}
+            {Icon && <Icon className="h-4 w-4 shrink-0" />}
             <div className="flex flex-col min-w-0">
               <span className="text-sm truncate">{t(`${translationKey}.label`)}</span>
-              <span className="text-xs text-gray-500 truncate">
+              <span className="text-xs text-foreground truncate">
                 {t(`${translationKey}.description`)}
               </span>
             </div>

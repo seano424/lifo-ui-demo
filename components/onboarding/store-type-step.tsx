@@ -85,7 +85,7 @@ export function StoreTypeStep() {
   }
 
   return (
-    <div className="mx-auto space-y-4">
+    <div className="mx-auto flex flex-col gap-4">
       <StepHeader
         title={isManualEntry ? t('addStoreDetailsTitle') : t('completeStoreInformationTitle')}
       />
@@ -96,7 +96,7 @@ export function StoreTypeStep() {
         </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
               <FormFieldWrapper
                 control={form.control}
                 name="store_name"

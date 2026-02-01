@@ -478,7 +478,7 @@ export default function BaseScanningInterface({ config, callbacks, className }: 
   return (
     <div className={`bg-white min-h-screen flex flex-col gap-4 ${className}`}>
       <div className="w-full">
-        <div className="px-4 space-y-4">
+        <div className="px-4 flex flex-col gap-4">
           {/* Step 1: Barcode Scanning */}
           {logic.state.currentUIStep === 'barcode' && (
             <>
@@ -535,7 +535,7 @@ export default function BaseScanningInterface({ config, callbacks, className }: 
                   {productLookupError && (
                     <Alert variant="destructive" className="border-orange-200 bg-orange-50">
                       <AlertCircle className="h-4 w-4 text-orange-600" />
-                      <AlertTitle className="text-orange-900 font-semibold">
+                      <AlertTitle className="text-orange-900 ">
                         {productLookupError.title}
                       </AlertTitle>
                       <AlertDescription className="text-orange-800">
@@ -581,7 +581,7 @@ export default function BaseScanningInterface({ config, callbacks, className }: 
 
           {/* Step 2: Product Display */}
           {logic.state.currentUIStep === 'product' && logic.scannedProduct && (
-            <div className="space-y-4">
+            <div className="flex flex-col gap-4">
               {/* Auto-advancing to next step */}
               {!logic.isLookingUp && !logic.lookupError && logic.scannedProduct.lookupResult && (
                 <Alert>
@@ -601,7 +601,7 @@ export default function BaseScanningInterface({ config, callbacks, className }: 
 
           {/* Step 3: Processing/Form */}
           {(logic.state.currentUIStep === 'processing' || logic.state.currentUIStep === 'form') && (
-            <div className="space-y-4">
+            <div className="flex flex-col gap-4">
               {/* Product Context */}
               {logic.scannedProduct && (
                 <ProductCard

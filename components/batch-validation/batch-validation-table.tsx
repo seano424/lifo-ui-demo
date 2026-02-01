@@ -69,11 +69,11 @@ export function BatchValidationTable({
   }
 
   return (
-    <div className="space-y-4">
+    <div className="flex flex-col gap-4">
       <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
         <div className="flex flex-col sm:flex-row items-center gap-2">
           <Typography variant="h3">{t('preview.title')}</Typography>
-          <span className="text-sm text-gray-600">
+          <span className="text-sm text-foreground">
             ({startIndex + 1}-{endIndex} of {items.length} items)
           </span>
         </div>
@@ -88,7 +88,7 @@ export function BatchValidationTable({
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
-            <span className="text-xs text-gray-500 min-w-[60px] text-center">
+            <span className="text-xs text-foreground min-w-[60px] text-center">
               Page {currentPage + 1} of {totalPages}
             </span>
             <Button
@@ -154,7 +154,9 @@ export function BatchValidationTable({
                     />
                   </td>
                   <td className="border border-gray-200 p-2">
-                    <div className="text-xs  text-gray-700">{getCategoryLabel(item.Category)}</div>
+                    <div className="text-xs  text-foreground">
+                      {getCategoryLabel(item.Category)}
+                    </div>
                   </td>
                   <td className="border border-gray-200 p-2">
                     <div className="flex items-center justify-center gap-1">
@@ -195,7 +197,7 @@ export function BatchValidationTable({
                       className={cn(
                         'font-mono text-xs h-7 min-w-[80px]',
                         item.Cost_Price < PRICE_CONSTRAINTS.MIN_PRICE &&
-                          'border-red-500 focus:border-red-500',
+                          'border-destructive focus:border-destructive',
                       )}
                       min={PRICE_CONSTRAINTS.MIN_PRICE}
                       max={PRICE_CONSTRAINTS.MAX_PRICE}
@@ -217,7 +219,7 @@ export function BatchValidationTable({
                       className={cn(
                         'font-mono text-xs h-7 min-w-[80px]',
                         item.Selling_Price < PRICE_CONSTRAINTS.MIN_PRICE &&
-                          'border-red-500 focus:border-red-500',
+                          'border-destructive focus:border-destructive',
                       )}
                       min={PRICE_CONSTRAINTS.MIN_PRICE}
                       max={PRICE_CONSTRAINTS.MAX_PRICE}
@@ -259,12 +261,12 @@ export function BatchValidationTable({
       </div>
 
       {/* Mobile card view */}
-      <div className="md:hidden space-y-3">
+      <div className="md:hidden flex flex-col gap-3">
         {currentItems.map((item, index) => {
           const actualIndex = startIndex + index
           return (
             <div key={actualIndex} className="border border-gray-200 rounded-2xl p-3 bg-white">
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 <div className="flex items-center gap-2">
                   <Input
                     value={item.SKU}
@@ -283,11 +285,11 @@ export function BatchValidationTable({
                   maxLength={255}
                   disabled={disabled}
                 />
-                <div className="text-xs  text-gray-700 bg-gray-50 p-2 rounded-lg">
+                <div className="text-xs  text-foreground bg-gray-50 p-2 rounded-lg">
                   Category: {getCategoryLabel(item.Category)}
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-gray-600">{t('preview.quantityLabel')}</span>
+                  <span className="text-sm text-foreground">{t('preview.quantityLabel')}</span>
                   <div className="flex items-center gap-1">
                     <Button
                       variant="outline"
@@ -313,8 +315,10 @@ export function BatchValidationTable({
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-2">
-                  <div className="space-y-1">
-                    <label className="text-xs  text-gray-700">{t('preview.table.costPrice')}</label>
+                  <div className="flex flex-col gap-1">
+                    <label className="text-xs  text-foreground">
+                      {t('preview.table.costPrice')}
+                    </label>
                     <Input
                       type="number"
                       value={item.Cost_Price.toFixed(2)}
@@ -328,7 +332,7 @@ export function BatchValidationTable({
                       className={cn(
                         'text-sm h-8',
                         item.Cost_Price < PRICE_CONSTRAINTS.MIN_PRICE &&
-                          'border-red-500 focus:border-red-500',
+                          'border-destructive focus:border-destructive',
                       )}
                       min={PRICE_CONSTRAINTS.MIN_PRICE}
                       max={PRICE_CONSTRAINTS.MAX_PRICE}
@@ -336,13 +340,13 @@ export function BatchValidationTable({
                       disabled={disabled}
                     />
                     {item.Cost_Price < PRICE_CONSTRAINTS.MIN_PRICE && (
-                      <span className="text-xs text-red-600">
+                      <span className="text-xs text-destructive">
                         {t('csvUpload.errors.priceTooLow')}
                       </span>
                     )}
                   </div>
-                  <div className="space-y-1">
-                    <label className="text-xs  text-gray-700">
+                  <div className="flex flex-col gap-1">
+                    <label className="text-xs  text-foreground">
                       {t('preview.table.sellingPrice')}
                     </label>
                     <Input
@@ -358,7 +362,7 @@ export function BatchValidationTable({
                       className={cn(
                         'text-sm h-8',
                         item.Selling_Price < PRICE_CONSTRAINTS.MIN_PRICE &&
-                          'border-red-500 focus:border-red-500',
+                          'border-destructive focus:border-destructive',
                       )}
                       min={PRICE_CONSTRAINTS.MIN_PRICE}
                       max={PRICE_CONSTRAINTS.MAX_PRICE}
@@ -366,14 +370,16 @@ export function BatchValidationTable({
                       disabled={disabled}
                     />
                     {item.Selling_Price < PRICE_CONSTRAINTS.MIN_PRICE && (
-                      <span className="text-xs text-red-600">
+                      <span className="text-xs text-destructive">
                         {t('csvUpload.errors.priceTooLow')}
                       </span>
                     )}
                   </div>
                 </div>
-                <div className="space-y-1">
-                  <label className="text-xs  text-gray-700">{t('preview.table.expiryDate')}</label>
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs  text-foreground">
+                    {t('preview.table.expiryDate')}
+                  </label>
                   {item.Expiry_Date ? (
                     <Input
                       type="date"

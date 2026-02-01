@@ -107,9 +107,7 @@ export function DashboardKPICards() {
     <div className="w-full flex flex-col gap-4">
       <div className="flex flex-col gap-6">
         <div className="flex flex-col md:flex-row items-center gap-2 justify-between">
-          <Typography variant="h4" className="font-bold">
-            {t('title')}
-          </Typography>
+          <Typography variant="h4">{t('title')}</Typography>
           <Typography variant="p" className="text-muted-foreground dark:text-secondary-50">
             {t('lastUpdated')} {format.dateTime(new Date(), { dateStyle: 'short' })}
           </Typography>
@@ -186,7 +184,7 @@ export function DashboardKPICards() {
 
       {/* Error state message */}
       {hasAnyError && (
-        <div className="mt-4 p-3 bg-red-500/10 border border-red-500/20 rounded-2xl">
+        <div className="mt-4 p-3 bg-destructive/10 border border-destructive/20 rounded-2xl">
           <p className="text-sm text-white">{t('errorMessage')}</p>
         </div>
       )}

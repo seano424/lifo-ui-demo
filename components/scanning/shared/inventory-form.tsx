@@ -99,24 +99,18 @@ export default function InventoryForm({
         <CardContent className="p-4">
           <div className="flex flex-col items-center text-center mb-3">
             <div className="flex items-center gap-2">
-              <Check className="w-6 h-6 text-secondary-900 stroke-5 border-2 border-secondary-900 rounded-full p-[3px] bg-primary-100" />
-              <Typography variant="h3" className="text-primary-800 font-black">
-                {t('titles.detailsCaptured')}
-              </Typography>
+              <Check className="w-6 h-6 stroke-5 border-2 border-secondary-900 rounded-full p-[3px] bg-primary-100" />
+              <Typography variant="h3">{t('titles.detailsCaptured')}</Typography>
             </div>
-            <Typography variant="h3" className="text-primary-700 font-black">
-              {t('titles.reviewAndSubmit')}
-            </Typography>
+            <Typography variant="h3">{t('titles.reviewAndSubmit')}</Typography>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             {showExpiryDate && (
               <div>
-                <Label className="text-xs">
+                <Label>
                   {finalExpiryDateLabel} {t('labels.editableNote')}{' '}
-                  <span className="text-gray-500">
-                    ({t('labels.optional', { defaultValue: 'Optional' })})
-                  </span>
+                  <span>({t('labels.optional', { defaultValue: 'Optional' })})</span>
                 </Label>
                 <Input
                   type="date"
@@ -129,7 +123,7 @@ export default function InventoryForm({
             )}
             {showQuantity && (
               <div>
-                <Label className="text-xs">{finalQuantityLabel}</Label>
+                <Label>{finalQuantityLabel}</Label>
                 <Input
                   min="0"
                   type="number"
@@ -144,9 +138,9 @@ export default function InventoryForm({
 
           {showPrice && (
             <div className="mt-3">
-              <Label className="text-xs">{finalPriceLabel}</Label>
+              <Label>{finalPriceLabel}</Label>
               <div className="relative">
-                <Euro className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Euro className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-foreground" />
                 <Input
                   min="0"
                   type="number"
@@ -162,7 +156,7 @@ export default function InventoryForm({
 
           {showBatchNumber && (
             <div className="mt-3">
-              <Label className="text-xs">{finalBatchNumberLabel}</Label>
+              <Label>{finalBatchNumberLabel}</Label>
               <Input
                 type="text"
                 value={data.batchNumber || ''}
@@ -180,15 +174,15 @@ export default function InventoryForm({
 
   return (
     <Card className={className}>
-      <CardContent className="p-4 space-y-3">
-        <Label className="">{finalTitle}</Label>
+      <CardContent className="p-4 flex flex-col gap-3">
+        <Label>{finalTitle}</Label>
 
         <div className="grid grid-cols-2 gap-2">
           {showExpiryDate && (
             <div>
-              <Label htmlFor="expiry" className="text-xs">
+              <Label htmlFor="expiry">
                 {finalExpiryDateLabel}{' '}
-                <span className="text-gray-500">
+                <span className="text-foreground">
                   ({t('labels.optional', { defaultValue: 'Optional' })})
                 </span>
               </Label>
@@ -203,9 +197,7 @@ export default function InventoryForm({
           )}
           {showQuantity && (
             <div>
-              <Label htmlFor="quantity" className="text-xs">
-                {finalQuantityLabel}
-              </Label>
+              <Label htmlFor="quantity">{finalQuantityLabel}</Label>
               <Input
                 id="quantity"
                 type="number"
@@ -220,11 +212,9 @@ export default function InventoryForm({
 
         {showPrice && (
           <div>
-            <Label htmlFor="price" className="text-xs">
-              {finalPriceLabel}
-            </Label>
+            <Label htmlFor="price">{finalPriceLabel}</Label>
             <div className="relative">
-              <Euro className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Euro className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-foreground" />
               <Input
                 id="price"
                 type="number"
@@ -241,9 +231,7 @@ export default function InventoryForm({
 
         {showBatchNumber && (
           <div>
-            <Label htmlFor="batchNumber" className="text-xs">
-              {finalBatchNumberLabel}
-            </Label>
+            <Label htmlFor="batchNumber">{finalBatchNumberLabel}</Label>
             <Input
               id="batchNumber"
               type="text"
@@ -260,7 +248,7 @@ export default function InventoryForm({
           <div className="flex gap-2">
             <Button
               onClick={onSubmit}
-              className="flex-1 bg-purple-600 hover:bg-purple-700"
+              className="flex-1"
               disabled={!canSubmit || submitDisabled || disabled}
             >
               {finalSubmitButtonText}

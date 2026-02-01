@@ -2,6 +2,7 @@ import DashboardBreadcrumbs from '@/components/dashboard/dashboard-breadcrumbs'
 import { NotificationBellExpiry } from '@/components/notifications/notification-bell-expiry'
 import { TeamSwitcher } from '@/components/team-switcher'
 import { CompactLanguageSwitcher } from '@/components/ui/compact-language-switcher'
+import { CompactThemeSwitcher } from '@/components/compact-theme-switcher'
 import { Separator } from '@/components/ui/separator'
 import { SidebarTrigger } from '@/components/ui/sidebar'
 import UserButton from '@/components/users/user-button'
@@ -18,6 +19,7 @@ export function DashboardNav() {
       </div>
 
       <div className="flex items-center gap-2">
+        <CompactThemeSwitcher />
         <CompactLanguageSwitcher />
         <NotificationBellExpiry />
         <TeamSwitcher compact />

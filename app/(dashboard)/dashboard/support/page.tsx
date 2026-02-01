@@ -120,19 +120,17 @@ export default function SupportPage() {
       <DashboardInsetHeader title={t('title')} description={t('subtitle')} />
 
       {/* Support Sections */}
-      <div className="space-y-12">
+      <div className="flex flex-col gap-12">
         {sections.map(section => (
-          <div key={section.id} className="space-y-4">
+          <div key={section.id} className="flex flex-col gap-4">
             {/* Section Header */}
             <div className="flex items-start gap-3">
-              <div className="p-2 bg-primary/10 rounded-lg flex-shrink-0">
+              <div className="p-2 bg-primary/10 rounded-lg shrink-0">
                 <section.icon className="h-6 w-6 text-primary" />
               </div>
               <div className="min-w-0 flex flex-col gap-1">
-                <Typography variant="h2" className="text-xl font-semibold">
-                  {section.title}
-                </Typography>
-                <Typography variant="p" color="muted" className="text-sm">
+                <Typography variant="h3">{section.title}</Typography>
+                <Typography variant="p" color="muted">
                   {section.description}
                 </Typography>
               </div>
@@ -145,22 +143,17 @@ export default function SupportPage() {
                   <Card key={article.href} className="h-full opacity-60 cursor-not-allowed">
                     <CardHeader className="pb-3">
                       <div className="flex items-start justify-between gap-2">
-                        <Typography
-                          variant="h3"
-                          className="text-base  leading-tight text-muted-foreground"
-                        >
-                          {article.title}
-                        </Typography>
+                        <Typography variant="h3">{article.title}</Typography>
                         <span className="px-2 py-1 bg-orange-100 text-orange-600 text-xs  rounded-md shrink-0">
                           {t('common.comingSoon')}
                         </span>
                       </div>
                     </CardHeader>
                     <CardContent className="pt-0">
-                      <Typography variant="p" color="muted" className="text-sm mb-3 line-clamp-2">
+                      <Typography variant="p" color="muted">
                         {article.description}
                       </Typography>
-                      <div className="flex items-center gap-1 text-xs text-muted-foreground ">
+                      <div className="flex items-center gap-1">
                         <Clock className="h-3 w-3" />
                         <span>{article.readTime}</span>
                       </div>
@@ -171,10 +164,8 @@ export default function SupportPage() {
                     <Card className="h-full hover:shadow-md transition-shadow duration-200 cursor-pointer">
                       <CardHeader className="pb-3">
                         <div className="flex items-start justify-between gap-2">
-                          <Typography variant="h3" className="text-base  leading-tight">
-                            {article.title}
-                          </Typography>
-                          <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                          <Typography variant="h3">{article.title}</Typography>
+                          <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
                         </div>
                       </CardHeader>
                       <CardContent className="pt-0">
@@ -201,10 +192,8 @@ export default function SupportPage() {
           <CardContent className="p-6">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div className="flex flex-col gap-2">
-                <Typography variant="h3" className="text-lg font-semibold">
-                  {t('contactSupport.title')}
-                </Typography>
-                <Typography variant="p" color="muted" className="text-sm">
+                <Typography variant="h3">{t('contactSupport.title')}</Typography>
+                <Typography variant="p" color="muted">
                   {t('contactSupport.description')}
                 </Typography>
               </div>

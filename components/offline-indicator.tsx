@@ -27,15 +27,15 @@ export function OfflineIndicator() {
       <div
         className={`rounded-lg border px-4 py-3 shadow-lg backdrop-blur-sm ${
           isOffline
-            ? 'border-orange-200 bg-orange-50/95 text-orange-800'
-            : 'border-green-200 bg-green-50/95 text-green-800'
+            ? 'border-orange-200 dark:border-orange-700 bg-orange-50/95 dark:bg-orange-900/95 text-orange-800 dark:text-orange-200'
+            : 'border-primary-200 dark:border-primary-700 bg-primary-50/95 dark:bg-background/95 text-primary-800 dark:text-primary-200'
         }`}
       >
         <div className="flex items-center gap-3">
           {isOffline ? (
-            <WifiOff className="h-5 w-5 text-orange-600 flex-shrink-0" />
+            <WifiOff className="h-5 w-5 text-orange-600 shrink-0" />
           ) : (
-            <Wifi className="h-5 w-5 text-green-600 flex-shrink-0" />
+            <Wifi className="h-5 w-5 text-primary shrink-0" />
           )}
           <div className="flex-1 min-w-0">
             <p className="text-sm  leading-tight">

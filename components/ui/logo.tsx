@@ -20,10 +20,17 @@ interface LogoProps {
 }
 
 const sizeMap = {
-  sm: 'h-8',
-  md: 'h-12',
-  lg: 'h-16',
-  xl: 'h-24',
+  sm: 'h-6',
+  md: 'h-8',
+  lg: 'h-10',
+  xl: 'h-12',
+}
+
+const textSizeMap = {
+  sm: 'text-2xl  font-extrabold',
+  md: 'text-3xl  font-extrabold',
+  lg: 'text-4xl  font-extrabold',
+  xl: 'text-5xl  font-extrabold',
 }
 
 export function Logo({
@@ -80,7 +87,7 @@ export function Logo({
   const logoElement = (
     <Image
       src={getImageSrc()}
-      alt="LIFO"
+      alt="lifo"
       className={cn(sizeClass, 'w-auto', className)}
       priority={priority}
       width={600}
@@ -95,11 +102,11 @@ export function Logo({
         href={href}
         className={cn(
           'inline-block',
-          withText && 'flex items-center gap-2 font-heading font-black text-4xl',
+          withText && 'flex items-center gap-2  font-extrabold font-heading',
         )}
       >
         {logoElement}
-        {withText && 'LIFO'}
+        <span className={cn(textSizeMap[size])}>{withText && 'lifo'}</span>
       </Link>
     )
   }
@@ -108,11 +115,11 @@ export function Logo({
     <div
       className={cn(
         'inline-block',
-        withText && 'flex items-center gap-2 font-heading font-black text-4xl',
+        withText && 'flex items-center gap-2  text-2xl font-extrabold font-heading',
       )}
     >
       {logoElement}
-      {withText && 'LIFO'}
+      <span className={cn(textSizeMap[size])}>{withText && 'lifo'}</span>
     </div>
   )
 }

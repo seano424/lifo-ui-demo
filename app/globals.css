@@ -24,7 +24,7 @@
 
 /* Sonner Toast Container */
 [data-sonner-toaster] {
-  font-family: var(--font-montserrat), sans-serif;
+  font-family: var(--font-inter), sans-serif;
 }
 
 /* Individual Toast Styling */
@@ -249,7 +249,7 @@
 
   /* Font families */
   --font-sans:
-    var(--font-montserrat), ui-sans-serif, system-ui, -apple-system,
+    var(--font-inter), ui-sans-serif, system-ui, -apple-system,
     BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
     'Noto Sans', sans-serif;
   --font-heading:
@@ -267,11 +267,62 @@
   --breakpoint-xl: 1280px;
   --breakpoint-2xl: 1536px;
   --breakpoint-3xl: 1920px;
+
+  /* Animation definitions for Tailwind 4 - Balanced, noticeable animations */
+  --animate-float-slow: float-slow 10s ease-in-out infinite;
+  --animate-float-slower: float-slower 12s ease-in-out infinite;
+  --animate-float-slowest: float-slowest 15s ease-in-out infinite;
+
+  /* Smooth floating animations for gradient blobs - Elegant movement */
+  @keyframes float-slow {
+    0%,
+    100% {
+      transform: translate(0, 0) scale(1);
+    }
+    25% {
+      transform: translate(90px, -90px) scale(1.15);
+    }
+    50% {
+      transform: translate(-60px, 70px) scale(0.92);
+    }
+    75% {
+      transform: translate(110px, 90px) scale(1.12);
+    }
+  }
+
+  @keyframes float-slower {
+    0%,
+    100% {
+      transform: translate(0, 0) scale(1);
+    }
+    25% {
+      transform: translate(-110px, 90px) scale(1.14);
+    }
+    50% {
+      transform: translate(90px, -70px) scale(0.94);
+    }
+    75% {
+      transform: translate(-90px, -110px) scale(1.16);
+    }
+  }
+
+  @keyframes float-slowest {
+    0%,
+    100% {
+      transform: translate(0, 0) scale(1) rotate(0deg);
+    }
+    33% {
+      transform: translate(70px, 120px) scale(1.14) rotate(5deg);
+    }
+    66% {
+      transform: translate(-90px, -90px) scale(0.92) rotate(-5deg);
+    }
+  }
 }
 
 /* Container utility with auto-centering and responsive padding */
 @utility container {
-  @apply mx-auto px-4 sm:px-8 max-w-6xl;
+  @apply mx-auto px-4 max-w-6xl;
 }
 
 @layer base {
@@ -321,12 +372,12 @@
 
   .dark {
     /* Dark mode - Using your dark color as base */
-    --background: 225 42% 8%;
-    --foreground: 0 0% 98%;
-    --card: 225 42% 10%;
-    --card-foreground: 0 0% 98%;
-    --popover: 225 42% 8%;
-    --popover-foreground: 0 0% 98%;
+    --background: 210 11% 4%;
+    --foreground: 0 0% 75%;
+    --card: 210 11% 5%;
+    --card-foreground: 0 0% 85%;
+    --popover: 210 11% 4%;
+    --popover-foreground: 0 0% 85%;
 
     /* Updated primary for dark mode - slightly adjusted for better contrast */
     --primary: 252 100% 65%;
@@ -337,11 +388,11 @@
     --secondary-foreground: 0 0% 100%;
 
     /* Muted areas - lighter than background */
-    --muted: 225 42% 15%;
+    --muted: 210 11% 10%;
     --muted-foreground: 215 20% 65%;
 
     /* Accent - using primary colors on dark background */
-    --accent: 225 42% 15%;
+    --accent: 210 11% 10%;
     --accent-foreground: 252 100% 65%;
 
     /* Destructive - slightly muted red for dark mode */
@@ -349,8 +400,8 @@
     --destructive-foreground: 0 0% 98%;
 
     /* Borders and inputs */
-    --border: 225 42% 15%;
-    --input: 225 42% 15%;
+    --border: 210 11% 12%;
+    --input: 210 11% 10%;
     --ring: 252 100% 65%;
 
     /* Chart colors - using lighter shades for dark mode */
@@ -423,4 +474,13 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+}
+
+/* Reduced motion support for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .animate-float-slow,
+  .animate-float-slower,
+  .animate-float-slowest {
+    animation: none;
+  }
 }

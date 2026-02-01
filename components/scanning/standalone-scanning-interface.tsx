@@ -473,7 +473,7 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
   return (
     <div className={`min-h-screen flex flex-col gap-4 ${className}`}>
       <div className="w-full">
-        <div className="px-4 space-y-4">
+        <div className="px-4 flex flex-col gap-4">
           {/* Step 1: Barcode Scanning */}
           {uiStep === 'camera-barcode' && (
             <>
@@ -524,7 +524,7 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
 
           {/* Step 2: Product Success */}
           {uiStep === 'product-success' && scannedProduct && (
-            <div className="space-y-4">
+            <div className="flex flex-col gap-4">
               {/* Lookup Status */}
               {lookupError && (
                 <Alert variant="destructive">
@@ -570,7 +570,7 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
 
           {/* Step 3: Expiry Date Scanning */}
           {uiStep === 'camera-expiry' && (
-            <div className="space-y-4">
+            <div className="flex flex-col gap-4">
               {/* Camera for OCR */}
               {!inventoryData.expiryDate && (
                 <ScanningCamera
@@ -679,13 +679,13 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
               <DialogDescription>{t('submission.description')}</DialogDescription>
             </DialogHeader>
 
-            <div className="space-y-4">
-              <div className="text-sm text-gray-600">
+            <div className="flex flex-col gap-4">
+              <div className="text-sm text-foreground">
                 {t('submission.submitText', { count: scannedItems.length })}
               </div>
 
               {/* Summary List */}
-              <div className="max-h-60 overflow-y-auto space-y-2 border rounded-2xl p-3 bg-gray-50">
+              <div className="max-h-60 overflow-y-auto flex flex-col gap-2 border rounded-2xl p-3 bg-gray-50">
                 {scannedItems.map(item => {
                   const totalValue = item.quantity * item.price
                   return (
@@ -694,9 +694,9 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
                       className="flex justify-between items-start p-2 bg-white rounded-2xl border text-sm"
                     >
                       <div className="flex-1">
-                        <div className="">{item.productName}</div>
-                        {item.brand && <div className="text-xs text-gray-600">{item.brand}</div>}
-                        <div className="text-xs text-gray-500">
+                        <div>{item.productName}</div>
+                        {item.brand && <div className="text-xs text-foreground">{item.brand}</div>}
+                        <div className="text-xs text-foreground">
                           {t('submission.totals.expires')}{' '}
                           {item.expiryDate
                             ? new Date(item.expiryDate).toLocaleDateString()
@@ -704,10 +704,10 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="">
+                        <div>
                           {item.quantity}x {formatPrice(item.price)}
                         </div>
-                        <div className="text-xs text-gray-600">
+                        <div className="text-xs text-foreground">
                           Total: {formatPrice(totalValue)}
                         </div>
                       </div>

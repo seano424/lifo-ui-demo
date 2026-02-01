@@ -20,24 +20,24 @@ interface TodoCardProps {
 // Move urgency config outside component for better performance
 const URGENCY_CONFIG = {
   critical: {
-    color: 'bg-red-500',
-    textColor: 'text-red-700',
-    bgColor: 'group-hover:bg-red-500 bg-red-100',
-    badge: 'bg-red-200 text-red-800 border-red-500',
+    color: 'bg-destructive',
+    textColor: 'text-destructive',
+    bgColor: 'group-hover:bg-destructive bg-destructive',
+    badge: 'bg-destructive text-destructive border-destructive',
     badgeVariant: 'default' as const,
-    borderColor: 'border-red-500',
+    borderColor: 'border-destructive',
   },
   high: {
-    color: 'bg-red-500',
-    textColor: 'text-red-700',
-    bgColor: 'group-hover:bg-red-50 bg-red-500',
-    badge: 'bg-red-100 text-red-800 border-red-500',
+    color: 'bg-destructive',
+    textColor: 'text-destructive',
+    bgColor: 'group-hover:bg-red-50 bg-destructive',
+    badge: 'bg-destructive text-destructive border-destructive',
     badgeVariant: 'default' as const,
-    borderColor: 'border-red-500',
+    borderColor: 'border-destructive',
   },
   medium: {
     color: 'bg-primary-500',
-    textColor: 'text-primary-700',
+    textColor: 'text-primary-800',
     bgColor: 'group-hover:bg-primary-50 bg-primary-500',
     badge: 'bg-primary-100 text-primary-800 border-primary-500',
     badgeVariant: 'primary' as const,
@@ -53,17 +53,17 @@ const URGENCY_CONFIG = {
   },
   none: {
     color: 'bg-gray-500',
-    textColor: 'text-gray-700',
+    textColor: 'text-foreground',
     bgColor: 'group-hover:bg-gray-50 bg-gray-500',
-    badge: 'bg-gray-100 text-gray-800 border-gray-200',
+    badge: 'bg-gray-100 text-foreground border-gray-200',
     badgeVariant: 'secondary' as const,
     borderColor: 'border-gray-500',
   },
   default: {
     color: 'bg-gray-500',
-    textColor: 'text-gray-700',
+    textColor: 'text-foreground',
     bgColor: 'group-hover:bg-gray-50 bg-gray-500',
-    badge: 'bg-gray-100 text-gray-800 border-gray-200',
+    badge: 'bg-gray-100 text-foreground border-gray-200',
     badgeVariant: 'secondary' as const,
     borderColor: 'border-gray-500',
   },
@@ -172,7 +172,7 @@ export function TodoCard({ todo, onClick }: TodoCardProps) {
           variant="outline"
           className={cn(
             'border-2 rounded-full cursor-pointer',
-            'sm:h-6 sm:w-6 h-5 w-5 p-0 bg-brand-white dark:bg-brand-dark transition-all duration-200 items-center justify-center',
+            'sm:h-6 sm:w-6 h-5 w-5 p-0 bg-brand-white dark:bg-background transition-all duration-200 items-center justify-center',
             urgencyConfig.badge,
           )}
         >

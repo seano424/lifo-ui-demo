@@ -7,6 +7,7 @@ import { Card } from '@/components/ui/card'
 import { OCR_CONFIG } from '@/lib/api/ocr-config'
 import { cn } from '@/lib/utils'
 import { useIsMobile } from '@/hooks/use-mobile'
+import { Typography } from '../ui/typography'
 
 interface ImageUploadZoneProps {
   onImageSelected: (file: File) => void
@@ -61,7 +62,9 @@ export function ImageUploadZone({
       <div
         className={cn(
           'border-2 border-dashed rounded-2xl p-8 text-center transition-colors',
-          dragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300',
+          dragActive
+            ? 'border-secondary dark:border-secondary-700 bg-secondary/10 dark:bg-secondary/20'
+            : 'border-gray-300 dark:border-gray-600',
           !disabled && 'hover:border-gray-400 cursor-pointer',
           disabled && 'opacity-50 cursor-not-allowed',
         )}
@@ -80,15 +83,19 @@ export function ImageUploadZone({
           disabled={disabled}
         />
 
-        <div className="space-y-4">
+        <div className="flex flex-col gap-4">
           <FileImage className="h-12 w-12 text-primary-400 mx-auto" />
           <div>
-            <h3 className="font-semibold text-lg">Upload delivery note image</h3>
-            <p className="text-gray-600 text-sm mt-1">Drag and drop or click to select an image</p>
+            <Typography variant="h3">Upload delivery note image</Typography>
+            <Typography variant="muted">Drag and drop or click to select an image</Typography>
           </div>
-          <div className="text-xs text-gray-500 space-y-1">
-            <p>Supported formats: {OCR_CONFIG.supportedExtensions.join(', ')}</p>
-            <p>Maximum file size: {OCR_CONFIG.maxFileSize / 1024 / 1024}MB</p>
+          <div className="text-xs text-foreground flex flex-col gap-1">
+            <Typography variant="muted">
+              Supported formats: {OCR_CONFIG.supportedExtensions.join(', ')}
+            </Typography>
+            <Typography variant="muted">
+              Maximum file size: {OCR_CONFIG.maxFileSize / 1024 / 1024}MB
+            </Typography>
           </div>
           <div className="flex flex-col sm:flex-row sm:items-center gap-2 justify-center">
             <Button

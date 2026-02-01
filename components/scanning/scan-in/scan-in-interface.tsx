@@ -133,14 +133,14 @@ export default function ScanInInterface({ onItemAdded, className }: ScanInInterf
               </DialogDescription>
             </DialogHeader>
 
-            <div className="space-y-4">
-              <div className="text-sm text-gray-600">
+            <div className="flex flex-col gap-4">
+              <div className="text-sm text-foreground">
                 You are about to submit {pendingItems.length} item
                 {pendingItems.length > 1 ? 's' : ''} to inventory:
               </div>
 
               {/* Summary List */}
-              <div className="max-h-60 overflow-y-auto space-y-2 border rounded-2xl p-3 bg-gray-50">
+              <div className="max-h-60 overflow-y-auto flex flex-col gap-2 border rounded-2xl p-3 bg-gray-50">
                 {pendingItems.map(item => {
                   const totalValue = item.quantity * item.price
                   return (
@@ -149,9 +149,9 @@ export default function ScanInInterface({ onItemAdded, className }: ScanInInterf
                       className="flex justify-between items-start p-2 bg-white rounded-2xl border text-sm"
                     >
                       <div className="flex-1">
-                        <div className="">{item.productName}</div>
-                        {item.brand && <div className="text-xs text-gray-600">{item.brand}</div>}
-                        <div className="text-xs text-gray-500">
+                        <div>{item.productName}</div>
+                        {item.brand && <div className="text-xs text-foreground">{item.brand}</div>}
+                        <div className="text-xs text-foreground">
                           Expires:{' '}
                           {item.expiryDate
                             ? new Date(item.expiryDate).toLocaleDateString()
@@ -159,10 +159,10 @@ export default function ScanInInterface({ onItemAdded, className }: ScanInInterf
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="">
+                        <div>
                           {item.quantity}x {formatPrice(item.price)}
                         </div>
-                        <div className="text-xs text-gray-600">
+                        <div className="text-xs text-foreground">
                           Total: {formatPrice(totalValue)}
                         </div>
                       </div>

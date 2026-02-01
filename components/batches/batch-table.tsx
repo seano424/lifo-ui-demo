@@ -28,15 +28,11 @@ import { useEffect, useState } from 'react'
 import { cn } from '@/lib/utils'
 
 const VALID_COLUMN_IDS = [
-  'batch_number',
   'product_name',
-  'supplier',
   'expiry_date',
+  'days_left',
   'current_quantity',
-  'cost_price',
-  'selling_price',
-  'status',
-  'created_at',
+  'location',
 ]
 
 interface BatchTableProps {
@@ -137,7 +133,7 @@ export function BatchTable({
 
   if (data.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 border border-border rounded-lg bg-muted/10">
+      <div className="flex flex-col items-center justify-center py-16 rounded-lg bg-muted/10">
         <Package className="h-12 w-12 text-muted-foreground mb-4" />
         <CardTitle className="text-lg mb-2">{t('emptyState.title')}</CardTitle>
         <CardDescription className="text-center max-w-md">
@@ -162,7 +158,7 @@ export function BatchTable({
               {headerGroup.headers.map(header => (
                 <TableHead
                   key={header.id}
-                  className="sticky top-0 bg-background z-10 py-3 px-4"
+                  className="sticky top-0 bg-background z-10 py-3 px-4 border-b border-border"
                   style={
                     header.column.columnDef.size
                       ? { width: header.column.columnDef.size }
@@ -183,7 +179,7 @@ export function BatchTable({
               key={row.id}
               onClick={() => handleBatchClick(row.original)}
               className={cn(
-                'cursor-pointer transition-all border-none duration-100 ease-in-out',
+                'cursor-pointer transition-all duration-100 ease-in-out',
                 isExpiringSoon(row.original) ? 'hover:bg-muted/30' : 'hover:bg-muted/30',
               )}
             >

@@ -328,14 +328,14 @@ export default function BarcodeScanner({
       <div className="flex items-center gap-2 flex-col justify-center">
         <div className="flex items-center gap-2">
           <Scan className="w-6 h-6  text-secondary-900 stroke-5 border-2 border-secondary-900 rounded-full p-[3px] bg-primary-100" />
-          <Typography variant="h3" className="text-primary-800 font-black">
+          <Typography variant="h3" className="text-primary-800 ">
             {displayTitle}
           </Typography>
         </div>
         <Typography variant="p">{displaySubtitle}</Typography>
       </div>
 
-      <div className="space-y-4">
+      <div className="flex flex-col gap-4">
         {/* Error Display */}
         {displayError && (
           <Alert variant="destructive" className="flex flex-col items-center justify-center gap-2">
@@ -353,11 +353,11 @@ export default function BarcodeScanner({
         )}
 
         {/* Camera container - fixed size matching camera's native 638×358 */}
-        <div className="relative w-full aspect-[638/358] border border-black rounded-2xl bg-gray-100 dark:bg-brand-dark">
+        <div className="relative w-full aspect-[638/358] border border-black rounded-2xl bg-gray-100 dark:bg-background">
           {/* Camera Permission Request */}
           {(hasPermission === false || hasPermission === null) && (
             <div className="absolute inset-0 flex items-center justify-center bg-gray-50 rounded-2xl">
-              <div className="text-center space-y-4">
+              <div className="text-center flex flex-col gap-4">
                 <Alert className="border-none bg-transparent shadow-none">
                   <Camera className="h-4 w-4" />
                   <AlertDescription>{displayPermissionMessage}</AlertDescription>
@@ -393,7 +393,7 @@ export default function BarcodeScanner({
               {isScanning && isInitialized && (
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                   <div className="border-2 border-primary-400 w-64 h-32 rounded-2xl relative">
-                    <div className="absolute inset-x-0 top-1/2 h-0.5 bg-red-500 transform -translate-y-1/2 animate-pulse" />
+                    <div className="absolute inset-x-0 top-1/2 h-0.5 bg-destructive transform -translate-y-1/2 animate-pulse" />
                     {detectedBarcode && (
                       <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-primary-500 text-white px-2 py-1 rounded-2xl text-sm">
                         <CheckCircle className="w-3 h-3 inline mr-1" />

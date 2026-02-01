@@ -139,7 +139,7 @@ export default function NewBatchesPage() {
   const totalUnits = summary?.total_units || 0
 
   return (
-    <div className="container space-y-4 py-6">
+    <div className="container flex flex-col gap-4 py-6">
       {/* Page Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <Typography variant="h3">{t('title')}</Typography>
@@ -156,7 +156,7 @@ export default function NewBatchesPage() {
       </div>
 
       {/* Search and Filters */}
-      <div className="flex flex-row flex-wrap lg:items-center lg:gap-4 gap-3 bg-gray-50 dark:bg-gray-900 rounded-2xl p-4">
+      <div className="flex flex-row flex-wrap lg:items-center lg:gap-4 gap-3 bg-gray-50 dark:bg-background rounded-2xl p-4">
         {/* Search Bar */}
         <div className="flex-1">
           <TodoSearchBar
@@ -236,7 +236,7 @@ export default function NewBatchesPage() {
 
       {/* Loading State */}
       {isLoading && (
-        <div className="space-y-4">
+        <div className="flex flex-col gap-4">
           <Skeleton className="h-40 w-full" />
           <Skeleton className="h-40 w-full" />
           <Skeleton className="h-40 w-full" />
@@ -255,15 +255,13 @@ export default function NewBatchesPage() {
       {!isLoading && !productsError && totalDrafts === 0 && (
         <Card className="border-2 border-dashed border-gray-200 dark:border-gray-800">
           <CardContent className="flex flex-col items-center justify-center py-16 px-6 text-center">
-            <div className="rounded-full bg-green-50 dark:bg-green-900/20 p-4 mb-4">
-              <PartyPopper className="h-12 w-12 text-green-600 dark:text-green-400" />
+            <div className="rounded-full bg-primary-50 dark:bg-background/20 p-4 mb-4">
+              <PartyPopper className="h-12 w-12 text-primary dark:text-primary-400" />
             </div>
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
-              No new deliveries!
-            </h3>
-            <p className="text-base text-gray-500 dark:text-gray-400 max-w-md">
+            <Typography variant="h3">No new deliveries!</Typography>
+            <Typography variant="p" color="muted">
               All your batches have expiry dates assigned. New deliveries will appear here.
-            </p>
+            </Typography>
           </CardContent>
         </Card>
       )}
@@ -271,7 +269,7 @@ export default function NewBatchesPage() {
       {/* Products List */}
       {!isLoading && !productsError && products && products.length > 0 && (
         <>
-          <div className="space-y-4 bg-gray-50 dark:bg-gray-900 rounded-2xl p-4">
+          <div className="flex flex-col gap-4 bg-gray-50 dark:bg-background rounded-2xl p-4">
             {products.map(product => (
               <DraftBatchCard
                 key={product.product_id}
@@ -284,10 +282,10 @@ export default function NewBatchesPage() {
           {/* Pagination */}
           {totalPages > 1 && (
             <div className="flex items-center justify-between border-t border-gray-200 dark:border-gray-800 pt-4">
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <Typography variant="p" color="muted">
                 Showing {(currentPage - 1) * ITEMS_PER_PAGE + 1} to{' '}
                 {Math.min(currentPage * ITEMS_PER_PAGE, totalProducts)} of {totalProducts} products
-              </p>
+              </Typography>
               <div className="flex gap-2">
                 <Button
                   variant="outline"

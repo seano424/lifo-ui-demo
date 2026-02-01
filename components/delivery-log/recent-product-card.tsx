@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import type { RecentDeliveryProduct } from '@/hooks/use-draft-batches'
 import { cn } from '@/lib/utils'
+import { Typography } from '../ui/typography'
 
 interface RecentProductCardProps {
   product: RecentDeliveryProduct
@@ -81,7 +82,7 @@ export function RecentProductCard({
         <div className="flex gap-3">
           {/* Product Image */}
           <div className="shrink-0">
-            <div className="relative h-14 w-14 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+            <div className="relative h-14 w-14 rounded-lg overflow-hidden bg-gray-100 dark:bg-background border border-gray-200 dark:border-gray-700">
               {product.product_name ? (
                 <Image
                   src={`https://placehold.co/200x200/e5e7eb/6b7280?text=${encodeURIComponent(
@@ -95,24 +96,22 @@ export function RecentProductCard({
                 />
               ) : (
                 <div className="flex items-center justify-center h-full">
-                  <Package className="h-6 w-6 text-gray-400" />
+                  <Package className="h-6 w-6 text-foreground" />
                 </div>
               )}
             </div>
           </div>
 
           {/* Product Info */}
-          <div className="flex-1 min-w-0 space-y-1">
+          <div className="flex-1 min-w-0 flex flex-col gap-1">
             <div className="flex items-start justify-between gap-2">
               <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-sm text-gray-900 dark:text-gray-100 truncate">
-                  {product.product_name}
-                </h3>
+                <Typography variant="p">{product.product_name}</Typography>
                 {product.last_expiry_days !== null && (
-                  <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
-                    <Calendar className="h-3 w-3" />
+                  <Typography variant="muted">
+                    <Calendar className="h-3 w-3 mr-1" />
                     Last: +{product.last_expiry_days}d expiry
-                  </p>
+                  </Typography>
                 )}
               </div>
               {isAdded && (
@@ -133,7 +132,7 @@ export function RecentProductCard({
                   onClick={handleQuickAdd}
                   disabled={isAdded}
                   className={cn(
-                    'flex-1 min-h-[36px] font-semibold text-xs',
+                    'flex-1 min-h-[36px]  text-xs',
                     !isAdded && 'bg-primary-600 hover:bg-primary-700',
                   )}
                 >
@@ -148,7 +147,7 @@ export function RecentProductCard({
                   size="sm"
                   onClick={() => setShowCustomInput(true)}
                   disabled={isAdded}
-                  className="flex-none px-3 min-h-[36px] text-xs font-medium"
+                  className="flex-none px-3 min-h-[36px] text-xs "
                 >
                   + custom
                 </Button>
@@ -171,7 +170,6 @@ export function RecentProductCard({
                   size="sm"
                   onClick={handleCustomSubmit}
                   disabled={!customQuantity || Number.parseInt(customQuantity, 10) <= 0}
-                  className="px-3 h-9"
                 >
                   Add
                 </Button>

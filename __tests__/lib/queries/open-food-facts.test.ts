@@ -61,7 +61,7 @@ describe('Open Food Facts Client', () => {
         expect.objectContaining({
           mode: 'cors',
           headers: expect.objectContaining({
-            'User-Agent': 'LIFO-FoodWasteApp/1.0 (contact@lifo-app.com)',
+            'User-Agent': 'lifo-FoodWasteApp/1.0 (contact@lifo-app.com)',
             Accept: 'application/json',
           }),
         }),

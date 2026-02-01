@@ -39,10 +39,10 @@ export function SquareConnectionCard({ status, isLoading, onConnect }: SquareCon
   if (isLoading) {
     return (
       <Card className="p-6">
-        <div className="space-y-4">
+        <div className="flex flex-col gap-4">
           <div className="flex items-center gap-4">
             <div className="h-10 w-10 animate-pulse rounded bg-gray-200" />
-            <div className="flex-1 space-y-4">
+            <div className="flex-1 flex flex-col gap-4">
               <div className="h-4 w-1/3 animate-pulse rounded bg-gray-200" />
               <div className="h-3 w-2/3 animate-pulse rounded bg-gray-200" />
             </div>
@@ -62,9 +62,7 @@ export function SquareConnectionCard({ status, isLoading, onConnect }: SquareCon
           <div className="flex flex-col sm:flex-row sm:items-center gap-4">
             <Image src="/square/square-icon.svg" alt="Square" width={40} height={40} />
             <div>
-              <Typography variant="h4" className="font-semibold">
-                Square
-              </Typography>
+              <Typography variant="h4">Square</Typography>
               <Typography variant="p" className="text-sm text-muted-foreground">
                 {t('description')}
               </Typography>
@@ -72,7 +70,7 @@ export function SquareConnectionCard({ status, isLoading, onConnect }: SquareCon
           </div>
           <Button
             variant="outline"
-            className="w-fit group-hover:bg-white group-hover:text-primary-900 hover:bg-white hover:text-primary-900 pointer-events-none"
+            className="w-fit group-hover:bg-white dark:group-hover:bg-gray-800 group-hover:text-primary-800 dark:group-hover:text-primary-200 hover:bg-white dark:hover:bg-gray-800 hover:text-primary-800 dark:hover:text-primary-200 pointer-events-none"
           >
             {t('connect')}
           </Button>
@@ -91,7 +89,7 @@ export function SquareConnectionCard({ status, isLoading, onConnect }: SquareCon
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center justify-between">
           <div className="flex items-center gap-2">
             <Image src="/square/square-icon.svg" alt="Square" width={32} height={32} />
-            <div className="space-y-1">
+            <div className="flex flex-col gap-1">
               <div className="flex items-center gap-4 flex-wrap">
                 <Typography variant="h2">Square</Typography>
                 <Badge variant="secondary">{t('connected')}</Badge>
@@ -103,7 +101,7 @@ export function SquareConnectionCard({ status, isLoading, onConnect }: SquareCon
           </div>
           <Button
             variant="outline"
-            className="sm:w-fit group-hover:bg-white group-hover:text-primary-900 hover:bg-white hover:text-primary-900 pointer-events-none"
+            className="sm:w-fit group-hover:bg-white dark:group-hover:bg-gray-800 group-hover:text-primary-800 dark:group-hover:text-primary-200 hover:bg-white dark:hover:bg-gray-800 hover:text-primary-800 dark:hover:text-primary-200 pointer-events-none"
           >
             <Settings className="h-4 w-4" />
             {t('manage')}
@@ -112,7 +110,7 @@ export function SquareConnectionCard({ status, isLoading, onConnect }: SquareCon
 
         {/* Connected Locations Section */}
         {stores.length > 0 && (
-          <div className="space-y-4">
+          <div className="flex flex-col gap-4">
             <div className="flex items-center gap-1">
               <MapPin className="h-4 w-4 text-muted-foreground" />
               <Typography variant="muted">
@@ -122,7 +120,7 @@ export function SquareConnectionCard({ status, isLoading, onConnect }: SquareCon
               </Typography>
             </div>
 
-            <div className="space-y-4">
+            <div className="flex flex-col gap-4">
               {stores.map(store => {
                 const isCurrentStore = activeStore?.store_id === store.store_id
 
@@ -134,7 +132,7 @@ export function SquareConnectionCard({ status, isLoading, onConnect }: SquareCon
                     }`}
                   >
                     <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                      <div className="space-y-4 flex-1">
+                      <div className="flex flex-col gap-4 flex-1">
                         <div className="flex items-center gap-2 flex-wrap">
                           <Typography variant="p" className="text-sm ">
                             {store.store_name}

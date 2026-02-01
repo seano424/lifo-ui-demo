@@ -3,16 +3,16 @@
     "title": "Algemene Voorwaarden",
     "lastUpdated": "Laatst bijgewerkt: 16 oktober 2025",
     "metadata": {
-      "title": "Algemene Voorwaarden | LIFO",
-      "description": "Servicevoorwaarden en privacybeleid voor het LIFO voedselverspillingsmanagementplatform"
+      "title": "Algemene Voorwaarden | lifo",
+      "description": "Servicevoorwaarden en privacybeleid voor het lifo voedselverspillingsmanagementplatform"
     },
     "section1": {
       "title": "1. Acceptatie van Voorwaarden",
-      "content": "Door een account aan te maken en de LIFO-applicatie en website (gezamenlijk de \"Service\") te gebruiken, gaat u akkoord met deze Algemene Voorwaarden, inclusief onze privacypraktijken zoals hierin beschreven. Als u niet akkoord gaat met deze voorwaarden, gebruik de Service dan niet."
+      "content": "Door een account aan te maken en de lifo-applicatie en website (gezamenlijk de \"Service\") te gebruiken, gaat u akkoord met deze Algemene Voorwaarden, inclusief onze privacypraktijken zoals hierin beschreven. Als u niet akkoord gaat met deze voorwaarden, gebruik de Service dan niet."
     },
     "section2": {
       "title": "2. Beschrijving van de Service",
-      "content": "LIFO biedt voorraadbeheersoftware op lotniveau, ontworpen om detailhandels te helpen bij het bijhouden van vervaldatums van producten, het verminderen van voedselverspilling en het optimaliseren van kortings- en donatiebeslissingen door middel van beeldherkenning en data-analyse."
+      "content": "lifo biedt voorraadbeheersoftware op lotniveau, ontworpen om detailhandels te helpen bij het bijhouden van vervaldatums van producten, het verminderen van voedselverspilling en het optimaliseren van kortings- en donatiebeslissingen door middel van beeldherkenning en data-analyse."
     },
     "section3": {
       "title": "3. Gebruikersaccounts",
@@ -111,7 +111,7 @@
       "items": [
         "De Service te gebruiken in overeenstemming met alle toepasselijke wetten en voedselveiligheidsvoorschriften",
         "De nauwkeurigheid van vervaldatums en productinformatie te waarborgen",
-        "Productveiligheid onafhankelijk te verifiëren; LIFO-aanbevelingen zijn uitsluitend adviserend",
+        "Productveiligheid onafhankelijk te verifiëren; lifo-aanbevelingen zijn uitsluitend adviserend",
         "De Service niet te misbruiken, te verstoren of te proberen ongeautoriseerde toegang te krijgen",
         "De Service niet te gebruiken voor onwettige of frauduleuze doeleinden",
         "Passende back-upsystemen te onderhouden voor kritieke bedrijfsgegevens"
@@ -123,7 +123,7 @@
     },
     "section11": {
       "title": "11. Intellectueel Eigendom",
-      "content": "De Service, inclusief het ontwerp, functies, beeldherkenningstechnologie en onderliggende software, is eigendom van LIFO en wordt beschermd door intellectuele eigendomswetten. U mag geen enkel deel van de Service kopiëren, wijzigen, reverse-engineeren of afgeleide werken creëren."
+      "content": "De Service, inclusief het ontwerp, functies, beeldherkenningstechnologie en onderliggende software, is eigendom van lifo en wordt beschermd door intellectuele eigendomswetten. U mag geen enkel deel van de Service kopiëren, wijzigen, reverse-engineeren of afgeleide werken creëren."
     },
     "section12": {
       "title": "12. Gegevensbeveiliging",
@@ -138,7 +138,7 @@
     },
     "section13": {
       "title": "13. Beperking van Aansprakelijkheid",
-      "intro": "De Service wordt geleverd \"zoals het is\" zonder garanties van welke aard dan ook. LIFO is niet aansprakelijk voor:",
+      "intro": "De Service wordt geleverd \"zoals het is\" zonder garanties van welke aard dan ook. lifo is niet aansprakelijk voor:",
       "items": [
         "Zakelijke beslissingen genomen op basis van Service-aanbevelingen",
         "Voedselveiligheidsincidenten of problemen met naleving van regelgeving",
@@ -189,7 +189,7 @@
       "content": "U heeft het recht een klacht in te dienen bij uw lokale gegevensbeschermingsautoriteit als u van mening bent dat we de AVG of uw privacyrechten hebben geschonden."
     },
     "finalStatement": {
-      "content": "Door LIFO te gebruiken, erkent u dat u deze Algemene Voorwaarden hebt gelezen, begrepen en ermee akkoord gaat gebonden te zijn, inclusief onze gegevensverzamelings- en privacypraktijken."
+      "content": "Door lifo te gebruiken, erkent u dat u deze Algemene Voorwaarden hebt gelezen, begrepen en ermee akkoord gaat gebonden te zijn, inclusief onze gegevensverzamelings- en privacypraktijken."
     }
   }
 }

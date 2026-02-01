@@ -11,7 +11,7 @@ import {
 import { type Language, useLanguageStore } from '@/lib/stores/language-store'
 import { Globe } from 'lucide-react'
 
-const LIFO_LANGUAGES = {
+const lifo_LANGUAGES = {
   fr: { name: 'Français' },
   en: { name: 'English' },
   nl: { name: 'Nederlands' },
@@ -39,7 +39,7 @@ export function CompactLanguageSwitcher() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        {Object.entries(LIFO_LANGUAGES).map(([code, { name }]) => (
+        {Object.entries(lifo_LANGUAGES).map(([code, { name }]) => (
           <DropdownMenuItem
             key={code}
             onClick={() => handleLanguageChange(code)}

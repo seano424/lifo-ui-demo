@@ -3,12 +3,12 @@
     "title": "Privacy Policy",
     "lastUpdated": "Last Updated: October 16, 2025",
     "metadata": {
-      "title": "Privacy Policy | LIFO",
-      "description": "Privacy Policy for LIFO food waste management platform"
+      "title": "Privacy Policy | lifo",
+      "description": "Privacy Policy for lifo food waste management platform"
     },
     "section1": {
       "title": "1. Who We Are",
-      "content": "LIFO provides batch-level inventory management software for retail stores. We help you track product expiration dates, reduce food waste, and make data-driven decisions about discounts and donations. Contact Us: Email: contact@lifo-app.com | For GDPR rights requests: contact@lifo-app.com"
+      "content": "lifo provides batch-level inventory management software for retail stores. We help you track product expiration dates, reduce food waste, and make data-driven decisions about discounts and donations. Contact Us: Email: contact@lifo-app.com | For GDPR rights requests: contact@lifo-app.com"
     },
     "section2": {
       "title": "2. What Data We Collect",
@@ -79,7 +79,7 @@
     },
     "section8": {
       "title": "8. Analytics & Cookies",
-      "intro": "We use Google Analytics to understand how users interact with LIFO and improve our service.",
+      "intro": "We use Google Analytics to understand how users interact with lifo and improve our service.",
       "whatWeCollect": {
         "title": "What we collect:",
         "items": [
@@ -141,7 +141,7 @@
     },
     "section11": {
       "title": "11. Children's Privacy",
-      "intro": "The LIFO Service is not intended for individuals under 16 years of age. We do not knowingly collect personal data from children. If we discover that we have inadvertently collected data from a child, we will delete it immediately.",
+      "intro": "The lifo Service is not intended for individuals under 16 years of age. We do not knowingly collect personal data from children. If we discover that we have inadvertently collected data from a child, we will delete it immediately.",
       "items": [
         "If you believe we have collected data from a child, please contact us at: contact@lifo-app.com"
       ]
@@ -171,7 +171,7 @@
     },
     "section15": {
       "title": "15. Data Ownership",
-      "content": "You own your data. All inventory data, product information, and business insights generated through LIFO remain your property. We are merely processors of this data on your behalf. You can export your data at any time in standard formats (CSV, JSON) through your account settings."
+      "content": "You own your data. All inventory data, product information, and business insights generated through lifo remain your property. We are merely processors of this data on your behalf. You can export your data at any time in standard formats (CSV, JSON) through your account settings."
     },
     "section16": {
       "title": "16. Contact Us",
@@ -180,7 +180,7 @@
       "responseTime": "We aim to respond to all privacy inquiries within 2 business days."
     },
     "finalStatement": {
-      "content": "By using LIFO, you acknowledge that you have read and understood this Privacy Policy."
+      "content": "By using lifo, you acknowledge that you have read and understood this Privacy Policy."
     }
   }
 }

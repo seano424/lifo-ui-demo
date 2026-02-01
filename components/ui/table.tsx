@@ -1,5 +1,3 @@
-'use client'
-
 import type * as React from 'react'
 
 import { cn } from '@/lib/utils'
@@ -8,7 +6,7 @@ function Table({ className, ...props }: React.ComponentProps<'table'>) {
   return (
     <div
       data-slot="table-container"
-      className="relative w-full overflow-x-auto scrollbar-thin scrollbar-thumb-primary scrollbar-track-primary-foreground border border-border rounded-lg"
+      className="relative w-full overflow-x-auto scrollbar-thin scrollbar-thumb-primary scrollbar-track-primary-foreground rounded-lg"
     >
       <table
         data-slot="table"
@@ -67,7 +65,7 @@ function TableHead({ className, ...props }: React.ComponentProps<'th'>) {
     <th
       data-slot="table-head"
       className={cn(
-        'text-foreground h-10 text-left align-middle  whitespace-nowrap [&:has([role=checkbox])]:pr-0 border-b border-muted-foreground',
+        'text-foreground h-10 text-left align-middle  whitespace-nowrap [&:has([role=checkbox])]:pr-0',
         className,
       )}
       {...props}
@@ -79,10 +77,7 @@ function TableCell({ className, ...props }: React.ComponentProps<'td'>) {
   return (
     <td
       data-slot="table-cell"
-      className={cn(
-        'p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 border-b border-border',
-        className,
-      )}
+      className={cn('align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0', className)}
       {...props}
     />
   )

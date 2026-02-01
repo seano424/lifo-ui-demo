@@ -744,7 +744,7 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
                       size="sm"
                       variant="ghost"
                       onClick={() => removeItemFromList(item.batchId)}
-                      className="text-red-600 hover:text-red-700"
+                      className="text-destructive hover:text-destructive"
                     >
                       <Trash2 className="h-3 w-3" />
                     </Button>
@@ -797,7 +797,7 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
                         ? 'bg-primary-100 text-primary-700 border-primary-200'
                         : action.actionType === 'donate'
                           ? 'bg-blue-100 text-blue-700 border-blue-200'
-                          : 'bg-red-100 text-red-700 border-red-200'
+                          : 'bg-destructive text-destructive border-destructive'
                     return (
                       <div
                         key={action.actionType}
@@ -821,7 +821,7 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
                       ? 'text-primary-700'
                       : item.actionType === 'donate'
                         ? 'text-blue-700'
-                        : 'text-red-700'
+                        : 'text-destructive'
                   const actionBg =
                     item.actionType === 'sold'
                       ? 'bg-primary-50'

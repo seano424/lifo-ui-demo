@@ -135,7 +135,7 @@ export function DraftBatchNotification({
         href="/dashboard/inventory/new"
         className={cn('inline-flex items-center justify-center', 'relative', className)}
       >
-        <Badge variant="destructive" className="h-5 min-w-5 px-1.5 text-xs font-semibold">
+        <Badge variant="destructive" className="h-5 min-w-5 px-1.5 text-xs ">
           {totalDrafts}
         </Badge>
       </Link>
@@ -164,13 +164,7 @@ export function DraftBatchNotification({
 
         {/* Action Button */}
         <div className="mt-3">
-          <Button
-            asChild
-            asLink
-            href="/dashboard/inventory/new"
-            variant="black"
-            className="rounded-4xl font-bold tracking-tight px-3"
-          >
+          <Button asChild asLink href="/dashboard/inventory/new" variant="black">
             Add Expiry Dates
           </Button>
         </div>
@@ -181,7 +175,7 @@ export function DraftBatchNotification({
         variant="ghost"
         size="icon"
         onClick={handleDismiss}
-        className="shrink-0 h-8 w-8 shadow-secondary-100 shadow-xl"
+        className="shrink-0 h-8 w-8"
         aria-label="Dismiss notification"
       >
         <X className="h-4 w-4" />

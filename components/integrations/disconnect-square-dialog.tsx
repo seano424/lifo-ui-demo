@@ -58,7 +58,7 @@ export function DisconnectSquareDialog({ connectionId, trigger }: DisconnectSqua
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>
         {trigger || (
-          <Button variant="destructive">
+          <Button variant="subtleDestructive">
             <Unplug className="h-4 w-4" />
             {t('disconnect')}
           </Button>
@@ -68,16 +68,16 @@ export function DisconnectSquareDialog({ connectionId, trigger }: DisconnectSqua
       <AlertDialogContent>
         <AlertDialogHeader>
           <div className="mb-2 flex items-center gap-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-100">
-              <AlertTriangle className="h-5 w-5 text-red-600" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-destructive">
+              <AlertTriangle className="h-5 w-5 text-destructive" />
             </div>
             <AlertDialogTitle>{t('title')}</AlertDialogTitle>
           </div>
-          <div className="space-y-2 text-left">
+          <div className="flex flex-col gap-2 text-left">
             <AlertDialogDescription>{t('description')}</AlertDialogDescription>
             <div className="rounded-lg bg-amber-50 p-3 text-sm">
               <p className=" text-amber-900">{t('warning')}</p>
-              <ul className="mt-2 list-disc space-y-1 pl-4 text-amber-800">
+              <ul className="mt-2 list-disc flex flex-col gap-1 pl-4 text-amber-800">
                 <li>{t('warningSync')}</li>
                 <li>{t('warningReconnect')}</li>
                 <li>{t('warningData')}</li>
@@ -96,7 +96,7 @@ export function DisconnectSquareDialog({ connectionId, trigger }: DisconnectSqua
               handleDisconnect()
             }}
             disabled={disconnectMutation.isPending}
-            className="bg-red-600 hover:bg-red-700"
+            className="bg-destructive hover:bg-destructive"
           >
             {disconnectMutation.isPending ? (
               <>

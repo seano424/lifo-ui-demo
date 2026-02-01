@@ -9,7 +9,7 @@ function SuccessContent() {
 
   return (
     <div className="flex min-h-screen items-center justify-center">
-      <div className="max-w-md mx-auto space-y-6">
+      <div className="max-w-md mx-auto flex flex-col gap-6">
         {/* Success Icon */}
         <div className="text-center flex flex-col items-center gap-2">
           <Check className="w-10 h-10 text-secondary-900 stroke-5 border-2 border-secondary-900 rounded-full p-[3px] bg-primary-100" />
@@ -32,7 +32,7 @@ function SuccessContent() {
               <Typography variant="p">
                 <strong>{t('whatsNext')}</strong>
               </Typography>
-              <ul className="mt-2 space-y-1">
+              <ul className="mt-2 flex flex-col gap-1">
                 <li>1. {t('steps.checkEmail')}</li>
                 <li>2. {t('steps.clickLink')}</li>
                 <li>3. {t('steps.redirected')}</li>

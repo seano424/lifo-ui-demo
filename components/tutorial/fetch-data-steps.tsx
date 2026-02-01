@@ -52,7 +52,7 @@ export function FetchDataSteps() {
           Head over to the{' '}
           <a
             href="https://supabase.com/dashboard/project/_/editor"
-            className="font-bold hover:underline text-foreground/80"
+            className=" hover:underline text-foreground/80"
             target="_blank"
             rel="noreferrer"
           >
@@ -62,7 +62,7 @@ export function FetchDataSteps() {
           stuck for creativity, you can copy and paste the following into the{' '}
           <a
             href="https://supabase.com/dashboard/project/_/sql/new"
-            className="font-bold hover:underline text-foreground/80"
+            className=" hover:underline text-foreground/80"
             target="_blank"
             rel="noreferrer"
           >
@@ -90,10 +90,7 @@ export function FetchDataSteps() {
       <TutorialStep title="Explore the Supabase UI Library">
         <p>
           Head over to the{' '}
-          <a
-            href="https://supabase.com/ui"
-            className="font-bold hover:underline text-foreground/80"
-          >
+          <a href="https://supabase.com/ui" className=" hover:underline text-foreground/80">
             Supabase UI library
           </a>{' '}
           and try installing some blocks. For example, you can install a Realtime Chat block by

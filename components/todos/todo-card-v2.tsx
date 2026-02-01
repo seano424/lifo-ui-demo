@@ -28,7 +28,7 @@ interface TodoCardV2Props {
 
 // Status badge colors
 const STATUS_COLORS = {
-  expired: 'text-red-600',
+  expired: 'text-destructive',
   today: 'text-primary',
   tomorrow: 'text-secondary',
   thisWeek: 'text-secondary',
@@ -226,7 +226,7 @@ export function TodoCardV2({ todo, onClick }: TodoCardV2Props) {
 
   //   // Expired - red accent with shadow
   //   if (isExpiring) {
-  //     return 'border-red-500 sm:hover:shadow-red-400/50 border-l-8 border-y-gray-200 border-r-gray-200'
+  //     return 'border-destructive sm:hover:shadow-destructive/50 border-l-8 border-y-gray-200 border-r-gray-200'
   //   }
 
   //   // Critical/high urgency - primary accent
@@ -326,7 +326,7 @@ export function TodoCardV2({ todo, onClick }: TodoCardV2Props) {
           <div className="flex flex-col gap-4">
             {/* Product name + status badge */}
             <div className="flex gap-2 lg:gap-4 flex-wrap flex-col-reverse lg:flex-row">
-              <Typography className="font-heading" variant="h4">
+              <Typography className="" variant="h4">
                 {todo.product_name}
               </Typography>
 
@@ -335,7 +335,7 @@ export function TodoCardV2({ todo, onClick }: TodoCardV2Props) {
                 className={cn(
                   statusBadge && todo.available_quantity != null && todo.available_quantity > 0
                     ? statusBadge.color
-                    : 'text-gray-600',
+                    : 'text-foreground',
                   'flex items-center gap-1 text-xs sm:text-sm',
                 )}
               >
@@ -346,9 +346,9 @@ export function TodoCardV2({ todo, onClick }: TodoCardV2Props) {
             </div>
 
             {/* Units + action summary */}
-            <div className="flex items-center gap-1 text-sm text-gray-600">
+            <div className="flex items-center gap-1 text-sm text-foreground">
               <Typography variant="small" className="flex items-center gap-1">
-                <PackageIcon className="h-4 w-4 text-gray-400" />
+                <PackageIcon className="h-4 w-4 text-foreground" />
                 <span>{unitsSummary}</span>
               </Typography>
             </div>

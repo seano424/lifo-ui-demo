@@ -16,15 +16,15 @@ import { sampleActionLog } from '@/lib/sample-data'
 const getActionColor = (action: string) => {
   switch (action) {
     case 'sold':
-      return 'bg-primary-100 text-primary-800 border-primary-200'
+      return 'bg-primary-100 dark:bg-background/40 text-primary-800 dark:text-primary-300 border-primary-200 dark:border-primary-700'
     case 'discounted':
-      return 'bg-blue-100 text-blue-800 border-blue-200'
+      return 'bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-300 border-blue-200 dark:border-blue-700'
     case 'donated':
-      return 'bg-purple-100 text-purple-800 border-purple-200'
+      return 'bg-purple-100 dark:bg-purple-900/40 text-purple-800 dark:text-purple-300 border-purple-200 dark:border-purple-700'
     case 'expired':
-      return 'bg-red-100 text-red-800 border-red-200'
+      return 'bg-destructive text-destructive border-destructive'
     default:
-      return 'bg-gray-100 text-gray-800 border-gray-200'
+      return 'bg-gray-100 dark:bg-background/60 text-foreground dark:text-foreground border-gray-200 dark:border-gray-600'
   }
 }
 
@@ -54,7 +54,7 @@ export function ActionLog() {
           <TableBody>
             {sampleActionLog.map(log => (
               <TableRow key={log.id}>
-                <TableCell className="">{log.productName}</TableCell>
+                <TableCell>{log.productName}</TableCell>
                 <TableCell>
                   <Badge className={getActionColor(log.action)}>
                     {log.action.charAt(0).toUpperCase() + log.action.slice(1)}

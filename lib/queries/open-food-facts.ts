@@ -74,7 +74,7 @@ class OpenFoodFactsClient {
       const response = await fetch(`${this.baseUrl}/${barcode}.json`, {
         mode: 'cors',
         headers: {
-          'User-Agent': 'LIFO-FoodWasteApp/1.0 (contact@lifo-app.com)',
+          'User-Agent': 'lifo-FoodWasteApp/1.0 (contact@lifo-app.com)',
           Accept: 'application/json',
         },
       })

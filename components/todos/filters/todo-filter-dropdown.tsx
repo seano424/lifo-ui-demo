@@ -82,7 +82,7 @@ export function TodoFilterDropdown({ filters, onFiltersChange }: TodoFilterDropd
         aria-haspopup="true"
         className={cn(
           'gap-2 w-full md:w-auto',
-          isOpen && 'bg-white hover:bg-primary-50 text-primary-900 border-primary-200 border',
+          isOpen && 'bg-white hover:bg-primary-50 text-primary-800 border-primary-200 border',
         )}
       >
         <Filter className="h-4 w-4" />

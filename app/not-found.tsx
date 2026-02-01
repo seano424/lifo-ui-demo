@@ -12,8 +12,8 @@ export default function NotFound() {
   const t = useTranslations('errors')
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-b from-background to-background/90">
-      <div className="max-w-md w-full space-y-8 text-center">
+    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-linear-to-b from-background to-background/90">
+      <div className="max-w-md w-full flex flex-col gap-8 text-center">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -31,16 +31,14 @@ export default function NotFound() {
               delay: 0.2,
             }}
           >
-            <Typography as="h1" className="text-9xl font-bold text-primary mb-2">
+            <Typography as="h1" color="primary">
               404
             </Typography>
           </motion.div>
 
-          <Typography as="h2" className="text-2xl font-semibold mb-2">
-            {t('pageNotFoundTitle', { fallback: 'Page not found' })}
-          </Typography>
+          <Typography as="h2">{t('pageNotFoundTitle', { fallback: 'Page not found' })}</Typography>
 
-          <Typography as="p" className="text-muted-foreground mb-8">
+          <Typography as="p" color="muted">
             {t('pageNotFoundDescription', {
               fallback: "The page you're looking for doesn't exist or has been moved.",
             })}

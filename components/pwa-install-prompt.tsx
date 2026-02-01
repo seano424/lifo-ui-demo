@@ -4,6 +4,7 @@ import { Logo } from '@/components/ui/logo'
 import { X } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
+import { Typography } from './ui/typography'
 
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>
@@ -149,12 +150,12 @@ export default function PWAInstallPrompt() {
       <div className="fixed bottom-4 right-4 z-50 hidden md:block">
         <div className="bg-white rounded-lg shadow-lg border border-gray-200 p-3 max-w-xs">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded flex items-center justify-center flex-shrink-0">
+            <div className="w-8 h-8 rounded flex items-center justify-center shrink-0">
               <Logo variant="svg" size="sm" className="w-6 h-6" />
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className=" text-gray-900 text-xs">{t('title')}</h3>
-              <p className="text-gray-500 text-xs">{t('subtitle')}</p>
+              <Typography variant="h3">{t('title')}</Typography>
+              <Typography variant="p">{t('subtitle')}</Typography>
             </div>
             <div className="flex gap-1">
               <button
@@ -167,7 +168,7 @@ export default function PWAInstallPrompt() {
               <button
                 type="button"
                 onClick={handleDismiss}
-                className="text-gray-400 hover:text-gray-600 p-1"
+                className="text-foreground hover:text-foreground p-1"
                 aria-label={t('closeAriaLabel')}
               >
                 <X size={12} />

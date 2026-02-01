@@ -7,6 +7,7 @@ import { useMediaQuery } from '@/hooks/use-mobile'
 import { ArrowUpDown } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import type { SortDirection, SortField } from './types'
+import { Typography } from '@/components/ui/typography'
 
 const SORT_OPTIONS: {
   value: SortField
@@ -105,7 +106,7 @@ export function UnifiedSortModal({
   const buttonSize = isMobile ? 'sm' : 'sm'
   const buttonHeight = isMobile ? 'h-7' : 'h-16'
   const textSize = isMobile ? 'text-xs' : 'text-base'
-  const spacing = isMobile ? 'space-y-2' : 'space-y-4'
+  const spacing = isMobile ? 'flex flex-col gap-2' : 'flex flex-col gap-4'
   const padding = isMobile ? 'px-6 py-4 pb-6' : 'px-8 py-6'
 
   return (
@@ -114,20 +115,18 @@ export function UnifiedSortModal({
       onClose={onClose}
       variant="fullHeight"
       titleElement={
-        <div
-          className={`flex items-center ${isMobile ? 'px-6' : 'px-8'} gap-2 text-primary font-bold`}
-        >
+        <div className={`flex items-center ${isMobile ? 'px-6' : 'px-8'} gap-2 text-primary `}>
           <ArrowUpDown className="w-5 h-5" />
           {t('filters.sortTitle')}
         </div>
       }
     >
-      <div className={`space-y-8 ${padding}`}>
+      <div className={`flex flex-col gap-8 ${padding}`}>
         {/* Sort Field Selection */}
         <div className={spacing}>
-          <h4 className={`${isMobile ? 'text-sm' : 'text-base'}  text-muted-foreground`}>
+          <Typography variant="h4" color="muted">
             {t('filters.sortBy')}
-          </h4>
+          </Typography>
           <div className={`grid ${gridCols} gap-3`}>
             {SORT_OPTIONS.map(option => {
               const isSelected = sortConfig.field === option.value
@@ -164,9 +163,9 @@ export function UnifiedSortModal({
 
         {/* Sort Direction Selection */}
         <div className={spacing}>
-          <h4 className={`${isMobile ? 'text-sm' : 'text-base'}  text-muted-foreground`}>
+          <Typography variant="h4" color="muted">
             {t('filters.sortDirection')}
-          </h4>
+          </Typography>
           <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-2'} gap-3`}>
             {SORT_DIRECTION_OPTIONS.map(option => {
               const isSelected = sortConfig.direction === option.value
@@ -191,23 +190,24 @@ export function UnifiedSortModal({
         </div>
 
         {/* Current Sort Display */}
-        <div className="space-y-2">
-          <h4 className={`${isMobile ? 'text-sm' : 'text-base'}  text-muted-foreground`}>
+        <div className="flex flex-col gap-2">
+          <Typography variant="h4" color="muted">
             {t('filters.currentSort')}
-          </h4>
+          </Typography>
           <div className={`p-3 bg-muted rounded-lg ${isMobile ? 'p-2' : 'p-4'}`}>
-            <div
-              className={`flex items-center gap-2 ${isMobile ? 'text-sm' : 'text-base'} flex-wrap`}
-            >
-              <span className={`${isMobile ? 'text-base' : 'text-lg'}`}>
+            <div className={`flex items-center gap-2 flex-wrap`}>
+              <Typography variant="h4" color="primary">
                 {SORT_OPTIONS.find(o => o.value === sortConfig.field)?.emoji}
-              </span>
-              <span className="truncate flex-1 min-w-0">
+              </Typography>
+              <Typography variant="h4" color="primary">
                 {t(SORT_OPTIONS.find(o => o.value === sortConfig.field)?.labelKey || '')}
-              </span>
-              <span className={`text-muted-foreground ${isMobile ? 'text-sm' : 'text-base'}`}>
-                {sortConfig.direction === 'asc' ? '⬆️' : '⬇️'}
-              </span>
+              </Typography>
+              <Typography variant="h4" color="primary">
+                {t(
+                  SORT_DIRECTION_OPTIONS.find(o => o.value === sortConfig.direction)?.labelKey ||
+                    '',
+                )}
+              </Typography>
             </div>
           </div>
         </div>

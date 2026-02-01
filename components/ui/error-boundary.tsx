@@ -2,6 +2,7 @@
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Typography } from '@/components/ui/typography'
 import { AlertCircle, RefreshCw } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import React, { type ErrorInfo, type ReactNode } from 'react'
@@ -50,7 +51,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
               Something went wrong
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="flex flex-col gap-4">
             <p className="text-muted-foreground">
               An error occurred while loading this component. Please try refreshing the page or
               contact support if the problem persists.
@@ -112,8 +113,10 @@ export function SimpleErrorFallback({
   return (
     <div className="text-center py-8">
       <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-4" />
-      <h3 className="text-lg font-semibold mb-2">{t('somethingWrong')}</h3>
-      <p className="text-muted-foreground mb-4">{t('unableToLoadContent')}</p>
+      <Typography variant="h3">{t('somethingWrong')}</Typography>
+      <Typography variant="p" color="muted">
+        {t('unableToLoadContent')}
+      </Typography>
       <Button onClick={resetError} variant="outline">
         <RefreshCw className="h-4 w-4 mr-2" />
         {t('retry')}

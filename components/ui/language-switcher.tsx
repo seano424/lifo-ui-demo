@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/select'
 import { type Language, useLanguageStore } from '@/lib/stores/language-store'
 
-const LIFO_LANGUAGES = {
+const lifo_LANGUAGES = {
   fr: { name: 'Français' },
   en: { name: 'English' },
   nl: { name: 'Nederlands' },
@@ -33,7 +33,7 @@ export function LanguageSwitcher() {
         </div>
       </SelectTrigger>
       <SelectContent>
-        {Object.entries(LIFO_LANGUAGES).map(([code, { name }]) => (
+        {Object.entries(lifo_LANGUAGES).map(([code, { name }]) => (
           <SelectItem key={code} value={code}>
             <div className="flex items-center gap-2">
               <span>{name}</span>
@@ -47,14 +47,13 @@ export function LanguageSwitcher() {
 
 // Alternative: Simple button group version for mobile
 export function LanguageButtonGroup() {
-  const { currentLanguage, setLanguage, isLoading } = useLanguageStore()
+  const { setLanguage, isLoading } = useLanguageStore()
 
   return (
     <div className="flex items-center gap-1 rounded-2xl border p-1">
-      {Object.entries(LIFO_LANGUAGES).map(([code]) => (
+      {Object.entries(lifo_LANGUAGES).map(([code]) => (
         <Button
           key={code}
-          variant={currentLanguage === code ? 'default' : 'ghost'}
           size="sm"
           onClick={() => setLanguage(code as Language)}
           disabled={isLoading}

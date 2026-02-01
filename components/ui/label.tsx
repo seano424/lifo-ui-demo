@@ -20,7 +20,7 @@ const Label = React.forwardRef<
   <LabelPrimitive.Root ref={ref} className={cn(labelVariants(), className)} {...props}>
     <Typography variant="p" color="muted">
       {props.children}
-      {required && <span className="text-red-500">*</span>}
+      {required && <span className="text-destructive">*</span>}
     </Typography>
   </LabelPrimitive.Root>
 ))

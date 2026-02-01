@@ -6,9 +6,9 @@ import ServiceWorkerRegistrar from '@/components/service-worker-registrar'
 import { Toaster } from '@/components/ui/toaster'
 import { ReactQueryProvider } from '@/lib/react-query/provider'
 import type { Metadata } from 'next'
-import { getMessages } from 'next-intl/server'
+import { getLocale, getMessages } from 'next-intl/server'
 import { ThemeProvider } from 'next-themes'
-import { Montserrat, Raleway, Roboto_Mono } from 'next/font/google'
+import { Inter, Raleway, Roboto_Mono } from 'next/font/google'
 import './globals.css'
 
 const defaultUrl = process.env.VERCEL_URL
@@ -17,14 +17,26 @@ const defaultUrl = process.env.VERCEL_URL
 
 export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
-  title: 'LIFO - Expiry Tracking for Food Retailers',
+  title: 'Expiry Tracking for Retailers | lifo',
   description:
-    "LIFO helps food retailers reduce waste by tracking what's expiring and when to act—discount, donate, or sell in time.",
+    "lifo helps retailers reduce waste by tracking what's expiring and when to act—discount, donate, or sell in time.",
   manifest: '/manifest.json',
+  icons: {
+    icon: [
+      {
+        url: '/logos/logo-light-theme.svg',
+        media: '(prefers-color-scheme: light)',
+      },
+      {
+        url: '/logos/logo-dark-theme.svg',
+        media: '(prefers-color-scheme: dark)',
+      },
+    ],
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: 'LIFO',
+    title: 'lifo',
   },
 }
 
@@ -38,9 +50,9 @@ const raleway = Raleway({
   fallback: ['system-ui', 'arial'],
 })
 
-// Montserrat font for body text
-const montserrat = Montserrat({
-  variable: '--font-montserrat',
+// Inter font for body text
+const inter = Inter({
+  variable: '--font-inter',
   display: 'swap',
   subsets: ['latin'],
   weight: ['400', '500', '600', '700', '800', '900'],
@@ -62,21 +74,21 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const locale = await getLocale()
   const messages = await getMessages()
 
   return (
     <html
-      lang="en"
+      lang={locale}
       suppressHydrationWarning
       data-scroll-behavior="smooth"
-      className={`${raleway.variable} ${montserrat.variable} ${robotoMono.variable} ${debugScreens}`}
+      className={`${raleway.variable} ${inter.variable} ${robotoMono.variable} ${debugScreens}`}
     >
       <body className={`font-sans antialiased`}>
         <ThemeProvider
           attribute="class"
-          defaultTheme="light"
-          forcedTheme="light"
-          enableSystem={false}
+          defaultTheme="system"
+          enableSystem={true}
           disableTransitionOnChange
         >
           <ReactQueryProvider>
@@ -90,7 +102,6 @@ export default async function RootLayout({
           <Toaster
             position="top-right"
             richColors
-            theme="light"
             className="toaster"
             closeButton
             closeOnClickOutside

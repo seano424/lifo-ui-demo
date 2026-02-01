@@ -15,7 +15,7 @@ interface NoStoresErrorProps {
 }
 
 export function NoStoresError({
-  redirectPath = '/onboarding/create-account',
+  redirectPath = '/auth/sign-up',
   className = '',
 }: NoStoresErrorProps) {
   const t = useTranslations('dashboard.errors')
@@ -36,7 +36,7 @@ export function NoStoresError({
               <div className="rounded-full bg-destructive/20 dark:bg-destructive/30 p-2.5 sm:p-3.5">
                 <AlertTriangle className="h-7 w-7 sm:h-8 sm:w-8 text-destructive" />
               </div>
-              <Typography variant="h3" className="text-lg sm:text-2xl font-bold text-destructive">
+              <Typography variant="h3" className="text-lg sm:text-2xl  text-destructive">
                 {t('noStores.title')}
               </Typography>
             </div>
@@ -47,9 +47,12 @@ export function NoStoresError({
             </Typography>
             <div className="bg-primary/5 p-3 sm:p-4 rounded-2xl border border-primary/25 mb-2">
               <div className="flex items-start gap-4">
-                <Store className="h-12 w-12 sm:h-20 sm:w-20 text-primary-600" />
+                <Store className="h-12 w-12 sm:h-20 sm:w-20 text-primary-800 dark:text-primary-200" />
                 <div>
-                  <Typography variant="p" className="text-xs sm:text-lg font-bold text-primary-600">
+                  <Typography
+                    variant="p"
+                    className="text-xs sm:text-lg  text-primary-800 dark:text-primary-200"
+                  >
                     {t('noStores.tip.title')}
                   </Typography>
                   <Typography variant="p" className="text-xs sm:text-sm text-muted-foreground mt-1">
@@ -62,7 +65,7 @@ export function NoStoresError({
           <CardFooter className="bg-destructive/5 dark:bg-destructive/10 p-4 sm:p-6 border-t border-destructive/20 dark:border-destructive/30">
             <Link href={redirectPath} className="w-full">
               <Button
-                className="w-full bg-gradient-to-r from-primary to-secondary-900 hover:bg-gradient-to-r hover:from-primary/90 hover:to-secondary-900/90 text-primary-foreground  py-1.5 sm:py-2 text-sm sm:text-base shadow-md"
+                className="w-full bg-linear-to-r from-primary to-secondary-900 hover:bg-linear-to-r hover:from-primary/90 hover:to-secondary-900/90 text-primary-foreground  py-1.5 sm:py-2 text-sm sm:text-base shadow-md"
                 size="default"
                 type="button"
               >

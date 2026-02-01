@@ -3,12 +3,12 @@
     "title": "Privacybeleid",
     "lastUpdated": "Laatst bijgewerkt: 16 oktober 2025",
     "metadata": {
-      "title": "Privacybeleid | LIFO",
-      "description": "Privacybeleid voor het LIFO voedselverspillingsbeheersysteem"
+      "title": "Privacybeleid | lifo",
+      "description": "Privacybeleid voor het lifo voedselverspillingsbeheersysteem"
     },
     "section1": {
       "title": "1. Wie Wij Zijn",
-      "content": "LIFO biedt batch-niveau voorraadbeheer software voor winkels. We helpen u de vervaldata van producten bij te houden, voedselverspilling te verminderen en datagestuurde beslissingen te nemen over kortingen en donaties. Neem contact met ons op: E-mail: contact@lifo-app.com | Voor AVG-rechtenverzoeken: contact@lifo-app.com"
+      "content": "lifo biedt batch-niveau voorraadbeheer software voor winkels. We helpen u de vervaldata van producten bij te houden, voedselverspilling te verminderen en datagestuurde beslissingen te nemen over kortingen en donaties. Neem contact met ons op: E-mail: contact@lifo-app.com | Voor AVG-rechtenverzoeken: contact@lifo-app.com"
     },
     "section2": {
       "title": "2. Welke Gegevens Wij Verzamelen",
@@ -79,7 +79,7 @@
     },
     "section8": {
       "title": "8. Analytics en Cookies",
-      "intro": "We gebruiken Google Analytics om te begrijpen hoe gebruikers met LIFO interageren en onze service te verbeteren.",
+      "intro": "We gebruiken Google Analytics om te begrijpen hoe gebruikers met lifo interageren en onze service te verbeteren.",
       "whatWeCollect": {
         "title": "Wat we verzamelen:",
         "items": [
@@ -141,7 +141,7 @@
     },
     "section11": {
       "title": "11. Privacy van Kinderen",
-      "intro": "De LIFO-dienst is niet bedoeld voor personen jonger dan 16 jaar. We verzamelen niet bewust persoonlijke gegevens van kinderen. Als we ontdekken dat we per ongeluk gegevens van een kind hebben verzameld, zullen we deze onmiddellijk verwijderen.",
+      "intro": "De lifo-dienst is niet bedoeld voor personen jonger dan 16 jaar. We verzamelen niet bewust persoonlijke gegevens van kinderen. Als we ontdekken dat we per ongeluk gegevens van een kind hebben verzameld, zullen we deze onmiddellijk verwijderen.",
       "items": [
         "Als u denkt dat we gegevens van een kind hebben verzameld, neem dan contact met ons op via: contact@lifo-app.com"
       ]
@@ -171,7 +171,7 @@
     },
     "section15": {
       "title": "15. Eigendom van Gegevens",
-      "content": "U bent eigenaar van uw gegevens. Alle voorraadgegevens, productinformatie en bedrijfsinzichten gegenereerd via LIFO blijven uw eigendom. Wij zijn slechts verwerkers van deze gegevens namens u. U kunt uw gegevens op elk moment exporteren in standaardformaten (CSV, JSON) via uw accountinstellingen."
+      "content": "U bent eigenaar van uw gegevens. Alle voorraadgegevens, productinformatie en bedrijfsinzichten gegenereerd via lifo blijven uw eigendom. Wij zijn slechts verwerkers van deze gegevens namens u. U kunt uw gegevens op elk moment exporteren in standaardformaten (CSV, JSON) via uw accountinstellingen."
     },
     "section16": {
       "title": "16. Neem Contact Met Ons Op",
@@ -180,7 +180,7 @@
       "responseTime": "We streven ernaar om binnen 2 werkdagen te reageren op alle privacyvragen."
     },
     "finalStatement": {
-      "content": "Door LIFO te gebruiken, erkent u dat u dit privacybeleid hebt gelezen en begrepen."
+      "content": "Door lifo te gebruiken, erkent u dat u dit privacybeleid hebt gelezen en begrepen."
     }
   }
 }

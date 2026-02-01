@@ -26,6 +26,7 @@ import {
 } from '@/hooks/use-draft-batches'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 import { cn } from '@/lib/utils'
+import { Typography } from '../ui/typography'
 
 interface DeliveryLogSheetProps {
   open: boolean
@@ -204,10 +205,6 @@ export function DeliveryLogSheet({ open, onOpenChange, onComplete }: DeliveryLog
     [onOpenChange],
   )
 
-  // ============================================================================
-  // RENDER
-  // ============================================================================
-
   return (
     <>
       <Sheet open={open} onOpenChange={handleOpenChange}>
@@ -227,7 +224,7 @@ export function DeliveryLogSheet({ open, onOpenChange, onComplete }: DeliveryLog
                   variant="ghost"
                   size="sm"
                   onClick={handleClearAll}
-                  className="text-gray-500 hover:text-red-600"
+                  className="text-foreground hover:text-destructive"
                 >
                   <X className="h-4 w-4 mr-1" />
                   Clear All
@@ -239,7 +236,7 @@ export function DeliveryLogSheet({ open, onOpenChange, onComplete }: DeliveryLog
           {/* Search Input - Fixed */}
           <div className="px-6 pt-4 pb-3 border-b border-gray-200 dark:border-gray-800 shrink-0">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-foreground" />
               <Input
                 type="text"
                 placeholder="Search products..."
@@ -263,23 +260,21 @@ export function DeliveryLogSheet({ open, onOpenChange, onComplete }: DeliveryLog
           {/* Content Area - Scrollable */}
           <div className="flex-1 min-h-0 overflow-hidden">
             <ScrollArea className="h-full">
-              <div className="p-6 space-y-6">
+              <div className="p-6 flex flex-col gap-6">
                 {/* Recent Products Section */}
                 <div>
                   <div className="flex items-center justify-between mb-3">
-                    <h3 className="font-semibold text-sm text-gray-700 dark:text-gray-300">
+                    <Typography variant="h3">
                       {searchQuery ? 'Search Results' : 'Recent / Frequent'}
-                    </h3>
+                    </Typography>
                     {!searchQuery && recentProducts && (
-                      <span className="text-xs text-gray-500 dark:text-gray-400">
-                        {recentProducts.length} products
-                      </span>
+                      <Typography variant="small">{recentProducts.length} products</Typography>
                     )}
                   </div>
 
                   {/* Loading State */}
                   {isLoadingRecent && (
-                    <div className="space-y-3">
+                    <div className="flex flex-col gap-4">
                       <Skeleton className="h-20 w-full" />
                       <Skeleton className="h-20 w-full" />
                       <Skeleton className="h-20 w-full" />
@@ -300,7 +295,7 @@ export function DeliveryLogSheet({ open, onOpenChange, onComplete }: DeliveryLog
 
                   {/* Products List */}
                   {!isLoadingRecent && filteredRecentProducts.length > 0 && (
-                    <div className="space-y-3">
+                    <div className="flex flex-col gap-4">
                       {filteredRecentProducts.map(product => (
                         <RecentProductCard
                           key={product.product_id}
@@ -332,12 +327,12 @@ export function DeliveryLogSheet({ open, onOpenChange, onComplete }: DeliveryLog
 
           {/* Footer - Always visible summary - Fixed */}
           {deliveryItems.size > 0 && (
-            <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 shrink-0">
+            <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-background shrink-0">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-600 dark:text-gray-400">
+                <Typography variant="small">
                   {deliveryItems.size} product{deliveryItems.size !== 1 ? 's' : ''} •{' '}
                   {deliveryItemsArray.reduce((sum, item) => sum + item.quantity, 0)} units
-                </span>
+                </Typography>
                 <Button
                   variant="link"
                   size="sm"
@@ -346,7 +341,7 @@ export function DeliveryLogSheet({ open, onOpenChange, onComplete }: DeliveryLog
                     const scrollArea = document.querySelector('[data-radix-scroll-area-viewport]')
                     scrollArea?.scrollTo({ top: scrollArea.scrollHeight, behavior: 'smooth' })
                   }}
-                  className="text-primary-600 dark:text-primary-400"
+                  className="text-primary-800 dark:text-primary-400"
                 >
                   View Summary
                 </Button>

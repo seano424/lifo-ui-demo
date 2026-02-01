@@ -97,7 +97,7 @@ export function AddStoreDetailsStep({ onSubmit, isSubmitting = false }: AddStore
 
       <div>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="flex flex-col gap-4">
             <FormField<StoreFormData>
               control={form.control}
               name="store_name"
@@ -261,7 +261,7 @@ export function AddStoreDetailsStep({ onSubmit, isSubmitting = false }: AddStore
                   {t('buttons.back')}
                 </Button>
               )}
-              <Button type="submit" className="w-full mx-auto font-bold" disabled={isSubmitting}>
+              <Button type="submit" className="w-full mx-auto " disabled={isSubmitting}>
                 {isSubmitting ? t('buttons.creating') : t('buttons.create')}
               </Button>
             </div>

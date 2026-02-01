@@ -62,13 +62,13 @@ export function QuantitySelector({
         className={cn(
           // 44px minimum tap target for mobile
           'h-11 w-11 shrink-0 rounded-2xl',
-          'border-none bg-primary-50 text-primary-600',
+          'border-none bg-primary-50 text-primary-800',
           'active:scale-95 transition-transform',
           'disabled:opacity-40 disabled:cursor-not-allowed',
         )}
         aria-label="Decrease quantity"
       >
-        <Minus className="h-5 w-5 text-primary-600" />
+        <Minus className="h-5 w-5 text-primary-800" />
       </Button>
 
       {/* Current Value Display */}
@@ -76,13 +76,13 @@ export function QuantitySelector({
         className={cn(
           'flex-1 min-w-[80px] text-center',
           'px-4 py-2.5 rounded-2xl',
-          'bg-gray-50 dark:bg-gray-800',
+          'bg-gray-50 dark:bg-background',
         )}
       >
         <span
           className={cn(
-            'text-2xl font-bold tabular-nums',
-            'text-gray-900 dark:text-gray-100',
+            'text-2xl  tabular-nums',
+            'text-foreground dark:text-foreground',
             disabled && 'opacity-50',
           )}
         >
@@ -100,13 +100,13 @@ export function QuantitySelector({
         className={cn(
           // 44px minimum tap target for mobile
           'h-11 w-11 shrink-0 rounded-2xl',
-          'border-none bg-primary-50 text-primary-600',
+          'border-none bg-primary-50 text-primary-800',
           'active:scale-95 transition-transform',
           'disabled:bg-opacity-50 disabled:cursor-not-allowed',
         )}
         aria-label="Increase quantity"
       >
-        <Plus className="h-5 w-5 text-primary-600" />
+        <Plus className="h-5 w-5 text-primary-800" />
       </Button>
     </div>
   )

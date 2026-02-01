@@ -2,7 +2,6 @@
 
 import {
   ChartNoAxesCombined,
-  HelpCircle,
   Layers,
   PackagePlus,
   SettingsIcon,
@@ -101,11 +100,11 @@ function useNavigationData() {
               url: '/dashboard/settings',
               icon: SettingsIcon,
             },
-            {
-              title: t('support'),
-              url: '/dashboard/support',
-              icon: HelpCircle,
-            },
+            // {
+            //   title: t('support'),
+            //   url: '/dashboard/support',
+            //   icon: HelpCircle,
+            // },
           ],
         },
       ],
@@ -128,17 +127,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar
       collapsible="icon"
-      className="bg-secondary-100/10 dark:bg-brand-dark border-l-none"
+      className="bg-secondary-100/10 dark:bg-background border-l-none"
       {...props}
     >
-      <SidebarHeader className="flex gap-2 justify-center items-center h-16 border-b dark:bg-brand-dark">
+      <SidebarHeader className="flex gap-2 justify-center items-center h-16 border-b dark:bg-background">
         {/* Desktop logo with text */}
         <Link
           href="/"
-          className="group-data-[collapsible=icon]:hidden hidden sm:flex items-center gap-2 hover:opacity-80 transition-opacity duration-200 ease-in-out font-heading font-black text-4xl"
+          className="group-data-[collapsible=icon]:hidden hidden sm:flex items-center gap-2 hover:opacity-80 transition-opacity duration-200 ease-in-out   text-4xl"
         >
-          <Logo variant="svg" size="sm" priority />
-          LIFO
+          <Logo variant="svg" size="sm" priority withText />
         </Link>
 
         {/* Mobile vertical logo */}
@@ -146,7 +144,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           href="/"
           className="group-data-[collapsible=icon]:hidden sm:hidden hover:opacity-80 transition-opacity duration-200 ease-in-out"
         >
-          <Logo variant="svg" size="sm" priority />
+          <Logo variant="svg" size="sm" priority withText />
         </Link>
 
         {/* Collapsed icon logo */}

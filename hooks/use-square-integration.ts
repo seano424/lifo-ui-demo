@@ -10,6 +10,7 @@ import { toast } from 'sonner'
 import { fastApiClient } from '@/lib/services/fastapi-client'
 import { createClient } from '@/lib/supabase/client'
 import { queryKeys } from '@/lib/queries/query-keys'
+import { formatErrorForToast, parseBackendError } from '@/lib/utils/error-parser'
 import type {
   SquareConnectionStatus,
   ConnectionListResponse,
@@ -111,7 +112,9 @@ export function useInitiateSquareConnect() {
     onError: error => {
       if (process.env.NODE_ENV === 'development')
         console.error('Square connection initiation failed:', error)
-      toast.error(`Failed to connect Square: ${error.message}`)
+
+      const { title, description } = formatErrorForToast(error)
+      toast.error(title, { description })
     },
   })
 }
@@ -146,7 +149,9 @@ export function useDisconnectSquare() {
     },
     onError: error => {
       if (process.env.NODE_ENV === 'development') console.error('Square disconnect failed:', error)
-      toast.error(`Failed to disconnect: ${error.message}`)
+
+      const { title, description } = formatErrorForToast(error)
+      toast.error(title, { description })
     },
   })
 }
@@ -181,7 +186,9 @@ export function useSyncSquareCatalog() {
     },
     onError: error => {
       if (process.env.NODE_ENV === 'development') console.error('Catalog sync failed:', error)
-      toast.error(`Failed to sync catalog: ${error.message}`)
+
+      const { title, description } = formatErrorForToast(error)
+      toast.error(title, { description })
     },
   })
 }
@@ -217,7 +224,22 @@ export function useSyncSquareInventory() {
     },
     onError: error => {
       if (process.env.NODE_ENV === 'development') console.error('Inventory sync failed:', error)
-      toast.error(`Failed to sync inventory: ${error.message}`)
+
+      const parsedError = parseBackendError(error)
+      const { title, description } = formatErrorForToast(error)
+
+      // Show detailed error with optional action button for specific error types
+      if (
+        parsedError.type === 'constraint' &&
+        parsedError.technical?.includes('initial_quantity_check')
+      ) {
+        toast.error(title, {
+          description: description,
+          duration: 8000, // Longer duration for actionable errors
+        })
+      } else {
+        toast.error(title, { description })
+      }
     },
   })
 }
@@ -262,7 +284,9 @@ export function useSyncSquareOrders() {
     },
     onError: error => {
       if (process.env.NODE_ENV === 'development') console.error('Orders sync failed:', error)
-      toast.error(`Failed to sync orders: ${error.message}`)
+
+      const { title, description } = formatErrorForToast(error)
+      toast.error(title, { description })
     },
   })
 }

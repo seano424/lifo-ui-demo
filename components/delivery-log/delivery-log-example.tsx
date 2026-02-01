@@ -17,6 +17,7 @@ import { Badge } from '@/components/ui/badge'
 import { DeliveryLogSheet } from './delivery-log-sheet'
 import { useDraftBatchesSummary, useRecentDeliveryProducts } from '@/hooks/use-draft-batches'
 import { useActiveStoreId } from '@/lib/stores/store-context'
+import { Typography } from '../ui/typography'
 
 // ============================================================================
 // Example 1: Simple Button
@@ -62,17 +63,17 @@ export function DeliveryDashboardCard() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle className="text-lg">Quick Add Delivery</CardTitle>
-            <Truck className="h-5 w-5 text-primary-600 dark:text-primary-400" />
+            <Truck className="h-5 w-5 text-primary-800 dark:text-primary-400" />
           </div>
           <CardDescription>Add products from recent deliveries</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+              <p className="text-2xl  text-foreground dark:text-foreground">
                 {recentProducts?.length || 0}
               </p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Recent products</p>
+              <p className="text-sm text-foreground dark:text-foreground">Recent products</p>
             </div>
             {draftSummary && draftSummary.total_draft_batches > 0 && (
               <Badge variant="secondary" className="text-base px-3 py-1">
@@ -140,7 +141,7 @@ export function InventoryDeliveryButton() {
         <Package className="h-5 w-5 mr-2" />
         Log Delivery
         {hasDrafts && (
-          <Badge variant="destructive" className="ml-2 h-5 min-w-5 px-1.5 text-xs font-semibold">
+          <Badge variant="destructive" className="ml-2 h-5 min-w-5 px-1.5 text-xs ">
             {draftSummary.total_draft_batches}
           </Badge>
         )}
@@ -171,14 +172,14 @@ export function DeliveryLogDemo() {
   }
 
   return (
-    <div className="container max-w-4xl mx-auto py-8 space-y-8">
+    <div className="container max-w-4xl mx-auto py-8 flex flex-col gap-8">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+        <Typography variant="h1" color="primary">
           Delivery Log Examples
-        </h1>
-        <p className="text-gray-600 dark:text-gray-400 mt-2">
+        </Typography>
+        <Typography variant="p" color="muted">
           Interactive examples showing different ways to use the DeliveryLogSheet component
-        </p>
+        </Typography>
       </div>
 
       {/* Stats Card */}
@@ -189,16 +190,20 @@ export function DeliveryLogDemo() {
         <CardContent>
           <div className="grid grid-cols-2 gap-4">
             <div className="text-center">
-              <p className="text-3xl font-bold text-primary-600 dark:text-primary-400">
+              <Typography variant="h2" color="primary">
                 {recentProducts?.length || 0}
-              </p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Recent Products</p>
+              </Typography>
+              <Typography variant="p" color="muted">
+                Recent Products
+              </Typography>
             </div>
             <div className="text-center">
-              <p className="text-3xl font-bold text-orange-600 dark:text-orange-400">
+              <Typography variant="h2" color="primary">
                 {draftSummary?.total_draft_batches || 0}
-              </p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Pending Drafts</p>
+              </Typography>
+              <Typography variant="p" color="muted">
+                Pending Drafts
+              </Typography>
             </div>
           </div>
         </CardContent>
@@ -243,46 +248,46 @@ export function DeliveryLogDemo() {
           <CardTitle>Delivery Log Flow</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
+          <div className="flex flex-col gap-4">
             <div className="flex items-center gap-3">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-600 text-white font-bold text-sm">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-600 text-white  text-sm">
                 1
               </div>
-              <p className="text-sm text-gray-700 dark:text-gray-300">
+              <Typography variant="p" color="muted">
                 User opens delivery log sheet
-              </p>
+              </Typography>
             </div>
             <div className="flex items-center gap-3">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-600 text-white font-bold text-sm">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-600 text-white  text-sm">
                 2
               </div>
-              <p className="text-sm text-gray-700 dark:text-gray-300">
+              <Typography variant="p" color="muted">
                 Adds products via quick-add buttons or custom quantity
-              </p>
+              </Typography>
             </div>
             <div className="flex items-center gap-3">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-600 text-white font-bold text-sm">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-600 text-white  text-sm">
                 3
               </div>
-              <p className="text-sm text-gray-700 dark:text-gray-300">
+              <Typography variant="p" color="muted">
                 Reviews summary and clicks "Done with Delivery"
-              </p>
+              </Typography>
             </div>
             <div className="flex items-center gap-3">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-600 text-white font-bold text-sm">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-600 text-white  text-sm">
                 4
               </div>
-              <p className="text-sm text-gray-700 dark:text-gray-300">
+              <Typography variant="p" color="muted">
                 System creates draft batches in database
-              </p>
+              </Typography>
             </div>
             <div className="flex items-center gap-3">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-600 text-white font-bold text-sm">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-600 text-white  text-sm">
                 5
               </div>
-              <p className="text-sm text-gray-700 dark:text-gray-300">
+              <Typography variant="p" color="muted">
                 Prompt: "Add expiry dates now?" → Opens BatchCreationSheet
-              </p>
+              </Typography>
             </div>
           </div>
         </CardContent>
@@ -291,12 +296,12 @@ export function DeliveryLogDemo() {
       {/* Documentation */}
       <Card>
         <CardContent className="p-6">
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+          <Typography variant="p" color="muted">
             📚 For complete documentation and API reference, see{' '}
-            <code className="px-2 py-1 rounded bg-gray-100 dark:bg-gray-800 text-xs">
+            <Typography variant="code" color="primary">
               components/delivery-log/
-            </code>
-          </p>
+            </Typography>
+          </Typography>
         </CardContent>
       </Card>
     </div>

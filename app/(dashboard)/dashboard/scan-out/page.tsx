@@ -15,14 +15,14 @@ export default function ScanOutPage() {
   }
 
   return (
-    <div className="space-y-6 px-4 container md:py-6 lg:py-8">
+    <div className="flex flex-col gap-6 px-4 container md:py-6 lg:py-8">
       <DashboardInsetHeader title={t('title')} description={t('description')} />
       <div className="lg:max-w-screen-sm lg:mx-auto pb-40 mt-8">
         <ScanOutInterface onItemRemoved={handleItemRemoved} />
 
         {removedItems.length > 0 && (
           <div className="mt-8 flex flex-col gap-8">
-            <Typography variant="h3" className="text-center font-black text-primary-900">
+            <Typography variant="h3" color="primary" className="text-center">
               {t('recentlyRemoved', { count: removedItems.length })}
             </Typography>
             <div className="flex flex-col gap-2">
@@ -31,10 +31,8 @@ export default function ScanOutPage() {
                   key={`${item.id}-${index}-${item.expiryDate}`}
                   className="py-4 px-8 bg-primary-900 text-white rounded-2xl border border-primary-200 w-max mx-auto flex flex-col gap-2"
                 >
-                  <Typography variant="p" className="font-bold text-white">
-                    {item.productName}
-                  </Typography>
-                  <Typography variant="p" className="text-sm text-white">
+                  <Typography variant="p">{item.productName}</Typography>
+                  <Typography variant="p">
                     {t('removedQuantityExpires', {
                       quantity: item.quantity,
                       date: item.expiryDate

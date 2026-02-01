@@ -3,6 +3,7 @@
 import DashboardInsetHeader from '@/components/dashboard/dashboard-inset-header'
 import { StoreUsersList } from '@/components/store-users/store-users-list'
 import { StoreUsersPrefetch } from '@/components/store-users/store-users-prefetch'
+import { Typography } from '@/components/ui/typography'
 import { queryKeys } from '@/lib/queries/query-keys'
 import { fetchStoreUsersPage } from '@/lib/queries/store-users'
 import { fetchUserStores } from '@/lib/queries/stores'
@@ -25,7 +26,9 @@ export default async function UsersPage() {
     // Redirect to login or show error
     return (
       <div className="text-center py-12">
-        <p>{t('loginRequired')}</p>
+        <Typography variant="p" color="muted">
+          {t('loginRequired')}
+        </Typography>
       </div>
     )
   }
@@ -37,8 +40,12 @@ export default async function UsersPage() {
   if (!primaryStore) {
     return (
       <div className="text-center py-12">
-        <h2 className="text-xl font-semibold mb-2">{t('noStoreAccess')}</h2>
-        <p className="text-gray-600">{t('noStoreAccessDescription')}</p>
+        <Typography variant="h1" color="primary">
+          {t('noStoreAccess')}
+        </Typography>
+        <Typography variant="p" color="muted">
+          {t('noStoreAccessDescription')}
+        </Typography>
       </div>
     )
   }
@@ -64,7 +71,7 @@ export default async function UsersPage() {
       {/* This component will handle store switching if user has multiple stores */}
       <StoreUsersPrefetch />
 
-      <div className="space-y-6 container md:py-6 lg:py-8">
+      <div className="flex flex-col gap-6 container md:py-6 lg:py-8">
         <DashboardInsetHeader title="Team Management" />
 
         <StoreUsersList />

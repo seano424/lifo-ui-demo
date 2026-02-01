@@ -43,9 +43,9 @@ export function DiscountForm({ batch, currencySymbol, isLoading, onConfirm }: Di
   }
 
   return (
-    <div className="space-y-4">
+    <div className="flex flex-col gap-4">
       {/* Discount Presets */}
-      <div className="space-y-2">
+      <div className="flex flex-col gap-2">
         <label className="text-sm  text-black">Select discount</label>
         <div className="grid grid-cols-5 gap-2">
           {discountPresets.map(preset => (
@@ -81,7 +81,7 @@ export function DiscountForm({ batch, currencySymbol, isLoading, onConfirm }: Di
 
       {/* Price Preview */}
       <div className="bg-white rounded-xl p-4 border border-muted/50">
-        <div className="space-y-2">
+        <div className="flex flex-col gap-2">
           <div className="flex justify-between items-center">
             <span className="text-sm text-muted-foreground">Original price</span>
             <span className="text-sm text-muted-foreground line-through">
@@ -91,7 +91,7 @@ export function DiscountForm({ batch, currencySymbol, isLoading, onConfirm }: Di
           </div>
           <div className="flex justify-between items-center">
             <span className="text-sm  text-black">New price</span>
-            <span className="text-lg font-semibold text-black">
+            <span className="text-lg  text-black">
               {currencySymbol}
               {newPrice.toFixed(2)}
             </span>
@@ -100,7 +100,7 @@ export function DiscountForm({ batch, currencySymbol, isLoading, onConfirm }: Di
       </div>
 
       {/* Quantity Selector */}
-      <div className="space-y-2">
+      <div className="flex flex-col gap-2">
         <label className="text-sm  text-black">Quantity</label>
         <div className="flex justify-center">
           <QuantitySelector

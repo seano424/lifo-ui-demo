@@ -1,52 +1,52 @@
 import { Slot } from '@radix-ui/react-slot'
 import { cva, type VariantProps } from 'class-variance-authority'
-import { Loader2 } from 'lucide-react'
+import { ChevronRightIcon, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import * as React from 'react'
 
 import { cn } from '@/lib/utils'
 
 const buttonVariants = cva(
-  'rounded-4xl font-heading font-semibold transition-transform duration-75 focus:outline-none disabled:opacity-50 disabled:pointer-events-none overflow-hidden cursor-pointer inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors duration-200 ease-in-out focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
+  'rounded-xl transition-all  duration-100 focus:outline-none disabled:opacity-50 disabled:pointer-events-none overflow-hidden cursor-pointer inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors duration-200 ease-in-out focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0',
   {
     variants: {
       variant: {
         // Enhanced variants using new color palettes
         default:
-          'bg-primary-900 text-white hover:bg-primary-800 dark:bg-primary-700 dark:hover:bg-primary-600',
+          'bg-primary-900 hover:bg-primary-800 dark:bg-primary-900/80 dark:hover:bg-primary-900 text-white',
         destructive:
-          'bg-destructive text-destructive-foreground shadow-xs hover:bg-destructive/90 dark:bg-red-700 dark:hover:bg-red-700',
-        subtleDestructive: 'bg-red-100 text-red-900 shadow-xs hover:bg-red-200',
+          'bg-destructive text-destructive-foreground shadow-xs hover:bg-destructive/90 dark:bg-destructive dark:hover:bg-destructive',
+        subtleDestructive: 'text-destructive hover:bg-destructive-100',
         outline: 'border border-input bg-background shadow-xs hover:border-border',
-        secondary:
-          'bg-secondary-900 text-white shadow-xs hover:bg-secondary-800 dark:bg-secondary-700 dark:hover:bg-secondary-600',
+        secondary: 'bg-secondary-900 shadow-xs hover:bg-secondary-800 text-white',
         ghost:
-          'hover:bg-primary-50 hover:text-primary-900 dark:hover:bg-primary-900/0 dark:text-primary-300',
+          'hover:bg-primary-50 hover:text-primary-800 dark:hover:bg-primary-900/0 dark:text-foreground font-normal w-fit',
         subtleTertiary:
-          'bg-primary-50 text-primary-900 dark:bg-primary-900/10 dark:text-primary-300',
-        link: 'text-primary-900 underline-offset-4 hover:underline dark:text-primary-300',
+          'bg-primary-50 text-primary-800 dark:bg-background/10 dark:text-primary-300',
+        link: 'text-primary-800 underline-offset-4 hover:underline dark:text-primary-300',
 
         // New subtle variants using lighter shades
         subtle:
-          'bg-primary-600 text-white hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600',
+          'bg-primary-50 text-primary-800 dark:bg-primary-900/0 dark:text-foreground font-normal w-fit',
         subtleSecondary:
-          'bg-secondary-100/10 text-sky-700 shadow-xs hover:bg-secondary-100/80 dark:bg-secondary-900 dark:text-secondary-100 dark:hover:bg-secondary-900',
+          'bg-secondary-100/10 shadow-xs hover:bg-secondary-100/80 dark:bg-secondary-900/70 dark:hover:bg-secondary-900/80',
 
         // Brand variants (preserved for backward compatibility)
-        brand: 'bg-brand-primary text-white hover:bg-primary-800 dark:hover:bg-primary-600',
+        brand:
+          'bg-brand-primary hover:bg-brand-primary/80 dark:hover:bg-brand-primary/60 text-white',
         brandOutline:
-          'border border-brand-primary bg-background shadow-xs hover:bg-primary-50 hover:text-brand-primary dark:hover:bg-primary-900/10 dark:hover:text-primary-300',
+          'border border-brand-primary bg-background shadow-xs hover:bg-brand-primary/10 hover:text-brand-primary dark:hover:bg-brand-primary/10 dark:hover:text-brand-primary',
         brandSecondaryOutline:
-          'border border-brand-secondary bg-background shadow-xs hover:bg-secondary-50 hover:text-brand-secondary dark:hover:bg-secondary-900/10 dark:hover:text-secondary-300',
-        black: 'bg-black text-white hover:bg-black/90',
-        gray: 'bg-gray-50 hover:bg-gray-50/90',
-        subtleGray: 'bg-gray-100 text-gray-900 hover:bg-gray-200',
-        white: 'bg-white text-primary-900 hover:bg-white/90',
+          'border border-brand-secondary bg-background shadow-xs hover:bg-brand-secondary/10 hover:text-brand-secondary dark:hover:bg-brand-secondary/10 dark:hover:text-brand-secondary',
+        black: 'bg-black hover:bg-black/90 text-white',
+        gray: 'bg-gray-50 hover:bg-gray-50/90 dark:bg-secondary-100/10 dark:hover:bg-opacity-20',
+        subtleGray: 'bg-gray-100 text-foreground hover:bg-gray-200',
+        white: 'bg-white text-primary-800 hover:bg-white/90',
       },
       size: {
-        sm: 'px-4 py-1.5 text-sm',
-        default: 'px-6 py-2.5 text-sm',
-        lg: 'px-6 py-2.5 text-base',
+        sm: 'px-4 py-2 text-sm',
+        default: 'px-4 py-2 text-sm',
+        lg: 'px-4 sm:px-6 py-3 sm:py-3.5 sm:text-base text-sm',
         xl: 'px-8 py-4 text-lg',
         icon: 'h-9 w-9',
       },
@@ -73,6 +73,7 @@ type ButtonOnlyProps =
 
 type ButtonPropsBase = {
   asChild?: boolean
+  hasArrowUpIcon?: boolean
   asLink?: boolean
   href?: string
   children?: React.ReactNode
@@ -93,6 +94,7 @@ const Button = React.forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPro
       size,
       asChild = false,
       asLink = false,
+      hasArrowUpIcon = false,
       href,
       children,
       loading = false,
@@ -108,12 +110,17 @@ const Button = React.forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPro
 
     // Show loading content when loading is true
     const content = loading ? (
-      <>
+      <span className="contents">
         <Loader2 className="animate-spin" />
         {loadingText || 'Loading...'}
-      </>
+      </span>
     ) : (
-      children
+      <span className="contents">
+        {children}
+        {hasArrowUpIcon && (
+          <ChevronRightIcon className="w-5 h-5 -rotate-45 transition-transform duration-300 ease-in-out group-hover:translate-x-px group-hover:-translate-y-1 -translate-y-px" />
+        )}
+      </span>
     )
 
     // Disable button when loading
@@ -130,6 +137,7 @@ const Button = React.forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPro
             href={href}
             className={cn(
               buttonVariants({ variant, size, className }),
+              hasArrowUpIcon && 'group',
               isDisabled && 'opacity-50 pointer-events-none',
             )}
             ref={ref as React.Ref<HTMLAnchorElement>}
@@ -145,6 +153,7 @@ const Button = React.forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPro
             href={href}
             className={cn(
               buttonVariants({ variant, size, className }),
+              hasArrowUpIcon && 'group',
               isDisabled && 'opacity-50 pointer-events-none',
             )}
             ref={ref as React.Ref<HTMLAnchorElement>}
@@ -163,7 +172,7 @@ const Button = React.forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPro
 
     return (
       <Comp
-        className={cn(buttonVariants({ variant, size, className }))}
+        className={cn(buttonVariants({ variant, size, className }), hasArrowUpIcon && 'group')}
         ref={ref as React.Ref<HTMLButtonElement>}
         disabled={isDisabled}
         {...buttonProps}

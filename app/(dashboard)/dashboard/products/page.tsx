@@ -73,7 +73,7 @@ export default async function ProductsPage() {
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <div className="space-y-6 container md:py-6 lg:py-8">
+      <div className="flex flex-col gap-6 container md:py-6 lg:py-8">
         {/* Store Context Header */}
         <StoreHeaderDisplay variant="compact" showAddress={false} />
 

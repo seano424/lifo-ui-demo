@@ -61,9 +61,9 @@ export default function OCRResultDisplay({
   return (
     <div
       className={cn(
-        'rounded-lg border p-4 space-y-3',
-        isSuccess && 'border-green-500/50 bg-green-50 dark:bg-green-950/20',
-        hasWarning && 'border-yellow-500/50 bg-yellow-50 dark:bg-yellow-950/20',
+        'rounded-lg border p-4 flex flex-col gap-3',
+        isSuccess && 'border-primary-500/50 bg-primary-50 dark:bg-primary-950/20',
+        hasWarning && 'border-primary/50 bg-yellow-50 dark:bg-yellow-950/20',
         hasInfo && 'border-blue-500/50 bg-blue-50 dark:bg-blue-950/20',
         className,
       )}
@@ -72,11 +72,11 @@ export default function OCRResultDisplay({
     >
       {/* Header with icon */}
       <div className="flex items-center gap-2">
-        {isSuccess && <CheckCircle2 className="w-5 h-5 text-green-600 dark:text-green-400" />}
-        {hasWarning && <AlertCircle className="w-5 h-5 text-yellow-600 dark:text-yellow-500" />}
+        {isSuccess && <CheckCircle2 className="w-5 h-5 text-primary dark:text-primary-400" />}
+        {hasWarning && <AlertCircle className="w-5 h-5 text-yellow-600 dark:text-primary" />}
         {hasInfo && <Info className="w-5 h-5 text-blue-600 dark:text-blue-400" />}
 
-        <span className="font-semibold text-sm">
+        <span className=" text-sm">
           {isSuccess && t('result.success', { defaultValue: 'Date Detected' })}
           {hasWarning && t('result.warning', { defaultValue: 'Date Needs Review' })}
           {hasInfo && t('result.info', { defaultValue: 'Text Detected' })}
@@ -86,25 +86,25 @@ export default function OCRResultDisplay({
       {/* Extracted Date */}
       {europeanDate && (
         <div>
-          <div className="text-xs text-gray-600 dark:text-gray-400 mb-1">
+          <div className="text-xs text-foreground dark:text-foreground mb-1">
             {t('result.expiryDate', { defaultValue: 'Expiry Date' })}
           </div>
-          <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">{europeanDate}</div>
+          <div className="text-2xl  text-foreground dark:text-foreground">{europeanDate}</div>
         </div>
       )}
 
       {/* Batch Number (NEW) */}
       {batchNumber && (
         <div>
-          <div className="text-xs text-gray-600 dark:text-gray-400 mb-1">
+          <div className="text-xs text-foreground dark:text-foreground mb-1">
             {t('result.batchNumber', { defaultValue: 'Batch/Lot Number' })}
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-lg font-mono font-semibold text-gray-900 dark:text-gray-100">
+            <span className="text-lg font-mono  text-foreground dark:text-foreground">
               {batchNumber}
             </span>
             {batchConfidence !== undefined && (
-              <span className="text-xs text-gray-500 dark:text-gray-400">
+              <span className="text-xs text-foreground dark:text-foreground">
                 ({Math.round(batchConfidence * 100)}%)
               </span>
             )}
@@ -120,22 +120,22 @@ export default function OCRResultDisplay({
       {/* Confidence Score */}
       {confidence !== undefined && (
         <div className="flex items-center justify-between pt-2 border-t border-gray-200 dark:border-gray-700">
-          <span className="text-xs text-gray-600 dark:text-gray-400">
+          <span className="text-xs text-foreground dark:text-foreground">
             {t('result.confidence', { defaultValue: 'Confidence' })}
           </span>
           <div className="flex items-center gap-2">
-            <div className="w-32 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+            <div className="w-32 h-2 bg-gray-200 dark:bg-background rounded-full overflow-hidden">
               <div
                 className={cn(
                   'h-full transition-all',
-                  confidence >= 0.8 && 'bg-green-500',
-                  confidence >= 0.6 && confidence < 0.8 && 'bg-yellow-500',
-                  confidence < 0.6 && 'bg-red-500',
+                  confidence >= 0.8 && 'bg-primary-500',
+                  confidence >= 0.6 && confidence < 0.8 && 'bg-primary',
+                  confidence < 0.6 && 'bg-destructive',
                 )}
                 style={{ width: `${Math.round(confidence * 100)}%` }}
               />
             </div>
-            <span className="text-sm font-semibold text-gray-900 dark:text-gray-100 min-w-[3rem] text-right">
+            <span className="text-sm  text-foreground dark:text-foreground min-w-[3rem] text-right">
               {Math.round(confidence * 100)}%
             </span>
           </div>
@@ -145,9 +145,7 @@ export default function OCRResultDisplay({
       {/* Validation Message */}
       {showValidation && validation && !validation.valid && (
         <div className="text-sm text-yellow-700 dark:text-yellow-400 bg-yellow-100 dark:bg-yellow-900/30 rounded p-2">
-          <span className="font-semibold">
-            {t('result.validationWarning', { defaultValue: 'Warning:' })}{' '}
-          </span>
+          <span>{t('result.validationWarning', { defaultValue: 'Warning:' })} </span>
           {validation.reason}
         </div>
       )}
@@ -155,9 +153,7 @@ export default function OCRResultDisplay({
       {/* Alternative date suggestion from raw text */}
       {rawParsed?.isoDate && rawParsed.isoDate !== extractedDate && (
         <div className="text-sm text-blue-700 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/30 rounded p-2">
-          <span className="font-semibold">
-            {t('result.alternativeDate', { defaultValue: 'Alternative:' })}{' '}
-          </span>
+          <span>{t('result.alternativeDate', { defaultValue: 'Alternative:' })} </span>
           {rawParsed.europeanDate}
           {rawParsed.validationError && ` (${rawParsed.validationError})`}
         </div>
@@ -166,10 +162,10 @@ export default function OCRResultDisplay({
       {/* Raw OCR Text */}
       {showRawText && rawOcrText && (
         <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
-          <div className="text-xs text-gray-600 dark:text-gray-400 mb-1">
+          <div className="text-xs text-foreground dark:text-foreground mb-1">
             {t('result.detectedText', { defaultValue: 'Detected Text' })}
           </div>
-          <div className="text-xs font-mono bg-gray-100 dark:bg-gray-800 rounded p-2 text-gray-800 dark:text-gray-300 break-all">
+          <div className="text-xs font-mono bg-gray-100 dark:bg-background rounded p-2 text-foreground dark:text-foreground break-all">
             "{rawOcrText}"
           </div>
         </div>
@@ -177,7 +173,7 @@ export default function OCRResultDisplay({
 
       {/* Helpful hint if confidence is low */}
       {confidence !== undefined && confidence < 0.7 && (
-        <div className="text-xs text-gray-600 dark:text-gray-400 italic">
+        <div className="text-xs text-foreground dark:text-foreground italic">
           {t('result.lowConfidenceHint', {
             defaultValue: 'Low confidence - please verify the date is correct',
           })}
@@ -205,7 +201,7 @@ export function OCRResultCompact({
       className={cn(
         'flex items-center gap-2 px-3 py-2 rounded-md',
         validation.valid
-          ? 'bg-green-50 dark:bg-green-950/20 text-green-900 dark:text-green-100'
+          ? 'bg-primary-50 dark:bg-primary-950/20 text-primary-900 dark:text-primary-100'
           : 'bg-yellow-50 dark:bg-yellow-950/20 text-yellow-900 dark:text-yellow-100',
         className,
       )}
@@ -216,7 +212,7 @@ export function OCRResultCompact({
         <AlertCircle className="w-4 h-4" />
       )}
 
-      <span className="font-semibold">{europeanDate}</span>
+      <span>{europeanDate}</span>
 
       {confidence !== undefined && (
         <span className="text-xs opacity-75">({Math.round(confidence * 100)}%)</span>

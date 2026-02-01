@@ -130,8 +130,7 @@ export function DeactivateStoreDialog({ store, canDeactivate }: DeactivateStoreD
 
           <div className="flex flex-col gap-2">
             <Label htmlFor="confirm-store-name">
-              {t('confirmLabelPrefix')}{' '}
-              <span className="font-mono font-bold">{store.store_name}</span>{' '}
+              {t('confirmLabelPrefix')} <span className="font-mono ">{store.store_name}</span>{' '}
               {t('confirmLabelSuffix')}
             </Label>
             <Input

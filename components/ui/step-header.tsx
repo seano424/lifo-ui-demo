@@ -13,8 +13,8 @@ interface StepHeaderProps {
  */
 export function StepHeader({ title, subtitle, centered = true }: StepHeaderProps) {
   const containerClasses = centered
-    ? 'text-center space-y-2 flex flex-col items-center'
-    : 'space-y-2'
+    ? 'text-center flex flex-col gap-2 flex flex-col items-center'
+    : 'flex flex-col gap-2'
 
   return (
     <div className={containerClasses}>

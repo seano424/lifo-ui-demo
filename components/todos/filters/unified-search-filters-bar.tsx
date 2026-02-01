@@ -7,6 +7,7 @@ import type { BatchStatus, TodoActionType, TodoUrgencyLevel } from '@/lib/querie
 import { ArrowUpDown, Filter, X } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { TodoSearchBar } from './todo-search-bar'
+import { Typography } from '@/components/ui/typography'
 
 interface UnifiedSearchFiltersBarProps {
   searchTerm?: string
@@ -76,7 +77,7 @@ export function UnifiedSearchFiltersBar({
 
   if (isMobile) {
     return (
-      <div className="px-4 py-6 space-y-6">
+      <div className="px-4 py-6 flex flex-col gap-6">
         {/* Filter and Sort Buttons Row */}
         <div className="flex justify-center gap-3">
           <Button
@@ -110,9 +111,11 @@ export function UnifiedSearchFiltersBar({
 
         {/* Active Filters Display */}
         {hasActiveFilters && onRemoveFilter && (
-          <div className="space-y-2">
+          <div className="flex flex-col gap-2">
             <div className="flex items-center justify-center gap-3">
-              <h4 className="text-sm  text-muted-foreground">{t('filters.activeFilters')}</h4>
+              <Typography variant="h4" color="primary">
+                {t('filters.activeFilters')}
+              </Typography>
               {onClearAll && (
                 <Button
                   variant="outline"
@@ -212,7 +215,7 @@ export function UnifiedSearchFiltersBar({
             <Button
               variant="subtleTertiary"
               onClick={onFiltersClick}
-              className="flex items-center gap-2 h-12 px-4 font-semibold"
+              className="flex items-center gap-2 h-12 px-4 "
             >
               <Filter className="w-4 h-4" />
               {t('filters.filtersTitle')}
@@ -220,7 +223,7 @@ export function UnifiedSearchFiltersBar({
             <Button
               variant="subtleTertiary"
               onClick={onSortClick}
-              className="flex items-center gap-2 h-12 px-4 font-semibold"
+              className="flex items-center gap-2 h-12 px-4 "
             >
               <ArrowUpDown className="w-4 h-4" />
               {t('filters.sortTitle')}
@@ -239,12 +242,14 @@ export function UnifiedSearchFiltersBar({
 
         {/* Active Filters Display */}
         {hasActiveFilters && onRemoveFilter && (
-          <div className="mt-4 space-y-2">
+          <div className="mt-4 flex flex-col gap-2">
             <div className="flex justify-center mt-8">
               <div className="w-1/2 border-t border-border" />
             </div>
             <div className="flex items-center justify-center gap-3">
-              <h4 className="text-sm  text-muted-foreground">{t('filters.activeFilters')}</h4>
+              <Typography variant="h4" color="primary">
+                {t('filters.activeFilters')}
+              </Typography>
               {onClearAll && (
                 <Button
                   variant="outline"

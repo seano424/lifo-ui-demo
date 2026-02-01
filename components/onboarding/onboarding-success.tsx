@@ -24,8 +24,8 @@ export function OnboardingSuccess({ storeName }: OnboardingSuccessProps) {
   }
 
   return (
-    <div className="max-w-md mx-auto space-y-6">
-      <div className="text-center space-y-4 flex flex-col items-center justify-center">
+    <div className="max-w-md mx-auto flex flex-col gap-6">
+      <div className="text-center flex flex-col gap-4 flex flex-col items-center justify-center">
         <Check className="w-10 h-10 stroke-2 rounded-full p-2 bg-primary-900 text-white" />
         <Typography variant="h1">{t('welcome')}</Typography>
         <Typography variant="p" color="muted">
@@ -37,16 +37,14 @@ export function OnboardingSuccess({ storeName }: OnboardingSuccessProps) {
         <CardHeader>
           <CardTitle className="text-center">{t('whatsNextTitle')}</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-3">
+        <CardContent className="flex flex-col gap-4">
+          <div className="flex flex-col gap-4">
             <div className="flex items-start gap-3">
-              <div className="w-6 h-6 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+              <div className="w-6 h-6 bg-primary/10 rounded-full flex items-center justify-center shrink-0 mt-0.5">
                 <span className="text-xs  text-primary">1</span>
               </div>
-              <div className="space-y-1 flex flex-col">
-                <Typography variant="small" className="">
-                  {t('nextSteps.completeSetup.title')}
-                </Typography>
+              <div className="flex flex-col gap-1 flex flex-col">
+                <Typography variant="small">{t('nextSteps.completeSetup.title')}</Typography>
                 <Typography variant="small" color="muted">
                   {t('nextSteps.completeSetup.description')}
                 </Typography>
@@ -54,13 +52,11 @@ export function OnboardingSuccess({ storeName }: OnboardingSuccessProps) {
             </div>
 
             <div className="flex items-start gap-3">
-              <div className="w-6 h-6 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+              <div className="w-6 h-6 bg-primary/10 rounded-full flex items-center justify-center shrink-0 mt-0.5">
                 <span className="text-xs  text-primary">2</span>
               </div>
-              <div className="space-y-1 flex flex-col">
-                <Typography variant="small" className="">
-                  {t('nextSteps.addProducts.title')}
-                </Typography>
+              <div className="flex flex-col gap-1 flex flex-col">
+                <Typography variant="small">{t('nextSteps.addProducts.title')}</Typography>
                 <Typography variant="small" color="muted">
                   {t('nextSteps.addProducts.description')}
                 </Typography>
@@ -68,13 +64,11 @@ export function OnboardingSuccess({ storeName }: OnboardingSuccessProps) {
             </div>
 
             <div className="flex items-start gap-3">
-              <div className="w-6 h-6 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+              <div className="w-6 h-6 bg-primary/10 rounded-full flex items-center justify-center shrink-0 mt-0.5">
                 <span className="text-xs  text-primary">3</span>
               </div>
-              <div className="space-y-1 flex flex-col">
-                <Typography variant="small" className="">
-                  {t('nextSteps.inviteTeam.title')}
-                </Typography>
+              <div className="flex flex-col gap-1 flex flex-col">
+                <Typography variant="small">{t('nextSteps.inviteTeam.title')}</Typography>
                 <Typography variant="small" color="muted">
                   {t('nextSteps.inviteTeam.description')}
                 </Typography>

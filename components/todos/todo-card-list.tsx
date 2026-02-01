@@ -127,7 +127,7 @@ export function TodoCardList({
         {Array.from({ length: 4 }, () => (
           <div key={crypto.randomUUID()} className="flex flex-col gap-4">
             <div className="flex gap-4">
-              <Skeleton className="h-8 w-8 flex-shrink-0 bg-muted animate-pulse" />
+              <Skeleton className="h-8 w-8 shrink-0 bg-muted animate-pulse" />
               <div className="w-full flex flex-col gap-2">
                 <Skeleton className="h-6 w-64 bg-muted animate-pulse" />
                 <Skeleton className="h-6 w-8/12 bg-muted animate-pulse" />

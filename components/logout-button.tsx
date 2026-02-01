@@ -1,8 +1,6 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
-import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { createClient } from '@/lib/supabase/client'
 
@@ -27,36 +25,15 @@ interface LogoutButtonProps {
 
 export function LogoutButton({ className, variant = 'gray' }: LogoutButtonProps) {
   const t = useTranslations('marketing.auth')
-  const router = useRouter()
-  const [isLoggingOut, setIsLoggingOut] = useState(false)
 
   const logout = async () => {
-    if (isLoggingOut) return // Prevent double-clicks
-
-    setIsLoggingOut(true)
-
     const supabase = createClient()
-
-    try {
-      await supabase.auth.signOut()
-    } catch (error) {
-      // Log but continue - local cleanup happens via navigation
-      console.error('Logout API error:', error)
-    }
-
-    // Navigate and refresh - hooks will naturally clear state
-    router.push('/')
-    router.refresh()
+    await supabase.auth.signOut()
+    window.location.href = '/'
   }
 
   return (
-    <Button
-      variant={variant}
-      size="default"
-      onClick={logout}
-      disabled={isLoggingOut}
-      className={className}
-    >
+    <Button variant={variant} size="default" onClick={logout} className={className}>
       {t('logout')}
     </Button>
   )

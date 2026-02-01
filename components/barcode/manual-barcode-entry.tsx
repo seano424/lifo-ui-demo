@@ -290,7 +290,7 @@ export default function ManualBarcodeEntry({
   }
 
   return (
-    <div className={`space-y-4 max-w-2xl mx-auto ${className}`}>
+    <div className={`flex flex-col gap-4 max-w-2xl mx-auto ${className}`}>
       <Card>
         <CardHeader>
           <div className="flex justify-between">
@@ -301,14 +301,14 @@ export default function ManualBarcodeEntry({
           </div>
         </CardHeader>
 
-        <CardContent className="space-y-4">
+        <CardContent className="flex flex-col gap-4">
           {selectedProduct && (
             <Card>
               <CardContent className="p-4">
                 <div className="flex items-start gap-3">
                   <div className="flex-1">
                     <Typography variant="h3">{t('productSelected')}</Typography>
-                    <div className="text-sm mt-1 space-y-1">
+                    <div className="text-sm mt-1 flex flex-col gap-1">
                       <div>
                         <strong>{tFields('name')}:</strong> {selectedProduct.productName}
                       </div>
@@ -354,9 +354,9 @@ export default function ManualBarcodeEntry({
 
           {!selectedProduct && (
             <>
-              <div className="space-y-4">
+              <div className="flex flex-col gap-4">
                 {/* Barcode Lookup */}
-                <div className="space-y-2">
+                <div className="flex flex-col gap-2">
                   <Label>{t('searchByBarcode')}</Label>
                   <div className="flex flex-col sm:flex-row gap-2">
                     <Input
@@ -405,11 +405,11 @@ export default function ManualBarcodeEntry({
                 </div>
 
                 {/* Product Name Search */}
-                <div className="space-y-2">
+                <div className="flex flex-col gap-2">
                   <Label>
                     {t('searchByProductName')}
                     {mode === 'scan-out' && (
-                      <span className="text-xs text-gray-500 ml-2">{t('inStockItemsOnly')}</span>
+                      <span className="text-xs text-foreground ml-2">{t('inStockItemsOnly')}</span>
                     )}
                   </Label>
                   <div className="relative">
@@ -487,11 +487,11 @@ export default function ManualBarcodeEntry({
                                   <Typography variant="p">{product.brand}</Typography>
                                 )}
                                 {product.isOutOfStock ? (
-                                  <Typography variant="small" className="text-red-600">
+                                  <Typography variant="small" className="text-destructive">
                                     {t('outOfStock')}
                                   </Typography>
                                 ) : product.total_available_quantity ? (
-                                  <Typography variant="small" className="text-primary-900">
+                                  <Typography variant="small" className="text-primary-800">
                                     {product.total_available_quantity} {t('unitsAvailable')}
                                     {product.batch_count &&
                                       product.batch_count > 1 &&
@@ -539,9 +539,11 @@ export default function ManualBarcodeEntry({
                                     }}
                                   >
                                     <div className="flex-1">
-                                      <div className="">{product.name}</div>
+                                      <div>{product.name}</div>
                                       {product.brand && (
-                                        <div className="text-sm text-gray-500">{product.brand}</div>
+                                        <div className="text-sm text-foreground">
+                                          {product.brand}
+                                        </div>
                                       )}
                                     </div>
                                   </Button>
@@ -576,11 +578,11 @@ export default function ManualBarcodeEntry({
                                   }}
                                 >
                                   <div className="flex-1">
-                                    <div className="">
-                                      {product.product_name || 'Unknown Product'}
-                                    </div>
+                                    <div>{product.product_name || 'Unknown Product'}</div>
                                     {product.brands && (
-                                      <div className="text-sm text-gray-500">{product.brands}</div>
+                                      <div className="text-sm text-foreground">
+                                        {product.brands}
+                                      </div>
                                     )}
                                   </div>
                                 </Button>
@@ -595,7 +597,7 @@ export default function ManualBarcodeEntry({
                       (mode === 'deliveries' &&
                         (!supabaseSearch.data || supabaseSearch.data.length === 0) &&
                         (!productSearch.data || productSearch.data.length === 0))) && (
-                      <div className="text-sm text-gray-500 p-3 border rounded-2xl">
+                      <div className="text-sm text-foreground p-3 border rounded-2xl">
                         {t('noProductsFound')} "{productNameQuery}"
                       </div>
                     )}
@@ -612,7 +614,7 @@ export default function ManualBarcodeEntry({
               )}
 
               {lookupResult && (
-                <div className="space-y-3">
+                <div className="flex flex-col gap-4">
                   {lookupResult.found ? (
                     <Card>
                       <CardContent className="p-4">
@@ -621,14 +623,14 @@ export default function ManualBarcodeEntry({
                           barcodeStockStatus.hasStock ? (
                             <div className="flex justify-center items-center gap-2">
                               <Check className="w-6 h-6 text-secondary-900 stroke-5 border-2 border-secondary-900 rounded-full p-[3px] bg-primary-100" />
-                              <Typography variant="h3" className="text-primary-800 font-black">
+                              <Typography variant="h3" className="text-primary-800 ">
                                 {t('productFound')}
                               </Typography>
                             </div>
                           ) : (
                             <div className="flex justify-center items-center gap-2">
-                              <AlertCircle className="w-6 h-6 text-red-600" />
-                              <Typography variant="h3" className="text-red-600 font-black">
+                              <AlertCircle className="w-6 h-6 text-destructive" />
+                              <Typography variant="h3" className="text-destructive ">
                                 {t('outOfStock')}
                               </Typography>
                             </div>
@@ -636,14 +638,14 @@ export default function ManualBarcodeEntry({
                         ) : (
                           <div className="flex justify-center items-center gap-2">
                             <Check className="w-6 h-6 text-secondary-900 stroke-5 border-2 border-secondary-900 rounded-full p-[3px] bg-primary-100" />
-                            <Typography variant="h3" className="text-primary-800 font-black">
+                            <Typography variant="h3" className="text-primary-800 ">
                               {t('productFound')}
                             </Typography>
                           </div>
                         )}
 
                         {lookupResult.product && (
-                          <div className="text-sm space-y-2">
+                          <div className="text-sm flex flex-col gap-2">
                             <div>
                               <strong>{tFields('name')}:</strong>{' '}
                               {lookupResult.product.product_name ||
@@ -666,11 +668,11 @@ export default function ManualBarcodeEntry({
                               <div>
                                 <strong>Stock:</strong>{' '}
                                 {barcodeStockStatus.hasStock ? (
-                                  <span className="text-primary-600">
+                                  <span className="text-primary-800">
                                     {barcodeStockStatus.availableQuantity} {t('unitsAvailable')}
                                   </span>
                                 ) : (
-                                  <span className="text-red-600">{t('noStockAvailable')}</span>
+                                  <span className="text-destructive">{t('noStockAvailable')}</span>
                                 )}
                               </div>
                             )}
@@ -750,7 +752,7 @@ export default function ManualBarcodeEntry({
                       {t('addProductManually')}
                     </div>
                   </div>
-                  <div className="space-y-3">
+                  <div className="flex flex-col gap-4">
                     <div className="grid grid-cols-1 gap-3">
                       <div>
                         <Label>{tFields('barcode')} *</Label>
@@ -863,7 +865,7 @@ export default function ManualBarcodeEntry({
                       </div>
 
                       {productSearch.data && productSearch.data.length > 0 && (
-                        <div className="mt-2 max-h-32 overflow-y-auto space-y-1">
+                        <div className="mt-2 max-h-32 overflow-y-auto flex flex-col gap-1">
                           {productSearch.data
                             .slice(0, SEARCH_CONFIG.MAX_SEARCH_RESULTS)
                             .map((product: OpenFoodFactsSearchResult) => (
@@ -898,11 +900,9 @@ export default function ManualBarcodeEntry({
                                 }}
                               >
                                 <div className="text-left">
-                                  <div className="">
-                                    {product.product_name || 'Unknown Product'}
-                                  </div>
+                                  <div>{product.product_name || 'Unknown Product'}</div>
                                   {product.brands && (
-                                    <div className="text-gray-500">{product.brands}</div>
+                                    <div className="text-foreground">{product.brands}</div>
                                   )}
                                 </div>
                               </Button>

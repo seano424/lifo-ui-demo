@@ -161,7 +161,7 @@
     "optional": "facultatif",
     "pwa": {
       "installPrompt": {
-        "title": "Installer LIFO",
+        "title": "Installer lifo",
         "subtitle": "PWA Expérimental",
         "installButton": "Installer",
         "dismissAriaLabel": "Ignorer",

@@ -13,13 +13,11 @@ interface CtaFeatureProps {
 function CtaFeature({ icon, title, description }: CtaFeatureProps) {
   return (
     <div className="flex gap-4 items-start">
-      <div className="text-primary-900 bg-blue-100/70 p-2.5 rounded-2xl border border-blue-200/50 shadow-sm">
+      <div className="text-primary dark:text-primary-300 bg-primary-100/70 dark:bg-background/30 p-2.5 rounded-2xl border border-primary-200/50 dark:border-primary-700/50 shadow-sm">
         {icon}
       </div>
       <div className="flex flex-col gap-1">
-        <Typography variant="h4" className="font-bold mb-1">
-          {title}
-        </Typography>
+        <Typography variant="h4">{title}</Typography>
         <Typography variant="p">{description}</Typography>
       </div>
     </div>
@@ -37,8 +35,8 @@ export function CtaSection() {
         </Typography>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center max-w-3xl mx-auto">
           {/* Left column - Features */}
-          <div className="space-y-8">
-            <div className="space-y-6">
+          <div className="flex flex-col gap-8">
+            <div className="flex flex-col gap-6">
               <CtaFeature
                 icon={<Zap size={22} strokeWidth={1.5} />}
                 title={t('features.quickSetup.title')}
@@ -66,49 +64,34 @@ export function CtaSection() {
           </div>
 
           {/* Right column - CTA card */}
-          <div className="flex flex-col rounded-2xl bg-card border shadow-xl p-8 mb-8 space-y-6">
+          <div className="flex flex-col rounded-2xl bg-card border shadow-xl p-8 mb-8 flex flex-col gap-6">
             <div className="flex flex-col gap-1">
-              <Typography variant="h3" className="text-2xl font-bold text-secondary-900 mb-4">
-                {t('card.title')}
-              </Typography>
-              <Typography variant="p" className="text-secondary-900">
-                {t('card.description')}
-              </Typography>
+              <Typography variant="h3">{t('card.title')}</Typography>
+              <Typography variant="p">{t('card.description')}</Typography>
             </div>
 
-            <div className="space-y-3 py-4">
+            <div className="flex flex-col gap-3 py-4">
               <div className="flex items-center gap-2">
-                <div className="text-secondary-600">
+                <div className="text-secondary dark:text-secondary-400">
                   <Check size={20} />
                 </div>
-                <Typography variant="p" className=" font-semibold">
-                  {t('card.benefits.noCommitment')}
-                </Typography>
+                <Typography variant="p">{t('card.benefits.noCommitment')}</Typography>
               </div>
               <div className="flex items-center gap-2">
-                <div className="text-secondary-600">
+                <div className="text-secondary dark:text-secondary-400">
                   <Check size={20} />
                 </div>
-                <Typography variant="p" className="font-semibold">
-                  {t('card.benefits.instantSetup')}
-                </Typography>
+                <Typography variant="p">{t('card.benefits.instantSetup')}</Typography>
               </div>
               <div className="flex items-center gap-2">
-                <div className="text-secondary-600">
+                <div className="text-secondary dark:text-secondary-400">
                   <Check size={20} />
                 </div>
-                <Typography variant="p" className="font-semibold">
-                  {t('card.benefits.support')}
-                </Typography>
+                <Typography variant="p">{t('card.benefits.support')}</Typography>
               </div>
             </div>
 
-            <Button
-              asLink
-              href="/contact"
-              size="xl"
-              className="w-full bg-gradient-to-r from-primary-900 to-secondary-800 text-white hover:opacity-90 transition-opacity shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2 whitespace-normal sm:whitespace-nowrap"
-            >
+            <Button asLink href="/contact" size="xl">
               <span className="text-center">{t('card.button')}</span>{' '}
               <ArrowRight size={18} className="shrink-0" />
             </Button>

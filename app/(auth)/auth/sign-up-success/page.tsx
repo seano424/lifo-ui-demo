@@ -137,7 +137,7 @@ function SignUpSuccessContent() {
       <div className="w-full max-w-md">
         <div className="flex flex-col gap-6">
           <Card shadow="primary">
-            <CardHeader className="text-center space-y-4">
+            <CardHeader className="text-center flex flex-col gap-4">
               {/* Icon */}
               <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
                 <Mail className="w-8 h-8 text-primary" />
@@ -151,7 +151,7 @@ function SignUpSuccessContent() {
                 {email ? (
                   <Typography variant="p" className="text-base text-muted-foreground">
                     {t.rich('checkEmail', {
-                      email: _ => <span className="font-semibold text-foreground">{email}</span>,
+                      email: _ => <span className=" text-foreground">{email}</span>,
                     })}
                   </Typography>
                 ) : (
@@ -162,7 +162,7 @@ function SignUpSuccessContent() {
               </div>
             </CardHeader>
 
-            <CardContent className="space-y-4">
+            <CardContent className="flex flex-col gap-4">
               {/* Instructions */}
               <Typography variant="p" color="muted" className="text-center">
                 {t('instructions')}
@@ -212,7 +212,7 @@ function LoadingFallback() {
     <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
       <div className="w-full max-w-md">
         <Card shadow="primary">
-          <CardHeader className="text-center space-y-4">
+          <CardHeader className="text-center flex flex-col gap-4">
             <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
               <Mail className="w-8 h-8 text-primary animate-pulse" />
             </div>

@@ -79,9 +79,7 @@ export function StoreInsightsDashboard({ storeId: propStoreId }: StoreInsightsDa
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between flex-col sm:flex-row gap-4 text-center sm:text-left">
         <div className="flex flex-col gap-2">
-          <Typography variant="h4" className="font-bold">
-            {t('title')}
-          </Typography>
+          <Typography variant="h4">{t('title')}</Typography>
           <Typography variant="p" className="text-muted-foreground dark:text-secondary-50">
             {t('description')}
           </Typography>
@@ -109,7 +107,7 @@ export function StoreInsightsDashboard({ storeId: propStoreId }: StoreInsightsDa
           </Button>
         </div>
       </div>
-      <div className="space-y-6">
+      <div className="flex flex-col gap-6">
         <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-5 text-center sm:text-left">
           <div className="flex flex-col gap-2 border rounded-2xl p-4">
             <Typography variant="h4">{t('metrics.urgentItems')}</Typography>
@@ -150,7 +148,7 @@ export function StoreInsightsDashboard({ storeId: propStoreId }: StoreInsightsDa
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4 text-center sm:text-left">
+            <div className="flex flex-col gap-4 text-center sm:text-left">
               {false && (
                 <Alert>
                   <AlertTriangle className="h-4 w-4" />
@@ -164,35 +162,41 @@ export function StoreInsightsDashboard({ storeId: propStoreId }: StoreInsightsDa
               )}
 
               {/* Analytics Summary */}
-              <div className="space-y-2">
-                <h4 className="font-semibold text-sm">{t('overview.recentActivity')}</h4>
+              <div className="flex flex-col gap-2">
+                <Typography variant="h4" color="primary">
+                  {t('overview.recentActivity')}
+                </Typography>
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div className="p-3 bg-blue-50 rounded">
-                    <p className="">{t('overview.actionsTaken')}</p>
-                    <p className="text-blue-600">
+                    <Typography variant="p" color="muted">
+                      {t('overview.actionsTaken')}
+                    </Typography>
+                    <Typography variant="p" color="primary">
                       {t('overview.actionsTakenPeriod', {
                         totalActions: t('comingSoon'),
                       })}
-                    </p>
+                    </Typography>
                   </div>
                   <div className="p-3 bg-primary-50 rounded">
-                    <p className="">{t('overview.discountsApplied')}</p>
-                    <p className="text-primary-600">
+                    <Typography variant="p" color="muted">
+                      {t('overview.discountsApplied')}
+                    </Typography>
+                    <Typography variant="p" color="primary">
                       {t('overview.saved', {
                         discountValue: t('comingSoon'),
                       })}
-                    </p>
+                    </Typography>
                   </div>
                 </div>
               </div>
 
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                <p className="text-sm text-muted-foreground">
+                <Typography variant="p" color="muted">
                   {t('overview.averageScore', {
                     avgScore: t('comingSoon'),
                     discountValue: t('comingSoon'),
                   })}
-                </p>
+                </Typography>
               </div>
             </div>
           </CardContent>
@@ -202,11 +206,11 @@ export function StoreInsightsDashboard({ storeId: propStoreId }: StoreInsightsDa
         {scoringLogs.length > 0 && (
           <Card>
             <CardHeader>
-              <CardTitle>🔍 Scoring Debug Logs</CardTitle>
+              <CardTitle>Scoring Debug Logs</CardTitle>
               <CardDescription>Real-time logs from the latest scoring operation</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-1 font-mono text-sm bg-muted p-4 rounded-lg max-h-60 overflow-y-auto">
+              <div className="flex flex-col gap-1 font-mono text-sm bg-muted p-4 rounded-lg max-h-60 overflow-y-auto">
                 {scoringLogs.map((log, index) => (
                   <div key={`log-${index}-${log.slice(0, 10)}`} className="text-foreground">
                     {log}

@@ -268,7 +268,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
       <div className="flex items-center gap-2 flex-col justify-center">
         <div className="flex items-center gap-1">
           <Zap className="w-6 h-6 text-secondary-900 fill-primary-100" />
-          <Typography variant="h3" className="text-primary-800 font-black">
+          <Typography variant="h3" color="primary">
             {t('title')}
           </Typography>
           <Zap className="w-6 h-6 text-secondary-900 fill-primary-100" />
@@ -301,19 +301,19 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
           />
 
           {selectedFile ? (
-            <div className="space-y-4">
-              <FileCheck className="h-12 w-12 text-primary-500 mx-auto" />
+            <div className="flex flex-col gap-4">
+              <FileCheck className="h-12 w-12 text-primary-800 mx-auto" />
               <div>
-                <h3 className="font-semibold text-lg">{selectedFile.name}</h3>
-                <p className="text-gray-600">{(selectedFile.size / 1024).toFixed(1)} KB</p>
+                <Typography variant="h3">{selectedFile.name}</Typography>
+                <Typography variant="p">{(selectedFile.size / 1024).toFixed(1)} KB</Typography>
               </div>
             </div>
           ) : (
-            <div className="space-y-4">
-              <Upload className="h-12 w-12 text-gray-400 mx-auto" />
+            <div className="flex flex-col gap-4">
+              <Upload className="h-12 w-12 text-foreground mx-auto" />
               <div>
-                <h3 className="font-semibold text-lg">{t('dropZone.dropHere')}</h3>
-                <p className="text-gray-600">{t('dropZone.orBrowse')}</p>
+                <Typography variant="h3">{t('dropZone.dropHere')}</Typography>
+                <Typography variant="p">{t('dropZone.orBrowse')}</Typography>
               </div>
               <Button onClick={() => fileInputRef.current?.click()} variant="outline">
                 {t('dropZone.chooseFile')}
@@ -326,7 +326,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
       {/* Simple Preview */}
       {!uploadResult && isPreviewReady && csvPreview.length > 0 && (
         <Card className="p-6">
-          <div className="space-y-4">
+          <div className="flex flex-col gap-4">
             <BatchValidationTable
               items={csvPreview}
               currentPage={currentPage}
@@ -343,52 +343,57 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                 variant={validationResult.has_validation_errors ? 'destructive' : 'default'}
                 className={
                   validationResult.has_validation_errors
-                    ? 'bg-red-50 border-red-200'
-                    : 'bg-green-50 border-green-200'
+                    ? 'bg-red-50 border-destructive'
+                    : 'bg-primary-50 border-primary-200'
                 }
               >
                 <AlertCircle className="h-4 w-4" />
                 <AlertTitle
                   className={
                     validationResult.has_validation_errors
-                      ? 'text-red-800 font-semibold'
-                      : 'text-green-800 font-semibold'
+                      ? 'text-destructive '
+                      : 'text-primary-800 '
                   }
                 >
                   {validationResult.has_validation_errors
                     ? 'Validation Errors Found'
                     : 'Validation Successful'}
                 </AlertTitle>
-                <AlertDescription className="space-y-3 mt-2">
-                  <p
+                <AlertDescription className="flex flex-col gap-3 mt-2">
+                  <Typography
+                    variant="p"
                     className={
-                      validationResult.has_validation_errors ? 'text-red-700' : 'text-green-700'
+                      validationResult.has_validation_errors
+                        ? 'text-destructive'
+                        : 'text-primary-700'
                     }
                   >
                     {validationResult.message}
-                  </p>
+                  </Typography>
 
                   {validationResult.has_validation_errors &&
                     validationResult.warnings &&
                     validationResult.warnings.length > 0 && (
-                      <div className="space-y-3">
+                      <div className="flex flex-col gap-4">
                         {validationResult.warnings.map(
                           (warning: ValidationWarning, idx: number) => (
                             <div
                               key={`validation-warning-${idx}-${warning.message.slice(0, 20)}`}
-                              className="space-y-2 border-t border-red-200 pt-2"
+                              className="flex flex-col gap-2 border-t border-destructive pt-2"
                             >
-                              <p className="text-red-700 ">{warning.message}</p>
+                              <Typography variant="p">{warning.message}</Typography>
                               {warning.suggestion && (
-                                <p className="text-red-600 text-sm italic">{warning.suggestion}</p>
+                                <Typography variant="p" color="destructive">
+                                  {warning.suggestion}
+                                </Typography>
                               )}
                               {warning.affected_items && warning.affected_items.length > 0 && (
-                                <details className="text-sm">
-                                  <summary className="cursor-pointer text-red-600 hover:text-red-800">
+                                <details>
+                                  <summary className="cursor-pointer text-destructive hover:text-destructive">
                                     View affected items ({warning.total_affected} total, showing
                                     first {Math.min(5, warning.affected_items.length)})
                                   </summary>
-                                  <ul className="mt-2 space-y-1 list-disc list-inside text-red-700">
+                                  <ul className="mt-2 flex flex-col gap-1 list-disc list-inside text-destructive">
                                     {warning.affected_items
                                       .slice(0, 5)
                                       .map((item: AffectedItem, i: number) => (
@@ -398,7 +403,7 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                                           {item.product_name}
                                           {item.sku && ` (SKU: ${item.sku})`}
                                           {item.error && (
-                                            <span className="block ml-6 text-xs text-red-600">
+                                            <span className="block ml-6 text-xs text-destructive">
                                               {item.error}
                                             </span>
                                           )}
@@ -414,10 +419,10 @@ export function CSVUploadForm({ storeId }: CSVUploadFormProps) {
                     )}
 
                   {!validationResult.has_validation_errors && (
-                    <p className="text-green-600 text-sm">
+                    <Typography variant="p" color="primary">
                       All {validationResult.validation_results.valid_items} items passed validation.
                       Ready to upload!
-                    </p>
+                    </Typography>
                   )}
                 </AlertDescription>
               </Alert>

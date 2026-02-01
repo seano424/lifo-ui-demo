@@ -69,13 +69,13 @@ export function KPICard({
     return (
       <div className={cn('bg-background border rounded-2xl p-5 flex flex-col h-full', className)}>
         <div className="flex items-start gap-3 mb-4">
-          <Skeleton className="h-10 w-10 rounded-xl flex-shrink-0" />
+          <Skeleton className="h-10 w-10 rounded-xl shrink-0" />
           <Skeleton className="h-5 flex-1 rounded-lg" />
         </div>
         <div className="flex-1 flex flex-col justify-between">
-          <div className="space-y-3">
+          <div className="flex flex-col gap-4">
             <Skeleton className="h-8 w-2/3 rounded-lg" />
-            <div className="space-y-1">
+            <div className="flex flex-col gap-1">
               <Skeleton className="h-4 w-full rounded-lg" />
               <Skeleton className="h-4 w-3/4 rounded-lg" />
             </div>
@@ -96,7 +96,7 @@ export function KPICard({
           className,
         )}
       >
-        <div className="text-center space-y-2">
+        <div className="text-center flex flex-col gap-2">
           <div className="w-12 h-12 rounded-xl bg-destructive/10 flex items-center justify-center mx-auto mb-3">
             <Typography className="text-destructive text-xl">⚠</Typography>
           </div>
@@ -114,13 +114,13 @@ export function KPICard({
           (() => {
             const IconComponent = iconMap[icon as keyof typeof iconMap]
             return IconComponent ? (
-              <div className="p-2.5 rounded-xl bg-primary/10 text-primary flex-shrink-0">
+              <div className="p-2.5 rounded-xl bg-primary/10 text-primary shrink-0">
                 <IconComponent className="w-5 h-5" />
               </div>
             ) : null
           })()}
         <div className="flex-1 min-w-0">
-          <Typography variant="h4" className="font-semibold text-foreground leading-tight">
+          <Typography variant="h4" className=" text-foreground leading-tight">
             {label}
           </Typography>
         </div>
@@ -129,17 +129,17 @@ export function KPICard({
       {/* Main content area */}
       <div className="flex-1 flex flex-col justify-between">
         {/* Value and details */}
-        <div className="space-y-3">
-          <Typography variant="h2" className="font-bold text-foreground text-2xl">
+        <div className="flex flex-col gap-4">
+          <Typography variant="h2" color="primary">
             {showTrends && trendData ? formatValue(trendData.current) : formatValue(value)}
           </Typography>
 
-          <div className="space-y-1">
-            <Typography variant="p" className="text-muted-foreground text-sm leading-relaxed">
+          <div className="flex flex-col gap-1">
+            <Typography variant="p" color="muted">
               {subtitle}
             </Typography>
             {productCount && (
-              <Typography variant="p" className="text-muted-foreground text-sm">
+              <Typography variant="p" color="muted">
                 {productCount} product{productCount > 1 ? 's' : ''}
               </Typography>
             )}

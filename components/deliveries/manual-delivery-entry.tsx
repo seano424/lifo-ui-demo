@@ -228,9 +228,9 @@ export default function ManualDeliveryEntry({
     inventoryData.price > 0
 
   return (
-    <div className={`space-y-6 ${className}`}>
-      <div className="space-y-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="space-y-6">
+    <div className={`flex flex-col gap-6 ${className}`}>
+      <div className="flex flex-col gap-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="flex flex-col gap-6">
           {/* Product Selection Section */}
           {!selectedProduct ? (
             <ManualBarcodeEntry
@@ -244,10 +244,10 @@ export default function ManualDeliveryEntry({
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
-                      <Package className="w-5 h-5 text-primary-600" />
+                      <Package className="w-5 h-5 text-primary-800" />
                       <Typography variant="h3">{t('selectedProduct.title')}</Typography>
                     </div>
-                    <div className="space-y-1 text-sm flex flex-col">
+                    <div className="flex flex-col gap-1 text-sm flex flex-col">
                       <Typography variant="p">
                         <span>{t('selectedProduct.fields.name')}</span>{' '}
                         {selectedProduct.productName}
@@ -275,7 +275,7 @@ export default function ManualDeliveryEntry({
                     variant="ghost"
                     size="sm"
                     onClick={handleClearSelection}
-                    className="text-gray-500 hover:text-gray-700"
+                    className="text-foreground hover:text-foreground"
                   >
                     <Trash2 className="w-4 h-4" />
                   </Button>
@@ -366,12 +366,12 @@ export default function ManualDeliveryEntry({
             <DialogDescription>{t('confirmation.description')}</DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-4">
+          <div className="flex flex-col gap-4">
             <Typography variant="p">
               {t('confirmation.submitText', { count: scannedItems.length })}
             </Typography>
 
-            <div className="max-h-60 overflow-y-auto space-y-2 border rounded-2xl p-3 bg-gray-50">
+            <div className="max-h-60 overflow-y-auto flex flex-col gap-2 border rounded-2xl p-3 bg-gray-50">
               {scannedItems.map(item => {
                 const totalValue = item.quantity * item.price
                 return (
@@ -448,7 +448,7 @@ export default function ManualDeliveryEntry({
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
-                <Check className="w-5 h-5 text-primary-600" />
+                <Check className="w-5 h-5 text-primary-800" />
                 {t('success.title')}
               </DialogTitle>
               <DialogDescription>
