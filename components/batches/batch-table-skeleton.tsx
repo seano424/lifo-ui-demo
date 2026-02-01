@@ -27,14 +27,14 @@ export function BatchTableSkeleton() {
           {BATCH_TABLE_COLUMN_CONFIG.map(column => (
             <TableHead
               key={column.id}
-              className="sticky top-0 bg-background z-10 py-3 px-4"
+              className="sticky top-0 bg-background z-10 py-3"
               style={{ width: column.width }}
             >
               <div
-                className={`flex font-heading  items-center gap-1 ${column.align === 'right' ? 'justify-end' : ''}`}
+                className={`flex items-center gap-1 ${column.align === 'right' ? 'justify-end' : ''}`}
               >
                 <span className="text-sm text-foreground">{t(column.headerKey)}</span>
-                {column.sortable !== false && <ArrowUpDownIcon className="h-3.5 w-3.5" />}
+                {column.sortable && <ArrowUpDownIcon className="h-3.5 w-3.5" />}
               </div>
             </TableHead>
           ))}
@@ -46,7 +46,7 @@ export function BatchTableSkeleton() {
             {BATCH_TABLE_COLUMN_CONFIG.map(column => (
               <TableCell
                 key={column.id}
-                className={`py-3 px-4 ${column.align === 'right' ? 'text-right' : ''}`}
+                className={`py-3 ${column.align === 'right' ? 'text-right' : ''}`}
                 style={{ width: column.width }}
               >
                 {column.hasMultipleLines ? (

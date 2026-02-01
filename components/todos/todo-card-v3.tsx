@@ -294,7 +294,7 @@ export function TodoCardV3({ todo, currencySymbol = '€', onClick }: TodoCardV3
           {/* Status - LEFT side, primary scan element */}
           <div className="flex items-center gap-1.5">
             {isUrgent ? (
-              <Typography variant="small" color="destructive" className=" font-heading">
+              <Typography variant="small" color="destructive" className=" ">
                 {isExpiring
                   ? t('card.expiredStatus')
                   : isExpiringToday
@@ -304,7 +304,7 @@ export function TodoCardV3({ todo, currencySymbol = '€', onClick }: TodoCardV3
                       : t('card.daysLeft', { days: daysUntilExpiry })}
               </Typography>
             ) : (
-              <Typography variant="extraSmall" color="muted" className="font-heading ">
+              <Typography variant="extraSmall" color="muted" className=" ">
                 {daysUntilExpiry}d until expiry
               </Typography>
             )}

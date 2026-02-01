@@ -401,7 +401,7 @@ export function TodosExpiryList({ initialFilters, pageSize = 20 }: TodosExpiryLi
                 aria-selected={activeTab === tab.id}
                 aria-controls={`tabpanel-${tab.id}`}
                 className={cn(
-                  'rounded-none select-none font-heading  relative flex flex-col-reverse sm:flex-row items-center pb-4 gap-1 min-w-0 shrink-0',
+                  'rounded-none select-none   relative flex flex-col-reverse sm:flex-row items-center pb-4 gap-1 min-w-0 shrink-0',
                   'hover:bg-transparent group/tab',
                   activeTab === tab.id ? 'text-primary' : 'text-black',
                 )}

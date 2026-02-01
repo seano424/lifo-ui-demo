@@ -22,7 +22,7 @@ export function IntegrateDataStep() {
       <div className="flex flex-col gap-4">
         <div className="flex items-center gap-2">
           <Typography variant="h3">{t('steps.addStore.realTime')}</Typography>
-          <Badge className=" font-heading" variant="invertedSecondary">
+          <Badge className=" " variant="invertedSecondary">
             {t('steps.addStore.recommended')}
           </Badge>
         </div>

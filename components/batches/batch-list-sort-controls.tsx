@@ -31,36 +31,21 @@ export function BatchListSortControls({
         onValueChange={(field: BatchSortField) => updateSort(field)}
         disabled={isLoading}
       >
-        <SelectTrigger className="w-max" hideChevron>
-          <div className="flex items-center gap-2">
+        <SelectTrigger className="w-max" showChevron={false}>
+          <div className="flex items-center gap-1">
             <SelectValue className="whitespace-nowrap" />
-            <ArrowUpDownIcon className="h-4 w-4" />
+            <ArrowUpDownIcon className="h-4 w-4 text-foreground" />
           </div>
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="created_at" hideCheckIcon>
-            {t('createdDate')}
-          </SelectItem>
           <SelectItem value="expiry_date" hideCheckIcon>
             {t('expiryDate')}
-          </SelectItem>
-          <SelectItem value="batch_number" hideCheckIcon>
-            {t('batchNumber')}
           </SelectItem>
           <SelectItem value="product_name" hideCheckIcon>
             {t('productName')}
           </SelectItem>
           <SelectItem value="current_quantity" hideCheckIcon>
             {t('stockLevel')}
-          </SelectItem>
-          <SelectItem value="cost_price" hideCheckIcon>
-            {t('costPrice')}
-          </SelectItem>
-          <SelectItem value="selling_price" hideCheckIcon>
-            {t('sellingPrice')}
-          </SelectItem>
-          <SelectItem value="status" hideCheckIcon>
-            {t('status')}
           </SelectItem>
         </SelectContent>
       </Select>
