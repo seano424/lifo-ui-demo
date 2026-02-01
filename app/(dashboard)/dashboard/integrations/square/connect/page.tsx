@@ -14,6 +14,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { ErrorBoundary } from '@/components/ui/error-boundary'
 import { useInitiateSquareConnect } from '@/hooks/use-square-integration'
 import { Typography } from '@/components/ui/typography'
+import Image from 'next/image'
 
 export default function SquareConnectPage() {
   const router = useRouter()
@@ -41,15 +42,15 @@ export default function SquareConnectPage() {
             variant="ghost"
             size="sm"
             onClick={() => router.push('/dashboard/integrations')}
-            className="mb-4"
+            className="mb-4 w-fit"
           >
             <ArrowRight className="mr-2 h-4 w-4 rotate-180" />
             {t('backToIntegrations')}
           </Button>
 
           <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-black">
-              <Square className="h-6 w-6 text-white" />
+            <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center shrink-0">
+              <Image src="/square/square-icon.svg" alt="Square" width={20} height={20} />
             </div>
             <div>
               <Typography variant="h3">{t('connectTitle')}</Typography>
@@ -68,7 +69,7 @@ export default function SquareConnectPage() {
               <CardTitle>{t('whatYouGet')}</CardTitle>
               <CardDescription>{t('whatYouGetDescription')}</CardDescription>
             </CardHeader>
-            <CardContent className="flex flex-col gap-4">
+            <CardContent className="">
               <div className="flex gap-3">
                 <CheckCircle className="h-5 w-5 shrink-0 text-primary" />
                 <div>
@@ -138,7 +139,7 @@ export default function SquareConnectPage() {
                 {t('connect')}
               </Button>
 
-              <Alert>
+              <Alert className="w-max">
                 <AlertDescription>{t('redirectNotice')}</AlertDescription>
               </Alert>
             </div>
