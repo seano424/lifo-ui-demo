@@ -161,9 +161,9 @@ export function NavMain({
                 <SidebarMenuItem className="flex flex-col items-center gap-2" key={item.title}>
                   <SidebarMenuButton
                     className={cn(
-                      'hover:bg-secondary-100/30 rounded-lg dark:hover:bg-secondary-900/5 dark:data-[active=true]:bg-primary-900/10 py-2 px-2  relative',
+                      'hover:bg-secondary-100/30 rounded-lg dark:hover:bg-secondary-900/5 dark:data-[active=true]:bg-primary-900/10 py-2 px-2 relative opacity-90',
                       isPathActive(item.url) &&
-                        'bg-secondary-100/30 hover:bg-secondary-100/30 dark:hover:bg-secondary-900/5 dark:text-brand-white dark:bg-secondary-900/5 font-semibold',
+                        'bg-secondary-100/30 hover:bg-secondary-100/30 dark:hover:bg-secondary-900/5 dark:text-brand-white dark:bg-secondary-900/5 font-medium opacity-100',
                     )}
                     asChild
                     tooltip={item.title}
