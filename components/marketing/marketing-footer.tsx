@@ -20,7 +20,7 @@ export function MarketingFooter() {
           <div className="flex flex-col gap-4">
             <div className="flex items-center gap-2">
               <Logo variant="svg" size="sm" className="w-10 h-auto" />
-              <Typography variant="h4" className="font-heading font-black text-xl">
+              <Typography variant="h4" className="font-heading  text-xl">
                 lifo
               </Typography>
             </div>
@@ -31,7 +31,7 @@ export function MarketingFooter() {
 
           {/* Links */}
           <div className="flex flex-col gap-4">
-            <Typography variant="h4" className="text-base font-bold">
+            <Typography variant="h4" className="text-base ">
               {t('quickLinks')}
             </Typography>
             <div className="grid grid-cols-1 gap-2">
@@ -70,7 +70,7 @@ export function MarketingFooter() {
 
           {/* Contact */}
           <div className="flex flex-col gap-4">
-            <Typography variant="h4" className="text-base font-bold">
+            <Typography variant="h4" className="text-base ">
               {t('contactUs')}
             </Typography>
             <div className="flex flex-col gap-2">

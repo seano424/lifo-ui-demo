@@ -81,7 +81,7 @@ export function DraftBatchesList({ className, onSelectBatch }: DraftBatchesListP
       {/* Alert with count */}
       <Alert className="bg-linear-to-r from-amber-50 to-orange-50 dark:from-amber-950 dark:to-orange-950 border-amber-200 dark:border-amber-800">
         <AlertCircle className="h-5 w-5 text-amber-600 dark:text-amber-400" />
-        <AlertTitle className="text-amber-900 dark:text-amber-100 font-semibold">
+        <AlertTitle className="text-amber-900 dark:text-amber-100 ">
           {t('needsExpiryDate', { count })}
         </AlertTitle>
         <AlertDescription className="text-amber-800 dark:text-amber-200 mt-2">
@@ -139,9 +139,7 @@ export function DraftBatchesList({ className, onSelectBatch }: DraftBatchesListP
                     className="cursor-pointer hover:bg-muted/50 transition-colors"
                     onClick={() => onSelectBatch?.(batch)}
                   >
-                    <TableCell className="font-mono font-semibold text-sm">
-                      {batch.batch_number}
-                    </TableCell>
+                    <TableCell className="font-mono  text-sm">{batch.batch_number}</TableCell>
                     <TableCell>
                       <div className="space-y-0.5">
                         <div>{batch.products?.name || 'Unknown Product'}</div>

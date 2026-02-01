@@ -27,8 +27,8 @@ const badgeVariants = cva(
         xl: 'px-8 py-4 text-lg',
       },
       font: {
-        default: 'font-medium tracking-tight',
-        mono: 'font-mono font-medium tracking-tight',
+        default: ' tracking-tight',
+        mono: 'font-mono  tracking-tight',
         heading: 'font-heading font-extrabold',
       },
     },

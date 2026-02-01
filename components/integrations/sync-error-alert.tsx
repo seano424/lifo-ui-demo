@@ -54,7 +54,7 @@ export function SyncErrorAlert({
       </AlertTitle>
       <AlertDescription className="space-y-2">
         <p>{message}</p>
-        {suggestion && <p className="text-sm font-medium mt-2">{suggestion}</p>}
+        {suggestion && <p className="text-sm  mt-2">{suggestion}</p>}
         {technical && process.env.NODE_ENV === 'development' && (
           <details className="mt-3">
             <summary className="text-xs cursor-pointer hover:underline">Technical Details</summary>

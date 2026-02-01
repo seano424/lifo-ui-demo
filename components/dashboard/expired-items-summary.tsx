@@ -80,7 +80,7 @@ export function ExpiredItemsSummary() {
                 </Typography>
               </div>
               <div className="text-right">
-                <Typography variant="p" className="font-semibold">
+                <Typography variant="p" className="">
                   {expiredCount}
                 </Typography>
                 <Typography variant="small" className="text-foreground">

@@ -403,7 +403,7 @@ export function BatchCreationSheet({
                   </div>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <Typography variant="p" className="truncate font-bold">
+                  <Typography variant="p" className="truncate ">
                     {currentProduct.product_name}
                   </Typography>
                   {currentProduct.product_brand && (
@@ -509,7 +509,7 @@ export function BatchCreationSheet({
               {/* Add Batch Button */}
               <Button
                 size="lg"
-                className="w-full min-h-[44px] font-semibold"
+                className="w-full min-h-[44px] "
                 disabled={!isDateSelected || isActivating || isIgnoring}
                 onClick={handleActivateBatch}
               >
@@ -555,7 +555,7 @@ export function BatchCreationSheet({
             <Button
               size="lg"
               variant="outline"
-              className="w-full min-h-[44px] font-medium"
+              className="w-full min-h-[44px] "
               onClick={handleDone}
             >
               Done
@@ -568,7 +568,7 @@ export function BatchCreationSheet({
             <Button
               size="lg"
               variant="ghost"
-              className="w-full min-h-[44px] font-medium text-foreground hover:text-foreground dark:text-foreground dark:hover:text-foreground"
+              className="w-full min-h-[44px]  text-foreground hover:text-foreground dark:text-foreground dark:hover:text-foreground"
               onClick={handleSkipProduct}
             >
               Skip This Product

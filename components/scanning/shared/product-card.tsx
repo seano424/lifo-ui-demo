@@ -52,7 +52,7 @@ function ProductCard({
 
           {/* Product Information */}
           <div className="flex flex-col gap-2 justify-center items-center flex-1">
-            <Typography className="text-secondary-900 font-black" variant="p">
+            <Typography className="text-secondary-900 " variant="p">
               {mode === 'selected' ? t('titles.selectedProduct') : t('titles.productInformation')}
             </Typography>
             <div className="flex flex-wrap text-center justify-center items-center gap-2 text-sm">
@@ -80,7 +80,7 @@ function ProductCard({
           {showProceedButton && onProceed && (
             <Button
               variant="subtleSecondary"
-              className="font-semibold rounded-full p-2 h-8 w-8"
+              className=" rounded-full p-2 h-8 w-8"
               onClick={onProceed}
             >
               <ArrowRight className="w-4 h-4" />

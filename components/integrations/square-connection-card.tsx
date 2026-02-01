@@ -62,7 +62,7 @@ export function SquareConnectionCard({ status, isLoading, onConnect }: SquareCon
           <div className="flex flex-col sm:flex-row sm:items-center gap-4">
             <Image src="/square/square-icon.svg" alt="Square" width={40} height={40} />
             <div>
-              <Typography variant="h4" className="font-semibold">
+              <Typography variant="h4" className="">
                 Square
               </Typography>
               <Typography variant="p" className="text-sm text-muted-foreground">

@@ -132,7 +132,7 @@ export function RecentProductCard({
                   onClick={handleQuickAdd}
                   disabled={isAdded}
                   className={cn(
-                    'flex-1 min-h-[36px] font-semibold text-xs',
+                    'flex-1 min-h-[36px]  text-xs',
                     !isAdded && 'bg-primary-600 hover:bg-primary-700',
                   )}
                 >
@@ -147,7 +147,7 @@ export function RecentProductCard({
                   size="sm"
                   onClick={() => setShowCustomInput(true)}
                   disabled={isAdded}
-                  className="flex-none px-3 min-h-[36px] text-xs font-medium"
+                  className="flex-none px-3 min-h-[36px] text-xs "
                 >
                   + custom
                 </Button>

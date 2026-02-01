@@ -120,7 +120,7 @@ export function KPICard({
             ) : null
           })()}
         <div className="flex-1 min-w-0">
-          <Typography variant="h4" className="font-semibold text-foreground leading-tight">
+          <Typography variant="h4" className=" text-foreground leading-tight">
             {label}
           </Typography>
         </div>

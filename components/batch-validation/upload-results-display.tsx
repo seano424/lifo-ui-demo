@@ -59,21 +59,21 @@ export function UploadResultsDisplay({ result, onUploadAnother }: UploadResultsD
         {/* Performance Metrics */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="text-center">
-            <div className="text-2xl font-bold text-primary-800">{result.processed || 0}</div>
+            <div className="text-2xl  text-primary-800">{result.processed || 0}</div>
             <Typography variant="p" color="muted">
               {t('results.metrics.processed')}
             </Typography>
           </div>
 
           <div className="text-center">
-            <div className="text-2xl font-bold text-yellow-600">{result.skipped || 0}</div>
+            <div className="text-2xl  text-yellow-600">{result.skipped || 0}</div>
             <Typography variant="p" color="muted">
               {t('results.metrics.skipped')}
             </Typography>
           </div>
 
           <div className="text-center">
-            <div className="text-2xl font-bold text-blue-600">
+            <div className="text-2xl  text-blue-600">
               {result.performance_metrics?.items_per_second || 0}
             </div>
             <Typography variant="p" color="muted">
@@ -82,9 +82,7 @@ export function UploadResultsDisplay({ result, onUploadAnother }: UploadResultsD
           </div>
 
           <div className="text-center">
-            <div className="text-2xl font-bold text-purple-600">
-              {result.processing_time_ms || 0}ms
-            </div>
+            <div className="text-2xl  text-purple-600">{result.processing_time_ms || 0}ms</div>
             <Typography variant="p" color="muted">
               {t('results.metrics.totalTime')}
             </Typography>
@@ -110,7 +108,7 @@ export function UploadResultsDisplay({ result, onUploadAnother }: UploadResultsD
                       <div className="text-foreground">{error}</div>
                     ) : (
                       <>
-                        <div className="font-semibold text-destructive">Row {error.row}</div>
+                        <div className=" text-destructive">Row {error.row}</div>
                         <div className="text-foreground">{error.message}</div>
                       </>
                     )}

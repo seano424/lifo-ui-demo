@@ -22,7 +22,7 @@ export function NextStepsGrid({ title, items }: NextStepsGridProps) {
       <div className="text-center flex flex-col gap-2">
         <Typography
           variant="h2"
-          className="text-2xl font-bold bg-linear-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent"
+          className="text-2xl  bg-linear-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent"
         >
           {title}
         </Typography>
@@ -40,7 +40,7 @@ export function NextStepsGrid({ title, items }: NextStepsGridProps) {
                   <div className="flex items-start justify-between">
                     <Typography
                       variant="h4"
-                      className="font-semibold text-lg leading-tight group-hover:text-primary transition-colors"
+                      className=" text-lg leading-tight group-hover:text-primary transition-colors"
                     >
                       {item.title}
                     </Typography>

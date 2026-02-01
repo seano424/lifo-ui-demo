@@ -35,7 +35,7 @@ function Stat({ icon, label, description, subtext, accentColor }: StatProps) {
         <div className="flex flex-col">
           <Typography
             variant="h3"
-            className="text-2xl font-bold text-foreground mb-3 group-hover:scale-105 transition-transform duration-300"
+            className="text-2xl  text-foreground mb-3 group-hover:scale-105 transition-transform duration-300"
           >
             {label}
           </Typography>

@@ -41,7 +41,7 @@ export default function Contact() {
                 <div className="flex flex-col gap-1">
                   <Typography
                     variant="h3"
-                    className="text-base lg:text-lg font-bold text-foreground mb-1 lg:mb-2"
+                    className="text-base lg:text-lg  text-foreground mb-1 lg:mb-2"
                   >
                     {t('features.support.title')}
                   </Typography>
@@ -61,7 +61,7 @@ export default function Contact() {
                 <div className="flex flex-col gap-1">
                   <Typography
                     variant="h3"
-                    className="text-base lg:text-lg font-bold text-foreground mb-1 lg:mb-2"
+                    className="text-base lg:text-lg  text-foreground mb-1 lg:mb-2"
                   >
                     {t('features.expertise.title')}
                   </Typography>
@@ -81,7 +81,7 @@ export default function Contact() {
                 <div className="flex flex-col gap-1">
                   <Typography
                     variant="h3"
-                    className="text-base lg:text-lg font-bold text-foreground mb-1 lg:mb-2"
+                    className="text-base lg:text-lg  text-foreground mb-1 lg:mb-2"
                   >
                     {t('features.followup.title')}
                   </Typography>

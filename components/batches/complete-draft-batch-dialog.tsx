@@ -125,7 +125,7 @@ export function CompleteDraftBatchDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[550px]">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold">{t('completeBatch')}</DialogTitle>
+          <DialogTitle className="text-2xl ">{t('completeBatch')}</DialogTitle>
           <DialogDescription className="text-base">
             Add an expiry date to activate this batch and enable AI scoring
           </DialogDescription>
@@ -136,18 +136,18 @@ export function CompleteDraftBatchDialog({
           <div className="rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-linear-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 p-5 flex flex-col gap-4 shadow-sm">
             <div className="flex gap-4">
               <div className="flex-1 bg-white dark:bg-slate-950 rounded-lg p-3 border border-slate-200 dark:border-slate-700">
-                <Label className="text-xs uppercase tracking-wide text-muted-foreground font-semibold">
+                <Label className="text-xs uppercase tracking-wide text-muted-foreground ">
                   Batch Number
                 </Label>
-                <p className="font-bold mt-1 font-mono text-slate-900 dark:text-slate-100">
+                <p className=" mt-1 font-mono text-slate-900 dark:text-slate-100">
                   {batch.batch_number}
                 </p>
               </div>
               <div className="flex-1 bg-white dark:bg-slate-950 rounded-lg p-3 border border-slate-200 dark:border-slate-700">
-                <Label className="text-xs uppercase tracking-wide text-muted-foreground font-semibold">
+                <Label className="text-xs uppercase tracking-wide text-muted-foreground ">
                   Quantity
                 </Label>
-                <p className="font-bold mt-1 text-slate-900 dark:text-slate-100">
+                <p className=" mt-1 text-slate-900 dark:text-slate-100">
                   {batch.current_quantity} units
                 </p>
               </div>
@@ -157,7 +157,7 @@ export function CompleteDraftBatchDialog({
           {/* Expiry date input */}
           {!showOCR ? (
             <div className="flex flex-col gap-4">
-              <Label htmlFor="expiry-date" className="text-base font-semibold">
+              <Label htmlFor="expiry-date" className="text-base ">
                 Expiry Date *
                 {expiryDate && (
                   <span className="ml-2 text-xs font-normal text-primary dark:text-primary-400">
@@ -193,7 +193,7 @@ export function CompleteDraftBatchDialog({
               {expiryDate && (
                 <div className="bg-primary-50 dark:bg-primary-950 border border-primary-200 dark:border-primary-800 rounded-lg p-3">
                   <p className="text-sm  text-primary-800 dark:text-primary-200">
-                    Captured date: <span className="font-bold">{expiryDate}</span>
+                    Captured date: <span className="">{expiryDate}</span>
                   </p>
                   <p className="text-xs text-primary-700 dark:text-primary-300 mt-1">
                     You can modify this date using the calendar above
@@ -216,7 +216,7 @@ export function CompleteDraftBatchDialog({
           ) : (
             <div className="flex flex-col gap-4">
               <div className="flex items-center justify-between">
-                <Label className="text-base font-semibold">Scan Expiry Date</Label>
+                <Label className="text-base ">Scan Expiry Date</Label>
                 <Button
                   type="button"
                   variant="ghost"
@@ -242,7 +242,7 @@ export function CompleteDraftBatchDialog({
               </div>
               {autoOCRState.isAnalyzing && (
                 <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg p-4 text-center">
-                  <p className="font-semibold text-blue-900 dark:text-blue-100">
+                  <p className=" text-blue-900 dark:text-blue-100">
                     Analyzing frame... Attempt {autoOCRState.attemptCount} / 5
                   </p>
                   {autoOCRState.lastReason && (
@@ -270,7 +270,7 @@ export function CompleteDraftBatchDialog({
             type="button"
             onClick={handleComplete}
             disabled={!expiryDate || isPending}
-            className="flex-1 sm:flex-none h-11 bg-linear-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-semibold shadow-lg hover:shadow-xl transition-all"
+            className="flex-1 sm:flex-none h-11 bg-linear-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white  shadow-lg hover:shadow-xl transition-all"
           >
             {isPending ? (
               <>

@@ -108,7 +108,7 @@ export function DeliveryNoteUploadForm({ storeId }: DeliveryNoteUploadFormProps)
       <div className="flex items-center gap-2 flex-col justify-center">
         <div className="flex items-center gap-1">
           <Camera className="w-6 h-6 text-secondary-900" />
-          <Typography variant="h3" className="text-primary-800 font-black">
+          <Typography variant="h3" className="text-primary-800 ">
             Delivery Note Upload
           </Typography>
         </div>

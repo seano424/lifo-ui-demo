@@ -55,7 +55,7 @@ export function DashboardWelcome() {
           <div className="flex flex-col justify-center items-center md:items-start gap-3 md:gap-4 flex-1 text-center md:text-left">
             <div className="flex items-center gap-2 justify-center md:justify-start">
               <BarChart3 className="text-secondary h-5 w-5 shrink-0" />
-              <Typography variant="h4" className="font-semibold text-base sm:text-lg">
+              <Typography variant="h4" className=" text-base sm:text-lg">
                 {t('welcome.help.title')}
               </Typography>
             </div>
@@ -122,7 +122,7 @@ function WelcomeActionCard({
           </div>
 
           <div className="flex flex-col gap-2 flex-grow">
-            <Typography variant="h4" className="font-semibold">
+            <Typography variant="h4" className="">
               {t(title)}
             </Typography>
             <Typography variant="p" className="text-muted-foreground text-sm">

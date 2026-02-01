@@ -24,7 +24,7 @@
 
 /* Sonner Toast Container */
 [data-sonner-toaster] {
-  font-family: var(--font-plus-jakarta-sans), sans-serif;
+  font-family: var(--font-montserrat), sans-serif;
 }
 
 /* Individual Toast Styling */
@@ -249,7 +249,7 @@
 
   /* Font families */
   --font-sans:
-    var(--font-plus-jakarta-sans), ui-sans-serif, system-ui, -apple-system,
+    var(--font-montserrat), ui-sans-serif, system-ui, -apple-system,
     BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
     'Noto Sans', sans-serif;
   --font-heading:

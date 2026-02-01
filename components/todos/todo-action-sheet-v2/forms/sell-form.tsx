@@ -71,7 +71,7 @@ export function SellForm({ batch, currencySymbol, isLoading, onConfirm }: SellFo
       <div className="bg-white rounded-3xl p-3 border border-muted-foreground/10">
         <div className="flex justify-between items-center">
           <span className="text-sm text-muted-foreground">Revenue</span>
-          <span className="text-lg font-semibold text-black">
+          <span className="text-lg  text-black">
             {currencySymbol}
             {revenue}
           </span>

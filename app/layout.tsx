@@ -8,7 +8,7 @@ import { ReactQueryProvider } from '@/lib/react-query/provider'
 import type { Metadata } from 'next'
 import { getLocale, getMessages } from 'next-intl/server'
 import { ThemeProvider } from 'next-themes'
-import { Plus_Jakarta_Sans, Raleway, Roboto_Mono } from 'next/font/google'
+import { Montserrat, Raleway, Roboto_Mono } from 'next/font/google'
 import './globals.css'
 
 const defaultUrl = process.env.VERCEL_URL
@@ -50,12 +50,12 @@ const raleway = Raleway({
   fallback: ['system-ui', 'arial'],
 })
 
-// Plus Jakarta Sans font for body text
-const plusJakartaSans = Plus_Jakarta_Sans({
-  variable: '--font-plus-jakarta-sans',
+// Montserrat font for body text
+const montserrat = Montserrat({
+  variable: '--font-montserrat',
   display: 'swap',
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700', '800'],
+  weight: ['400', '500', '600', '700', '800', '900'],
   preload: true,
 })
 
@@ -82,7 +82,7 @@ export default async function RootLayout({
       lang={locale}
       suppressHydrationWarning
       data-scroll-behavior="smooth"
-      className={`${raleway.variable} ${plusJakartaSans.variable} ${robotoMono.variable} ${debugScreens}`}
+      className={`${raleway.variable} ${montserrat.variable} ${robotoMono.variable} ${debugScreens}`}
     >
       <body className={`font-sans antialiased`}>
         <ThemeProvider

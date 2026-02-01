@@ -52,7 +52,7 @@ export function QuantitySelector({
         </Button>
 
         <div className="flex items-center gap-2 min-w-[120px] justify-center">
-          <span className="text-2xl font-semibold text-[#1d1d1f]">{value}</span>
+          <span className="text-2xl  text-[#1d1d1f]">{value}</span>
           <span className="text-sm text-[#86868b]">/ {max}</span>
         </div>
 

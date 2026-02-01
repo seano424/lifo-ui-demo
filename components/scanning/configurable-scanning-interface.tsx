@@ -535,7 +535,7 @@ export default function BaseScanningInterface({ config, callbacks, className }: 
                   {productLookupError && (
                     <Alert variant="destructive" className="border-orange-200 bg-orange-50">
                       <AlertCircle className="h-4 w-4 text-orange-600" />
-                      <AlertTitle className="text-orange-900 font-semibold">
+                      <AlertTitle className="text-orange-900 ">
                         {productLookupError.title}
                       </AlertTitle>
                       <AlertDescription className="text-orange-800">

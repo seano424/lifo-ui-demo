@@ -70,7 +70,7 @@ export function DeliveryDashboardCard() {
         <CardContent>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-2xl font-bold text-foreground dark:text-foreground">
+              <p className="text-2xl  text-foreground dark:text-foreground">
                 {recentProducts?.length || 0}
               </p>
               <p className="text-sm text-foreground dark:text-foreground">Recent products</p>
@@ -141,7 +141,7 @@ export function InventoryDeliveryButton() {
         <Package className="h-5 w-5 mr-2" />
         Log Delivery
         {hasDrafts && (
-          <Badge variant="destructive" className="ml-2 h-5 min-w-5 px-1.5 text-xs font-semibold">
+          <Badge variant="destructive" className="ml-2 h-5 min-w-5 px-1.5 text-xs ">
             {draftSummary.total_draft_batches}
           </Badge>
         )}
@@ -250,7 +250,7 @@ export function DeliveryLogDemo() {
         <CardContent>
           <div className="flex flex-col gap-4">
             <div className="flex items-center gap-3">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-600 text-white font-bold text-sm">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-600 text-white  text-sm">
                 1
               </div>
               <Typography variant="p" color="muted">
@@ -258,7 +258,7 @@ export function DeliveryLogDemo() {
               </Typography>
             </div>
             <div className="flex items-center gap-3">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-600 text-white font-bold text-sm">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-600 text-white  text-sm">
                 2
               </div>
               <Typography variant="p" color="muted">
@@ -266,7 +266,7 @@ export function DeliveryLogDemo() {
               </Typography>
             </div>
             <div className="flex items-center gap-3">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-600 text-white font-bold text-sm">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-600 text-white  text-sm">
                 3
               </div>
               <Typography variant="p" color="muted">
@@ -274,7 +274,7 @@ export function DeliveryLogDemo() {
               </Typography>
             </div>
             <div className="flex items-center gap-3">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-600 text-white font-bold text-sm">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-600 text-white  text-sm">
                 4
               </div>
               <Typography variant="p" color="muted">
@@ -282,7 +282,7 @@ export function DeliveryLogDemo() {
               </Typography>
             </div>
             <div className="flex items-center gap-3">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-600 text-white font-bold text-sm">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-600 text-white  text-sm">
                 5
               </div>
               <Typography variant="p" color="muted">

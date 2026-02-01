@@ -253,7 +253,7 @@ export function BatchCreationExample() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-foreground dark:text-foreground mb-2">
+              <label className="block text-sm  text-foreground dark:text-foreground mb-2">
                 Choose Expiry Date
               </label>
               <ExpiryPresetButtons
