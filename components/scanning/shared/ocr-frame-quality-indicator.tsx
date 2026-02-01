@@ -56,7 +56,7 @@ export default function OCRFrameQualityIndicator({
       {/* Header */}
       <div className="flex items-center gap-2 border-b border-white/20 pb-2">
         <Camera className="w-4 h-4" />
-        <span className="">
+        <span>
           Auto-Scan {attemptCount}/{maxAttempts}
         </span>
       </div>
@@ -144,7 +144,7 @@ export default function OCRFrameQualityIndicator({
           <span className="text-xs opacity-75">
             {t('ocrFrameQuality.quality', { defaultValue: 'Quality' })}
           </span>
-          <span className="">{Math.round(analysis.overallScore * 100)}%</span>
+          <span>{Math.round(analysis.overallScore * 100)}%</span>
         </div>
 
         {/* Ready Indicator */}

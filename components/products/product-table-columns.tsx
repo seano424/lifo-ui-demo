@@ -78,7 +78,7 @@ export function createProductTableColumns({
       ),
       cell: ({ row }) => (
         <div className="text-right">
-          <div className="">{row.original.total_stock || 0}</div>
+          <div>{row.original.total_stock || 0}</div>
           {/* <div className="text-xs text-muted-foreground">{row.original.unit_type || 'units'}</div> */}
         </div>
       ),

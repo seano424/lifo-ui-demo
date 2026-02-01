@@ -235,7 +235,7 @@ export function ProductsListPresentation({
               <TableBody>
                 {products.map(product => (
                   <TableRow key={product.product_id}>
-                    <TableCell className="">
+                    <TableCell>
                       <div>
                         <div>{product.name || t('table.unnamedProduct')}</div>
                         <div>SKU: {product.sku || 'N/A'}</div>
@@ -258,7 +258,7 @@ export function ProductsListPresentation({
                     </TableCell>
                     <TableCell>
                       <Typography variant="muted">
-                        <span className="">{product.total_stock || 0}</span>
+                        <span>{product.total_stock || 0}</span>
                         <span>{product.unit_type || t('table.units')}</span>
                       </Typography>
                     </TableCell>

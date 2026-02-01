@@ -130,9 +130,7 @@ export function BatchStatusSummary() {
                 <div className="h-8 w-8 bg-primary-500 rounded-full mx-auto mb-2 flex items-center justify-center">
                   <div className="h-2 w-2 bg-white rounded-full" />
                 </div>
-                <Typography variant="p" className="">
-                  {t('status.allGood')}
-                </Typography>
+                <Typography variant="p">{t('status.allGood')}</Typography>
               </div>
             )}
           </div>

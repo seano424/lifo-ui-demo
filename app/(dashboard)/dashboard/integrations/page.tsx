@@ -88,9 +88,7 @@ export default function IntegrationsPage() {
       {/* Active Section */}
       <div className="flex flex-col border border-border rounded-xl overflow-hidden">
         <div className="p-4 flex flex-col gap-4">
-          <Typography variant="h5" className="">
-            Active
-          </Typography>
+          <Typography variant="h5">Active</Typography>
           {/* Tabs */}
           {/* <div className="flex gap-6">
             <Button

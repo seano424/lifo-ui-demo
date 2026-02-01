@@ -127,7 +127,7 @@ export function ProductsSortToolbar({
                   <Icon className="h-4 w-4 mt-0.5 shrink-0" />
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <span className="">{option.label}</span>
+                      <span>{option.label}</span>
                       {isSelected && (
                         <Badge variant="secondary" className="text-xs">
                           {t('current')}

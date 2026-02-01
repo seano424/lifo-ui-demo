@@ -122,9 +122,7 @@ function WelcomeActionCard({
           </div>
 
           <div className="flex flex-col gap-2 flex-grow">
-            <Typography variant="h4" className="">
-              {t(title)}
-            </Typography>
+            <Typography variant="h4">{t(title)}</Typography>
             <Typography variant="p" className="text-muted-foreground text-sm">
               {t(description)}
             </Typography>

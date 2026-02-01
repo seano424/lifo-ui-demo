@@ -95,9 +95,7 @@ export function AddStoreSuccess({ storeName, storeId, onSuccess }: AddStoreSucce
                 <span className="text-xs  text-primary">1</span>
               </div>
               <div className="flex flex-col gap-1 flex flex-col">
-                <Typography variant="small" className="">
-                  {t('whatsNext.steps.configure.title')}
-                </Typography>
+                <Typography variant="small">{t('whatsNext.steps.configure.title')}</Typography>
                 <Typography variant="small" color="muted">
                   {t('whatsNext.steps.configure.description')}
                 </Typography>
@@ -109,9 +107,7 @@ export function AddStoreSuccess({ storeName, storeId, onSuccess }: AddStoreSucce
                 <span className="text-xs  text-primary">2</span>
               </div>
               <div className="flex flex-col gap-1 flex flex-col">
-                <Typography variant="small" className="">
-                  {t('whatsNext.steps.inventory.title')}
-                </Typography>
+                <Typography variant="small">{t('whatsNext.steps.inventory.title')}</Typography>
                 <Typography variant="small" color="muted">
                   {t('whatsNext.steps.inventory.description')}
                 </Typography>
@@ -123,9 +119,7 @@ export function AddStoreSuccess({ storeName, storeId, onSuccess }: AddStoreSucce
                 <span className="text-xs  text-primary">3</span>
               </div>
               <div className="flex flex-col gap-1 flex flex-col">
-                <Typography variant="small" className="">
-                  {t('whatsNext.steps.team.title')}
-                </Typography>
+                <Typography variant="small">{t('whatsNext.steps.team.title')}</Typography>
                 <Typography variant="small" color="muted">
                   {t('whatsNext.steps.team.description')}
                 </Typography>

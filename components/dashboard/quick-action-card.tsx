@@ -62,9 +62,7 @@ export function QuickActionCard({
 
           <div className="flex flex-col gap-2 flex-grow">
             <div className="flex items-center justify-between gap-3">
-              <Typography variant="h4" className="">
-                {t(title)}
-              </Typography>
+              <Typography variant="h4">{t(title)}</Typography>
               <ArrowRight
                 className={cn(
                   'h-4 w-4 transform transition-transform group-hover:translate-x-1 shrink-0',

@@ -69,7 +69,7 @@ export default function SquareConnectPage() {
               <CardTitle>{t('whatYouGet')}</CardTitle>
               <CardDescription>{t('whatYouGetDescription')}</CardDescription>
             </CardHeader>
-            <CardContent className="">
+            <CardContent>
               <div className="flex gap-3">
                 <CheckCircle className="h-5 w-5 shrink-0 text-primary" />
                 <div>

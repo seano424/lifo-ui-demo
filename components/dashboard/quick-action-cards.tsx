@@ -12,9 +12,7 @@ export function QuickActionCards() {
   return (
     <div className="w-full flex flex-col gap-6">
       <div className="flex flex-col gap-2 text-center sm:text-left">
-        <Typography variant="h4" className="">
-          {t('quickActions.title')}
-        </Typography>
+        <Typography variant="h4">{t('quickActions.title')}</Typography>
         <Typography variant="p" className="text-muted-foreground dark:text-muted-foreground">
           {t('quickActions.description')}
         </Typography>

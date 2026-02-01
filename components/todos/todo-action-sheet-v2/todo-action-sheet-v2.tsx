@@ -281,9 +281,7 @@ export function TodoActionSheetV2({
         onClose={onClose}
         titleElement={
           <div className="flex flex-col gap-2 lg:p-4">
-            <Typography className="" variant="h3">
-              {currentBatch.product_name}
-            </Typography>
+            <Typography variant="h3">{currentBatch.product_name}</Typography>
 
             <div className="flex items-center divide-x divide-muted-foreground/10 ">
               <Typography variant="muted" color="destructive" className="pr-2">

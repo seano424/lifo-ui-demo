@@ -175,7 +175,7 @@ export default function InventoryForm({
   return (
     <Card className={className}>
       <CardContent className="p-4 flex flex-col gap-3">
-        <Label className="">{finalTitle}</Label>
+        <Label>{finalTitle}</Label>
 
         <div className="grid grid-cols-2 gap-2">
           {showExpiryDate && (

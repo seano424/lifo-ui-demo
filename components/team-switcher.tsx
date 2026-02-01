@@ -136,7 +136,7 @@ export function TeamSwitcher({ compact = false }: TeamSwitcherProps) {
                   >
                     <div className="flex items-center gap-5 justify-between w-full">
                       <div className="flex flex-1 flex-col gap-1 justify-between">
-                        <span className="">{store.store_name}</span>
+                        <span>{store.store_name}</span>
 
                         <div className="flex items-center gap-1 text-xs text-muted-foreground">
                           {/* <MapPin className="size-3" /> */}

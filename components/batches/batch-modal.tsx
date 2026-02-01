@@ -120,9 +120,7 @@ export function BatchModal({ isOpen, onClose, batch, currencySymbol = '€' }: B
       onClose={onClose}
       titleElement={
         <div className="flex flex-col gap-2 py-4">
-          <Typography className="" variant="h3">
-            {getProductName()}
-          </Typography>
+          <Typography variant="h3">{getProductName()}</Typography>
           <div className="flex items-center divide-x divide-muted-foreground/10">
             <Typography variant="p" className="pr-2 ">
               {getExpiryContext()}

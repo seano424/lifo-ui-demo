@@ -107,9 +107,7 @@ export function DashboardKPICards() {
     <div className="w-full flex flex-col gap-4">
       <div className="flex flex-col gap-6">
         <div className="flex flex-col md:flex-row items-center gap-2 justify-between">
-          <Typography variant="h4" className="">
-            {t('title')}
-          </Typography>
+          <Typography variant="h4">{t('title')}</Typography>
           <Typography variant="p" className="text-muted-foreground dark:text-secondary-50">
             {t('lastUpdated')} {format.dateTime(new Date(), { dateStyle: 'short' })}
           </Typography>

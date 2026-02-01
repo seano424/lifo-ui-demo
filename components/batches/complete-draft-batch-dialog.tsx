@@ -193,7 +193,7 @@ export function CompleteDraftBatchDialog({
               {expiryDate && (
                 <div className="bg-primary-50 dark:bg-primary-950 border border-primary-200 dark:border-primary-800 rounded-lg p-3">
                   <p className="text-sm  text-primary-800 dark:text-primary-200">
-                    Captured date: <span className="">{expiryDate}</span>
+                    Captured date: <span>{expiryDate}</span>
                   </p>
                   <p className="text-xs text-primary-700 dark:text-primary-300 mt-1">
                     You can modify this date using the calendar above

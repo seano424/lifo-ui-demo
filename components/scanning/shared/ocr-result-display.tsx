@@ -145,7 +145,7 @@ export default function OCRResultDisplay({
       {/* Validation Message */}
       {showValidation && validation && !validation.valid && (
         <div className="text-sm text-yellow-700 dark:text-yellow-400 bg-yellow-100 dark:bg-yellow-900/30 rounded p-2">
-          <span className="">{t('result.validationWarning', { defaultValue: 'Warning:' })} </span>
+          <span>{t('result.validationWarning', { defaultValue: 'Warning:' })} </span>
           {validation.reason}
         </div>
       )}
@@ -153,7 +153,7 @@ export default function OCRResultDisplay({
       {/* Alternative date suggestion from raw text */}
       {rawParsed?.isoDate && rawParsed.isoDate !== extractedDate && (
         <div className="text-sm text-blue-700 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/30 rounded p-2">
-          <span className="">{t('result.alternativeDate', { defaultValue: 'Alternative:' })} </span>
+          <span>{t('result.alternativeDate', { defaultValue: 'Alternative:' })} </span>
           {rawParsed.europeanDate}
           {rawParsed.validationError && ` (${rawParsed.validationError})`}
         </div>
@@ -212,7 +212,7 @@ export function OCRResultCompact({
         <AlertCircle className="w-4 h-4" />
       )}
 
-      <span className="">{europeanDate}</span>
+      <span>{europeanDate}</span>
 
       {confidence !== undefined && (
         <span className="text-xs opacity-75">({Math.round(confidence * 100)}%)</span>

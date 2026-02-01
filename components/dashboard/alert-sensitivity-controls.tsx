@@ -140,19 +140,19 @@ export function AlertSensitivityControls({
               {currentAlertLevel === 'conservative' && (
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 bg-destructive rounded-full" />
-                  <span className="">{t('levels.conservative')}</span>
+                  <span>{t('levels.conservative')}</span>
                 </div>
               )}
               {currentAlertLevel === 'balanced' && (
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 bg-primary rounded-full" />
-                  <span className="">{t('levels.balanced')}</span>
+                  <span>{t('levels.balanced')}</span>
                 </div>
               )}
               {currentAlertLevel === 'proactive' && (
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 bg-primary-500 rounded-full" />
-                  <span className="">{t('levels.proactive')}</span>
+                  <span>{t('levels.proactive')}</span>
                 </div>
               )}
             </div>
@@ -230,7 +230,7 @@ export function AlertSensitivityControls({
           {showAdvanced && (
             <div className="flex flex-col gap-4 p-4 bg-muted/30 rounded-2xl border border-dashed">
               <div className="text-sm flex flex-col gap-3">
-                <p className="">{t('technical.thresholds')}</p>
+                <p>{t('technical.thresholds')}</p>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="flex flex-col gap-1">
                     <p className="text-xs  text-yellow-700">{t('technical.warningLevel')}</p>

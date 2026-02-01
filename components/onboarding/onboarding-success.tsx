@@ -44,9 +44,7 @@ export function OnboardingSuccess({ storeName }: OnboardingSuccessProps) {
                 <span className="text-xs  text-primary">1</span>
               </div>
               <div className="flex flex-col gap-1 flex flex-col">
-                <Typography variant="small" className="">
-                  {t('nextSteps.completeSetup.title')}
-                </Typography>
+                <Typography variant="small">{t('nextSteps.completeSetup.title')}</Typography>
                 <Typography variant="small" color="muted">
                   {t('nextSteps.completeSetup.description')}
                 </Typography>
@@ -58,9 +56,7 @@ export function OnboardingSuccess({ storeName }: OnboardingSuccessProps) {
                 <span className="text-xs  text-primary">2</span>
               </div>
               <div className="flex flex-col gap-1 flex flex-col">
-                <Typography variant="small" className="">
-                  {t('nextSteps.addProducts.title')}
-                </Typography>
+                <Typography variant="small">{t('nextSteps.addProducts.title')}</Typography>
                 <Typography variant="small" color="muted">
                   {t('nextSteps.addProducts.description')}
                 </Typography>
@@ -72,9 +68,7 @@ export function OnboardingSuccess({ storeName }: OnboardingSuccessProps) {
                 <span className="text-xs  text-primary">3</span>
               </div>
               <div className="flex flex-col gap-1 flex flex-col">
-                <Typography variant="small" className="">
-                  {t('nextSteps.inviteTeam.title')}
-                </Typography>
+                <Typography variant="small">{t('nextSteps.inviteTeam.title')}</Typography>
                 <Typography variant="small" color="muted">
                   {t('nextSteps.inviteTeam.description')}
                 </Typography>

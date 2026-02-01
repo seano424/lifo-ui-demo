@@ -65,9 +65,7 @@ export function ExpiredItemsSummary() {
             <div className="h-8 w-8 bg-primary-500 rounded-full mx-auto mb-2 flex items-center justify-center">
               <div className="h-2 w-2 bg-white rounded-full" />
             </div>
-            <Typography variant="p" className="">
-              {t('noExpiredItems')}
-            </Typography>
+            <Typography variant="p">{t('noExpiredItems')}</Typography>
           </div>
         ) : (
           <div className="flex flex-col gap-4">
@@ -80,9 +78,7 @@ export function ExpiredItemsSummary() {
                 </Typography>
               </div>
               <div className="text-right">
-                <Typography variant="p" className="">
-                  {expiredCount}
-                </Typography>
+                <Typography variant="p">{expiredCount}</Typography>
                 <Typography variant="small" className="text-foreground">
                   €{Math.round(expiredValue).toLocaleString()}
                 </Typography>

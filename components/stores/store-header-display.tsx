@@ -82,7 +82,7 @@ export function StoreHeaderDisplay({
               <Store className="size-5" />
             </div>
             <div>
-              <p className="">{t('noStoreSelected')}</p>
+              <p>{t('noStoreSelected')}</p>
               <p className="text-sm">{t('pleaseSelectStore')}</p>
             </div>
           </div>

@@ -149,7 +149,7 @@ export default function ScanInInterface({ onItemAdded, className }: ScanInInterf
                       className="flex justify-between items-start p-2 bg-white rounded-2xl border text-sm"
                     >
                       <div className="flex-1">
-                        <div className="">{item.productName}</div>
+                        <div>{item.productName}</div>
                         {item.brand && <div className="text-xs text-foreground">{item.brand}</div>}
                         <div className="text-xs text-foreground">
                           Expires:{' '}
@@ -159,7 +159,7 @@ export default function ScanInInterface({ onItemAdded, className }: ScanInInterf
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="">
+                        <div>
                           {item.quantity}x {formatPrice(item.price)}
                         </div>
                         <div className="text-xs text-foreground">

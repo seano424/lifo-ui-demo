@@ -223,7 +223,7 @@ export function StoreUsersList({ storeId: propStoreId, serverPermissions }: Stor
               {data.map(storeUser => {
                 return (
                   <TableRow key={storeUser.user_id} className="hover:bg-opacity-0">
-                    <TableCell className="">
+                    <TableCell>
                       <div>
                         <div>{storeUser.full_name}</div>
                       </div>

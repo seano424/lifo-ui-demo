@@ -20,9 +20,7 @@ function Feature({ icon, title, description }: FeatureProps) {
         <Typography variant="h3" className="capitalize">
           {title}
         </Typography>
-        <Typography variant="p" className="">
-          {description}
-        </Typography>
+        <Typography variant="p">{description}</Typography>
       </div>
     </div>
   )
