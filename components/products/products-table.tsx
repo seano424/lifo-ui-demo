@@ -109,7 +109,7 @@ export function ProductsTable({ data, currentSort, updateSort, isLoading }: Prod
 
   if (data.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 border border-border rounded-lg bg-muted/10">
+      <div className="flex flex-col items-center justify-center py-16 rounded-lg bg-muted/10">
         <Package className="h-12 w-12 text-muted-foreground mb-4" />
         <CardTitle className="text-lg mb-2">{t('empty.title')}</CardTitle>
         <CardDescription className="text-center max-w-md">{t('empty.description')}</CardDescription>
@@ -128,11 +128,11 @@ export function ProductsTable({ data, currentSort, updateSort, isLoading }: Prod
       >
         <TableHeader>
           {table.getHeaderGroups().map(headerGroup => (
-            <TableRow key={headerGroup.id} className="border-b-2 border-border">
+            <TableRow key={headerGroup.id}>
               {headerGroup.headers.map(header => (
                 <TableHead
                   key={header.id}
-                  className="py-3 px-4"
+                  className="sticky top-0 bg-background z-10 py-3 px-4 border-b border-border"
                   style={
                     header.column.columnDef.size
                       ? { width: header.column.columnDef.size }
@@ -152,7 +152,7 @@ export function ProductsTable({ data, currentSort, updateSort, isLoading }: Prod
             <TableRow
               key={row.id}
               onClick={() => handleProductClick(row.original)}
-              className="cursor-pointer hover:bg-muted/30 transition-colors border-b border-border"
+              className="cursor-pointer transition-all duration-100 ease-in-out hover:bg-muted/30"
             >
               {row.getVisibleCells().map(cell => (
                 <TableCell
@@ -160,7 +160,7 @@ export function ProductsTable({ data, currentSort, updateSort, isLoading }: Prod
                   style={
                     cell.column.columnDef.size ? { width: cell.column.columnDef.size } : undefined
                   }
-                  className="py-4 px-4"
+                  className="py-3 px-4"
                 >
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </TableCell>

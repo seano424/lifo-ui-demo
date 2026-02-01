@@ -326,7 +326,7 @@ export function TodoCardV2({ todo, onClick }: TodoCardV2Props) {
           <div className="flex flex-col gap-4">
             {/* Product name + status badge */}
             <div className="flex gap-2 lg:gap-4 flex-wrap flex-col-reverse lg:flex-row">
-              <Typography className="font-heading" variant="h4">
+              <Typography className="" variant="h4">
                 {todo.product_name}
               </Typography>
 

@@ -8,6 +8,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+// import { ArrowUpDownIcon } from 'lucide-react'
+import { PRODUCT_TABLE_COLUMN_CONFIG } from '@/components/products/product-table-columns'
 
 export function ProductListSkeleton() {
   const t = useTranslations('productTable')
@@ -21,48 +23,44 @@ export function ProductListSkeleton() {
       }}
     >
       <TableHeader>
-        <TableRow className="border-b-2 border-border">
-          <TableHead className="py-3" style={{ width: 200 }}>
-            <span className="text-sm text-foreground">{t('product')}</span>
-          </TableHead>
-          <TableHead className="py-3 text-right" style={{ width: 200 }}>
-            <span className="text-sm text-foreground">{t('totalStock')}</span>
-          </TableHead>
-          <TableHead className="py-3 text-right" style={{ width: 200 }}>
-            <span className="text-sm text-foreground">{t('activeBatches')}</span>
-          </TableHead>
-          <TableHead className="py-3 text-right" style={{ width: 200 }}>
-            <span className="text-sm text-foreground">{t('dateAdded')}</span>
-          </TableHead>
-          <TableHead className="py-3 text-right" style={{ width: 240 }}>
-            <span className="text-sm text-foreground">{t('category')}</span>
-          </TableHead>
-          <TableHead className="py-3 text-right" style={{ width: 240 }}>
-            <span className="text-sm text-foreground">{t('brand')}</span>
-          </TableHead>
+        <TableRow className="border-b border-border">
+          {PRODUCT_TABLE_COLUMN_CONFIG.map(column => (
+            <TableHead
+              key={column.id}
+              className="sticky top-0 bg-background z-10 py-3"
+              style={{ width: column.width }}
+            >
+              <div
+                className={`flex items-center gap-1 ${column.align === 'right' ? 'justify-end' : ''}`}
+              >
+                <span className="text-sm text-foreground">{t(column.headerKey)}</span>
+                {/* {column.sortable !== false && <ArrowUpDownIcon className="h-3.5 w-3.5" />} */}
+              </div>
+            </TableHead>
+          ))}
         </TableRow>
       </TableHeader>
       <TableBody>
         {Array.from({ length: 10 }).map((_, i) => (
-          <TableRow key={`skeleton-${i + 1}`} className="border-b border-border">
-            <TableCell className="py-4" style={{ width: 200 }}>
-              <Skeleton className="h-5 w-full rounded" />
-            </TableCell>
-            <TableCell className="py-4 text-right" style={{ width: 200 }}>
-              <Skeleton className="h-5 w-full rounded" />
-            </TableCell>
-            <TableCell className="py-4 text-right" style={{ width: 200 }}>
-              <Skeleton className="h-5 w-full rounded" />
-            </TableCell>
-            <TableCell className="py-4 text-right" style={{ width: 200 }}>
-              <Skeleton className="h-5 w-full rounded" />
-            </TableCell>
-            <TableCell className="py-4 text-right" style={{ width: 240 }}>
-              <Skeleton className="h-5 w-full rounded" />
-            </TableCell>
-            <TableCell className="py-4 text-right" style={{ width: 240 }}>
-              <Skeleton className="h-5 w-full rounded" />
-            </TableCell>
+          <TableRow key={`skeleton-${i + 1}`} className="border-none">
+            {PRODUCT_TABLE_COLUMN_CONFIG.map(column => (
+              <TableCell
+                key={column.id}
+                className={`py-3 ${column.align === 'right' ? 'text-right' : ''}`}
+                style={{ width: column.width }}
+              >
+                {column.hasMultipleLines ? (
+                  <div className="flex flex-col gap-2">
+                    <Skeleton className="h-4 w-full rounded" />
+                    <Skeleton className="h-3 w-3/4 rounded" />
+                  </div>
+                ) : (
+                  <Skeleton
+                    className={`h-5 w-full rounded ${column.align === 'right' ? 'ml-auto' : ''}`}
+                  />
+                )}
+              </TableCell>
+            ))}
           </TableRow>
         ))}
       </TableBody>

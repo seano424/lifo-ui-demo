@@ -7,6 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Typography } from '../ui/typography'
 
 interface BatchListFiltersProps {
   filters?: {
@@ -37,9 +38,9 @@ export function BatchListFilters({ filters, onFiltersChange, isLoading }: BatchL
         }
         disabled={isLoading}
       >
-        <SelectTrigger className="w-[140px]" hideChevron>
+        <SelectTrigger className="w-[140px]">
           <div className="flex items-center gap-2">
-            <span className="text-xs text-muted-foreground">{t('date')}:</span>
+            <Typography variant="small">{t('date')}:</Typography>
             <SelectValue />
           </div>
         </SelectTrigger>
@@ -76,9 +77,9 @@ export function BatchListFilters({ filters, onFiltersChange, isLoading }: BatchL
         }
         disabled={isLoading}
       >
-        <SelectTrigger className="w-[140px]" hideChevron>
+        <SelectTrigger className="w-[180px]" showChevron>
           <div className="flex items-center gap-2">
-            <span className="text-xs text-muted-foreground">{t('status')}:</span>
+            <Typography variant="small">{t('status')}:</Typography>
             <SelectValue />
           </div>
         </SelectTrigger>

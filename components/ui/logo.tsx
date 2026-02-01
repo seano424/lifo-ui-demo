@@ -27,10 +27,10 @@ const sizeMap = {
 }
 
 const textSizeMap = {
-  sm: 'text-2xl font-heading font-extrabold',
-  md: 'text-3xl font-heading font-extrabold',
-  lg: 'text-4xl font-heading font-extrabold',
-  xl: 'text-5xl font-heading font-extrabold',
+  sm: 'text-2xl  font-extrabold',
+  md: 'text-3xl  font-extrabold',
+  lg: 'text-4xl  font-extrabold',
+  xl: 'text-5xl  font-extrabold',
 }
 
 export function Logo({
@@ -102,7 +102,7 @@ export function Logo({
         href={href}
         className={cn(
           'inline-block',
-          withText && 'flex items-center gap-2 font-heading font-extrabold',
+          withText && 'flex items-center gap-2  font-extrabold font-heading',
         )}
       >
         {logoElement}
@@ -115,7 +115,7 @@ export function Logo({
     <div
       className={cn(
         'inline-block',
-        withText && 'flex items-center gap-2 font-heading text-2xl font-extrabold',
+        withText && 'flex items-center gap-2  text-2xl font-extrabold font-heading',
       )}
     >
       {logoElement}

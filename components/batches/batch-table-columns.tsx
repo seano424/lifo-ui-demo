@@ -4,6 +4,7 @@ import type { ColumnDef } from '@tanstack/react-table'
 import { SortableHeader } from '@/components/batches/sortable-header'
 import type { BatchSort, BatchSortField, BatchWithProduct } from '@/lib/queries/batches'
 import { parseISODateAsLocal } from '@/lib/utils/date-conversion'
+import { Badge } from '../ui/badge'
 
 // Export column metadata for use in skeleton
 export const BATCH_TABLE_COLUMN_CONFIG = [
@@ -176,24 +177,20 @@ export function createBatchTableColumns({
       ),
       cell: ({ row }) => {
         let expiryDate: Date | null = null
-        let isExpired = false
+        let daysLeft = 0
 
         if (row.original.expiry_date) {
           expiryDate = parseISODateAsLocal(row.original.expiry_date)
           const today = new Date()
           today.setHours(0, 0, 0, 0)
-          isExpired = expiryDate < today
+          daysLeft = getDaysLeft(expiryDate)
         }
 
         return (
           <div className={alignments.expiry_date.cellClass}>
-            {expiryDate ? (
-              <span className={`text-sm truncate ${isExpired ? 'text-destructive' : ''}`}>
-                {expiryDate.toLocaleDateString()}
-              </span>
-            ) : (
-              <span className="text-sm truncate">{tExpiry('noExpiryDate')}</span>
-            )}
+            <Badge variant={daysLeft <= 3 ? 'danger' : 'elevated'}>
+              {expiryDate ? expiryDate.toLocaleDateString() : tExpiry('noExpiryDate')}
+            </Badge>
           </div>
         )
       },
@@ -223,11 +220,11 @@ export function createBatchTableColumns({
 
         const expiryDate = parseISODateAsLocal(row.original.expiry_date)
         const daysLeft = getDaysLeft(expiryDate)
-        const { textClass, label } = getDaysLeftStyling(daysLeft)
+        const { label } = getDaysLeftStyling(daysLeft)
 
         return (
           <div className={alignments.days_left.cellClass}>
-            <span className={`text-sm ${textClass}`}>{label}</span>
+            <Badge variant={daysLeft <= 3 ? 'danger' : 'elevated'}>{label}</Badge>
           </div>
         )
       },
@@ -256,7 +253,7 @@ export function createBatchTableColumns({
     {
       id: 'location',
       header: () => (
-        <div className={`flex font-heading  items-center ${alignments.location.headerClass}`}>
+        <div className={`flex items-center font-normal ${alignments.location.headerClass}`}>
           {t('headers.location')}
         </div>
       ),

@@ -22,11 +22,11 @@ function SelectTrigger({
   className,
   size = 'default',
   children,
-  hideChevron = false,
+  showChevron = true,
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Trigger> & {
   size?: 'sm' | 'default' | 'lg' | 'xl'
-  hideChevron?: boolean
+  showChevron?: boolean
 }) {
   const sizeClasses = {
     sm: 'px-3 py-1.5 text-sm',
@@ -40,14 +40,14 @@ function SelectTrigger({
       data-slot="select-trigger"
       data-size={size}
       className={cn(
-        "flex w-full select-none items-center justify-between rounded-2xl tracking-wide  font-heading border border-input bg-transparent shadow-xs transition-colors data-[placeholder]:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "flex w-full select-none items-center justify-between rounded-2xl tracking-wide border border-input bg-transparent shadow-xs transition-colors focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         sizeClasses[size],
         className,
       )}
       {...props}
     >
       {children}
-      {!hideChevron && (
+      {showChevron && (
         <SelectPrimitive.Icon asChild>
           <ChevronDownIcon className="size-4 opacity-50" />
         </SelectPrimitive.Icon>
@@ -115,7 +115,7 @@ function SelectItem({
     <SelectPrimitive.Item
       data-slot="select-item"
       className={cn(
-        'relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&>svg]:size-4 [&>svg]:shrink-0',
+        'relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden transition-colors focus:bg-accent focus:text-accent-foreground [&>svg]:size-4 [&>svg]:shrink-0',
         className,
       )}
       {...props}

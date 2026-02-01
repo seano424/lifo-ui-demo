@@ -4,12 +4,8 @@ import { BatchesFilteredList } from '@/components/batches/batches-filtered-list'
 import DashboardInsetHeader from '@/components/dashboard/dashboard-inset-header'
 import { NoStoresError } from '@/components/dashboard/no-stores-error'
 import { getTranslations } from 'next-intl/server'
-import {
-  type BatchFilters,
-  type BatchSortField,
-  fetchBatchesPage,
-  fetchExpiringBatches,
-} from '@/lib/queries/batches'
+import { type BatchFilters, type BatchSortField, fetchExpiringBatches } from '@/lib/queries/batches'
+import { fetchBatchesPageRPC } from '@/lib/queries/batches-rpc'
 import { queryKeys } from '@/lib/queries/query-keys'
 import { fetchUserPreferences, fetchUserStores } from '@/lib/queries/stores'
 import { createPrefetchedQuery } from '@/lib/react-query/prefetch'
@@ -109,7 +105,7 @@ export default async function InventoryBatchesPage({ searchParams }: InventoryBa
     await queryClient.prefetchInfiniteQuery({
       queryKey: queryKeys.batches.infinite(storeToUse.store_id, filters),
       queryFn: ({ pageParam = 0 }) =>
-        fetchBatchesPage({ page: pageParam, pageSize: 100 }, filters, serverClient),
+        fetchBatchesPageRPC({ page: pageParam, pageSize: 100 }, filters, serverClient),
       initialPageParam: 0,
       getNextPageParam: lastPage => lastPage.nextPage,
       pages: 1, // Only prefetch first page

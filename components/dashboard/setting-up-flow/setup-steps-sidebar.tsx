@@ -85,8 +85,8 @@ export function SetupStepsSidebar() {
                 variant="p"
                 className={cn(
                   '',
-                  isCurrent && ' font-heading text-primary-900 dark:text-secondary-700',
-                  completed && ' font-heading text-primary-900 dark:text-secondary-700',
+                  isCurrent && '  text-primary-900 dark:text-secondary-700',
+                  completed && '  text-primary-900 dark:text-secondary-700',
                 )}
               >
                 {t(STEP_LABELS[step])}
