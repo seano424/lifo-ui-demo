@@ -105,6 +105,7 @@ export type Database = {
       store_settings: {
         Row: {
           backup_preferences: Json | null
+          batch_tracking_config: Json | null
           critical_threshold: number | null
           currency: string | null
           display_preferences: Json | null
@@ -122,6 +123,7 @@ export type Database = {
         }
         Insert: {
           backup_preferences?: Json | null
+          batch_tracking_config?: Json | null
           critical_threshold?: number | null
           currency?: string | null
           display_preferences?: Json | null
@@ -139,6 +141,7 @@ export type Database = {
         }
         Update: {
           backup_preferences?: Json | null
+          batch_tracking_config?: Json | null
           critical_threshold?: number | null
           currency?: string | null
           display_preferences?: Json | null
@@ -1292,15 +1295,56 @@ export type Database = {
           },
         ]
       }
+      store_category_settings: {
+        Row: {
+          auto_create_batches: boolean
+          category_id: string
+          created_at: string
+          default_shelf_life_days: number | null
+          is_tracked: boolean
+          store_id: string
+          updated_at: string
+        }
+        Insert: {
+          auto_create_batches?: boolean
+          category_id: string
+          created_at?: string
+          default_shelf_life_days?: number | null
+          is_tracked?: boolean
+          store_id: string
+          updated_at?: string
+        }
+        Update: {
+          auto_create_batches?: boolean
+          category_id?: string
+          created_at?: string
+          default_shelf_life_days?: number | null
+          is_tracked?: boolean
+          store_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "store_category_settings_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["category_id"]
+          },
+        ]
+      }
       store_products: {
         Row: {
           added_by: string | null
+          auto_create_batches: boolean | null
           cost_price: number | null
           created_at: string | null
           image_url: string | null
           is_active: boolean | null
+          is_tracked_for_batches: boolean | null
           product_id: string
           selling_price: number | null
+          shelf_life_override_days: number | null
           square_synced_at: string | null
           square_variation_id: string | null
           store_id: string
@@ -1311,12 +1355,15 @@ export type Database = {
         }
         Insert: {
           added_by?: string | null
+          auto_create_batches?: boolean | null
           cost_price?: number | null
           created_at?: string | null
           image_url?: string | null
           is_active?: boolean | null
+          is_tracked_for_batches?: boolean | null
           product_id: string
           selling_price?: number | null
+          shelf_life_override_days?: number | null
           square_synced_at?: string | null
           square_variation_id?: string | null
           store_id: string
@@ -1327,12 +1374,15 @@ export type Database = {
         }
         Update: {
           added_by?: string | null
+          auto_create_batches?: boolean | null
           cost_price?: number | null
           created_at?: string | null
           image_url?: string | null
           is_active?: boolean | null
+          is_tracked_for_batches?: boolean | null
           product_id?: string
           selling_price?: number | null
+          shelf_life_override_days?: number | null
           square_synced_at?: string | null
           square_variation_id?: string | null
           store_id?: string
@@ -2988,6 +3038,7 @@ export type Database = {
           urgency_level: string
         }[]
       }
+      get_batch_tracking_setup: { Args: { p_store_id: string }; Returns: Json }
       get_batches_page: {
         Args: {
           p_filters?: Json
@@ -3075,6 +3126,20 @@ export type Database = {
           total_count: number
           updated_at: string
           verification_status: string
+        }[]
+      }
+      get_categories_with_tracking_settings: {
+        Args: { p_store_id: string }
+        Returns: {
+          auto_create_batches: boolean
+          category_code: string
+          category_id: string
+          default_shelf_life_days: number
+          display_name_en: string
+          display_name_fr: string
+          is_tracked: boolean
+          product_count: number
+          typical_shelf_life_days: number
         }[]
       }
       get_csv_upload_stats: {
@@ -3271,6 +3336,31 @@ export type Database = {
           product_name: string
           total_count: number
           urgency_level: string
+        }[]
+      }
+      get_products_for_tracking_setup: {
+        Args: {
+          p_category_id?: string
+          p_offset?: number
+          p_only_tracked?: boolean
+          p_page_size?: number
+          p_search_term?: string
+          p_store_id: string
+        }
+        Returns: {
+          auto_create_batches: boolean
+          barcode: string
+          brand: string
+          category_id: string
+          category_name: string
+          image_url: string
+          inherited_auto_create: boolean
+          is_tracked_for_batches: boolean
+          name: string
+          product_id: string
+          shelf_life_override_days: number
+          total_count: number
+          typical_shelf_life_days: number
         }[]
       }
       get_products_paginated: {
@@ -3880,6 +3970,15 @@ export type Database = {
       rls_check_store_access: {
         Args: { check_store_id: string }
         Returns: boolean
+      }
+      save_batch_tracking_setup: {
+        Args: {
+          p_category_settings?: Json[]
+          p_config: Json
+          p_product_overrides?: Json[]
+          p_store_id: string
+        }
+        Returns: Json
       }
       search_products_with_stock: {
         Args: {
