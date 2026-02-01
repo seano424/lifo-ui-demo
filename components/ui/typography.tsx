@@ -8,10 +8,10 @@ const typographyVariants = cva('', {
   variants: {
     variant: {
       h1: 'scroll-m-20 text-4xl sm:text-5xl md:text-6xl xl:text-7xl font-heading font-black',
-      h2: 'scroll-m-20 text-3xl sm:text-4xl font-heading font-semibold',
-      h3: 'scroll-m-20 text-2xl lg:text-3xl font-heading font-semibold',
-      h4: 'scroll-m-20 text-xl lg:text-2xl font-heading font-semibold',
-      h5: 'scroll-m-20 text-lg lg:text-xl font-heading font-semibold',
+      h2: 'scroll-m-20 text-3xl sm:text-4xl',
+      h3: 'scroll-m-20 text-2xl lg:text-3xl',
+      h4: 'scroll-m-20 text-xl lg:text-2xl',
+      h5: 'scroll-m-20 text-lg lg:text-xl',
       p: 'text-base leading-5 font-sans',
       muted: 'text-sm text-muted-foreground font-sans',
       small: 'text-sm font-sans',

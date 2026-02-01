@@ -27,10 +27,7 @@ function NavBadge({ count, className }: { count: number; className?: string }) {
     <NotificationCount
       count={count}
       variant="sidebar"
-      className={cn(
-        'ml-auto shrink-0 bg-linear-to-br from-secondary-900 via-primary-900 to-transparent',
-        className,
-      )}
+      className={cn('ml-auto shrink-0', className)}
     />
   )
 }
@@ -164,9 +161,9 @@ export function NavMain({
                 <SidebarMenuItem className="flex flex-col items-center gap-2" key={item.title}>
                   <SidebarMenuButton
                     className={cn(
-                      'hover:bg-secondary-100/30 rounded-2xl dark:hover:bg-secondary-900/5 dark:data-[active=true]:bg-primary-900/10 py-2 px-2  relative',
+                      'hover:bg-secondary-100/30 rounded-lg dark:hover:bg-secondary-900/5 dark:data-[active=true]:bg-primary-900/10 py-2 px-2  relative',
                       isPathActive(item.url) &&
-                        'bg-secondary-100/30 font-bold hover:bg-secondary-100/30 dark:hover:bg-secondary-900/5 text-secondary-900 dark:text-brand-white dark:bg-secondary-900/5',
+                        'bg-secondary-100/30 hover:bg-secondary-100/30 dark:hover:bg-secondary-900/5 dark:text-brand-white dark:bg-secondary-900/5 font-semibold',
                     )}
                     asChild
                     tooltip={item.title}

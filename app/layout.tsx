@@ -8,7 +8,7 @@ import { ReactQueryProvider } from '@/lib/react-query/provider'
 import type { Metadata } from 'next'
 import { getLocale, getMessages } from 'next-intl/server'
 import { ThemeProvider } from 'next-themes'
-import { Montserrat, Raleway, Roboto_Mono } from 'next/font/google'
+import { Inter, Raleway, Roboto_Mono } from 'next/font/google'
 import './globals.css'
 
 const defaultUrl = process.env.VERCEL_URL
@@ -50,9 +50,9 @@ const raleway = Raleway({
   fallback: ['system-ui', 'arial'],
 })
 
-// Montserrat font for body text
-const montserrat = Montserrat({
-  variable: '--font-montserrat',
+// Inter font for body text
+const inter = Inter({
+  variable: '--font-inter',
   display: 'swap',
   subsets: ['latin'],
   weight: ['400', '500', '600', '700', '800', '900'],
@@ -82,7 +82,7 @@ export default async function RootLayout({
       lang={locale}
       suppressHydrationWarning
       data-scroll-behavior="smooth"
-      className={`${raleway.variable} ${montserrat.variable} ${robotoMono.variable} ${debugScreens}`}
+      className={`${raleway.variable} ${inter.variable} ${robotoMono.variable} ${debugScreens}`}
     >
       <body className={`font-sans antialiased`}>
         <ThemeProvider
