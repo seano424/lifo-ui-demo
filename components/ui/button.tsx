@@ -16,18 +16,18 @@ const buttonVariants = cva(
           'bg-primary-900 hover:bg-primary-800 dark:bg-primary-900/80 dark:hover:bg-primary-900 text-white',
         destructive:
           'bg-destructive text-destructive-foreground shadow-xs hover:bg-destructive/90 dark:bg-destructive dark:hover:bg-destructive',
-        subtleDestructive: 'bg-destructive text-destructive shadow-xs hover:bg-destructive',
+        subtleDestructive: 'text-destructive hover:bg-destructive-100',
         outline: 'border border-input bg-background shadow-xs hover:border-border',
         secondary: 'bg-secondary-900 shadow-xs hover:bg-secondary-800 text-white',
         ghost:
-          'hover:bg-primary-50 hover:text-primary-800 dark:hover:bg-primary-900/0 dark:text-foreground font-normal',
+          'hover:bg-primary-50 hover:text-primary-800 dark:hover:bg-primary-900/0 dark:text-foreground font-normal w-fit',
         subtleTertiary:
           'bg-primary-50 text-primary-800 dark:bg-background/10 dark:text-primary-300',
         link: 'text-primary-800 underline-offset-4 hover:underline dark:text-primary-300',
 
         // New subtle variants using lighter shades
         subtle:
-          'bg-primary-600 hover:bg-primary-700 dark:bg-background dark:hover:bg-primary-600 text-white',
+          'bg-primary-50 text-primary-800 dark:bg-primary-900/0 dark:text-foreground font-normal w-fit',
         subtleSecondary:
           'bg-secondary-100/10 shadow-xs hover:bg-secondary-100/80 dark:bg-secondary-900/70 dark:hover:bg-secondary-900/80',
 

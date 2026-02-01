@@ -58,7 +58,7 @@ export function DisconnectSquareDialog({ connectionId, trigger }: DisconnectSqua
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>
         {trigger || (
-          <Button variant="destructive">
+          <Button variant="subtleDestructive">
             <Unplug className="h-4 w-4" />
             {t('disconnect')}
           </Button>

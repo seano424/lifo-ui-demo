@@ -7,7 +7,7 @@
 
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
-import { ArrowRight, RefreshCw, Square, Package, Boxes, ShoppingCart, MapPin } from 'lucide-react'
+import { ArrowRight, RefreshCw, Package, Boxes, ShoppingCart, MapPin } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -25,6 +25,7 @@ import { useEffect } from 'react'
 import { useStoreState } from '@/lib/stores/store-context'
 import { Typography } from '@/components/ui/typography'
 import { useStoreActions, useUserStores } from '@/hooks/use-stores'
+import { SquareIcon } from '@/components/integrations/square-icon'
 
 export default function SquareManagementPage() {
   const router = useRouter()
@@ -97,7 +98,7 @@ export default function SquareManagementPage() {
         {/* Header */}
         <div className="flex flex-col gap-4">
           <Button
-            variant="ghost"
+            variant="subtle"
             size="sm"
             onClick={() => router.push('/dashboard/integrations')}
             className="mb-2 min-h-[44px] min-w-[44px]"
@@ -108,9 +109,7 @@ export default function SquareManagementPage() {
 
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-black">
-                <Square className="h-6 w-6 text-white" />
-              </div>
+              <SquareIcon />
               <div>
                 <Typography as="h1" color="primary">
                   {t('title')}
