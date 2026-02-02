@@ -57,7 +57,7 @@ export function DashboardHeader({ timeRange, onTimeRangeChange }: DashboardHeade
   return (
     <div className="flex items-end justify-between">
       {/* Left: Greeting + Store/Date */}
-      <div>
+      <div className="flex flex-col gap-2">
         <Typography variant="h2">{t(`greeting.${greetingKey}`, { name: userName })}</Typography>
         <Typography variant="p" color="muted">
           {activeStore?.store_name} · {formattedDate}

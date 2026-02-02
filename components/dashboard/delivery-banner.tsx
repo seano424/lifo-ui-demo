@@ -110,17 +110,15 @@ export function DeliveryBanner() {
   }
 
   return (
-    <div className="flex items-center justify-between rounded-2xl bg-card px-6 py-4">
+    <div className="flex items-center justify-between rounded-2xl bg-card p-3">
       {/* Left: Icon + Message */}
       <div className="flex items-center gap-4">
-        <div className="rounded-xl bg-white/10 p-2.5">
+        <div className="rounded-xl bg-white p-2.5">
           <Box className="h-5 w-5" aria-hidden="true" />
         </div>
         <div>
-          <Typography variant="p" color="default">
-            {t('title', { count: totalDrafts })}
-          </Typography>
-          <Typography variant="p" color="muted">
+          <Typography variant="p">{t('title', { count: totalDrafts })}</Typography>
+          <Typography variant="p">
             {t('description', { units: totalUnits, count: productsWithDrafts })}
           </Typography>
         </div>
@@ -130,15 +128,14 @@ export function DeliveryBanner() {
       <div className="flex items-center gap-3">
         <Button
           asChild
-          size="sm"
-          variant="subtle"
+          variant="white"
           asLink
           href="/dashboard/inventory/new"
           onClick={handleDismiss}
         >
           {t('cta')}
         </Button>
-        <Button variant="ghost" size="icon" onClick={handleDismiss} aria-label={t('dismiss')}>
+        <Button variant="white" size="icon" onClick={handleDismiss} aria-label={t('dismiss')}>
           <X className="h-4 w-4" />
         </Button>
       </div>

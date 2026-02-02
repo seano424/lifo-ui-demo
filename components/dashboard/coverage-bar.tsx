@@ -50,7 +50,7 @@ export function CoverageBar() {
       {/* Progress Bar */}
       <div className="mb-3 h-2.5 w-full overflow-hidden rounded-full bg-gray-100">
         <div
-          className="h-full rounded-full bg-gray-600 transition-all duration-700"
+          className="h-full rounded-full bg-gray-200 transition-all duration-700"
           style={{ width: `${percent}%` }}
           role="progressbar"
           aria-valuenow={percent}

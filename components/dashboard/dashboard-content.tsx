@@ -14,7 +14,7 @@ export function DashboardContent() {
   const daysFilter = timeRange === '7d' ? 7 : timeRange === '30d' ? 30 : 90
 
   return (
-    <div className="flex flex-col gap-6 pb-8 animate-in fade-in-0 duration-1000">
+    <div className="flex flex-col gap-6 pb-80 animate-in fade-in-0 duration-1000">
       <DashboardHeader timeRange={timeRange} onTimeRangeChange={setTimeRange} />
       <DeliveryBanner />
       <StatCards daysFilter={daysFilter} />
