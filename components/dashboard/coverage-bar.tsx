@@ -61,7 +61,7 @@ export function CoverageBar() {
       </div>
 
       {/* Footer Row */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row gap-2 sm:gap-0 sm:items-center sm:justify-between">
         <Typography variant="p" color="muted">
           {t('tracked', { count: covered })}
         </Typography>

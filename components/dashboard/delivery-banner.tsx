@@ -113,7 +113,7 @@ export function DeliveryBanner() {
     <div className="flex-col gap-4 sm:flex-row flex sm:items-center sm:justify-between rounded-2xl bg-card p-3">
       {/* Left: Icon + Message */}
       <div className="flex items-center gap-4">
-        <div className="rounded-xl bg-white p-2.5">
+        <div className="rounded-xl bg-white p-2.5 dark:bg-primary-900 dark:text-primary-100">
           <Box className="h-5 w-5" aria-hidden="true" />
         </div>
         <div className="flex flex-col gap-1">

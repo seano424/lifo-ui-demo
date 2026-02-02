@@ -18,7 +18,7 @@ export function AutomationCard() {
   if (isLoading) {
     return (
       <Card className="overflow-hidden">
-        <div className="border-b border-gray-100 px-6 py-4">
+        <div className="border-b border-muted px-6 py-4">
           <Skeleton className="h-5 w-24" />
           <Skeleton className="mt-1 h-3 w-32" />
         </div>
@@ -56,37 +56,48 @@ export function AutomationCard() {
 
   // Active state - show rules summary and list
   return (
-    <Card className="overflow-hidden">
+    <Card className="overflow-hidden flex flex-col gap-0">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
+      <div className="flex items-center justify-between border-b border-muted px-6 py-4">
         <div>
           <Typography variant="h4">{t('title')}</Typography>
           <Typography variant="p" color="muted">
             {t('subtitle')}
           </Typography>
         </div>
-        <Link
-          href="/dashboard/settings/automation"
-          className="flex items-center gap-1 transition-colors hover:text-gray-900"
-        >
-          <Typography variant="p" color="muted">
+        <Link href="/dashboard/settings/automation">
+          <Typography
+            variant="p"
+            color="muted"
+            className="flex items-center gap-1 hover:text-gray-900 dark:hover:text-secondary-100"
+          >
             {t('manage')}
+            <Settings className="h-3.5 w-3.5" aria-hidden="true" />
           </Typography>
-          <Settings className="h-3.5 w-3.5" aria-hidden="true" />
         </Link>
       </div>
 
       {/* Summary Stats Row */}
-      <div className="flex items-center gap-6 border-b border-gray-50 px-6 py-4">
-        <div>
-          <Typography variant="h3">{activeRules.length}</Typography>
+      <div className="flex flex-col sm:flex-row sm:items-center gap-6 border-b border-muted px-6 py-4">
+        <div className="flex sm:flex-col gap-2 sm:gap-0 items-center sm:items-start">
+          <Typography
+            className="border aspect-square min-h-10 min-w-10 p-2 flex items-center justify-center rounded-full dark:border-secondary-100"
+            variant="p"
+          >
+            {activeRules.length}
+          </Typography>
           <Typography variant="p" color="muted">
             {t('activeRules')}
           </Typography>
         </div>
-        <div className="h-8 w-px bg-gray-100" />
-        <div>
-          <Typography variant="h3">{totalProducts}</Typography>
+        <div className="h-8 w-px bg-muted hidden sm:block" />
+        <div className="flex sm:flex-col gap-2 sm:gap-0 items-center sm:items-start">
+          <Typography
+            className="border aspect-square min-h-10 min-w-10 p-2 flex items-center justify-center rounded-full dark:border-secondary-100"
+            variant="p"
+          >
+            {totalProducts}
+          </Typography>
           <Typography variant="p" color="muted">
             {t('productsCovered')}
           </Typography>
@@ -94,21 +105,21 @@ export function AutomationCard() {
       </div>
 
       {/* Rules List */}
-      <div className="divide-y divide-gray-50">
+      <div className="divide-y divide-muted">
         {rules.map(rule => (
           <div
             key={rule.rule_id}
-            className="flex items-center justify-between px-6 py-3 transition-colors hover:bg-gray-50 hover:text-gray-900"
+            className="flex sm:items-center justify-between px-6 py-3 transition-colors hover:bg-gray-50 hover:text-gray-900 dark:hover:bg-secondary-900/10 dark:hover:text-secondary-100"
           >
             <div className="flex items-center gap-3">
               <div
                 className={cn(
-                  'h-2 w-2 rounded-full',
-                  rule.status === 'active' ? 'bg-gray-900' : 'bg-gray-300',
+                  'h-2 w-2 rounded-full hidden sm:block',
+                  rule.status === 'active' ? 'bg-primary' : 'bg-gray-200',
                 )}
               />
-              <div className="flex gap-2">
-                <Typography variant="p" color="default">
+              <div className="flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between sm:divide-x sm:divide-muted">
+                <Typography variant="p" color="default" className="sm:pr-2">
                   {rule.name}
                 </Typography>
                 <Typography variant="small" color="muted">
@@ -124,7 +135,7 @@ export function AutomationCard() {
       </div>
 
       {/* Footer */}
-      <div className="border-t border-gray-100 px-6 py-3">
+      <div className="border-t border-muted px-6 py-5">
         <Typography variant="p">
           <Link href="/dashboard/settings/automation" className="flex items-center gap-2">
             <Plus className="h-3.5 w-3.5" aria-hidden="true" />

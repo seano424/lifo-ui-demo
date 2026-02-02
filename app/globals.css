@@ -372,9 +372,9 @@
 
   .dark {
     /* Dark mode - Using your dark color as base */
-    --background: 210 11% 4%;
-    --foreground: 0 0% 75%;
-    --card: 210 11% 5%;
+    --background: 210 11% 10%;
+    --foreground: 0 0% 85%;
+    --card: 210 11% 15%;
     --card-foreground: 0 0% 85%;
     --popover: 210 11% 4%;
     --popover-foreground: 0 0% 85%;
@@ -389,7 +389,7 @@
 
     /* Muted areas - lighter than background */
     --muted: 210 11% 10%;
-    --muted-foreground: 215 20% 65%;
+    --muted-foreground: 215 20% 80%;
 
     /* Accent - using primary colors on dark background */
     --accent: 210 11% 10%;

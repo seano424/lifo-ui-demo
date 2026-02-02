@@ -74,8 +74,8 @@ export function DashboardHeader({ timeRange, onTimeRangeChange }: DashboardHeade
             className={cn(
               'rounded-lg px-3 py-1.5 transition-colors',
               timeRange === btn.key
-                ? 'border border-gray-200 bg-white text-gray-900 shadow-sm'
-                : 'border border-transparent bg-transparent text-gray-400 hover:border-gray-100 hover:bg-white hover:text-gray-600',
+                ? 'border border-gray-200 bg-white text-gray-900 shadow-sm dark:border-primary-300 dark:bg-primary-900 dark:text-primary-100'
+                : 'border border-transparent bg-transparent text-gray-400 hover:border-gray-100 hover:bg-white hover:text-gray-600 dark:border-gray-800 dark:bg-secondary-900/10 dark:text-secondary-100 dark:hover:border-gray-700 dark:hover:bg-secondary-900/20 dark:hover:text-secondary-100',
             )}
           >
             <Typography variant="p" color="default">
