@@ -163,6 +163,89 @@
       },
       "errorMessage": "Sommige statistieken konden niet worden geladen. Probeer te vernieuwen.",
       "cancel": "Annuleren"
+    },
+    "redesign": {
+      "header": {
+        "greeting": {
+          "morning": "Goedemorgen, {name}",
+          "afternoon": "Goedemiddag, {name}",
+          "evening": "Goedenavond, {name}"
+        },
+        "timeRange": {
+          "7d": "7 dagen",
+          "30d": "30 dagen",
+          "90d": "90 dagen"
+        }
+      },
+      "deliveryBanner": {
+        "title": "{count, plural, =1 {1 levering} other {# leveringen}} hebben vervaldatums nodig",
+        "description": "{units, plural, =1 {1 eenheid} other {# eenheden}} over {count, plural, =1 {1 product} other {# producten}}",
+        "cta": "Data Toevoegen",
+        "dismiss": "Banner sluiten"
+      },
+      "stats": {
+        "trends": {
+          "noChange": "Geen wijziging",
+          "fewerThanLast": "{count, plural, =1 {1 minder} other {# minder}} dan vorige periode",
+          "moreThanLast": "{count, plural, =1 {1 meer} other {# meer}} dan vorige periode",
+          "plusThisWeek": "+{count} deze week",
+          "minusThisWeek": "-{count} deze week",
+          "plusPercent": "+{percent}%",
+          "minusPercent": "-{percent}%",
+          "lessValue": "€{amount} minder risico",
+          "moreValue": "€{amount} meer risico",
+          "batches": "{count} batches"
+        },
+        "expiringThisWeek": {
+          "label": "Verloopt Deze Week",
+          "subtitle": "{units, plural, =1 {1 eenheid} other {# eenheden}}"
+        },
+        "activeBatches": {
+          "label": "Actieve Batches",
+          "subtitle": "{products, plural, =1 {1 product} other {# producten}}"
+        },
+        "coverage": {
+          "label": "Dekking",
+          "subtitle": "{covered} van {total, plural, =1 {1 product} other {# producten}}"
+        },
+        "valueAtRisk": {
+          "label": "Waarde in Gevaar",
+          "subtitle": "Verloopt binnenkort"
+        }
+      },
+      "coverage": {
+        "title": "Vervaldatum Dekking",
+        "subtitle": "Producten met gevolgde batches",
+        "progressLabel": "{percent}% dekking",
+        "tracked": "{count, plural, =1 {1 product} other {# producten}} gevolgd",
+        "remaining": "{count, plural, =1 {1 product} other {# producten}} resterend"
+      },
+      "automation": {
+        "title": "Automatisering",
+        "subtitle": "Automatische batch-aanmaakregels",
+        "emptyState": {
+          "title": "Geen automatiseringsregels geconfigureerd",
+          "description": "Stel regels in om automatisch batches te maken van leveringen"
+        },
+        "addRule": "Regel toevoegen",
+        "manage": "Beheren",
+        "activeRules": "Actieve regels",
+        "productsCovered": "Gedekte producten",
+        "ruleStatus": {
+          "active": "actief",
+          "paused": "gepauzeerd"
+        },
+        "ruleTypes": {
+          "category": "Categorie",
+          "product": "Product"
+        }
+      },
+      "expiringTable": {
+        "daysLeft": {
+          "singular": "dag over",
+          "plural": "dagen over"
+        }
+      }
     }
   },
   "alerts": {

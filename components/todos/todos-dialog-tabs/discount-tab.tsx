@@ -5,6 +5,7 @@ import { InputSlider } from '@/components/ui/input-slider'
 import { Typography } from '@/components/ui/typography'
 import type { TodoItem } from '@/lib/queries/todos-rpc'
 import { useBatchActionRPC, isValidRecommendedAction } from '@/hooks/use-batch-actions-rpc'
+import { useCurrency } from '@/hooks/use-currency'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 import { useState } from 'react'
 import { useMediaQuery } from '@/hooks/use-mobile'
@@ -18,10 +19,16 @@ interface DiscountTabProps {
   onClose: () => void
 }
 
-export function DiscountTab({ selectedBatch, currencySymbol = '€', onClose }: DiscountTabProps) {
+export function DiscountTab({
+  selectedBatch,
+  currencySymbol: providedCurrencySymbol,
+  onClose,
+}: DiscountTabProps) {
   const t = useTranslations('todos')
   const tCommon = useTranslations()
   const tErrors = useTranslations('errors.common')
+  const defaultCurrencySymbol = useCurrency()
+  const currencySymbol = providedCurrencySymbol ?? defaultCurrencySymbol
 
   const activeStoreId = useActiveStoreId()
   const { executeDiscount, isDiscounting } = useBatchActionRPC(activeStoreId || undefined)

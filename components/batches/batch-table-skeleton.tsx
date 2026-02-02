@@ -23,7 +23,7 @@ export function BatchTableSkeleton() {
       }}
     >
       <TableHeader>
-        <TableRow className="border-b border-border">
+        <TableRow className="border-b border-muted">
           {BATCH_TABLE_COLUMN_CONFIG.map(column => (
             <TableHead
               key={column.id}

@@ -23,7 +23,7 @@ export function ProductListSkeleton() {
       }}
     >
       <TableHeader>
-        <TableRow className="border-b border-border">
+        <TableRow className="border-b border-muted">
           {PRODUCT_TABLE_COLUMN_CONFIG.map(column => (
             <TableHead
               key={column.id}

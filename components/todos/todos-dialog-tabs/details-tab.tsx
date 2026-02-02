@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/select'
 import { Typography } from '@/components/ui/typography'
 import { useBatchActions } from '@/hooks/use-batches'
+import { useCurrency } from '@/hooks/use-currency'
 import type { TodoItem } from '@/lib/queries/todos-rpc'
 import type { Database } from '@/types/supabase'
 import { cn } from '@/lib/utils'
@@ -30,11 +31,17 @@ interface DetailsTabProps {
   onClose: () => void
 }
 
-export function DetailsTab({ selectedBatch, currencySymbol = '€', onClose }: DetailsTabProps) {
+export function DetailsTab({
+  selectedBatch,
+  currencySymbol: providedCurrencySymbol,
+  onClose,
+}: DetailsTabProps) {
   const t = useTranslations('todos')
   const tCommon = useTranslations()
   const tErrors = useTranslations('errors.common')
   const { resolvedTheme } = useTheme()
+  const defaultCurrencySymbol = useCurrency()
+  const currencySymbol = providedCurrencySymbol ?? defaultCurrencySymbol
 
   const { updateBatch, isUpdating } = useBatchActions()
 

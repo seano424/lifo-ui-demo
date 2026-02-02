@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils'
 import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 import { useBatchTodo } from '@/hooks/use-batch-todo'
+import { useCurrency } from '@/hooks/use-currency'
 import { DiscountTab } from './todos-dialog-tabs/discount-tab'
 import { DisposeTab } from './todos-dialog-tabs/dispose-tab'
 import { DonateTab } from './todos-dialog-tabs/donate-tab'
@@ -37,9 +38,11 @@ export function TodoActionBottomSheet({
   isOpen,
   onClose,
   selectedBatch,
-  currencySymbol = '€',
+  currencySymbol: providedCurrencySymbol,
 }: TodoActionBottomSheetProps) {
   const t = useTranslations('todos')
+  const defaultCurrencySymbol = useCurrency()
+  const currencySymbol = providedCurrencySymbol ?? defaultCurrencySymbol
   const [activeTab, setActiveTab] = useState<TabType>('details')
 
   // Fetch fresh batch data to ensure UI stays in sync

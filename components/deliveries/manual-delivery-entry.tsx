@@ -19,6 +19,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Typography } from '@/components/ui/typography'
+import { useCurrency } from '@/hooks/use-currency'
 import { useDeliveryScanningSession } from '@/hooks/use-delivery-scanning-session'
 import { useInventoryActions, useScannedItemConverter } from '@/hooks/use-inventory-submission'
 import type { InventorySubmissionResult } from '@/lib/queries/inventory'
@@ -58,6 +59,7 @@ export default function ManualDeliveryEntry({
   className = '',
 }: ManualDeliveryEntryProps) {
   const t = useTranslations('manualDelivery')
+  const currencySymbol = useCurrency()
   const { activeStore } = useStoreState()
   const storeId = propStoreId || activeStore?.store_id
 
@@ -211,7 +213,7 @@ export default function ManualDeliveryEntry({
     )
   }
 
-  const formatPrice = (price: number) => `€${price.toFixed(2)}`
+  const formatPrice = (price: number) => `${currencySymbol}${price.toFixed(2)}`
 
   // Helper function to format date consistently
   const formatExpiryDate = (dateString: string | null) => {

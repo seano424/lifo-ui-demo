@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import type { TodoItem } from '@/lib/queries/todos-rpc'
 import type { BatchWithProduct } from '@/lib/queries/batches'
 import { useBatchActions } from '@/hooks/use-batches'
+import { useCurrency } from '@/hooks/use-currency'
 import type { Database } from '@/types/supabase'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -19,7 +20,14 @@ interface BatchModalProps {
   currencySymbol?: string
 }
 
-export function BatchModal({ isOpen, onClose, batch, currencySymbol = '€' }: BatchModalProps) {
+export function BatchModal({
+  isOpen,
+  onClose,
+  batch,
+  currencySymbol: providedCurrencySymbol,
+}: BatchModalProps) {
+  const defaultCurrencySymbol = useCurrency()
+  const currencySymbol = providedCurrencySymbol ?? defaultCurrencySymbol
   const { updateBatch, isUpdating } = useBatchActions()
 
   const [isEditing, setIsEditing] = useState(false)

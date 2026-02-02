@@ -86,7 +86,7 @@ export default function IntegrationsPage() {
       <DashboardInsetHeader page="integrations" />
 
       {/* Active Section */}
-      <div className="flex flex-col border border-border rounded-xl overflow-hidden">
+      <div className="flex flex-col border border-muted rounded-xl overflow-hidden">
         <div className="p-4 flex flex-col gap-4">
           <Typography variant="h5">Active</Typography>
           {/* Tabs */}
@@ -126,7 +126,7 @@ export default function IntegrationsPage() {
         </div>
 
         {/* Integrations */}
-        <div className="divide-y divide-border border-t border-border">
+        <div className="divide-y divide-border border-t border-muted">
           {/* Not Loading State */}
           {isLoadingSquare && (
             <div className="overflow-x-auto scrollbar-none">

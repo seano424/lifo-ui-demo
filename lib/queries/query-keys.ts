@@ -17,6 +17,13 @@ export const queryKeys = {
     all: ['dashboard'] as const,
     expirySummary: (storeId: string) =>
       [...queryKeys.dashboard.all, 'expiry-summary', storeId] as const,
+    // Dashboard redesign queries
+    redesignSummary: (storeId: string, daysFilter: number) =>
+      [...queryKeys.dashboard.all, 'redesign-summary', storeId, daysFilter] as const,
+    expiringBatches: (storeId: string, limit: number) =>
+      [...queryKeys.dashboard.all, 'expiring-batches', storeId, limit] as const,
+    automationRules: (storeId: string) =>
+      [...queryKeys.dashboard.all, 'automation-rules', storeId] as const,
   },
 
   // Enhanced Todos and RPC queries with flexible filtering support

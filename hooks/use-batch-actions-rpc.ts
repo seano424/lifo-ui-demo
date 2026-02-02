@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import { useCurrency } from '@/hooks/use-currency'
 import { ADHOC_RECIPIENT_UUID } from '@/hooks/use-donation-recipients'
 
 // Type-safe action recommendation values (matches database enum)
@@ -257,6 +258,7 @@ const validateString = (value: string, fieldName: string, maxLength = 500): void
 
 export function useBatchActionRPC(providedStoreId?: string) {
   const queryClient = useQueryClient()
+  const currencySymbol = useCurrency()
   const supabase = createClient()
 
   // Get current user ID helper
@@ -609,7 +611,7 @@ export function useBatchActionRPC(providedStoreId?: string) {
 
       if (result.success) {
         toast.success(`Successfully donated ${variables.quantity} units`, {
-          description: `Total value donated: €${result.total_value_donated?.toFixed(2)}`,
+          description: `Total value donated: ${currencySymbol}${result.total_value_donated?.toFixed(2)}`,
         })
         logger.log('BatchActions', '🔄 Starting query invalidation after donate')
         await invalidateRelatedQueries(variables.batchId, context?.storeId, 'donate')
@@ -722,7 +724,7 @@ export function useBatchActionRPC(providedStoreId?: string) {
 
       if (result.success) {
         toast.success(`Applied ${variables.discountPercentage}% discount`, {
-          description: `New price: €${result.new_price?.toFixed(2)}`,
+          description: `New price: ${currencySymbol}${result.new_price?.toFixed(2)}`,
         })
         logger.log('BatchActions', '🔄 Starting query invalidation after discount')
         await invalidateRelatedQueries(variables.batchId, context?.storeId, 'discount')
@@ -811,7 +813,7 @@ export function useBatchActionRPC(providedStoreId?: string) {
     onSuccess: async (result, variables, context) => {
       if (result.success) {
         toast.success(`Marked ${variables.quantity} units as sold`, {
-          description: `Revenue: €${result.revenue_recovered?.toFixed(2)}`,
+          description: `Revenue: ${currencySymbol}${result.revenue_recovered?.toFixed(2)}`,
         })
         await invalidateRelatedQueries(variables.batchId, context?.storeId, 'sold')
       } else {

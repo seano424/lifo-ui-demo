@@ -17,7 +17,7 @@ const buttonVariants = cva(
         destructive:
           'bg-destructive text-destructive-foreground shadow-xs hover:bg-destructive/90 dark:bg-destructive dark:hover:bg-destructive',
         subtleDestructive: 'text-destructive hover:bg-destructive-100',
-        outline: 'border border-input bg-background shadow-xs hover:border-border',
+        outline: 'border border-input bg-background shadow-xs hover:border-muted',
         secondary: 'bg-secondary-900 shadow-xs hover:bg-secondary-800 text-white',
         ghost:
           'hover:bg-primary-50 hover:text-primary-800 dark:hover:bg-primary-900/0 dark:text-foreground font-normal w-fit',
@@ -41,7 +41,8 @@ const buttonVariants = cva(
         black: 'bg-black hover:bg-black/90 text-white',
         gray: 'bg-gray-50 hover:bg-gray-50/90 dark:bg-secondary-100/10 dark:hover:bg-opacity-20',
         subtleGray: 'bg-gray-100 text-foreground hover:bg-gray-200',
-        white: 'bg-white text-primary-800 hover:bg-white/90',
+        white:
+          'bg-white text-primary-800 hover:bg-white/90 dark:bg-primary-900 dark:text-primary-100 dark:hover:bg-primary-900/90',
       },
       size: {
         sm: 'px-4 py-2 text-sm',

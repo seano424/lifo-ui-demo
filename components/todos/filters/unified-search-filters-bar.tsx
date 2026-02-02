@@ -244,7 +244,7 @@ export function UnifiedSearchFiltersBar({
         {hasActiveFilters && onRemoveFilter && (
           <div className="mt-4 flex flex-col gap-2">
             <div className="flex justify-center mt-8">
-              <div className="w-1/2 border-t border-border" />
+              <div className="w-1/2 border-t border-muted" />
             </div>
             <div className="flex items-center justify-center gap-3">
               <Typography variant="h4" color="primary">

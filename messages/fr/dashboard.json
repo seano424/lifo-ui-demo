@@ -163,6 +163,89 @@
       },
       "errorMessage": "Certaines métriques n'ont pas pu être chargées. Veuillez actualiser.",
       "cancel": "Annuler"
+    },
+    "redesign": {
+      "header": {
+        "greeting": {
+          "morning": "Bonjour, {name}",
+          "afternoon": "Bon après-midi, {name}",
+          "evening": "Bonsoir, {name}"
+        },
+        "timeRange": {
+          "7d": "7 jours",
+          "30d": "30 jours",
+          "90d": "90 jours"
+        }
+      },
+      "deliveryBanner": {
+        "title": "{count, plural, =1 {1 livraison} other {# livraisons}} nécessitent des dates d'expiration",
+        "description": "{units, plural, =1 {1 unité} other {# unités}} sur {count, plural, =1 {1 produit} other {# produits}}",
+        "cta": "Ajouter des Dates",
+        "dismiss": "Fermer la bannière"
+      },
+      "stats": {
+        "trends": {
+          "noChange": "Aucun changement",
+          "fewerThanLast": "{count, plural, =1 {1 de moins} other {# de moins}} que la période précédente",
+          "moreThanLast": "{count, plural, =1 {1 de plus} other {# de plus}} que la période précédente",
+          "plusThisWeek": "+{count} cette semaine",
+          "minusThisWeek": "-{count} cette semaine",
+          "plusPercent": "+{percent}%",
+          "minusPercent": "-{percent}%",
+          "lessValue": "€{amount} de moins en risque",
+          "moreValue": "€{amount} de plus en risque",
+          "batches": "{count} lots"
+        },
+        "expiringThisWeek": {
+          "label": "Expirant Cette Semaine",
+          "subtitle": "{units, plural, =1 {1 unité} other {# unités}}"
+        },
+        "activeBatches": {
+          "label": "Lots Actifs",
+          "subtitle": "{products, plural, =1 {1 produit} other {# produits}}"
+        },
+        "coverage": {
+          "label": "Couverture",
+          "subtitle": "{covered} sur {total, plural, =1 {1 produit} other {# produits}}"
+        },
+        "valueAtRisk": {
+          "label": "Valeur en Risque",
+          "subtitle": "Expirant bientôt"
+        }
+      },
+      "coverage": {
+        "title": "Couverture des Dates d'Expiration",
+        "subtitle": "Produits avec lots suivis",
+        "progressLabel": "{percent}% de couverture",
+        "tracked": "{count, plural, =1 {1 produit} other {# produits}} suivi",
+        "remaining": "{count, plural, =1 {1 produit} other {# produits}} restant"
+      },
+      "automation": {
+        "title": "Automatisation",
+        "subtitle": "Règles de création automatique de lots",
+        "emptyState": {
+          "title": "Aucune règle d'automatisation configurée",
+          "description": "Configurez des règles pour créer automatiquement des lots à partir des livraisons"
+        },
+        "addRule": "Ajouter une règle",
+        "manage": "Gérer",
+        "activeRules": "Règles actives",
+        "productsCovered": "Produits couverts",
+        "ruleStatus": {
+          "active": "actif",
+          "paused": "en pause"
+        },
+        "ruleTypes": {
+          "category": "Catégorie",
+          "product": "Produit"
+        }
+      },
+      "expiringTable": {
+        "daysLeft": {
+          "singular": "jour restant",
+          "plural": "jours restants"
+        }
+      }
     }
   },
   "alerts": {

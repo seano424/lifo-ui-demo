@@ -1,35 +1,58 @@
 'use client'
 
-import DashboardInsetHeader from '@/components/dashboard/dashboard-inset-header'
-import { ExpiringSoonCard } from '@/components/dashboard/expiring-soon-card'
-import { InventoryOverviewCard } from '@/components/dashboard/inventory-overview-card'
-import { DraftBatchNotification } from '@/components/draft-batch-notification'
-import { useStoreState } from '@/lib/stores/store-context'
-import { useTranslations } from 'next-intl'
+import { useState } from 'react'
+import { DashboardHeader } from './dashboard-header'
+import { DeliveryBanner } from './delivery-banner'
+import { StatCards } from './stat-cards/stat-cards'
+import { BatchesFilteredList } from '@/components/batches/batches-filtered-list'
+import { CoverageBar } from './coverage-bar'
+import { AutomationCard } from './automation-card'
+import { Typography } from '../ui/typography'
+import { Button } from '../ui/button'
+import { ChevronRight } from 'lucide-react'
 
 export function DashboardContent() {
-  const t = useTranslations('dashboardNav')
-  const { activeStore } = useStoreState()
+  const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d'>('30d')
+
+  const daysFilter = timeRange === '7d' ? 7 : timeRange === '30d' ? 30 : 90
 
   return (
-    <div className="flex flex-col gap-8 pb-8 animate-in fade-in-0 duration-1000">
-      {/* Enhanced Header */}
-      <DashboardInsetHeader
-        title={t('titles.dashboard')}
-        description={t('descriptions.dashboard')}
-      />
-
-      {/* Draft Batch Notification */}
-      <DraftBatchNotification variant="full" />
-
-      {/* Simplified Dashboard */}
-      <div className="flex flex-col gap-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-6">
-          <ExpiringSoonCard storeId={activeStore?.store_id || null} />
-
-          <InventoryOverviewCard storeId={activeStore?.store_id || null} />
+    <div className="flex flex-col gap-8 pb-80 animate-in fade-in-0 duration-1000">
+      <DashboardHeader timeRange={timeRange} onTimeRangeChange={setTimeRange} />
+      <DeliveryBanner />
+      <StatCards daysFilter={daysFilter} />
+      <div className="border border-muted rounded-2xl">
+        <div className="flex items-center justify-between border-b border-muted p-4">
+          <div className="flex flex-col gap-1">
+            <Typography variant="h4">Expiring Soon</Typography>
+            <Typography variant="p" color="muted">
+              Batches closest to their expiry date
+            </Typography>
+          </div>
+          <Button
+            variant="subtle"
+            asLink
+            href="/dashboard/inventory/batches"
+            className="gap-2 flex items-center"
+          >
+            View all
+            <ChevronRight className="h-4 w-4" />
+          </Button>
         </div>
+
+        <BatchesFilteredList
+          showControls={false}
+          highlightExpiring
+          expiringDays={daysFilter}
+          initialFilters={{
+            filter: 'expiring',
+            expiringDays: daysFilter.toString(),
+            status: 'active',
+          }}
+        />
       </div>
+      <CoverageBar />
+      <AutomationCard />
     </div>
   )
 }

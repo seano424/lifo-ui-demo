@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/dialog'
 import { Typography } from '@/components/ui/typography'
 import { useAutoOCRScanner } from '@/hooks/use-auto-ocr-scanner'
+import { useCurrency } from '@/hooks/use-currency'
 import { useOCRWithFallback } from '@/hooks/use-ocr-processing'
 import { captureImageFromVideo } from '@/lib/api/ocr-client'
 import { useStoreState } from '@/lib/stores/store-context'
@@ -59,6 +60,7 @@ interface ScanOutInterfaceProps {
 
 export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProps) {
   const t = useTranslations('scanOut')
+  const currencySymbol = useCurrency()
   const { activeStore } = useStoreState()
   const { submitCheckout, isSubmittingCheckout, findAvailableBatches, matchBatchByExpiry } =
     useScanOutActions()
@@ -547,7 +549,7 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
     })
   }
 
-  const formatPrice = (price: number) => `€${price.toFixed(2)}`
+  const formatPrice = (price: number) => `${currencySymbol}${price.toFixed(2)}`
 
   // Calculate totals for pending items
   const totalItems = pendingItems.reduce((sum, item) => sum + item.quantity, 0)

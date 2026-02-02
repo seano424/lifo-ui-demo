@@ -163,6 +163,89 @@
       },
       "errorMessage": "Some metrics could not be loaded. Please try refreshing.",
       "cancel": "Cancel"
+    },
+    "redesign": {
+      "header": {
+        "greeting": {
+          "morning": "Good morning, {name}",
+          "afternoon": "Good afternoon, {name}",
+          "evening": "Good evening, {name}"
+        },
+        "timeRange": {
+          "7d": "7 days",
+          "30d": "30 days",
+          "90d": "90 days"
+        }
+      },
+      "deliveryBanner": {
+        "title": "{count, plural, =1 {1 delivery} other {# deliveries}} need expiry dates",
+        "description": "{units, plural, =1 {1 unit} other {# units}} across {count, plural, =1 {1 product} other {# products}}",
+        "cta": "Add Dates",
+        "dismiss": "Dismiss banner"
+      },
+      "stats": {
+        "trends": {
+          "noChange": "No change",
+          "fewerThanLast": "{count, plural, =1 {1 fewer} other {# fewer}} than last period",
+          "moreThanLast": "{count, plural, =1 {1 more} other {# more}} than last period",
+          "plusThisWeek": "+{count} this week",
+          "minusThisWeek": "-{count} this week",
+          "plusPercent": "+{percent}%",
+          "minusPercent": "-{percent}%",
+          "lessValue": "€{amount} less at risk",
+          "moreValue": "€{amount} more at risk",
+          "batches": "{count} batches"
+        },
+        "expiringThisWeek": {
+          "label": "Expiring This Week",
+          "subtitle": "{units, plural, =1 {1 unit} other {# units}}"
+        },
+        "activeBatches": {
+          "label": "Active Batches",
+          "subtitle": "{products, plural, =1 {1 product} other {# products}}"
+        },
+        "coverage": {
+          "label": "Coverage",
+          "subtitle": "{covered} of {total, plural, =1 {1 product} other {# products}}"
+        },
+        "valueAtRisk": {
+          "label": "Value at Risk",
+          "subtitle": "Expiring soon"
+        }
+      },
+      "coverage": {
+        "title": "Expiry Date Coverage",
+        "subtitle": "Products with tracked batches",
+        "progressLabel": "{percent}% coverage",
+        "tracked": "{count, plural, =1 {1 product} other {# products}} tracked",
+        "remaining": "{count, plural, =1 {1 product} other {# products}} remaining"
+      },
+      "automation": {
+        "title": "Automation",
+        "subtitle": "Auto-batch creation rules",
+        "emptyState": {
+          "title": "No automation rules configured",
+          "description": "Set up rules to automatically create batches from deliveries"
+        },
+        "addRule": "Add rule",
+        "manage": "Manage",
+        "activeRules": "Active rules",
+        "productsCovered": "Products covered",
+        "ruleStatus": {
+          "active": "active",
+          "paused": "paused"
+        },
+        "ruleTypes": {
+          "category": "Category",
+          "product": "Product"
+        }
+      },
+      "expiringTable": {
+        "daysLeft": {
+          "singular": "day left",
+          "plural": "days left"
+        }
+      }
     }
   },
   "alerts": {
