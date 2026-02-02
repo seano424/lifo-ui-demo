@@ -110,7 +110,7 @@ export function DeliveryBanner() {
   }
 
   return (
-    <div className="flex items-center justify-between rounded-2xl bg-card p-3">
+    <div className="flex-col gap-4 sm:flex-row flex sm:items-center sm:justify-between rounded-2xl bg-card p-3">
       {/* Left: Icon + Message */}
       <div className="flex items-center gap-4">
         <div className="rounded-xl bg-white p-2.5">
@@ -127,7 +127,7 @@ export function DeliveryBanner() {
       </div>
 
       {/* Right: Actions */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center justify-between border-t border-border pt-4 sm:border-none sm:pt-0 sm:justify-end gap-3">
         <Button
           asChild
           variant="white"
