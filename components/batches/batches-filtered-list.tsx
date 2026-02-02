@@ -57,13 +57,19 @@ export function BatchesFilteredList({
     // Default to active status
     if (initialFilters?.status) {
       baseFilters.status = initialFilters.status as
+        | 'draft'
         | 'active'
         | 'expired'
         | 'damaged'
         | 'sold_out'
         | 'reserved'
+        | 'ignored'
+      // Don't exclude draft/ignored when explicitly filtering for them
+      baseFilters.excludeDrafts = !['draft', 'ignored'].includes(initialFilters.status)
     } else {
       baseFilters.status = 'active'
+      // By default, exclude draft and ignored batches from the main view
+      baseFilters.excludeDrafts = true
     }
 
     if (initialFilters?.search) {
@@ -161,15 +167,21 @@ export function BatchesFilteredList({
 
   const handleFiltersChange = useCallback(
     (newFilters: { expiringInDays?: number; status?: string }) => {
+      const statusValue = newFilters.status as
+        | 'draft'
+        | 'active'
+        | 'expired'
+        | 'damaged'
+        | 'sold_out'
+        | 'reserved'
+        | 'ignored'
+        | undefined
+
       updateFilters({
         expiringInDays: newFilters.expiringInDays,
-        status: newFilters.status as
-          | 'active'
-          | 'expired'
-          | 'damaged'
-          | 'sold_out'
-          | 'reserved'
-          | undefined,
+        status: statusValue,
+        // Don't exclude draft/ignored when explicitly filtering for them
+        excludeDrafts: !(statusValue && ['draft', 'ignored'].includes(statusValue)),
       })
     },
     [updateFilters],

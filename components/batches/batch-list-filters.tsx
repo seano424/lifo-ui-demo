@@ -90,8 +90,14 @@ export function BatchListFilters({ filters, onFiltersChange, isLoading }: BatchL
           <SelectItem value="active" hideCheckIcon>
             {t('active')}
           </SelectItem>
+          <SelectItem value="draft" hideCheckIcon>
+            {t('draft')}
+          </SelectItem>
           <SelectItem value="expired" hideCheckIcon>
             {t('expired')}
+          </SelectItem>
+          <SelectItem value="ignored" hideCheckIcon>
+            {t('ignored')}
           </SelectItem>
         </SelectContent>
       </Select>

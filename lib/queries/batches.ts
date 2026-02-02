@@ -59,7 +59,7 @@ export type BatchSort = {
 export type BatchFilters = {
   storeId?: string
   product_id?: string
-  status?: 'draft' | 'active' | 'expired' | 'damaged' | 'sold_out' | 'reserved'
+  status?: 'draft' | 'active' | 'expired' | 'damaged' | 'sold_out' | 'reserved' | 'ignored'
   location_code?: string
   supplier?: string
   expiringInDays?: number // Batches expiring within X days (excludes draft batches with no expiry date)

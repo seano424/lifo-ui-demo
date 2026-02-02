@@ -29,6 +29,7 @@ import { cn } from '@/lib/utils'
 
 const VALID_COLUMN_IDS = [
   'product_name',
+  'status',
   'expiry_date',
   'days_left',
   'current_quantity',
@@ -54,6 +55,7 @@ export function BatchTable({
 }: BatchTableProps) {
   const t = useTranslations('batches.table')
   const tExpiry = useTranslations('batches.expiry')
+  const tStatus = useTranslations('batches.status')
   const currencySymbol = useCurrency()
   const { activeStore } = useStoreState()
 
@@ -112,6 +114,7 @@ export function BatchTable({
     updateSort,
     t,
     tExpiry,
+    tStatus,
     storeName: activeStore?.store_name,
   })
 
