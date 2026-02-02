@@ -4,7 +4,7 @@ import { queryKeys } from '@/lib/queries/query-keys'
 import type { TodoFilters, TodoItem } from '@/lib/queries/todos-rpc'
 import { createClient } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
-import { useMutation, useQueryClient } from '@tantml:parameter>
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { useCurrency } from '@/hooks/use-currency'
 import { ADHOC_RECIPIENT_UUID } from '@/hooks/use-donation-recipients'

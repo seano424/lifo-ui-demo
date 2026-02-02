@@ -79,28 +79,24 @@ export function AutomationCard() {
 
       {/* Summary Stats Row */}
       <div className="flex flex-col sm:flex-row sm:items-center gap-6 border-b border-muted px-6 py-4">
-        <div className="flex sm:flex-col gap-2 sm:gap-0 items-center sm:items-start">
+        <div className="flex gap-2 items-center">
           <Typography
             className="border aspect-square min-h-10 min-w-10 p-2 flex items-center justify-center rounded-full dark:border-secondary-100"
             variant="p"
           >
             {activeRules.length}
           </Typography>
-          <Typography variant="p" color="muted">
-            {t('activeRules')}
-          </Typography>
+          <Typography variant="p">{t('activeRules')}</Typography>
         </div>
         <div className="h-8 w-px bg-muted hidden sm:block" />
-        <div className="flex sm:flex-col gap-2 sm:gap-0 items-center sm:items-start">
+        <div className="flex gap-2 items-center">
           <Typography
             className="border aspect-square min-h-10 min-w-10 p-2 flex items-center justify-center rounded-full dark:border-secondary-100"
             variant="p"
           >
             {totalProducts}
           </Typography>
-          <Typography variant="p" color="muted">
-            {t('productsCovered')}
-          </Typography>
+          <Typography variant="p">{t('productsCovered')}</Typography>
         </div>
       </div>
 

@@ -295,7 +295,7 @@ export function TodoCardV2({ todo, onClick }: TodoCardV2Props) {
 
     // Fallback: just quantity
     return `${currentQty} ${t('card.units')}`
-  }, [todo, t, valueAtRisk])
+  }, [todo, t, valueAtRisk, currencySymbol])
 
   const handleCardClick = () => {
     onClick?.()
