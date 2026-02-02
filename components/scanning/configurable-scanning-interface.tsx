@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { BarcodeDetection } from '@/components/barcode/barcode-scanner'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
+import { useCurrency } from '@/hooks/use-currency'
 import { useOCRWithFallback } from '@/hooks/use-ocr-processing'
 import { useProductLookup } from '@/hooks/use-product-lookup'
 import { captureImageFromVideo } from '@/lib/api/ocr-client'
@@ -466,8 +467,9 @@ export function useBaseScanningLogic(
 // Base scanning interface component
 export default function BaseScanningInterface({ config, callbacks, className }: BaseScanningProps) {
   const logic = useBaseScanningLogic(config, callbacks)
+  const currencySymbol = useCurrency()
 
-  const formatPrice = (price: number) => `€${price.toFixed(2)}`
+  const formatPrice = (price: number) => `${currencySymbol}${price.toFixed(2)}`
 
   // Memoize error message calculation for performance
   const productLookupError = useMemo(

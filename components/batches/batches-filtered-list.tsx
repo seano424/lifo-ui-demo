@@ -26,6 +26,7 @@ interface BatchesFilteredListProps {
   pageSize?: number
   highlightExpiring?: boolean
   expiryAlertDays?: number
+  showControls?: boolean
 }
 
 export function BatchesFilteredList({
@@ -33,6 +34,7 @@ export function BatchesFilteredList({
   pageSize = 100,
   highlightExpiring = false,
   expiryAlertDays = 3,
+  showControls = true,
 }: BatchesFilteredListProps) {
   const router = useRouter()
   const activeStoreId = useActiveStoreId()
@@ -196,40 +198,42 @@ export function BatchesFilteredList({
   return (
     <div className="flex flex-col gap-6">
       {/* Control bar - Search, Filters, and Sort on same level */}
-      <div className="flex flex-row flex-wrap lg:items-center lg:gap-4 gap-3">
-        {/* Search Bar */}
-        <div className="flex-1">
-          <TodoSearchBar
-            searchTerm={filters.search}
-            onSearchChange={handleSearchChange}
-            isLoading={false}
-            placeholder={t('searchPlaceholder')}
-            size="large"
+      {showControls && (
+        <div className="flex flex-row flex-wrap lg:items-center lg:gap-4 gap-3">
+          {/* Search Bar */}
+          <div className="flex-1">
+            <TodoSearchBar
+              searchTerm={filters.search}
+              onSearchChange={handleSearchChange}
+              isLoading={false}
+              placeholder={t('searchPlaceholder')}
+              size="large"
+            />
+          </div>
+
+          {/* Filters */}
+          <BatchListFilters
+            filters={{
+              expiringInDays: filters.expiringInDays,
+              status: filters.status,
+            }}
+            onFiltersChange={handleFiltersChange}
+            isLoading={isLoading}
           />
-        </div>
 
-        {/* Filters */}
-        <BatchListFilters
-          filters={{
-            expiringInDays: filters.expiringInDays,
-            status: filters.status,
-          }}
-          onFiltersChange={handleFiltersChange}
-          isLoading={isLoading}
-        />
+          {/* Sort Controls */}
+          <BatchListSortControls
+            currentSort={filters.sort || { field: 'expiry_date', direction: 'asc' }}
+            updateSort={handleSortFieldChange}
+            isLoading={isLoading}
+          />
 
-        {/* Sort Controls */}
-        <BatchListSortControls
-          currentSort={filters.sort || { field: 'expiry_date', direction: 'asc' }}
-          updateSort={handleSortFieldChange}
-          isLoading={isLoading}
-        />
-
-        {/* Add Batch Button */}
-        {/* <Link href="/dashboard/deliveries">
+          {/* Add Batch Button */}
+          {/* <Link href="/dashboard/deliveries">
           <Button>{tButtons('addBatch')}</Button>
         </Link> */}
-      </div>
+        </div>
+      )}
 
       {/* Table with horizontal scroll */}
       <div className="overflow-x-auto">

@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input'
 import { useBatchTodo } from '@/hooks/use-batch-todo'
 import { useBatchActionRPC, isValidRecommendedAction } from '@/hooks/use-batch-actions-rpc'
 import { useBatchActions } from '@/hooks/use-batches'
+import { useCurrency } from '@/hooks/use-currency'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 import type { TodoItem } from '@/lib/queries/todos-rpc'
 import { Edit3, Save, TagIcon, PercentIcon, PackageOpenIcon, PackageXIcon, X } from 'lucide-react'
@@ -34,9 +35,11 @@ export function TodoActionSheetV2({
   isOpen,
   onClose,
   selectedBatch,
-  currencySymbol = '€',
+  currencySymbol: providedCurrencySymbol,
 }: TodoActionSheetV2Props) {
   const activeStoreId = useActiveStoreId()
+  const defaultCurrencySymbol = useCurrency()
+  const currencySymbol = providedCurrencySymbol ?? defaultCurrencySymbol
 
   // State
   const [activeAction, setActiveAction] = useState<ActionType>(null)

@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react'
+import { useCurrency } from '@/hooks/use-currency'
 import { PRICE_CONSTRAINTS } from '@/lib/constants/file-upload'
 
 export interface CsvPreviewItem {
@@ -51,6 +52,7 @@ export function useBatchUploadBase(
   options: UseBatchUploadBaseOptions = {},
 ): UseBatchUploadBaseReturn {
   const { itemsPerPage = 10, onItemsChange } = options
+  const currencySymbol = useCurrency()
 
   const [items, setItemsInternal] = useState<CsvPreviewItem[]>([])
   const [currentPage, setCurrentPage] = useState(0)
@@ -66,16 +68,17 @@ export function useBatchUploadBase(
     const errors: Record<number, string> = {}
     items.forEach((item, index) => {
       if (item.Cost_Price < PRICE_CONSTRAINTS.MIN_PRICE) {
-        errors[index] = `Cost price must be at least €${PRICE_CONSTRAINTS.MIN_PRICE.toFixed(2)}`
+        errors[index] =
+          `Cost price must be at least ${currencySymbol}${PRICE_CONSTRAINTS.MIN_PRICE.toFixed(2)}`
       }
       if (item.Selling_Price < PRICE_CONSTRAINTS.MIN_PRICE) {
         errors[index] =
           errors[index] ||
-          `Selling price must be at least €${PRICE_CONSTRAINTS.MIN_PRICE.toFixed(2)}`
+          `Selling price must be at least ${currencySymbol}${PRICE_CONSTRAINTS.MIN_PRICE.toFixed(2)}`
       }
     })
     return errors
-  }, [items])
+  }, [items, currencySymbol])
 
   const hasValidationErrors = useMemo(() => {
     return Object.keys(pricingErrors).length > 0

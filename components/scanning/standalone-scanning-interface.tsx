@@ -16,6 +16,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { useAutoOCRScanner } from '@/hooks/use-auto-ocr-scanner'
+import { useCurrency } from '@/hooks/use-currency'
 import { useInventoryActions, useScannedItemConverter } from '@/hooks/use-inventory-submission'
 import { useOCRWithFallback } from '@/hooks/use-ocr-processing'
 import { useProductLookup } from '@/hooks/use-product-lookup'
@@ -50,6 +51,7 @@ type UIStep = 'camera-barcode' | 'product-success' | 'camera-expiry' | 'batch-su
 
 export default function ScanningInterface({ onItemAdded, className }: ScanningProps) {
   const t = useTranslations('scanningInterface')
+  const currencySymbol = useCurrency()
 
   // Existing workflow state
   const currentStep = useScanningStep()
@@ -468,7 +470,7 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
   }
 
   // Format price helper
-  const formatPrice = (price: number) => `€${price.toFixed(2)}`
+  const formatPrice = (price: number) => `${currencySymbol}${price.toFixed(2)}`
 
   return (
     <div className={`min-h-screen flex flex-col gap-4 ${className}`}>
@@ -623,7 +625,7 @@ export default function ScanningInterface({ onItemAdded, className }: ScanningPr
                     onClick={handleAddToInventory}
                     variant="secondary"
                   >
-                    {t('inventory.addToInventory')} • {inventoryData.quantity}x €
+                    {t('inventory.addToInventory')} • {inventoryData.quantity}x {currencySymbol}
                     {inventoryData.price.toFixed(2)}
                   </Button>
                 </div>

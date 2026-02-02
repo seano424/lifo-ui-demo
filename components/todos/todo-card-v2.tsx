@@ -15,6 +15,7 @@ import { Typography } from '../ui/typography'
 import { format } from 'date-fns'
 import { useTranslations } from 'next-intl'
 import { useMemo } from 'react'
+import { useCurrency } from '@/hooks/use-currency'
 import {
   calculateTodoDateInfo,
   type ActionButtonConfig,
@@ -37,6 +38,7 @@ const STATUS_COLORS = {
 
 export function TodoCardV2({ todo, onClick }: TodoCardV2Props) {
   const t = useTranslations('todos')
+  const currencySymbol = useCurrency()
 
   // Validate required fields
   if (!todo) {
@@ -259,7 +261,7 @@ export function TodoCardV2({ todo, onClick }: TodoCardV2Props) {
       // Use actual selling price (current_selling_price if discounted, otherwise selling_price or unit_price)
       const actualSellingPrice = todo.current_selling_price ?? todo.selling_price ?? unitPrice
       const revenue = totalSold * actualSellingPrice
-      return `${totalSold} ${t('card.soldUnits')} • €${revenue.toFixed(0)} ${t('card.revenue')}`
+      return `${totalSold} ${t('card.soldUnits')} • ${currencySymbol}${revenue.toFixed(0)} ${t('card.revenue')}`
     }
 
     // Case 2: In-progress sales - show remaining and sold with revenue
@@ -267,7 +269,7 @@ export function TodoCardV2({ todo, onClick }: TodoCardV2Props) {
       // Use actual selling price instead of calculating with discount
       const actualSellingPrice = todo.current_selling_price ?? todo.selling_price ?? unitPrice
       const revenue = totalSold * actualSellingPrice
-      return `${currentQty} ${t('card.remaining')} • ${totalSold} ${t('card.soldUnits')} (€${revenue.toFixed(0)})`
+      return `${currentQty} ${t('card.remaining')} • ${totalSold} ${t('card.soldUnits')} (${currencySymbol}${revenue.toFixed(0)})`
     }
 
     // Case 3: Donate or Dispose action
@@ -288,7 +290,7 @@ export function TodoCardV2({ todo, onClick }: TodoCardV2Props) {
 
     // Case 5: No actions yet - show value with unit price
     if (valueAtRisk != null && unitPrice > 0) {
-      return `${currentQty} ${t('card.units')} • €${unitPrice.toFixed(2)}/${t('card.unit')} • €${valueAtRisk.toFixed(0)} ${t('card.total')}`
+      return `${currentQty} ${t('card.units')} • ${currencySymbol}${unitPrice.toFixed(2)}/${t('card.unit')} • ${currencySymbol}${valueAtRisk.toFixed(0)} ${t('card.total')}`
     }
 
     // Fallback: just quantity

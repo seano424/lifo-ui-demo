@@ -7,6 +7,7 @@ import { Typography } from '../ui/typography'
 import { format } from 'date-fns'
 import { useTranslations } from 'next-intl'
 import { useMemo } from 'react'
+import { useCurrency } from '@/hooks/use-currency'
 import { calculateTodoDateInfo, type ActionButtonConfig } from '@/lib/utils/todo-status'
 
 interface TodoCardV3Props {
@@ -15,8 +16,14 @@ interface TodoCardV3Props {
   onClick?: () => void
 }
 
-export function TodoCardV3({ todo, currencySymbol = '€', onClick }: TodoCardV3Props) {
+export function TodoCardV3({
+  todo,
+  currencySymbol: providedCurrencySymbol,
+  onClick,
+}: TodoCardV3Props) {
   const t = useTranslations('todos')
+  const defaultCurrencySymbol = useCurrency()
+  const currencySymbol = providedCurrencySymbol ?? defaultCurrencySymbol
 
   // Validate required fields
   if (!todo) {

@@ -4,6 +4,7 @@ import { Check } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Typography } from '@/components/ui/typography'
+import { useCurrency } from '@/hooks/use-currency'
 import type { AvailableBatch } from '@/types/scanning'
 
 interface BatchSelectionListProps {
@@ -20,7 +21,8 @@ export default function BatchSelectionList({
   className = '',
 }: BatchSelectionListProps) {
   const t = useTranslations('common.scanning')
-  const formatPrice = (price: number) => `€${price.toFixed(2)}`
+  const currencySymbol = useCurrency()
+  const formatPrice = (price: number) => `${currencySymbol}${price.toFixed(2)}`
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {

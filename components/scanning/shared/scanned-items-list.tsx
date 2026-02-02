@@ -15,6 +15,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Typography } from '@/components/ui/typography'
+import { useCurrency } from '@/hooks/use-currency'
 
 export interface ScannedItem {
   id: string
@@ -45,6 +46,7 @@ export default function ScannedItemsList({
   className = '',
 }: ScannedItemsListProps) {
   const t = useTranslations('scannedItemsList')
+  const currencySymbol = useCurrency()
 
   // Use translation as default if no title provided
   const finalTitle = title || t('title')
@@ -67,7 +69,7 @@ export default function ScannedItemsList({
   })
   const [showAdvancedEdit, setShowAdvancedEdit] = useState(false)
 
-  const formatPrice = (price: number) => `€${price.toFixed(2)}`
+  const formatPrice = (price: number) => `${currencySymbol}${price.toFixed(2)}`
 
   // Helper function to format date consistently
   const formatExpiryDate = (dateString: string | null) => {

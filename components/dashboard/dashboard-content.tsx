@@ -1,35 +1,34 @@
 'use client'
 
-import DashboardInsetHeader from '@/components/dashboard/dashboard-inset-header'
-import { ExpiringSoonCard } from '@/components/dashboard/expiring-soon-card'
-import { InventoryOverviewCard } from '@/components/dashboard/inventory-overview-card'
-import { DraftBatchNotification } from '@/components/draft-batch-notification'
-import { useStoreState } from '@/lib/stores/store-context'
-import { useTranslations } from 'next-intl'
+import { useState } from 'react'
+import { DashboardHeader } from './dashboard-header'
+import { DeliveryBanner } from './delivery-banner'
+import { StatCards } from './stat-cards/stat-cards'
+import { BatchesFilteredList } from '@/components/batches/batches-filtered-list'
+import { CoverageBar } from './coverage-bar'
+import { AutomationCard } from './automation-card'
 
 export function DashboardContent() {
-  const t = useTranslations('dashboardNav')
-  const { activeStore } = useStoreState()
+  const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d'>('7d')
+
+  const daysFilter = timeRange === '7d' ? 7 : timeRange === '30d' ? 30 : 90
 
   return (
-    <div className="flex flex-col gap-8 pb-8 animate-in fade-in-0 duration-1000">
-      {/* Enhanced Header */}
-      <DashboardInsetHeader
-        title={t('titles.dashboard')}
-        description={t('descriptions.dashboard')}
+    <div className="flex flex-col gap-6 pb-8 animate-in fade-in-0 duration-1000">
+      <DashboardHeader timeRange={timeRange} onTimeRangeChange={setTimeRange} />
+      <DeliveryBanner />
+      <StatCards daysFilter={daysFilter} />
+      <BatchesFilteredList
+        showControls={false}
+        highlightExpiring
+        initialFilters={{
+          filter: 'expiring',
+          expiringDays: '30',
+          status: 'active',
+        }}
       />
-
-      {/* Draft Batch Notification */}
-      <DraftBatchNotification variant="full" />
-
-      {/* Simplified Dashboard */}
-      <div className="flex flex-col gap-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-6">
-          <ExpiringSoonCard storeId={activeStore?.store_id || null} />
-
-          <InventoryOverviewCard storeId={activeStore?.store_id || null} />
-        </div>
-      </div>
+      <CoverageBar />
+      <AutomationCard />
     </div>
   )
 }

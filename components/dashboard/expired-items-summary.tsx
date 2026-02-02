@@ -2,12 +2,14 @@
 
 import { Skeleton } from '@/components/ui/skeleton'
 import { Typography } from '@/components/ui/typography'
+import { useCurrency } from '@/hooks/use-currency'
 import { useDashboardSummary } from '@/hooks/use-dashboard-summary'
 import { AlertTriangle } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
 export function ExpiredItemsSummary() {
   const t = useTranslations('storeInsights.expiredItems')
+  const currencySymbol = useCurrency()
   const { data, isLoading, error } = useDashboardSummary()
 
   if (isLoading) {
@@ -53,7 +55,10 @@ export function ExpiredItemsSummary() {
           </div>
           <div className="text-right text-foreground dark:text-brand-white flex items-center gap-1">
             <Typography variant="h2">{expiredCount}</Typography>
-            <Typography variant="p">€{Math.round(expiredValue).toLocaleString()}</Typography>
+            <Typography variant="p">
+              {currencySymbol}
+              {Math.round(expiredValue).toLocaleString()}
+            </Typography>
           </div>
         </div>
       </div>
@@ -80,7 +85,8 @@ export function ExpiredItemsSummary() {
               <div className="text-right">
                 <Typography variant="p">{expiredCount}</Typography>
                 <Typography variant="small" className="text-foreground">
-                  €{Math.round(expiredValue).toLocaleString()}
+                  {currencySymbol}
+                  {Math.round(expiredValue).toLocaleString()}
                 </Typography>
               </div>
             </div>

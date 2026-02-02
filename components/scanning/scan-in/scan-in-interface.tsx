@@ -12,6 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { useCurrency } from '@/hooks/use-currency'
 import { useInventoryActions, useScannedItemConverter } from '@/hooks/use-inventory-submission'
 import { useStoreState } from '@/lib/stores/store-context'
 import BaseScanningInterface, {
@@ -27,6 +28,7 @@ interface ScanInInterfaceProps {
 
 export default function ScanInInterface({ onItemAdded, className }: ScanInInterfaceProps) {
   const t = useTranslations('common.scanning')
+  const currencySymbol = useCurrency()
   const { activeStore } = useStoreState()
   const { submitBatch, isSubmittingBatch } = useInventoryActions()
   const { convertMultipleScannedItems } = useScannedItemConverter()
@@ -116,7 +118,7 @@ export default function ScanInInterface({ onItemAdded, className }: ScanInInterf
     )
   }
 
-  const formatPrice = (price: number) => `€${price.toFixed(2)}`
+  const formatPrice = (price: number) => `${currencySymbol}${price.toFixed(2)}`
 
   return (
     <>
