@@ -27,6 +27,7 @@ interface BatchesFilteredListProps {
   highlightExpiring?: boolean
   expiryAlertDays?: number
   showControls?: boolean
+  expiringDays?: number // Controlled prop for external time range changes
 }
 
 export function BatchesFilteredList({
@@ -35,6 +36,7 @@ export function BatchesFilteredList({
   highlightExpiring = false,
   expiryAlertDays = 3,
   showControls = true,
+  expiringDays,
 }: BatchesFilteredListProps) {
   const router = useRouter()
   const activeStoreId = useActiveStoreId()
@@ -89,6 +91,13 @@ export function BatchesFilteredList({
   useEffect(() => {
     setFilters(prev => ({ ...prev, storeId: activeStoreId || undefined }))
   }, [activeStoreId])
+
+  // Update expiring days filter when controlled prop changes
+  useEffect(() => {
+    if (expiringDays !== undefined) {
+      setFilters(prev => ({ ...prev, expiringInDays: expiringDays }))
+    }
+  }, [expiringDays])
 
   const updateFilters = useCallback(
     (newFilters: Partial<BatchFilters>) => {

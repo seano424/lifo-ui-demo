@@ -9,7 +9,7 @@ import { CoverageBar } from './coverage-bar'
 import { AutomationCard } from './automation-card'
 
 export function DashboardContent() {
-  const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d'>('7d')
+  const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d'>('30d')
 
   const daysFilter = timeRange === '7d' ? 7 : timeRange === '30d' ? 30 : 90
 
@@ -21,9 +21,10 @@ export function DashboardContent() {
       <BatchesFilteredList
         showControls={false}
         highlightExpiring
+        expiringDays={daysFilter}
         initialFilters={{
           filter: 'expiring',
-          expiringDays: '30',
+          expiringDays: daysFilter.toString(),
           status: 'active',
         }}
       />
