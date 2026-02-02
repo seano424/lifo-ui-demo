@@ -133,7 +133,7 @@ export function BatchTable({
 
   if (data.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 rounded-lg bg-muted/10">
+      <div className="flex select-none flex-col items-center justify-center py-16 rounded-lg bg-muted/10">
         <Package className="h-12 w-12 text-muted-foreground mb-4" />
         <CardTitle className="text-lg mb-2">{t('emptyState.title')}</CardTitle>
         <CardDescription className="text-center max-w-md">
