@@ -89,10 +89,8 @@ export function BatchesFilteredList({
     return baseFilters
   })
 
-  const { data, count, isLoading, error, hasMore, fetchNextPage, isFetchingNextPage } = useBatches(
-    filters,
-    pageSize,
-  )
+  const { data, count, isLoading, isFetching, error, hasMore, fetchNextPage, isFetchingNextPage } =
+    useBatches(filters, pageSize)
 
   useEffect(() => {
     setFilters(prev => ({ ...prev, storeId: activeStoreId || undefined }))
@@ -261,6 +259,8 @@ export function BatchesFilteredList({
         <BatchTable
           data={data}
           isLoading={isLoading}
+          isFetching={isFetching}
+          hasActiveStore={!!activeStoreId}
           currentSort={filters.sort || { field: 'expiry_date', direction: 'asc' }}
           updateSort={handleSortFieldChange}
           highlightExpiring={highlightExpiring}

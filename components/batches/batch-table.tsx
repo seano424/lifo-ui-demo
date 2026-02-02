@@ -1,6 +1,5 @@
 'use client'
 
-import { BatchTableSkeleton } from '@/components/batches/batch-table-skeleton'
 import { createBatchTableColumns } from '@/components/batches/batch-table-columns'
 import { BatchModal } from '@/components/batches/batch-modal'
 import { CardDescription, CardTitle } from '@/components/ui/card'
@@ -41,6 +40,8 @@ interface BatchTableProps {
   currentSort: BatchSort
   updateSort: (field: BatchSortField) => void
   isLoading: boolean
+  isFetching?: boolean
+  hasActiveStore?: boolean
   highlightExpiring?: boolean
   expiryAlertDays?: number
 }
@@ -50,6 +51,8 @@ export function BatchTable({
   currentSort,
   updateSort,
   isLoading,
+  isFetching = false,
+  hasActiveStore = true,
   highlightExpiring = false,
   expiryAlertDays = 3,
 }: BatchTableProps) {
@@ -130,22 +133,6 @@ export function BatchTable({
     enableSorting: false,
   })
 
-  if (isLoading) {
-    return <BatchTableSkeleton />
-  }
-
-  if (data.length === 0) {
-    return (
-      <div className="flex select-none flex-col items-center justify-center py-16 rounded-lg bg-muted/10">
-        <Package className="h-12 w-12 text-muted-foreground mb-4" />
-        <CardTitle className="text-lg mb-2">{t('emptyState.title')}</CardTitle>
-        <CardDescription className="text-center max-w-md">
-          {t('emptyState.description')}
-        </CardDescription>
-      </div>
-    )
-  }
-
   return (
     <>
       <Table
@@ -211,6 +198,16 @@ export function BatchTable({
         batch={selectedBatch}
         currencySymbol={currencySymbol}
       />
+
+      {!isLoading && !isFetching && hasActiveStore && data.length === 0 && (
+        <div className="flex select-none flex-col items-center justify-center py-16 rounded-lg bg-muted/10">
+          <Package className="h-12 w-12 text-muted-foreground mb-4" />
+          <CardTitle className="text-lg mb-2">{t('emptyState.title')}</CardTitle>
+          <CardDescription className="text-center max-w-md">
+            {t('emptyState.description')}
+          </CardDescription>
+        </div>
+      )}
     </>
   )
 }

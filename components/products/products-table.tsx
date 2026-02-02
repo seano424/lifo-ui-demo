@@ -1,6 +1,5 @@
 'use client'
 
-import { ProductListSkeleton } from '@/components/products/product-list-skeleton'
 import { createProductTableColumns } from '@/components/products/product-table-columns'
 import { ProductModal } from '@/components/products/product-modal'
 import { CardDescription, CardTitle } from '@/components/ui/card'
@@ -39,9 +38,18 @@ interface ProductsTableProps {
   currentSort: ProductSort
   updateSort: (field: SortField) => void
   isLoading: boolean
+  isFetching?: boolean
+  hasActiveStore?: boolean
 }
 
-export function ProductsTable({ data, currentSort, updateSort, isLoading }: ProductsTableProps) {
+export function ProductsTable({
+  data,
+  currentSort,
+  updateSort,
+  isLoading,
+  isFetching = false,
+  hasActiveStore = true,
+}: ProductsTableProps) {
   const t = useTranslations('products')
   const tTable = useTranslations('productTable')
 
@@ -102,20 +110,6 @@ export function ProductsTable({ data, currentSort, updateSort, isLoading }: Prod
     getSortedRowModel: getSortedRowModel(),
     enableSorting: false,
   })
-
-  if (isLoading) {
-    return <ProductListSkeleton />
-  }
-
-  if (data.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center py-16 rounded-lg bg-muted/10">
-        <Package className="h-12 w-12 text-muted-foreground mb-4" />
-        <CardTitle className="text-lg mb-2">{t('empty.title')}</CardTitle>
-        <CardDescription className="text-center max-w-md">{t('empty.description')}</CardDescription>
-      </div>
-    )
-  }
 
   return (
     <>
@@ -178,6 +172,16 @@ export function ProductsTable({ data, currentSort, updateSort, isLoading }: Prod
         }}
         product={selectedProduct}
       />
+
+      {!isLoading && !isFetching && hasActiveStore && data.length === 0 && (
+        <div className="flex flex-col items-center justify-center py-16 rounded-lg bg-muted/10">
+          <Package className="h-12 w-12 text-muted-foreground mb-4" />
+          <CardTitle className="text-lg mb-2">{t('empty.title')}</CardTitle>
+          <CardDescription className="text-center max-w-md">
+            {t('empty.description')}
+          </CardDescription>
+        </div>
+      )}
     </>
   )
 }
