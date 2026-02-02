@@ -97,7 +97,7 @@ export function StatCards({ daysFilter }: StatCardsProps) {
       {/* Expiring This Week */}
       <StatCard
         label={t('expiringThisWeek.label')}
-        value={data.expiring_count}
+        value={`${t('trends.batches', { count: data.expiring_count })}`}
         subtitle={t('expiringThisWeek.subtitle', { units: data.expiring_units })}
         trend={expiringTrend}
         icon={AlertTriangle}
@@ -107,7 +107,7 @@ export function StatCards({ daysFilter }: StatCardsProps) {
       {/* Active Batches */}
       <StatCard
         label={t('activeBatches.label')}
-        value={data.active_batches}
+        value={`${t('trends.batches', { count: data.active_batches })}`}
         subtitle={t('activeBatches.subtitle', { products: data.active_products })}
         trend={batchesTrend}
         icon={Layers}

@@ -193,7 +193,8 @@
           "plusPercent": "+{percent}%",
           "minusPercent": "-{percent}%",
           "lessValue": "€{amount} minder risico",
-          "moreValue": "€{amount} meer risico"
+          "moreValue": "€{amount} meer risico",
+          "batches": "{count} batches"
         },
         "expiringThisWeek": {
           "label": "Verloopt Deze Week",

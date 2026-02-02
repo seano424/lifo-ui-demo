@@ -193,7 +193,8 @@
           "plusPercent": "+{percent}%",
           "minusPercent": "-{percent}%",
           "lessValue": "€{amount} less at risk",
-          "moreValue": "€{amount} more at risk"
+          "moreValue": "€{amount} more at risk",
+          "batches": "{count} batches"
         },
         "expiringThisWeek": {
           "label": "Expiring This Week",

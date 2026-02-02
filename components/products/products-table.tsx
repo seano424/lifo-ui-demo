@@ -132,7 +132,7 @@ export function ProductsTable({ data, currentSort, updateSort, isLoading }: Prod
               {headerGroup.headers.map(header => (
                 <TableHead
                   key={header.id}
-                  className="sticky top-0 bg-background z-10 py-3 px-4 border-b border-border"
+                  className="sticky top-0 bg-background z-10 py-3 px-4 border-b border-muted"
                   style={
                     header.column.columnDef.size
                       ? { width: header.column.columnDef.size }

@@ -116,9 +116,11 @@ export function DeliveryBanner() {
         <div className="rounded-xl bg-white p-2.5">
           <Box className="h-5 w-5" aria-hidden="true" />
         </div>
-        <div>
-          <Typography variant="p">{t('title', { count: totalDrafts })}</Typography>
-          <Typography variant="p">
+        <div className="flex flex-col gap-1">
+          <Typography variant="p" color="primary">
+            {t('title', { count: totalDrafts })}
+          </Typography>
+          <Typography variant="p" color="muted">
             {t('description', { units: totalUnits, count: productsWithDrafts })}
           </Typography>
         </div>

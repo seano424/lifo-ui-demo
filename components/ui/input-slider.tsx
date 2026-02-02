@@ -83,7 +83,7 @@ const InputSlider = React.forwardRef<HTMLDivElement, InputSliderProps>(
                   className={cn(
                     'h-12  text-xl px-4 border rounded-2xl',
                     'focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary',
-                    'bg-background border-border',
+                    'bg-background border-muted',
                     isPercentage &&
                       '[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none',
                     inputClassName,
@@ -110,7 +110,7 @@ const InputSlider = React.forwardRef<HTMLDivElement, InputSliderProps>(
                 width: `${progressRatio === 1 ? 100 : Math.max(6, progressPercentage)}%`,
               }}
             >
-              <div className="h-8 w-8 shrink-0 rounded-full bg-brand-white shadow-lg border border-border" />
+              <div className="h-8 w-8 shrink-0 rounded-full bg-brand-white shadow-lg border border-muted" />
             </div>
             <input
               type="range"

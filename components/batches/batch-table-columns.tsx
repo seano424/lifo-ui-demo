@@ -258,7 +258,7 @@ export function createBatchTableColumns({
         </div>
       ),
       cell: () => (
-        <div className={`text-sm text-muted-foreground truncate ${alignments.location.cellClass}`}>
+        <div className={`text-sm truncate ${alignments.location.cellClass}`}>
           {storeName || '-'}
         </div>
       ),

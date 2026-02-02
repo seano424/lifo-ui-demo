@@ -50,8 +50,8 @@ export function StatCard({
       <Typography variant="muted" color="muted">
         {label}
       </Typography>
-      <Typography variant="h2">{value}</Typography>
-      <Typography variant="h4" color="muted">
+      <Typography variant="h3">{value}</Typography>
+      <Typography variant="h5" color="muted">
         {subtitle}
       </Typography>
       {trend && <TrendBadge {...trend} />}

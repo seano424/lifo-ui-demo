@@ -288,7 +288,7 @@ export function TodoCardV3({
       aria-label={`Todo item: ${todo.product_name}`}
       className="flex gap-2 w-full flex-1 group"
     >
-      {/* <div className="h-6 w-6 bg-card border-2 border-border rounded-full sm:group-hover:border-primary/40 transition-all duration-400 mt-2" /> */}
+      {/* <div className="h-6 w-6 bg-card border-2 border-muted rounded-full sm:group-hover:border-primary/40 transition-all duration-400 mt-2" /> */}
       <div
         className={cn(
           'bg-card w-full flex flex-col gap-3 rounded-[14px] p-[18px] cursor-pointer transition-all shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.03)]',
@@ -370,7 +370,7 @@ export function TodoCardV3({
         </div>
 
         {/* Suggestion Row - Border Only */}
-        <div className="pt-3.5 mt-auto border-t border-border/60 flex justify-between items-center">
+        <div className="pt-3.5 mt-auto border-t border-muted/60 flex justify-between items-center">
           <Typography variant="small" color="muted">
             {actionLabel}
           </Typography>

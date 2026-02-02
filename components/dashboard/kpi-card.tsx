@@ -80,7 +80,7 @@ export function KPICard({
               <Skeleton className="h-4 w-3/4 rounded-lg" />
             </div>
           </div>
-          <div className="mt-4 pt-3 border-t border-border/50">
+          <div className="mt-4 pt-3 border-t border-muted/50">
             <Skeleton className="h-8 w-full rounded-lg" />
           </div>
         </div>
@@ -148,7 +148,7 @@ export function KPICard({
 
         {/* Action button */}
         {isLink && (
-          <div className="mt-4 pt-3 border-t border-border/50">
+          <div className="mt-4 pt-3 border-t border-muted/50">
             <Button
               variant="outline"
               size="sm"

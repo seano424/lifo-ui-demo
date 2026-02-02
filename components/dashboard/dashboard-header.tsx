@@ -55,11 +55,11 @@ export function DashboardHeader({ timeRange, onTimeRangeChange }: DashboardHeade
   ]
 
   return (
-    <div className="flex items-end justify-between">
+    <div className="flex-col gap-4 items-center justify-center sm:flex-row flex sm:items-end sm:justify-between">
       {/* Left: Greeting + Store/Date */}
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2 text-center sm:text-left">
         <Typography variant="h2">{t(`greeting.${greetingKey}`, { name: userName })}</Typography>
-        <Typography variant="p" color="muted">
+        <Typography variant="p" color="muted" className="max-w-xs sm:max-w-none mx-auto sm:mx-0">
           {activeStore?.store_name} · {formattedDate}
         </Typography>
       </div>
