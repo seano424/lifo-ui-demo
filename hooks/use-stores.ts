@@ -47,11 +47,28 @@ export function useUserStores() {
     refetchOnReconnect: false, // Don't refetch on network reconnect
   })
 
+  // Set loading state based on queries
+  useEffect(() => {
+    // If no user, immediately set loading to false
+    if (!currentUser) {
+      setLoadingStores(false)
+      return
+    }
+
+    // Keep loading true while queries are running
+    if (userStoresResult.isLoading || userPreferencesResult.isLoading) {
+      setLoadingStores(true)
+    }
+  }, [currentUser, userStoresResult.isLoading, userPreferencesResult.isLoading, setLoadingStores])
+
   // Auto-select store when data loads
   useEffect(() => {
-    if (userStoresResult.data && userStoresResult.data.length > 0) {
-      setLoadingStores(userStoresResult.isLoading)
+    // Wait for both queries to complete
+    if (userStoresResult.isLoading || userPreferencesResult.isLoading) {
+      return
+    }
 
+    if (userStoresResult.data && userStoresResult.data.length > 0) {
       // Always sync Zustand with React Query data
       setUserStores(userStoresResult.data)
 
@@ -83,13 +100,32 @@ export function useUserStores() {
     }
   }, [
     userStoresResult.data,
-    userPreferencesResult.data,
-    activeStore,
     userStoresResult.isLoading,
+    userPreferencesResult.data,
+    userPreferencesResult.isLoading,
+    activeStore,
     setActiveStore,
-    setLoadingStores,
     setUserStores,
-  ]) // Removed Zustand setters from dependencies since they are stable
+  ])
+
+  // Clear loading state only after active store is set or when we have no stores
+  useEffect(() => {
+    // Don't clear loading if queries are still running
+    if (userStoresResult.isLoading || userPreferencesResult.isLoading) {
+      return
+    }
+
+    // Clear loading if we have an active store OR if user has no stores
+    if (activeStore || (userStoresResult.data && userStoresResult.data.length === 0)) {
+      setLoadingStores(false)
+    }
+  }, [
+    activeStore,
+    userStoresResult.data,
+    userStoresResult.isLoading,
+    userPreferencesResult.isLoading,
+    setLoadingStores,
+  ])
 
   return {
     userStores: userStores, // Return the UserStore[] from Zustand

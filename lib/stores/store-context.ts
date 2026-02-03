@@ -29,7 +29,7 @@ export const useStoreState = create<StoreState>()(
   subscribeWithSelector((set, get) => ({
     activeStore: null,
     userStores: [],
-    isLoadingStores: false,
+    isLoadingStores: true, // Start as true, will be set to false once stores are loaded
     isChangingStore: false,
 
     setActiveStore: store => {

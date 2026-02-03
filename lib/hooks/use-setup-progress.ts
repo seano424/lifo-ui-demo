@@ -15,7 +15,7 @@ export interface SetupProgress {
  * This replaces localStorage-based completion tracking with actual data
  */
 export function useSetupProgress(): SetupProgress {
-  const { activeStore } = useStoreState()
+  const { activeStore, isLoadingStores } = useStoreState()
 
   // Check if the active store has any batches
   const { data: hasBatches, isLoading } = useQuery({
@@ -34,7 +34,7 @@ export function useSetupProgress(): SetupProgress {
   return {
     hasStore: !!activeStore,
     hasBatches: hasBatches ?? false,
-    isLoading,
+    isLoading: isLoading || isLoadingStores,
   }
 }
 

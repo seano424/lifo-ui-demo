@@ -4,8 +4,12 @@ import { DashboardContent } from '@/components/dashboard/dashboard-content'
 import { SettingUpFlow } from '@/components/dashboard/setting-up-flow'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useSetupProgress } from '@/lib/hooks/use-setup-progress'
+import { useUserStores } from '@/hooks/use-stores'
 
 export function DashboardPageClient() {
+  // Initialize store loading state early to prevent flash
+  useUserStores()
+
   const progress = useSetupProgress()
 
   // Show loading skeleton while checking setup progress
