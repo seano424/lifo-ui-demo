@@ -94,10 +94,10 @@ interface BatchDetailData {
 interface DonateActionParams {
   p_batch_id: string
   p_quantity_affected: number
-  p_donation_recipient_id: string
+  p_donation_recipient_id?: string | undefined
   p_user_id: string
-  p_notes?: string | null
-  p_recommended_action?: string | null
+  p_notes?: string | undefined
+  p_recommended_action?: string | undefined
 }
 
 interface DiscountActionParams {
@@ -105,18 +105,18 @@ interface DiscountActionParams {
   p_quantity_affected: number
   p_discount_percentage: number
   p_user_id: string
-  p_notes?: string | null
-  p_recommended_action?: string | null
+  p_notes?: string | undefined
+  p_recommended_action?: string | undefined
 }
 
 interface SoldActionParams {
   p_batch_id: string
   p_quantity_sold: number
   p_user_id: string
-  p_sale_timing?: string | null
-  p_sale_occurred_at?: string | null
-  p_notes?: string | null
-  p_recommended_action?: string | null
+  p_sale_timing?: string | undefined
+  p_sale_occurred_at?: string | undefined
+  p_notes?: string | undefined
+  p_recommended_action?: string | undefined
 }
 
 interface DisposeActionParams {
@@ -124,23 +124,16 @@ interface DisposeActionParams {
   p_quantity_disposed: number
   p_disposal_reason: string
   p_user_id: string
-  p_notes?: string | null
-  p_recommended_action?: string | null
+  p_notes?: string | undefined
+  p_recommended_action?: string | undefined
 }
 
 interface DismissActionParams {
   p_batch_id: string
   p_dismissal_reason: string
   p_user_id: string
-  p_notes?: string | null
-  p_recommended_action?: string | null
-}
-
-interface BulkActionParams {
-  p_batch_ids: string[]
-  p_action_type: 'donate' | 'discount' | 'sold' | 'dispose' | 'dismiss'
-  p_action_params: Record<string, unknown>
-  p_user_id: string
+  p_notes?: string | undefined
+  p_recommended_action?: string | undefined
 }
 
 // RPC Return Type (all functions return this structure)
@@ -548,10 +541,10 @@ export function useBatchActionRPC(providedStoreId?: string) {
         p_donation_recipient_id:
           params.donationRecipientId && params.donationRecipientId !== ADHOC_RECIPIENT_UUID
             ? params.donationRecipientId
-            : null,
+            : undefined,
         p_user_id: userId,
-        p_notes: params.notes || null,
-        p_recommended_action: params.recommendedAction || null,
+        p_notes: params.notes ?? undefined,
+        p_recommended_action: params.recommendedAction ?? undefined,
       } as DonateActionParams
 
       logger.log('BatchActions', 'Starting donate RPC call', {
@@ -560,7 +553,17 @@ export function useBatchActionRPC(providedStoreId?: string) {
         recommendedAction: params.recommendedAction,
       })
       const startTime = performance.now()
-      const { data, error } = await supabase.rpc('execute_donate_action', rpcParams)
+      const { data, error } = await supabase.rpc(
+        'execute_donate_action',
+        rpcParams as unknown as {
+          p_batch_id: string
+          p_donation_recipient_id: string
+          p_notes?: string | undefined
+          p_quantity_affected: number
+          p_recommended_action?: string | undefined
+          p_user_id: string
+        },
+      )
       const endTime = performance.now()
       logger.log('BatchActions', `Donate RPC completed in ${(endTime - startTime).toFixed(2)}ms`, {
         success: !error,
@@ -573,7 +576,7 @@ export function useBatchActionRPC(providedStoreId?: string) {
         throw error
       }
 
-      return data as ActionResult
+      return data as unknown as ActionResult
     },
     onMutate: async variables => {
       // Optimistic update: Remove from pending todos immediately
@@ -658,8 +661,8 @@ export function useBatchActionRPC(providedStoreId?: string) {
         p_quantity_affected: params.quantity,
         p_discount_percentage: params.discountPercentage,
         p_user_id: userId,
-        p_notes: params.notes || null,
-        p_recommended_action: params.recommendedAction || null,
+        p_notes: params.notes ?? undefined,
+        p_recommended_action: params.recommendedAction ?? undefined,
       } as DiscountActionParams
 
       logger.log('BatchActions', 'Starting discount RPC call', {
@@ -686,7 +689,7 @@ export function useBatchActionRPC(providedStoreId?: string) {
         throw error
       }
 
-      return data as ActionResult
+      return data as unknown as ActionResult
     },
     onMutate: async variables => {
       // Optimistic update: Update batch price and potentially move to in_progress
@@ -767,9 +770,9 @@ export function useBatchActionRPC(providedStoreId?: string) {
         p_quantity_sold: params.quantity,
         p_user_id: userId,
         p_sale_timing: params.saleTiming || 'just-now',
-        p_sale_occurred_at: params.saleOccurredAt || null,
-        p_notes: params.notes || null,
-        p_recommended_action: params.recommendedAction || null,
+        p_sale_occurred_at: params.saleOccurredAt ?? undefined,
+        p_notes: params.notes ?? undefined,
+        p_recommended_action: params.recommendedAction ?? undefined,
       } as SoldActionParams)
       const endTime = performance.now()
       logger.log('BatchActions', `Sold RPC completed in ${(endTime - startTime).toFixed(2)}ms`, {
@@ -778,7 +781,7 @@ export function useBatchActionRPC(providedStoreId?: string) {
       })
 
       if (error) throw error
-      return data as ActionResult
+      return data as unknown as ActionResult
     },
     onMutate: async variables => {
       // Optimistic update: Remove from pending if all quantity sold
@@ -864,8 +867,8 @@ export function useBatchActionRPC(providedStoreId?: string) {
         p_quantity_disposed: params.quantity,
         p_disposal_reason: params.disposalReason,
         p_user_id: userId,
-        p_notes: params.notes || null,
-        p_recommended_action: params.recommendedAction || null,
+        p_notes: params.notes ?? undefined,
+        p_recommended_action: params.recommendedAction ?? undefined,
       } as DisposeActionParams)
       const endTime = performance.now()
       logger.log('BatchActions', `Dispose RPC completed in ${(endTime - startTime).toFixed(2)}ms`, {
@@ -874,7 +877,7 @@ export function useBatchActionRPC(providedStoreId?: string) {
       })
 
       if (error) throw error
-      return data as ActionResult
+      return data as unknown as ActionResult
     },
     onMutate: async variables => {
       // Optimistic update: Remove from pending if all quantity disposed
@@ -950,12 +953,12 @@ export function useBatchActionRPC(providedStoreId?: string) {
         p_batch_id: params.batchId,
         p_dismissal_reason: params.dismissalReason,
         p_user_id: userId,
-        p_notes: params.notes || null,
-        p_recommended_action: params.recommendedAction || null,
+        p_notes: params.notes ?? undefined,
+        p_recommended_action: params.recommendedAction ?? undefined,
       } as DismissActionParams)
 
       if (error) throw error
-      return data as ActionResult
+      return data as unknown as ActionResult
     },
     onMutate: async variables => {
       // Optimistic update: Remove from pending todos immediately (dismissed = completed)
@@ -1048,12 +1051,12 @@ export function useBatchActionRPC(providedStoreId?: string) {
       const { data, error } = await supabase.rpc('execute_bulk_action', {
         p_batch_ids: params.batchIds,
         p_action_type: params.actionType,
-        p_action_params: params.actionParams,
+        p_action_params: params.actionParams as unknown as string | number | boolean | null,
         p_user_id: userId,
-      } as BulkActionParams)
+      })
 
       if (error) throw error
-      return data as BulkActionResult
+      return data as unknown as BulkActionResult
     },
     onMutate: async variables => {
       // Optimistic update: Remove all batches from pending todos

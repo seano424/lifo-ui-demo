@@ -119,52 +119,54 @@ export function useScanOutActions() {
       }
 
       // Transform to nested structure with batch and products
-      return data.map((rpcResult: BatchRPCResult): AvailableBatch => {
-        const currentQty = Number(rpcResult.current_quantity)
-        const initialQty = Number(rpcResult.initial_quantity)
-        const availableQty = rpcResult.available_quantity
-          ? Number(rpcResult.available_quantity)
-          : currentQty
+      return (data as unknown as BatchRPCResult[]).map(
+        (rpcResult: BatchRPCResult): AvailableBatch => {
+          const currentQty = Number(rpcResult.current_quantity)
+          const initialQty = Number(rpcResult.initial_quantity)
+          const availableQty = rpcResult.available_quantity
+            ? Number(rpcResult.available_quantity)
+            : currentQty
 
-        return {
-          batch: {
-            batch_id: rpcResult.batch_id,
-            batch_number: rpcResult.batch_number,
-            product_id: rpcResult.product_id,
-            store_id: rpcResult.store_id,
-            expiry_date: rpcResult.expiry_date,
-            current_quantity: currentQty,
-            available_quantity: availableQty,
-            initial_quantity: initialQty,
-            cost_price: Number(rpcResult.cost_price),
-            selling_price: Number(rpcResult.selling_price),
-            location_code: rpcResult.location_code,
-            status: rpcResult.status,
-            lifecycle_status: rpcResult.lifecycle_status || null,
-            verification_status: rpcResult.verification_status,
-            created_at: rpcResult.created_at,
-            // Additional required fields not returned by RPC (for full BatchRow compliance)
-            received_date: null,
-            reserved_quantity: null,
-            updated_at: rpcResult.created_at,
-            manufacture_date: null,
-            supplier: null,
-            ocr_extracted_date: null,
-            ocr_confidence: null,
-            processing_batch_id: null,
-            batch_source: null,
-            scanned_barcode: null,
-            scan_confidence: null,
-            created_by: null,
-          },
-          products: {
-            product_name: rpcResult.product_name || 'Unknown Product',
-            brand_name: rpcResult.brand_name || 'Unknown Brand',
-            barcode: rpcResult.product_barcode || barcode,
-            category_name: rpcResult.category_name || undefined,
-          },
-        }
-      })
+          return {
+            batch: {
+              batch_id: rpcResult.batch_id,
+              batch_number: rpcResult.batch_number,
+              product_id: rpcResult.product_id,
+              store_id: rpcResult.store_id,
+              expiry_date: rpcResult.expiry_date,
+              current_quantity: currentQty,
+              available_quantity: availableQty,
+              initial_quantity: initialQty,
+              cost_price: Number(rpcResult.cost_price),
+              selling_price: Number(rpcResult.selling_price),
+              location_code: rpcResult.location_code,
+              status: rpcResult.status,
+              lifecycle_status: rpcResult.lifecycle_status || null,
+              verification_status: rpcResult.verification_status,
+              created_at: rpcResult.created_at,
+              // Additional required fields not returned by RPC (for full BatchRow compliance)
+              received_date: null,
+              reserved_quantity: null,
+              updated_at: rpcResult.created_at,
+              manufacture_date: null,
+              supplier: null,
+              ocr_extracted_date: null,
+              ocr_confidence: null,
+              processing_batch_id: null,
+              batch_source: null,
+              scanned_barcode: null,
+              scan_confidence: null,
+              created_by: null,
+            },
+            products: {
+              product_name: rpcResult.product_name || 'Unknown Product',
+              brand_name: rpcResult.brand_name || 'Unknown Brand',
+              barcode: rpcResult.product_barcode || barcode,
+              category_name: rpcResult.category_name || undefined,
+            },
+          }
+        },
+      )
     } catch (error) {
       logger.error('ScanOut', 'Error in findAvailableBatches', { error })
       throw error

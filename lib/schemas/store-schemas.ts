@@ -6,7 +6,7 @@ import {
   createStoreNameValidator,
   createWebsiteValidator,
 } from '@/lib/utils/validation-utils'
-import type { Database } from '@/types/supabase'
+import type { Database } from '@/types/supabase-extended'
 
 // Get the allowed store types from your database schema check constraint
 type StoreType = Database['business']['Enums']['store_type_enum']

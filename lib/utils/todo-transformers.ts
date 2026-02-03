@@ -1,4 +1,4 @@
-import type { Database } from '@/types/supabase'
+import type { Database } from '@/types/supabase-extended'
 
 export type BatchAction = Database['inventory']['Tables']['batch_actions']['Row']
 export type ActionType = Database['public']['Enums']['action_type']

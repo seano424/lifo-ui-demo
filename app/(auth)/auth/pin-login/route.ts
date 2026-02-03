@@ -1,6 +1,7 @@
 // app/api/auth/pin-login/route.ts
 import { type NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import type { ValidatePinLoginResult } from '@/types/rpc-returns'
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,7 +17,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate PIN using your existing RPC
-    const { data: result, error } = await supabase.rpc('validate_pin_login', {
+    const { data, error } = await supabase.rpc('validate_pin_login', {
       p_username: username,
       p_pin: pin,
     })
@@ -28,6 +29,8 @@ export async function POST(request: NextRequest) {
         { status: 500 },
       )
     }
+
+    const result = data as ValidatePinLoginResult | null
 
     if (!result || !result.success) {
       return NextResponse.json(

@@ -44,9 +44,9 @@ export async function fetchProductsPageRPC(
 
       const { data, error } = await supabase.schema('inventory').rpc('get_products_paginated', {
         p_store_id: filters.storeId,
-        p_category_code: filters.category || null,
-        p_brand: filters.brand || null,
-        p_search: filters.search || null,
+        p_category_code: filters.category ?? undefined,
+        p_brand: filters.brand ?? undefined,
+        p_search: filters.search ?? undefined,
         p_sort_field: filters.sort?.field || 'created_at',
         p_sort_direction: filters.sort?.direction || 'desc',
         p_page_size: pageSize,

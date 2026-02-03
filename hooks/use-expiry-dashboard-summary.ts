@@ -26,7 +26,7 @@ export function useExpiryDashboardSummary(storeId: string | null) {
       })
 
       if (error) throw error
-      return data as ExpiryDashboardSummary
+      return data as unknown as ExpiryDashboardSummary
     },
     enabled: !!storeId,
     staleTime: 2 * 60 * 1000, // 2 minutes

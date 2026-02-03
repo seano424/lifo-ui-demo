@@ -1,7 +1,7 @@
 // lib/queries/stores.ts
 import { createClient } from '@/lib/supabase/client'
 import type { createClient as createServerClient } from '@/lib/supabase/server'
-import type { Database } from '@/types/supabase'
+import type { Database } from '@/types/supabase-extended'
 import { logger } from '@/lib/utils/logger'
 import { withPerformanceTracking } from '@/lib/utils/performance'
 import { fetchUserPreferencesRPC, updateUserPrimaryStoreRPC } from './stores-rpc'
@@ -81,13 +81,13 @@ export async function fetchUserStores(
         throw error
       }
 
-      const userStores = data
+      const userStores: UserStore[] = data
         .filter(item => item.stores !== null) // Filter out null stores (deactivated)
         .map(item => {
           return {
             store: item.stores as unknown as Store,
             role: item.role_in_store as string,
-            permissions: item.permissions,
+            permissions: (item.permissions as unknown as StorePermissions) || {},
           }
         })
 
@@ -146,7 +146,7 @@ export async function fetchUserStoresAlternative(
           throw error
         }
 
-        const userStores = data.map(storeData => ({
+        const userStores: UserStore[] = data.map(storeData => ({
           store: {
             store_id: storeData.store_id,
             store_name: storeData.store_name,
@@ -168,7 +168,7 @@ export async function fetchUserStoresAlternative(
             updated_at: storeData.updated_at,
           } as Store,
           role: storeData.store_users[0]?.role_in_store as string,
-          permissions: storeData.store_users[0]?.permissions,
+          permissions: (storeData.store_users[0]?.permissions as unknown as StorePermissions) || {},
         }))
 
         logger.log(context, 'User stores fetched successfully', {

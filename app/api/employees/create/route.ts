@@ -76,10 +76,11 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    const permissions = storeUser.permissions as { can_manage_users?: boolean } | null
     const canManageUsers =
       storeUser.role_in_store === 'owner' ||
       storeUser.role_in_store === 'manager' ||
-      storeUser.permissions?.can_manage_users === true
+      (permissions?.can_manage_users ?? false)
 
     if (!canManageUsers) {
       return NextResponse.json(

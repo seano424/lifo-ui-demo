@@ -1,6 +1,6 @@
 // lib/utils/scoring-thresholds.ts
 import type { SupabaseClient } from '@supabase/supabase-js'
-import type { Database } from '@/types/supabase'
+import type { Database } from '@/types/supabase-extended'
 
 export type ThresholdType = 'critical' | 'warning'
 

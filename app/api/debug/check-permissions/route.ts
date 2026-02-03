@@ -42,10 +42,11 @@ export async function GET(request: NextRequest) {
       .eq('store_id', storeId)
       .single()
 
+    const permissions = storeUser?.permissions as { can_manage_users?: boolean } | null
     const canManageUsers =
       storeUser?.role_in_store === 'owner' ||
       storeUser?.role_in_store === 'manager' ||
-      storeUser?.permissions?.can_manage_users === true
+      (permissions?.can_manage_users ?? false)
 
     return NextResponse.json({
       success: true,
@@ -70,7 +71,7 @@ export async function GET(request: NextRequest) {
           canManageUsers,
           isOwner: storeUser?.role_in_store === 'owner',
           isManager: storeUser?.role_in_store === 'manager',
-          hasManageUsersPermission: storeUser?.permissions?.can_manage_users === true,
+          hasManageUsersPermission: permissions?.can_manage_users ?? false,
           isActive: storeUser?.is_active,
         },
       },

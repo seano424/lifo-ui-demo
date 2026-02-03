@@ -26,7 +26,7 @@ import { toast } from 'sonner'
 
 import { Input } from '@/components/ui/input'
 import type { ActionType, AvailableBatch } from '@/types/scanning'
-import type { Database } from '@/types/supabase'
+import type { Database } from '@/types/supabase-extended'
 import type { ScannedItem } from '../shared'
 import BatchSelectionList from '../shared/batch-selection-list'
 import ScanningCamera from '../shared/scanning-camera'
@@ -162,8 +162,7 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
 
         // Transform the flat RPC result to match AvailableBatch type with nested batch
         batches =
-          batchesData?.map(
-            (rpcBatch: {
+          (batchesData as unknown as Array<{
               batch_id: string
               batch_number: string
               product_id: string
@@ -181,7 +180,8 @@ export default function ScanOutInterface({ onItemRemoved }: ScanOutInterfaceProp
               product_name: string
               brand_name: string
               barcode: string
-            }) => ({
+            }>)?.map(
+            (rpcBatch) => ({
               batch: {
                 batch_id: rpcBatch.batch_id,
                 batch_number: rpcBatch.batch_number,

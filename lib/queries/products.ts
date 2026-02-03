@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/client'
 import type { createClient as createServerClient } from '@/lib/supabase/server'
 import { logger } from '@/lib/utils/logger'
 import { withPerformanceTracking } from '@/lib/utils/performance'
-import type { Database } from '@/types/supabase'
+import type { Database } from '@/types/supabase-extended'
 
 type ServerClient = Awaited<ReturnType<typeof createServerClient>>
 
@@ -200,30 +200,32 @@ export async function fetchProducts(
       })
     }
 
-    const transformedData = storeProductsData.map((storeProduct: StoreProductWithProduct) => {
-      const aggregation = productAggregations.get(storeProduct.product_id) || {
-        total_stock: 0,
-        active_batches_count: 0,
-      }
+    const transformedData = (storeProductsData as unknown as StoreProductWithProduct[]).map(
+      (storeProduct: StoreProductWithProduct) => {
+        const aggregation = productAggregations.get(storeProduct.product_id) || {
+          total_stock: 0,
+          active_batches_count: 0,
+        }
 
-      const categoryData = storeProduct.products?.categories || null
+        const categoryData = storeProduct.products?.categories || null
 
-      return {
-        ...storeProduct.products,
-        category_code: categoryData?.category_code,
-        category_display_name: categoryData?.display_name_en,
-        category_display_name_fr: categoryData?.display_name_fr,
-        category_display_name_nl: categoryData?.display_name_nl,
-        store_cost_price: storeProduct.cost_price,
-        store_selling_price: storeProduct.selling_price,
-        store_is_active: storeProduct.is_active,
-        store_sku: storeProduct.store_sku,
-        supplier_code: storeProduct.supplier_code,
-        total_stock: aggregation.total_stock,
-        active_batches_count: aggregation.active_batches_count,
-        avg_days_to_expiry: null,
-      }
-    })
+        return {
+          ...storeProduct.products,
+          category_code: categoryData?.category_code,
+          category_display_name: categoryData?.display_name_en,
+          category_display_name_fr: categoryData?.display_name_fr,
+          category_display_name_nl: categoryData?.display_name_nl,
+          store_cost_price: storeProduct.cost_price,
+          store_selling_price: storeProduct.selling_price,
+          store_is_active: storeProduct.is_active,
+          store_sku: storeProduct.store_sku,
+          supplier_code: storeProduct.supplier_code,
+          total_stock: aggregation.total_stock,
+          active_batches_count: aggregation.active_batches_count,
+          avg_days_to_expiry: null,
+        }
+      },
+    )
 
     return transformedData as Product[]
   } catch (err) {
@@ -587,7 +589,9 @@ export async function createProduct(productData: CreateProductData): Promise<Pro
         const { data: globalProduct, error: globalError } = await supabase
           .schema('inventory')
           .from('products')
-          .insert(globalProductData)
+          .insert(
+            globalProductData as unknown as Database['inventory']['Tables']['products']['Insert'],
+          )
           .select()
           .single()
 
@@ -970,7 +974,13 @@ export async function fetchProductById(
           })
         }
 
-        const categoryData = data.products?.categories || null
+        type CategoryData = {
+          category_code: string
+          display_name_en: string
+          display_name_fr: string
+          display_name_nl: string
+        } | null
+        const categoryData = (data.products?.categories as unknown as CategoryData) || null
 
         const combinedProduct = {
           ...data.products,
@@ -995,7 +1005,7 @@ export async function fetchProductById(
           activeBatches: active_batches_count,
         })
 
-        return combinedProduct as Product
+        return combinedProduct as unknown as Product
       } catch (err) {
         logger.queryWarn(context, 'Unexpected error', {
           error: err instanceof Error ? err.message : String(err),

@@ -3,6 +3,7 @@
 import bcrypt from 'bcryptjs'
 import { createClient } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
+import type { ValidatePinLoginResult, CheckPinLockStatusResult } from '@/types/rpc-returns'
 
 export interface PINLoginResult {
   success: boolean
@@ -69,14 +70,14 @@ export async function verifyPIN(pin: string, hash: string): Promise<boolean> {
 /**
  * Validate PIN login and create Supabase session
  */
-export async function validatePINLogin(data: PINValidationData): Promise<PINLoginResult> {
+export async function validatePINLogin(validationData: PINValidationData): Promise<PINLoginResult> {
   const supabase = createClient()
 
   try {
     // Call Supabase RPC function to validate PIN and get user data
-    const { data: result, error } = await supabase.rpc('validate_pin_login', {
-      p_username: data.username,
-      p_pin: data.pin,
+    const { data, error } = await supabase.rpc('validate_pin_login', {
+      p_username: validationData.username,
+      p_pin: validationData.pin,
     })
 
     if (error) {
@@ -86,6 +87,8 @@ export async function validatePINLogin(data: PINValidationData): Promise<PINLogi
         error: 'Authentication service error',
       }
     }
+
+    const result = data as ValidatePinLoginResult | null
 
     if (!result || !result.success) {
       // Handle specific error cases
@@ -107,7 +110,7 @@ export async function validatePINLogin(data: PINValidationData): Promise<PINLogi
 
       return {
         success: false,
-        error: result.error || 'Invalid username or PIN',
+        error: result?.error || 'Invalid username or PIN',
       }
     }
 
@@ -160,13 +163,14 @@ export async function validatePINLogin(data: PINValidationData): Promise<PINLogi
 
 /**
  * Reset PIN attempts for a user (admin function)
+ * @param username - The username (not userId) to reset attempts for
  */
-export async function resetUserPINAttempts(userId: string): Promise<boolean> {
+export async function resetUserPINAttempts(username: string): Promise<boolean> {
   const supabase = createClient()
 
   try {
     const { error } = await supabase.rpc('reset_pin_attempts', {
-      target_user_id: userId,
+      p_username: username,
     })
 
     if (error) {
@@ -183,9 +187,10 @@ export async function resetUserPINAttempts(userId: string): Promise<boolean> {
 
 /**
  * Update user's PIN (with verification)
+ * @param username - The username (not userId) to update PIN for
  */
 export async function updateUserPIN(
-  userId: string,
+  username: string,
   oldPin: string,
   newPin: string,
 ): Promise<{ success: boolean; error?: string }> {
@@ -201,9 +206,9 @@ export async function updateUserPIN(
     }
 
     const { error } = await supabase.rpc('update_user_pin', {
-      target_user_id: userId,
-      old_pin: oldPin,
-      new_pin: newPin,
+      p_username: username,
+      p_old_pin: oldPin,
+      p_new_pin: newPin,
     })
 
     if (error) {
@@ -253,13 +258,14 @@ export function isValidUsername(username: string): boolean {
 
 /**
  * Check if user is currently PIN locked
+ * @param username - The username (not userId) to check lock status for
  */
-export async function isUserPINLocked(userId: string): Promise<boolean> {
+export async function isUserPINLocked(username: string): Promise<boolean> {
   const supabase = createClient()
 
   try {
     const { data, error } = await supabase.rpc('check_pin_lock_status', {
-      target_user_id: userId,
+      p_username: username,
     })
 
     if (error) {
@@ -267,7 +273,8 @@ export async function isUserPINLocked(userId: string): Promise<boolean> {
       return false
     }
 
-    return data?.is_locked || false
+    const result = data as CheckPinLockStatusResult | null
+    return result?.is_locked || false
   } catch (error) {
     logger.error('PIN Auth', 'isUserPINLocked unexpected error:', error)
     return false

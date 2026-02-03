@@ -13,7 +13,7 @@ import {
   fetchProductsNeedingExpiryDates,
   fetchStoreSummaryStats,
 } from '@/lib/queries/store-inventory-stats'
-import type { Database } from '@/types/supabase'
+import type { Database } from '@/types/supabase-extended'
 
 type StoreInventoryStats = Database['inventory']['Views']['store_inventory_stats']['Row']
 

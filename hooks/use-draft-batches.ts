@@ -163,10 +163,10 @@ async function fetchDraftBatchesSummary(storeId: string): Promise<DraftBatchesSu
 
     logger.log(context, 'Draft batches summary fetched', {
       storeId,
-      totalDrafts: (data as DraftBatchesSummary)?.total_draft_batches || 0,
+      totalDrafts: (data as unknown as DraftBatchesSummary)?.total_draft_batches || 0,
     })
 
-    return data as DraftBatchesSummary
+    return data as unknown as DraftBatchesSummary
   })
 }
 
@@ -189,10 +189,10 @@ async function fetchDraftBatchesByProduct(
         .schema('inventory')
         .rpc('get_draft_batches_by_product', {
           p_store_id: storeId,
-          p_category_codes: options.category_codes || null,
-          p_limit: options.limit || null,
-          p_offset: options.offset || null,
-          p_search: options.search || null,
+          p_category_codes: options.category_codes ?? undefined,
+          p_limit: options.limit ?? undefined,
+          p_offset: options.offset ?? undefined,
+          p_search: options.search ?? undefined,
         })
 
       if (error) {
@@ -205,7 +205,7 @@ async function fetchDraftBatchesByProduct(
         throw new Error(`Failed to fetch draft batches by product: ${error.message}`)
       }
 
-      const results = (data || []) as ProductWithDraftBatches[]
+      const results = (data || []) as unknown as ProductWithDraftBatches[]
 
       logger.log(context, 'Draft batches by product fetched', {
         storeId,
@@ -250,7 +250,7 @@ async function fetchRecentDeliveryProducts(
         throw new Error(`Failed to fetch recent delivery products: ${error.message}`)
       }
 
-      const results = (data || []) as RecentDeliveryProduct[]
+      const results = (data || []) as unknown as RecentDeliveryProduct[]
 
       logger.log(context, 'Recent delivery products fetched', {
         storeId,
@@ -373,8 +373,8 @@ export function useActivateDraftBatch() {
       const { data, error } = await supabase.schema('inventory').rpc('activate_draft_batch', {
         p_batch_id: params.batchId,
         p_expiry_date: params.expiryDate,
-        p_quantity: params.quantity || null,
-        p_user_id: params.userId || null,
+        p_quantity: params.quantity ?? undefined,
+        p_user_id: params.userId ?? undefined,
       })
       const endTime = performance.now()
 
@@ -392,7 +392,7 @@ export function useActivateDraftBatch() {
         throw error
       }
 
-      return data as ActivateDraftBatchResult
+      return data as unknown as ActivateDraftBatchResult
     },
 
     onSuccess: (result, _variables) => {
@@ -488,8 +488,8 @@ export function useIgnoreDraftBatch() {
       const startTime = performance.now()
       const { data, error } = await supabase.schema('inventory').rpc('ignore_draft_batch', {
         p_batch_id: params.batchId,
-        p_quantity: params.quantity || null,
-        p_user_id: params.userId || null,
+        p_quantity: params.quantity ?? undefined,
+        p_user_id: params.userId ?? undefined,
       })
       const endTime = performance.now()
 
@@ -507,7 +507,7 @@ export function useIgnoreDraftBatch() {
         throw error
       }
 
-      return data as IgnoreDraftBatchResult
+      return data as unknown as IgnoreDraftBatchResult
     },
 
     onMutate: async params => {
@@ -670,7 +670,7 @@ export function useLogDelivery() {
       const { data, error } = await supabase.schema('inventory').rpc('log_delivery_create_drafts', {
         p_store_id: activeStoreId,
         p_user_id: userId,
-        p_items: params.items,
+        p_items: params.items as unknown as string | number | boolean | null,
       })
       const endTime = performance.now()
 
@@ -685,7 +685,7 @@ export function useLogDelivery() {
         throw error
       }
 
-      return data as LogDeliveryResult
+      return data as unknown as LogDeliveryResult
     },
 
     onSuccess: (result, _variables) => {

@@ -90,12 +90,12 @@ export function useProductLookup(barcode: string | null, enabled: boolean = true
       }
 
       if (lookupResult && typeof lookupResult === 'object' && 'found' in lookupResult) {
-        const result = lookupResult as RpcLookupResult
+        const result = lookupResult as unknown as RpcLookupResult
         if (result.found) {
           return {
             barcode,
             found: true,
-            product: result.product_data as ProductLookupResult['product'],
+            product: result.product_data as unknown as ProductLookupResult['product'],
             source: result.source as ProductLookupResult['source'],
             cached_at: result.cached_at,
           }
@@ -119,6 +119,7 @@ async function fallbackProductLookup(
 ): Promise<ProductLookupResult> {
   // Check cache first
   const { data: cachedProduct } = await supabase
+    .schema('inventory')
     .from('product_recognition_cache')
     .select('*')
     .eq('barcode', barcode)
@@ -128,9 +129,9 @@ async function fallbackProductLookup(
     return {
       barcode,
       found: true,
-      product: cachedProduct.open_food_facts_data,
+      product: cachedProduct.open_food_facts_data as unknown as ProductLookupResult['product'],
       source: 'cache',
-      cached_at: cachedProduct.last_verified,
+      cached_at: cachedProduct.last_verified ?? undefined,
     }
   }
 
@@ -152,21 +153,26 @@ async function fallbackProductLookup(
     }
 
     // Cache in background (don't await)
-    supabase.from('product_recognition_cache').upsert({
-      barcode,
-      product_name: supabaseProduct.name,
-      brand: supabaseProduct.brand || null,
-      category: parseFirstCategory(productData.categories),
-      image_url: supabaseProduct.image_url || null,
-      open_food_facts_data: productData,
-      is_verified: supabaseProduct.is_verified,
-      verification_count: 1,
-    })
+    supabase
+      .schema('inventory')
+      .from('product_recognition_cache')
+      .upsert({
+        barcode,
+        product_name: supabaseProduct.name,
+        brand: supabaseProduct.brand || null,
+        category: parseFirstCategory(
+          (productData as unknown as { categories?: string }).categories,
+        ),
+        image_url: supabaseProduct.image_url || null,
+        open_food_facts_data: productData as unknown as string | number | boolean | null,
+        is_verified: supabaseProduct.is_verified,
+        verification_count: 1,
+      })
 
     return {
       barcode,
       found: true,
-      product: productData,
+      product: productData as unknown as ProductLookupResult['product'],
       source: 'supabase',
     }
   }
@@ -215,17 +221,20 @@ async function fetchFromOpenFoodFacts(
 
     // Cache successful lookups in background (don't await)
     if (result.found && result.product) {
-      supabase.from('product_recognition_cache').upsert({
-        barcode,
-        product_name:
-          result.product.product_name || result.product.product_name_en || 'Unknown Product',
-        brand: result.product.brands || null,
-        category: parseFirstCategory(result.product.categories),
-        image_url: result.product.image_front_url || result.product.image_url || null,
-        open_food_facts_data: result.product,
-        is_verified: false,
-        verification_count: 1,
-      })
+      supabase
+        .schema('inventory')
+        .from('product_recognition_cache')
+        .upsert({
+          barcode,
+          product_name:
+            result.product.product_name || result.product.product_name_en || 'Unknown Product',
+          brand: result.product.brands || null,
+          category: parseFirstCategory(result.product.categories),
+          image_url: result.product.image_front_url || result.product.image_url || null,
+          open_food_facts_data: result.product,
+          is_verified: false,
+          verification_count: 1,
+        })
     }
 
     return result
@@ -278,7 +287,7 @@ export function useSupabaseProductSearch(storeId?: string) {
         'search_products_with_stock',
         {
           search_query: query,
-          store_id_param: storeId || null,
+          store_id_param: storeId ?? undefined,
           max_results: LOOKUP_CONFIG.MAX_SEARCH_RESULTS,
         },
       )
@@ -499,6 +508,7 @@ export function useAddProductToCache() {
       const supabase = createClient()
 
       const { data, error } = await supabase
+        .schema('inventory')
         .from('product_recognition_cache')
         .upsert({
           barcode,
@@ -563,6 +573,7 @@ export function useVerifyProduct() {
       }
 
       const { data, error } = await supabase
+        .schema('inventory')
         .from('product_recognition_cache')
         .update(updateData)
         .eq('barcode', barcode)

@@ -42,7 +42,8 @@ export async function POST(request: NextRequest) {
 
     // Optional: Get store name for email template
     const { data: store } = await supabase
-      .from('business.stores')
+      .schema('business')
+      .from('stores')
       .select('store_name')
       .eq('store_id', storeId)
       .single()
@@ -59,20 +60,23 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: result.error }, { status: 500 })
     }
 
-    // Update the PIN delivery record with the sent status
+    // Update the email delivery record with the sent status
     try {
       await supabase
-        .from('user_mgmt.pin_deliveries')
+        .schema('user_mgmt')
+        .from('email_deliveries')
         .update({
-          delivery_status: 'sent',
-          external_message_id: result.messageId,
+          status: 'sent',
+          resend_email_id: result.messageId,
+          sent_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
         })
-        .eq('delivery_address', credentials.email)
-        .eq('delivery_status', 'pending')
+        .eq('recipient_email', credentials.email)
+        .eq('status', 'pending')
         .order('created_at', { ascending: false })
         .limit(1)
     } catch (updateError) {
-      console.warn('Failed to update PIN delivery record:', updateError)
+      console.warn('Failed to update email delivery record:', updateError)
       // Don't fail the request if we can't update the record
     }
 

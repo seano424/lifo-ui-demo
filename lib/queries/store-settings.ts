@@ -3,6 +3,13 @@ import { createClient } from '@/lib/supabase/client'
 import type { createClient as createServerClient } from '@/lib/supabase/server'
 import { logger } from '@/lib/utils/logger'
 import { withPerformanceTracking } from '@/lib/utils/performance'
+import type {
+  StoreSettingsCompleteResult,
+  UpdateStoreSettingsResult,
+  UpdateStoreAdvancedSettingsResult,
+  UpdateStoreThresholdsResult,
+  GetStoreSettingsResult,
+} from '@/types/rpc-returns'
 
 type ServerClient = Awaited<ReturnType<typeof createServerClient>>
 
@@ -113,10 +120,15 @@ export async function fetchStoreSettings(
         throw new Error(`Failed to fetch store: ${error.message}`)
       }
 
+      const result = data as StoreSettingsCompleteResult | null
+      if (!result) {
+        throw new Error('No data returned from get_store_settings_complete')
+      }
+
       // Data comes as { store: {...}, settings: {...} }
       return {
-        ...data.store,
-        settings: data.settings || undefined,
+        ...result.store,
+        settings: result.settings || undefined,
       }
     },
   )
@@ -138,21 +150,21 @@ export async function updateStoreBasicInfo(
       // Use the RPC function to update store data
       const { data, error } = await supabase.rpc('update_store_settings', {
         store_id_param: storeId,
-        store_name_param: updates.store_name || null,
-        business_name_param: updates.business_name || null,
-        store_code_param: updates.store_code || null,
-        store_type_param: updates.store_type || null,
-        size_category_param: updates.size_category || null,
-        address_param: updates.address || null,
-        city_param: updates.city || null,
-        postal_code_param: updates.postal_code || null,
-        country_param: updates.country || null,
-        phone_param: updates.phone || null,
-        email_param: updates.email || null,
-        website_url_param: updates.website_url || null,
-        description_param: updates.description || null,
-        default_markup_percent_param: updates.default_markup_percent || null,
-        waste_reduction_target_percent_param: updates.waste_reduction_target_percent || null,
+        store_name_param: updates.store_name ?? undefined,
+        business_name_param: updates.business_name ?? undefined,
+        store_code_param: updates.store_code ?? undefined,
+        store_type_param: updates.store_type ?? undefined,
+        size_category_param: updates.size_category ?? undefined,
+        address_param: updates.address ?? undefined,
+        city_param: updates.city ?? undefined,
+        postal_code_param: updates.postal_code ?? undefined,
+        country_param: updates.country ?? undefined,
+        phone_param: updates.phone ?? undefined,
+        email_param: updates.email ?? undefined,
+        website_url_param: updates.website_url ?? undefined,
+        description_param: updates.description ?? undefined,
+        default_markup_percent_param: updates.default_markup_percent ?? undefined,
+        waste_reduction_target_percent_param: updates.waste_reduction_target_percent ?? undefined,
       })
 
       if (error) {
@@ -164,7 +176,12 @@ export async function updateStoreBasicInfo(
         throw new Error(`Failed to update store: ${error.message}`)
       }
 
-      return data
+      const result = data as UpdateStoreSettingsResult | null
+      if (!result) {
+        throw new Error('No data returned from update_store_settings')
+      }
+
+      return result as unknown as StoreBasicInfo
     },
   )
 }
@@ -185,17 +202,17 @@ export async function updateStoreAdvancedSettings(
       // Use the new RPC function for updating advanced settings (public schema)
       const { data, error } = await supabase.rpc('update_store_advanced_settings', {
         p_store_id: storeId,
-        p_critical_threshold: updates.critical_threshold || null,
-        p_warning_threshold: updates.warning_threshold || null,
-        p_scoring_weights: updates.scoring_weights || null,
-        p_notification_preferences: updates.notification_preferences || null,
-        p_display_preferences: updates.display_preferences || null,
-        p_backup_preferences: updates.backup_preferences || null,
-        p_opening_hours: updates.opening_hours || null,
-        p_peak_hours: updates.peak_hours || null,
-        p_weather_location_lat: updates.weather_location_lat || null,
-        p_weather_location_lon: updates.weather_location_lon || null,
-        p_currency: updates.currency || null,
+        p_critical_threshold: updates.critical_threshold ?? undefined,
+        p_warning_threshold: updates.warning_threshold ?? undefined,
+        p_scoring_weights: updates.scoring_weights ?? undefined,
+        p_notification_preferences: updates.notification_preferences ?? undefined,
+        p_display_preferences: updates.display_preferences ?? undefined,
+        p_backup_preferences: updates.backup_preferences ?? undefined,
+        p_opening_hours: updates.opening_hours ?? undefined,
+        p_peak_hours: updates.peak_hours ?? undefined,
+        p_weather_location_lat: updates.weather_location_lat ?? undefined,
+        p_weather_location_lon: updates.weather_location_lon ?? undefined,
+        p_currency: updates.currency ?? undefined,
       })
 
       if (error) {
@@ -207,14 +224,15 @@ export async function updateStoreAdvancedSettings(
         throw new Error(`Failed to update settings: ${error.message}`)
       }
 
-      if (!data || data.length === 0) {
+      const result = data as UpdateStoreAdvancedSettingsResult[] | null
+      if (!result || result.length === 0) {
         logger.queryWarn('lib/queries/store-settings', 'No data returned from update operation', {
           storeId,
         })
         throw new Error('No data returned from update operation')
       }
 
-      return data[0] // RPC returns an array, get the first result
+      return result[0] as unknown as StoreAdvancedSettings // RPC returns an array, get the first result
     },
   )
 }
@@ -250,14 +268,15 @@ export async function updateStoreThresholds(
         throw new Error(`Failed to update thresholds: ${error.message}`)
       }
 
-      if (!data || data.length === 0) {
+      const result = data as UpdateStoreThresholdsResult[] | null
+      if (!result || result.length === 0) {
         logger.queryWarn('lib/queries/store-settings', 'No data returned from threshold update', {
           storeId,
         })
         throw new Error('No data returned from threshold update operation')
       }
 
-      return data[0] // RPC returns an array, get the first result
+      return result[0] // RPC returns an array, get the first result
     },
   )
 }
@@ -280,9 +299,11 @@ export async function debugStoreAccess(
 
   try {
     // Test 1: Check RPC function access
-    const { data: rpcData, error: rpcError } = await supabase.rpc('get_store_settings', {
+    const rpcResult = await supabase.rpc('get_store_settings', {
       store_id_param: storeId,
     })
+    const rpcData = rpcResult.data as GetStoreSettingsResult | null
+    const rpcError = rpcResult.error
 
     // Test 2: Check user's role in the store via business schema
     const { data: roleData, error: roleError } = await supabase
@@ -290,7 +311,7 @@ export async function debugStoreAccess(
       .from('store_users')
       .select('role_in_store, permissions, is_active')
       .eq('store_id', storeId)
-      .eq('user_id', (await supabase.auth.getUser()).data.user?.id)
+      .eq('user_id', (await supabase.auth.getUser()).data.user?.id ?? '')
       .single()
 
     // Test 3: Try a minimal RPC update
@@ -392,9 +413,9 @@ export async function testTableAccess(
     if (!error) {
       return { success: true, method: 'RPC function' }
     }
-  } catch (error) {
+  } catch (err) {
     logger.queryWarn('lib/queries/store-settings', 'testTableAccess error', {
-      error: error instanceof Error ? error.message : String(error),
+      error: err instanceof Error ? err.message : String(err),
       storeId,
     })
   }

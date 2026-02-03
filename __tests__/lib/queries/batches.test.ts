@@ -10,7 +10,7 @@
 
 import { fetchBatchesPage, fetchExpiringBatches, type BatchFilters } from '@/lib/queries/batches'
 import type { SupabaseClient } from '@supabase/supabase-js'
-import type { Database } from '@/types/supabase'
+import type { Database } from '@/types/supabase-extended'
 
 // Mock the Supabase client module
 jest.mock('@/lib/supabase/client', () => ({

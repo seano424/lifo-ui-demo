@@ -47,14 +47,18 @@ export async function POST(request: NextRequest) {
     // Check if user has permission to send emails for this store (if store_id provided)
     if (store_id) {
       const { data: storeAccess } = await supabase
-        .from('business.store_users')
+        .schema('business')
+        .from('store_users')
         .select('role_in_store')
         .eq('store_id', store_id)
         .eq('user_id', user.id)
         .eq('is_active', true)
         .single()
 
-      if (!storeAccess || !['owner', 'manager'].includes(storeAccess.role_in_store)) {
+      if (
+        !storeAccess ||
+        (storeAccess.role_in_store && !['owner', 'manager'].includes(storeAccess.role_in_store))
+      ) {
         return NextResponse.json(
           { success: false, error: 'Permission denied for this store' },
           { status: 403 },
@@ -66,7 +70,8 @@ export async function POST(request: NextRequest) {
     let storeName = 'lifo'
     if (store_id) {
       const { data: storeData } = await supabase
-        .from('business.stores')
+        .schema('business')
+        .from('stores')
         .select('store_name, business_name')
         .eq('store_id', store_id)
         .single()
@@ -96,14 +101,15 @@ export async function POST(request: NextRequest) {
     if (delivery_id && emailResult.success) {
       try {
         await supabase
-          .from('user_mgmt.pin_deliveries')
+          .schema('user_mgmt')
+          .from('email_deliveries')
           .update({
-            delivery_status: 'sent',
-            delivery_sent_at: new Date().toISOString(),
-            external_message_id: emailResult.messageId,
+            status: 'sent',
+            sent_at: new Date().toISOString(),
+            resend_email_id: emailResult.messageId,
             updated_at: new Date().toISOString(),
           })
-          .eq('delivery_id', delivery_id)
+          .eq('email_delivery_id', delivery_id)
       } catch (updateError) {
         console.error('Failed to update delivery status:', updateError)
         // Don't fail the whole request if status update fails

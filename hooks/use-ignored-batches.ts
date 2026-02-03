@@ -109,10 +109,10 @@ async function fetchIgnoredBatchesSummary(storeId: string): Promise<IgnoredBatch
 
       logger.log(context, 'Ignored batches summary fetched', {
         storeId,
-        totalIgnored: (data as IgnoredBatchesSummary)?.total_ignored_batches || 0,
+        totalIgnored: (data as unknown as IgnoredBatchesSummary)?.total_ignored_batches || 0,
       })
 
-      return data as IgnoredBatchesSummary
+      return data as unknown as IgnoredBatchesSummary
     },
   )
 }
@@ -136,10 +136,10 @@ async function fetchIgnoredBatchesByProduct(
         .schema('inventory')
         .rpc('get_ignored_batches_by_product', {
           p_store_id: storeId,
-          p_category_codes: options.category_codes || null,
-          p_limit: options.limit || null,
-          p_offset: options.offset || null,
-          p_search: options.search || null,
+          p_category_codes: options.category_codes ?? undefined,
+          p_limit: options.limit ?? undefined,
+          p_offset: options.offset ?? undefined,
+          p_search: options.search ?? undefined,
         })
 
       if (error) {
@@ -152,7 +152,7 @@ async function fetchIgnoredBatchesByProduct(
         throw new Error(`Failed to fetch ignored batches by product: ${error.message}`)
       }
 
-      const results = (data || []) as ProductWithIgnoredBatches[]
+      const results = (data || []) as unknown as ProductWithIgnoredBatches[]
 
       logger.log(context, 'Ignored batches by product fetched', {
         storeId,
@@ -249,7 +249,7 @@ export function useRestoreIgnoredBatch() {
       const startTime = performance.now()
       const { data, error } = await supabase.schema('inventory').rpc('restore_ignored_batch', {
         p_batch_id: params.batchId,
-        p_user_id: params.userId || null,
+        p_user_id: params.userId ?? undefined,
       })
       const endTime = performance.now()
 
@@ -267,7 +267,7 @@ export function useRestoreIgnoredBatch() {
         throw error
       }
 
-      return data as RestoreIgnoredBatchResult
+      return data as unknown as RestoreIgnoredBatchResult
     },
 
     onSuccess: (result, _variables) => {

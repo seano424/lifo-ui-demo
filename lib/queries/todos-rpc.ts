@@ -2,7 +2,9 @@ import { createClient } from '@/lib/supabase/client'
 import type { createClient as createServerClient } from '@/lib/supabase/server'
 import { logger } from '@/lib/utils/logger'
 import { withPerformanceTracking } from '@/lib/utils/performance'
-import type { Database } from '@/types/supabase'
+import type { Database } from '@/types/supabase-extended'
+import type { PostgrestError } from '@supabase/supabase-js'
+import type { Json } from '@/types/supabase'
 
 // Type for the server client (it's a Promise!)
 type ServerClient = Awaited<ReturnType<typeof createServerClient>>
@@ -118,7 +120,22 @@ export async function fetchTodosBySection(
     async () => {
       const supabase = serverClient || createClient()
 
-      const { data, error, count } = await supabase.rpc('get_todos_by_section', {
+      // Type assertion needed as this RPC function may not be in generated types
+      const { data, error, count } = await (
+        supabase.rpc as unknown as (
+          name: 'get_todos_by_section',
+          params: {
+            p_store_id: string
+            p_section_filter: TodoSection
+            p_limit: number
+            p_offset: number
+          },
+        ) => Promise<{
+          data: TodoItem[] | null
+          error: PostgrestError | null
+          count: number | null
+        }>
+      )('get_todos_by_section', {
         p_store_id: storeId,
         p_section_filter: section,
         p_limit: pageSize,
@@ -177,7 +194,7 @@ export async function fetchDashboardSummary(
       }
 
       return (
-        data || {
+        (data as DashboardSummary) || {
           total_active_batches: 0,
           needs_attention_count: 0,
           critical_count: 0,
@@ -221,7 +238,7 @@ export async function fetchTodosDashboardOverview(
         throw new Error(`Failed to fetch dashboard overview: ${error.message}`)
       }
 
-      return data || []
+      return (data as TodosDashboardOverview[]) || []
     },
   )
 }
@@ -310,14 +327,16 @@ export async function fetchTodosWithCounts(
 
   const { data, error } = await supabase.rpc('get_todos_with_counts', {
     p_store_id: storeId,
-    p_filters: filters,
+    p_filters: filters as unknown as Json,
     p_limit: limit,
     p_offset: offset,
   })
 
   if (error) throw error
 
-  if (!data || data.length === 0) {
+  const typedData = data as TodoItemWithCounts[] | null
+
+  if (!typedData || typedData.length === 0) {
     return {
       data: [],
       counts: {
@@ -332,7 +351,7 @@ export async function fetchTodosWithCounts(
   }
 
   // Extract counts from first row (same on all rows due to window functions)
-  const firstRow = data[0] as TodoItemWithCounts
+  const firstRow = typedData[0]
   const counts: TodoCounts = {
     total: firstRow.total_count,
     pending: firstRow.pending_count,
@@ -342,7 +361,7 @@ export async function fetchTodosWithCounts(
     expired: firstRow.expired_count,
   }
 
-  return { data: data as TodoItem[], counts }
+  return { data: typedData as TodoItem[], counts }
 }
 
 /**
@@ -355,14 +374,21 @@ export async function fetchTodosCounts(storeId: string, filters: TodoFilters): P
 
   const { data, error } = await supabase.rpc('get_todos_counts_with_filters', {
     p_store_id: storeId,
-    p_filters: filters,
+    p_filters: filters as unknown as Json,
   })
 
   if (error) throw error
 
   // Old RPC returns: {pending, in_progress, completed, expiring, expired}
   // But NOT 'total', so we calculate it
-  const counts = data || { pending: 0, in_progress: 0, completed: 0, expiring: 0, expired: 0 }
+  const typedData = data as {
+    pending: number
+    in_progress: number
+    completed: number
+    expiring: number
+    expired: number
+  } | null
+  const counts = typedData || { pending: 0, in_progress: 0, completed: 0, expiring: 0, expired: 0 }
 
   return {
     // Calculate total from completion statuses (not including expiring/expired since those overlap)

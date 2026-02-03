@@ -41,6 +41,7 @@ import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Typography } from '../ui/typography'
+import type { CheckUserExistsResult, AddEmployeeResult } from '@/types/rpc-returns'
 
 interface AddEmployeeDialogProps {
   isOpen: boolean
@@ -180,13 +181,15 @@ export function AddEmployeeDialog({
         return
       }
 
-      if (data.exists) {
-        setExistingUser(data)
+      const result = data as CheckUserExistsResult | null
+
+      if (result?.exists) {
+        setExistingUser(result as ExistingUserInfo)
         setFlowType('invite_existing')
 
         // Pre-fill name fields if we have the data
-        if (data.full_name) {
-          const [first, ...lastParts] = data.full_name.split(' ')
+        if (result.full_name) {
+          const [first, ...lastParts] = result.full_name.split(' ')
           setFormData(prev => ({
             ...prev,
             firstName: first || '',
@@ -468,11 +471,13 @@ export function AddEmployeeDialog({
         throw new Error(error.message)
       }
 
-      if (!data.success) {
-        if (data.error === 'already_member') {
-          toast.error(`User is already a ${data.existing_role} of this store`)
+      const result = data as AddEmployeeResult | null
+
+      if (!result?.success) {
+        if (result?.error === 'already_member') {
+          toast.error(`User is already a ${result.existing_role} of this store`)
         } else {
-          toast.error(data.message || 'Failed to invite user')
+          toast.error('Failed to invite user')
         }
         return
       }
