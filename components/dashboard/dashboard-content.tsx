@@ -24,7 +24,7 @@ export function DashboardContent() {
       className={cn(
         'flex flex-col gap-10 pb-80 animate-in fade-in-0 duration-1000',
         'transition-all duration-300 ease-in-out',
-        isVisible ? 'pt-12' : 'pt-0',
+        isVisible ? 'pt-16 sm:pt-12' : 'pt-0',
       )}
     >
       <div className="absolute top-16 left-0 right-0 transition-all duration-300">

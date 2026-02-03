@@ -29,33 +29,37 @@ export function DeliveryBanner({ totalDrafts, isClosing = false, onDismiss }: De
   return (
     <div
       className={cn(
-        'flex-col gap-4 sm:flex-row flex sm:items-center sm:justify-between py-2 px-4 bg-[#363644] dark:border-y dark:border-card dark:bg-card/0',
+        'flex items-center justify-between gap-2',
+        'py-3 px-4 sm:py-2 bg-[#363644] dark:border-y dark:border-card dark:bg-card/0',
         'transition-all duration-300 ease-in-out',
         isClosing && 'opacity-0 -translate-y-full',
       )}
     >
-      {/* Left: Icon + Message */}
-      <div className="flex items-center gap-4">
-        {/* <Badge variant="primary" className="aspect-square [&_svg]:size-4 p-2">
-          <Box className="h-10 w-10" aria-hidden="true" />
-        </Badge> */}
-        <div className="flex flex-col gap-1">
-          <Typography variant="small" color="white">
-            {t('title', { count: totalDrafts })}
-          </Typography>
-          {/* <Typography variant="small">
-            {t('description', { units: totalUnits, count: productsWithDrafts })}
-          </Typography> */}
-        </div>
-      </div>
+      {/* Left: Message (clickable on mobile) */}
+      <Button
+        asChild
+        variant="link"
+        className="h-auto p-0 text-white hover:text-white/80 sm:pointer-events-none sm:hover:no-underline"
+        asLink
+        href="/dashboard/inventory/new"
+        onClick={onDismiss}
+      >
+        <Typography
+          variant="small"
+          color="white"
+          className="dark:text-secondary sm:dark:text-muted-foreground"
+        >
+          {t('title', { count: totalDrafts })}
+        </Typography>
+      </Button>
 
       {/* Right: Actions */}
-      <div className="flex items-center justify-between border-t border-border pt-4 sm:border-none sm:pt-0 sm:justify-end gap-1">
+      <div className="flex items-center gap-2">
         <Button
           asChild
           size="xs"
           variant="ghost"
-          className="text-white"
+          className="hidden text-white hover:bg-white/10 sm:inline-flex"
           asLink
           href="/dashboard/inventory/new"
           onClick={onDismiss}
@@ -63,7 +67,7 @@ export function DeliveryBanner({ totalDrafts, isClosing = false, onDismiss }: De
           {t('cta')}
         </Button>
         <Button
-          className="text-white"
+          className="text-white hover:bg-white/10"
           size="icon"
           variant="ghost"
           onClick={onDismiss}
