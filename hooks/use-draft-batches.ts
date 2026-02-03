@@ -12,13 +12,13 @@ import { toast } from 'sonner'
 import { useRestoreIgnoredBatch } from './use-ignored-batches'
 import { safeParseJsonb } from '@/lib/validation/jsonb-validators'
 import type {
-  DraftBatchesSummary,
+  DraftBatchesSummaryResponse,
   DraftBatchItem,
-  ProductWithDraftBatches,
-  ActivateDraftBatchResult,
-  IgnoreDraftBatchResult,
-  DeliveryItemResult,
-  LogDeliveryResult,
+  DraftBatchesByProduct,
+  ActivateDraftBatchResponse,
+  IgnoreDraftBatchResponse,
+  DeliveryResultItem,
+  LogDeliveryResponse,
   RecentDeliveryProduct,
 } from '@/types/rpc-returns'
 
@@ -28,13 +28,13 @@ import type {
 
 // Re-export types from centralized location for backwards compatibility
 export type {
-  DraftBatchesSummary,
+  DraftBatchesSummaryResponse as DraftBatchesSummary,
   DraftBatchItem,
-  ProductWithDraftBatches,
-  ActivateDraftBatchResult,
-  IgnoreDraftBatchResult,
-  DeliveryItemResult,
-  LogDeliveryResult,
+  DraftBatchesByProduct as ProductWithDraftBatches,
+  ActivateDraftBatchResponse as ActivateDraftBatchResult,
+  IgnoreDraftBatchResponse as IgnoreDraftBatchResult,
+  DeliveryResultItem as DeliveryItemResult,
+  LogDeliveryResponse as LogDeliveryResult,
   RecentDeliveryProduct,
 }
 
@@ -63,7 +63,7 @@ export interface DraftBatchesByProductOptions {
 /**
  * Fetch summary of draft batches for a store
  */
-async function fetchDraftBatchesSummary(storeId: string): Promise<DraftBatchesSummary> {
+async function fetchDraftBatchesSummary(storeId: string): Promise<DraftBatchesSummaryResponse> {
   const supabase = createClient()
   const context = 'fetchDraftBatchesSummary'
 
@@ -81,7 +81,7 @@ async function fetchDraftBatchesSummary(storeId: string): Promise<DraftBatchesSu
       throw new Error(`Failed to fetch draft batches summary: ${error.message}`)
     }
 
-    const result = assertRpcResult<DraftBatchesSummary>(data)
+    const result = assertRpcResult<DraftBatchesSummaryResponse>(data)
 
     logger.log(context, 'Draft batches summary fetched', {
       storeId,
@@ -98,7 +98,7 @@ async function fetchDraftBatchesSummary(storeId: string): Promise<DraftBatchesSu
 async function fetchDraftBatchesByProduct(
   storeId: string,
   options: DraftBatchesByProductOptions = {},
-): Promise<ProductWithDraftBatches[]> {
+): Promise<DraftBatchesByProduct[]> {
   const supabase = createClient()
   const context = 'fetchDraftBatchesByProduct'
 
@@ -127,7 +127,7 @@ async function fetchDraftBatchesByProduct(
         throw new Error(`Failed to fetch draft batches by product: ${error.message}`)
       }
 
-      const results = assertRpcArray<ProductWithDraftBatches>(data)
+      const results = assertRpcArray<DraftBatchesByProduct>(data)
 
       logger.log(context, 'Draft batches by product fetched', {
         storeId,
@@ -282,7 +282,7 @@ export function useActivateDraftBatch() {
       expiryDate: string
       quantity?: number
       userId?: string
-    }): Promise<ActivateDraftBatchResult> => {
+    }): Promise<ActivateDraftBatchResponse> => {
       const context = 'activateDraftBatch'
 
       // Check user authentication and authorization
@@ -355,7 +355,7 @@ export function useActivateDraftBatch() {
         throw error
       }
 
-      return assertRpcResult<ActivateDraftBatchResult>(data)
+      return assertRpcResult<ActivateDraftBatchResponse>(data)
     },
 
     onSuccess: (result, _variables) => {
@@ -386,9 +386,11 @@ export function useActivateDraftBatch() {
         }
 
         // Invalidate the activated batch detail
-        queryClient.invalidateQueries({
-          queryKey: queryKeys.batches.detail(result.activated_batch_id),
-        })
+        if (result.activated_batch_id) {
+          queryClient.invalidateQueries({
+            queryKey: queryKeys.batches.detail(result.activated_batch_id),
+          })
+        }
 
         // If batch was split, also invalidate the remaining draft batch
         if (result.was_split && result.remaining_draft_batch_id) {
@@ -440,7 +442,7 @@ export function useIgnoreDraftBatch() {
       batchId: string
       quantity?: number
       userId?: string
-    }): Promise<IgnoreDraftBatchResult> => {
+    }): Promise<IgnoreDraftBatchResponse> => {
       const context = 'ignoreDraftBatch'
 
       // Check user authentication and authorization
@@ -511,7 +513,7 @@ export function useIgnoreDraftBatch() {
         throw error
       }
 
-      return assertRpcResult<IgnoreDraftBatchResult>(data)
+      return assertRpcResult<IgnoreDraftBatchResponse>(data)
     },
 
     onMutate: async params => {
@@ -530,18 +532,21 @@ export function useIgnoreDraftBatch() {
       // Optimistically remove batch from the list
       queryClient.setQueryData(
         queryKeys.batches.draftsByProduct(activeStoreId, {}),
-        (old: ProductWithDraftBatches[] | undefined) => {
+        (old: DraftBatchesByProduct[] | undefined) => {
           if (!old) return old
 
           return old
             .map(product => ({
               ...product,
-              draft_batches: product.draft_batches.filter(b => b.batch_id !== params.batchId),
-              draft_batch_count: product.draft_batches.filter(b => b.batch_id !== params.batchId)
-                .length,
+              draft_batches: product.draft_batches.filter(
+                (b: DraftBatchItem) => b.batch_id !== params.batchId,
+              ),
+              draft_batch_count: product.draft_batches.filter(
+                (b: DraftBatchItem) => b.batch_id !== params.batchId,
+              ).length,
               total_draft_quantity: product.draft_batches
-                .filter(b => b.batch_id !== params.batchId)
-                .reduce((sum, b) => sum + b.quantity, 0),
+                .filter((b: DraftBatchItem) => b.batch_id !== params.batchId)
+                .reduce((sum: number, b: DraftBatchItem) => sum + b.quantity, 0),
             }))
             .filter(p => p.draft_batches.length > 0) // Remove products with no drafts
         },
@@ -558,12 +563,14 @@ export function useIgnoreDraftBatch() {
 
         toast.success(`${result.product_name} ignored`, {
           description: message,
-          action: {
-            label: 'Undo',
-            onClick: () => {
-              restoreBatch({ batchId: result.ignored_batch_id })
-            },
-          },
+          action: result.ignored_batch_id
+            ? {
+                label: 'Undo',
+                onClick: () => {
+                  restoreBatch({ batchId: result.ignored_batch_id! })
+                },
+              }
+            : undefined,
           duration: 5000,
         })
 
@@ -580,9 +587,11 @@ export function useIgnoreDraftBatch() {
         }
 
         // Invalidate the ignored batch detail
-        queryClient.invalidateQueries({
-          queryKey: queryKeys.batches.detail(result.ignored_batch_id),
-        })
+        if (result.ignored_batch_id) {
+          queryClient.invalidateQueries({
+            queryKey: queryKeys.batches.detail(result.ignored_batch_id),
+          })
+        }
 
         // If batch was split, also invalidate the remaining draft batch
         if (result.was_split && result.remaining_draft_batch_id) {
@@ -641,7 +650,7 @@ export function useLogDelivery() {
     mutationFn: async (params: {
       items: DeliveryItem[]
       userId?: string
-    }): Promise<LogDeliveryResult> => {
+    }): Promise<LogDeliveryResponse> => {
       const context = 'logDelivery'
 
       if (!activeStoreId) {
@@ -690,7 +699,7 @@ export function useLogDelivery() {
         throw error
       }
 
-      return assertRpcResult<LogDeliveryResult>(data)
+      return assertRpcResult<LogDeliveryResponse>(data)
     },
 
     onSuccess: (result, _variables) => {

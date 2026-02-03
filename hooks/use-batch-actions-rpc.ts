@@ -9,7 +9,14 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { useCurrency } from '@/hooks/use-currency'
 import { ADHOC_RECIPIENT_UUID } from '@/hooks/use-donation-recipients'
-import type { BatchActionResult, BulkBatchActionResult } from '@/types/rpc-returns'
+import type {
+  ExecuteDiscountResponse,
+  ExecuteDonateResponse,
+  ExecuteDisposeResponse,
+  ExecuteSoldResponse,
+  ExecuteDismissResponse,
+  ExecuteBulkActionResponse,
+} from '@/types/rpc-returns'
 
 // Type-safe action recommendation values (matches database enum)
 export type RecommendedAction =
@@ -139,8 +146,16 @@ interface DismissActionParams {
 }
 
 // Re-export RPC return types from centralized location for backwards compatibility
-export type ActionResult = BatchActionResult
-export type BulkActionResult = BulkBatchActionResult
+// Extended action result to maintain backward compatibility with optional error field
+export type ActionResult = (
+  | ExecuteDiscountResponse
+  | ExecuteDonateResponse
+  | ExecuteDisposeResponse
+  | ExecuteSoldResponse
+  | ExecuteDismissResponse
+) & { error?: string }
+
+export type BulkActionResult = ExecuteBulkActionResponse
 
 // Hook parameter types for clean API
 interface DonateParams {
@@ -579,17 +594,20 @@ export function useBatchActionRPC(providedStoreId?: string) {
       return { storeId }
     },
     onSuccess: async (result, variables, context) => {
+      // Type narrow to ExecuteDonateResponse
+      const donateResult = result as ExecuteDonateResponse
+
       logger.log('BatchActions', '✅ Donate onSuccess called', {
         success: result.success,
         batchId: variables.batchId,
         quantity: variables.quantity,
-        remainingQuantity: result.remaining_quantity,
+        remainingQuantity: donateResult.remaining_quantity,
         storeId: context?.storeId,
       })
 
       if (result.success) {
         toast.success(`Successfully donated ${variables.quantity} units`, {
-          description: `Total value donated: ${currencySymbol}${result.total_value_donated?.toFixed(2)}`,
+          description: `Total value donated: ${currencySymbol}${donateResult.original_value?.toFixed(2)}`,
         })
         logger.log('BatchActions', '🔄 Starting query invalidation after donate')
         await invalidateRelatedQueries(variables.batchId, context?.storeId, 'donate')
@@ -691,18 +709,21 @@ export function useBatchActionRPC(providedStoreId?: string) {
       return { storeId }
     },
     onSuccess: async (result, variables, context) => {
+      // Type narrow to ExecuteDiscountResponse
+      const discountResult = result as ExecuteDiscountResponse
+
       logger.log('BatchActions', '✅ Discount onSuccess called', {
         success: result.success,
         batchId: variables.batchId,
         discountPercentage: variables.discountPercentage,
-        newPrice: result.new_price,
-        originalPrice: result.original_price,
+        discountedPrice: discountResult.discounted_price,
+        potentialRevenue: discountResult.potential_revenue,
         storeId: context?.storeId,
       })
 
       if (result.success) {
         toast.success(`Applied ${variables.discountPercentage}% discount`, {
-          description: `New price: ${currencySymbol}${result.new_price?.toFixed(2)}`,
+          description: `New price: ${currencySymbol}${discountResult.discounted_price?.toFixed(2)}`,
         })
         logger.log('BatchActions', '🔄 Starting query invalidation after discount')
         await invalidateRelatedQueries(variables.batchId, context?.storeId, 'discount')
@@ -790,8 +811,10 @@ export function useBatchActionRPC(providedStoreId?: string) {
     },
     onSuccess: async (result, variables, context) => {
       if (result.success) {
+        // Type narrow to ExecuteSoldResponse
+        const soldResult = result as ExecuteSoldResponse
         toast.success(`Marked ${variables.quantity} units as sold`, {
-          description: `Revenue: ${currencySymbol}${result.revenue_recovered?.toFixed(2)}`,
+          description: `Revenue: ${currencySymbol}${soldResult.revenue_recovered?.toFixed(2)}`,
         })
         await invalidateRelatedQueries(variables.batchId, context?.storeId, 'sold')
       } else {

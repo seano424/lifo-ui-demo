@@ -10,10 +10,10 @@ import { withPerformanceTracking } from '@/lib/utils/performance'
 import { assertRpcResult, assertRpcArray } from '@/lib/utils/rpc-types'
 import { toast } from 'sonner'
 import type {
-  IgnoredBatchesSummary,
+  IgnoredBatchesSummaryResponse,
   IgnoredBatchItem,
-  ProductWithIgnoredBatches,
-  RestoreIgnoredBatchResult,
+  IgnoredBatchesByProduct,
+  RestoreIgnoredBatchResponse,
 } from '@/types/rpc-returns'
 
 // ============================================================================
@@ -22,10 +22,10 @@ import type {
 
 // Re-export types from centralized location for backwards compatibility
 export type {
-  IgnoredBatchesSummary,
+  IgnoredBatchesSummaryResponse as IgnoredBatchesSummary,
   IgnoredBatchItem,
-  ProductWithIgnoredBatches,
-  RestoreIgnoredBatchResult,
+  IgnoredBatchesByProduct as ProductWithIgnoredBatches,
+  RestoreIgnoredBatchResponse as RestoreIgnoredBatchResult,
 }
 
 /**
@@ -45,7 +45,7 @@ export interface IgnoredBatchesByProductOptions extends Record<string, unknown> 
 /**
  * Fetch summary of ignored batches for a store
  */
-async function fetchIgnoredBatchesSummary(storeId: string): Promise<IgnoredBatchesSummary> {
+async function fetchIgnoredBatchesSummary(storeId: string): Promise<IgnoredBatchesSummaryResponse> {
   const supabase = createClient()
   const context = 'fetchIgnoredBatchesSummary'
 
@@ -69,7 +69,7 @@ async function fetchIgnoredBatchesSummary(storeId: string): Promise<IgnoredBatch
         throw new Error(`Failed to fetch ignored batches summary: ${error.message}`)
       }
 
-      const result = assertRpcResult<IgnoredBatchesSummary>(data)
+      const result = assertRpcResult<IgnoredBatchesSummaryResponse>(data)
 
       logger.log(context, 'Ignored batches summary fetched', {
         storeId,
@@ -87,7 +87,7 @@ async function fetchIgnoredBatchesSummary(storeId: string): Promise<IgnoredBatch
 async function fetchIgnoredBatchesByProduct(
   storeId: string,
   options: IgnoredBatchesByProductOptions = {},
-): Promise<ProductWithIgnoredBatches[]> {
+): Promise<IgnoredBatchesByProduct[]> {
   const supabase = createClient()
   const context = 'fetchIgnoredBatchesByProduct'
 
@@ -116,7 +116,7 @@ async function fetchIgnoredBatchesByProduct(
         throw new Error(`Failed to fetch ignored batches by product: ${error.message}`)
       }
 
-      const results = assertRpcArray<ProductWithIgnoredBatches>(data)
+      const results = assertRpcArray<IgnoredBatchesByProduct>(data)
 
       logger.log(context, 'Ignored batches by product fetched', {
         storeId,
@@ -203,7 +203,7 @@ export function useRestoreIgnoredBatch() {
     mutationFn: async (params: {
       batchId: string
       userId?: string
-    }): Promise<RestoreIgnoredBatchResult> => {
+    }): Promise<RestoreIgnoredBatchResponse> => {
       const context = 'restoreIgnoredBatch'
 
       logger.log(context, 'Starting ignored batch restore', {
@@ -231,7 +231,7 @@ export function useRestoreIgnoredBatch() {
         throw error
       }
 
-      return assertRpcResult<RestoreIgnoredBatchResult>(data)
+      return assertRpcResult<RestoreIgnoredBatchResponse>(data)
     },
 
     onSuccess: (result, _variables) => {
@@ -253,9 +253,11 @@ export function useRestoreIgnoredBatch() {
         }
 
         // Invalidate the restored batch detail
-        queryClient.invalidateQueries({
-          queryKey: queryKeys.batches.detail(result.restored_batch_id),
-        })
+        if (result.restored_batch_id) {
+          queryClient.invalidateQueries({
+            queryKey: queryKeys.batches.detail(result.restored_batch_id),
+          })
+        }
       } else {
         toast.error('Restore failed', {
           description: result.message,

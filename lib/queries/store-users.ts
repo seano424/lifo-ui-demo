@@ -5,6 +5,7 @@ import { logger } from '@/lib/utils/logger'
 import { PerformanceTimer } from '@/lib/utils/performance'
 import type {
   StoreUserRow as RPCStoreUserRow,
+  StoreUserRowPaginated as RPCStoreUserRowPaginated,
   RemoveUserFromStoreResult,
 } from '@/types/rpc-returns'
 import type { Json } from '@/types/supabase'
@@ -52,39 +53,23 @@ export type StoreUsersPageParam = {
   pageSize: number
 }
 
-// Define the expected row shape for store user queries
-interface StoreUserRow {
-  store_id: string
-  user_id: string
-  role_in_store: 'owner' | 'manager' | 'employee' | 'staff'
-  permissions?: Record<string, boolean>
-  assigned_at: string
-  assigned_by: string | null
-  is_active: boolean
-  can_use_pin_auth: boolean
-  pin_access_level: 'basic' | 'elevated' | 'admin'
-  pin_permissions?: Record<string, unknown>
-  email?: string
-  created_at?: string
-  updated_at?: string
-  raw_user_meta_data?: Record<string, unknown>
-}
-
-// Transform helper function
-function transformStoreUserRow(row: StoreUserRow): StoreUser {
+// Transform helper function - now uses RPCStoreUserRow directly
+function transformStoreUserRow(row: RPCStoreUserRow): StoreUser {
   const metadata = row.raw_user_meta_data || {}
 
   return {
     store_id: row.store_id,
     user_id: row.user_id,
     role_in_store: row.role_in_store,
-    permissions: row.permissions || {},
+    // Convert UserPermissions to Record<string, boolean>
+    permissions: row.permissions ? (row.permissions as unknown as Record<string, boolean>) : {},
     assigned_at: row.assigned_at,
     assigned_by: row.assigned_by,
     is_active: row.is_active,
     can_use_pin_auth: row.can_use_pin_auth,
-    pin_access_level: row.pin_access_level,
-    pin_permissions: row.pin_permissions || {},
+    pin_access_level: row.pin_access_level as 'basic' | 'elevated' | 'admin',
+    // Convert PinPermissions to Record<string, unknown>
+    pin_permissions: row.pin_permissions ? (row.pin_permissions as Record<string, unknown>) : {},
     // User details
     email: row.email || '',
     created_at: row.created_at || '',
@@ -179,7 +164,7 @@ export async function fetchStoreUsersPage(
       throw new Error(`Failed to fetch store users: ${error.message}`)
     }
 
-    const result = (data as RPCStoreUserRow[] | null) || []
+    const result = (data as RPCStoreUserRowPaginated[] | null) || []
     let storeUsers = result.map(transformStoreUserRow)
 
     // Apply client-side filters that the SQL function doesn't handle
@@ -197,8 +182,7 @@ export async function fetchStoreUsersPage(
       )
     }
 
-    const totalCount =
-      result.length > 0 ? Number((result[0] as RPCStoreUserRow)?.total_count || 0) : 0
+    const totalCount = result.length > 0 ? Number(result[0]?.total_count || 0) : 0
 
     logger.log(context, 'Successfully fetched paginated users', {
       storeId,

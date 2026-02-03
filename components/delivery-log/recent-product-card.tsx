@@ -49,7 +49,7 @@ export function RecentProductCard({
   const [customQuantity, setCustomQuantity] = useState('')
 
   const handleQuickAdd = () => {
-    onQuickAdd(product.last_delivery_quantity)
+    onQuickAdd(product.last_delivery_quantity ?? 1)
   }
 
   const handleCustomSubmit = () => {
