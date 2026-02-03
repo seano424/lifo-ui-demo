@@ -65,6 +65,8 @@ export function DashboardContent() {
           showControls={false}
           highlightExpiring
           expiringDays={daysFilter}
+          pageSize={500}
+          clientSideSort={true}
           initialFilters={{
             filter: 'expiring',
             expiringDays: daysFilter.toString(),

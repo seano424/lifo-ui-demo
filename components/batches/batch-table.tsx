@@ -44,6 +44,7 @@ interface BatchTableProps {
   hasActiveStore?: boolean
   highlightExpiring?: boolean
   expiryAlertDays?: number
+  clientSideSort?: boolean
 }
 
 export function BatchTable({
@@ -55,6 +56,7 @@ export function BatchTable({
   hasActiveStore = true,
   highlightExpiring = false,
   expiryAlertDays = 3,
+  clientSideSort = false,
 }: BatchTableProps) {
   const t = useTranslations('batches.table')
   const tExpiry = useTranslations('batches.expiry')
@@ -127,10 +129,11 @@ export function BatchTable({
     state: {
       sorting,
     },
-    onSortingChange: setSorting,
+    onSortingChange: clientSideSort ? setSorting : undefined,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    enableSorting: false,
+    enableSorting: clientSideSort,
+    manualSorting: !clientSideSort, // Server-side sorting when not client-side
   })
 
   return (

@@ -28,6 +28,7 @@ interface BatchesFilteredListProps {
   expiryAlertDays?: number
   showControls?: boolean
   expiringDays?: number // Controlled prop for external time range changes
+  clientSideSort?: boolean // Enable client-side sorting instead of server-side
 }
 
 export function BatchesFilteredList({
@@ -37,6 +38,7 @@ export function BatchesFilteredList({
   expiryAlertDays = 3,
   showControls = true,
   expiringDays,
+  clientSideSort = false,
 }: BatchesFilteredListProps) {
   const router = useRouter()
   const activeStoreId = useActiveStoreId()
@@ -89,8 +91,11 @@ export function BatchesFilteredList({
     return baseFilters
   })
 
+  // For client-side sorting, exclude sort from query filters to prevent refetching
+  const queryFilters = clientSideSort ? { ...filters, sort: undefined } : filters
+
   const { data, count, isLoading, isFetching, error, hasMore, fetchNextPage, isFetchingNextPage } =
-    useBatches(filters, pageSize)
+    useBatches(queryFilters, pageSize)
 
   useEffect(() => {
     setFilters(prev => ({ ...prev, storeId: activeStoreId || undefined }))
@@ -200,9 +205,18 @@ export function BatchesFilteredList({
       }
       const newDirection =
         currentSort.field === field && currentSort.direction === 'asc' ? 'desc' : 'asc'
-      handleSortChange({ field, direction: newDirection })
+
+      // For client-side sorting, just update local state without URL/server refetch
+      if (clientSideSort) {
+        setFilters(prev => ({
+          ...prev,
+          sort: { field, direction: newDirection },
+        }))
+      } else {
+        handleSortChange({ field, direction: newDirection })
+      }
     },
-    [filters.sort, handleSortChange],
+    [filters.sort, handleSortChange, clientSideSort],
   )
 
   if (error) {
@@ -265,6 +279,7 @@ export function BatchesFilteredList({
           updateSort={handleSortFieldChange}
           highlightExpiring={highlightExpiring}
           expiryAlertDays={expiryAlertDays}
+          clientSideSort={clientSideSort}
         />
       </div>
 
