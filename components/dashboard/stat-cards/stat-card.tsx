@@ -45,12 +45,12 @@ export function StatCard({
   }
 
   return (
-    <Card className="relative cursor-default p-5 transition-all duration-200 flex flex-col gap-3">
+    <Card className="relative cursor-default p-5 transition-all duration-200 flex flex-col gap-3 flex-1 bg-card">
       {/* <Icon className="h-6 w-6" aria-hidden="true" /> */}
-      <Typography variant="muted" color="muted">
+      <Typography variant="p" color="primary">
         {label}
       </Typography>
-      <Typography variant="h3">{value}</Typography>
+      <Typography variant="h4">{value}</Typography>
       <Typography variant="h5" color="muted">
         {subtitle}
       </Typography>

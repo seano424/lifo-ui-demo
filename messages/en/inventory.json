@@ -120,6 +120,7 @@
     "active": "Active",
     "draft": "Draft",
     "expired": "Expired",
+    "ignored": "Ignored",
     "damaged": "Damaged",
     "soldOut": "Sold Out",
     "reserved": "Reserved",
@@ -165,9 +166,13 @@
       "active": "Active",
       "draft": "Draft",
       "expired": "Expired",
+      "ignored": "Ignored",
       "damaged": "Damaged",
       "soldOut": "Sold Out",
-      "reserved": "Reserved"
+      "sold_out": "Sold Out",
+      "reserved": "Reserved",
+      "donated": "Donated",
+      "disposed": "Disposed"
     },
     "expiry": {
       "expired": "Expired",

@@ -120,6 +120,7 @@
     "active": "Actief",
     "draft": "Concept",
     "expired": "Verlopen",
+    "ignored": "Genegeerd",
     "damaged": "Beschadigd",
     "soldOut": "Uitverkocht",
     "reserved": "Gereserveerd",
@@ -165,9 +166,13 @@
       "active": "Actief",
       "draft": "Concept",
       "expired": "Verlopen",
+      "ignored": "Genegeerd",
       "damaged": "Beschadigd",
       "soldOut": "Uitverkocht",
-      "reserved": "Gereserveerd"
+      "sold_out": "Uitverkocht",
+      "reserved": "Gereserveerd",
+      "donated": "Gedoneerd",
+      "disposed": "Verwijderd"
     },
     "expiry": {
       "expired": "Verlopen",

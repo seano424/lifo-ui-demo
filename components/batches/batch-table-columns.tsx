@@ -17,6 +17,14 @@ export const BATCH_TABLE_COLUMN_CONFIG = [
     sortable: true,
   },
   {
+    id: 'status',
+    headerKey: 'headers.status',
+    width: 100,
+    align: 'left',
+    hasMultipleLines: false,
+    sortable: true,
+  },
+  {
     id: 'expiry_date',
     headerKey: 'headers.expiryDate',
     width: 130,
@@ -68,6 +76,30 @@ function getAlignmentClasses(columnIndex: number): {
   }
 }
 
+// Helper function to get status badge variant
+// function getStatusVariant(
+//   status: string,
+// ): 'default' | 'secondary' | 'primary' | 'danger' | 'elevated' {
+//   switch (status) {
+//     case 'active':
+//       return 'primary'
+//     case 'draft':
+//       return 'secondary'
+//     case 'expired':
+//       return 'danger'
+//     case 'ignored':
+//       return 'default'
+//     case 'damaged':
+//       return 'danger'
+//     case 'sold_out':
+//       return 'secondary'
+//     case 'reserved':
+//       return 'elevated'
+//     default:
+//       return 'default'
+//   }
+// }
+
 // Helper function to calculate days until expiry
 function getDaysLeft(expiryDate: Date): number {
   const today = new Date()
@@ -117,20 +149,23 @@ export function createBatchTableColumns({
   updateSort,
   t,
   tExpiry,
+  tStatus,
   storeName,
 }: {
   currentSort: BatchSort
   updateSort: (field: BatchSortField) => void
   t: (key: string) => string
   tExpiry: (key: string, params?: { days: number }) => string
+  tStatus: (key: string) => string
   storeName?: string
 }): ColumnDef<BatchWithProduct>[] {
   const alignments = {
     product_name: getAlignmentClasses(0),
-    expiry_date: getAlignmentClasses(1),
-    days_left: getAlignmentClasses(2),
-    current_quantity: getAlignmentClasses(3),
-    location: getAlignmentClasses(4),
+    status: getAlignmentClasses(1),
+    expiry_date: getAlignmentClasses(2),
+    days_left: getAlignmentClasses(3),
+    current_quantity: getAlignmentClasses(4),
+    location: getAlignmentClasses(5),
   }
 
   return [
@@ -163,6 +198,30 @@ export function createBatchTableColumns({
       size: BATCH_TABLE_COLUMN_CONFIG[0].width,
     },
     {
+      id: 'status',
+      accessorKey: 'status',
+      header: () => (
+        <SortableHeader
+          field="status"
+          currentSort={currentSort}
+          updateSort={updateSort}
+          className={alignments.status.headerClass}
+        >
+          {t('headers.status')}
+        </SortableHeader>
+      ),
+      cell: ({ row }) => {
+        const status = row.original.status || 'active'
+        return (
+          <div className={alignments.status.cellClass}>
+            {/* <Badge variant={getStatusVariant(status)}>{tStatus(status)}</Badge> */}
+            {tStatus(status)}
+          </div>
+        )
+      },
+      size: BATCH_TABLE_COLUMN_CONFIG[1].width,
+    },
+    {
       id: 'expiry_date',
       accessorKey: 'expiry_date',
       header: () => (
@@ -177,24 +236,22 @@ export function createBatchTableColumns({
       ),
       cell: ({ row }) => {
         let expiryDate: Date | null = null
-        let daysLeft = 0
+        // let daysLeft = 0
 
         if (row.original.expiry_date) {
           expiryDate = parseISODateAsLocal(row.original.expiry_date)
           const today = new Date()
           today.setHours(0, 0, 0, 0)
-          daysLeft = getDaysLeft(expiryDate)
+          // daysLeft = getDaysLeft(expiryDate)
         }
 
         return (
           <div className={alignments.expiry_date.cellClass}>
-            <Badge variant={daysLeft <= 3 ? 'danger' : 'elevated'}>
-              {expiryDate ? expiryDate.toLocaleDateString() : tExpiry('noExpiryDate')}
-            </Badge>
+            {expiryDate ? expiryDate.toLocaleDateString() : tExpiry('noExpiryDate')}
           </div>
         )
       },
-      size: BATCH_TABLE_COLUMN_CONFIG[1].width,
+      size: BATCH_TABLE_COLUMN_CONFIG[2].width,
     },
     {
       id: 'days_left',
@@ -224,11 +281,11 @@ export function createBatchTableColumns({
 
         return (
           <div className={alignments.days_left.cellClass}>
-            <Badge variant={daysLeft <= 3 ? 'danger' : 'elevated'}>{label}</Badge>
+            <Badge variant={daysLeft <= 3 ? 'danger' : 'primary'}>{label}</Badge>
           </div>
         )
       },
-      size: BATCH_TABLE_COLUMN_CONFIG[2].width,
+      size: BATCH_TABLE_COLUMN_CONFIG[3].width,
     },
     {
       id: 'current_quantity',
@@ -248,7 +305,7 @@ export function createBatchTableColumns({
           {Number(row.original.current_quantity).toLocaleString()}
         </div>
       ),
-      size: BATCH_TABLE_COLUMN_CONFIG[3].width,
+      size: BATCH_TABLE_COLUMN_CONFIG[4].width,
     },
     {
       id: 'location',
@@ -262,7 +319,7 @@ export function createBatchTableColumns({
           {storeName || '-'}
         </div>
       ),
-      size: BATCH_TABLE_COLUMN_CONFIG[4].width,
+      size: BATCH_TABLE_COLUMN_CONFIG[5].width,
     },
   ]
 }

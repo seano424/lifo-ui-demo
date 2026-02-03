@@ -28,6 +28,8 @@ interface BatchesFilteredListProps {
   expiryAlertDays?: number
   showControls?: boolean
   expiringDays?: number // Controlled prop for external time range changes
+  clientSideSort?: boolean // Enable client-side sorting instead of server-side
+  clientSideTimeFilter?: boolean // Enable client-side time filtering (loads max range, filters on client)
 }
 
 export function BatchesFilteredList({
@@ -37,6 +39,8 @@ export function BatchesFilteredList({
   expiryAlertDays = 3,
   showControls = true,
   expiringDays,
+  clientSideSort = false,
+  clientSideTimeFilter = false,
 }: BatchesFilteredListProps) {
   const router = useRouter()
   const activeStoreId = useActiveStoreId()
@@ -57,13 +61,19 @@ export function BatchesFilteredList({
     // Default to active status
     if (initialFilters?.status) {
       baseFilters.status = initialFilters.status as
+        | 'draft'
         | 'active'
         | 'expired'
         | 'damaged'
         | 'sold_out'
         | 'reserved'
+        | 'ignored'
+      // Don't exclude draft/ignored when explicitly filtering for them
+      baseFilters.excludeDrafts = !['draft', 'ignored'].includes(initialFilters.status)
     } else {
       baseFilters.status = 'active'
+      // By default, exclude draft and ignored batches from the main view
+      baseFilters.excludeDrafts = true
     }
 
     if (initialFilters?.search) {
@@ -83,21 +93,46 @@ export function BatchesFilteredList({
     return baseFilters
   })
 
-  const { data, count, isLoading, error, hasMore, fetchNextPage, isFetchingNextPage } = useBatches(
-    filters,
-    pageSize,
-  )
+  // For client-side sorting, exclude sort from query filters to prevent refetching
+  const queryFilters = clientSideSort ? { ...filters, sort: undefined } : filters
+
+  const {
+    data: rawData,
+    count,
+    isLoading,
+    isFetching,
+    error,
+    hasMore,
+    fetchNextPage,
+    isFetchingNextPage,
+  } = useBatches(queryFilters, pageSize)
+
+  // Client-side time filtering: filter batches by expiry date if enabled
+  const data =
+    clientSideTimeFilter && expiringDays !== undefined
+      ? rawData.filter(batch => {
+          if (!batch.expiry_date) return false
+          const expiryDate = new Date(batch.expiry_date)
+          const today = new Date()
+          today.setHours(0, 0, 0, 0)
+          expiryDate.setHours(0, 0, 0, 0)
+          const daysToExpiry = Math.ceil(
+            (expiryDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
+          )
+          return daysToExpiry >= 0 && daysToExpiry <= expiringDays
+        })
+      : rawData
 
   useEffect(() => {
     setFilters(prev => ({ ...prev, storeId: activeStoreId || undefined }))
   }, [activeStoreId])
 
-  // Update expiring days filter when controlled prop changes
+  // Update expiring days filter when controlled prop changes (unless using client-side filtering)
   useEffect(() => {
-    if (expiringDays !== undefined) {
+    if (expiringDays !== undefined && !clientSideTimeFilter) {
       setFilters(prev => ({ ...prev, expiringInDays: expiringDays }))
     }
-  }, [expiringDays])
+  }, [expiringDays, clientSideTimeFilter])
 
   const updateFilters = useCallback(
     (newFilters: Partial<BatchFilters>) => {
@@ -147,7 +182,7 @@ export function BatchesFilteredList({
         }
       }
 
-      router.replace(`?${params.toString()}`)
+      router.replace(`?${params.toString()}`, { scroll: false })
     },
     [router],
   )
@@ -161,15 +196,21 @@ export function BatchesFilteredList({
 
   const handleFiltersChange = useCallback(
     (newFilters: { expiringInDays?: number; status?: string }) => {
+      const statusValue = newFilters.status as
+        | 'draft'
+        | 'active'
+        | 'expired'
+        | 'damaged'
+        | 'sold_out'
+        | 'reserved'
+        | 'ignored'
+        | undefined
+
       updateFilters({
         expiringInDays: newFilters.expiringInDays,
-        status: newFilters.status as
-          | 'active'
-          | 'expired'
-          | 'damaged'
-          | 'sold_out'
-          | 'reserved'
-          | undefined,
+        status: statusValue,
+        // Don't exclude draft/ignored when explicitly filtering for them
+        excludeDrafts: !(statusValue && ['draft', 'ignored'].includes(statusValue)),
       })
     },
     [updateFilters],
@@ -190,9 +231,18 @@ export function BatchesFilteredList({
       }
       const newDirection =
         currentSort.field === field && currentSort.direction === 'asc' ? 'desc' : 'asc'
-      handleSortChange({ field, direction: newDirection })
+
+      // For client-side sorting, just update local state without URL/server refetch
+      if (clientSideSort) {
+        setFilters(prev => ({
+          ...prev,
+          sort: { field, direction: newDirection },
+        }))
+      } else {
+        handleSortChange({ field, direction: newDirection })
+      }
     },
-    [filters.sort, handleSortChange],
+    [filters.sort, handleSortChange, clientSideSort],
   )
 
   if (error) {
@@ -249,10 +299,13 @@ export function BatchesFilteredList({
         <BatchTable
           data={data}
           isLoading={isLoading}
+          isFetching={isFetching}
+          hasActiveStore={!!activeStoreId}
           currentSort={filters.sort || { field: 'expiry_date', direction: 'asc' }}
           updateSort={handleSortFieldChange}
           highlightExpiring={highlightExpiring}
           expiryAlertDays={expiryAlertDays}
+          clientSideSort={clientSideSort}
         />
       </div>
 

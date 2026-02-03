@@ -11,7 +11,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
     <HydrationBoundary state={dashboardData.dehydratedState}>
       <SidebarProvider>
         <AppSidebar />
-        <SidebarInset className="overflow-y-auto">
+        <SidebarInset className="overflow-y-auto relative">
           <DashboardNav />
           {children}
         </SidebarInset>

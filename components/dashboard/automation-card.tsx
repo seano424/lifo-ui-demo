@@ -56,7 +56,7 @@ export function AutomationCard() {
 
   // Active state - show rules summary and list
   return (
-    <Card className="overflow-hidden flex flex-col gap-0">
+    <Card className="overflow-hidden flex flex-col gap-0 bg-card">
       {/* Header */}
       <div className="flex items-center justify-between border-b border-muted px-6 py-4">
         <div>
@@ -131,14 +131,16 @@ export function AutomationCard() {
       </div>
 
       {/* Footer */}
-      <div className="border-t border-muted px-6 py-5">
-        <Typography variant="p">
-          <Link href="/dashboard/settings/automation" className="flex items-center gap-2">
-            <Plus className="h-3.5 w-3.5" aria-hidden="true" />
-            {t('addRule')}
-          </Link>
-        </Typography>
-      </div>
+
+      <Typography variant="p">
+        <Link
+          href="/dashboard/settings/automation"
+          className="flex items-center gap-2 hover:bg-gray-50 hover:text-gray-900 dark:hover:bg-secondary-900/10 dark:hover:text-secondary-100 px-6 py-5 border-t border-muted"
+        >
+          <Plus className="h-3.5 w-3.5" aria-hidden="true" />
+          {t('addRule')}
+        </Link>
+      </Typography>
     </Card>
   )
 }

@@ -59,10 +59,8 @@ export function ProductsFilteredList({
     return baseFilters
   })
 
-  const { data, count, isLoading, error, hasMore, fetchNextPage, isFetchingNextPage } = useProducts(
-    filters,
-    pageSize,
-  )
+  const { data, count, isLoading, isFetching, error, hasMore, fetchNextPage, isFetchingNextPage } =
+    useProducts(filters, pageSize)
 
   useEffect(() => {
     setFilters(prev => {
@@ -206,6 +204,8 @@ export function ProductsFilteredList({
         <ProductsTable
           data={data}
           isLoading={isLoading}
+          isFetching={isFetching}
+          hasActiveStore={!!activeStoreId}
           currentSort={filters.sort || { field: 'created_at', direction: 'desc' }}
           updateSort={field => {
             const currentSort = filters.sort || {

@@ -1,63 +1,17 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { Box, X } from 'lucide-react'
+import { X } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import { useDraftBatchesSummary } from '@/hooks/use-draft-batches'
-import { useActiveStoreId } from '@/lib/stores/store-context'
 import { Button } from '@/components/ui/button'
 import { Typography } from '../ui/typography'
+import { cn } from '@/lib/utils'
+import type { DraftBatchesSummary } from '@/hooks/use-draft-batches'
 
-const DISMISSED_STORAGE_KEY = 'lifo_dismissed_delivery_banner'
-
-interface DismissedState {
-  count: number
-  timestamp: number
-}
-
-/**
- * Get dismissed delivery banner state from localStorage
- */
-function getDismissedState(): DismissedState | null {
-  if (typeof window === 'undefined') return null
-
-  try {
-    const stored = localStorage.getItem(DISMISSED_STORAGE_KEY)
-    return stored ? JSON.parse(stored) : null
-  } catch {
-    return null
-  }
-}
-
-/**
- * Save dismissed delivery banner state to localStorage
- */
-function setDismissedState(count: number) {
-  if (typeof window === 'undefined') return
-
-  const state: DismissedState = {
-    count,
-    timestamp: Date.now(),
-  }
-
-  try {
-    localStorage.setItem(DISMISSED_STORAGE_KEY, JSON.stringify(state))
-  } catch {
-    // Ignore localStorage errors
-  }
-}
-
-/**
- * Clear dismissed state from localStorage
- */
-function clearDismissedState() {
-  if (typeof window === 'undefined') return
-
-  try {
-    localStorage.removeItem(DISMISSED_STORAGE_KEY)
-  } catch {
-    // Ignore localStorage errors
-  }
+interface DeliveryBannerProps {
+  totalDrafts: number
+  isClosing?: boolean
+  onDismiss: () => void
+  summary: DraftBatchesSummary | undefined
 }
 
 /**
@@ -66,78 +20,56 @@ function clearDismissedState() {
  * Shows a dark banner when there are draft batches needing expiry dates.
  * Can be dismissed, but reappears when new drafts are created.
  */
-export function DeliveryBanner() {
+export function DeliveryBanner({ totalDrafts, isClosing = false, onDismiss }: DeliveryBannerProps) {
   const t = useTranslations('dashboard.redesign.deliveryBanner')
-  const storeId = useActiveStoreId()
-  const { data: summary, isLoading } = useDraftBatchesSummary(storeId || undefined)
-  const [isDismissed, setIsDismissed] = useState(false)
-
-  const totalDrafts = summary?.total_draft_batches || 0
-  const totalUnits = summary?.total_units || 0
-  const productsWithDrafts = summary?.products_with_drafts || 0
-
-  // Check if banner should be shown
-  useEffect(() => {
-    if (!summary || totalDrafts === 0) {
-      setIsDismissed(false)
-      clearDismissedState()
-      return
-    }
-
-    const dismissedState = getDismissedState()
-
-    if (dismissedState) {
-      // Show banner if draft count increased since dismissal
-      if (totalDrafts > dismissedState.count) {
-        setIsDismissed(false)
-        clearDismissedState()
-      } else {
-        setIsDismissed(true)
-      }
-    } else {
-      setIsDismissed(false)
-    }
-  }, [summary, totalDrafts])
-
-  const handleDismiss = () => {
-    setIsDismissed(true)
-    setDismissedState(totalDrafts)
-  }
-
-  // Don't show if loading, no drafts, or dismissed
-  if (isLoading || totalDrafts === 0 || isDismissed) {
-    return null
-  }
 
   return (
-    <div className="flex-col gap-4 sm:flex-row flex sm:items-center sm:justify-between rounded-2xl bg-card p-3">
-      {/* Left: Icon + Message */}
-      <div className="flex items-center gap-4">
-        <div className="rounded-xl bg-white p-2.5 dark:bg-primary-900 dark:text-primary-100">
-          <Box className="h-5 w-5" aria-hidden="true" />
-        </div>
-        <div className="flex flex-col gap-1">
-          <Typography variant="p" color="primary">
-            {t('title', { count: totalDrafts })}
-          </Typography>
-          <Typography variant="p" color="muted">
-            {t('description', { units: totalUnits, count: productsWithDrafts })}
-          </Typography>
-        </div>
-      </div>
+    <div
+      className={cn(
+        'flex items-center justify-between gap-2',
+        'py-3 px-4 sm:py-2 bg-[#363644] dark:border-y dark:border-card dark:bg-card/0',
+        'transition-all duration-300 ease-in-out',
+        isClosing && 'opacity-0 -translate-y-full',
+      )}
+    >
+      {/* Left: Message (clickable on mobile) */}
+      <Button
+        asChild
+        variant="link"
+        className="h-auto p-0 text-white hover:text-white/80 sm:pointer-events-none sm:hover:no-underline"
+        asLink
+        href="/dashboard/inventory/new"
+        onClick={onDismiss}
+      >
+        <Typography
+          variant="small"
+          color="white"
+          className="dark:text-secondary sm:dark:text-muted-foreground"
+        >
+          {t('title', { count: totalDrafts })}
+        </Typography>
+      </Button>
 
       {/* Right: Actions */}
-      <div className="flex items-center justify-between border-t border-border pt-4 sm:border-none sm:pt-0 sm:justify-end gap-3">
+      <div className="flex items-center gap-2">
         <Button
           asChild
-          variant="white"
+          size="xs"
+          variant="ghost"
+          className="hidden text-white hover:bg-white/10 sm:inline-flex"
           asLink
           href="/dashboard/inventory/new"
-          onClick={handleDismiss}
+          onClick={onDismiss}
         >
           {t('cta')}
         </Button>
-        <Button variant="white" size="icon" onClick={handleDismiss} aria-label={t('dismiss')}>
+        <Button
+          className="text-white hover:bg-white/10"
+          size="icon"
+          variant="ghost"
+          onClick={onDismiss}
+          aria-label={t('dismiss')}
+        >
           <X className="h-4 w-4" />
         </Button>
       </div>

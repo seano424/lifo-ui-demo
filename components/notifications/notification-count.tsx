@@ -19,8 +19,7 @@ export function NotificationCount({
 
   const variantClasses = {
     sidebar: 'min-w-6 bg-secondary-900/10 text-foreground',
-    navbar:
-      'min-w-7 bg-secondary-900/10 text-foreground border border-white px-1 text-[10px] shadow-lg',
+    navbar: 'min-w-7 bg-secondary-900 dark:text-white px-1 shadow-lg rounded-full',
     default: 'min-w-6 bg-secondary-900/10 text-foreground',
   }
 

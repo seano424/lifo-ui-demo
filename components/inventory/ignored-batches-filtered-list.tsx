@@ -168,7 +168,7 @@ export function IgnoredBatchesFilteredList({
         }
       }
 
-      router.replace(`?${params.toString()}`)
+      router.replace(`?${params.toString()}`, { scroll: false })
     },
     [router],
   )

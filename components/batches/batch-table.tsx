@@ -1,6 +1,5 @@
 'use client'
 
-import { BatchTableSkeleton } from '@/components/batches/batch-table-skeleton'
 import { createBatchTableColumns } from '@/components/batches/batch-table-columns'
 import { BatchModal } from '@/components/batches/batch-modal'
 import { CardDescription, CardTitle } from '@/components/ui/card'
@@ -29,6 +28,7 @@ import { cn } from '@/lib/utils'
 
 const VALID_COLUMN_IDS = [
   'product_name',
+  'status',
   'expiry_date',
   'days_left',
   'current_quantity',
@@ -40,8 +40,11 @@ interface BatchTableProps {
   currentSort: BatchSort
   updateSort: (field: BatchSortField) => void
   isLoading: boolean
+  isFetching?: boolean
+  hasActiveStore?: boolean
   highlightExpiring?: boolean
   expiryAlertDays?: number
+  clientSideSort?: boolean
 }
 
 export function BatchTable({
@@ -49,11 +52,15 @@ export function BatchTable({
   currentSort,
   updateSort,
   isLoading,
+  isFetching = false,
+  hasActiveStore = true,
   highlightExpiring = false,
   expiryAlertDays = 3,
+  clientSideSort = false,
 }: BatchTableProps) {
   const t = useTranslations('batches.table')
   const tExpiry = useTranslations('batches.expiry')
+  const tStatus = useTranslations('batches.status')
   const currencySymbol = useCurrency()
   const { activeStore } = useStoreState()
 
@@ -112,6 +119,7 @@ export function BatchTable({
     updateSort,
     t,
     tExpiry,
+    tStatus,
     storeName: activeStore?.store_name,
   })
 
@@ -121,27 +129,12 @@ export function BatchTable({
     state: {
       sorting,
     },
-    onSortingChange: setSorting,
+    onSortingChange: clientSideSort ? setSorting : undefined,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    enableSorting: false,
+    enableSorting: clientSideSort,
+    manualSorting: !clientSideSort, // Server-side sorting when not client-side
   })
-
-  if (isLoading) {
-    return <BatchTableSkeleton />
-  }
-
-  if (data.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center py-16 rounded-lg bg-muted/10">
-        <Package className="h-12 w-12 text-muted-foreground mb-4" />
-        <CardTitle className="text-lg mb-2">{t('emptyState.title')}</CardTitle>
-        <CardDescription className="text-center max-w-md">
-          {t('emptyState.description')}
-        </CardDescription>
-      </div>
-    )
-  }
 
   return (
     <>
@@ -158,7 +151,7 @@ export function BatchTable({
               {headerGroup.headers.map(header => (
                 <TableHead
                   key={header.id}
-                  className="sticky top-0 bg-background z-10 py-3 px-4 border-b border-muted"
+                  className="sticky top-0 z-10 py-3 px-4 border-b border-muted"
                   style={
                     header.column.columnDef.size
                       ? { width: header.column.columnDef.size }
@@ -208,6 +201,16 @@ export function BatchTable({
         batch={selectedBatch}
         currencySymbol={currencySymbol}
       />
+
+      {!isLoading && !isFetching && hasActiveStore && data.length === 0 && (
+        <div className="flex select-none flex-col items-center justify-center py-16 rounded-lg">
+          <Package className="h-12 w-12 text-muted-foreground mb-4" />
+          <CardTitle className="text-lg mb-2">{t('emptyState.title')}</CardTitle>
+          <CardDescription className="text-center max-w-md">
+            {t('emptyState.description')}
+          </CardDescription>
+        </div>
+      )}
     </>
   )
 }

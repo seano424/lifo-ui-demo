@@ -47,11 +47,24 @@ export function useUserStores() {
     refetchOnReconnect: false, // Don't refetch on network reconnect
   })
 
-  // Auto-select store when data loads
+  // Consolidated effect: Handle loading state, store selection, and completion
   useEffect(() => {
-    if (userStoresResult.data && userStoresResult.data.length > 0) {
-      setLoadingStores(userStoresResult.isLoading)
+    // If no user, immediately set loading to false
+    if (!currentUser) {
+      setLoadingStores(false)
+      return
+    }
 
+    const isLoading = userStoresResult.isLoading || userPreferencesResult.isLoading
+
+    // Keep loading true while queries are running
+    if (isLoading) {
+      setLoadingStores(true)
+      return
+    }
+
+    // Queries are complete - handle store selection and sync
+    if (userStoresResult.data && userStoresResult.data.length > 0) {
       // Always sync Zustand with React Query data
       setUserStores(userStoresResult.data)
 
@@ -81,15 +94,22 @@ export function useUserStores() {
         }
       }
     }
+
+    // Clear loading state if we have an active store OR if user has no stores
+    if (activeStore || (userStoresResult.data && userStoresResult.data.length === 0)) {
+      setLoadingStores(false)
+    }
   }, [
+    currentUser,
     userStoresResult.data,
-    userPreferencesResult.data,
-    activeStore,
     userStoresResult.isLoading,
+    userPreferencesResult.data,
+    userPreferencesResult.isLoading,
+    activeStore,
     setActiveStore,
-    setLoadingStores,
     setUserStores,
-  ]) // Removed Zustand setters from dependencies since they are stable
+    setLoadingStores,
+  ])
 
   return {
     userStores: userStores, // Return the UserStore[] from Zustand
