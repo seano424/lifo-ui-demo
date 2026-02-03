@@ -77,28 +77,28 @@ function getAlignmentClasses(columnIndex: number): {
 }
 
 // Helper function to get status badge variant
-function getStatusVariant(
-  status: string,
-): 'default' | 'secondary' | 'primary' | 'danger' | 'elevated' {
-  switch (status) {
-    case 'active':
-      return 'primary'
-    case 'draft':
-      return 'secondary'
-    case 'expired':
-      return 'danger'
-    case 'ignored':
-      return 'default'
-    case 'damaged':
-      return 'danger'
-    case 'sold_out':
-      return 'secondary'
-    case 'reserved':
-      return 'elevated'
-    default:
-      return 'default'
-  }
-}
+// function getStatusVariant(
+//   status: string,
+// ): 'default' | 'secondary' | 'primary' | 'danger' | 'elevated' {
+//   switch (status) {
+//     case 'active':
+//       return 'primary'
+//     case 'draft':
+//       return 'secondary'
+//     case 'expired':
+//       return 'danger'
+//     case 'ignored':
+//       return 'default'
+//     case 'damaged':
+//       return 'danger'
+//     case 'sold_out':
+//       return 'secondary'
+//     case 'reserved':
+//       return 'elevated'
+//     default:
+//       return 'default'
+//   }
+// }
 
 // Helper function to calculate days until expiry
 function getDaysLeft(expiryDate: Date): number {
