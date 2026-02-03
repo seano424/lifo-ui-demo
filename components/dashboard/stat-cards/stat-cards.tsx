@@ -115,7 +115,7 @@ export function StatCards({ daysFilter }: StatCardsProps) {
       />
 
       {/* Coverage */}
-      {/* <StatCard
+      <StatCard
         label={t('coverage.label')}
         value={`${coveragePercent}%`}
         subtitle={t('coverage.subtitle', {
@@ -125,7 +125,7 @@ export function StatCards({ daysFilter }: StatCardsProps) {
         trend={coverageTrend}
         icon={Shield}
         accentClass="bg-muted"
-      /> */}
+      />
 
       {/* Value at Risk */}
       <StatCard

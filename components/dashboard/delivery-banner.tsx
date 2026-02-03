@@ -12,7 +12,7 @@ interface DeliveryBannerProps {
   totalDrafts: number
   isClosing?: boolean
   onDismiss: () => void
-  summary: DraftBatchesSummary
+  summary: DraftBatchesSummary | undefined
 }
 
 /**
@@ -29,7 +29,7 @@ export function DeliveryBanner({ totalDrafts, isClosing = false, onDismiss }: De
   return (
     <div
       className={cn(
-        'flex-col gap-4 sm:flex-row flex sm:items-center sm:justify-between py-2 px-4 bg-card/0 border-b dark:border-y dark:border-card',
+        'flex-col gap-4 sm:flex-row flex sm:items-center sm:justify-between py-2 px-4 bg-[#363644] dark:border-y dark:border-card dark:bg-card/0',
         'transition-all duration-300 ease-in-out',
         isClosing && 'opacity-0 -translate-y-full',
       )}
@@ -40,7 +40,9 @@ export function DeliveryBanner({ totalDrafts, isClosing = false, onDismiss }: De
           <Box className="h-10 w-10" aria-hidden="true" />
         </Badge> */}
         <div className="flex flex-col gap-1">
-          <Typography variant="small">{t('title', { count: totalDrafts })}</Typography>
+          <Typography variant="small" color="white">
+            {t('title', { count: totalDrafts })}
+          </Typography>
           {/* <Typography variant="small">
             {t('description', { units: totalUnits, count: productsWithDrafts })}
           </Typography> */}
@@ -52,14 +54,21 @@ export function DeliveryBanner({ totalDrafts, isClosing = false, onDismiss }: De
         <Button
           asChild
           size="xs"
-          variant="subtleSecondary"
+          variant="ghost"
+          className="text-white"
           asLink
           href="/dashboard/inventory/new"
           onClick={onDismiss}
         >
           {t('cta')}
         </Button>
-        <Button size="icon" variant="ghost" onClick={onDismiss} aria-label={t('dismiss')}>
+        <Button
+          className="text-white"
+          size="icon"
+          variant="ghost"
+          onClick={onDismiss}
+          aria-label={t('dismiss')}
+        >
           <X className="h-4 w-4" />
         </Button>
       </div>

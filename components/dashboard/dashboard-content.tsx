@@ -22,7 +22,7 @@ export function DashboardContent() {
   return (
     <div
       className={cn(
-        'flex flex-col gap-8 pb-80 animate-in fade-in-0 duration-1000',
+        'flex flex-col gap-10 pb-80 animate-in fade-in-0 duration-1000',
         'transition-all duration-300 ease-in-out',
         isVisible ? 'pt-12' : 'pt-0',
       )}
@@ -37,9 +37,12 @@ export function DashboardContent() {
           />
         )}
       </div>
+
       <DashboardHeader timeRange={timeRange} onTimeRangeChange={setTimeRange} />
+
       <StatCards daysFilter={daysFilter} />
-      <div className="border border-muted rounded-2xl">
+
+      <div className="rounded-2xl bg-card">
         <div className="flex items-center justify-between border-b border-muted p-4">
           <div className="flex flex-col gap-1">
             <Typography variant="h4">Expiring Soon</Typography>
@@ -69,8 +72,9 @@ export function DashboardContent() {
           }}
         />
       </div>
-      <CoverageBar />
+
       <AutomationCard />
+      <CoverageBar />
     </div>
   )
 }

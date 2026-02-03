@@ -148,7 +148,7 @@ export function BatchTable({
               {headerGroup.headers.map(header => (
                 <TableHead
                   key={header.id}
-                  className="sticky top-0 bg-background z-10 py-3 px-4 border-b border-muted"
+                  className="sticky top-0 z-10 py-3 px-4 border-b border-muted"
                   style={
                     header.column.columnDef.size
                       ? { width: header.column.columnDef.size }
@@ -200,7 +200,7 @@ export function BatchTable({
       />
 
       {!isLoading && !isFetching && hasActiveStore && data.length === 0 && (
-        <div className="flex select-none flex-col items-center justify-center py-16 rounded-lg bg-muted/10">
+        <div className="flex select-none flex-col items-center justify-center py-16 rounded-lg">
           <Package className="h-12 w-12 text-muted-foreground mb-4" />
           <CardTitle className="text-lg mb-2">{t('emptyState.title')}</CardTitle>
           <CardDescription className="text-center max-w-md">
