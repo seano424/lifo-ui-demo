@@ -1,12 +1,13 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Box, X } from 'lucide-react'
+import { X } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useDraftBatchesSummary } from '@/hooks/use-draft-batches'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 import { Button } from '@/components/ui/button'
 import { Typography } from '../ui/typography'
+// import { Badge } from '../ui/badge'
 
 const DISMISSED_STORAGE_KEY = 'lifo_dismissed_delivery_banner'
 
@@ -110,17 +111,17 @@ export function DeliveryBanner() {
   }
 
   return (
-    <div className="flex-col gap-4 sm:flex-row flex sm:items-center sm:justify-between rounded-2xl bg-card p-3">
+    <div className="flex-col gap-4 sm:flex-row flex sm:items-center sm:justify-between rounded-2xl bg-card py-3 px-5">
       {/* Left: Icon + Message */}
       <div className="flex items-center gap-4">
-        <div className="rounded-xl bg-white p-2.5 dark:bg-primary-900 dark:text-primary-100">
-          <Box className="h-5 w-5" aria-hidden="true" />
-        </div>
+        {/* <Badge variant="primary" className="aspect-square [&_svg]:size-4 p-2">
+          <Box className="h-10 w-10" aria-hidden="true" />
+        </Badge> */}
         <div className="flex flex-col gap-1">
-          <Typography variant="p" color="primary">
+          <Typography variant="h5" color="primary">
             {t('title', { count: totalDrafts })}
           </Typography>
-          <Typography variant="p" color="muted">
+          <Typography variant="small" color="muted">
             {t('description', { units: totalUnits, count: productsWithDrafts })}
           </Typography>
         </div>
@@ -130,14 +131,14 @@ export function DeliveryBanner() {
       <div className="flex items-center justify-between border-t border-border pt-4 sm:border-none sm:pt-0 sm:justify-end gap-3">
         <Button
           asChild
-          variant="white"
+          variant="gray"
           asLink
           href="/dashboard/inventory/new"
           onClick={handleDismiss}
         >
           {t('cta')}
         </Button>
-        <Button variant="white" size="icon" onClick={handleDismiss} aria-label={t('dismiss')}>
+        <Button size="icon" variant="ghost" onClick={handleDismiss} aria-label={t('dismiss')}>
           <X className="h-4 w-4" />
         </Button>
       </div>

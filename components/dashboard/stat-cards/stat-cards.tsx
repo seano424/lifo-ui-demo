@@ -24,17 +24,17 @@ export function StatCards({ daysFilter }: StatCardsProps) {
           value=""
           subtitle=""
           icon={AlertTriangle}
-          accentClass="bg-gray-900"
+          accentClass="bg-muted"
           isLoading
         />
-        <StatCard label="" value="" subtitle="" icon={Layers} accentClass="bg-gray-700" isLoading />
-        <StatCard label="" value="" subtitle="" icon={Shield} accentClass="bg-gray-700" isLoading />
+        <StatCard label="" value="" subtitle="" icon={Layers} accentClass="bg-muted" isLoading />
+        <StatCard label="" value="" subtitle="" icon={Shield} accentClass="bg-muted" isLoading />
         <StatCard
           label=""
           value=""
           subtitle=""
           icon={DollarSign}
-          accentClass="bg-gray-900"
+          accentClass="bg-muted"
           isLoading
         />
       </div>
@@ -93,7 +93,7 @@ export function StatCards({ daysFilter }: StatCardsProps) {
   }
 
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <div className="flex gap-4 flex-wrap">
       {/* Expiring This Week */}
       <StatCard
         label={t('expiringThisWeek.label')}
@@ -101,7 +101,7 @@ export function StatCards({ daysFilter }: StatCardsProps) {
         subtitle={t('expiringThisWeek.subtitle', { units: data.expiring_units })}
         trend={expiringTrend}
         icon={AlertTriangle}
-        accentClass="bg-gray-900"
+        accentClass="bg-muted"
       />
 
       {/* Active Batches */}
@@ -111,11 +111,11 @@ export function StatCards({ daysFilter }: StatCardsProps) {
         subtitle={t('activeBatches.subtitle', { products: data.active_products })}
         trend={batchesTrend}
         icon={Layers}
-        accentClass="bg-gray-700"
+        accentClass="bg-muted"
       />
 
       {/* Coverage */}
-      <StatCard
+      {/* <StatCard
         label={t('coverage.label')}
         value={`${coveragePercent}%`}
         subtitle={t('coverage.subtitle', {
@@ -124,8 +124,8 @@ export function StatCards({ daysFilter }: StatCardsProps) {
         })}
         trend={coverageTrend}
         icon={Shield}
-        accentClass="bg-gray-700"
-      />
+        accentClass="bg-muted"
+      /> */}
 
       {/* Value at Risk */}
       <StatCard
@@ -134,7 +134,7 @@ export function StatCards({ daysFilter }: StatCardsProps) {
         subtitle={t('valueAtRisk.subtitle')}
         trend={valueTrend}
         icon={DollarSign}
-        accentClass="bg-gray-900"
+        accentClass="bg-muted"
       />
     </div>
   )

@@ -11,7 +11,7 @@ export function TrendBadge({ value, direction, isPositive = false }: TrendBadgeP
   const Icon = direction === 'up' ? ArrowUpRight : ArrowDownRight
 
   return (
-    <Badge variant={isPositive ? 'success' : 'danger'}>
+    <Badge variant={isPositive ? 'primary' : 'danger'}>
       <Icon className="h-3 w-3" aria-hidden="true" />
       {value}
     </Badge>
