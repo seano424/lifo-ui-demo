@@ -182,7 +182,8 @@ export async function updateStoreBasicInfo(
         throw new Error('No data returned from update_store_settings')
       }
 
-      return result as unknown as StoreBasicInfo
+      // UpdateStoreSettingsResult has the same structure as StoreBasicInfo
+      return result as StoreBasicInfo
     },
   )
 }

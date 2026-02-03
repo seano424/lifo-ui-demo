@@ -295,3 +295,212 @@ export interface UrgentAlertsResult {
 export interface UserCanManageStoreUsersResult {
   can_manage: boolean
 }
+
+// ====================
+// Draft Batches RPCs
+// ====================
+
+/**
+ * Summary statistics for draft batches in a store
+ * Returned by: inventory.get_draft_batches_summary
+ */
+export interface DraftBatchesSummary {
+  total_draft_batches: number
+  total_units: number
+  products_with_drafts: number
+  by_category: Array<{
+    category_code: string
+    category_name: string
+    draft_count: number
+    total_quantity: number
+  }>
+}
+
+/**
+ * Individual draft batch item
+ */
+export interface DraftBatchItem {
+  batch_id: string
+  batch_number: string
+  quantity: number
+  received_date: string | null
+  created_at: string
+}
+
+/**
+ * Product with its associated draft batches
+ * Returned by: inventory.get_draft_batches_by_product
+ */
+export interface ProductWithDraftBatches {
+  product_id: string
+  product_name: string
+  product_brand: string | null
+  category_name: string | null
+  typical_shelf_life_days: number | null
+  draft_batch_count: number
+  total_draft_quantity: number
+  draft_batches: DraftBatchItem[]
+  last_expiry_days: number | null
+  last_batch_expiry_date: string | null
+  total_count: number // Total matching products (for pagination)
+}
+
+/**
+ * Result from activating a draft batch
+ * Returned by: inventory.activate_draft_batch
+ */
+export interface ActivateDraftBatchResult {
+  success: boolean
+  activated_batch_id: string
+  activated_quantity: number
+  expiry_date: string
+  was_split: boolean
+  remaining_draft_batch_id: string | null
+  remaining_draft_quantity: number | null
+  message: string
+}
+
+/**
+ * Result from ignoring a draft batch
+ * Returned by: inventory.ignore_draft_batch
+ */
+export interface IgnoreDraftBatchResult {
+  success: boolean
+  ignored_batch_id: string
+  ignored_quantity: number
+  product_name: string
+  was_split: boolean
+  remaining_draft_batch_id: string | null
+  remaining_draft_quantity: number | null
+  message: string
+}
+
+/**
+ * Individual item result from delivery logging
+ */
+export interface DeliveryItemResult {
+  product_id: string
+  product_name: string
+  quantity: number
+  draft_batch_id: string
+  suggested_expiry_days: number | null
+  suggested_expiry_date: string | null
+}
+
+/**
+ * Result from logging a delivery
+ * Returned by: inventory.log_delivery_create_drafts
+ */
+export interface LogDeliveryResult {
+  success: boolean
+  total_items: number
+  drafts_created: number
+  items: DeliveryItemResult[]
+}
+
+/**
+ * Recent delivery product information
+ * Returned by: inventory.get_recent_delivery_products
+ */
+export interface RecentDeliveryProduct {
+  product_id: string
+  product_name: string
+  last_delivery_quantity: number
+  last_expiry_days: number | null
+  total_delivery_count: number
+}
+
+// ====================
+// Ignored Batches RPCs
+// ====================
+
+/**
+ * Summary statistics for ignored batches in a store
+ * Returned by: inventory.get_ignored_batches_summary
+ */
+export interface IgnoredBatchesSummary {
+  total_ignored_batches: number
+  total_units: number
+  products_with_ignored: number
+  by_category: Array<{
+    category_code: string
+    category_name: string
+    ignored_count: number
+    total_quantity: number
+  }>
+}
+
+/**
+ * Individual ignored batch item
+ */
+export interface IgnoredBatchItem {
+  batch_id: string
+  batch_number: string
+  quantity: number
+  received_date: string | null
+  ignored_at: string
+  created_at: string
+}
+
+/**
+ * Product with its associated ignored batches
+ * Returned by: inventory.get_ignored_batches_by_product
+ */
+export interface ProductWithIgnoredBatches {
+  product_id: string
+  product_name: string
+  product_brand: string | null
+  category_name: string | null
+  typical_shelf_life_days: number | null
+  ignored_batch_count: number
+  total_ignored_quantity: number
+  ignored_batches: IgnoredBatchItem[]
+  total_count: number // Total matching products (for pagination)
+}
+
+/**
+ * Result from restoring an ignored batch
+ * Returned by: inventory.restore_ignored_batch
+ */
+export interface RestoreIgnoredBatchResult {
+  success: boolean
+  restored_batch_id: string
+  restored_quantity: number
+  product_name: string
+  message: string
+}
+
+// ====================
+// Batch Actions RPCs
+// ====================
+
+/**
+ * Result from executing batch actions (donate, discount, sold, dispose, dismiss)
+ * Returned by: execute_donate_action, execute_discount_action, execute_sold_action,
+ *              execute_dispose_action, execute_dismiss_action
+ */
+export interface BatchActionResult {
+  success: boolean
+  action_id?: string
+  error?: string
+  remaining_quantity?: number
+  total_value_donated?: number
+  original_price?: number
+  new_price?: number
+  savings_total?: number
+  revenue_recovered?: number
+  total_loss_value?: number
+  message?: string
+}
+
+/**
+ * Result from bulk batch action execution
+ * Returned by: execute_bulk_action
+ */
+export interface BulkBatchActionResult {
+  success: boolean
+  success_count: number
+  error_count: number
+  results: BatchActionResult[]
+  message?: string
+}

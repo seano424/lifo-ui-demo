@@ -4,10 +4,12 @@ import { queryKeys } from '@/lib/queries/query-keys'
 import type { TodoFilters, TodoItem } from '@/lib/queries/todos-rpc'
 import { createClient } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
+import { assertRpcResult } from '@/lib/utils/rpc-types'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { useCurrency } from '@/hooks/use-currency'
 import { ADHOC_RECIPIENT_UUID } from '@/hooks/use-donation-recipients'
+import type { BatchActionResult, BulkBatchActionResult } from '@/types/rpc-returns'
 
 // Type-safe action recommendation values (matches database enum)
 export type RecommendedAction =
@@ -136,29 +138,9 @@ interface DismissActionParams {
   p_recommended_action?: string | undefined
 }
 
-// RPC Return Type (all functions return this structure)
-interface ActionResult {
-  success: boolean
-  action_id?: string
-  error?: string
-  remaining_quantity?: number
-  total_value_donated?: number
-  original_price?: number
-  new_price?: number
-  savings_total?: number
-  revenue_recovered?: number
-  total_loss_value?: number
-  message?: string
-}
-
-// Bulk action result type
-interface BulkActionResult {
-  success: boolean
-  success_count: number
-  error_count: number
-  results: ActionResult[]
-  message?: string
-}
+// Re-export RPC return types from centralized location for backwards compatibility
+export type ActionResult = BatchActionResult
+export type BulkActionResult = BulkBatchActionResult
 
 // Hook parameter types for clean API
 interface DonateParams {
@@ -569,7 +551,7 @@ export function useBatchActionRPC(providedStoreId?: string) {
         throw error
       }
 
-      return data as unknown as ActionResult
+      return assertRpcResult<ActionResult>(data)
     },
     onMutate: async variables => {
       // Optimistic update: Remove from pending todos immediately
@@ -682,7 +664,7 @@ export function useBatchActionRPC(providedStoreId?: string) {
         throw error
       }
 
-      return data as unknown as ActionResult
+      return assertRpcResult<ActionResult>(data)
     },
     onMutate: async variables => {
       // Optimistic update: Update batch price and potentially move to in_progress
@@ -774,7 +756,7 @@ export function useBatchActionRPC(providedStoreId?: string) {
       })
 
       if (error) throw error
-      return data as unknown as ActionResult
+      return assertRpcResult<ActionResult>(data)
     },
     onMutate: async variables => {
       // Optimistic update: Remove from pending if all quantity sold
@@ -870,7 +852,7 @@ export function useBatchActionRPC(providedStoreId?: string) {
       })
 
       if (error) throw error
-      return data as unknown as ActionResult
+      return assertRpcResult<ActionResult>(data)
     },
     onMutate: async variables => {
       // Optimistic update: Remove from pending if all quantity disposed
@@ -951,7 +933,7 @@ export function useBatchActionRPC(providedStoreId?: string) {
       } as DismissActionParams)
 
       if (error) throw error
-      return data as unknown as ActionResult
+      return assertRpcResult<ActionResult>(data)
     },
     onMutate: async variables => {
       // Optimistic update: Remove from pending todos immediately (dismissed = completed)
@@ -1044,12 +1026,13 @@ export function useBatchActionRPC(providedStoreId?: string) {
       const { data, error } = await supabase.rpc('execute_bulk_action', {
         p_batch_ids: params.batchIds,
         p_action_type: params.actionType,
-        p_action_params: params.actionParams as unknown as string | number | boolean | null,
+        // Supabase types JSONB RPC parameters as Json - we need to cast the typed object to match
+        p_action_params: params.actionParams as never,
         p_user_id: userId,
       })
 
       if (error) throw error
-      return data as unknown as BulkActionResult
+      return assertRpcResult<BulkActionResult>(data)
     },
     onMutate: async variables => {
       // Optimistic update: Remove all batches from pending todos
@@ -1157,13 +1140,4 @@ export function useBatchActionRPC(providedStoreId?: string) {
 }
 
 // Export types for use in components
-export type {
-  ActionResult,
-  BulkActionResult,
-  BulkParams,
-  DiscountParams,
-  DismissParams,
-  DisposeParams,
-  DonateParams,
-  SoldParams,
-}
+export type { BulkParams, DiscountParams, DismissParams, DisposeParams, DonateParams, SoldParams }

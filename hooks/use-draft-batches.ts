@@ -7,123 +7,43 @@ import { queryKeys } from '@/lib/queries/query-keys'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 import { logger } from '@/lib/utils/logger'
 import { withPerformanceTracking } from '@/lib/utils/performance'
+import { assertRpcResult, assertRpcArray } from '@/lib/utils/rpc-types'
 import { toast } from 'sonner'
 import { useRestoreIgnoredBatch } from './use-ignored-batches'
+import { safeParseJsonb } from '@/lib/validation/jsonb-validators'
+import type {
+  DraftBatchesSummary,
+  DraftBatchItem,
+  ProductWithDraftBatches,
+  ActivateDraftBatchResult,
+  IgnoreDraftBatchResult,
+  DeliveryItemResult,
+  LogDeliveryResult,
+  RecentDeliveryProduct,
+} from '@/types/rpc-returns'
 
 // ============================================================================
 // TYPE DEFINITIONS
 // ============================================================================
 
-/**
- * Summary statistics for draft batches in a store
- */
-export interface DraftBatchesSummary {
-  total_draft_batches: number
-  total_units: number
-  products_with_drafts: number
-  by_category: Array<{
-    category_code: string
-    category_name: string
-    draft_count: number
-    total_quantity: number
-  }>
+// Re-export types from centralized location for backwards compatibility
+export type {
+  DraftBatchesSummary,
+  DraftBatchItem,
+  ProductWithDraftBatches,
+  ActivateDraftBatchResult,
+  IgnoreDraftBatchResult,
+  DeliveryItemResult,
+  LogDeliveryResult,
+  RecentDeliveryProduct,
 }
 
 /**
- * Individual draft batch item
- */
-export interface DraftBatchItem {
-  batch_id: string
-  batch_number: string
-  quantity: number
-  received_date: string | null
-  created_at: string
-}
-
-/**
- * Product with its associated draft batches
- */
-export interface ProductWithDraftBatches {
-  product_id: string
-  product_name: string
-  product_brand: string | null
-  category_name: string | null
-  typical_shelf_life_days: number | null
-  draft_batch_count: number
-  total_draft_quantity: number
-  draft_batches: DraftBatchItem[]
-  last_expiry_days: number | null
-  last_batch_expiry_date: string | null
-  total_count: number // Total matching products (for pagination)
-}
-
-/**
- * Result from activating a draft batch
- */
-export interface ActivateDraftBatchResult {
-  success: boolean
-  activated_batch_id: string
-  activated_quantity: number
-  expiry_date: string
-  was_split: boolean
-  remaining_draft_batch_id: string | null
-  remaining_draft_quantity: number | null
-  message: string
-}
-
-/**
- * Result from ignoring a draft batch
- */
-export interface IgnoreDraftBatchResult {
-  success: boolean
-  ignored_batch_id: string
-  ignored_quantity: number
-  product_name: string
-  was_split: boolean
-  remaining_draft_batch_id: string | null
-  remaining_draft_quantity: number | null
-  message: string
-}
-
-/**
- * Item for delivery logging
+ * Item for delivery logging (input parameter type)
  */
 export interface DeliveryItem {
   product_id: string
   quantity: number
-}
-
-/**
- * Individual item result from delivery logging
- */
-export interface DeliveryItemResult {
-  product_id: string
-  product_name: string
-  quantity: number
-  draft_batch_id: string
-  suggested_expiry_days: number | null
-  suggested_expiry_date: string | null
-}
-
-/**
- * Result from logging a delivery
- */
-export interface LogDeliveryResult {
-  success: boolean
-  total_items: number
-  drafts_created: number
-  items: DeliveryItemResult[]
-}
-
-/**
- * Recent delivery product information
- */
-export interface RecentDeliveryProduct {
-  product_id: string
-  product_name: string
-  last_delivery_quantity: number
-  last_expiry_days: number | null
-  total_delivery_count: number
 }
 
 /**
@@ -161,12 +81,14 @@ async function fetchDraftBatchesSummary(storeId: string): Promise<DraftBatchesSu
       throw new Error(`Failed to fetch draft batches summary: ${error.message}`)
     }
 
+    const result = assertRpcResult<DraftBatchesSummary>(data)
+
     logger.log(context, 'Draft batches summary fetched', {
       storeId,
-      totalDrafts: (data as unknown as DraftBatchesSummary)?.total_draft_batches || 0,
+      totalDrafts: result?.total_draft_batches || 0,
     })
 
-    return data as unknown as DraftBatchesSummary
+    return result
   })
 }
 
@@ -205,7 +127,7 @@ async function fetchDraftBatchesByProduct(
         throw new Error(`Failed to fetch draft batches by product: ${error.message}`)
       }
 
-      const results = (data || []) as unknown as ProductWithDraftBatches[]
+      const results = assertRpcArray<ProductWithDraftBatches>(data)
 
       logger.log(context, 'Draft batches by product fetched', {
         storeId,
@@ -250,7 +172,7 @@ async function fetchRecentDeliveryProducts(
         throw new Error(`Failed to fetch recent delivery products: ${error.message}`)
       }
 
-      const results = (data || []) as unknown as RecentDeliveryProduct[]
+      const results = assertRpcArray<RecentDeliveryProduct>(data)
 
       logger.log(context, 'Recent delivery products fetched', {
         storeId,
@@ -391,11 +313,14 @@ export function useActivateDraftBatch() {
       }
 
       // Check if user has permission to manage batches
-      const permissions = storeUser.permissions as { can_upload_inventory?: boolean } | null
+      // Validate JSONB permissions with runtime validation
+      const permissionsResult = safeParseJsonb.storeUserPermissions(storeUser.permissions || {})
+      const permissions = permissionsResult.success ? permissionsResult.data : {}
+
       const canManageBatches =
         storeUser.role_in_store === 'owner' ||
         storeUser.role_in_store === 'manager' ||
-        (permissions?.can_upload_inventory ?? false)
+        (permissions.can_upload_inventory ?? false)
 
       if (!canManageBatches) {
         throw new Error('You do not have permission to activate batches')
@@ -430,7 +355,7 @@ export function useActivateDraftBatch() {
         throw error
       }
 
-      return data as unknown as ActivateDraftBatchResult
+      return assertRpcResult<ActivateDraftBatchResult>(data)
     },
 
     onSuccess: (result, _variables) => {
@@ -546,11 +471,14 @@ export function useIgnoreDraftBatch() {
       }
 
       // Check if user has permission to manage batches
-      const permissions = storeUser.permissions as { can_upload_inventory?: boolean } | null
+      // Validate JSONB permissions with runtime validation
+      const permissionsResult = safeParseJsonb.storeUserPermissions(storeUser.permissions || {})
+      const permissions = permissionsResult.success ? permissionsResult.data : {}
+
       const canManageBatches =
         storeUser.role_in_store === 'owner' ||
         storeUser.role_in_store === 'manager' ||
-        (permissions?.can_upload_inventory ?? false)
+        (permissions.can_upload_inventory ?? false)
 
       if (!canManageBatches) {
         throw new Error('You do not have permission to ignore batches')
@@ -583,7 +511,7 @@ export function useIgnoreDraftBatch() {
         throw error
       }
 
-      return data as unknown as IgnoreDraftBatchResult
+      return assertRpcResult<IgnoreDraftBatchResult>(data)
     },
 
     onMutate: async params => {
@@ -746,7 +674,8 @@ export function useLogDelivery() {
       const { data, error } = await supabase.schema('inventory').rpc('log_delivery_create_drafts', {
         p_store_id: activeStoreId,
         p_user_id: userId,
-        p_items: params.items as unknown as string | number | boolean | null,
+        // Supabase types JSONB RPC parameters as Json - we need to cast the typed array to match
+        p_items: params.items as never,
       })
       const endTime = performance.now()
 
@@ -761,7 +690,7 @@ export function useLogDelivery() {
         throw error
       }
 
-      return data as unknown as LogDeliveryResult
+      return assertRpcResult<LogDeliveryResult>(data)
     },
 
     onSuccess: (result, _variables) => {

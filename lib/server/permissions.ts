@@ -1,6 +1,8 @@
 // lib/server/permissions.ts
 import type { createClient as createServerClient } from '@/lib/supabase/server'
 import type { StoreUserPermissions as StoreUserPermissionsType } from '@/lib/schemas'
+import { safeParseJsonb } from '@/lib/validation/jsonb-validators'
+import { DEFAULT_STORE_USER_PERMISSIONS } from '@/lib/schemas/jsonb-schemas'
 
 type ServerClient = Awaited<ReturnType<typeof createServerClient>>
 
@@ -95,7 +97,22 @@ export async function checkUserStorePermissions(
     }
 
     // User has store_users relationship - determine permissions based on role and explicit permissions
-    const permissions = (storeUser.permissions || {}) as StoreUserPermissionsType
+    // Validate JSONB permissions data with runtime validation
+    const permissionsResult = safeParseJsonb.storeUserPermissions(storeUser.permissions || {})
+    const permissions: StoreUserPermissionsType = permissionsResult.success
+      ? permissionsResult.data
+      : DEFAULT_STORE_USER_PERMISSIONS
+
+    // Log validation failures for monitoring
+    if (!permissionsResult.success) {
+      console.warn('⚠️ Invalid permissions JSONB data for user:', {
+        userId,
+        storeId,
+        error: permissionsResult.error,
+        rawData: storeUser.permissions,
+      })
+    }
+
     const role = storeUser.role_in_store
 
     const isOwner = role === 'owner'

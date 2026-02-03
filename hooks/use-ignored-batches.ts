@@ -7,63 +7,25 @@ import { queryKeys } from '@/lib/queries/query-keys'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 import { logger } from '@/lib/utils/logger'
 import { withPerformanceTracking } from '@/lib/utils/performance'
+import { assertRpcResult, assertRpcArray } from '@/lib/utils/rpc-types'
 import { toast } from 'sonner'
+import type {
+  IgnoredBatchesSummary,
+  IgnoredBatchItem,
+  ProductWithIgnoredBatches,
+  RestoreIgnoredBatchResult,
+} from '@/types/rpc-returns'
 
 // ============================================================================
 // TYPE DEFINITIONS
 // ============================================================================
 
-/**
- * Summary statistics for ignored batches in a store
- */
-export interface IgnoredBatchesSummary {
-  total_ignored_batches: number
-  total_units: number
-  products_with_ignored: number
-  by_category: Array<{
-    category_code: string
-    category_name: string
-    ignored_count: number
-    total_quantity: number
-  }>
-}
-
-/**
- * Individual ignored batch item
- */
-export interface IgnoredBatchItem {
-  batch_id: string
-  batch_number: string
-  quantity: number
-  received_date: string | null
-  ignored_at: string
-  created_at: string
-}
-
-/**
- * Product with its associated ignored batches
- */
-export interface ProductWithIgnoredBatches {
-  product_id: string
-  product_name: string
-  product_brand: string | null
-  category_name: string | null
-  typical_shelf_life_days: number | null
-  ignored_batch_count: number
-  total_ignored_quantity: number
-  ignored_batches: IgnoredBatchItem[]
-  total_count: number // Total matching products (for pagination)
-}
-
-/**
- * Result from restoring an ignored batch
- */
-export interface RestoreIgnoredBatchResult {
-  success: boolean
-  restored_batch_id: string
-  restored_quantity: number
-  product_name: string
-  message: string
+// Re-export types from centralized location for backwards compatibility
+export type {
+  IgnoredBatchesSummary,
+  IgnoredBatchItem,
+  ProductWithIgnoredBatches,
+  RestoreIgnoredBatchResult,
 }
 
 /**
@@ -107,12 +69,14 @@ async function fetchIgnoredBatchesSummary(storeId: string): Promise<IgnoredBatch
         throw new Error(`Failed to fetch ignored batches summary: ${error.message}`)
       }
 
+      const result = assertRpcResult<IgnoredBatchesSummary>(data)
+
       logger.log(context, 'Ignored batches summary fetched', {
         storeId,
-        totalIgnored: (data as unknown as IgnoredBatchesSummary)?.total_ignored_batches || 0,
+        totalIgnored: result?.total_ignored_batches || 0,
       })
 
-      return data as unknown as IgnoredBatchesSummary
+      return result
     },
   )
 }
@@ -152,7 +116,7 @@ async function fetchIgnoredBatchesByProduct(
         throw new Error(`Failed to fetch ignored batches by product: ${error.message}`)
       }
 
-      const results = (data || []) as unknown as ProductWithIgnoredBatches[]
+      const results = assertRpcArray<ProductWithIgnoredBatches>(data)
 
       logger.log(context, 'Ignored batches by product fetched', {
         storeId,
@@ -267,7 +231,7 @@ export function useRestoreIgnoredBatch() {
         throw error
       }
 
-      return data as unknown as RestoreIgnoredBatchResult
+      return assertRpcResult<RestoreIgnoredBatchResult>(data)
     },
 
     onSuccess: (result, _variables) => {
