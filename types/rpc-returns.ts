@@ -122,12 +122,30 @@ export interface UpdateStoreAdvancedSettingsResult {
   store_id: string
   critical_threshold?: number
   warning_threshold?: number
-  scoring_weights?: Record<string, number>
-  notification_preferences?: Record<string, unknown>
-  display_preferences?: Record<string, unknown>
-  backup_preferences?: Record<string, unknown>
-  opening_hours?: Record<string, unknown>
-  peak_hours?: Record<string, unknown>
+  scoring_weights?: {
+    expiry: number
+    margin: number
+    velocity: number
+  }
+  notification_preferences?: {
+    email_alerts: boolean
+    sms_alerts: boolean
+    push_notifications: boolean
+    alert_types: string[]
+  }
+  display_preferences?: {
+    theme: string
+    language: string
+    date_format: string
+    time_format: string
+  }
+  backup_preferences?: {
+    auto_backup: boolean
+    backup_frequency: string
+    retention_days: number
+  }
+  opening_hours?: Record<string, { open: string; close: string }>
+  peak_hours?: Record<string, string>
   weather_location_lat?: number
   weather_location_lon?: number
   currency?: string

@@ -341,48 +341,41 @@ export function useBatchActionRPC(providedStoreId?: string) {
 
       // Always invalidate core todos queries - use the actual query pattern that the hooks use
       const coreInvalidations = [
-        // Invalidate all filtered todos queries (this covers pending, in-progress, completed)
+        // Invalidate all todo-related queries in a single call (filtered, with-counts, counts)
+        // This combines what were previously 3 separate invalidation calls into one
         queryClient.invalidateQueries({
-          queryKey: [...queryKeys.todos.all, 'filtered'],
+          queryKey: queryKeys.todos.all,
           predicate: query => {
             const queryKey = query.queryKey as readonly unknown[]
+            // Match queries with format: ['todos', 'filtered'|'with-counts'|'counts', { storeId: ... }]
+            const queryType = queryKey?.[1] as string | undefined
             const params = queryKey?.[2] as { storeId?: string } | undefined
-            return params?.storeId === storeId
+
+            // Only invalidate queries for this specific store
+            if (params?.storeId !== storeId) {
+              return false
+            }
+
+            // Match 'filtered', 'with-counts', and 'counts' query types
+            return (
+              queryType === 'filtered' ||
+              queryType === 'with-counts' ||
+              queryType === 'counts' ||
+              queryType === 'dashboardSummary' ||
+              queryType === 'urgentCount'
+            )
           },
         }),
-        // Invalidate todos with counts queries (used by todos-filtered-list tabs)
+        // Refresh batch-specific queries
         queryClient.invalidateQueries({
-          queryKey: [...queryKeys.todos.all, 'with-counts'],
           predicate: query => {
             const queryKey = query.queryKey as readonly unknown[]
-            const params = queryKey?.[2] as { storeId?: string } | undefined
-            return params?.storeId === storeId
+            // Match batch detail and batch todo queries for this specific batch
+            return (
+              (queryKey[0] === 'batches' && queryKey[1] === 'detail' && queryKey[2] === batchId) ||
+              (queryKey[0] === 'batches' && queryKey[1] === 'todo' && queryKey[2] === batchId)
+            )
           },
-        }),
-        // Invalidate todos counts (tab badges)
-        queryClient.invalidateQueries({
-          queryKey: [...queryKeys.todos.all, 'counts'],
-          predicate: query => {
-            const queryKey = query.queryKey as readonly unknown[]
-            const params = queryKey?.[2] as { storeId?: string } | undefined
-            return params?.storeId === storeId
-          },
-        }),
-        // Refresh specific batch details
-        queryClient.invalidateQueries({
-          queryKey: queryKeys.batches.detail(batchId),
-        }),
-        // Refresh specific batch todo data (used by BatchTable)
-        queryClient.invalidateQueries({
-          queryKey: queryKeys.batches.todo(batchId),
-        }),
-        // Update dashboard summary
-        queryClient.invalidateQueries({
-          queryKey: queryKeys.todos.dashboardSummary(storeId),
-        }),
-        // Update urgent todos count (sidebar badge)
-        queryClient.invalidateQueries({
-          queryKey: queryKeys.todos.urgentCount(storeId),
         }),
       ]
 

@@ -4,6 +4,7 @@ import type { EmailCredentials } from '@/lib/email/client'
 import { sendPasswordResetEmail } from '@/lib/email/resend'
 import { createClient } from '@/lib/supabase/server'
 import { type NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 
 export async function POST(request: NextRequest) {
   try {
@@ -25,6 +26,15 @@ export async function POST(request: NextRequest) {
     if (!storeId) {
       return NextResponse.json({ success: false, error: 'Store ID is required' }, { status: 400 })
     }
+
+    // Validate email format to prevent SQL injection or bypass attempts
+    const emailSchema = z.string().email()
+    const emailValidation = emailSchema.safeParse(credentials.email)
+    if (!emailValidation.success) {
+      return NextResponse.json({ success: false, error: 'Invalid email format' }, { status: 400 })
+    }
+
+    const validatedEmail = emailValidation.data
 
     // Verify the user is authenticated and has permission
     const supabase = await createClient()
@@ -50,6 +60,7 @@ export async function POST(request: NextRequest) {
 
     const emailCredentials: EmailCredentials = {
       ...credentials,
+      email: validatedEmail,
       store_name: store?.store_name || 'lifo',
     }
 
@@ -71,7 +82,7 @@ export async function POST(request: NextRequest) {
           sent_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         })
-        .eq('recipient_email', credentials.email)
+        .eq('recipient_email', validatedEmail)
         .eq('status', 'pending')
         .order('created_at', { ascending: false })
         .limit(1)

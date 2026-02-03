@@ -28,6 +28,13 @@ export async function loginWithCredentials(_prevState: unknown, formData: FormDa
 
     // If identifier doesn't contain @, treat it as a username and lookup email
     if (!identifier.includes('@')) {
+      // Validate username format to prevent injection attacks
+      // Username must be 3-20 characters, lowercase letters, numbers, hyphens, underscores only
+      const usernameRegex = /^[a-z0-9_-]{3,20}$/
+      if (!usernameRegex.test(identifier)) {
+        return { error: 'Invalid username format' }
+      }
+
       const { data, error: userError } = await supabase.rpc('get_user_by_username', {
         p_username: identifier,
       })

@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/client'
 import type { createClient as createServerClient } from '@/lib/supabase/server'
 import { logger } from '@/lib/utils/logger'
 import { withPerformanceTracking } from '@/lib/utils/performance'
+import { safeParseJsonb } from '@/lib/validation/jsonb-validators'
 import type {
   StoreSettingsCompleteResult,
   UpdateStoreSettingsResult,
@@ -232,7 +233,100 @@ export async function updateStoreAdvancedSettings(
         throw new Error('No data returned from update operation')
       }
 
-      return result[0] as unknown as StoreAdvancedSettings // RPC returns an array, get the first result
+      const firstResult = result[0]
+
+      // Validate JSONB fields with runtime validation
+      const validatedSettings: StoreAdvancedSettings = {
+        store_id: firstResult.store_id,
+        critical_threshold: firstResult.critical_threshold,
+        warning_threshold: firstResult.warning_threshold,
+        weather_location_lat: firstResult.weather_location_lat,
+        weather_location_lon: firstResult.weather_location_lon,
+        currency: firstResult.currency,
+        updated_at: firstResult.updated_at,
+      }
+
+      // Validate and parse scoring_weights if present
+      if (firstResult.scoring_weights) {
+        const scoringResult = safeParseJsonb.scoringWeights(firstResult.scoring_weights)
+        if (!scoringResult.success) {
+          logger.error('lib/queries/store-settings', 'Invalid scoring_weights from RPC', {
+            error: scoringResult.error,
+            storeId,
+          })
+          throw new Error('Invalid scoring_weights data returned from database')
+        }
+        validatedSettings.scoring_weights = scoringResult.data
+      }
+
+      // Validate and parse notification_preferences if present
+      if (firstResult.notification_preferences) {
+        const notificationResult = safeParseJsonb.notificationPreferences(
+          firstResult.notification_preferences,
+        )
+        if (!notificationResult.success) {
+          logger.error('lib/queries/store-settings', 'Invalid notification_preferences from RPC', {
+            error: notificationResult.error,
+            storeId,
+          })
+          throw new Error('Invalid notification_preferences data returned from database')
+        }
+        validatedSettings.notification_preferences = notificationResult.data
+      }
+
+      // Validate and parse display_preferences if present
+      if (firstResult.display_preferences) {
+        const displayResult = safeParseJsonb.displayPreferences(firstResult.display_preferences)
+        if (!displayResult.success) {
+          logger.error('lib/queries/store-settings', 'Invalid display_preferences from RPC', {
+            error: displayResult.error,
+            storeId,
+          })
+          throw new Error('Invalid display_preferences data returned from database')
+        }
+        validatedSettings.display_preferences = displayResult.data
+      }
+
+      // Validate and parse backup_preferences if present
+      if (firstResult.backup_preferences) {
+        const backupResult = safeParseJsonb.backupPreferences(firstResult.backup_preferences)
+        if (!backupResult.success) {
+          logger.error('lib/queries/store-settings', 'Invalid backup_preferences from RPC', {
+            error: backupResult.error,
+            storeId,
+          })
+          throw new Error('Invalid backup_preferences data returned from database')
+        }
+        validatedSettings.backup_preferences = backupResult.data
+      }
+
+      // Validate and parse opening_hours if present
+      if (firstResult.opening_hours) {
+        const openingResult = safeParseJsonb.openingHours(firstResult.opening_hours)
+        if (!openingResult.success) {
+          logger.error('lib/queries/store-settings', 'Invalid opening_hours from RPC', {
+            error: openingResult.error,
+            storeId,
+          })
+          throw new Error('Invalid opening_hours data returned from database')
+        }
+        validatedSettings.opening_hours = openingResult.data
+      }
+
+      // Validate and parse peak_hours if present
+      if (firstResult.peak_hours) {
+        const peakResult = safeParseJsonb.peakHours(firstResult.peak_hours)
+        if (!peakResult.success) {
+          logger.error('lib/queries/store-settings', 'Invalid peak_hours from RPC', {
+            error: peakResult.error,
+            storeId,
+          })
+          throw new Error('Invalid peak_hours data returned from database')
+        }
+        validatedSettings.peak_hours = peakResult.data
+      }
+
+      return validatedSettings
     },
   )
 }

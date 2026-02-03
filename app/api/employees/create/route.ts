@@ -198,10 +198,7 @@ export async function POST(request: NextRequest) {
       success: true,
       user_id: newUser.user.id,
       username,
-      email,
-      pin,
-      role,
-      message: 'Employee created successfully using Admin API',
+      message: 'Employee created successfully. PIN has been set and can be shared securely.',
     })
   } catch (error: unknown) {
     console.error('❌ Server error in employee creation:', error)

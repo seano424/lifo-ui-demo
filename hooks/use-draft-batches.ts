@@ -363,6 +363,44 @@ export function useActivateDraftBatch() {
     }): Promise<ActivateDraftBatchResult> => {
       const context = 'activateDraftBatch'
 
+      // Check user authentication and authorization
+      if (!activeStoreId) {
+        throw new Error('No active store selected')
+      }
+
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+      if (!user) {
+        throw new Error('User not authenticated')
+      }
+
+      // Verify user has permission to manage batches for this store
+      const { data: storeUser, error: permissionError } = await supabase
+        .schema('business')
+        .from('store_users')
+        .select('role_in_store, permissions, is_active')
+        .eq('store_id', activeStoreId)
+        .eq('user_id', user.id)
+        .eq('is_active', true)
+        .single()
+
+      if (permissionError || !storeUser) {
+        logger.error(context, 'Permission check failed', { error: permissionError })
+        throw new Error('You do not have permission to manage batches for this store')
+      }
+
+      // Check if user has permission to manage batches
+      const permissions = storeUser.permissions as { can_upload_inventory?: boolean } | null
+      const canManageBatches =
+        storeUser.role_in_store === 'owner' ||
+        storeUser.role_in_store === 'manager' ||
+        (permissions?.can_upload_inventory ?? false)
+
+      if (!canManageBatches) {
+        throw new Error('You do not have permission to activate batches')
+      }
+
       logger.log(context, 'Starting draft batch activation', {
         batchId: params.batchId,
         expiryDate: params.expiryDate,
@@ -479,6 +517,44 @@ export function useIgnoreDraftBatch() {
       userId?: string
     }): Promise<IgnoreDraftBatchResult> => {
       const context = 'ignoreDraftBatch'
+
+      // Check user authentication and authorization
+      if (!activeStoreId) {
+        throw new Error('No active store selected')
+      }
+
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+      if (!user) {
+        throw new Error('User not authenticated')
+      }
+
+      // Verify user has permission to manage batches for this store
+      const { data: storeUser, error: permissionError } = await supabase
+        .schema('business')
+        .from('store_users')
+        .select('role_in_store, permissions, is_active')
+        .eq('store_id', activeStoreId)
+        .eq('user_id', user.id)
+        .eq('is_active', true)
+        .single()
+
+      if (permissionError || !storeUser) {
+        logger.error(context, 'Permission check failed', { error: permissionError })
+        throw new Error('You do not have permission to manage batches for this store')
+      }
+
+      // Check if user has permission to manage batches
+      const permissions = storeUser.permissions as { can_upload_inventory?: boolean } | null
+      const canManageBatches =
+        storeUser.role_in_store === 'owner' ||
+        storeUser.role_in_store === 'manager' ||
+        (permissions?.can_upload_inventory ?? false)
+
+      if (!canManageBatches) {
+        throw new Error('You do not have permission to ignore batches')
+      }
 
       logger.log(context, 'Starting draft batch ignore', {
         batchId: params.batchId,

@@ -6,9 +6,21 @@ import { z } from 'zod'
 
 // 1. scoring_weights
 export const scoringWeightsSchema = z.object({
-  expiry: z.number(),
-  margin: z.number(),
-  velocity: z.number(),
+  expiry: z
+    .number()
+    .min(0, 'Expiry weight must be non-negative')
+    .max(1, 'Expiry weight must be between 0 and 1')
+    .describe('Weight for expiry date in scoring algorithm (0.0-1.0)'),
+  margin: z
+    .number()
+    .min(0, 'Margin weight must be non-negative')
+    .max(1, 'Margin weight must be between 0 and 1')
+    .describe('Weight for profit margin in scoring algorithm (0.0-1.0)'),
+  velocity: z
+    .number()
+    .min(0, 'Velocity weight must be non-negative')
+    .max(1, 'Velocity weight must be between 0 and 1')
+    .describe('Weight for sales velocity in scoring algorithm (0.0-1.0)'),
 })
 export type ScoringWeights = z.infer<typeof scoringWeightsSchema>
 
@@ -52,9 +64,16 @@ export const DEFAULT_DISPLAY_PREFERENCES: DisplayPreferences = {
 
 // 4. backup_preferences
 export const backupPreferencesSchema = z.object({
-  auto_backup: z.boolean(),
-  retention_days: z.number(),
-  backup_frequency: z.enum(['daily', 'weekly', 'monthly']),
+  auto_backup: z.boolean().describe('Enable automatic backups'),
+  retention_days: z
+    .number()
+    .int('Retention days must be a whole number')
+    .min(1, 'Retention must be at least 1 day')
+    .max(365, 'Retention cannot exceed 365 days')
+    .describe('Number of days to retain backups'),
+  backup_frequency: z
+    .enum(['daily', 'weekly', 'monthly'])
+    .describe('Frequency of automatic backups'),
 })
 export type BackupPreferences = z.infer<typeof backupPreferencesSchema>
 
@@ -138,30 +157,83 @@ export const DEFAULT_BATCH_TRACKING_CONFIG: BatchTrackingConfig = {
 
 // 8. donation_preference_config
 export const donationPreferenceConfigSchema = z.object({
-  strategy: z.enum(['balanced', 'donation_first', 'discount_first']),
-  show_reasoning: z.boolean(),
-  blocked_recipients: z.array(z.string()),
-  margin_sensitivity: z.number(),
-  tax_deduction_rate: z.number(),
-  auto_donate_enabled: z.boolean(),
-  excluded_categories: z.array(z.string()),
-  min_value_threshold: z.number(),
-  critical_expiry_days: z.number(),
-  preferred_recipients: z.array(z.string()),
-  max_days_before_expiry: z.number(),
-  max_value_per_donation: z.number(),
-  min_days_before_expiry: z.number(),
-  bulk_quantity_threshold: z.number(),
-  enable_tax_calculations: z.boolean(),
-  min_margin_for_discount: z.number(),
-  small_quantity_fallback: z.enum(['discount', 'donate', 'dispose']),
-  donation_first_threshold: z.number(),
-  force_donation_categories: z.array(z.string()),
-  min_quantity_for_donation: z.number(),
-  require_user_confirmation: z.boolean(),
-  donation_weight_multiplier: z.number(),
-  european_disposal_threshold: z.number(),
-  include_recipient_suggestions: z.boolean(),
+  strategy: z
+    .enum(['balanced', 'donation_first', 'discount_first'])
+    .describe('AI recommendation strategy for expired products'),
+  show_reasoning: z.boolean().describe('Show AI reasoning in recommendations'),
+  blocked_recipients: z.array(z.string()).describe('List of blocked recipient IDs'),
+  margin_sensitivity: z
+    .number()
+    .min(0, 'Margin sensitivity must be non-negative')
+    .max(2, 'Margin sensitivity must be between 0 and 2')
+    .describe('Sensitivity to profit margins (0.0-2.0)'),
+  tax_deduction_rate: z
+    .number()
+    .min(0, 'Tax rate must be non-negative')
+    .max(100, 'Tax rate cannot exceed 100%')
+    .describe('Tax deduction rate for donations (0-100%)'),
+  auto_donate_enabled: z.boolean().describe('Enable automatic donations'),
+  excluded_categories: z.array(z.string()).describe('Categories excluded from donation'),
+  min_value_threshold: z
+    .number()
+    .min(0, 'Minimum value must be non-negative')
+    .describe('Minimum value for donations'),
+  critical_expiry_days: z
+    .number()
+    .int('Critical expiry days must be a whole number')
+    .min(0, 'Critical expiry days must be non-negative')
+    .describe('Days before expiry considered critical'),
+  preferred_recipients: z.array(z.string()).describe('Preferred donation recipients'),
+  max_days_before_expiry: z
+    .number()
+    .int('Max days must be a whole number')
+    .min(0, 'Max days must be non-negative')
+    .max(365, 'Max days cannot exceed 365')
+    .describe('Maximum days before expiry for donations'),
+  max_value_per_donation: z
+    .number()
+    .min(0, 'Max value must be non-negative')
+    .describe('Maximum value per single donation'),
+  min_days_before_expiry: z
+    .number()
+    .int('Min days must be a whole number')
+    .min(0, 'Min days must be non-negative')
+    .describe('Minimum days before expiry for donations'),
+  bulk_quantity_threshold: z
+    .number()
+    .min(0, 'Bulk threshold must be non-negative')
+    .describe('Quantity threshold for bulk donations'),
+  enable_tax_calculations: z.boolean().describe('Enable tax deduction calculations'),
+  min_margin_for_discount: z
+    .number()
+    .min(0, 'Min margin must be non-negative')
+    .max(100, 'Min margin cannot exceed 100%')
+    .describe('Minimum margin required for discounts (0-100%)'),
+  small_quantity_fallback: z
+    .enum(['discount', 'donate', 'dispose'])
+    .describe('Action for small quantities'),
+  donation_first_threshold: z
+    .number()
+    .min(0, 'Threshold must be non-negative')
+    .max(1, 'Threshold must be between 0 and 1')
+    .describe('Threshold for prioritizing donations (0.0-1.0)'),
+  force_donation_categories: z.array(z.string()).describe('Categories forced to donate'),
+  min_quantity_for_donation: z
+    .number()
+    .min(0, 'Min quantity must be non-negative')
+    .describe('Minimum quantity for donations'),
+  require_user_confirmation: z.boolean().describe('Require confirmation for auto-donations'),
+  donation_weight_multiplier: z
+    .number()
+    .min(0, 'Multiplier must be non-negative')
+    .max(3, 'Multiplier must be between 0 and 3')
+    .describe('Weight multiplier for donation recommendations (0.0-3.0)'),
+  european_disposal_threshold: z
+    .number()
+    .min(0, 'Threshold must be non-negative')
+    .max(100, 'Threshold cannot exceed 100%')
+    .describe('Threshold for disposal vs donation (0-100%)'),
+  include_recipient_suggestions: z.boolean().describe('Include recipient suggestions in UI'),
 })
 export type DonationPreferenceConfig = z.infer<typeof donationPreferenceConfigSchema>
 
