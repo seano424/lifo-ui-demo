@@ -27,7 +27,7 @@ export function DeliveryBanner({ totalDrafts, isClosing = false, onDismiss }: De
     <div
       className={cn(
         'flex items-center justify-between gap-2',
-        'py-3 px-4 sm:py-2 bg-[#363644] dark:border-y dark:border-card dark:bg-card/0',
+        'py-3 px-4 sm:py-2 bg-none border-b border-muted dark:border-y dark:border-card dark:bg-card/0',
         'transition-all duration-300 ease-in-out',
         isClosing && 'opacity-0 -translate-y-full',
       )}
@@ -41,13 +41,7 @@ export function DeliveryBanner({ totalDrafts, isClosing = false, onDismiss }: De
         href="/dashboard/inventory/new"
         onClick={onDismiss}
       >
-        <Typography
-          variant="small"
-          color="white"
-          className="dark:text-secondary sm:dark:text-muted-foreground"
-        >
-          {t('title', { count: totalDrafts })}
-        </Typography>
+        <Typography variant="small">{t('title', { count: totalDrafts })}</Typography>
       </Button>
 
       {/* Right: Actions */}
@@ -56,7 +50,7 @@ export function DeliveryBanner({ totalDrafts, isClosing = false, onDismiss }: De
           asChild
           size="xs"
           variant="ghost"
-          className="hidden text-white hover:bg-white/10 sm:inline-flex"
+          className="hidden hover:bg-white/10 sm:inline-flex"
           asLink
           href="/dashboard/inventory/new"
           onClick={onDismiss}
@@ -64,7 +58,7 @@ export function DeliveryBanner({ totalDrafts, isClosing = false, onDismiss }: De
           {t('cta')}
         </Button>
         <Button
-          className="text-white hover:bg-white/10"
+          className="hover:bg-white/10"
           size="icon"
           variant="ghost"
           onClick={onDismiss}
