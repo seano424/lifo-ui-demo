@@ -27,7 +27,7 @@ const buttonVariants = cva(
 
         // New subtle variants using lighter shades
         subtle:
-          'bg-primary-50 text-primary-800 dark:bg-primary-900/0 dark:text-foreground font-normal w-fit',
+          'bg-primary-50 text-primary-800 dark:bg-primary-900/10 dark:text-foreground font-normal w-fit',
         subtleSecondary:
           'bg-secondary-800 text-white shadow-xs hover:bg-secondary-700 dark:bg-secondary-900/70 dark:hover:bg-secondary-900/80',
 

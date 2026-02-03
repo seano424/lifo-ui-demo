@@ -47,7 +47,7 @@ export function useUserStores() {
     refetchOnReconnect: false, // Don't refetch on network reconnect
   })
 
-  // Set loading state based on queries
+  // Consolidated effect: Handle loading state, store selection, and completion
   useEffect(() => {
     // If no user, immediately set loading to false
     if (!currentUser) {
@@ -55,19 +55,15 @@ export function useUserStores() {
       return
     }
 
-    // Keep loading true while queries are running
-    if (userStoresResult.isLoading || userPreferencesResult.isLoading) {
-      setLoadingStores(true)
-    }
-  }, [currentUser, userStoresResult.isLoading, userPreferencesResult.isLoading, setLoadingStores])
+    const isLoading = userStoresResult.isLoading || userPreferencesResult.isLoading
 
-  // Auto-select store when data loads
-  useEffect(() => {
-    // Wait for both queries to complete
-    if (userStoresResult.isLoading || userPreferencesResult.isLoading) {
+    // Keep loading true while queries are running
+    if (isLoading) {
+      setLoadingStores(true)
       return
     }
 
+    // Queries are complete - handle store selection and sync
     if (userStoresResult.data && userStoresResult.data.length > 0) {
       // Always sync Zustand with React Query data
       setUserStores(userStoresResult.data)
@@ -98,7 +94,13 @@ export function useUserStores() {
         }
       }
     }
+
+    // Clear loading state if we have an active store OR if user has no stores
+    if (activeStore || (userStoresResult.data && userStoresResult.data.length === 0)) {
+      setLoadingStores(false)
+    }
   }, [
+    currentUser,
     userStoresResult.data,
     userStoresResult.isLoading,
     userPreferencesResult.data,
@@ -106,24 +108,6 @@ export function useUserStores() {
     activeStore,
     setActiveStore,
     setUserStores,
-  ])
-
-  // Clear loading state only after active store is set or when we have no stores
-  useEffect(() => {
-    // Don't clear loading if queries are still running
-    if (userStoresResult.isLoading || userPreferencesResult.isLoading) {
-      return
-    }
-
-    // Clear loading if we have an active store OR if user has no stores
-    if (activeStore || (userStoresResult.data && userStoresResult.data.length === 0)) {
-      setLoadingStores(false)
-    }
-  }, [
-    activeStore,
-    userStoresResult.data,
-    userStoresResult.isLoading,
-    userPreferencesResult.isLoading,
     setLoadingStores,
   ])
 

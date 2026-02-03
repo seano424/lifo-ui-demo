@@ -79,10 +79,10 @@ function getAlignmentClasses(columnIndex: number): {
 // Helper function to get status badge variant
 function getStatusVariant(
   status: string,
-): 'default' | 'secondary' | 'success' | 'danger' | 'elevated' {
+): 'default' | 'secondary' | 'primary' | 'danger' | 'elevated' {
   switch (status) {
     case 'active':
-      return 'success'
+      return 'primary'
     case 'draft':
       return 'secondary'
     case 'expired':
@@ -214,7 +214,8 @@ export function createBatchTableColumns({
         const status = row.original.status || 'active'
         return (
           <div className={alignments.status.cellClass}>
-            <Badge variant={getStatusVariant(status)}>{tStatus(status)}</Badge>
+            {/* <Badge variant={getStatusVariant(status)}>{tStatus(status)}</Badge> */}
+            {tStatus(status)}
           </div>
         )
       },
@@ -235,20 +236,18 @@ export function createBatchTableColumns({
       ),
       cell: ({ row }) => {
         let expiryDate: Date | null = null
-        let daysLeft = 0
+        // let daysLeft = 0
 
         if (row.original.expiry_date) {
           expiryDate = parseISODateAsLocal(row.original.expiry_date)
           const today = new Date()
           today.setHours(0, 0, 0, 0)
-          daysLeft = getDaysLeft(expiryDate)
+          // daysLeft = getDaysLeft(expiryDate)
         }
 
         return (
           <div className={alignments.expiry_date.cellClass}>
-            <Badge variant={daysLeft <= 3 ? 'danger' : 'elevated'}>
-              {expiryDate ? expiryDate.toLocaleDateString() : tExpiry('noExpiryDate')}
-            </Badge>
+            {expiryDate ? expiryDate.toLocaleDateString() : tExpiry('noExpiryDate')}
           </div>
         )
       },
@@ -282,7 +281,7 @@ export function createBatchTableColumns({
 
         return (
           <div className={alignments.days_left.cellClass}>
-            <Badge variant={daysLeft <= 3 ? 'danger' : 'elevated'}>{label}</Badge>
+            <Badge variant={daysLeft <= 3 ? 'danger' : 'primary'}>{label}</Badge>
           </div>
         )
       },

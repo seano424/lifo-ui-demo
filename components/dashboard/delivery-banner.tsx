@@ -5,7 +5,6 @@ import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Typography } from '../ui/typography'
 import { cn } from '@/lib/utils'
-// import { Badge } from '../ui/badge'
 import type { DraftBatchesSummary } from '@/hooks/use-draft-batches'
 
 interface DeliveryBannerProps {
@@ -23,8 +22,6 @@ interface DeliveryBannerProps {
  */
 export function DeliveryBanner({ totalDrafts, isClosing = false, onDismiss }: DeliveryBannerProps) {
   const t = useTranslations('dashboard.redesign.deliveryBanner')
-  // const totalUnits = summary?.total_units || 0
-  // const productsWithDrafts = summary?.products_with_drafts || 0
 
   return (
     <div

@@ -23,7 +23,7 @@ export function DashboardContent() {
     <div
       className={cn(
         'flex flex-col gap-10 pb-80 animate-in fade-in-0 duration-1000',
-        'transition-all duration-300 ease-in-out',
+        'transition-all duration-300 ease-in-out min-h-screen',
         isVisible ? 'pt-16 sm:pt-12' : 'pt-0',
       )}
     >
@@ -42,7 +42,7 @@ export function DashboardContent() {
 
       <StatCards daysFilter={daysFilter} />
 
-      <div className="rounded-2xl bg-card">
+      <div className="rounded-2xl bg-card/10">
         <div className="flex items-center justify-between border-b border-muted p-4">
           <div className="flex flex-col gap-1">
             <Typography variant="h4">Expiring Soon</Typography>
@@ -54,7 +54,7 @@ export function DashboardContent() {
             variant="subtle"
             asLink
             href="/dashboard/inventory/batches"
-            className="gap-2 flex items-center"
+            className="gap-2 flex items-center hover:text-secondary dark:hover:text-secondary"
           >
             View all
             <ChevronRight className="h-4 w-4" />
@@ -73,8 +73,8 @@ export function DashboardContent() {
         />
       </div>
 
-      <AutomationCard />
       <CoverageBar />
+      <AutomationCard />
     </div>
   )
 }

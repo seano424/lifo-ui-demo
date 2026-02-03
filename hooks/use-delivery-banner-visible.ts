@@ -5,6 +5,7 @@ import { useDraftBatchesSummary } from '@/hooks/use-draft-batches'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 
 const DISMISSED_STORAGE_KEY = 'lifo_dismissed_delivery_banner'
+const BANNER_TRANSITION_DURATION_MS = 300
 
 interface DismissedState {
   count: number
@@ -102,7 +103,7 @@ export function useDeliveryBannerVisible() {
       setIsDismissed(true)
       setDismissedState(totalDrafts)
       setIsClosing(false)
-    }, 300) // Match transition duration
+    }, BANNER_TRANSITION_DURATION_MS)
   }
 
   // Banner is visible if not loading, has drafts, not dismissed, or currently closing

@@ -151,7 +151,7 @@ export function BatchesFilteredList({
         }
       }
 
-      router.replace(`?${params.toString()}`)
+      router.replace(`?${params.toString()}`, { scroll: false })
     },
     [router],
   )
