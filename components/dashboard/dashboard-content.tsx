@@ -67,9 +67,10 @@ export function DashboardContent() {
           expiringDays={daysFilter}
           pageSize={500}
           clientSideSort={true}
+          clientSideTimeFilter={true}
           initialFilters={{
             filter: 'expiring',
-            expiringDays: daysFilter.toString(),
+            expiringDays: '90', // Always load 90 days, filter client-side
             status: 'active',
           }}
         />

@@ -29,6 +29,7 @@ interface BatchesFilteredListProps {
   showControls?: boolean
   expiringDays?: number // Controlled prop for external time range changes
   clientSideSort?: boolean // Enable client-side sorting instead of server-side
+  clientSideTimeFilter?: boolean // Enable client-side time filtering (loads max range, filters on client)
 }
 
 export function BatchesFilteredList({
@@ -39,6 +40,7 @@ export function BatchesFilteredList({
   showControls = true,
   expiringDays,
   clientSideSort = false,
+  clientSideTimeFilter = false,
 }: BatchesFilteredListProps) {
   const router = useRouter()
   const activeStoreId = useActiveStoreId()
@@ -94,19 +96,43 @@ export function BatchesFilteredList({
   // For client-side sorting, exclude sort from query filters to prevent refetching
   const queryFilters = clientSideSort ? { ...filters, sort: undefined } : filters
 
-  const { data, count, isLoading, isFetching, error, hasMore, fetchNextPage, isFetchingNextPage } =
-    useBatches(queryFilters, pageSize)
+  const {
+    data: rawData,
+    count,
+    isLoading,
+    isFetching,
+    error,
+    hasMore,
+    fetchNextPage,
+    isFetchingNextPage,
+  } = useBatches(queryFilters, pageSize)
+
+  // Client-side time filtering: filter batches by expiry date if enabled
+  const data =
+    clientSideTimeFilter && expiringDays !== undefined
+      ? rawData.filter(batch => {
+          if (!batch.expiry_date) return false
+          const expiryDate = new Date(batch.expiry_date)
+          const today = new Date()
+          today.setHours(0, 0, 0, 0)
+          expiryDate.setHours(0, 0, 0, 0)
+          const daysToExpiry = Math.ceil(
+            (expiryDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
+          )
+          return daysToExpiry >= 0 && daysToExpiry <= expiringDays
+        })
+      : rawData
 
   useEffect(() => {
     setFilters(prev => ({ ...prev, storeId: activeStoreId || undefined }))
   }, [activeStoreId])
 
-  // Update expiring days filter when controlled prop changes
+  // Update expiring days filter when controlled prop changes (unless using client-side filtering)
   useEffect(() => {
-    if (expiringDays !== undefined) {
+    if (expiringDays !== undefined && !clientSideTimeFilter) {
       setFilters(prev => ({ ...prev, expiringInDays: expiringDays }))
     }
-  }, [expiringDays])
+  }, [expiringDays, clientSideTimeFilter])
 
   const updateFilters = useCallback(
     (newFilters: Partial<BatchFilters>) => {
