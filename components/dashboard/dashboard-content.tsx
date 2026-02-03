@@ -51,10 +51,10 @@ export function DashboardContent() {
             </Typography>
           </div>
           <Button
-            variant="subtle"
+            variant="ghost"
             asLink
             href="/dashboard/inventory/batches"
-            className="gap-2 flex items-center hover:text-secondary dark:hover:text-secondary"
+            className="gap-2 flex items-center hover:text-secondary dark:hover:text-secondary px-0"
           >
             View all
             <ChevronRight className="h-4 w-4" />
