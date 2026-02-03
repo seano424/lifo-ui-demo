@@ -7,7 +7,7 @@ import * as React from 'react'
 import { cn } from '@/lib/utils'
 
 const buttonVariants = cva(
-  'rounded-xl transition-all  duration-100 focus:outline-none disabled:opacity-50 disabled:pointer-events-none overflow-hidden cursor-pointer inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors duration-200 ease-in-out focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0',
+  'rounded-xl transition-all duration-100 focus:outline-none disabled:opacity-50 disabled:pointer-events-none overflow-hidden cursor-pointer inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors duration-200 ease-in-out focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0',
   {
     variants: {
       variant: {
@@ -20,7 +20,7 @@ const buttonVariants = cva(
         outline: 'border border-input bg-background shadow-xs hover:border-muted',
         secondary: 'bg-secondary-900 shadow-xs hover:bg-secondary-800 text-white',
         ghost:
-          'hover:bg-primary-50 hover:text-primary-800 dark:hover:bg-primary-900/0 dark:text-foreground font-normal w-fit',
+          'hover:text-primary-800 dark:hover:bg-primary-900/0 dark:text-foreground font-normal w-fit',
         subtleTertiary:
           'bg-primary-50 text-primary-800 dark:bg-background/10 dark:text-primary-300',
         link: 'text-primary-800 underline-offset-4 hover:underline dark:text-primary-300',
@@ -29,7 +29,7 @@ const buttonVariants = cva(
         subtle:
           'bg-primary-50 text-primary-800 dark:bg-primary-900/0 dark:text-foreground font-normal w-fit',
         subtleSecondary:
-          'bg-secondary-100/10 shadow-xs hover:bg-secondary-100/80 dark:bg-secondary-900/70 dark:hover:bg-secondary-900/80',
+          'bg-secondary-800 text-white shadow-xs hover:bg-secondary-700 dark:bg-secondary-900/70 dark:hover:bg-secondary-900/80',
 
         // Brand variants (preserved for backward compatibility)
         brand:
@@ -46,6 +46,7 @@ const buttonVariants = cva(
           'bg-white text-primary-800 hover:bg-white/90 dark:bg-primary-900 dark:text-primary-100 dark:hover:bg-primary-900/90',
       },
       size: {
+        xs: 'px-4 py-1.5 text-sm',
         sm: 'px-4 py-2 text-sm',
         default: 'px-4 py-2 text-sm',
         lg: 'px-4 sm:px-6 py-3 sm:py-3.5 sm:text-base text-sm',

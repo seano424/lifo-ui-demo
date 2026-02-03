@@ -45,7 +45,7 @@ export function StatCard({
   }
 
   return (
-    <Card className="relative cursor-default p-5 transition-all duration-200 flex flex-col gap-3 flex-1">
+    <Card className="relative cursor-default p-5 transition-all duration-200 flex flex-col gap-3 flex-1 bg-opacity-0 border">
       {/* <Icon className="h-6 w-6" aria-hidden="true" /> */}
       <Typography variant="p" color="muted">
         {label}

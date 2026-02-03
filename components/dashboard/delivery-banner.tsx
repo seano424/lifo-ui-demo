@@ -1,64 +1,18 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import { X } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import { useDraftBatchesSummary } from '@/hooks/use-draft-batches'
-import { useActiveStoreId } from '@/lib/stores/store-context'
 import { Button } from '@/components/ui/button'
 import { Typography } from '../ui/typography'
+import { cn } from '@/lib/utils'
 // import { Badge } from '../ui/badge'
+import type { DraftBatchesSummary } from '@/hooks/use-draft-batches'
 
-const DISMISSED_STORAGE_KEY = 'lifo_dismissed_delivery_banner'
-
-interface DismissedState {
-  count: number
-  timestamp: number
-}
-
-/**
- * Get dismissed delivery banner state from localStorage
- */
-function getDismissedState(): DismissedState | null {
-  if (typeof window === 'undefined') return null
-
-  try {
-    const stored = localStorage.getItem(DISMISSED_STORAGE_KEY)
-    return stored ? JSON.parse(stored) : null
-  } catch {
-    return null
-  }
-}
-
-/**
- * Save dismissed delivery banner state to localStorage
- */
-function setDismissedState(count: number) {
-  if (typeof window === 'undefined') return
-
-  const state: DismissedState = {
-    count,
-    timestamp: Date.now(),
-  }
-
-  try {
-    localStorage.setItem(DISMISSED_STORAGE_KEY, JSON.stringify(state))
-  } catch {
-    // Ignore localStorage errors
-  }
-}
-
-/**
- * Clear dismissed state from localStorage
- */
-function clearDismissedState() {
-  if (typeof window === 'undefined') return
-
-  try {
-    localStorage.removeItem(DISMISSED_STORAGE_KEY)
-  } catch {
-    // Ignore localStorage errors
-  }
+interface DeliveryBannerProps {
+  totalDrafts: number
+  isClosing?: boolean
+  onDismiss: () => void
+  summary: DraftBatchesSummary
 }
 
 /**
@@ -67,78 +21,45 @@ function clearDismissedState() {
  * Shows a dark banner when there are draft batches needing expiry dates.
  * Can be dismissed, but reappears when new drafts are created.
  */
-export function DeliveryBanner() {
+export function DeliveryBanner({ totalDrafts, isClosing = false, onDismiss }: DeliveryBannerProps) {
   const t = useTranslations('dashboard.redesign.deliveryBanner')
-  const storeId = useActiveStoreId()
-  const { data: summary, isLoading } = useDraftBatchesSummary(storeId || undefined)
-  const [isDismissed, setIsDismissed] = useState(false)
-
-  const totalDrafts = summary?.total_draft_batches || 0
-  const totalUnits = summary?.total_units || 0
-  const productsWithDrafts = summary?.products_with_drafts || 0
-
-  // Check if banner should be shown
-  useEffect(() => {
-    if (!summary || totalDrafts === 0) {
-      setIsDismissed(false)
-      clearDismissedState()
-      return
-    }
-
-    const dismissedState = getDismissedState()
-
-    if (dismissedState) {
-      // Show banner if draft count increased since dismissal
-      if (totalDrafts > dismissedState.count) {
-        setIsDismissed(false)
-        clearDismissedState()
-      } else {
-        setIsDismissed(true)
-      }
-    } else {
-      setIsDismissed(false)
-    }
-  }, [summary, totalDrafts])
-
-  const handleDismiss = () => {
-    setIsDismissed(true)
-    setDismissedState(totalDrafts)
-  }
-
-  // Don't show if loading, no drafts, or dismissed
-  if (isLoading || totalDrafts === 0 || isDismissed) {
-    return null
-  }
+  // const totalUnits = summary?.total_units || 0
+  // const productsWithDrafts = summary?.products_with_drafts || 0
 
   return (
-    <div className="flex-col gap-4 sm:flex-row flex sm:items-center sm:justify-between rounded-2xl bg-card py-3 px-5">
+    <div
+      className={cn(
+        'flex-col gap-4 sm:flex-row flex sm:items-center sm:justify-between py-2 px-4 bg-card/0 border-b dark:border-y dark:border-card',
+        'transition-all duration-300 ease-in-out',
+        isClosing && 'opacity-0 -translate-y-full',
+      )}
+    >
       {/* Left: Icon + Message */}
       <div className="flex items-center gap-4">
         {/* <Badge variant="primary" className="aspect-square [&_svg]:size-4 p-2">
           <Box className="h-10 w-10" aria-hidden="true" />
         </Badge> */}
         <div className="flex flex-col gap-1">
-          <Typography variant="h5" color="primary">
-            {t('title', { count: totalDrafts })}
-          </Typography>
-          <Typography variant="small" color="muted">
+          <Typography variant="small">{t('title', { count: totalDrafts })}</Typography>
+          {/* <Typography variant="small">
             {t('description', { units: totalUnits, count: productsWithDrafts })}
-          </Typography>
+          </Typography> */}
         </div>
       </div>
 
       {/* Right: Actions */}
-      <div className="flex items-center justify-between border-t border-border pt-4 sm:border-none sm:pt-0 sm:justify-end gap-3">
+      <div className="flex items-center justify-between border-t border-border pt-4 sm:border-none sm:pt-0 sm:justify-end gap-1">
         <Button
           asChild
-          variant="gray"
+          size="xs"
+          variant="subtleSecondary"
           asLink
           href="/dashboard/inventory/new"
-          onClick={handleDismiss}
+          onClick={onDismiss}
         >
           {t('cta')}
         </Button>
-        <Button size="icon" variant="ghost" onClick={handleDismiss} aria-label={t('dismiss')}>
+        <Button size="icon" variant="ghost" onClick={onDismiss} aria-label={t('dismiss')}>
           <X className="h-4 w-4" />
         </Button>
       </div>

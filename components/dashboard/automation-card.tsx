@@ -56,7 +56,7 @@ export function AutomationCard() {
 
   // Active state - show rules summary and list
   return (
-    <Card className="overflow-hidden flex flex-col gap-0">
+    <Card className="overflow-hidden flex flex-col gap-0 bg-opacity-0 border">
       {/* Header */}
       <div className="flex items-center justify-between border-b border-muted px-6 py-4">
         <div>
