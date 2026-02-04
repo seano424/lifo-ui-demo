@@ -7,8 +7,13 @@ import { queryKeys } from '@/lib/queries/query-keys'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 import { logger } from '@/lib/utils/logger'
 import { withPerformanceTracking } from '@/lib/utils/performance'
-import { assertRpcResult, assertRpcArray } from '@/lib/utils/rpc-types'
+import { validateRpcResult, validateRpcArray } from '@/lib/utils/rpc-types'
 import { toast } from 'sonner'
+import {
+  IgnoredBatchesSummaryResponseSchema,
+  IgnoredBatchesByProductSchema,
+  RestoreIgnoredBatchResponseSchema,
+} from '@/lib/validation/rpc-schemas'
 import type {
   IgnoredBatchesSummaryResponse,
   IgnoredBatchItem,
@@ -69,7 +74,7 @@ async function fetchIgnoredBatchesSummary(storeId: string): Promise<IgnoredBatch
         throw new Error(`Failed to fetch ignored batches summary: ${error.message}`)
       }
 
-      const result = assertRpcResult<IgnoredBatchesSummaryResponse>(data)
+      const result = validateRpcResult(data, IgnoredBatchesSummaryResponseSchema, context)
 
       logger.log(context, 'Ignored batches summary fetched', {
         storeId,
@@ -116,7 +121,7 @@ async function fetchIgnoredBatchesByProduct(
         throw new Error(`Failed to fetch ignored batches by product: ${error.message}`)
       }
 
-      const results = assertRpcArray<IgnoredBatchesByProduct>(data)
+      const results = validateRpcArray(data, IgnoredBatchesByProductSchema, context)
 
       logger.log(context, 'Ignored batches by product fetched', {
         storeId,
@@ -231,7 +236,7 @@ export function useRestoreIgnoredBatch() {
         throw error
       }
 
-      return assertRpcResult<RestoreIgnoredBatchResponse>(data)
+      return validateRpcResult(data, RestoreIgnoredBatchResponseSchema, context)
     },
 
     onSuccess: (result, _variables) => {
