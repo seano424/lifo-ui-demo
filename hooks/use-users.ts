@@ -172,10 +172,10 @@ export function useCurrentUserStoreRole() {
         userId: user.id,
         storeId: activeStoreId,
         role: userData.role_in_store as StoreRole,
-        permissions: userData.permissions || {},
+        permissions: (userData.permissions as Record<string, boolean>) || {},
         isActive: userData.is_active ?? true,
         canUsePinAuth: userData.can_use_pin_auth ?? false,
-        pinAccessLevel: userData.pin_access_level || 'basic',
+        pinAccessLevel: (userData.pin_access_level as 'basic' | 'elevated' | 'admin') || 'basic',
         storeName: userData.store_name,
       }
 

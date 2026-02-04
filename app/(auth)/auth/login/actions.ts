@@ -4,6 +4,15 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { logger } from '@/lib/utils/logger'
 
+interface GetUserByUsernameResult {
+  success: boolean
+  user?: {
+    email: string
+    username: string
+    full_name: string
+  }
+}
+
 export async function loginWithCredentials(_prevState: unknown, formData: FormData) {
   const supabase = await createClient()
 
@@ -19,7 +28,14 @@ export async function loginWithCredentials(_prevState: unknown, formData: FormDa
 
     // If identifier doesn't contain @, treat it as a username and lookup email
     if (!identifier.includes('@')) {
-      const { data: userResult, error: userError } = await supabase.rpc('get_user_by_username', {
+      // Validate username format to prevent injection attacks
+      // Username must be 3-20 characters, lowercase letters, numbers, hyphens, underscores only
+      const usernameRegex = /^[a-z0-9_-]{3,20}$/
+      if (!usernameRegex.test(identifier)) {
+        return { error: 'Invalid username format' }
+      }
+
+      const { data, error: userError } = await supabase.rpc('get_user_by_username', {
         p_username: identifier,
       })
 
@@ -27,6 +43,8 @@ export async function loginWithCredentials(_prevState: unknown, formData: FormDa
         logger.error('LoginAction', 'Failed to lookup user by username:', userError)
         return { error: 'Authentication service error' }
       }
+
+      const userResult = data as GetUserByUsernameResult | null
 
       if (!userResult || !userResult.success || !userResult.user?.email) {
         return { error: 'Invalid credentials' }

@@ -3,6 +3,13 @@ import { createClient } from '@/lib/supabase/client'
 import type { createClient as createServerClient } from '@/lib/supabase/server'
 import { logger } from '@/lib/utils/logger'
 import { PerformanceTimer } from '@/lib/utils/performance'
+import type {
+  StoreUserRow as RPCStoreUserRow,
+  StoreUserRowPaginated as RPCStoreUserRowPaginated,
+  RemoveUserFromStoreResult,
+} from '@/types/rpc-returns'
+import type { Json } from '@/types/supabase'
+import type { Database } from '@/types/supabase-extended'
 
 type ServerClient = Awaited<ReturnType<typeof createServerClient>>
 
@@ -46,39 +53,23 @@ export type StoreUsersPageParam = {
   pageSize: number
 }
 
-// Define the expected row shape for store user queries
-interface StoreUserRow {
-  store_id: string
-  user_id: string
-  role_in_store: 'owner' | 'manager' | 'employee' | 'staff'
-  permissions?: Record<string, boolean>
-  assigned_at: string
-  assigned_by: string | null
-  is_active: boolean
-  can_use_pin_auth: boolean
-  pin_access_level: 'basic' | 'elevated' | 'admin'
-  pin_permissions?: Record<string, unknown>
-  email?: string
-  created_at?: string
-  updated_at?: string
-  raw_user_meta_data?: Record<string, unknown>
-}
-
-// Transform helper function
-function transformStoreUserRow(row: StoreUserRow): StoreUser {
+// Transform helper function - now uses RPCStoreUserRow directly
+function transformStoreUserRow(row: RPCStoreUserRow): StoreUser {
   const metadata = row.raw_user_meta_data || {}
 
   return {
     store_id: row.store_id,
     user_id: row.user_id,
     role_in_store: row.role_in_store,
-    permissions: row.permissions || {},
+    // Convert UserPermissions to Record<string, boolean>
+    permissions: row.permissions ? (row.permissions as unknown as Record<string, boolean>) : {},
     assigned_at: row.assigned_at,
     assigned_by: row.assigned_by,
     is_active: row.is_active,
     can_use_pin_auth: row.can_use_pin_auth,
-    pin_access_level: row.pin_access_level,
-    pin_permissions: row.pin_permissions || {},
+    pin_access_level: row.pin_access_level as 'basic' | 'elevated' | 'admin',
+    // Convert PinPermissions to Record<string, unknown>
+    pin_permissions: row.pin_permissions ? (row.pin_permissions as Record<string, unknown>) : {},
     // User details
     email: row.email || '',
     created_at: row.created_at || '',
@@ -120,7 +111,8 @@ export async function fetchStoreUsers(
       throw new Error(`Failed to fetch store users: ${error.message}`)
     }
 
-    const storeUsers = (data || []).map(transformStoreUserRow)
+    const result = (data as RPCStoreUserRow[] | null) || []
+    const storeUsers = result.map(transformStoreUserRow)
 
     timer.end({ success: true, userCount: storeUsers.length })
 
@@ -156,7 +148,7 @@ export async function fetchStoreUsersPage(
       input_store_id: storeId,
       page_number: page,
       page_size: pageSize,
-      role_filter: filters.role_in_store || null,
+      role_filter: filters.role_in_store ?? undefined,
       pin_auth_filter: filters.can_use_pin_auth,
     })
 
@@ -172,7 +164,8 @@ export async function fetchStoreUsersPage(
       throw new Error(`Failed to fetch store users: ${error.message}`)
     }
 
-    let storeUsers = (data || []).map(transformStoreUserRow)
+    const result = (data as RPCStoreUserRowPaginated[] | null) || []
+    let storeUsers = result.map(transformStoreUserRow)
 
     // Apply client-side filters that the SQL function doesn't handle
     if (filters.email) {
@@ -189,8 +182,7 @@ export async function fetchStoreUsersPage(
       )
     }
 
-    const totalCount =
-      data && data.length > 0 ? Number((data[0] as Record<string, unknown>)?.total_count || 0) : 0
+    const totalCount = result.length > 0 ? Number(result[0]?.total_count || 0) : 0
 
     logger.log(context, 'Successfully fetched paginated users', {
       storeId,
@@ -244,7 +236,8 @@ export async function fetchStoreUserById(
       throw new Error(`Failed to fetch store users: ${error.message}`)
     }
 
-    const userRow = data?.find((row: StoreUserRow) => row.user_id === userId)
+    const result = (data as RPCStoreUserRow[] | null) || []
+    const userRow = result.find((row: RPCStoreUserRow) => row.user_id === userId)
 
     if (!userRow) {
       logger.log(context, 'User not found', { storeId, userId })
@@ -302,12 +295,12 @@ export async function updateStoreUser(
     const { data: rpcData, error: rpcError } = await supabase.rpc('update_store_user_safe', {
       input_store_id: storeId,
       input_user_id: userId,
-      input_role_in_store: updates.role_in_store || null,
-      input_permissions: updates.permissions || null,
-      input_is_active: updates.is_active ?? null,
-      input_can_use_pin_auth: updates.can_use_pin_auth ?? null,
-      input_pin_access_level: updates.pin_access_level || null,
-      input_pin_permissions: updates.pin_permissions || null,
+      input_role_in_store: updates.role_in_store ?? undefined,
+      input_permissions: (updates.permissions as unknown as Json) ?? undefined,
+      input_is_active: updates.is_active ?? undefined,
+      input_can_use_pin_auth: updates.can_use_pin_auth ?? undefined,
+      input_pin_access_level: updates.pin_access_level ?? undefined,
+      input_pin_permissions: (updates.pin_permissions as unknown as Json) ?? undefined,
     })
 
     if (rpcError) {
@@ -324,13 +317,14 @@ export async function updateStoreUser(
       throw new Error(`Failed to update store user: ${rpcError.message}`)
     }
 
-    if (!rpcData || rpcData.length === 0) {
+    const result = (rpcData as RPCStoreUserRow[] | null) || []
+    if (result.length === 0) {
       timer.end({ success: false, reason: 'No data returned' })
       logger.queryWarn(context, 'No data returned from RPC', { storeId, userId })
       throw new Error('No data returned from RPC update')
     }
 
-    const updatedUser = transformStoreUserRow(rpcData[0])
+    const updatedUser = transformStoreUserRow(result[0])
 
     timer.end({ success: true, method: 'rpc-only' })
     logger.log(context, 'Update successful', { storeId, userId })
@@ -399,22 +393,24 @@ export async function removeUserFromStore(storeId: string, userId: string): Prom
       throw new Error(`Failed to remove user from store: ${error.message}`)
     }
 
+    const result = data as RemoveUserFromStoreResult | null
+
     // The RPC function returns JSON with success/error fields
-    if (!data?.success) {
-      timer.end({ success: false, rpcError: data?.error })
+    if (!result?.success) {
+      timer.end({ success: false, rpcError: result?.error })
       logger.queryWarn(context, 'RPC returned failure', {
-        rpcError: data?.error,
-        rpcData: data,
+        rpcError: result?.error,
+        rpcData: result,
         storeId,
         userId,
       })
-      throw new Error(data?.error || 'Failed to remove user from store')
+      throw new Error(result?.error || 'Failed to remove user from store')
     }
 
     timer.end({
       success: true,
-      removedRole: data?.removed_user_role,
-      removedBy: data?.removed_by,
+      removedRole: result?.removed_user_role,
+      removedBy: result?.removed_by,
     })
   } catch (err) {
     logger.queryWarn(context, 'Unexpected error', {
@@ -463,12 +459,14 @@ export async function addUserToStore(
         store_id: storeId,
         user_id: userId,
         role_in_store: roleInStore,
-        permissions,
+        permissions:
+          permissions as unknown as Database['business']['Tables']['store_users']['Insert']['permissions'],
         assigned_by: assignedBy,
         is_active: true,
         can_use_pin_auth: canUsePinAuth,
         pin_access_level: pinAccessLevel,
-        pin_permissions: pinPermissions,
+        pin_permissions:
+          pinPermissions as unknown as Database['business']['Tables']['store_users']['Insert']['pin_permissions'],
       })
       .select()
       .single()
@@ -520,9 +518,9 @@ export async function canManageStoreUser(storeId: string, targetUserId?: string)
   logger.log(context, 'Checking user management permissions', { storeId, targetUserId })
 
   try {
-    const { data, error } = await supabase.rpc('user_can_manage_store_users', {
+    const { data, error } = await supabase.schema('business').rpc('user_can_manage_store_users', {
       target_store_id: storeId,
-      target_user_id: targetUserId || null,
+      target_user_id: targetUserId ?? undefined,
     })
 
     if (error) {

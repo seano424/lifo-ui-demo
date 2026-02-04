@@ -1,7 +1,7 @@
 // lib/queries/urgent-alerts.ts
 
 import { createClient } from '@/lib/supabase/client'
-import type { Database } from '@/types/supabase'
+import type { Database } from '@/types/supabase-extended'
 import { logger } from '@/lib/utils/logger'
 import { withPerformanceTracking } from '@/lib/utils/performance'
 

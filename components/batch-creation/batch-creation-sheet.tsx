@@ -27,8 +27,8 @@ import {
   useIgnoreDraftBatch,
   useDraftBatchesByProduct,
   type ActivateDraftBatchResult,
-  type ProductWithDraftBatches,
 } from '@/hooks/use-draft-batches'
+import type { DraftBatchesByProduct } from '@/types/rpc-returns'
 import { cn } from '@/lib/utils'
 import { parseISODateAsLocal } from '@/lib/utils/date-conversion'
 import { Typography } from '@/components/ui/typography'
@@ -39,8 +39,8 @@ interface BatchCreationSheetProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   storeId: string
-  products?: ProductWithDraftBatches[]
-  singleProduct?: ProductWithDraftBatches
+  products?: DraftBatchesByProduct[]
+  singleProduct?: DraftBatchesByProduct
   onComplete?: () => void
   hideIgnoreButton?: boolean
 }

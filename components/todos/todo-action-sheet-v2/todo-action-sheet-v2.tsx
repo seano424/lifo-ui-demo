@@ -19,7 +19,7 @@ import { SellForm } from './forms/sell-form'
 import { DiscountForm } from './forms/discount-form'
 import { DonateForm } from './forms/donate-form'
 import { DisposeForm } from './forms/dispose-form'
-import type { Database } from '@/types/supabase'
+import type { Database } from '@/types/supabase-extended'
 import { Typography } from '@/components/ui/typography'
 
 interface TodoActionSheetV2Props {

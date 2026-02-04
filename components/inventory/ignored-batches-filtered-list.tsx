@@ -25,15 +25,15 @@ import {
   type ProductWithIgnoredBatches,
 } from '@/hooks/use-ignored-batches'
 import { useActiveStoreId } from '@/lib/stores/store-context'
-import type { ProductWithDraftBatches } from '@/hooks/use-draft-batches'
+import type { DraftBatchesByProduct } from '@/types/rpc-returns'
 
 /**
- * Transform ProductWithIgnoredBatches to ProductWithDraftBatches
+ * Transform ProductWithIgnoredBatches to DraftBatchesByProduct
  * This allows us to reuse the BatchCreationSheet component for ignored batches
  */
 function transformIgnoredProductToDraftProduct(
   product: ProductWithIgnoredBatches,
-): ProductWithDraftBatches {
+): DraftBatchesByProduct {
   return {
     product_id: product.product_id,
     product_name: product.product_name,
@@ -101,7 +101,7 @@ export function IgnoredBatchesFilteredList({
   const [selectedCategories, setSelectedCategories] = useState<string[]>(
     initialFilters?.category ? [initialFilters.category] : [],
   )
-  const [selectedProduct, setSelectedProduct] = useState<ProductWithDraftBatches | null>(null)
+  const [selectedProduct, setSelectedProduct] = useState<DraftBatchesByProduct | null>(null)
   const [isSheetOpen, setIsSheetOpen] = useState(false)
 
   // Fetch summary data

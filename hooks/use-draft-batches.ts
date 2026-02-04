@@ -7,123 +7,43 @@ import { queryKeys } from '@/lib/queries/query-keys'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 import { logger } from '@/lib/utils/logger'
 import { withPerformanceTracking } from '@/lib/utils/performance'
+import { assertRpcResult, assertRpcArray } from '@/lib/utils/rpc-types'
 import { toast } from 'sonner'
 import { useRestoreIgnoredBatch } from './use-ignored-batches'
+import { safeParseJsonb } from '@/lib/validation/jsonb-validators'
+import type {
+  DraftBatchesSummaryResponse,
+  DraftBatchItem,
+  DraftBatchesByProduct,
+  ActivateDraftBatchResponse,
+  IgnoreDraftBatchResponse,
+  DeliveryResultItem,
+  LogDeliveryResponse,
+  RecentDeliveryProduct,
+} from '@/types/rpc-returns'
 
 // ============================================================================
 // TYPE DEFINITIONS
 // ============================================================================
 
-/**
- * Summary statistics for draft batches in a store
- */
-export interface DraftBatchesSummary {
-  total_draft_batches: number
-  total_units: number
-  products_with_drafts: number
-  by_category: Array<{
-    category_code: string
-    category_name: string
-    draft_count: number
-    total_quantity: number
-  }>
+// Re-export types from centralized location for backwards compatibility
+export type {
+  DraftBatchesSummaryResponse as DraftBatchesSummary,
+  DraftBatchItem,
+  DraftBatchesByProduct as ProductWithDraftBatches,
+  ActivateDraftBatchResponse as ActivateDraftBatchResult,
+  IgnoreDraftBatchResponse as IgnoreDraftBatchResult,
+  DeliveryResultItem as DeliveryItemResult,
+  LogDeliveryResponse as LogDeliveryResult,
+  RecentDeliveryProduct,
 }
 
 /**
- * Individual draft batch item
- */
-export interface DraftBatchItem {
-  batch_id: string
-  batch_number: string
-  quantity: number
-  received_date: string | null
-  created_at: string
-}
-
-/**
- * Product with its associated draft batches
- */
-export interface ProductWithDraftBatches {
-  product_id: string
-  product_name: string
-  product_brand: string | null
-  category_name: string | null
-  typical_shelf_life_days: number | null
-  draft_batch_count: number
-  total_draft_quantity: number
-  draft_batches: DraftBatchItem[]
-  last_expiry_days: number | null
-  last_batch_expiry_date: string | null
-  total_count: number // Total matching products (for pagination)
-}
-
-/**
- * Result from activating a draft batch
- */
-export interface ActivateDraftBatchResult {
-  success: boolean
-  activated_batch_id: string
-  activated_quantity: number
-  expiry_date: string
-  was_split: boolean
-  remaining_draft_batch_id: string | null
-  remaining_draft_quantity: number | null
-  message: string
-}
-
-/**
- * Result from ignoring a draft batch
- */
-export interface IgnoreDraftBatchResult {
-  success: boolean
-  ignored_batch_id: string
-  ignored_quantity: number
-  product_name: string
-  was_split: boolean
-  remaining_draft_batch_id: string | null
-  remaining_draft_quantity: number | null
-  message: string
-}
-
-/**
- * Item for delivery logging
+ * Item for delivery logging (input parameter type)
  */
 export interface DeliveryItem {
   product_id: string
   quantity: number
-}
-
-/**
- * Individual item result from delivery logging
- */
-export interface DeliveryItemResult {
-  product_id: string
-  product_name: string
-  quantity: number
-  draft_batch_id: string
-  suggested_expiry_days: number | null
-  suggested_expiry_date: string | null
-}
-
-/**
- * Result from logging a delivery
- */
-export interface LogDeliveryResult {
-  success: boolean
-  total_items: number
-  drafts_created: number
-  items: DeliveryItemResult[]
-}
-
-/**
- * Recent delivery product information
- */
-export interface RecentDeliveryProduct {
-  product_id: string
-  product_name: string
-  last_delivery_quantity: number
-  last_expiry_days: number | null
-  total_delivery_count: number
 }
 
 /**
@@ -143,7 +63,7 @@ export interface DraftBatchesByProductOptions {
 /**
  * Fetch summary of draft batches for a store
  */
-async function fetchDraftBatchesSummary(storeId: string): Promise<DraftBatchesSummary> {
+async function fetchDraftBatchesSummary(storeId: string): Promise<DraftBatchesSummaryResponse> {
   const supabase = createClient()
   const context = 'fetchDraftBatchesSummary'
 
@@ -161,12 +81,14 @@ async function fetchDraftBatchesSummary(storeId: string): Promise<DraftBatchesSu
       throw new Error(`Failed to fetch draft batches summary: ${error.message}`)
     }
 
+    const result = assertRpcResult<DraftBatchesSummaryResponse>(data)
+
     logger.log(context, 'Draft batches summary fetched', {
       storeId,
-      totalDrafts: (data as DraftBatchesSummary)?.total_draft_batches || 0,
+      totalDrafts: result?.total_draft_batches || 0,
     })
 
-    return data as DraftBatchesSummary
+    return result
   })
 }
 
@@ -176,7 +98,7 @@ async function fetchDraftBatchesSummary(storeId: string): Promise<DraftBatchesSu
 async function fetchDraftBatchesByProduct(
   storeId: string,
   options: DraftBatchesByProductOptions = {},
-): Promise<ProductWithDraftBatches[]> {
+): Promise<DraftBatchesByProduct[]> {
   const supabase = createClient()
   const context = 'fetchDraftBatchesByProduct'
 
@@ -189,10 +111,10 @@ async function fetchDraftBatchesByProduct(
         .schema('inventory')
         .rpc('get_draft_batches_by_product', {
           p_store_id: storeId,
-          p_category_codes: options.category_codes || null,
-          p_limit: options.limit || null,
-          p_offset: options.offset || null,
-          p_search: options.search || null,
+          p_category_codes: options.category_codes ?? undefined,
+          p_limit: options.limit ?? undefined,
+          p_offset: options.offset ?? undefined,
+          p_search: options.search ?? undefined,
         })
 
       if (error) {
@@ -205,7 +127,7 @@ async function fetchDraftBatchesByProduct(
         throw new Error(`Failed to fetch draft batches by product: ${error.message}`)
       }
 
-      const results = (data || []) as ProductWithDraftBatches[]
+      const results = assertRpcArray<DraftBatchesByProduct>(data)
 
       logger.log(context, 'Draft batches by product fetched', {
         storeId,
@@ -250,7 +172,7 @@ async function fetchRecentDeliveryProducts(
         throw new Error(`Failed to fetch recent delivery products: ${error.message}`)
       }
 
-      const results = (data || []) as RecentDeliveryProduct[]
+      const results = assertRpcArray<RecentDeliveryProduct>(data)
 
       logger.log(context, 'Recent delivery products fetched', {
         storeId,
@@ -360,8 +282,49 @@ export function useActivateDraftBatch() {
       expiryDate: string
       quantity?: number
       userId?: string
-    }): Promise<ActivateDraftBatchResult> => {
+    }): Promise<ActivateDraftBatchResponse> => {
       const context = 'activateDraftBatch'
+
+      // Check user authentication and authorization
+      if (!activeStoreId) {
+        throw new Error('No active store selected')
+      }
+
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+      if (!user) {
+        throw new Error('User not authenticated')
+      }
+
+      // Verify user has permission to manage batches for this store
+      const { data: storeUser, error: permissionError } = await supabase
+        .schema('business')
+        .from('store_users')
+        .select('role_in_store, permissions, is_active')
+        .eq('store_id', activeStoreId)
+        .eq('user_id', user.id)
+        .eq('is_active', true)
+        .single()
+
+      if (permissionError || !storeUser) {
+        logger.error(context, 'Permission check failed', { error: permissionError })
+        throw new Error('You do not have permission to manage batches for this store')
+      }
+
+      // Check if user has permission to manage batches
+      // Validate JSONB permissions with runtime validation
+      const permissionsResult = safeParseJsonb.storeUserPermissions(storeUser.permissions || {})
+      const permissions = permissionsResult.success ? permissionsResult.data : {}
+
+      const canManageBatches =
+        storeUser.role_in_store === 'owner' ||
+        storeUser.role_in_store === 'manager' ||
+        (permissions.can_upload_inventory ?? false)
+
+      if (!canManageBatches) {
+        throw new Error('You do not have permission to activate batches')
+      }
 
       logger.log(context, 'Starting draft batch activation', {
         batchId: params.batchId,
@@ -373,8 +336,8 @@ export function useActivateDraftBatch() {
       const { data, error } = await supabase.schema('inventory').rpc('activate_draft_batch', {
         p_batch_id: params.batchId,
         p_expiry_date: params.expiryDate,
-        p_quantity: params.quantity || null,
-        p_user_id: params.userId || null,
+        p_quantity: params.quantity ?? undefined,
+        p_user_id: params.userId ?? undefined,
       })
       const endTime = performance.now()
 
@@ -392,7 +355,7 @@ export function useActivateDraftBatch() {
         throw error
       }
 
-      return data as ActivateDraftBatchResult
+      return assertRpcResult<ActivateDraftBatchResponse>(data)
     },
 
     onSuccess: (result, _variables) => {
@@ -423,9 +386,11 @@ export function useActivateDraftBatch() {
         }
 
         // Invalidate the activated batch detail
-        queryClient.invalidateQueries({
-          queryKey: queryKeys.batches.detail(result.activated_batch_id),
-        })
+        if (result.activated_batch_id) {
+          queryClient.invalidateQueries({
+            queryKey: queryKeys.batches.detail(result.activated_batch_id),
+          })
+        }
 
         // If batch was split, also invalidate the remaining draft batch
         if (result.was_split && result.remaining_draft_batch_id) {
@@ -477,8 +442,49 @@ export function useIgnoreDraftBatch() {
       batchId: string
       quantity?: number
       userId?: string
-    }): Promise<IgnoreDraftBatchResult> => {
+    }): Promise<IgnoreDraftBatchResponse> => {
       const context = 'ignoreDraftBatch'
+
+      // Check user authentication and authorization
+      if (!activeStoreId) {
+        throw new Error('No active store selected')
+      }
+
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+      if (!user) {
+        throw new Error('User not authenticated')
+      }
+
+      // Verify user has permission to manage batches for this store
+      const { data: storeUser, error: permissionError } = await supabase
+        .schema('business')
+        .from('store_users')
+        .select('role_in_store, permissions, is_active')
+        .eq('store_id', activeStoreId)
+        .eq('user_id', user.id)
+        .eq('is_active', true)
+        .single()
+
+      if (permissionError || !storeUser) {
+        logger.error(context, 'Permission check failed', { error: permissionError })
+        throw new Error('You do not have permission to manage batches for this store')
+      }
+
+      // Check if user has permission to manage batches
+      // Validate JSONB permissions with runtime validation
+      const permissionsResult = safeParseJsonb.storeUserPermissions(storeUser.permissions || {})
+      const permissions = permissionsResult.success ? permissionsResult.data : {}
+
+      const canManageBatches =
+        storeUser.role_in_store === 'owner' ||
+        storeUser.role_in_store === 'manager' ||
+        (permissions.can_upload_inventory ?? false)
+
+      if (!canManageBatches) {
+        throw new Error('You do not have permission to ignore batches')
+      }
 
       logger.log(context, 'Starting draft batch ignore', {
         batchId: params.batchId,
@@ -488,8 +494,8 @@ export function useIgnoreDraftBatch() {
       const startTime = performance.now()
       const { data, error } = await supabase.schema('inventory').rpc('ignore_draft_batch', {
         p_batch_id: params.batchId,
-        p_quantity: params.quantity || null,
-        p_user_id: params.userId || null,
+        p_quantity: params.quantity ?? undefined,
+        p_user_id: params.userId ?? undefined,
       })
       const endTime = performance.now()
 
@@ -507,7 +513,7 @@ export function useIgnoreDraftBatch() {
         throw error
       }
 
-      return data as IgnoreDraftBatchResult
+      return assertRpcResult<IgnoreDraftBatchResponse>(data)
     },
 
     onMutate: async params => {
@@ -526,18 +532,21 @@ export function useIgnoreDraftBatch() {
       // Optimistically remove batch from the list
       queryClient.setQueryData(
         queryKeys.batches.draftsByProduct(activeStoreId, {}),
-        (old: ProductWithDraftBatches[] | undefined) => {
+        (old: DraftBatchesByProduct[] | undefined) => {
           if (!old) return old
 
           return old
             .map(product => ({
               ...product,
-              draft_batches: product.draft_batches.filter(b => b.batch_id !== params.batchId),
-              draft_batch_count: product.draft_batches.filter(b => b.batch_id !== params.batchId)
-                .length,
+              draft_batches: product.draft_batches.filter(
+                (b: DraftBatchItem) => b.batch_id !== params.batchId,
+              ),
+              draft_batch_count: product.draft_batches.filter(
+                (b: DraftBatchItem) => b.batch_id !== params.batchId,
+              ).length,
               total_draft_quantity: product.draft_batches
-                .filter(b => b.batch_id !== params.batchId)
-                .reduce((sum, b) => sum + b.quantity, 0),
+                .filter((b: DraftBatchItem) => b.batch_id !== params.batchId)
+                .reduce((sum: number, b: DraftBatchItem) => sum + b.quantity, 0),
             }))
             .filter(p => p.draft_batches.length > 0) // Remove products with no drafts
         },
@@ -554,12 +563,14 @@ export function useIgnoreDraftBatch() {
 
         toast.success(`${result.product_name} ignored`, {
           description: message,
-          action: {
-            label: 'Undo',
-            onClick: () => {
-              restoreBatch({ batchId: result.ignored_batch_id })
-            },
-          },
+          action: result.ignored_batch_id
+            ? {
+                label: 'Undo',
+                onClick: () => {
+                  restoreBatch({ batchId: result.ignored_batch_id! })
+                },
+              }
+            : undefined,
           duration: 5000,
         })
 
@@ -576,9 +587,11 @@ export function useIgnoreDraftBatch() {
         }
 
         // Invalidate the ignored batch detail
-        queryClient.invalidateQueries({
-          queryKey: queryKeys.batches.detail(result.ignored_batch_id),
-        })
+        if (result.ignored_batch_id) {
+          queryClient.invalidateQueries({
+            queryKey: queryKeys.batches.detail(result.ignored_batch_id),
+          })
+        }
 
         // If batch was split, also invalidate the remaining draft batch
         if (result.was_split && result.remaining_draft_batch_id) {
@@ -637,7 +650,7 @@ export function useLogDelivery() {
     mutationFn: async (params: {
       items: DeliveryItem[]
       userId?: string
-    }): Promise<LogDeliveryResult> => {
+    }): Promise<LogDeliveryResponse> => {
       const context = 'logDelivery'
 
       if (!activeStoreId) {
@@ -670,7 +683,8 @@ export function useLogDelivery() {
       const { data, error } = await supabase.schema('inventory').rpc('log_delivery_create_drafts', {
         p_store_id: activeStoreId,
         p_user_id: userId,
-        p_items: params.items,
+        // Supabase types JSONB RPC parameters as Json - we need to cast the typed array to match
+        p_items: params.items as never,
       })
       const endTime = performance.now()
 
@@ -685,7 +699,7 @@ export function useLogDelivery() {
         throw error
       }
 
-      return data as LogDeliveryResult
+      return assertRpcResult<LogDeliveryResponse>(data)
     },
 
     onSuccess: (result, _variables) => {

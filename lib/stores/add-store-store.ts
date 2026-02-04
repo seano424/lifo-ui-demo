@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
 import type { STORE_TYPES } from '@/lib/schemas/store-schemas'
-import type { Database } from '@/types/supabase'
+import type { Database } from '@/types/supabase-extended'
 
 // Database types
 export type StoreInsert = Database['business']['Tables']['stores']['Insert']

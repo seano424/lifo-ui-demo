@@ -51,9 +51,9 @@ async function fetchIgnoredBatchesByProduct(
     .schema('inventory')
     .rpc('get_ignored_batches_by_product', {
       p_store_id: storeId,
-      p_category_codes: options.category_codes || null,
-      p_limit: options.limit || null,
-      p_offset: options.offset || null,
+      p_category_codes: options.category_codes ?? undefined,
+      p_limit: options.limit ?? undefined,
+      p_offset: options.offset ?? undefined,
     })
 
   if (error) {

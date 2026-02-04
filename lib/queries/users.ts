@@ -258,7 +258,7 @@ export async function updateUserPhone(
 
       const { data, error } = await supabase.rpc('update_user_phone', {
         target_user_id: userId,
-        new_phone: phone,
+        new_phone: phone ?? '',
       })
 
       if (error) {
@@ -342,12 +342,20 @@ export async function getUserByUsername(
         throw new Error(`Failed to lookup user by username: ${error.message}`)
       }
 
-      if (!data || data.length === 0) {
+      const userData = data as unknown as Array<{
+        id: string
+        username: string
+        email: string
+      }> | null
+      if (!userData || userData.length === 0) {
         logger.log('lib/queries/users', 'User not found by username', { username })
         return null
       }
 
-      return data[0]
+      return {
+        user_id: userData[0].id,
+        email: userData[0].email,
+      }
     },
   )
 }
@@ -591,9 +599,12 @@ export async function fetchUserRoles(userId: string): Promise<string[]> {
       return []
     }
 
-    const roles = data
-      ? data.flatMap((item: { roles: { role_name: string }[] }) =>
-          Array.isArray(item.roles) ? item.roles.map(r => r.role_name) : [],
+    const typedData = data as unknown as Array<{
+      roles: Array<{ role_name: string }> | { role_name: string }
+    }> | null
+    const roles = typedData
+      ? typedData.flatMap(item =>
+          Array.isArray(item.roles) ? item.roles.map(r => r.role_name) : [item.roles.role_name],
         )
       : []
     return roles

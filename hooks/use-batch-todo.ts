@@ -18,7 +18,7 @@ async function fetchBatchTodo(batchId: string): Promise<TodoItem | null> {
     return null
   }
 
-  return data || null
+  return (data as unknown as TodoItem) || null
 }
 
 /**

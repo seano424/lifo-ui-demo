@@ -18,11 +18,8 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { BatchCreationSheet, DraftBatchCard } from '@/components/batch-creation'
 import { TodoSearchBar } from '@/components/todos/filters/todo-search-bar'
-import {
-  useDraftBatchesByProduct,
-  useDraftBatchesSummary,
-  type ProductWithDraftBatches,
-} from '@/hooks/use-draft-batches'
+import { useDraftBatchesByProduct, useDraftBatchesSummary } from '@/hooks/use-draft-batches'
+import type { DraftBatchesByProduct } from '@/types/rpc-returns'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 import { Typography } from '@/components/ui/typography'
 import { useTranslations } from 'next-intl'
@@ -42,7 +39,7 @@ export default function NewBatchesPage() {
     search: undefined,
   }))
   const [selectedCategories, setSelectedCategories] = useState<string[]>([])
-  const [selectedProduct, setSelectedProduct] = useState<ProductWithDraftBatches | null>(null)
+  const [selectedProduct, setSelectedProduct] = useState<DraftBatchesByProduct | null>(null)
   const [isSheetOpen, setIsSheetOpen] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
 
@@ -124,7 +121,7 @@ export default function NewBatchesPage() {
     setCurrentPage(1)
   }
 
-  const handleOpenSheet = (product: ProductWithDraftBatches) => {
+  const handleOpenSheet = (product: DraftBatchesByProduct) => {
     setSelectedProduct(product)
     setIsSheetOpen(true)
   }
@@ -194,7 +191,7 @@ export default function NewBatchesPage() {
                   <div className="flex items-center justify-between w-full">
                     <span>{category.category_name}</span>
                     <Badge variant="outline" className="ml-2 text-xs">
-                      {category.draft_count}
+                      {category.product_count}
                     </Badge>
                   </div>
                 </DropdownMenuCheckboxItem>

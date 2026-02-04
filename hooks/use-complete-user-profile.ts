@@ -39,7 +39,7 @@ export function useCompleteUserProfile() {
       // Call the consolidated RPC function
       const { data, error } = await supabase.rpc('get_user_complete_profile', {
         p_user_id: user.id,
-        p_store_id: activeStoreId,
+        p_store_id: activeStoreId ?? undefined,
       })
 
       if (error) {
@@ -50,7 +50,7 @@ export function useCompleteUserProfile() {
         throw new Error('User profile not found')
       }
 
-      return data as CompleteUserProfile
+      return data as unknown as CompleteUserProfile
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
     retry: (failureCount, error: Error) => {

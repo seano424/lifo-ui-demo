@@ -6,7 +6,7 @@
 
 import { createClient } from '@/lib/supabase/client'
 import { BATCH_SOURCES } from '@/types/inventory'
-import type { Database, Json } from '@/types/supabase'
+import type { Database, Json } from '@/types/supabase-extended'
 import { logger } from '@/lib/utils/logger'
 import { withPerformanceTracking } from '@/lib/utils/performance'
 
@@ -609,10 +609,10 @@ async function bulkUpsertProducts(
     .select('*')
     .in('barcode', barcodes)
 
-  const existingBarcodesSet = new Set(existingProducts?.map(p => p.barcode) || [])
+  const existingBarcodesSet = new Set(existingProducts?.map(p => p.barcode).filter(Boolean) || [])
 
   // Split into new products (to insert) and existing products (to return)
-  const newProducts = bulkProductData.filter(p => !existingBarcodesSet.has(p.barcode))
+  const newProducts = bulkProductData.filter(p => p.barcode && !existingBarcodesSet.has(p.barcode))
 
   logger.log(context, 'Products analyzed', {
     existing: existingProducts?.length || 0,

@@ -1,5 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
-import type { Database } from '@/types/supabase'
+import type { Database } from '@/types/supabase-extended'
 
 type Store = Database['business']['Tables']['stores']['Row']
 type Batch = Database['inventory']['Tables']['batches']['Row']

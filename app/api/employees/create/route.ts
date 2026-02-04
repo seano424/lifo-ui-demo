@@ -76,10 +76,11 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    const permissions = storeUser.permissions as { can_manage_users?: boolean } | null
     const canManageUsers =
       storeUser.role_in_store === 'owner' ||
       storeUser.role_in_store === 'manager' ||
-      storeUser.permissions?.can_manage_users === true
+      (permissions?.can_manage_users ?? false)
 
     if (!canManageUsers) {
       return NextResponse.json(
@@ -197,10 +198,7 @@ export async function POST(request: NextRequest) {
       success: true,
       user_id: newUser.user.id,
       username,
-      email,
-      pin,
-      role,
-      message: 'Employee created successfully using Admin API',
+      message: 'Employee created successfully. PIN has been set and can be shared securely.',
     })
   } catch (error: unknown) {
     console.error('❌ Server error in employee creation:', error)

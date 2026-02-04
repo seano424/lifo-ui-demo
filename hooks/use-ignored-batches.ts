@@ -7,63 +7,25 @@ import { queryKeys } from '@/lib/queries/query-keys'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 import { logger } from '@/lib/utils/logger'
 import { withPerformanceTracking } from '@/lib/utils/performance'
+import { assertRpcResult, assertRpcArray } from '@/lib/utils/rpc-types'
 import { toast } from 'sonner'
+import type {
+  IgnoredBatchesSummaryResponse,
+  IgnoredBatchItem,
+  IgnoredBatchesByProduct,
+  RestoreIgnoredBatchResponse,
+} from '@/types/rpc-returns'
 
 // ============================================================================
 // TYPE DEFINITIONS
 // ============================================================================
 
-/**
- * Summary statistics for ignored batches in a store
- */
-export interface IgnoredBatchesSummary {
-  total_ignored_batches: number
-  total_units: number
-  products_with_ignored: number
-  by_category: Array<{
-    category_code: string
-    category_name: string
-    ignored_count: number
-    total_quantity: number
-  }>
-}
-
-/**
- * Individual ignored batch item
- */
-export interface IgnoredBatchItem {
-  batch_id: string
-  batch_number: string
-  quantity: number
-  received_date: string | null
-  ignored_at: string
-  created_at: string
-}
-
-/**
- * Product with its associated ignored batches
- */
-export interface ProductWithIgnoredBatches {
-  product_id: string
-  product_name: string
-  product_brand: string | null
-  category_name: string | null
-  typical_shelf_life_days: number | null
-  ignored_batch_count: number
-  total_ignored_quantity: number
-  ignored_batches: IgnoredBatchItem[]
-  total_count: number // Total matching products (for pagination)
-}
-
-/**
- * Result from restoring an ignored batch
- */
-export interface RestoreIgnoredBatchResult {
-  success: boolean
-  restored_batch_id: string
-  restored_quantity: number
-  product_name: string
-  message: string
+// Re-export types from centralized location for backwards compatibility
+export type {
+  IgnoredBatchesSummaryResponse as IgnoredBatchesSummary,
+  IgnoredBatchItem,
+  IgnoredBatchesByProduct as ProductWithIgnoredBatches,
+  RestoreIgnoredBatchResponse as RestoreIgnoredBatchResult,
 }
 
 /**
@@ -83,7 +45,7 @@ export interface IgnoredBatchesByProductOptions extends Record<string, unknown> 
 /**
  * Fetch summary of ignored batches for a store
  */
-async function fetchIgnoredBatchesSummary(storeId: string): Promise<IgnoredBatchesSummary> {
+async function fetchIgnoredBatchesSummary(storeId: string): Promise<IgnoredBatchesSummaryResponse> {
   const supabase = createClient()
   const context = 'fetchIgnoredBatchesSummary'
 
@@ -107,12 +69,14 @@ async function fetchIgnoredBatchesSummary(storeId: string): Promise<IgnoredBatch
         throw new Error(`Failed to fetch ignored batches summary: ${error.message}`)
       }
 
+      const result = assertRpcResult<IgnoredBatchesSummaryResponse>(data)
+
       logger.log(context, 'Ignored batches summary fetched', {
         storeId,
-        totalIgnored: (data as IgnoredBatchesSummary)?.total_ignored_batches || 0,
+        totalIgnored: result?.total_ignored_batches || 0,
       })
 
-      return data as IgnoredBatchesSummary
+      return result
     },
   )
 }
@@ -123,7 +87,7 @@ async function fetchIgnoredBatchesSummary(storeId: string): Promise<IgnoredBatch
 async function fetchIgnoredBatchesByProduct(
   storeId: string,
   options: IgnoredBatchesByProductOptions = {},
-): Promise<ProductWithIgnoredBatches[]> {
+): Promise<IgnoredBatchesByProduct[]> {
   const supabase = createClient()
   const context = 'fetchIgnoredBatchesByProduct'
 
@@ -136,10 +100,10 @@ async function fetchIgnoredBatchesByProduct(
         .schema('inventory')
         .rpc('get_ignored_batches_by_product', {
           p_store_id: storeId,
-          p_category_codes: options.category_codes || null,
-          p_limit: options.limit || null,
-          p_offset: options.offset || null,
-          p_search: options.search || null,
+          p_category_codes: options.category_codes ?? undefined,
+          p_limit: options.limit ?? undefined,
+          p_offset: options.offset ?? undefined,
+          p_search: options.search ?? undefined,
         })
 
       if (error) {
@@ -152,7 +116,7 @@ async function fetchIgnoredBatchesByProduct(
         throw new Error(`Failed to fetch ignored batches by product: ${error.message}`)
       }
 
-      const results = (data || []) as ProductWithIgnoredBatches[]
+      const results = assertRpcArray<IgnoredBatchesByProduct>(data)
 
       logger.log(context, 'Ignored batches by product fetched', {
         storeId,
@@ -239,7 +203,7 @@ export function useRestoreIgnoredBatch() {
     mutationFn: async (params: {
       batchId: string
       userId?: string
-    }): Promise<RestoreIgnoredBatchResult> => {
+    }): Promise<RestoreIgnoredBatchResponse> => {
       const context = 'restoreIgnoredBatch'
 
       logger.log(context, 'Starting ignored batch restore', {
@@ -249,7 +213,7 @@ export function useRestoreIgnoredBatch() {
       const startTime = performance.now()
       const { data, error } = await supabase.schema('inventory').rpc('restore_ignored_batch', {
         p_batch_id: params.batchId,
-        p_user_id: params.userId || null,
+        p_user_id: params.userId ?? undefined,
       })
       const endTime = performance.now()
 
@@ -267,7 +231,7 @@ export function useRestoreIgnoredBatch() {
         throw error
       }
 
-      return data as RestoreIgnoredBatchResult
+      return assertRpcResult<RestoreIgnoredBatchResponse>(data)
     },
 
     onSuccess: (result, _variables) => {
@@ -289,9 +253,11 @@ export function useRestoreIgnoredBatch() {
         }
 
         // Invalidate the restored batch detail
-        queryClient.invalidateQueries({
-          queryKey: queryKeys.batches.detail(result.restored_batch_id),
-        })
+        if (result.restored_batch_id) {
+          queryClient.invalidateQueries({
+            queryKey: queryKeys.batches.detail(result.restored_batch_id),
+          })
+        }
       } else {
         toast.error('Restore failed', {
           description: result.message,

@@ -26,7 +26,7 @@ import {
 } from '@/lib/queries/batches-rpc'
 import { queryKeys } from '@/lib/queries/query-keys'
 import { useActiveStoreId } from '@/lib/stores/store-context'
-import type { Database } from '@/types/supabase'
+import type { Database } from '@/types/supabase-extended'
 import type { TodoFilters } from '@/lib/queries/todos-rpc'
 import { useCallback, useState } from 'react'
 import { toast } from 'sonner'

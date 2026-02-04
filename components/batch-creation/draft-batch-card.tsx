@@ -3,12 +3,12 @@
 import { Calendar, Package } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
-import type { ProductWithDraftBatches } from '@/hooks/use-draft-batches'
+import type { DraftBatchesByProduct } from '@/types/rpc-returns'
 import { cn } from '@/lib/utils'
 import { Typography } from '@/components/ui/typography'
 
 interface DraftBatchCardProps {
-  product: ProductWithDraftBatches
+  product: DraftBatchesByProduct
   onClick: () => void
   className?: string
 }

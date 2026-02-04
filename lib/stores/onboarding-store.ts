@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
 import type { STORE_TYPES } from '@/lib/schemas/store-schemas'
 import { stepManager, STEP_IDS, type StepId } from '@/lib/utils/onboarding-step-manager'
-import type { Database } from '@/types/supabase'
+import type { Database } from '@/types/supabase-extended'
 
 // Database types
 export type Store = Database['business']['Tables']['stores']['Row']

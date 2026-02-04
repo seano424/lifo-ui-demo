@@ -155,11 +155,11 @@ async function createDonationRecipient(
     .insert({
       store_id: storeId,
       name: recipientData.name,
-      recipient_type: recipientData.type,
-      contact_email: recipientData.contactEmail,
-      contact_phone: recipientData.contactPhone,
+      recipient_type: recipientData.type === 'adhoc' ? 'other' : recipientData.type,
+      contact_email: recipientData.contactEmail ?? null,
+      contact_phone: recipientData.contactPhone ?? null,
       is_certified: recipientData.isCertified ?? false,
-      certification_notes: recipientData.certificationNotes,
+      certification_notes: recipientData.certificationNotes ?? null,
       accepts_pickups: recipientData.acceptsPickups ?? true,
       max_distance_km: recipientData.maxDistanceKm ?? 10,
       is_active: true,
@@ -275,6 +275,16 @@ export function useDonationRecipients(storeId: string | undefined) {
       })
       return createDonationRecipient(storeId, recipientData)
     },
+    onMutate: async () => {
+      // Cancel outgoing refetches to prevent overwriting optimistic update
+      const queryKey = queryKeys.donations.recipients(storeId || '')
+      await queryClient.cancelQueries({ queryKey })
+
+      // Snapshot the previous value for rollback
+      const previousRecipients = queryClient.getQueryData(queryKey)
+
+      return { previousRecipients }
+    },
     onSuccess: async createdRecipient => {
       logger.log('useDonationRecipients', 'Mutation onSuccess - recipient created', {
         recipientId: createdRecipient.id,
@@ -294,7 +304,14 @@ export function useDonationRecipients(storeId: string | undefined) {
 
       toast.success(`Recipient "${createdRecipient.name}" created successfully`)
     },
-    onError: error => {
+    onError: (error, _variables, context) => {
+      // Rollback to previous data on error
+      if (context?.previousRecipients) {
+        const queryKey = queryKeys.donations.recipients(storeId || '')
+        queryClient.setQueryData(queryKey, context.previousRecipients)
+        logger.log('useDonationRecipients', 'Rolled back to previous recipients data after error')
+      }
+
       const errorMessage = error instanceof Error ? error.message : 'Failed to create recipient'
       logger.error('useDonationRecipients', 'Mutation onError - failed to create recipient', {
         error,

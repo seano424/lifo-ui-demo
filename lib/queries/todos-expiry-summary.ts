@@ -49,13 +49,23 @@ export async function fetchExpiryTodosSummary(
           throw new Error(`Failed to fetch expiry todos summary: ${error.message}`)
         }
 
-        const result = data || {
+        const defaultSummary = {
           expiring_today: 0,
           expiring_soon: 0,
           expiring_week: 0,
           expired: 0,
           total: 0,
         }
+
+        const result = data
+          ? {
+              expiring_today: data.expiring_today ?? 0,
+              expiring_soon: data.expiring_soon ?? 0,
+              expiring_week: data.expiring_week ?? 0,
+              expired: data.expired ?? 0,
+              total: data.total ?? 0,
+            }
+          : defaultSummary
 
         logger.log(context, 'Expiry todos summary fetched successfully (RPC)', {
           storeId,

@@ -85,8 +85,9 @@ export async function fetchInventoryKPITrends(
 
   const uniqueProducts = new Set(currentData?.map(batch => batch.product_id) ?? [])
 
+  type BatchData = { created_at: string; current_quantity: number; selling_price: number }
   const dailyValues =
-    currentData?.reduce(
+    (currentData as unknown as BatchData[])?.reduce(
       (acc, batch) => {
         const date = new Date(batch.created_at).toDateString()
         const value = batch.current_quantity * batch.selling_price
@@ -151,8 +152,9 @@ export async function fetchSalesKPITrends(
   const previous =
     previousData?.reduce((sum, action) => sum + (action.total_recovered_value || 0), 0) ?? 0
 
+  type ActionData = { performed_at: string; total_recovered_value: number | null }
   const dailySales =
-    currentData?.reduce(
+    (currentData as unknown as ActionData[])?.reduce(
       (acc, action) => {
         const date = new Date(action.performed_at).toDateString()
         const value = action.total_recovered_value || 0
@@ -233,8 +235,9 @@ export async function fetchDonationKPITrends(
     currentData?.filter(a => a.donation_recipient_id).map(a => a.donation_recipient_id),
   )
 
+  type DonationActionData = { performed_at: string; total_original_value: number | null }
   const dailyDonations =
-    currentData?.reduce(
+    (currentData as unknown as DonationActionData[])?.reduce(
       (acc, action) => {
         const date = new Date(action.performed_at).toDateString()
         const value = action.total_original_value || 0
@@ -298,8 +301,9 @@ export async function fetchWasteKPITrends(
   const previous =
     previousData?.reduce((sum, action) => sum + (action.total_original_value || 0), 0) ?? 0
 
+  type WasteActionData = { performed_at: string; total_original_value: number | null }
   const dailyWaste =
-    currentData?.reduce(
+    (currentData as unknown as WasteActionData[])?.reduce(
       (acc, action) => {
         const date = new Date(action.performed_at).toDateString()
         const value = action.total_original_value || 0

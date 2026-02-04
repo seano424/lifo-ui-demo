@@ -126,6 +126,7 @@ export async function fetchAllStoresInsights(
 
   // First get all active stores
   const { data: stores, error: storesError } = await supabase
+    .schema('business')
     .from('stores')
     .select('store_id, store_name')
     .eq('is_active', true)
@@ -139,8 +140,9 @@ export async function fetchAllStoresInsights(
     return []
   }
 
+  type StoreData = { store_id: string; store_name: string }
   // Get insights for each store
-  const insightsPromises = stores.map((store: { store_id: string; store_name: string }) =>
+  const insightsPromises = (stores as unknown as StoreData[]).map((store: StoreData) =>
     fetchStoreInsights(store.store_id, serverClient),
   )
 

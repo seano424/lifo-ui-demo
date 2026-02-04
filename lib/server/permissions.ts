@@ -1,5 +1,8 @@
 // lib/server/permissions.ts
 import type { createClient as createServerClient } from '@/lib/supabase/server'
+import type { StoreUserPermissions as StoreUserPermissionsType } from '@/lib/schemas'
+import { safeParseJsonb } from '@/lib/validation/jsonb-validators'
+import { DEFAULT_STORE_USER_PERMISSIONS } from '@/lib/schemas/jsonb-schemas'
 
 type ServerClient = Awaited<ReturnType<typeof createServerClient>>
 
@@ -94,7 +97,22 @@ export async function checkUserStorePermissions(
     }
 
     // User has store_users relationship - determine permissions based on role and explicit permissions
-    const permissions = storeUser.permissions || {}
+    // Validate JSONB permissions data with runtime validation
+    const permissionsResult = safeParseJsonb.storeUserPermissions(storeUser.permissions || {})
+    const permissions: StoreUserPermissionsType = permissionsResult.success
+      ? permissionsResult.data
+      : DEFAULT_STORE_USER_PERMISSIONS
+
+    // Log validation failures for monitoring
+    if (!permissionsResult.success) {
+      console.warn('⚠️ Invalid permissions JSONB data for user:', {
+        userId,
+        storeId,
+        error: permissionsResult.error,
+        rawData: storeUser.permissions,
+      })
+    }
+
     const role = storeUser.role_in_store
 
     const isOwner = role === 'owner'
@@ -105,21 +123,33 @@ export async function checkUserStorePermissions(
     const userPermissions: UserStorePermissions = {
       // Settings permissions
       canViewSettings:
-        permissions.can_manage_settings || permissions.can_view_settings || isOwner || isManager,
+        (permissions.can_manage_settings ?? false) ||
+        (permissions.can_view_settings ?? false) ||
+        isOwner ||
+        isManager,
       canEditBasicInfo:
-        permissions.can_manage_settings || permissions.can_edit_basic_info || isOwner || isManager,
+        (permissions.can_manage_settings ?? false) ||
+        (permissions.can_edit_basic_info ?? false) ||
+        isOwner ||
+        isManager,
       canEditAdvancedSettings:
-        permissions.can_manage_settings || permissions.can_edit_advanced_settings || isOwner,
-      canEditAISettings: permissions.can_edit_ai_settings || isOwner, // Very restrictive
+        (permissions.can_manage_settings ?? false) ||
+        (permissions.can_edit_advanced_settings ?? false) ||
+        isOwner,
+      canEditAISettings: (permissions.can_edit_ai_settings ?? false) || isOwner, // Very restrictive
 
       // Team management
       canManageTeam:
-        permissions.can_manage_team || permissions.can_manage_users || isOwner || isManager,
+        (permissions.can_manage_team ?? false) ||
+        (permissions.can_manage_users ?? false) ||
+        isOwner ||
+        isManager,
 
       // Analytics and inventory
-      canViewAnalytics: permissions.can_view_analytics || isOwner || isManager,
-      canUploadInventory: permissions.can_upload_inventory || isOwner || isManager || isEmployee,
-      canApplyDiscounts: permissions.can_apply_discounts || isOwner || isManager,
+      canViewAnalytics: (permissions.can_view_analytics ?? false) || isOwner || isManager,
+      canUploadInventory:
+        (permissions.can_upload_inventory ?? false) || isOwner || isManager || isEmployee,
+      canApplyDiscounts: (permissions.can_apply_discounts ?? false) || isOwner || isManager,
 
       // Role flags
       isOwner,
@@ -223,11 +253,18 @@ export async function getUserAccessibleStores(
         )
 
         if (permissionsResult.hasAccess && permissionsResult.permissions) {
+          const storesData = storeUser.stores as
+            | { store_name: string; is_active: boolean | null }
+            | { store_name: string; is_active: boolean | null }[]
+            | null
+          const storeName = Array.isArray(storesData)
+            ? storesData[0]?.store_name
+            : (storesData as { store_name: string; is_active: boolean | null })?.store_name
+
           accessibleStores.push({
             storeId: storeUser.store_id,
-            storeName: (storeUser.stores as { store_name: string; is_active: boolean }[])[0]
-              .store_name,
-            role: storeUser.role_in_store,
+            storeName: storeName ?? 'Unknown Store',
+            role: storeUser.role_in_store ?? 'employee',
             permissions: permissionsResult.permissions,
           })
         }

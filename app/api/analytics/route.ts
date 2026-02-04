@@ -5,7 +5,7 @@ import { type NextRequest, NextResponse } from 'next/server'
 import { fastApiClient } from '@/lib/services/fastapi-client'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getStoreThreshold } from '@/lib/utils/scoring-thresholds'
-import type { Database } from '@/types/supabase'
+import type { Database } from '@/types/supabase-extended'
 
 // Helper type for batch with store_products join
 type BatchWithStoreProduct = Database['inventory']['Tables']['batches']['Row'] & {

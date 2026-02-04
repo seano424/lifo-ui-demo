@@ -4,10 +4,19 @@ import { queryKeys } from '@/lib/queries/query-keys'
 import type { TodoFilters, TodoItem } from '@/lib/queries/todos-rpc'
 import { createClient } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
+import { assertRpcResult } from '@/lib/utils/rpc-types'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { useCurrency } from '@/hooks/use-currency'
 import { ADHOC_RECIPIENT_UUID } from '@/hooks/use-donation-recipients'
+import type {
+  ExecuteDiscountResponse,
+  ExecuteDonateResponse,
+  ExecuteDisposeResponse,
+  ExecuteSoldResponse,
+  ExecuteDismissResponse,
+  ExecuteBulkActionResponse,
+} from '@/types/rpc-returns'
 
 // Type-safe action recommendation values (matches database enum)
 export type RecommendedAction =
@@ -94,10 +103,10 @@ interface BatchDetailData {
 interface DonateActionParams {
   p_batch_id: string
   p_quantity_affected: number
-  p_donation_recipient_id: string
+  p_donation_recipient_id?: string | undefined
   p_user_id: string
-  p_notes?: string | null
-  p_recommended_action?: string | null
+  p_notes?: string | undefined
+  p_recommended_action?: string | undefined
 }
 
 interface DiscountActionParams {
@@ -105,18 +114,18 @@ interface DiscountActionParams {
   p_quantity_affected: number
   p_discount_percentage: number
   p_user_id: string
-  p_notes?: string | null
-  p_recommended_action?: string | null
+  p_notes?: string | undefined
+  p_recommended_action?: string | undefined
 }
 
 interface SoldActionParams {
   p_batch_id: string
   p_quantity_sold: number
   p_user_id: string
-  p_sale_timing?: string | null
-  p_sale_occurred_at?: string | null
-  p_notes?: string | null
-  p_recommended_action?: string | null
+  p_sale_timing?: string | undefined
+  p_sale_occurred_at?: string | undefined
+  p_notes?: string | undefined
+  p_recommended_action?: string | undefined
 }
 
 interface DisposeActionParams {
@@ -124,48 +133,29 @@ interface DisposeActionParams {
   p_quantity_disposed: number
   p_disposal_reason: string
   p_user_id: string
-  p_notes?: string | null
-  p_recommended_action?: string | null
+  p_notes?: string | undefined
+  p_recommended_action?: string | undefined
 }
 
 interface DismissActionParams {
   p_batch_id: string
   p_dismissal_reason: string
   p_user_id: string
-  p_notes?: string | null
-  p_recommended_action?: string | null
+  p_notes?: string | undefined
+  p_recommended_action?: string | undefined
 }
 
-interface BulkActionParams {
-  p_batch_ids: string[]
-  p_action_type: 'donate' | 'discount' | 'sold' | 'dispose' | 'dismiss'
-  p_action_params: Record<string, unknown>
-  p_user_id: string
-}
+// Re-export RPC return types from centralized location for backwards compatibility
+// Extended action result to maintain backward compatibility with optional error field
+export type ActionResult = (
+  | ExecuteDiscountResponse
+  | ExecuteDonateResponse
+  | ExecuteDisposeResponse
+  | ExecuteSoldResponse
+  | ExecuteDismissResponse
+) & { error?: string }
 
-// RPC Return Type (all functions return this structure)
-interface ActionResult {
-  success: boolean
-  action_id?: string
-  error?: string
-  remaining_quantity?: number
-  total_value_donated?: number
-  original_price?: number
-  new_price?: number
-  savings_total?: number
-  revenue_recovered?: number
-  total_loss_value?: number
-  message?: string
-}
-
-// Bulk action result type
-interface BulkActionResult {
-  success: boolean
-  success_count: number
-  error_count: number
-  results: ActionResult[]
-  message?: string
-}
+export type BulkActionResult = ExecuteBulkActionResponse
 
 // Hook parameter types for clean API
 interface DonateParams {
@@ -348,48 +338,41 @@ export function useBatchActionRPC(providedStoreId?: string) {
 
       // Always invalidate core todos queries - use the actual query pattern that the hooks use
       const coreInvalidations = [
-        // Invalidate all filtered todos queries (this covers pending, in-progress, completed)
+        // Invalidate all todo-related queries in a single call (filtered, with-counts, counts)
+        // This combines what were previously 3 separate invalidation calls into one
         queryClient.invalidateQueries({
-          queryKey: [...queryKeys.todos.all, 'filtered'],
+          queryKey: queryKeys.todos.all,
           predicate: query => {
             const queryKey = query.queryKey as readonly unknown[]
+            // Match queries with format: ['todos', 'filtered'|'with-counts'|'counts', { storeId: ... }]
+            const queryType = queryKey?.[1] as string | undefined
             const params = queryKey?.[2] as { storeId?: string } | undefined
-            return params?.storeId === storeId
+
+            // Only invalidate queries for this specific store
+            if (params?.storeId !== storeId) {
+              return false
+            }
+
+            // Match 'filtered', 'with-counts', and 'counts' query types
+            return (
+              queryType === 'filtered' ||
+              queryType === 'with-counts' ||
+              queryType === 'counts' ||
+              queryType === 'dashboardSummary' ||
+              queryType === 'urgentCount'
+            )
           },
         }),
-        // Invalidate todos with counts queries (used by todos-filtered-list tabs)
+        // Refresh batch-specific queries
         queryClient.invalidateQueries({
-          queryKey: [...queryKeys.todos.all, 'with-counts'],
           predicate: query => {
             const queryKey = query.queryKey as readonly unknown[]
-            const params = queryKey?.[2] as { storeId?: string } | undefined
-            return params?.storeId === storeId
+            // Match batch detail and batch todo queries for this specific batch
+            return (
+              (queryKey[0] === 'batches' && queryKey[1] === 'detail' && queryKey[2] === batchId) ||
+              (queryKey[0] === 'batches' && queryKey[1] === 'todo' && queryKey[2] === batchId)
+            )
           },
-        }),
-        // Invalidate todos counts (tab badges)
-        queryClient.invalidateQueries({
-          queryKey: [...queryKeys.todos.all, 'counts'],
-          predicate: query => {
-            const queryKey = query.queryKey as readonly unknown[]
-            const params = queryKey?.[2] as { storeId?: string } | undefined
-            return params?.storeId === storeId
-          },
-        }),
-        // Refresh specific batch details
-        queryClient.invalidateQueries({
-          queryKey: queryKeys.batches.detail(batchId),
-        }),
-        // Refresh specific batch todo data (used by BatchTable)
-        queryClient.invalidateQueries({
-          queryKey: queryKeys.batches.todo(batchId),
-        }),
-        // Update dashboard summary
-        queryClient.invalidateQueries({
-          queryKey: queryKeys.todos.dashboardSummary(storeId),
-        }),
-        // Update urgent todos count (sidebar badge)
-        queryClient.invalidateQueries({
-          queryKey: queryKeys.todos.urgentCount(storeId),
         }),
       ]
 
@@ -548,10 +531,10 @@ export function useBatchActionRPC(providedStoreId?: string) {
         p_donation_recipient_id:
           params.donationRecipientId && params.donationRecipientId !== ADHOC_RECIPIENT_UUID
             ? params.donationRecipientId
-            : null,
+            : undefined,
         p_user_id: userId,
-        p_notes: params.notes || null,
-        p_recommended_action: params.recommendedAction || null,
+        p_notes: params.notes ?? undefined,
+        p_recommended_action: params.recommendedAction ?? undefined,
       } as DonateActionParams
 
       logger.log('BatchActions', 'Starting donate RPC call', {
@@ -560,7 +543,17 @@ export function useBatchActionRPC(providedStoreId?: string) {
         recommendedAction: params.recommendedAction,
       })
       const startTime = performance.now()
-      const { data, error } = await supabase.rpc('execute_donate_action', rpcParams)
+      const { data, error } = await supabase.rpc(
+        'execute_donate_action',
+        rpcParams as unknown as {
+          p_batch_id: string
+          p_donation_recipient_id: string
+          p_notes?: string | undefined
+          p_quantity_affected: number
+          p_recommended_action?: string | undefined
+          p_user_id: string
+        },
+      )
       const endTime = performance.now()
       logger.log('BatchActions', `Donate RPC completed in ${(endTime - startTime).toFixed(2)}ms`, {
         success: !error,
@@ -573,7 +566,7 @@ export function useBatchActionRPC(providedStoreId?: string) {
         throw error
       }
 
-      return data as ActionResult
+      return assertRpcResult<ActionResult>(data)
     },
     onMutate: async variables => {
       // Optimistic update: Remove from pending todos immediately
@@ -601,17 +594,20 @@ export function useBatchActionRPC(providedStoreId?: string) {
       return { storeId }
     },
     onSuccess: async (result, variables, context) => {
+      // Type narrow to ExecuteDonateResponse
+      const donateResult = result as ExecuteDonateResponse
+
       logger.log('BatchActions', '✅ Donate onSuccess called', {
         success: result.success,
         batchId: variables.batchId,
         quantity: variables.quantity,
-        remainingQuantity: result.remaining_quantity,
+        remainingQuantity: donateResult.remaining_quantity,
         storeId: context?.storeId,
       })
 
       if (result.success) {
         toast.success(`Successfully donated ${variables.quantity} units`, {
-          description: `Total value donated: ${currencySymbol}${result.total_value_donated?.toFixed(2)}`,
+          description: `Total value donated: ${currencySymbol}${donateResult.original_value?.toFixed(2)}`,
         })
         logger.log('BatchActions', '🔄 Starting query invalidation after donate')
         await invalidateRelatedQueries(variables.batchId, context?.storeId, 'donate')
@@ -658,8 +654,8 @@ export function useBatchActionRPC(providedStoreId?: string) {
         p_quantity_affected: params.quantity,
         p_discount_percentage: params.discountPercentage,
         p_user_id: userId,
-        p_notes: params.notes || null,
-        p_recommended_action: params.recommendedAction || null,
+        p_notes: params.notes ?? undefined,
+        p_recommended_action: params.recommendedAction ?? undefined,
       } as DiscountActionParams
 
       logger.log('BatchActions', 'Starting discount RPC call', {
@@ -686,7 +682,7 @@ export function useBatchActionRPC(providedStoreId?: string) {
         throw error
       }
 
-      return data as ActionResult
+      return assertRpcResult<ActionResult>(data)
     },
     onMutate: async variables => {
       // Optimistic update: Update batch price and potentially move to in_progress
@@ -713,18 +709,21 @@ export function useBatchActionRPC(providedStoreId?: string) {
       return { storeId }
     },
     onSuccess: async (result, variables, context) => {
+      // Type narrow to ExecuteDiscountResponse
+      const discountResult = result as ExecuteDiscountResponse
+
       logger.log('BatchActions', '✅ Discount onSuccess called', {
         success: result.success,
         batchId: variables.batchId,
         discountPercentage: variables.discountPercentage,
-        newPrice: result.new_price,
-        originalPrice: result.original_price,
+        discountedPrice: discountResult.discounted_price,
+        potentialRevenue: discountResult.potential_revenue,
         storeId: context?.storeId,
       })
 
       if (result.success) {
         toast.success(`Applied ${variables.discountPercentage}% discount`, {
-          description: `New price: ${currencySymbol}${result.new_price?.toFixed(2)}`,
+          description: `New price: ${currencySymbol}${discountResult.discounted_price?.toFixed(2)}`,
         })
         logger.log('BatchActions', '🔄 Starting query invalidation after discount')
         await invalidateRelatedQueries(variables.batchId, context?.storeId, 'discount')
@@ -767,9 +766,9 @@ export function useBatchActionRPC(providedStoreId?: string) {
         p_quantity_sold: params.quantity,
         p_user_id: userId,
         p_sale_timing: params.saleTiming || 'just-now',
-        p_sale_occurred_at: params.saleOccurredAt || null,
-        p_notes: params.notes || null,
-        p_recommended_action: params.recommendedAction || null,
+        p_sale_occurred_at: params.saleOccurredAt ?? undefined,
+        p_notes: params.notes ?? undefined,
+        p_recommended_action: params.recommendedAction ?? undefined,
       } as SoldActionParams)
       const endTime = performance.now()
       logger.log('BatchActions', `Sold RPC completed in ${(endTime - startTime).toFixed(2)}ms`, {
@@ -778,7 +777,7 @@ export function useBatchActionRPC(providedStoreId?: string) {
       })
 
       if (error) throw error
-      return data as ActionResult
+      return assertRpcResult<ActionResult>(data)
     },
     onMutate: async variables => {
       // Optimistic update: Remove from pending if all quantity sold
@@ -812,8 +811,10 @@ export function useBatchActionRPC(providedStoreId?: string) {
     },
     onSuccess: async (result, variables, context) => {
       if (result.success) {
+        // Type narrow to ExecuteSoldResponse
+        const soldResult = result as ExecuteSoldResponse
         toast.success(`Marked ${variables.quantity} units as sold`, {
-          description: `Revenue: ${currencySymbol}${result.revenue_recovered?.toFixed(2)}`,
+          description: `Revenue: ${currencySymbol}${soldResult.revenue_recovered?.toFixed(2)}`,
         })
         await invalidateRelatedQueries(variables.batchId, context?.storeId, 'sold')
       } else {
@@ -864,8 +865,8 @@ export function useBatchActionRPC(providedStoreId?: string) {
         p_quantity_disposed: params.quantity,
         p_disposal_reason: params.disposalReason,
         p_user_id: userId,
-        p_notes: params.notes || null,
-        p_recommended_action: params.recommendedAction || null,
+        p_notes: params.notes ?? undefined,
+        p_recommended_action: params.recommendedAction ?? undefined,
       } as DisposeActionParams)
       const endTime = performance.now()
       logger.log('BatchActions', `Dispose RPC completed in ${(endTime - startTime).toFixed(2)}ms`, {
@@ -874,7 +875,7 @@ export function useBatchActionRPC(providedStoreId?: string) {
       })
 
       if (error) throw error
-      return data as ActionResult
+      return assertRpcResult<ActionResult>(data)
     },
     onMutate: async variables => {
       // Optimistic update: Remove from pending if all quantity disposed
@@ -950,12 +951,12 @@ export function useBatchActionRPC(providedStoreId?: string) {
         p_batch_id: params.batchId,
         p_dismissal_reason: params.dismissalReason,
         p_user_id: userId,
-        p_notes: params.notes || null,
-        p_recommended_action: params.recommendedAction || null,
+        p_notes: params.notes ?? undefined,
+        p_recommended_action: params.recommendedAction ?? undefined,
       } as DismissActionParams)
 
       if (error) throw error
-      return data as ActionResult
+      return assertRpcResult<ActionResult>(data)
     },
     onMutate: async variables => {
       // Optimistic update: Remove from pending todos immediately (dismissed = completed)
@@ -1048,12 +1049,13 @@ export function useBatchActionRPC(providedStoreId?: string) {
       const { data, error } = await supabase.rpc('execute_bulk_action', {
         p_batch_ids: params.batchIds,
         p_action_type: params.actionType,
-        p_action_params: params.actionParams,
+        // Supabase types JSONB RPC parameters as Json - we need to cast the typed object to match
+        p_action_params: params.actionParams as never,
         p_user_id: userId,
-      } as BulkActionParams)
+      })
 
       if (error) throw error
-      return data as BulkActionResult
+      return assertRpcResult<BulkActionResult>(data)
     },
     onMutate: async variables => {
       // Optimistic update: Remove all batches from pending todos
@@ -1161,13 +1163,4 @@ export function useBatchActionRPC(providedStoreId?: string) {
 }
 
 // Export types for use in components
-export type {
-  ActionResult,
-  BulkActionResult,
-  BulkParams,
-  DiscountParams,
-  DismissParams,
-  DisposeParams,
-  DonateParams,
-  SoldParams,
-}
+export type { BulkParams, DiscountParams, DismissParams, DisposeParams, DonateParams, SoldParams }
