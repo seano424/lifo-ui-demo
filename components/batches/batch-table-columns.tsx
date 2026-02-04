@@ -198,62 +198,6 @@ export function createBatchTableColumns({
       size: BATCH_TABLE_COLUMN_CONFIG[0].width,
     },
     {
-      id: 'status',
-      accessorKey: 'status',
-      header: () => (
-        <SortableHeader
-          field="status"
-          currentSort={currentSort}
-          updateSort={updateSort}
-          className={alignments.status.headerClass}
-        >
-          {t('headers.status')}
-        </SortableHeader>
-      ),
-      cell: ({ row }) => {
-        const status = row.original.status || 'active'
-        return (
-          <div className={alignments.status.cellClass}>
-            {/* <Badge variant={getStatusVariant(status)}>{tStatus(status)}</Badge> */}
-            {tStatus(status)}
-          </div>
-        )
-      },
-      size: BATCH_TABLE_COLUMN_CONFIG[1].width,
-    },
-    {
-      id: 'expiry_date',
-      accessorKey: 'expiry_date',
-      header: () => (
-        <SortableHeader
-          field="expiry_date"
-          currentSort={currentSort}
-          updateSort={updateSort}
-          className={alignments.expiry_date.headerClass}
-        >
-          {t('headers.expiryDate')}
-        </SortableHeader>
-      ),
-      cell: ({ row }) => {
-        let expiryDate: Date | null = null
-        // let daysLeft = 0
-
-        if (row.original.expiry_date) {
-          expiryDate = parseISODateAsLocal(row.original.expiry_date)
-          const today = new Date()
-          today.setHours(0, 0, 0, 0)
-          // daysLeft = getDaysLeft(expiryDate)
-        }
-
-        return (
-          <div className={alignments.expiry_date.cellClass}>
-            {expiryDate ? expiryDate.toLocaleDateString() : tExpiry('noExpiryDate')}
-          </div>
-        )
-      },
-      size: BATCH_TABLE_COLUMN_CONFIG[2].width,
-    },
-    {
       id: 'days_left',
       accessorKey: 'expiry_date',
       header: () => (
@@ -288,6 +232,38 @@ export function createBatchTableColumns({
       size: BATCH_TABLE_COLUMN_CONFIG[3].width,
     },
     {
+      id: 'expiry_date',
+      accessorKey: 'expiry_date',
+      header: () => (
+        <SortableHeader
+          field="expiry_date"
+          currentSort={currentSort}
+          updateSort={updateSort}
+          className={alignments.expiry_date.headerClass}
+        >
+          {t('headers.expiryDate')}
+        </SortableHeader>
+      ),
+      cell: ({ row }) => {
+        let expiryDate: Date | null = null
+        // let daysLeft = 0
+
+        if (row.original.expiry_date) {
+          expiryDate = parseISODateAsLocal(row.original.expiry_date)
+          const today = new Date()
+          today.setHours(0, 0, 0, 0)
+          // daysLeft = getDaysLeft(expiryDate)
+        }
+
+        return (
+          <div className={alignments.expiry_date.cellClass}>
+            {expiryDate ? expiryDate.toLocaleDateString() : tExpiry('noExpiryDate')}
+          </div>
+        )
+      },
+      size: BATCH_TABLE_COLUMN_CONFIG[2].width,
+    },
+    {
       id: 'current_quantity',
       accessorKey: 'current_quantity',
       header: () => (
@@ -306,6 +282,30 @@ export function createBatchTableColumns({
         </div>
       ),
       size: BATCH_TABLE_COLUMN_CONFIG[4].width,
+    },
+    {
+      id: 'status',
+      accessorKey: 'status',
+      header: () => (
+        <SortableHeader
+          field="status"
+          currentSort={currentSort}
+          updateSort={updateSort}
+          className={alignments.status.headerClass}
+        >
+          {t('headers.status')}
+        </SortableHeader>
+      ),
+      cell: ({ row }) => {
+        const status = row.original.status || 'active'
+        return (
+          <div className={alignments.status.cellClass}>
+            {/* <Badge variant={getStatusVariant(status)}>{tStatus(status)}</Badge> */}
+            {tStatus(status)}
+          </div>
+        )
+      },
+      size: BATCH_TABLE_COLUMN_CONFIG[1].width,
     },
     {
       id: 'location',
