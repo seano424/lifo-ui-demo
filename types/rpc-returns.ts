@@ -608,6 +608,7 @@ export interface ProductWithTrackingSettings {
   shelf_life_override_days: number | null
   auto_create_batches: boolean | null
   inherited_auto_create: boolean
+  inherited_shelf_life_days: number | null
   total_count: number
 }
 

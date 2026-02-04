@@ -342,6 +342,7 @@ export const ProductWithTrackingSettingsSchema = z.object({
   shelf_life_override_days: z.number().nullable(),
   auto_create_batches: z.boolean().nullable(),
   inherited_auto_create: z.boolean(),
+  inherited_shelf_life_days: z.number().nullable(),
   total_count: z.number(),
 })
 
