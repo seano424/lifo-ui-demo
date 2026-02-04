@@ -7,10 +7,18 @@ import { queryKeys } from '@/lib/queries/query-keys'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 import { logger } from '@/lib/utils/logger'
 import { withPerformanceTracking } from '@/lib/utils/performance'
-import { assertRpcResult, assertRpcArray } from '@/lib/utils/rpc-types'
+import { validateRpcResult, validateRpcArray } from '@/lib/utils/rpc-types'
 import { toast } from 'sonner'
 import { useRestoreIgnoredBatch } from './use-ignored-batches'
 import { safeParseJsonb } from '@/lib/validation/jsonb-validators'
+import {
+  DraftBatchesSummaryResponseSchema,
+  DraftBatchesByProductSchema,
+  ActivateDraftBatchResponseSchema,
+  IgnoreDraftBatchResponseSchema,
+  LogDeliveryResponseSchema,
+  RecentDeliveryProductSchema,
+} from '@/lib/validation/rpc-schemas'
 import type {
   DraftBatchesSummaryResponse,
   DraftBatchItem,
@@ -81,7 +89,7 @@ async function fetchDraftBatchesSummary(storeId: string): Promise<DraftBatchesSu
       throw new Error(`Failed to fetch draft batches summary: ${error.message}`)
     }
 
-    const result = assertRpcResult<DraftBatchesSummaryResponse>(data)
+    const result = validateRpcResult(data, DraftBatchesSummaryResponseSchema, context)
 
     logger.log(context, 'Draft batches summary fetched', {
       storeId,
@@ -127,7 +135,7 @@ async function fetchDraftBatchesByProduct(
         throw new Error(`Failed to fetch draft batches by product: ${error.message}`)
       }
 
-      const results = assertRpcArray<DraftBatchesByProduct>(data)
+      const results = validateRpcArray(data, DraftBatchesByProductSchema, context)
 
       logger.log(context, 'Draft batches by product fetched', {
         storeId,
@@ -172,7 +180,7 @@ async function fetchRecentDeliveryProducts(
         throw new Error(`Failed to fetch recent delivery products: ${error.message}`)
       }
 
-      const results = assertRpcArray<RecentDeliveryProduct>(data)
+      const results = validateRpcArray(data, RecentDeliveryProductSchema, context)
 
       logger.log(context, 'Recent delivery products fetched', {
         storeId,
@@ -355,7 +363,7 @@ export function useActivateDraftBatch() {
         throw error
       }
 
-      return assertRpcResult<ActivateDraftBatchResponse>(data)
+      return validateRpcResult(data, ActivateDraftBatchResponseSchema, context)
     },
 
     onSuccess: (result, _variables) => {
@@ -513,7 +521,7 @@ export function useIgnoreDraftBatch() {
         throw error
       }
 
-      return assertRpcResult<IgnoreDraftBatchResponse>(data)
+      return validateRpcResult(data, IgnoreDraftBatchResponseSchema, context)
     },
 
     onMutate: async params => {
@@ -699,7 +707,7 @@ export function useLogDelivery() {
         throw error
       }
 
-      return assertRpcResult<LogDeliveryResponse>(data)
+      return validateRpcResult(data, LogDeliveryResponseSchema, context)
     },
 
     onSuccess: (result, _variables) => {

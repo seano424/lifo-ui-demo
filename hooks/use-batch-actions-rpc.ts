@@ -4,11 +4,19 @@ import { queryKeys } from '@/lib/queries/query-keys'
 import type { TodoFilters, TodoItem } from '@/lib/queries/todos-rpc'
 import { createClient } from '@/lib/supabase/client'
 import { logger } from '@/lib/utils/logger'
-import { assertRpcResult } from '@/lib/utils/rpc-types'
+import { validateRpcResult } from '@/lib/utils/rpc-types'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { useCurrency } from '@/hooks/use-currency'
 import { ADHOC_RECIPIENT_UUID } from '@/hooks/use-donation-recipients'
+import {
+  ExecuteDiscountResponseSchema,
+  ExecuteDonateResponseSchema,
+  ExecuteDisposeResponseSchema,
+  ExecuteSoldResponseSchema,
+  ExecuteDismissResponseSchema,
+  ExecuteBulkActionResponseSchema,
+} from '@/lib/validation/rpc-schemas'
 import type {
   ExecuteDiscountResponse,
   ExecuteDonateResponse,
@@ -566,7 +574,7 @@ export function useBatchActionRPC(providedStoreId?: string) {
         throw error
       }
 
-      return assertRpcResult<ActionResult>(data)
+      return validateRpcResult(data, ExecuteDonateResponseSchema, 'executeDonate') as ActionResult
     },
     onMutate: async variables => {
       // Optimistic update: Remove from pending todos immediately
@@ -682,7 +690,11 @@ export function useBatchActionRPC(providedStoreId?: string) {
         throw error
       }
 
-      return assertRpcResult<ActionResult>(data)
+      return validateRpcResult(
+        data,
+        ExecuteDiscountResponseSchema,
+        'executeDiscount',
+      ) as ActionResult
     },
     onMutate: async variables => {
       // Optimistic update: Update batch price and potentially move to in_progress
@@ -777,7 +789,7 @@ export function useBatchActionRPC(providedStoreId?: string) {
       })
 
       if (error) throw error
-      return assertRpcResult<ActionResult>(data)
+      return validateRpcResult(data, ExecuteSoldResponseSchema, 'executeSold') as ActionResult
     },
     onMutate: async variables => {
       // Optimistic update: Remove from pending if all quantity sold
@@ -875,7 +887,7 @@ export function useBatchActionRPC(providedStoreId?: string) {
       })
 
       if (error) throw error
-      return assertRpcResult<ActionResult>(data)
+      return validateRpcResult(data, ExecuteDisposeResponseSchema, 'executeDispose') as ActionResult
     },
     onMutate: async variables => {
       // Optimistic update: Remove from pending if all quantity disposed
@@ -956,7 +968,7 @@ export function useBatchActionRPC(providedStoreId?: string) {
       } as DismissActionParams)
 
       if (error) throw error
-      return assertRpcResult<ActionResult>(data)
+      return validateRpcResult(data, ExecuteDismissResponseSchema, 'executeDismiss') as ActionResult
     },
     onMutate: async variables => {
       // Optimistic update: Remove from pending todos immediately (dismissed = completed)
@@ -1055,7 +1067,7 @@ export function useBatchActionRPC(providedStoreId?: string) {
       })
 
       if (error) throw error
-      return assertRpcResult<BulkActionResult>(data)
+      return validateRpcResult(data, ExecuteBulkActionResponseSchema, 'executeBulk')
     },
     onMutate: async variables => {
       // Optimistic update: Remove all batches from pending todos
