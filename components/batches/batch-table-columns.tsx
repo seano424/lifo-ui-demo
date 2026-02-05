@@ -278,7 +278,7 @@ export function createBatchTableColumns({
       ),
       cell: ({ row }) => (
         <div className={`${alignments.current_quantity.cellClass} tabular-nums`}>
-          {Number(row.original.current_quantity).toLocaleString()}
+          {Math.round(Number(row.original.current_quantity)).toLocaleString()}
         </div>
       ),
       size: BATCH_TABLE_COLUMN_CONFIG[4].width,

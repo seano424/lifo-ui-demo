@@ -94,7 +94,8 @@
       "!build/**",
       "!dist/**",
       "!next-env.d.ts",
-      "!types/supabase.ts"
+      "!types/supabase.ts",
+      "!docs/wireframes/**"
     ]
   },
   "javascript": {
