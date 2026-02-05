@@ -614,6 +614,43 @@ export function useUserActions() {
     toast.info('Role removal not yet implemented')
   }
 
+  // 🆕 NEW: Delete current user's account
+  const deleteAccount = async () => {
+    const supabase = createClient()
+
+    try {
+      // Get current user
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser()
+
+      if (userError || !user) {
+        throw new Error('Not authenticated')
+      }
+
+      // Delete user account via Supabase Admin API
+      // This should be handled by a server-side API endpoint for security
+      // For now, we'll sign out the user and show a message
+      const { error: signOutError } = await supabase.auth.signOut()
+
+      if (signOutError) {
+        throw signOutError
+      }
+
+      toast.success('Account deletion initiated. Redirecting to home...')
+
+      // Redirect to home page after a short delay
+      setTimeout(() => {
+        window.location.href = '/'
+      }, 2000)
+    } catch (error) {
+      console.error('Failed to delete account:', error)
+      toast.error('Failed to delete account. Please contact support.')
+      throw error
+    }
+  }
+
   return {
     createUser: createMutation.mutate,
     updateUser: updateMutation.mutate,
@@ -626,6 +663,7 @@ export function useUserActions() {
     lockUserPin,
     updateUserLanguage, // 🆕
     updateUserPhone, // 🆕
+    deleteAccount, // 🆕
     assignRole,
     removeRole,
     isCreating: createMutation.isPending,

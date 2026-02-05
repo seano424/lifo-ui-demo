@@ -1,15 +1,13 @@
 'use client'
 
 import UserAccountInformation from '@/components/account/user-account-information'
-import { AlertSensitivityControls } from '@/components/dashboard/alert-sensitivity-controls'
 import DashboardInsetHeader from '@/components/dashboard/dashboard-inset-header'
-import { AlertCircle, Bell, CreditCard, Lock, Store, User, Users } from 'lucide-react'
+import { AlertCircle, Bell, CreditCard, Store, User } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 // Import existing components - preserve all functionality
 import StoreInformation from '@/components/settings/store-information'
-import { StoreUsersList } from '@/components/store-users/store-users-list'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import ComingSoon from '@/components/ui/coming-soon'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -28,7 +26,7 @@ export default function UnifiedSettingsPage() {
 
   // Load all data once
   const { isLoading, error } = useUnifiedSettings()
-  const { isOwner, isManager, isLoading: isLoadingPermissions, storeId } = usePermissionsNew()
+  const { isOwner, isLoading: isLoadingPermissions, storeId } = usePermissionsNew()
 
   // Handle URL state for tab persistence
   useEffect(() => {
@@ -63,12 +61,15 @@ export default function UnifiedSettingsPage() {
 
     const baseTabs: TabValue[] = ['store', 'account', 'notifications']
 
-    if (isOwner || isManager) {
-      baseTabs.push('team')
-    }
+    // HIDDEN: Team tab temporarily disabled
+    // if (isOwner || isManager) {
+    //   baseTabs.push('team')
+    // }
 
     if (isOwner) {
-      baseTabs.push('billing', 'security')
+      baseTabs.push('billing')
+      // HIDDEN: Security tab temporarily disabled
+      // baseTabs.push('security')
     }
 
     return baseTabs
@@ -134,12 +135,13 @@ export default function UnifiedSettingsPage() {
                 <span className="hidden sm:inline whitespace-nowrap">{t('tabs.account')}</span>
               </TabsTrigger>
             )}
-            {visibleTabs()?.includes('team') && (
+            {/* HIDDEN: Team tab temporarily disabled */}
+            {/* {visibleTabs()?.includes('team') && (
               <TabsTrigger value="team" className="flex items-center justify-center gap-2 px-1">
                 <Users className="h-4 w-4 shrink-0" />
                 <span className="hidden sm:inline whitespace-nowrap">{t('tabs.team')}</span>
               </TabsTrigger>
-            )}
+            )} */}
             {visibleTabs()?.includes('notifications') && (
               <TabsTrigger
                 value="notifications"
@@ -157,12 +159,13 @@ export default function UnifiedSettingsPage() {
                 <span className="hidden sm:inline whitespace-nowrap">{t('tabs.billing')}</span>
               </TabsTrigger>
             )}
-            {visibleTabs()?.includes('security') && (
+            {/* HIDDEN: Security tab temporarily disabled */}
+            {/* {visibleTabs()?.includes('security') && (
               <TabsTrigger value="security" className="flex items-center justify-center gap-2 px-1">
                 <Lock className="h-4 w-4 shrink-0" />
                 <span className="hidden sm:inline whitespace-nowrap">{t('tabs.security')}</span>
               </TabsTrigger>
-            )}
+            )} */}
           </TabsList>
         )}
 
@@ -178,7 +181,8 @@ export default function UnifiedSettingsPage() {
             {/* Store Settings Tab */}
             <TabsContent value="store" className="mt-6 flex flex-col gap-6">
               <StoreInformation />
-              <AlertSensitivityControls storeId={storeId || undefined} />
+              {/* HIDDEN: Alert Sensitivity Controls temporarily disabled */}
+              {/* <AlertSensitivityControls storeId={storeId || undefined} /> */}
             </TabsContent>
 
             {/* Account Settings Tab */}
@@ -186,12 +190,12 @@ export default function UnifiedSettingsPage() {
               <UserAccountInformation />
             </TabsContent>
 
-            {/* Team Management Tab */}
-            {visibleTabs()?.includes('team') && (
+            {/* HIDDEN: Team Management Tab temporarily disabled */}
+            {/* {visibleTabs()?.includes('team') && (
               <TabsContent value="team" className="mt-6">
                 <StoreUsersList />
               </TabsContent>
-            )}
+            )} */}
 
             {/* Notifications Tab */}
             <TabsContent value="notifications" className="mt-6">
@@ -225,8 +229,8 @@ export default function UnifiedSettingsPage() {
               </TabsContent>
             )}
 
-            {/* Security Tab (Owner/Manager only) */}
-            {visibleTabs()?.includes('security') && (
+            {/* HIDDEN: Security Tab temporarily disabled */}
+            {/* {visibleTabs()?.includes('security') && (
               <TabsContent value="security" className="mt-6">
                 <ComingSoon
                   title={t('security.comingSoonTitle')}
@@ -240,7 +244,7 @@ export default function UnifiedSettingsPage() {
                   </Typography>
                 </ComingSoon>
               </TabsContent>
-            )}
+            )} */}
           </>
         )}
       </Tabs>

@@ -50,6 +50,7 @@
       "permissionError": "U heeft geen toestemming om winkelinstellingen te bekijken.",
       "sections": {
         "storeDetails": "Winkeldetails",
+        "locationInformation": "Locatie-informatie",
         "addressInformation": "Adresinformatie",
         "contactInformation": "Contactinformatie",
         "storeDescription": "Winkelbeschrijving",
@@ -288,6 +289,16 @@
     },
     "security": {
       "notice": "Dit is uw persoonlijke account. U kunt uw wachtwoord wijzigen in de login pagina."
+    },
+    "deleteAccount": {
+      "dangerZoneTitle": "Gevarenzone",
+      "dangerZoneDescription": "Verwijder uw account en alle bijbehorende gegevens permanent.",
+      "button": "Account verwijderen",
+      "title": "Account verwijderen?",
+      "description": "We vragen om uw bevestiging omdat deze actie al uw gegevens onherroepelijk zal verwijderen. En we zullen u missen.",
+      "confirm": "Mijn account verwijderen",
+      "cancel": "Annuleren",
+      "deleting": "Verwijderen..."
     }
   }
 }

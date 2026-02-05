@@ -50,6 +50,7 @@
       "permissionError": "You don't have permission to view store settings.",
       "sections": {
         "storeDetails": "Store Details",
+        "locationInformation": "Location Information",
         "addressInformation": "Address Information",
         "contactInformation": "Contact Information",
         "storeDescription": "Store Description",
@@ -288,6 +289,16 @@
     },
     "security": {
       "notice": "This is your personal account. You can change your password in the login page."
+    },
+    "deleteAccount": {
+      "dangerZoneTitle": "Danger Zone",
+      "dangerZoneDescription": "Permanently delete your account and all associated data.",
+      "button": "Delete account",
+      "title": "Delete account?",
+      "description": "We ask for your confirmation as this action will delete all your data irreversibly. And we will miss you.",
+      "confirm": "Delete my account",
+      "cancel": "Cancel",
+      "deleting": "Deleting..."
     }
   }
 }

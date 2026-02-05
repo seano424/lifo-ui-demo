@@ -50,6 +50,7 @@
       "permissionError": "Vous n'avez pas la permission de voir les paramètres du magasin.",
       "sections": {
         "storeDetails": "Détails du magasin",
+        "locationInformation": "Informations de localisation",
         "addressInformation": "Informations d'adresse",
         "contactInformation": "Informations de contact",
         "storeDescription": "Description du magasin",
@@ -288,6 +289,16 @@
     },
     "security": {
       "notice": "Ce compte est personnel. Vous pouvez changer votre mot de passe dans la page de connexion."
+    },
+    "deleteAccount": {
+      "dangerZoneTitle": "Zone de danger",
+      "dangerZoneDescription": "Supprimez définitivement votre compte et toutes les données associées.",
+      "button": "Supprimer le compte",
+      "title": "Supprimer le compte ?",
+      "description": "Nous demandons votre confirmation car cette action supprimera toutes vos données de manière irréversible. Et vous nous manquerez.",
+      "confirm": "Supprimer mon compte",
+      "cancel": "Annuler",
+      "deleting": "Suppression..."
     }
   }
 }
