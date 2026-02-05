@@ -350,6 +350,23 @@ export const queryKeys = {
     connectionsByStore: (storeId: string) => [...queryKeys.square.connections(), storeId] as const,
   },
 
+  // Batch tracking onboarding queries
+  batchTrackingOnboarding: {
+    all: ['batch-tracking-onboarding'] as const,
+    categories: (storeId: string) =>
+      [...queryKeys.batchTrackingOnboarding.all, 'categories', storeId] as const,
+    products: (
+      storeId: string,
+      filters: {
+        categoryId?: string | null
+        searchTerm?: string | null
+        onlyTracked?: boolean | null
+        pageSize?: number
+        offset?: number
+      },
+    ) => [...queryKeys.batchTrackingOnboarding.all, 'products', storeId, filters] as const,
+  },
+
   // Keep fastapi namespace for any remaining direct calls (deprecated)
   fastapi: {
     all: ['fastapi'] as const,

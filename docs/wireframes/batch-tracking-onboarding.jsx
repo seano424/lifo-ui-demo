@@ -1,9 +1,8 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import {
   ChevronLeft,
   ChevronRight,
   Check,
-  X,
   Search,
   ChevronDown,
   Package,
@@ -50,6 +49,7 @@ const Button = ({ children, variant = 'primary', onClick, disabled, className = 
   }
   return (
     <button
+      type="button"
       onClick={onClick}
       disabled={disabled}
       className={`${baseStyles} ${variants[variant]} ${className}`}
@@ -74,6 +74,7 @@ const Card = ({ children, className = '', selected, onClick }) => (
 
 const Toggle = ({ enabled, onChange }) => (
   <button
+    type="button"
     onClick={() => onChange(!enabled)}
     className={`relative w-12 h-6 rounded-full transition-colors ${
       enabled ? 'bg-gray-800' : 'bg-gray-300'
@@ -107,6 +108,7 @@ const Screen1Welcome = ({ onNext, onSkip }) => (
     <header className="flex justify-between items-center p-6 border-b bg-white">
       <div className="font-bold text-xl text-gray-800">LIFO</div>
       <button
+        type="button"
         onClick={onSkip}
         className="text-gray-500 hover:text-gray-700 text-sm flex items-center gap-1"
       >
@@ -146,10 +148,10 @@ const Screen1Welcome = ({ onNext, onSkip }) => (
         </ul>
       </div>
 
-      <Button onClick={onNext} className="w-full mb-3">
+      <Button type="button" onClick={onNext} className="w-full mb-3">
         Let's get started <ChevronRight className="w-4 h-4" />
       </Button>
-      <Button variant="ghost" onClick={onSkip}>
+      <Button type="button" variant="ghost" onClick={onSkip}>
         I'll do this later
       </Button>
 
@@ -175,12 +177,14 @@ const Screen2SelectProducts = ({ onNext, onBack, onSkip }) => {
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <header className="flex justify-between items-center p-6 border-b bg-white">
         <button
+          type="button"
           onClick={onBack}
           className="text-gray-500 hover:text-gray-700 flex items-center gap-1"
         >
           <ChevronLeft className="w-4 h-4" /> Back
         </button>
         <button
+          type="button"
           onClick={onSkip}
           className="text-gray-500 hover:text-gray-700 text-sm flex items-center gap-1"
         >
@@ -284,7 +288,9 @@ const Screen2SelectProducts = ({ onNext, onBack, onSkip }) => {
         <ProgressIndicator currentStep={2} totalSteps={5} />
 
         <div className="flex justify-center mt-6">
-          <Button onClick={onNext}>Next</Button>
+          <Button type="button" onClick={onNext}>
+            Next
+          </Button>
         </div>
       </main>
     </div>
@@ -344,12 +350,14 @@ const Screen3CategoryAutomation = ({ onNext, onBack, onSkip }) => {
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <header className="flex justify-between items-center p-6 border-b bg-white">
         <button
+          type="button"
           onClick={onBack}
           className="text-gray-500 hover:text-gray-700 flex items-center gap-1"
         >
           <ChevronLeft className="w-4 h-4" /> Back
         </button>
         <button
+          type="button"
           onClick={onSkip}
           className="text-gray-500 hover:text-gray-700 text-sm flex items-center gap-1"
         >
@@ -391,7 +399,7 @@ const Screen3CategoryAutomation = ({ onNext, onBack, onSkip }) => {
                 <input
                   type="number"
                   value={cat.days}
-                  onChange={e => updateCategory(cat.id, 'days', parseInt(e.target.value))}
+                  onChange={e => updateCategory(cat.id, 'days', parseInt(e.target.value, 10))}
                   disabled={!cat.enabled}
                   className={`w-16 px-3 py-2 border rounded-lg text-center ${
                     cat.enabled ? 'border-gray-300' : 'border-gray-200 bg-gray-100 text-gray-400'
@@ -415,10 +423,12 @@ const Screen3CategoryAutomation = ({ onNext, onBack, onSkip }) => {
         <ProgressIndicator currentStep={3} totalSteps={5} />
 
         <div className="flex justify-center gap-4 mt-6">
-          <Button variant="secondary" onClick={onNext}>
+          <Button type="button" variant="secondary" onClick={onNext}>
             Skip automation
           </Button>
-          <Button onClick={onNext}>Next</Button>
+          <Button type="button" onClick={onNext}>
+            Next
+          </Button>
         </div>
       </main>
     </div>
@@ -458,12 +468,14 @@ const Screen4ProductOverrides = ({ onNext, onBack, onSkip }) => {
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <header className="flex justify-between items-center p-6 border-b bg-white">
         <button
+          type="button"
           onClick={onBack}
           className="text-gray-500 hover:text-gray-700 flex items-center gap-1"
         >
           <ChevronLeft className="w-4 h-4" /> Back
         </button>
         <button
+          type="button"
           onClick={onSkip}
           className="text-gray-500 hover:text-gray-700 text-sm flex items-center gap-1"
         >
@@ -490,7 +502,10 @@ const Screen4ProductOverrides = ({ onNext, onBack, onSkip }) => {
               className="flex-1 outline-none text-sm"
             />
           </div>
-          <button className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm">
+          <button
+            type="button"
+            className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm"
+          >
             Category <ChevronDown className="w-4 h-4" />
           </button>
         </div>
@@ -537,7 +552,7 @@ const Screen4ProductOverrides = ({ onNext, onBack, onSkip }) => {
                           <span className="text-gray-400">(from category)</span>
                         )}
                         {product.isOverride && (
-                          <button className="ml-2 text-gray-500 hover:text-gray-700">
+                          <button type="button" className="ml-2 text-gray-500 hover:text-gray-700">
                             <RotateCcw className="w-3 h-3" />
                           </button>
                         )}
@@ -545,7 +560,10 @@ const Screen4ProductOverrides = ({ onNext, onBack, onSkip }) => {
                     ) : (
                       <>
                         Manual entry required
-                        <button className="ml-2 text-gray-600 hover:text-gray-800 font-medium">
+                        <button
+                          type="button"
+                          className="ml-2 text-gray-600 hover:text-gray-800 font-medium"
+                        >
                           Set →
                         </button>
                       </>
@@ -559,16 +577,20 @@ const Screen4ProductOverrides = ({ onNext, onBack, onSkip }) => {
 
         <div className="text-sm text-gray-500 mb-6">
           Showing 3 of 72 products
-          <button className="ml-2 text-gray-700 hover:underline">Load more ↓</button>
+          <button type="button" className="ml-2 text-gray-700 hover:underline">
+            Load more ↓
+          </button>
         </div>
 
         <ProgressIndicator currentStep={4} totalSteps={5} />
 
         <div className="flex justify-center gap-4 mt-6">
-          <Button variant="secondary" onClick={onNext}>
+          <Button type="button" variant="secondary" onClick={onNext}>
             Skip this step
           </Button>
-          <Button onClick={onNext}>Review setup</Button>
+          <Button type="button" onClick={onNext}>
+            Review setup
+          </Button>
         </div>
       </main>
     </div>
@@ -580,12 +602,14 @@ const Screen5Review = ({ onNext, onBack, onSkip, hasAutomation = true }) => (
   <div className="min-h-screen bg-gray-50 flex flex-col">
     <header className="flex justify-between items-center p-6 border-b bg-white">
       <button
+        type="button"
         onClick={onBack}
         className="text-gray-500 hover:text-gray-700 flex items-center gap-1"
       >
         <ChevronLeft className="w-4 h-4" /> Back
       </button>
       <button
+        type="button"
         onClick={onSkip}
         className="text-gray-500 hover:text-gray-700 text-sm flex items-center gap-1"
       >
@@ -679,7 +703,9 @@ const Screen5Review = ({ onNext, onBack, onSkip, hasAutomation = true }) => (
               </div>
               <span className="font-medium text-gray-900">Your automation rules</span>
             </div>
-            <button className="text-sm text-gray-600 hover:text-gray-800">Edit →</button>
+            <button type="button" className="text-sm text-gray-600 hover:text-gray-800">
+              Edit →
+            </button>
           </div>
           <div className="grid grid-cols-2 gap-3 text-sm">
             <div className="flex justify-between">
@@ -702,10 +728,14 @@ const Screen5Review = ({ onNext, onBack, onSkip, hasAutomation = true }) => (
       <ProgressIndicator currentStep={5} totalSteps={5} />
 
       <div className="flex flex-col items-center gap-3 mt-6">
-        <Button onClick={onNext} className="w-full max-w-xs">
+        <Button type="button" onClick={onNext} className="w-full max-w-xs">
           <Check className="w-4 h-4" /> Finish setup
         </Button>
-        <button onClick={onBack} className="text-sm text-gray-500 hover:text-gray-700">
+        <button
+          type="button"
+          onClick={onBack}
+          className="text-sm text-gray-500 hover:text-gray-700"
+        >
           {hasAutomation ? 'Change something? Go back' : 'Want automation? Go back'}
         </button>
       </div>
@@ -750,6 +780,7 @@ const Screen6Success = ({ onFinish }) => (
           },
         ].map((item, i) => (
           <button
+            type="button"
             key={i}
             className="w-full flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:bg-gray-50 text-left"
           >
@@ -765,7 +796,9 @@ const Screen6Success = ({ onFinish }) => (
       </div>
     </div>
 
-    <Button onClick={onFinish}>Go to Dashboard</Button>
+    <Button type="button" onClick={onFinish}>
+      Go to Dashboard
+    </Button>
   </div>
 )
 
@@ -793,10 +826,12 @@ const ErrorState = ({ onRetry, onContinue }) => (
         We had trouble connecting to Square. This might be temporary.
       </p>
       <div className="flex justify-center gap-3">
-        <Button variant="secondary" onClick={onRetry}>
+        <Button type="button" variant="secondary" onClick={onRetry}>
           Try again
         </Button>
-        <Button onClick={onContinue}>Continue manually</Button>
+        <Button type="button" onClick={onContinue}>
+          Continue manually
+        </Button>
       </div>
     </div>
   </div>
@@ -854,6 +889,7 @@ export default function LIFOOnboardingWireframes() {
         <span className="text-xs text-gray-500 mr-2">Screen:</span>
         {[1, 2, 3, 4, 5, 6].map(num => (
           <button
+            type="button"
             key={num}
             onClick={() => setCurrentScreen(num)}
             className={`w-8 h-8 rounded-full text-sm font-medium transition-colors ${
@@ -867,12 +903,14 @@ export default function LIFOOnboardingWireframes() {
         ))}
         <div className="w-px h-6 bg-gray-200 mx-2" />
         <button
+          type="button"
           onClick={() => setShowLoading(true)}
           className="px-3 py-1 text-xs bg-gray-100 text-gray-600 rounded-full hover:bg-gray-200"
         >
           Loading
         </button>
         <button
+          type="button"
           onClick={() => setShowError(true)}
           className="px-3 py-1 text-xs bg-gray-100 text-gray-600 rounded-full hover:bg-gray-200"
         >

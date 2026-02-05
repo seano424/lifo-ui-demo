@@ -601,8 +601,8 @@ export interface ProductWithTrackingSettings {
   brand: string | null
   barcode: string | null
   image_url: string | null
-  category_id: string
-  category_name: string
+  category_id: string | null
+  category_name: string | null
   typical_shelf_life_days: number | null
   is_tracked_for_batches: boolean
   shelf_life_override_days: number | null
