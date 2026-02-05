@@ -581,6 +581,37 @@ export interface SaveBatchTrackingSetupResponse {
   products_updated: number
 }
 
+/** Category with tracking settings from get_categories_with_tracking_settings */
+export interface CategoryWithTrackingSettings {
+  category_id: string
+  category_code: string
+  display_name_en: string
+  display_name_fr: string
+  typical_shelf_life_days: number | null
+  is_tracked: boolean
+  auto_create_batches: boolean
+  default_shelf_life_days: number | null
+  product_count: number
+}
+
+/** Product with tracking settings from get_products_for_tracking_setup */
+export interface ProductWithTrackingSettings {
+  product_id: string
+  name: string
+  brand: string | null
+  barcode: string | null
+  image_url: string | null
+  category_id: string
+  category_name: string
+  typical_shelf_life_days: number | null
+  is_tracked_for_batches: boolean
+  shelf_life_override_days: number | null
+  auto_create_batches: boolean | null
+  inherited_auto_create: boolean
+  inherited_shelf_life_days: number | null
+  total_count: number
+}
+
 // =============================================================================
 // PUBLIC SCHEMA - CSV IMPORT
 // =============================================================================
@@ -1285,6 +1316,8 @@ export interface RpcResultMap {
   // Batch Tracking Setup
   get_batch_tracking_setup: BatchTrackingSetupResponse
   save_batch_tracking_setup: SaveBatchTrackingSetupResponse
+  get_categories_with_tracking_settings: CategoryWithTrackingSettings[]
+  get_products_for_tracking_setup: ProductWithTrackingSettings[]
 
   // CSV Import
   fast_csv_import_skip_duplicates: FastCsvImportResponse

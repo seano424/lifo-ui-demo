@@ -306,6 +306,58 @@ export const RestoreIgnoredBatchResponseSchema = z.object({
 })
 
 // =============================================================================
+// BATCH TRACKING ONBOARDING SCHEMAS
+// =============================================================================
+
+/**
+ * Schema for get_categories_with_tracking_settings RPC response
+ * Validates categories with their tracking and automation settings
+ */
+export const CategoryWithTrackingSettingsSchema = z.object({
+  category_id: z.string(),
+  category_code: z.string(),
+  display_name_en: z.string(),
+  display_name_fr: z.string(),
+  typical_shelf_life_days: z.number().nullable(),
+  is_tracked: z.boolean(),
+  auto_create_batches: z.boolean(),
+  default_shelf_life_days: z.number().nullable(),
+  product_count: z.number(),
+})
+
+/**
+ * Schema for get_products_for_tracking_setup RPC response
+ * Validates products with their tracking settings and inheritance
+ */
+export const ProductWithTrackingSettingsSchema = z.object({
+  product_id: z.string(),
+  name: z.string(),
+  brand: z.string().nullable(),
+  barcode: z.string().nullable(),
+  image_url: z.string().nullable(),
+  category_id: z.string(),
+  category_name: z.string(),
+  typical_shelf_life_days: z.number().nullable(),
+  is_tracked_for_batches: z.boolean(),
+  shelf_life_override_days: z.number().nullable(),
+  auto_create_batches: z.boolean().nullable(),
+  inherited_auto_create: z.boolean(),
+  inherited_shelf_life_days: z.number().nullable(),
+  total_count: z.number(),
+})
+
+/**
+ * Schema for save_batch_tracking_setup RPC response
+ * Validates batch tracking setup save results
+ */
+export const SaveBatchTrackingSetupResponseSchema = z.object({
+  success: z.boolean(),
+  setup_completed: z.boolean(),
+  categories_updated: z.number(),
+  products_updated: z.number(),
+})
+
+// =============================================================================
 // TYPE INFERENCE HELPERS
 // =============================================================================
 
@@ -328,3 +380,6 @@ export type RecentDeliveryProduct = z.infer<typeof RecentDeliveryProductSchema>
 export type IgnoredBatchesSummaryResponse = z.infer<typeof IgnoredBatchesSummaryResponseSchema>
 export type IgnoredBatchesByProduct = z.infer<typeof IgnoredBatchesByProductSchema>
 export type RestoreIgnoredBatchResponse = z.infer<typeof RestoreIgnoredBatchResponseSchema>
+export type CategoryWithTrackingSettings = z.infer<typeof CategoryWithTrackingSettingsSchema>
+export type ProductWithTrackingSettings = z.infer<typeof ProductWithTrackingSettingsSchema>
+export type SaveBatchTrackingSetupResponse = z.infer<typeof SaveBatchTrackingSetupResponseSchema>

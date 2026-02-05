@@ -3355,6 +3355,7 @@ export type Database = {
           category_name: string
           image_url: string
           inherited_auto_create: boolean
+          inherited_shelf_life_days: number
           is_tracked_for_batches: boolean
           name: string
           product_id: string
@@ -3971,15 +3972,25 @@ export type Database = {
         Args: { check_store_id: string }
         Returns: boolean
       }
-      save_batch_tracking_setup: {
-        Args: {
-          p_category_settings?: Json[]
-          p_config: Json
-          p_product_overrides?: Json[]
-          p_store_id: string
-        }
-        Returns: Json
-      }
+      save_batch_tracking_setup:
+        | {
+            Args: {
+              p_category_settings?: Json
+              p_config: Json
+              p_product_overrides?: Json
+              p_store_id: string
+            }
+            Returns: Json
+          }
+        | {
+            Args: {
+              p_category_settings?: Json[]
+              p_config: Json
+              p_product_overrides?: Json[]
+              p_store_id: string
+            }
+            Returns: Json
+          }
       search_products_with_stock: {
         Args: {
           max_results?: number
