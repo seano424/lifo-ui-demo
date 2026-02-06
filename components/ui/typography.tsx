@@ -23,7 +23,7 @@ const typographyVariants = cva('', {
       default: 'text-foreground',
       muted: 'text-muted-foreground',
       primary: 'text-primary dark:text-primary-300',
-      destructive: 'text-destructive',
+      destructive: 'text-destructive dark:text-destructive-foreground',
       secondary: 'text-secondary dark:text-secondary-300',
       white: 'text-white',
     },

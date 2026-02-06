@@ -291,7 +291,7 @@
       "notice": "Dit is uw persoonlijke account. U kunt uw wachtwoord wijzigen in de login pagina."
     },
     "deletionWarning": {
-      "message": "⚠️ Uw account is gepland voor verwijdering op {date} ({days} dag{plural} resterend).",
+      "message": "Uw account is gepland voor verwijdering op {date} ({days} dag{plural} resterend).",
       "cancelButton": "Verwijdering annuleren",
       "cancellingButton": "Annuleren...",
       "cancelAriaLabel": "Accountverwijdering annuleren"

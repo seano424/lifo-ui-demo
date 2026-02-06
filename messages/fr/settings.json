@@ -291,7 +291,7 @@
       "notice": "Ce compte est personnel. Vous pouvez changer votre mot de passe dans la page de connexion."
     },
     "deletionWarning": {
-      "message": "⚠️ Votre compte est programmé pour suppression le {date} ({days} jour{plural} restant{plural}).",
+      "message": "Votre compte est programmé pour suppression le {date} ({days} jour{plural} restant{plural}).",
       "cancelButton": "Annuler la suppression",
       "cancellingButton": "Annulation...",
       "cancelAriaLabel": "Annuler la suppression du compte"

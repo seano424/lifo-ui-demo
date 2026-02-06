@@ -291,7 +291,7 @@
       "notice": "This is your personal account. You can change your password in the login page."
     },
     "deletionWarning": {
-      "message": "⚠️ Your account is scheduled for deletion on {date} ({days} day{plural} remaining).",
+      "message": "Your account is scheduled for deletion on {date} ({days} day{plural} remaining).",
       "cancelButton": "Cancel deletion",
       "cancellingButton": "Cancelling...",
       "cancelAriaLabel": "Cancel account deletion"
