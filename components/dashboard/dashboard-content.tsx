@@ -43,10 +43,10 @@ export function DashboardContent() {
       <StatCards daysFilter={daysFilter} />
 
       <div className="rounded-2xl bg-card/10">
-        <div className="flex items-center justify-between border-b border-muted p-4">
+        <div className="flex items-center justify-between border-b border-muted p-2 sm:p-4">
           <div className="flex flex-col gap-1">
             <Typography variant="h4">Expiring Soon</Typography>
-            <Typography variant="p" color="muted">
+            <Typography variant="p" color="muted" className="hidden sm:block">
               Batches closest to their expiry date
             </Typography>
           </div>
