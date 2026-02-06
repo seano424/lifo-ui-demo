@@ -290,15 +290,21 @@
     "security": {
       "notice": "Dit is uw persoonlijke account. U kunt uw wachtwoord wijzigen in de login pagina."
     },
+    "deletionWarning": {
+      "message": "⚠️ Uw account is gepland voor verwijdering op {date} ({days} dag{plural} resterend).",
+      "cancelButton": "Verwijdering annuleren",
+      "cancellingButton": "Annuleren...",
+      "cancelAriaLabel": "Accountverwijdering annuleren"
+    },
     "deleteAccount": {
       "dangerZoneTitle": "Gevarenzone",
-      "dangerZoneDescription": "Verwijder uw account en alle bijbehorende gegevens permanent.",
+      "dangerZoneDescription": "Verzoek tot accountverwijdering. Uw account blijft 30 dagen actief, zodat u van gedachten kunt veranderen.",
       "button": "Account verwijderen",
       "title": "Account verwijderen?",
-      "description": "We vragen om uw bevestiging omdat deze actie al uw gegevens onherroepelijk zal verwijderen. En we zullen u missen.",
-      "confirm": "Mijn account verwijderen",
+      "description": "Uw account blijft 30 dagen volledig actief. Daarna worden alle persoonlijke gegevens permanent verwijderd. U kunt dit op elk moment tijdens deze periode annuleren.",
+      "confirm": "Verwijdering plannen",
       "cancel": "Annuleren",
-      "deleting": "Verwijderen..."
+      "deleting": "Plannen..."
     }
   }
 }
