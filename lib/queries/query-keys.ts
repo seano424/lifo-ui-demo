@@ -259,6 +259,13 @@ export const queryKeys = {
     session: () => ['auth', 'session'] as const,
   },
 
+  // Account deletion queries (GDPR compliance)
+  accountDeletion: {
+    all: ['account-deletion'] as const,
+    pendingDeletion: () => [...queryKeys.accountDeletion.all, 'pending'] as const,
+    status: (userId: string) => [...queryKeys.accountDeletion.all, 'status', userId] as const,
+  },
+
   // Scanning workflow queries (for caching OCR results, etc.)
   scanning: {
     all: ['scanning'] as const,

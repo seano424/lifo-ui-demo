@@ -14,7 +14,7 @@ export const PRODUCT_TABLE_COLUMN_CONFIG = [
   {
     id: 'name',
     headerKey: 'product',
-    width: 150,
+    width: 130,
     align: 'left',
     hasMultipleLines: true,
     sortable: true,
@@ -22,7 +22,7 @@ export const PRODUCT_TABLE_COLUMN_CONFIG = [
   {
     id: 'total_stock',
     headerKey: 'totalStock',
-    width: 150,
+    width: 110,
     align: 'right',
     hasMultipleLines: false,
     sortable: true,
@@ -30,7 +30,7 @@ export const PRODUCT_TABLE_COLUMN_CONFIG = [
   {
     id: 'active_batches_count',
     headerKey: 'activeBatches',
-    width: 150,
+    width: 130,
     align: 'right',
     hasMultipleLines: false,
     sortable: true,
@@ -38,7 +38,7 @@ export const PRODUCT_TABLE_COLUMN_CONFIG = [
   {
     id: 'created_at',
     headerKey: 'dateAdded',
-    width: 150,
+    width: 110,
     align: 'right',
     hasMultipleLines: false,
     sortable: true,
@@ -94,7 +94,7 @@ export function createProductTableColumns({
           </div>
         </div>
       ),
-      size: 150,
+      size: 130,
     },
     {
       id: 'total_stock',
@@ -115,7 +115,7 @@ export function createProductTableColumns({
           {/* <div className="text-xs text-muted-foreground">{row.original.unit_type || 'units'}</div> */}
         </div>
       ),
-      size: 150,
+      size: 100,
     },
     {
       id: 'active_batches_count',

@@ -7,7 +7,6 @@ import {
   SettingsIcon,
   Zap,
   CalendarFold,
-  XCircle,
   Package,
 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
@@ -53,27 +52,33 @@ function useNavigationData() {
           title: t('batches'),
           items: [
             {
+              title: t('all'),
+              url: '/dashboard/inventory/batches',
+              icon: Layers,
+            },
+            {
               title: t('expiring'),
               url: '/dashboard/expiring',
               icon: CalendarFold,
               badge: expiryTodosCount > 0 ? expiryTodosCount : undefined,
             },
             {
-              title: t('newDeliveries'),
+              title: t('deliveries'),
               url: '/dashboard/inventory/new',
               icon: PackagePlus,
               badge: draftBatchCount,
             },
-            {
-              title: t('ignored'),
-              url: '/dashboard/inventory/ignored',
-              icon: XCircle,
-            },
-            {
-              title: t('all'),
-              url: '/dashboard/inventory/batches',
-              icon: Layers,
-            },
+            // {
+            //   title: t('ignored'),
+            //   url: '/dashboard/inventory/ignored',
+            //   icon: XCircle,
+            // },
+            // {
+            //   title: t('catalog'),
+            //   url: '/dashboard/inventory/products?sort=active_batches_count&direction=desc',
+            //   icon: Package,
+            //   isActive: true,
+            // },
           ],
         },
         {

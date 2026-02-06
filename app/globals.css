@@ -396,7 +396,7 @@
     --accent-foreground: 252 100% 65%;
 
     /* Destructive - slightly muted red for dark mode */
-    --destructive: 0 63% 31%;
+    --destructive: 0 63% 51%;
     --destructive-foreground: 0 0% 98%;
 
     /* Borders and inputs */

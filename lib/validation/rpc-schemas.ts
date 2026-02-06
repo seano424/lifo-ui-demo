@@ -358,6 +358,132 @@ export const SaveBatchTrackingSetupResponseSchema = z.object({
 })
 
 // =============================================================================
+// GDPR & ACCOUNT DELETION SCHEMAS
+// =============================================================================
+
+/**
+ * Schema for request_account_deletion RPC response
+ * Validates account deletion request with 30-day grace period
+ * Handles success, already-pending error, and other error cases
+ */
+export const RequestAccountDeletionResponseSchema = z.union([
+  // Success response
+  z.object({
+    success: z.literal(true),
+    message: z.string(),
+    deletion_scheduled_for: z.string(),
+    grace_days: z.number(),
+  }),
+  // Error response (deletion_scheduled_for present if already pending)
+  z.object({
+    success: z.literal(false),
+    message: z.string(),
+    deletion_scheduled_for: z.string().optional(),
+  }),
+])
+
+/**
+ * Schema for cancel_account_deletion RPC response
+ * Validates cancellation of pending account deletion
+ */
+export const CancelAccountDeletionResponseSchema = z.object({
+  success: z.boolean(),
+  message: z.string(),
+})
+
+/**
+ * Schema for get_deletion_status RPC response
+ * Validates deletion status information including grace period
+ * Uses discriminated union to handle success/error cases
+ */
+export const GetDeletionStatusResponseSchema = z.discriminatedUnion('success', [
+  // Success response - includes deletion status fields
+  z.object({
+    success: z.literal(true),
+    deletion_requested_at: z.string().nullable(),
+    scheduled_for: z.string().nullable(),
+    is_pending: z.boolean(),
+    deleted_at: z.string().nullable(),
+    grace_days: z.number(),
+    days_remaining: z.number().nullable(),
+  }),
+  // Error response - only includes message
+  z.object({
+    success: z.literal(false),
+    message: z.string(),
+  }),
+])
+
+/**
+ * Schema for gdpr_delete_user RPC response
+ * Validates GDPR-compliant user deletion results
+ * Uses discriminated union to handle success/error cases with different details
+ */
+export const GdprDeleteUserResponseSchema = z.discriminatedUnion('success', [
+  // Success response
+  z.object({
+    success: z.literal(true),
+    message: z.string(),
+    details: z.object({
+      user_id: z.string(),
+      deletion_type: z.string(),
+      records_affected: z.string(),
+    }),
+  }),
+  // Error response with optional error details
+  z.object({
+    success: z.literal(false),
+    message: z.string(),
+    details: z
+      .object({
+        sqlstate: z.string(),
+        user_id: z.string(),
+      })
+      .optional(),
+  }),
+])
+
+/**
+ * Schema for gdpr_delete_user_and_stores RPC response
+ * Validates user and store deletion results
+ * Uses discriminated union to handle success/error cases with different details
+ */
+export const GdprDeleteUserAndStoresResponseSchema = z.discriminatedUnion('success', [
+  // Success response
+  z.object({
+    success: z.literal(true),
+    message: z.string(),
+    details: z.object({
+      user_id: z.string(),
+      deletion_type: z.string(),
+      records_affected: z.string(),
+    }),
+  }),
+  // Error response with optional error details
+  z.object({
+    success: z.literal(false),
+    message: z.string(),
+    details: z
+      .object({
+        sqlstate: z.string(),
+        user_id: z.string(),
+      })
+      .optional(),
+  }),
+])
+
+/**
+ * Schema for process_expired_deletions RPC response
+ * Validates automated deletion processing results
+ */
+export const ProcessExpiredDeletionsResponseSchema = z.object({
+  success: z.boolean(),
+  processed: z.number(),
+  failed: z.number(),
+  run_at: z.string(),
+})
+
+// =============================================================================
 // TYPE INFERENCE HELPERS
 // =============================================================================
 
@@ -383,3 +509,9 @@ export type RestoreIgnoredBatchResponse = z.infer<typeof RestoreIgnoredBatchResp
 export type CategoryWithTrackingSettings = z.infer<typeof CategoryWithTrackingSettingsSchema>
 export type ProductWithTrackingSettings = z.infer<typeof ProductWithTrackingSettingsSchema>
 export type SaveBatchTrackingSetupResponse = z.infer<typeof SaveBatchTrackingSetupResponseSchema>
+export type RequestAccountDeletionResponse = z.infer<typeof RequestAccountDeletionResponseSchema>
+export type CancelAccountDeletionResponse = z.infer<typeof CancelAccountDeletionResponseSchema>
+export type GetDeletionStatusResponse = z.infer<typeof GetDeletionStatusResponseSchema>
+export type GdprDeleteUserResponse = z.infer<typeof GdprDeleteUserResponseSchema>
+export type GdprDeleteUserAndStoresResponse = z.infer<typeof GdprDeleteUserAndStoresResponseSchema>
+export type ProcessExpiredDeletionsResponse = z.infer<typeof ProcessExpiredDeletionsResponseSchema>

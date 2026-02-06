@@ -20,7 +20,7 @@ export const BATCH_TABLE_COLUMN_CONFIG = [
     id: 'status',
     headerKey: 'headers.status',
     width: 100,
-    align: 'left',
+    align: 'right',
     hasMultipleLines: false,
     sortable: true,
   },
@@ -35,7 +35,7 @@ export const BATCH_TABLE_COLUMN_CONFIG = [
   {
     id: 'days_left',
     headerKey: 'headers.daysLeft',
-    width: 130,
+    width: 110,
     align: 'right',
     hasMultipleLines: false,
     sortable: true,
@@ -43,7 +43,7 @@ export const BATCH_TABLE_COLUMN_CONFIG = [
   {
     id: 'current_quantity',
     headerKey: 'headers.quantity',
-    width: 130,
+    width: 110,
     align: 'right',
     hasMultipleLines: false,
     sortable: true,
@@ -75,30 +75,6 @@ function getAlignmentClasses(columnIndex: number): {
     cellClass: '',
   }
 }
-
-// Helper function to get status badge variant
-// function getStatusVariant(
-//   status: string,
-// ): 'default' | 'secondary' | 'primary' | 'danger' | 'elevated' {
-//   switch (status) {
-//     case 'active':
-//       return 'primary'
-//     case 'draft':
-//       return 'secondary'
-//     case 'expired':
-//       return 'danger'
-//     case 'ignored':
-//       return 'default'
-//     case 'damaged':
-//       return 'danger'
-//     case 'sold_out':
-//       return 'secondary'
-//     case 'reserved':
-//       return 'elevated'
-//     default:
-//       return 'default'
-//   }
-// }
 
 // Helper function to calculate days until expiry
 function getDaysLeft(expiryDate: Date): number {
@@ -150,7 +126,7 @@ export function createBatchTableColumns({
   t,
   tExpiry,
   tStatus,
-  storeName,
+  // storeName,
 }: {
   currentSort: BatchSort
   updateSort: (field: BatchSortField) => void
@@ -232,6 +208,26 @@ export function createBatchTableColumns({
       size: BATCH_TABLE_COLUMN_CONFIG[3].width,
     },
     {
+      id: 'current_quantity',
+      accessorKey: 'current_quantity',
+      header: () => (
+        <SortableHeader
+          field="current_quantity"
+          currentSort={currentSort}
+          updateSort={updateSort}
+          className={alignments.current_quantity.headerClass}
+        >
+          {t('headers.quantity')}
+        </SortableHeader>
+      ),
+      cell: ({ row }) => (
+        <div className={`${alignments.current_quantity.cellClass} tabular-nums`}>
+          {Math.round(Number(row.original.current_quantity)).toLocaleString()}
+        </div>
+      ),
+      size: BATCH_TABLE_COLUMN_CONFIG[4].width,
+    },
+    {
       id: 'expiry_date',
       accessorKey: 'expiry_date',
       header: () => (
@@ -264,26 +260,6 @@ export function createBatchTableColumns({
       size: BATCH_TABLE_COLUMN_CONFIG[2].width,
     },
     {
-      id: 'current_quantity',
-      accessorKey: 'current_quantity',
-      header: () => (
-        <SortableHeader
-          field="current_quantity"
-          currentSort={currentSort}
-          updateSort={updateSort}
-          className={alignments.current_quantity.headerClass}
-        >
-          {t('headers.quantity')}
-        </SortableHeader>
-      ),
-      cell: ({ row }) => (
-        <div className={`${alignments.current_quantity.cellClass} tabular-nums`}>
-          {Math.round(Number(row.original.current_quantity)).toLocaleString()}
-        </div>
-      ),
-      size: BATCH_TABLE_COLUMN_CONFIG[4].width,
-    },
-    {
       id: 'status',
       accessorKey: 'status',
       header: () => (
@@ -307,19 +283,19 @@ export function createBatchTableColumns({
       },
       size: BATCH_TABLE_COLUMN_CONFIG[1].width,
     },
-    {
-      id: 'location',
-      header: () => (
-        <div className={`flex items-center font-normal ${alignments.location.headerClass}`}>
-          {t('headers.location')}
-        </div>
-      ),
-      cell: () => (
-        <div className={`text-sm truncate ${alignments.location.cellClass}`}>
-          {storeName || '-'}
-        </div>
-      ),
-      size: BATCH_TABLE_COLUMN_CONFIG[5].width,
-    },
+    // {
+    //   id: 'location',
+    //   header: () => (
+    //     <div className={`flex items-center font-normal ${alignments.location.headerClass}`}>
+    //       {t('headers.location')}
+    //     </div>
+    //   ),
+    //   cell: () => (
+    //     <div className={`text-sm truncate ${alignments.location.cellClass}`}>
+    //       {storeName || '-'}
+    //     </div>
+    //   ),
+    //   size: BATCH_TABLE_COLUMN_CONFIG[5].width,
+    // },
   ]
 }

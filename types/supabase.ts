@@ -2589,6 +2589,10 @@ export type Database = {
           store_products_linked: number
         }[]
       }
+      cancel_account_deletion: {
+        Args: { target_user_id: string }
+        Returns: Json
+      }
       check_bulk_duplicates: {
         Args: {
           p_barcodes: string[]
@@ -2777,6 +2781,23 @@ export type Database = {
           batch_numbers_fixed: number
           batches_updated: number
         }[]
+      }
+      gdpr_delete_user: {
+        Args: {
+          deletion_type?: string
+          performed_by_user_id?: string
+          target_user_id: string
+        }
+        Returns: Json
+      }
+      gdpr_delete_user_and_stores: {
+        Args: {
+          delete_owned_stores?: boolean
+          deletion_type?: string
+          performed_by_user_id?: string
+          target_user_id: string
+        }
+        Returns: Json
       }
       get_action_history_enhanced: {
         Args: {
@@ -3193,6 +3214,7 @@ export type Database = {
         Args: { p_store_id: string }
         Returns: Json
       }
+      get_deletion_status: { Args: { target_user_id: string }; Returns: Json }
       get_donated_items: {
         Args: {
           p_days_back?: number
@@ -3941,8 +3963,13 @@ export type Database = {
         }
         Returns: boolean
       }
+      process_expired_deletions: { Args: never; Returns: Json }
       remove_user_from_store: {
         Args: { p_store_id: string; p_target_user_id: string }
+        Returns: Json
+      }
+      request_account_deletion: {
+        Args: { deletion_type?: string; target_user_id: string }
         Returns: Json
       }
       reset_pin_attempts: { Args: { p_username: string }; Returns: Json }
@@ -4746,6 +4773,8 @@ export type Database = {
       users: {
         Row: {
           created_at: string | null
+          deleted_at: string | null
+          deletion_requested_at: string | null
           email: string | null
           full_name: string | null
           is_active: boolean | null
@@ -4756,6 +4785,8 @@ export type Database = {
         }
         Insert: {
           created_at?: string | null
+          deleted_at?: string | null
+          deletion_requested_at?: string | null
           email?: string | null
           full_name?: string | null
           is_active?: boolean | null
@@ -4766,6 +4797,8 @@ export type Database = {
         }
         Update: {
           created_at?: string | null
+          deleted_at?: string | null
+          deletion_requested_at?: string | null
           email?: string | null
           full_name?: string | null
           is_active?: boolean | null
@@ -4781,6 +4814,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      cancel_account_deletion: {
+        Args: { target_user_id: string }
+        Returns: Json
+      }
       create_email_delivery: {
         Args: {
           p_email_data?: Json
@@ -4796,18 +4833,18 @@ export type Database = {
       }
       gdpr_delete_user: {
         Args: {
-          deletion_type?: string
-          performed_by_user_id?: string
-          target_user_id: string
+          p_deletion_type?: string
+          p_performed_by_user_id?: string
+          p_target_user_id: string
         }
         Returns: Json
       }
       gdpr_delete_user_and_stores: {
         Args: {
-          delete_owned_stores?: boolean
-          deletion_type?: string
-          performed_by_user_id?: string
-          target_user_id: string
+          p_delete_owned_stores?: boolean
+          p_deletion_type?: string
+          p_performed_by_user_id?: string
+          p_target_user_id: string
         }
         Returns: Json
       }
@@ -4831,6 +4868,7 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_deletion_status: { Args: { target_user_id: string }; Returns: Json }
       get_user_roles: { Args: { user_uuid?: string }; Returns: string[] }
       has_role: {
         Args: { role_name: string; user_uuid?: string }
@@ -4840,8 +4878,9 @@ export type Database = {
         Args: { role_name: string; user_uuid: string }
         Returns: boolean
       }
+      process_expired_deletions: { Args: never; Returns: Json }
       request_account_deletion: {
-        Args: { deletion_reason?: string }
+        Args: { deletion_type?: string; target_user_id: string }
         Returns: Json
       }
       update_email_delivery_status: {
