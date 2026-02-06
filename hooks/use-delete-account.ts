@@ -2,40 +2,19 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
-import { z } from 'zod'
 import { queryKeys } from '@/lib/queries/query-keys'
+import {
+  GetDeletionStatusResponseSchema,
+  RequestAccountDeletionResponseSchema,
+  CancelAccountDeletionResponseSchema,
+  GdprDeleteUserResponseSchema,
+  GdprDeleteUserAndStoresResponseSchema,
+} from '@/lib/validation/rpc-schemas'
 
 type DeleteAccountOptions = {
   deleteOwnedStores?: boolean
   deletionType?: 'user_request' | 'admin_action' | 'automated'
 }
-
-// Zod schemas for runtime validation
-const DeletionStatusSchema = z.object({
-  deletion_requested_at: z.string().nullable(),
-  scheduled_for: z.string().nullable(),
-  is_pending: z.boolean(),
-  deleted_at: z.string().nullable(),
-  grace_days: z.number().optional(),
-})
-
-const RequestDeletionSchema = z.object({
-  success: z.boolean(),
-  message: z.string(),
-  deletion_scheduled_for: z.string(),
-  grace_days: z.number(),
-})
-
-const CancelDeletionSchema = z.object({
-  success: z.boolean(),
-  message: z.string(),
-})
-
-const GdprDeletionSchema = z.object({
-  success: z.boolean(),
-  message: z.string(),
-  details: z.record(z.unknown()).optional(),
-})
 
 /**
  * Check if current user has a pending deletion (30-day grace period)
@@ -61,7 +40,7 @@ export function usePendingDeletion() {
       }
 
       // Validate response with Zod
-      const parsed = DeletionStatusSchema.safeParse(data)
+      const parsed = GetDeletionStatusResponseSchema.safeParse(data)
       if (!parsed.success) {
         console.error('Invalid deletion status response:', parsed.error)
         return null
@@ -69,7 +48,18 @@ export function usePendingDeletion() {
 
       const statusData = parsed.data
 
-      if (!statusData?.deletion_requested_at || !statusData?.scheduled_for) return null
+      // Handle error response
+      if (!statusData.success) {
+        // "User not found" is not an error - just means no deletion pending
+        // Only log actual errors
+        if (statusData.message !== 'User not found') {
+          console.error('Deletion status check failed:', statusData.message)
+        }
+        return null
+      }
+
+      // No pending deletion
+      if (!statusData.deletion_requested_at || !statusData.scheduled_for) return null
 
       const requestedAt = new Date(statusData.deletion_requested_at)
       const scheduledFor = new Date(statusData.scheduled_for)
@@ -112,18 +102,22 @@ export function useRequestDeletion() {
       if (error) throw error
 
       // Validate response with Zod
-      const parsed = RequestDeletionSchema.safeParse(data)
+      const parsed = RequestAccountDeletionResponseSchema.safeParse(data)
       if (!parsed.success) {
         console.error('Invalid request deletion response:', parsed.error)
         throw new Error('Invalid response from server')
       }
 
       const result = parsed.data
-      if (!result?.success) throw new Error(result?.message || 'Failed to request deletion')
+      if (!result.success) {
+        throw new Error(result.message || 'Failed to request deletion')
+      }
+      // TypeScript now knows result.success is true
       return result
     },
     onSuccess: data => {
       queryClient.invalidateQueries({ queryKey: queryKeys.accountDeletion.pendingDeletion() })
+      // TypeScript knows data.success is true here, so deletion_scheduled_for exists
       const date = new Date(data.deletion_scheduled_for).toLocaleDateString()
       toast.success(
         `Account scheduled for deletion on ${date}. You can cancel anytime before then.`,
@@ -158,14 +152,17 @@ export function useCancelDeletion() {
       if (error) throw error
 
       // Validate response with Zod
-      const parsed = CancelDeletionSchema.safeParse(data)
+      const parsed = CancelAccountDeletionResponseSchema.safeParse(data)
       if (!parsed.success) {
         console.error('Invalid cancel deletion response:', parsed.error)
         throw new Error('Invalid response from server')
       }
 
       const result = parsed.data
-      if (!result?.success) throw new Error(result?.message || 'Failed to cancel deletion')
+      if (!result.success) {
+        throw new Error(result.message || 'Failed to cancel deletion')
+      }
+      // TypeScript now knows result.success is true
       return result
     },
     onSuccess: () => {
@@ -233,18 +230,22 @@ export function useImmediateDeletion() {
         throw new Error(error.message || 'Failed to delete account')
       }
 
-      // Validate response with Zod
-      const parsed = GdprDeletionSchema.safeParse(data)
+      // Validate response with Zod - use appropriate schema
+      const schema = deleteOwnedStores
+        ? GdprDeleteUserAndStoresResponseSchema
+        : GdprDeleteUserResponseSchema
+
+      const parsed = schema.safeParse(data)
       if (!parsed.success) {
         console.error('Invalid GDPR deletion response:', parsed.error)
         throw new Error('Invalid response from server')
       }
 
       const result = parsed.data
-      if (!result?.success) {
-        throw new Error(result?.message || 'Deletion failed')
+      if (!result.success) {
+        throw new Error(result.message || 'Deletion failed')
       }
-
+      // TypeScript now knows result.success is true
       return result
     },
     onSuccess: async () => {

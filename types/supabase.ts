@@ -4833,18 +4833,18 @@ export type Database = {
       }
       gdpr_delete_user: {
         Args: {
-          deletion_type?: string
-          performed_by_user_id?: string
-          target_user_id: string
+          p_deletion_type?: string
+          p_performed_by_user_id?: string
+          p_target_user_id: string
         }
         Returns: Json
       }
       gdpr_delete_user_and_stores: {
         Args: {
-          delete_owned_stores?: boolean
-          deletion_type?: string
-          performed_by_user_id?: string
-          target_user_id: string
+          p_delete_owned_stores?: boolean
+          p_deletion_type?: string
+          p_performed_by_user_id?: string
+          p_target_user_id: string
         }
         Returns: Json
       }

@@ -613,6 +613,87 @@ export interface ProductWithTrackingSettings {
 }
 
 // =============================================================================
+// USER_MGMT SCHEMA - GDPR & ACCOUNT DELETION
+// =============================================================================
+
+/** Response from request_account_deletion - Success case */
+export interface RequestAccountDeletionSuccessResponse {
+  success: true
+  message: string
+  deletion_scheduled_for: string
+  grace_days: number
+}
+
+/** Response from request_account_deletion - Error case */
+export interface RequestAccountDeletionErrorResponse {
+  success: false
+  message: string
+}
+
+/** Response from request_account_deletion - Discriminated union */
+export type RequestAccountDeletionResponse =
+  | RequestAccountDeletionSuccessResponse
+  | RequestAccountDeletionErrorResponse
+
+/** Response from cancel_account_deletion */
+export interface CancelAccountDeletionResponse {
+  success: boolean
+  message: string
+}
+
+/** Response from get_deletion_status - Success case */
+export interface GetDeletionStatusSuccessResponse {
+  success: true
+  deletion_requested_at: string | null
+  scheduled_for: string | null
+  is_pending: boolean
+  deleted_at: string | null
+  grace_days: number
+  days_remaining: number | null
+}
+
+/** Response from get_deletion_status - Error case */
+export interface GetDeletionStatusErrorResponse {
+  success: false
+  message: string
+}
+
+/** Response from get_deletion_status - Discriminated union */
+export type GetDeletionStatusResponse =
+  | GetDeletionStatusSuccessResponse
+  | GetDeletionStatusErrorResponse
+
+/** Response from gdpr_delete_user */
+export interface GdprDeleteUserResponse {
+  success: boolean
+  message: string
+  details?: {
+    user_id: string
+    deletion_type: string
+    records_affected: string
+  }
+}
+
+/** Response from gdpr_delete_user_and_stores */
+export interface GdprDeleteUserAndStoresResponse {
+  success: boolean
+  message: string
+  details?: {
+    user_id: string
+    deletion_type: string
+    records_affected: string
+  }
+}
+
+/** Response from process_expired_deletions */
+export interface ProcessExpiredDeletionsResponse {
+  success: boolean
+  processed: number
+  failed: number
+  run_at: string
+}
+
+// =============================================================================
 // PUBLIC SCHEMA - CSV IMPORT
 // =============================================================================
 
@@ -1405,6 +1486,14 @@ export interface RpcResultMap {
 
   // Maintenance
   update_expired_batch_statuses: UpdateExpiredBatchStatusesResult[]
+
+  // GDPR & Account Deletion
+  request_account_deletion: RequestAccountDeletionResponse
+  cancel_account_deletion: CancelAccountDeletionResponse
+  get_deletion_status: GetDeletionStatusResponse
+  gdpr_delete_user: GdprDeleteUserResponse
+  gdpr_delete_user_and_stores: GdprDeleteUserAndStoresResponse
+  process_expired_deletions: ProcessExpiredDeletionsResponse
 }
 
 // =============================================================================
