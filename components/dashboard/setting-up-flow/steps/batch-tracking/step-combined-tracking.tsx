@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge'
 import { Toggle } from './toggle'
 import { ShelfLifeChip } from './shelf-life-chip'
 import { useTranslations } from 'next-intl'
-import { Package, Zap, Pencil, Eye, ChevronDown, RotateCcw } from 'lucide-react'
+import { Package, Zap, Type, Eye, ChevronDown, RotateCcw } from 'lucide-react'
 import type { ProcessedCategory, ProductOverride } from '../batch-tracking-step'
 
 interface StepCombinedTrackingProps {
@@ -167,7 +167,7 @@ export function StepCombinedTracking({
               <Zap className="w-3 h-3" /> = auto-calculate from delivery date
             </div>
             <div className="flex items-center gap-1.5">
-              <Pencil className="w-3 h-3" /> = you'll enter dates per delivery
+              <Type className="w-3 h-3" /> = you'll enter dates per delivery
             </div>
           </div>
         )}
@@ -212,7 +212,7 @@ export function StepCombinedTracking({
                         <td className="py-2.5">
                           {batch.confidence === 'manual' ? (
                             <Badge size="sm">
-                              <Pencil className="w-3 h-3" /> Set on delivery
+                              <Type className="w-3 h-3" /> Set on delivery
                             </Badge>
                           ) : (
                             <Badge size="sm" variant={batch.daysLeft <= 3 ? 'danger' : 'primary'}>
@@ -354,7 +354,7 @@ function CategoryRowWithConfig({
             className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
             title={mode === 'auto' ? 'Switch to manual entry' : 'Switch to automatic'}
           >
-            {mode === 'auto' ? <Pencil className="w-3.5 h-3.5" /> : <Zap className="w-3.5 h-3.5" />}
+            {mode === 'auto' ? <Zap className="w-3.5 h-3.5" /> : <Type className="w-3.5 h-3.5" />}
           </button>
         </div>
       )}

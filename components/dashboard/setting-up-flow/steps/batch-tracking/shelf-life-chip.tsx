@@ -17,9 +17,10 @@ const DEFAULT_SHELF_LIFE = 14
 /**
  * Shelf Life Chip Component
  *
- * Shows shelf life mode and days with inline editing.
- * - Auto mode: Shows days with click-to-edit inline input
- * - Manual mode: Shows "Manual entry" button
+ * Shows both auto and manual options as a segmented control.
+ * - Auto mode: Shows days with click-to-edit inline input (selected state)
+ * - Manual mode: Shows "Manual entry" (selected state)
+ * - Both options are always visible with clear selected/unselected states
  */
 export function ShelfLifeChip({
   mode,
@@ -37,69 +38,96 @@ export function ShelfLifeChip({
     setEditing(false)
   }
 
-  const handleModeToggle = (e: React.MouseEvent) => {
+  const handleAutoClick = (e: React.MouseEvent) => {
     e.stopPropagation()
-    const newMode = mode === 'auto' ? 'manual' : 'auto'
-    onModeChange(newMode)
+    if (mode !== 'auto') {
+      onModeChange('auto')
+    } else {
+      // Already in auto mode, start editing the days
+      setTempDays(days?.toString() || DEFAULT_SHELF_LIFE.toString())
+      setEditing(true)
+    }
   }
 
-  // Manual mode: show "Manual entry" button
-  if (mode === 'manual') {
-    return (
-      <div className={cn('flex items-center gap-2', className)}>
-        <button
-          type="button"
-          onClick={handleModeToggle}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-dashed border-gray-300 bg-gray-50 text-xs font-medium text-gray-400 hover:border-gray-400 hover:text-gray-500 transition-colors"
-        >
-          <Type className="w-3 h-3" />
-          Manual entry
-        </button>
-      </div>
-    )
+  const handleManualClick = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (mode !== 'manual') {
+      onModeChange('manual')
+    }
   }
 
-  // Auto mode - editing state: show inline input
+  // Editing state: show inline input in place of auto button
   if (editing) {
     return (
       <div
-        className={cn('inline-flex items-center gap-1.5', className)}
+        className={cn('inline-flex items-center gap-1', className)}
         onClick={e => e.stopPropagation()}
       >
-        <input
-          type="number"
-          min="1"
-          value={tempDays}
-          onChange={e => setTempDays(e.target.value)}
-          onBlur={commitDays}
-          onKeyDown={e => {
-            if (e.key === 'Enter') commitDays()
-            if (e.key === 'Escape') {
-              setTempDays(days?.toString() || '')
-              setEditing(false)
-            }
-          }}
-          className="w-20 text-sm text-center px-3 py-2.5 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 shadow-sm"
-        />
+        <div className="items-center rounded-lg border border-muted bg-white overflow-hidden grid grid-cols-2">
+          <div className="px-3 py-1.5 bg-secondary-50 border-r border-muted">
+            <input
+              type="number"
+              min="1"
+              value={tempDays}
+              onChange={e => setTempDays(e.target.value)}
+              onBlur={commitDays}
+              onKeyDown={e => {
+                if (e.key === 'Enter') commitDays()
+                if (e.key === 'Escape') {
+                  setTempDays(days?.toString() || '')
+                  setEditing(false)
+                }
+              }}
+              className="w-16 text-sm text-center bg-transparent border-none text-secondary-900 focus:outline-none focus:ring-0"
+            />
+          </div>
+          <button
+            type="button"
+            onClick={handleManualClick}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-muted-foreground hover:bg-muted transition-colors"
+          >
+            <Type className="w-3 h-3" />
+            Manual
+          </button>
+        </div>
       </div>
     )
   }
 
-  // Auto mode - display state: show days button
+  // Display state: show segmented control with both options
   return (
-    <div className={cn('flex items-center gap-2', className)}>
-      <button
-        type="button"
-        onClick={e => {
-          e.stopPropagation()
-          setTempDays(days?.toString() || DEFAULT_SHELF_LIFE.toString())
-          setEditing(true)
-        }}
-        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold transition-colors group bg-gray-100 text-gray-700 hover:bg-gray-200"
-      >
-        {days ?? DEFAULT_SHELF_LIFE}d
-        <ZapIcon className="w-3 h-3 text-gray-300 group-hover:text-gray-500 transition-colors" />
-      </button>
+    <div className={cn('inline-flex items-center gap-1', className)}>
+      <div className="border border-muted items-center rounded-lg overflow-hidden grid grid-cols-2">
+        {/* Auto button */}
+        <button
+          type="button"
+          onClick={handleAutoClick}
+          className={cn(
+            'inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium transition-colors border-r border-muted',
+            mode === 'auto'
+              ? 'bg-secondary-50 text-secondary-700'
+              : 'bg-white text-gray-600 hover:bg-gray-50',
+          )}
+        >
+          <ZapIcon className="w-3 h-3" />
+          {days ?? DEFAULT_SHELF_LIFE}d
+        </button>
+
+        {/* Manual button */}
+        <button
+          type="button"
+          onClick={handleManualClick}
+          className={cn(
+            'inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium transition-colors',
+            mode === 'manual'
+              ? 'bg-secondary-50 text-secondary-700'
+              : 'bg-white text-gray-600 hover:bg-gray-50',
+          )}
+        >
+          <Type className="w-3 h-3" />
+          Manual
+        </button>
+      </div>
     </div>
   )
 }
