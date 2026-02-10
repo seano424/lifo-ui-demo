@@ -7,8 +7,7 @@ import {
 } from '@/lib/queries/batch-tracking-onboarding'
 import { getDefaultShelfLife } from '@/lib/batch-tracking/shelf-life-lookup'
 import { StepSquareConnected } from './batch-tracking/step-square-connected'
-import { StepWhatToTrack } from './batch-tracking/step-what-to-track'
-import { StepHowToTrack } from './batch-tracking/step-how-to-track'
+import { StepCombinedTracking } from './batch-tracking/step-combined-tracking'
 import { ActivatingState } from './batch-tracking/activating-state'
 import { StepSuccess } from './batch-tracking/step-success'
 import { useActiveStoreId, useStoreState } from '@/lib/stores/store-context'
@@ -20,7 +19,7 @@ import { StoreIndicator } from '../store-indicator'
 // TYPES
 // =============================================================================
 
-export type WizardSubStep = 0 | 1 | 2 | 'activating' | 'success'
+export type WizardSubStep = 0 | 1 | 'activating' | 'success'
 
 export interface ProcessedCategory {
   id: string
@@ -47,8 +46,7 @@ export interface ProductOverride {
  * Batch Tracking Setup Step
  *
  * Multi-sub-step wizard for configuring batch tracking:
- * - Step 1: What to Track (enable/disable categories)
- * - Step 2: How to Track (shelf life + auto/manual mode)
+ * - Step 1: Combined What & How to Track (enable/disable categories + configure shelf life inline)
  * - Activating: Progress animation during batch creation
  * - Success: Completion screen with CTA to dashboard
  *
@@ -270,8 +268,8 @@ export function BatchTrackingStep() {
     } catch (error) {
       logger.error(context, 'Failed to activate batch tracking', { error, storeId })
       // TODO: Show error toast
-      // For now, go back to step 2
-      setSubStep(2)
+      // For now, go back to step 1
+      setSubStep(1)
     }
   }
 
@@ -291,29 +289,21 @@ export function BatchTrackingStep() {
       )}
 
       {subStep === 1 && (
-        <StepWhatToTrack
+        <StepCombinedTracking
           categories={processedCategories}
           enabledCategories={enabledCategories}
-          onToggleCategory={handleToggleCategory}
-          onNext={() => setSubStep(2)}
-          onBack={goToPrevStep}
-        />
-      )}
-
-      {subStep === 2 && (
-        <StepHowToTrack
-          categories={enabledCategories}
           categoryModes={categoryModes}
           shelfLifeDays={shelfLifeDays}
           productOverrides={productOverrides}
           storeId={storeId}
+          onToggleCategory={handleToggleCategory}
           onUpdateMode={handleUpdateCategoryMode}
           onUpdateShelfLife={handleUpdateShelfLife}
           onUpdateProductOverride={handleUpdateProductOverride}
           onClearProductOverride={handleClearProductOverride}
           onResetToDefaults={handleResetToDefaults}
           onActivate={handleActivate}
-          onBack={() => setSubStep(1)}
+          onBack={goToPrevStep}
         />
       )}
 
