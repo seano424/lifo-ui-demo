@@ -6,7 +6,12 @@ import { Typography } from '@/components/ui/typography'
 import { Button } from '@/components/ui/button'
 import { useTranslations } from 'next-intl'
 import Image from 'next/image'
-import { useSquareStatus, useInitiateSquareConnect } from '@/hooks/use-square-integration'
+import {
+  useSquareStatus,
+  useInitiateSquareConnect,
+  useSyncSquareCatalog,
+  useSyncSquareInventory,
+} from '@/hooks/use-square-integration'
 import { useStoreOverviews } from '@/hooks/use-store-overviews'
 import type { StoreOverview } from '@/lib/queries/store-overview-rpc'
 import { toast } from 'sonner'
@@ -53,10 +58,12 @@ interface StoreCardProps {
   store: StoreOverview
   isExpanded: boolean
   onToggle: () => void
+  onSyncNow: () => void
+  isSyncing: boolean
   t: (key: string) => string
 }
 
-function StoreCard({ store, isExpanded, onToggle, t }: StoreCardProps) {
+function StoreCard({ store, isExpanded, onToggle, onSyncNow, isSyncing, t }: StoreCardProps) {
   // Derive sync health from store data
   const syncHealth: SyncHealth =
     store.product_count === 0 && store.category_count === 0 ? 'empty' : 'healthy'
@@ -150,10 +157,15 @@ function StoreCard({ store, isExpanded, onToggle, t }: StoreCardProps) {
             <div className="flex items-center gap-2">
               <button
                 type="button"
-                className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground px-2.5 py-1.5 rounded-lg hover:bg-muted transition-colors"
+                onClick={e => {
+                  e.stopPropagation()
+                  onSyncNow()
+                }}
+                disabled={isSyncing}
+                className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground px-2.5 py-1.5 rounded-lg hover:bg-muted transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <RefreshCw className="w-3.5 h-3.5" />
-                Sync now
+                <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
+                {isSyncing ? 'Syncing...' : 'Sync now'}
               </button>
               <button
                 type="button"
@@ -326,6 +338,8 @@ export function AddStoreStep() {
   // Square integration hooks
   const { data: squareStatus } = useSquareStatus()
   const initiateSquareConnect = useInitiateSquareConnect()
+  const syncCatalogMutation = useSyncSquareCatalog()
+  const syncInventoryMutation = useSyncSquareInventory()
 
   // Store overviews hook
   const { data: stores } = useStoreOverviews()
@@ -343,6 +357,8 @@ export function AddStoreStep() {
   const { goToNextStep } = useSetupFlowStore()
 
   const isSquareConnected = squareStatus?.is_connected || false
+  const connectionId = squareStatus?.connection_id
+  const isSyncingData = syncCatalogMutation.isPending || syncInventoryMutation.isPending
 
   // Calculate catalog stats
   const categoryCount = categories?.length || 0
@@ -372,6 +388,23 @@ export function AddStoreStep() {
 
   const toggleStore = (storeId: string) => {
     setExpandedStoreId(expandedStoreId === storeId ? null : storeId)
+  }
+
+  const handleSyncNow = async () => {
+    if (!connectionId) {
+      toast.error('No Square connection found')
+      return
+    }
+
+    try {
+      // Sync both catalog and inventory
+      await syncCatalogMutation.mutateAsync({ connectionId, fullSync: false })
+      await syncInventoryMutation.mutateAsync({ connectionId, fullSync: false })
+      toast.success('Sync completed successfully')
+    } catch (error) {
+      console.error('Sync failed:', error)
+      toast.error('Sync failed. Please try again.')
+    }
   }
 
   // Show disconnected state if not connected
@@ -433,10 +466,12 @@ export function AddStoreStep() {
             </div>
             <button
               type="button"
-              className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground px-3 py-2 rounded-lg border hover:border-foreground/20 hover:bg-muted transition-all"
+              onClick={handleSyncNow}
+              disabled={isSyncingData}
+              className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground px-3 py-2 rounded-lg border hover:border-foreground/20 hover:bg-muted transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <RefreshCw className="w-3.5 h-3.5" />
-              Sync all stores
+              <RefreshCw className={`w-3.5 h-3.5 ${isSyncingData ? 'animate-spin' : ''}`} />
+              {isSyncingData ? 'Syncing...' : 'Sync all stores'}
             </button>
           </div>
 
@@ -448,6 +483,8 @@ export function AddStoreStep() {
                 store={store}
                 isExpanded={expandedStoreId === store.store_id}
                 onToggle={() => toggleStore(store.store_id)}
+                onSyncNow={handleSyncNow}
+                isSyncing={isSyncingData}
                 t={t}
               />
             ))}
