@@ -682,6 +682,8 @@
             "uncategorized": "Produits non catégorisés"
           },
           "noCategories": "Aucune catégorie trouvée",
+          "selectAll": "Tout sélectionner",
+          "deselectAll": "Tout désélectionner",
           "summary": {
             "tracking": "Suivi de",
             "of": "sur",
@@ -694,7 +696,8 @@
           "title": "Comment devons-nous suivre les dates d'expiration ?",
           "description": "Définissez une durée de conservation par défaut pour chaque catégorie. Lorsque les livraisons arrivent, nous calculerons automatiquement la date d'expiration. Choisissez \"Manuel\" pour les catégories où vous préférez entrer les dates vous-même.",
           "sections": {
-            "categories": "Catégories de produits"
+            "categories": "Catégories de produits",
+            "defaultShelfLife": "Durée de conservation par défaut"
           },
           "infoBox": {
             "message": "Ce sont les paramètres par défaut. Vous pourrez toujours les modifier plus tard dans les Paramètres."
@@ -808,6 +811,8 @@
               "uncategorized": "Produits non catégorisés"
             },
             "noFoodCategories": "Aucune catégorie alimentaire trouvée",
+            "selectAll": "Tout sélectionner",
+            "deselectAll": "Tout désélectionner",
             "summary": {
               "tracking": "Suivi de",
               "of": "sur",
@@ -820,7 +825,8 @@
             "title": "Comment devons-nous les suivre ?",
             "description": "Configurez la durée de conservation et le mode de suivi pour chaque catégorie. Vous pouvez personnaliser les produits individuels dans chaque catégorie si nécessaire.",
             "sections": {
-              "categories": "Catégories"
+              "categories": "Catégories",
+              "defaultShelfLife": "Durée de conservation par défaut"
             },
             "infoBox": {
               "message": "Ce sont les paramètres par défaut. Vous pourrez toujours les modifier plus tard dans les Paramètres."

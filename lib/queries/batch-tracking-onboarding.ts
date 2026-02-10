@@ -90,12 +90,16 @@ export function useBatchTrackingSetup(storeId: string) {
         throw new Error(`Failed to fetch batch tracking setup: ${error.message}`)
       }
 
+      const typedData = data as unknown as
+        | import('@/types/rpc-returns').BatchTrackingSetupResponse
+        | null
+
       logger.log(context, 'Batch tracking setup fetched successfully', {
         storeId,
-        setupCompleted: data?.setup_completed,
+        setupCompleted: typedData?.config?.setup_completed,
       })
 
-      return data
+      return typedData
     },
     staleTime: 2 * 60 * 1000, // 2 minutes
     enabled: !!storeId,

@@ -70,7 +70,7 @@ export function StepSquareConnected({
 
             <div className="grid grid-cols-2 gap-4">
               <div className="p-4 bg-muted/50 rounded-xl">
-                <Typography variant="large" className="font-semibold">
+                <Typography variant="h4" className="font-semibold">
                   {productCount.toLocaleString()}
                 </Typography>
                 <Typography variant="small" className="text-muted-foreground">
@@ -78,7 +78,7 @@ export function StepSquareConnected({
                 </Typography>
               </div>
               <div className="p-4 bg-muted/50 rounded-xl">
-                <Typography variant="large" className="font-semibold">
+                <Typography variant="h4" className="font-semibold">
                   {categoryCount.toLocaleString()}
                 </Typography>
                 <Typography variant="small" className="text-muted-foreground">

@@ -34,8 +34,10 @@ export function Toggle({ checked, onCheckedChange, disabled = false, className }
       <span
         aria-hidden="true"
         className={cn(
-          'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out',
-          checked ? 'translate-x-5' : 'translate-x-0',
+          'pointer-events-none inline-block h-5 w-5 transform rounded-full shadow-lg ring-0 transition duration-200 ease-in-out',
+          checked
+            ? 'translate-x-5 bg-white dark:bg-gray-900'
+            : 'translate-x-0 bg-white dark:bg-gray-100',
         )}
       />
     </button>

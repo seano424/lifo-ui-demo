@@ -71,17 +71,14 @@ export function BatchTrackingStep() {
     if (!categories) return []
 
     return categories.map(cat => {
-      const shelfLife = getDefaultShelfLife(
-        cat.display_name_en || cat.display_name_fr || cat.display_name_nl || 'Unknown',
-      )
+      const shelfLife = getDefaultShelfLife(cat.display_name_en || cat.display_name_fr || 'Unknown')
 
       return {
         id: cat.category_id,
-        name:
-          cat.display_name_en || cat.display_name_fr || cat.display_name_nl || 'Unknown Category',
+        name: cat.display_name_en || cat.display_name_fr || 'Unknown Category',
         productCount: cat.product_count,
         enabled: true, // All categories default to ON
-        mode: shelfLife.days ? 'auto' : 'manual', // Auto if we have shelf life, otherwise manual
+        mode: (shelfLife.days ? 'auto' : 'manual') as 'auto' | 'manual',
         days: shelfLife.days,
         matched: shelfLife.matched,
         matchedKeyword: shelfLife.matchedKeyword,
@@ -124,7 +121,11 @@ export function BatchTrackingStep() {
     if (!category) return
 
     if (enabled) {
-      setEnabledCategories(prev => [...prev, category])
+      // Only add if not already in the list (prevent duplicates)
+      setEnabledCategories(prev => {
+        if (prev.some(c => c.id === categoryId)) return prev
+        return [...prev, category]
+      })
     } else {
       setEnabledCategories(prev => prev.filter(c => c.id !== categoryId))
     }

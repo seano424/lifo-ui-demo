@@ -681,6 +681,8 @@
             "uncategorized": "Uncategorized Products"
           },
           "noCategories": "No categories found",
+          "selectAll": "Select all",
+          "deselectAll": "Deselect all",
           "summary": {
             "tracking": "Tracking",
             "of": "of",
@@ -693,7 +695,8 @@
           "title": "How should we track expiration dates?",
           "description": "Set a default shelf life for each category. When deliveries arrive, we'll calculate the expiry automatically. Choose \"Manual\" for categories where you'd rather enter dates yourself.",
           "sections": {
-            "categories": "Product categories"
+            "categories": "Product categories",
+            "defaultShelfLife": "Default shelf life"
           },
           "infoBox": {
             "message": "These are starting defaults. You can always change them later in Settings."
@@ -807,6 +810,8 @@
               "uncategorized": "Uncategorized Products"
             },
             "noFoodCategories": "No food categories found",
+            "selectAll": "Select all",
+            "deselectAll": "Deselect all",
             "summary": {
               "tracking": "Tracking",
               "of": "of",
@@ -819,7 +824,8 @@
             "title": "How should we track them?",
             "description": "Configure shelf life and tracking mode for each category. You can customize individual products within each category if needed.",
             "sections": {
-              "categories": "Categories"
+              "categories": "Categories",
+              "defaultShelfLife": "Default shelf life"
             },
             "infoBox": {
               "message": "These are starting defaults. You can always change them later in Settings."

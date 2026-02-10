@@ -96,9 +96,14 @@ export function StepHowToTrack({
 
       {/* Categories */}
       <div className="flex flex-col gap-3">
-        <Typography variant="h4" className="text-sm font-medium">
-          {t('sections.categories')}
-        </Typography>
+        <div className="flex items-center justify-between">
+          <Typography variant="h4" className="text-sm font-medium">
+            {t('sections.categories')}
+          </Typography>
+          <Typography variant="h4" className="text-sm font-medium text-muted-foreground">
+            {t('sections.defaultShelfLife')}
+          </Typography>
+        </div>
         <Card className="p-4 flex flex-col gap-3">
           {categories.map(category => (
             <CategoryConfigRow
@@ -159,8 +164,11 @@ export function StepHowToTrack({
                   </tr>
                 </thead>
                 <tbody className="divide-y">
-                  {previewBatches.map((batch, i) => (
-                    <tr key={i} className="hover:bg-muted/50 transition-colors">
+                  {previewBatches.map(batch => (
+                    <tr
+                      key={`${batch.product}-${batch.category}`}
+                      className="hover:bg-muted/50 transition-colors"
+                    >
                       <td className="px-4 py-2.5">
                         <div className="text-sm font-medium">{batch.product}</div>
                         <span className="text-xs text-muted-foreground">{batch.category}</span>

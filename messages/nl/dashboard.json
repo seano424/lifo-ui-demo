@@ -680,6 +680,8 @@
             "uncategorized": "Ongecategoriseerde producten"
           },
           "noCategories": "Geen categorieën gevonden",
+          "selectAll": "Alles selecteren",
+          "deselectAll": "Alles deselecteren",
           "summary": {
             "tracking": "Volgen",
             "of": "van",
@@ -692,7 +694,8 @@
           "title": "Hoe moeten we vervaldatums bijhouden?",
           "description": "Stel een standaard houdbaarheid in voor elke categorie. Wanneer leveringen aankomen, berekenen we automatisch de vervaldatum. Kies \"Handmatig\" voor categorieën waar u liever zelf datums invoert.",
           "sections": {
-            "categories": "Productcategorieën"
+            "categories": "Productcategorieën",
+            "defaultShelfLife": "Standaard houdbaarheid"
           },
           "infoBox": {
             "message": "Dit zijn standaardinstellingen. U kunt ze altijd later wijzigen in Instellingen."
@@ -806,6 +809,8 @@
               "uncategorized": "Ongecategoriseerde producten"
             },
             "noFoodCategories": "Geen voedselcategorieën gevonden",
+            "selectAll": "Alles selecteren",
+            "deselectAll": "Alles deselecteren",
             "summary": {
               "tracking": "Volgen",
               "of": "van",
@@ -818,7 +823,8 @@
             "title": "Hoe moeten we ze volgen?",
             "description": "Configureer houdbaarheid en trackingmodus voor elke categorie. U kunt individuele producten binnen elke categorie aanpassen indien nodig.",
             "sections": {
-              "categories": "Categorieën"
+              "categories": "Categorieën",
+              "defaultShelfLife": "Standaard houdbaarheid"
             },
             "infoBox": {
               "message": "Dit zijn standaardinstellingen. U kunt ze altijd later wijzigen in Instellingen."

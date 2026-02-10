@@ -20,7 +20,7 @@ export function useSetupProgress(): SetupProgress {
 
   return {
     hasStore: !!activeStore,
-    hasBatchTrackingSetup: batchTrackingSetup?.setup_completed ?? false,
+    hasBatchTrackingSetup: batchTrackingSetup?.config?.setup_completed ?? false,
     isLoading: isLoading || isLoadingStores,
   }
 }

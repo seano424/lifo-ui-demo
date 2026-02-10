@@ -39,6 +39,14 @@ export function StepWhatToTrack({
   const trackedProducts = enabledCategories.reduce((sum, cat) => sum + cat.productCount, 0)
 
   const canProceed = enabledCategories.length > 0
+  const allSelected = enabledIds.size === categories.length && categories.length > 0
+
+  const handleToggleAll = (checked: boolean) => {
+    // Only allow selecting all - once all are selected, toggle is disabled
+    if (checked) {
+      categories.forEach(cat => onToggleCategory(cat.id, true))
+    }
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -65,14 +73,35 @@ export function StepWhatToTrack({
               </Typography>
             </div>
           ) : (
-            categories.map(category => (
-              <CategoryRow
-                key={category.id}
-                category={category}
-                enabled={enabledIds.has(category.id)}
-                onToggle={onToggleCategory}
-              />
-            ))
+            <>
+              {/* Select All Toggle */}
+              <div className="flex items-center justify-between py-2 border-b pb-3">
+                <Typography
+                  variant="p"
+                  className={`font-medium transition-colors ${
+                    !allSelected ? 'text-muted-foreground' : ''
+                  }`}
+                >
+                  {t('selectAll')}
+                </Typography>
+                <Toggle
+                  checked={allSelected}
+                  onCheckedChange={handleToggleAll}
+                  disabled={allSelected}
+                />
+              </div>
+
+              {/* Category List */}
+              {categories.map(category => (
+                <CategoryRow
+                  key={category.id}
+                  category={category}
+                  enabled={enabledIds.has(category.id)}
+                  allSelected={allSelected}
+                  onToggle={onToggleCategory}
+                />
+              ))}
+            </>
           )}
         </Card>
       </div>
@@ -110,14 +139,21 @@ export function StepWhatToTrack({
 interface CategoryRowProps {
   category: ProcessedCategory
   enabled: boolean
+  allSelected: boolean
   onToggle: (categoryId: string, enabled: boolean) => void
 }
 
-function CategoryRow({ category, enabled, onToggle }: CategoryRowProps) {
+function CategoryRow({ category, enabled, allSelected, onToggle }: CategoryRowProps) {
+  // Mute text when disabled or when all are selected (less visual noise)
+  const shouldMute = !enabled || allSelected
+
   return (
     <div className="flex items-center justify-between py-2">
       <div className="flex-1">
-        <Typography variant="p" className="font-medium">
+        <Typography
+          variant="p"
+          className={`font-medium transition-colors ${shouldMute ? 'text-muted-foreground' : ''}`}
+        >
           {category.name}
         </Typography>
         <Typography variant="small" className="text-muted-foreground">
