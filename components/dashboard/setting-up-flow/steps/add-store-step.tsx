@@ -5,26 +5,21 @@ import { Typography } from '@/components/ui/typography'
 import { Button } from '@/components/ui/button'
 import { useTranslations } from 'next-intl'
 import Image from 'next/image'
-import {
-  useSquareStatus,
-  useInitiateSquareConnect,
-  useSyncSquareCatalog,
-  useSyncSquareInventory,
-} from '@/hooks/use-square-integration'
+import { useSquareStatus, useInitiateSquareConnect } from '@/hooks/use-square-integration'
 import { useStoreOverviews } from '@/hooks/use-store-overviews'
 import type { StoreOverview } from '@/lib/queries/store-overview-rpc'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 import { useCategoriesWithTrackingSettings } from '@/lib/queries/batch-tracking-onboarding'
-import { useActiveStoreId } from '@/lib/stores/store-context'
+import { useActiveStoreId, useStoreState } from '@/lib/stores/store-context'
 import { useSetupFlowStore } from '@/lib/stores/setup-flow-store'
+import { Badge } from '@/components/ui/badge'
 import {
   Loader2,
   ArrowRight,
   Store,
   Package,
   FolderTree,
-  RefreshCw,
   ExternalLink,
   Unlink,
   Clock,
@@ -33,7 +28,6 @@ import {
   ChevronUp,
   ChevronRight,
   Info,
-  AlertCircle,
 } from 'lucide-react'
 
 // ─── Helper Components ────────────────────────────────────
@@ -59,12 +53,14 @@ interface StoreCardProps {
   store: StoreOverview
   isExpanded: boolean
   onToggle: () => void
-  onSyncNow: () => void
-  isSyncing: boolean
   t: (key: string) => string
 }
 
-function StoreCard({ store, isExpanded, onToggle, onSyncNow, isSyncing, t }: StoreCardProps) {
+function StoreCard({ store, isExpanded, onToggle, t }: StoreCardProps) {
+  // Get active store to determine if this is the current store
+  const { activeStore } = useStoreState()
+  const isCurrentStore = activeStore?.store_id === store.store_id
+
   // Derive sync health from store data
   const syncHealth: SyncHealth =
     store.product_count === 0 && store.category_count === 0 ? 'empty' : 'healthy'
@@ -78,7 +74,7 @@ function StoreCard({ store, isExpanded, onToggle, onSyncNow, isSyncing, t }: Sto
     : store.store_id.slice(0, 8)
 
   return (
-    <div className="divide-y divide-border">
+    <div className={cn('divide-y divide-border', isCurrentStore && 'border-l-4 border-l-primary')}>
       {/* Store header — always visible */}
       <button
         type="button"
@@ -113,8 +109,9 @@ function StoreCard({ store, isExpanded, onToggle, onSyncNow, isSyncing, t }: Sto
           </Typography>
         </div>
 
-        {/* Right side - Expand indicator */}
-        <div className="hidden md:flex items-center justify-end md:col-span-2">
+        {/* Right side - Active Store badge and Expand indicator */}
+        <div className="hidden md:flex items-center justify-end gap-2 md:col-span-2">
+          {isCurrentStore && <Badge variant="primary">Active Store</Badge>}
           {isExpanded ? (
             <ChevronUp className="w-5 h-5 text-muted-foreground shrink-0" />
           ) : (
@@ -163,20 +160,9 @@ function StoreCard({ store, isExpanded, onToggle, onSyncNow, isSyncing, t }: Sto
           </div>
 
           {/* Actions bar */}
+          {/* NOTE: Sync buttons temporarily hidden during onboarding until backend UPSERT fix is deployed */}
           <div className="p-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2">
             <div className="flex items-center gap-2">
-              <Button
-                onClick={e => {
-                  e.stopPropagation()
-                  onSyncNow()
-                }}
-                disabled={isSyncing}
-                variant="outline"
-                size="sm"
-              >
-                <RefreshCw className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`} />
-                {isSyncing ? 'Syncing...' : 'Sync now'}
-              </Button>
               <Button variant="outline" size="sm">
                 <ExternalLink className="w-4 h-4" />
                 View in Square
@@ -343,16 +329,35 @@ function formatRelativeTime(dateString: string): string {
 
 // ─── Main Component ───────────────────────────────────────
 
+/**
+ * AddStoreStep - Square store review during onboarding
+ *
+ * TEMPORARY STATE: Sync buttons are currently hidden in the onboarding flow.
+ *
+ * Context:
+ * - Initial catalog sync happens successfully during OAuth callback
+ * - This step shows users their imported stores for review
+ * - Manual re-sync buttons are hidden due to backend duplicate key bug
+ *
+ * Backend Issue:
+ * - Catalog sync uses INSERT instead of UPSERT
+ * - Causes duplicate key errors when syncing existing products
+ * - Affects both regular and full sync modes
+ *
+ * To Re-enable Sync:
+ * 1. Wait for backend to implement UPSERT in catalog sync endpoint
+ * 2. Uncomment sync buttons in StoreCard component (actions bar)
+ * 3. Uncomment "Sync all stores" button in header section
+ * 4. Test that sync works without duplicate key errors
+ * 5. Remove these temporary notes
+ */
 export function AddStoreStep() {
   const t = useTranslations('setupFlow')
   const [expandedStoreId, setExpandedStoreId] = useState<string | null>(null)
-  const [showFullSyncConfirm, setShowFullSyncConfirm] = useState(false)
 
   // Square integration hooks
   const { data: squareStatus } = useSquareStatus()
   const initiateSquareConnect = useInitiateSquareConnect()
-  const syncCatalogMutation = useSyncSquareCatalog()
-  const syncInventoryMutation = useSyncSquareInventory()
 
   // Store overviews hook
   const { data: stores } = useStoreOverviews()
@@ -370,8 +375,6 @@ export function AddStoreStep() {
   const { goToNextStep } = useSetupFlowStore()
 
   const isSquareConnected = squareStatus?.is_connected || false
-  const connectionId = squareStatus?.connection_id
-  const isSyncingData = syncCatalogMutation.isPending || syncInventoryMutation.isPending
 
   // Calculate catalog stats
   const categoryCount = categories?.length || 0
@@ -401,36 +404,6 @@ export function AddStoreStep() {
 
   const toggleStore = (storeId: string) => {
     setExpandedStoreId(expandedStoreId === storeId ? null : storeId)
-  }
-
-  const handleSyncNow = async (forceFullSync = false) => {
-    if (!connectionId) {
-      toast.error('No Square connection found')
-      return
-    }
-
-    try {
-      // Sync both catalog and inventory
-      await syncCatalogMutation.mutateAsync({ connectionId, fullSync: forceFullSync })
-      await syncInventoryMutation.mutateAsync({ connectionId, fullSync: forceFullSync })
-      toast.success('Sync completed successfully')
-      setShowFullSyncConfirm(false) // Close confirmation if open
-    } catch (error) {
-      console.error('Sync failed:', error)
-
-      // Check if it's a duplicate key error
-      const errorMessage = error instanceof Error ? error.message : String(error)
-      if (errorMessage.includes('duplicate key') || errorMessage.includes('products_sku_key')) {
-        if (!forceFullSync) {
-          // Offer full sync as a recovery option
-          setShowFullSyncConfirm(true)
-        } else {
-          // Full sync also failed - this shouldn't happen
-          toast.error('Sync failed even with full sync. Please contact support.')
-        }
-      }
-      // Note: Generic errors are already handled by mutation onError in the hook
-    }
   }
 
   // Show disconnected state if not connected
@@ -489,59 +462,16 @@ export function AddStoreStep() {
 
       <Typography variant="p">{t('steps.addStore.descriptionConnected')}</Typography>
 
-      {/* Full Sync Confirmation Banner */}
-      {showFullSyncConfirm && (
-        <div className="border border-muted-foreground/30 rounded-xl overflow-hidden bg-muted/30">
-          <div className="p-4 flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 text-muted-foreground mt-0.5 shrink-0" />
-            <div className="flex-1">
-              <Typography variant="p" className="font-medium">
-                Products Already Exist
-              </Typography>
-              <Typography variant="small" className="text-muted-foreground mt-1">
-                Some products from Square are already in your catalog. Would you like to force a
-                full sync to update existing products? This may take longer but ensures all data is
-                up to date.
-              </Typography>
-              <div className="flex items-center gap-2 mt-3">
-                <Button
-                  onClick={() => handleSyncNow(true)}
-                  disabled={isSyncingData}
-                  variant="default"
-                  size="sm"
-                >
-                  <RefreshCw className={`w-4 h-4 ${isSyncingData ? 'animate-spin' : ''}`} />
-                  Force Full Sync
-                </Button>
-                <Button onClick={() => setShowFullSyncConfirm(false)} variant="ghost" size="sm">
-                  Cancel
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Main bordered container - matching integrations page style */}
       <div className="flex flex-col border border-muted rounded-xl overflow-hidden">
         {/* Header section */}
+        {/* NOTE: Sync button temporarily hidden until backend UPSERT fix is deployed */}
         <div className="p-4 flex flex-col gap-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <Typography variant="h5">{t('steps.addStore.yourStores')}</Typography>
-              <Typography variant="muted" className="mt-1">
-                {squareStores.length} stores connected from Square
-              </Typography>
-            </div>
-            <Button
-              onClick={() => handleSyncNow(false)}
-              disabled={isSyncingData}
-              variant="outline"
-              size="sm"
-            >
-              <RefreshCw className={`w-4 h-4 ${isSyncingData ? 'animate-spin' : ''}`} />
-              {isSyncingData ? 'Syncing...' : 'Sync all stores'}
-            </Button>
+          <div>
+            <Typography variant="h5">{t('steps.addStore.yourStores')}</Typography>
+            <Typography variant="muted" className="mt-1">
+              {squareStores.length} stores connected from Square
+            </Typography>
           </div>
         </div>
 
@@ -553,8 +483,6 @@ export function AddStoreStep() {
               store={store}
               isExpanded={expandedStoreId === store.store_id}
               onToggle={() => toggleStore(store.store_id)}
-              onSyncNow={() => handleSyncNow(false)}
-              isSyncing={isSyncingData}
               t={t}
             />
           ))}
