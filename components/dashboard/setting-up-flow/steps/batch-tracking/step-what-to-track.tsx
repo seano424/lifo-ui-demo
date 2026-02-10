@@ -144,8 +144,8 @@ interface CategoryRowProps {
 }
 
 function CategoryRow({ category, enabled, allSelected, onToggle }: CategoryRowProps) {
-  // Mute text when disabled or when all are selected (less visual noise)
-  const shouldMute = !enabled || allSelected
+  // Mute text when disabled
+  const shouldMute = !enabled
 
   return (
     <div className="flex items-center justify-between py-2">

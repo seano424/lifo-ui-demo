@@ -770,7 +770,9 @@
       },
       "addStore": {
         "title": "Connect your Square account",
+        "titleConnected": "Square Account Connected!",
         "description": "Track Product by Expiry Dates. Create batches, review expiring items, and receive notifications on expiring batches.",
+        "descriptionConnected": "Track product by expiry dates. Review expiring items, and receive notifications on expiring products.",
         "realTime": "Real time",
         "integration": "Integration",
         "manual": "Manual",

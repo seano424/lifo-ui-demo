@@ -771,7 +771,9 @@
       },
       "addStore": {
         "title": "Connectez votre compte Square",
+        "titleConnected": "Compte Square connecté !",
         "description": "Suivez les produits par dates d'expiration. Créez des lots, consultez les articles qui expirent et recevez des notifications sur les lots qui expirent.",
+        "descriptionConnected": "Suivez les produits par dates d'expiration. Consultez les articles qui expirent et recevez des notifications sur les produits qui expirent.",
         "realTime": "Temps réel",
         "recommended": "Recommandé",
         "squareDescription": "Connectez votre compte Square pour configurer le suivi en temps réel des produits par dates d'expiration",

@@ -769,7 +769,9 @@
       },
       "addStore": {
         "title": "Verbind uw Square account",
+        "titleConnected": "Square account verbonden!",
         "description": "Volg producten op vervaldatum. Maak batches aan, controleer verlopende artikelen en ontvang meldingen over verlopende batches.",
+        "descriptionConnected": "Volg producten op vervaldatum. Controleer verlopende artikelen en ontvang meldingen over verlopende producten.",
         "realTime": "Real-time",
         "recommended": "Aanbevolen",
         "squareDescription": "Verbind uw Square-account om real-time product tracking op vervaldatum in te stellen",

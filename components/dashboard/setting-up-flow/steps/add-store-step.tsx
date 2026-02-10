@@ -3,26 +3,38 @@
 import { Card } from '@/components/ui/card'
 import { Typography } from '@/components/ui/typography'
 import { Badge } from '@/components/ui/badge'
-import { BottomSheet } from '@/components/ui/bottom-sheet'
+import { Button } from '@/components/ui/button'
 import { useTranslations } from 'next-intl'
 import Image from 'next/image'
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { AddStoreFlow } from '@/components/settings/add-store-flow'
 import { useSquareStatus, useInitiateSquareConnect } from '@/hooks/use-square-integration'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
+import { useCategoriesWithTrackingSettings } from '@/lib/queries/batch-tracking-onboarding'
+import { useActiveStoreId } from '@/lib/stores/store-context'
+import { useSetupFlowStore } from '@/lib/stores/setup-flow-store'
+import { CheckCircle2, Loader2, ArrowRight } from 'lucide-react'
 
 export function AddStoreStep() {
   const t = useTranslations('setupFlow')
-  const router = useRouter()
-  const [isAddStoreOpen, setIsAddStoreOpen] = useState(false)
 
   // Square integration hooks
   const { data: squareStatus } = useSquareStatus()
   const initiateSquareConnect = useInitiateSquareConnect()
 
+  // Get store ID and catalog data
+  const storeId = useActiveStoreId()
+  const { data: categories, isLoading: isSyncing } = useCategoriesWithTrackingSettings(
+    storeId || '',
+  )
+
+  // Setup flow navigation
+  const { goToNextStep } = useSetupFlowStore()
+
   const isSquareConnected = squareStatus?.is_connected || false
+
+  // Calculate catalog stats
+  const categoryCount = categories?.length || 0
+  const productCount = categories?.reduce((sum, cat) => sum + cat.product_count, 0) || 0
 
   const handleSquareConnect = async () => {
     try {
@@ -39,58 +51,95 @@ export function AddStoreStep() {
     }
   }
 
+  const handleContinueToBatchTracking = () => {
+    goToNextStep()
+  }
+
   return (
-    <>
-      <div className="flex flex-col gap-6">
-        <Typography variant="h3">{t('steps.addStore.title')}</Typography>
+    <div className="flex flex-col gap-6">
+      <Typography variant="h3">
+        {isSquareConnected ? t('steps.addStore.titleConnected') : t('steps.addStore.title')}
+      </Typography>
 
-        <Typography variant="p">{t('steps.addStore.description')}</Typography>
+      <Typography variant="p">
+        {isSquareConnected
+          ? t('steps.addStore.descriptionConnected')
+          : t('steps.addStore.description')}
+      </Typography>
 
-        <Card
-          className={cn(
-            'p-6 transition-colors cursor-pointer group',
-            isSquareConnected ? 'shadow-primary-500 shadow-xl border-t-0' : '',
-          )}
-          onClick={() => {
-            if (isSquareConnected) {
-              router.push('/dashboard/integrations/square')
-            } else {
-              handleSquareConnect()
-            }
-          }}
-        >
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center justify-between">
-            <div className="flex flex-col sm:flex-row gap-4">
-              <div className="bg-white dark:bg-linear-to-br from-primary-900 rounded-lg p-1.5 h-fit mt-2">
-                <Image src="/square/square-icon.svg" alt="Square" width={32} height={32} />
-              </div>
-              <div className="flex flex-col gap-1">
-                <Typography variant="h3">Square</Typography>
-                <Typography variant="p">{t('steps.addStore.squareDescription')}</Typography>
-              </div>
+      <Card
+        className={cn(
+          'p-6 transition-colors',
+          isSquareConnected ? 'shadow-primary-500 shadow-xl border-t-0' : 'cursor-pointer group',
+        )}
+        onClick={() => {
+          if (!isSquareConnected) {
+            handleSquareConnect()
+          }
+        }}
+      >
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-4">
+            <div className="hidden dark:block">
+              <Image
+                src="/square/White/Square_Logo_2025_White.svg"
+                alt="Square"
+                width={150}
+                height={150}
+              />
             </div>
-          </div>
-          <div className="mt-4">
-            {isSquareConnected ? (
-              <Badge variant="ghost" className="gap-1 w-full">
-                Connected
-              </Badge>
-            ) : (
-              <Badge variant="ghost" className="gap-1 w-full">
-                Not Connected
-              </Badge>
+            <div className="block dark:hidden">
+              <Image
+                src="/square/Black/Square_Logo_2025_Black.svg"
+                alt="Square"
+                width={150}
+                height={150}
+              />
+            </div>
+
+            {!isSquareConnected && (
+              <Typography variant="h4">{t('steps.addStore.squareDescription')}</Typography>
             )}
           </div>
-        </Card>
-      </div>
 
-      <BottomSheet
-        isOpen={isAddStoreOpen}
-        variant="fullHeight"
-        onClose={() => setIsAddStoreOpen(false)}
-      >
-        <AddStoreFlow />
-      </BottomSheet>
-    </>
+          {/* Catalog Stats (shown when connected) */}
+          {isSquareConnected &&
+            (isSyncing ? (
+              <div className="flex flex-col items-center gap-3 py-4 text-center border-t">
+                <Loader2 className="h-8 w-8 text-primary animate-spin" />
+                <Typography variant="small" className="text-muted-foreground">
+                  Syncing your catalog...
+                </Typography>
+              </div>
+            ) : (
+              <>
+                <div className="grid grid-cols-2 gap-3 pt-4 border-t">
+                  <div className="p-3 bg-muted/50 rounded-lg">
+                    <Typography variant="h4" className="font-semibold">
+                      {productCount.toLocaleString()}
+                    </Typography>
+                    <Typography variant="small" className="text-muted-foreground">
+                      Products
+                    </Typography>
+                  </div>
+                  <div className="p-3 bg-muted/50 rounded-lg">
+                    <Typography variant="h4" className="font-semibold">
+                      {categoryCount.toLocaleString()}
+                    </Typography>
+                    <Typography variant="small" className="text-muted-foreground">
+                      Categories
+                    </Typography>
+                  </div>
+                </div>
+
+                <Button onClick={handleContinueToBatchTracking} size="lg" className="w-full mt-2">
+                  Continue to Batch Tracking Setup
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+              </>
+            ))}
+        </div>
+      </Card>
+    </div>
   )
 }

@@ -13,6 +13,7 @@ import { ActivatingState } from './batch-tracking/activating-state'
 import { StepSuccess } from './batch-tracking/step-success'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 import { logger } from '@/lib/utils/logger'
+import { useSetupFlowStore } from '@/lib/stores/setup-flow-store'
 
 // =============================================================================
 // TYPES
@@ -45,11 +46,13 @@ export interface ProductOverride {
  * Batch Tracking Setup Step
  *
  * Multi-sub-step wizard for configuring batch tracking:
- * - Step 0: Square Connected (catalog sync confirmation)
  * - Step 1: What to Track (enable/disable categories)
  * - Step 2: How to Track (shelf life + auto/manual mode)
  * - Activating: Progress animation during batch creation
  * - Success: Completion screen with CTA to dashboard
+ *
+ * Note: Square connection confirmation (previously Step 0) is now shown
+ * inline in the Add Store Step for a smoother user experience.
  */
 export function BatchTrackingStep() {
   const context = 'BatchTrackingStep'
@@ -57,8 +60,12 @@ export function BatchTrackingStep() {
   // Get active store ID from Zustand store context
   const storeId = useActiveStoreId()
 
+  // Setup flow navigation (for going back to Add Store step)
+  const { goToPrevStep } = useSetupFlowStore()
+
   // Internal sub-step navigation
-  const [subStep, setSubStep] = useState<WizardSubStep>(0)
+  // Start at step 1 (What to Track) since step 0 (Square Connected) is now shown in Add Store Step
+  const [subStep, setSubStep] = useState<WizardSubStep>(1)
 
   // Fetch data from backend
   const { data: categories, isLoading: isSyncing } = useCategoriesWithTrackingSettings(
@@ -253,7 +260,7 @@ export function BatchTrackingStep() {
           enabledCategories={enabledCategories}
           onToggleCategory={handleToggleCategory}
           onNext={() => setSubStep(2)}
-          onBack={() => setSubStep(0)}
+          onBack={goToPrevStep}
         />
       )}
 
