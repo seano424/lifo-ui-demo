@@ -130,11 +130,7 @@ export function StepCombinedTracking({
                 >
                   {t('whatToTrack.selectAll')}
                 </Typography>
-                <Toggle
-                  checked={allSelected}
-                  onCheckedChange={handleToggleAll}
-                  disabled={allSelected}
-                />
+                <Toggle checked={allSelected} onCheckedChange={handleToggleAll} />
               </div>
 
               {/* Category List with Inline Configuration */}
@@ -162,27 +158,30 @@ export function StepCombinedTracking({
 
         {/* Legend */}
         {enabledCategories.length > 0 && (
-          <div className="flex items-center gap-4 text-xs text-muted-foreground justify-center select-none">
-            <div className="flex items-center gap-1.5">
+          <Typography
+            variant="small"
+            className="flex items-center gap-4 py-4 border-t border-muted mt-2"
+          >
+            <span className="flex items-center gap-1.5">
               <Zap className="w-3 h-3" /> = auto-calculate from delivery date
-            </div>
-            <div className="flex items-center gap-1.5">
+            </span>
+            <span className="flex items-center gap-1.5">
               <Type className="w-3 h-3" /> = you'll enter dates per delivery
-            </div>
-          </div>
+            </span>
+          </Typography>
         )}
       </div>
 
       {/* Preview Dashboard - Auto-expanded */}
       {enabledCategories.length > 0 && (
-        <Card className="overflow-hidden">
+        <Card className="overflow-hidden p-4 border border-muted rounded-lg shadow-sm">
           <button
             type="button"
             onClick={() => setPreviewOpen(!previewOpen)}
             className="w-full flex items-center justify-between group"
           >
             <div className="flex items-center gap-2.5">
-              <Eye className="w-5 h-5 text-primary-900" />
+              <Eye className="w-5 h-5" />
               <Typography variant="p">Preview your dashboard</Typography>
             </div>
             <ChevronDown
@@ -204,10 +203,12 @@ export function StepCombinedTracking({
                     {previewBatches.map(batch => (
                       <tr key={`${batch.product}-${batch.category}`}>
                         <td className="py-2.5 flex flex-col gap-1">
-                          <Typography variant="small" color="primary">
+                          <Typography variant="small" color="muted">
                             {batch.product}
                           </Typography>
-                          <Typography variant="extraSmall">{batch.category}</Typography>
+                          <Typography variant="extraSmall" color="muted">
+                            {batch.category}
+                          </Typography>
                         </td>
                         <td className="py-2.5">
                           {batch.confidence === 'manual' ? (
@@ -215,13 +216,18 @@ export function StepCombinedTracking({
                               <Type className="w-3 h-3" /> Set on delivery
                             </Badge>
                           ) : (
-                            <Badge size="sm" variant={batch.daysLeft <= 3 ? 'danger' : 'primary'}>
+                            <Badge
+                              size="sm"
+                              variant={batch.daysLeft <= 3 ? 'destructive' : 'success'}
+                            >
                               {batch.daysLeft}d from delivery
                               {batch.confidence !== 'high' && '~'}
                             </Badge>
                           )}
                         </td>
-                        <td className="px-2 py-2.5 text-right tabular-nums">{batch.qty}</td>
+                        <td className="px-2 py-2.5 text-right tabular-nums text-muted-foreground">
+                          {batch.qty}
+                        </td>
                       </tr>
                     ))}
                   </tbody>
