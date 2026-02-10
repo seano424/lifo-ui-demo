@@ -39,9 +39,9 @@ export function useSquareStatus() {
 
       return await fastApiClient.getSquareStatus(session.access_token)
     },
-    staleTime: 2 * 60 * 1000, // 2 minutes
-    gcTime: 5 * 60 * 1000, // 5 minutes (formerly cacheTime)
-    refetchOnMount: true, // Always refetch on mount for fresh connection status
+    staleTime: 5 * 60 * 1000, // 5 minutes - connection status changes infrequently
+    gcTime: 10 * 60 * 1000, // 10 minutes (formerly cacheTime)
+    refetchOnMount: 'stale', // Only refetch if data is stale (improves performance)
     refetchOnWindowFocus: false,
     retry: (failureCount, error: Error) => {
       // Don't retry auth errors

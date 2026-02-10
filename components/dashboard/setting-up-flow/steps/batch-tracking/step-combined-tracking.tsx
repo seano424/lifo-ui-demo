@@ -68,6 +68,10 @@ export function StepCombinedTracking({
     }
   }
 
+  const handleSetAllMode = (mode: 'auto' | 'manual') => {
+    enabledCategories.forEach(cat => onUpdateMode(cat.id, mode))
+  }
+
   // Generate preview batches based on actual enabled categories
   const previewBatches = enabledCategories
     .filter(c => categoryModes[c.id] === 'auto')
@@ -76,7 +80,7 @@ export function StepCombinedTracking({
       product: `${c.name} Sample Product`,
       category: c.name,
       daysLeft: shelfLifeDays[c.id] || 14,
-      qty: Math.floor(Math.random() * 30) + 8,
+      qty: c.productCount,
       confidence: c.matched ? 'high' : 'low',
     }))
 
@@ -121,16 +125,34 @@ export function StepCombinedTracking({
           ) : (
             <>
               {/* Select All Toggle */}
-              <div className="flex items-center justify-between py-2 border-b pb-3">
-                <Typography
-                  variant="p"
-                  className={`font-medium transition-colors ${
-                    !allSelected ? 'text-muted-foreground' : ''
-                  }`}
-                >
-                  {t('whatToTrack.selectAll')}
-                </Typography>
-                <Toggle checked={allSelected} onCheckedChange={handleToggleAll} />
+              <div className="hidden flex-col-reverse sm:flex-row gap-4 sm:gap-0 sm:items-center sm:justify-between py-2 sm:flex pb-3">
+                <div className="flex items-center gap-3">
+                  <Toggle checked={allSelected} onCheckedChange={handleToggleAll} />
+                  <Typography
+                    variant="p"
+                    className={`font-medium transition-colors ${
+                      !allSelected ? 'text-muted-foreground' : ''
+                    }`}
+                  >
+                    {t('whatToTrack.selectAll')}
+                  </Typography>
+                </div>
+                {enabledCategories.length > 0 && (
+                  <div className="hidden sm:flex items-center gap-2">
+                    {/* <Button
+                      variant="outline"
+                      size="xs"
+                      onClick={() => handleSetAllMode('auto')}
+                    >
+                      <Zap className="w-3 h-3" />
+                      Reset all to default settings
+                    </Button> */}
+                    <Button variant="outline" size="xs" onClick={() => handleSetAllMode('manual')}>
+                      <Type className="w-3 h-3" />
+                      All to manual entry
+                    </Button>
+                  </div>
+                )}
               </div>
 
               {/* Category List with Inline Configuration */}
@@ -160,7 +182,7 @@ export function StepCombinedTracking({
         {enabledCategories.length > 0 && (
           <Typography
             variant="small"
-            className="flex items-center gap-4 py-4 border-t border-muted mt-2"
+            className="flex flex-col sm:flex-row items-center gap-4 py-4 border-t border-muted mt-2"
           >
             <span className="flex items-center gap-1.5">
               <Zap className="w-3 h-3" /> = auto-calculate from delivery date
@@ -174,7 +196,7 @@ export function StepCombinedTracking({
 
       {/* Preview Dashboard - Auto-expanded */}
       {enabledCategories.length > 0 && (
-        <Card className="overflow-hidden p-4 border border-muted rounded-lg shadow-sm">
+        <Card className="overflow-auto sm:overflow-hidden p-4 border border-muted rounded-lg shadow-sm">
           <button
             type="button"
             onClick={() => setPreviewOpen(!previewOpen)}
@@ -189,8 +211,46 @@ export function StepCombinedTracking({
             />
           </button>
           {previewOpen && previewBatches.length > 0 && (
-            <div className="py-4">
-              <div className="overflow-x-auto">
+            <div className="pt-4">
+              {/* Mobile: Card layout */}
+              <div className="block md:hidden space-y-3 mb-4">
+                {previewBatches.map(batch => (
+                  <div
+                    key={`${batch.product}-${batch.category}`}
+                    className="flex items-center justify-between gap-3 pb-3 border-b border-secondary-100 last:border-0"
+                  >
+                    <div className="flex flex-col gap-1 flex-1 min-w-0">
+                      <Typography variant="small" className="line-clamp-1">
+                        {batch.product}
+                      </Typography>
+                      <Typography variant="extraSmall" color="muted">
+                        {batch.category}
+                      </Typography>
+                    </div>
+                    <div className="flex items-center gap-3 shrink-0">
+                      {batch.confidence === 'manual' ? (
+                        <Badge size="sm" variant="elevated">
+                          <Type className="w-3 h-3" /> Set on delivery
+                        </Badge>
+                      ) : (
+                        <Badge size="sm" variant={batch.daysLeft <= 3 ? 'destructive' : 'elevated'}>
+                          {batch.daysLeft}d from delivery
+                          {batch.confidence !== 'high' && '~'}
+                        </Badge>
+                      )}
+                      <Typography
+                        variant="extraSmall"
+                        className="tabular-nums min-w-[30px] text-right"
+                      >
+                        {batch.qty}
+                      </Typography>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Desktop: Table layout */}
+              <div className="hidden md:block overflow-x-auto mb-4">
                 <table className="w-full">
                   <thead>
                     <tr className="text-left text-xs uppercase tracking-wider">
@@ -202,30 +262,32 @@ export function StepCombinedTracking({
                   <tbody className="divide-y divide-secondary-100">
                     {previewBatches.map(batch => (
                       <tr key={`${batch.product}-${batch.category}`}>
-                        <td className="py-2.5 flex flex-col gap-1">
-                          <Typography variant="small" color="muted">
-                            {batch.product}
-                          </Typography>
-                          <Typography variant="extraSmall" color="muted">
-                            {batch.category}
-                          </Typography>
+                        <td className="py-2.5">
+                          <div className="flex flex-col gap-1">
+                            <Typography variant="small" color="muted" className="line-clamp-1">
+                              {batch.product}
+                            </Typography>
+                            <Typography variant="extraSmall" color="muted">
+                              {batch.category}
+                            </Typography>
+                          </div>
                         </td>
                         <td className="py-2.5">
                           {batch.confidence === 'manual' ? (
-                            <Badge size="sm">
+                            <Badge size="sm" variant="elevated">
                               <Type className="w-3 h-3" /> Set on delivery
                             </Badge>
                           ) : (
                             <Badge
                               size="sm"
-                              variant={batch.daysLeft <= 3 ? 'destructive' : 'success'}
+                              variant={batch.daysLeft <= 3 ? 'destructive' : 'elevated'}
                             >
                               {batch.daysLeft}d from delivery
                               {batch.confidence !== 'high' && '~'}
                             </Badge>
                           )}
                         </td>
-                        <td className="px-2 py-2.5 text-right tabular-nums text-muted-foreground">
+                        <td className="py-2.5 text-right tabular-nums text-muted-foreground">
                           {batch.qty}
                         </td>
                       </tr>
@@ -233,7 +295,8 @@ export function StepCombinedTracking({
                   </tbody>
                 </table>
               </div>
-              <div className="px-2 pt-4 border-t border-secondary-100">
+
+              <div className="pt-4 border-t border-secondary-100">
                 <span className="text-xs">
                   Sample of {trackedProducts} tracked products · Tilde (~) = estimated from default
                   shelf life
@@ -260,13 +323,17 @@ export function StepCombinedTracking({
           <div className="flex items-center justify-between mb-2">
             <Typography variant="p">{trackedProducts} products ready</Typography>
           </div>
-          <div className="flex items-center gap-6">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-6">
             <div className="flex items-center gap-2">
-              <Typography variant="small">Auto-dated categories:</Typography>
+              <Typography variant="small" color="secondary">
+                Auto-dated categories:
+              </Typography>
               <Typography variant="small">{autoCount}</Typography>
             </div>
             <div className="flex items-center gap-2">
-              <Typography variant="small">Manual categories:</Typography>
+              <Typography variant="small" color="secondary">
+                Manual categories:
+              </Typography>
               <Typography variant="small">{manualCount}</Typography>
             </div>
           </div>
@@ -321,7 +388,7 @@ function CategoryRowWithConfig({
   const shouldMute = !enabled
 
   return (
-    <div className="flex items-center justify-between py-2 gap-4">
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between py-2 gap-4 border-b border-muted pb-4 sm:pb-0 sm:border-none">
       {/* Left: Category Info + Toggle */}
       <div className="flex items-center gap-3 flex-1 min-w-0">
         <Toggle
@@ -343,12 +410,13 @@ function CategoryRowWithConfig({
 
       {/* Right: Configuration (only shown when enabled) */}
       {enabled && (
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-2 w-full sm:w-auto">
           <ShelfLifeChip
             mode={mode}
             days={days}
             onModeChange={newMode => onUpdateMode(category.id, newMode)}
             onDaysChange={newDays => onUpdateShelfLife(category.id, newDays)}
+            className="w-full sm:w-auto"
           />
           {/* Mode toggle button */}
           <button
@@ -357,7 +425,7 @@ function CategoryRowWithConfig({
               const newMode = mode === 'auto' ? 'manual' : 'auto'
               onUpdateMode(category.id, newMode)
             }}
-            className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+            className="hidden sm:block p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
             title={mode === 'auto' ? 'Switch to manual entry' : 'Switch to automatic'}
           >
             {mode === 'auto' ? <Zap className="w-3.5 h-3.5" /> : <Type className="w-3.5 h-3.5" />}

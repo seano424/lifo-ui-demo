@@ -64,7 +64,7 @@ export function ShelfLifeChip({
         onClick={e => e.stopPropagation()}
       >
         <div className="items-center rounded-lg border border-muted bg-white overflow-hidden grid grid-cols-2">
-          <div className="px-3 py-1.5 bg-secondary-50 border-r border-muted">
+          <div className="px-3 py-3 bg-secondary-50 border-r border-muted">
             <input
               type="number"
               min="1"
@@ -84,7 +84,7 @@ export function ShelfLifeChip({
           <button
             type="button"
             onClick={handleManualClick}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-muted-foreground hover:bg-muted transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-3 text-sm font-medium text-muted-foreground hover:bg-muted transition-colors"
           >
             <Type className="w-3 h-3" />
             Manual
@@ -97,13 +97,13 @@ export function ShelfLifeChip({
   // Display state: show segmented control with both options
   return (
     <div className={cn('inline-flex items-center gap-1', className)}>
-      <div className="border border-muted items-center rounded-lg overflow-hidden grid grid-cols-2">
+      <div className="border border-muted items-center rounded-lg overflow-hidden grid grid-cols-2 flex-1">
         {/* Auto button */}
         <button
           type="button"
           onClick={handleAutoClick}
           className={cn(
-            'inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium transition-colors border-r border-muted',
+            'inline-flex items-center gap-1.5 px-3 py-3 text-sm font-medium transition-colors border-r border-muted',
             mode === 'auto'
               ? 'bg-secondary-50 text-secondary-700'
               : 'bg-white text-gray-600 hover:bg-gray-50',
@@ -118,7 +118,7 @@ export function ShelfLifeChip({
           type="button"
           onClick={handleManualClick}
           className={cn(
-            'inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium transition-colors',
+            'inline-flex items-center gap-1.5 px-3 py-3 text-sm font-medium transition-colors',
             mode === 'manual'
               ? 'bg-secondary-50 text-secondary-700'
               : 'bg-white text-gray-600 hover:bg-gray-50',
