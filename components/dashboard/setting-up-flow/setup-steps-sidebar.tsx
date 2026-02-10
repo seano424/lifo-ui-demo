@@ -12,9 +12,8 @@ import {
 } from '@/lib/hooks/use-setup-progress'
 
 const STEP_LABELS: Record<SetupStep, string> = {
-  'create-account': 'setupFlow.sidebar.steps.createAccount',
-  'add-store': 'setupFlow.sidebar.steps.addStore',
-  'create-first-batch': 'setupFlow.sidebar.steps.createBatch',
+  'add-store': 'setupFlow.sidebar.steps.connectSquare',
+  'batch-tracking-setup': 'setupFlow.sidebar.steps.batchTracking',
 }
 
 export function SetupStepsSidebar() {

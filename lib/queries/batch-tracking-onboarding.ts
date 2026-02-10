@@ -62,6 +62,47 @@ export interface SaveBatchTrackingSetupParams {
 // =============================================================================
 
 /**
+ * Get batch tracking setup configuration for a store
+ *
+ * @param storeId - The store ID to fetch config for
+ * @returns Query result with batch tracking config including setup_completed status
+ */
+export function useBatchTrackingSetup(storeId: string) {
+  const supabase = createClient()
+
+  return useQuery({
+    queryKey: queryKeys.batchTrackingOnboarding.config(storeId),
+    queryFn: async () => {
+      const context = 'useBatchTrackingSetup'
+
+      logger.log(context, 'Fetching batch tracking setup', { storeId })
+
+      const { data, error } = await supabase.rpc('get_batch_tracking_setup', {
+        p_store_id: storeId,
+      })
+
+      if (error) {
+        logger.queryWarn(context, 'RPC error', {
+          error: error.message,
+          code: error.code,
+          storeId,
+        })
+        throw new Error(`Failed to fetch batch tracking setup: ${error.message}`)
+      }
+
+      logger.log(context, 'Batch tracking setup fetched successfully', {
+        storeId,
+        setupCompleted: data?.setup_completed,
+      })
+
+      return data
+    },
+    staleTime: 2 * 60 * 1000, // 2 minutes
+    enabled: !!storeId,
+  })
+}
+
+/**
  * Fetch categories with their tracking settings and product counts
  *
  * @param storeId - The store ID to fetch categories for

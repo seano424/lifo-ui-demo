@@ -654,15 +654,110 @@
       "title": "Welcome to lifo AI, {name}!",
       "subtitle": "Track Product by Expiry Dates. Create batches, review expiring items, and receive notifications on expiring batches."
     },
+    "batchTracking": {
+      "title": "Set up batch tracking (recommended)",
+      "description": "Configure how LIFO tracks your inventory",
+      "steps": {
+        "squareConnected": {
+          "title": "Square Connected Successfully",
+          "description": "Your Square catalog has been synced. Let's configure batch tracking.",
+          "connectionActive": "Connection active",
+          "productsImported": "Products",
+          "categoriesFound": "Categories",
+          "nextSteps": "Next, we'll configure which products to track and how.",
+          "nextButton": "Next",
+          "syncing": {
+            "title": "Syncing your Square catalog...",
+            "description": "This usually takes a few seconds. Please wait while we import your products and categories."
+          }
+        },
+        "whatToTrack": {
+          "title": "What do you want to track?",
+          "description": "Select which product categories you want to track with batch tracking.",
+          "sections": {
+            "categories": "Product categories",
+            "food": "Food Categories",
+            "nonFood": "Non-Food Categories",
+            "uncategorized": "Uncategorized Products"
+          },
+          "noCategories": "No categories found",
+          "summary": {
+            "tracking": "Tracking",
+            "of": "of",
+            "products": "products"
+          },
+          "backButton": "Back",
+          "nextButton": "Next"
+        },
+        "howToTrack": {
+          "title": "How should we track expiration dates?",
+          "description": "Set a default shelf life for each category. When deliveries arrive, we'll calculate the expiry automatically. Choose \"Manual\" for categories where you'd rather enter dates yourself.",
+          "sections": {
+            "categories": "Product categories"
+          },
+          "infoBox": {
+            "message": "These are starting defaults. You can always change them later in Settings."
+          },
+          "modes": {
+            "auto": {
+              "description": "Auto-creates batches with estimated expiry dates based on",
+              "days": "days shelf life"
+            },
+            "manual": {
+              "description": "You'll manually enter expiry dates when processing deliveries"
+            }
+          },
+          "summary": {
+            "title": "Configuration Summary",
+            "autoCategories": "Auto categories",
+            "manualCategories": "Manual categories",
+            "productOverrides": "Product overrides"
+          },
+          "products": {
+            "expandButton": "Customize individual products",
+            "noProducts": "No products found in this category",
+            "showingLimit": "Showing first 50 products. You can customize more in Settings later.",
+            "inheritsCategorySettings": "Inherits category settings",
+            "customOverrideApplied": "Custom override applied",
+            "removeOverride": "Remove override"
+          },
+          "backButton": "Back",
+          "skipButton": "Use defaults",
+          "activateButton": "Activate Tracking"
+        },
+        "activating": {
+          "title": "Activating batch tracking...",
+          "description": "We're creating batches for your auto categories and setting up your configuration. This will just take a moment."
+        },
+        "success": {
+          "title": "Batch Tracking Activated!",
+          "description": "Your inventory tracking is now configured and ready to go.",
+          "summary": {
+            "title": "What we configured",
+            "autoCategories": "auto categories",
+            "autoDescription": "Batches created with estimated expiry dates",
+            "manualCategories": "manual categories",
+            "manualDescription": "Awaiting real expiry dates from deliveries",
+            "productOverrides": "product overrides",
+            "overridesDescription": "Custom settings for specific products"
+          },
+          "nextSteps": {
+            "title": "What happens next",
+            "step1": "When your next delivery arrives, LIFO will auto-create batches with the shelf lives you set",
+            "step2": "Manual categories will appear in 'Needs expiry dates' until you process deliveries",
+            "step3": "You can adjust any category or shelf life anytime in Settings"
+          },
+          "goToDashboard": "Go to Dashboard"
+        }
+      }
+    },
     "sidebar": {
       "title": "Your setup list",
       "subtitle": "Get started with your inventory management by adding your first products. Here are some quick actions to help you get started.",
       "complete": "complete",
       "steps": {
-        "createAccount": "Create your account",
-        "addStore": "Add your store",
-        "createBatch": "Create your first batch",
-        "setupNotifications": "Set up notifications"
+        "connectSquare": "Connect your Square Account",
+        "batchTracking": "Set up batch tracking (recommended)"
       }
     },
     "steps": {
@@ -686,12 +781,93 @@
         "manualEntryDescription": "Add your store information manually by entering the required fields below.",
         "manualEntryButton": "Add Store"
       },
-      "createBatch": {
-        "title": "Create your first batch",
-        "description": "Start tracking your inventory by creating your first product batch.",
-        "placeholder": "Batch Creation Coming Soon",
-        "placeholderDescription": "We're building the batch creation wizard. This will allow you to add products, set expiry dates, and manage inventory.",
-        "createButton": "Create New Batch"
+      "batchTracking": {
+        "title": "Set up batch tracking (recommended)",
+        "description": "Configure how LIFO tracks your inventory",
+        "steps": {
+          "squareConnected": {
+            "title": "Square Connected Successfully",
+            "description": "Your Square catalog has been synced. Let's configure batch tracking.",
+            "connectionActive": "Connection active",
+            "productsImported": "Products",
+            "categoriesFound": "Categories",
+            "nextSteps": "Next, we'll configure which products to track and how.",
+            "nextButton": "Next",
+            "syncing": {
+              "title": "Syncing your Square catalog...",
+              "description": "This usually takes a few seconds. Please wait while we import your products and categories."
+            }
+          },
+          "whatToTrack": {
+            "title": "What do you want to track?",
+            "description": "Select which product categories you want to track with batch tracking.",
+            "sections": {
+              "food": "Food Categories",
+              "nonFood": "Non-Food Categories",
+              "uncategorized": "Uncategorized Products"
+            },
+            "noFoodCategories": "No food categories found",
+            "summary": {
+              "tracking": "Tracking",
+              "of": "of",
+              "products": "products"
+            },
+            "backButton": "Back",
+            "nextButton": "Next"
+          },
+          "howToTrack": {
+            "title": "How should we track them?",
+            "description": "Configure shelf life and tracking mode for each category. You can customize individual products within each category if needed.",
+            "sections": {
+              "categories": "Categories"
+            },
+            "infoBox": {
+              "message": "These are starting defaults. You can always change them later in Settings."
+            },
+            "modes": {
+              "auto": {
+                "description": "Auto-creates batches with estimated expiry dates based on",
+                "days": "days shelf life"
+              },
+              "manual": {
+                "description": "You'll manually enter expiry dates when processing deliveries"
+              }
+            },
+            "summary": {
+              "title": "Configuration Summary",
+              "autoCategories": "Auto categories",
+              "manualCategories": "Manual categories",
+              "productOverrides": "Product overrides"
+            },
+            "backButton": "Back",
+            "skipButton": "Use defaults",
+            "activateButton": "Activate Tracking"
+          },
+          "activating": {
+            "title": "Activating batch tracking...",
+            "description": "We're creating batches for your auto categories and setting up your configuration. This will just take a moment."
+          },
+          "success": {
+            "title": "Batch Tracking Activated!",
+            "description": "Your inventory tracking is now configured and ready to go.",
+            "summary": {
+              "title": "What we configured",
+              "autoCategories": "auto categories",
+              "autoDescription": "Batches created with estimated expiry dates",
+              "manualCategories": "manual categories",
+              "manualDescription": "Awaiting real expiry dates from deliveries",
+              "productOverrides": "product overrides",
+              "overridesDescription": "Custom settings for specific products"
+            },
+            "nextSteps": {
+              "title": "What happens next",
+              "step1": "When your next delivery arrives, LIFO will auto-create batches with the shelf lives you set",
+              "step2": "Manual categories will appear in 'Needs expiry dates' until you process deliveries",
+              "step3": "You can adjust any category or shelf life anytime in Settings"
+            },
+            "goToDashboard": "Go to Dashboard"
+          }
+        }
       },
       "notifications": {
         "title": "Set up notifications",

@@ -1,9 +1,9 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-export type SetupStep = 'create-account' | 'add-store' | 'create-first-batch'
+export type SetupStep = 'add-store' | 'batch-tracking-setup'
 
-export const SETUP_STEPS: SetupStep[] = ['create-account', 'add-store', 'create-first-batch']
+export const SETUP_STEPS: SetupStep[] = ['add-store', 'batch-tracking-setup']
 
 export interface SetupFlowState {
   currentStep: SetupStep
@@ -20,7 +20,7 @@ export interface SetupFlowState {
 }
 
 const initialState = {
-  currentStep: 'create-account' as SetupStep,
+  currentStep: 'add-store' as SetupStep,
 }
 
 export const useSetupFlowStore = create<SetupFlowState>()(

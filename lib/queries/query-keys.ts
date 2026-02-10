@@ -353,6 +353,8 @@ export const queryKeys = {
   // Batch tracking onboarding queries
   batchTrackingOnboarding: {
     all: ['batch-tracking-onboarding'] as const,
+    config: (storeId: string) =>
+      [...queryKeys.batchTrackingOnboarding.all, 'config', storeId] as const,
     categories: (storeId: string) =>
       [...queryKeys.batchTrackingOnboarding.all, 'categories', storeId] as const,
     products: (
