@@ -784,7 +784,11 @@
         "importCSV": "Import CSV",
         "manualEntry": "Manually add your store information",
         "manualEntryDescription": "Add your store information manually by entering the required fields below.",
-        "manualEntryButton": "Add Store"
+        "manualEntryButton": "Add Store",
+        "loadingStores": "Loading your stores...",
+        "yourStores": "Your Stores",
+        "products": "Products",
+        "categories": "Categories"
       },
       "batchTracking": {
         "title": "Set up batch tracking (recommended)",

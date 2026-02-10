@@ -3869,6 +3869,31 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_user_store_overviews: {
+        Args: never
+        Returns: {
+          address: string
+          business_name: string
+          category_count: number
+          city: string
+          country: string
+          created_at: string
+          is_active: boolean
+          is_square_store: boolean
+          onboarding_completed: boolean
+          owner_id: string
+          permissions: Json
+          postal_code: string
+          product_count: number
+          role_in_store: string
+          store_code: string
+          store_id: string
+          store_name: string
+          store_type: string
+          timezone: string
+          updated_at: string
+        }[]
+      }
       get_user_store_role: {
         Args: { p_store_id: string; p_user_id: string }
         Returns: {

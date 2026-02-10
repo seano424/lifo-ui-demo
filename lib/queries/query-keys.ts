@@ -10,6 +10,7 @@ export const queryKeys = {
     all: ['stores'] as const,
     userStores: (userId: string) => [...queryKeys.stores.all, 'userStores', userId] as const,
     detail: (storeId: string) => [...queryKeys.stores.all, 'detail', storeId] as const,
+    overviews: () => [...queryKeys.stores.all, 'overviews'] as const,
   },
 
   // Dashboard overview queries

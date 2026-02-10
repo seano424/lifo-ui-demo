@@ -783,7 +783,11 @@
         "importCSV": "CSV importeren",
         "manualEntry": "Voeg uw winkelinformatie handmatig toe",
         "manualEntryDescription": "Voeg uw winkelinformatie handmatig toe door de vereiste velden hieronder in te voeren.",
-        "manualEntryButton": "Winkel toevoegen"
+        "manualEntryButton": "Winkel toevoegen",
+        "loadingStores": "Uw winkels laden...",
+        "yourStores": "Uw winkels",
+        "products": "Producten",
+        "categories": "Categorieën"
       },
       "batchTracking": {
         "title": "Batch tracking instellen (aanbevolen)",

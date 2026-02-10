@@ -785,7 +785,11 @@
         "importCSV": "Importer un CSV",
         "manualEntry": "Ajouter manuellement vos informations de magasin",
         "manualEntryDescription": "Ajoutez vos informations de magasin manuellement en entrant les champs requis ci-dessous.",
-        "manualEntryButton": "Ajouter le magasin"
+        "manualEntryButton": "Ajouter le magasin",
+        "loadingStores": "Chargement de vos magasins...",
+        "yourStores": "Vos magasins",
+        "products": "Produits",
+        "categories": "Catégories"
       },
       "batchTracking": {
         "title": "Configurer le suivi des lots (recommandé)",
