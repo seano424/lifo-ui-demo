@@ -722,7 +722,7 @@
             "removeOverride": "Remove override"
           },
           "backButton": "Back",
-          "skipButton": "Use defaults",
+          "resetButton": "Reset to defaults",
           "activateButton": "Activate Tracking"
         },
         "activating": {
@@ -840,7 +840,7 @@
               "productOverrides": "Product overrides"
             },
             "backButton": "Back",
-            "skipButton": "Use defaults",
+            "resetButton": "Reset to defaults",
             "activateButton": "Activate Tracking"
           },
           "activating": {

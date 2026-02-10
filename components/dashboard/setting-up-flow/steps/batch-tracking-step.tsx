@@ -150,6 +150,29 @@ export function BatchTrackingStep() {
     })
   }
 
+  const handleResetToDefaults = () => {
+    logger.log(context, 'Resetting all categories to default values')
+
+    // Reset modes and shelf life days to original defaults from processedCategories
+    const modes: Record<string, 'auto' | 'manual'> = {}
+    const days: Record<string, number | null> = {}
+
+    for (const cat of enabledCategories) {
+      const original = processedCategories.find(c => c.id === cat.id)
+      if (original) {
+        modes[cat.id] =
+          original.mode === 'auto' || original.mode === 'manual' ? original.mode : 'auto'
+        days[cat.id] = original.days
+      }
+    }
+
+    setCategoryModes(modes)
+    setShelfLifeDays(days)
+
+    // Clear all product overrides
+    setProductOverrides({})
+  }
+
   const handleActivate = async () => {
     if (!storeId) {
       logger.error(context, 'Cannot activate batch tracking without storeId')
@@ -244,6 +267,7 @@ export function BatchTrackingStep() {
           onUpdateShelfLife={handleUpdateShelfLife}
           onUpdateProductOverride={handleUpdateProductOverride}
           onClearProductOverride={handleClearProductOverride}
+          onResetToDefaults={handleResetToDefaults}
           onActivate={handleActivate}
           onBack={() => setSubStep(1)}
         />

@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { ShelfLifeChip } from './shelf-life-chip'
 // import { CategoryProductExpand } from './category-product-expand' // Hidden for now
 import { useTranslations } from 'next-intl'
-import { Zap, Pencil, Eye, ChevronDown, Info, SkipForward } from 'lucide-react'
+import { Zap, Pencil, Eye, ChevronDown, Info, RotateCcw } from 'lucide-react'
 import type { ProcessedCategory, ProductOverride } from '../batch-tracking-step'
 
 interface StepHowToTrackProps {
@@ -20,6 +20,7 @@ interface StepHowToTrackProps {
   onUpdateShelfLife: (categoryId: string, days: number | null) => void
   onUpdateProductOverride: (productId: string, override: ProductOverride) => void
   onClearProductOverride: (productId: string) => void
+  onResetToDefaults: () => void
   onActivate: () => void
   onBack: () => void
 }
@@ -42,6 +43,7 @@ export function StepHowToTrack({
   onUpdateShelfLife,
   onUpdateProductOverride,
   onClearProductOverride,
+  onResetToDefaults,
   onActivate,
   onBack,
 }: StepHowToTrackProps) {
@@ -235,9 +237,9 @@ export function StepHowToTrack({
           {t('backButton')}
         </Button>
         <div className="flex gap-3">
-          <Button variant="outline" onClick={onActivate}>
-            <SkipForward className="w-3 h-3 mr-1.5" />
-            {t('skipButton')}
+          <Button variant="outline" onClick={onResetToDefaults}>
+            <RotateCcw className="w-3 h-3 mr-1.5" />
+            {t('resetButton')}
           </Button>
           <Button onClick={onActivate}>
             <Zap className="w-3.5 h-3.5 mr-2" />

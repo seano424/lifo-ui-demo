@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
-import { Edit3, Type, ZapIcon } from 'lucide-react'
+import { Type, ZapIcon } from 'lucide-react'
 
 interface ShelfLifeChipProps {
   mode: 'auto' | 'manual'

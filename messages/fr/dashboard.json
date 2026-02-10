@@ -723,7 +723,7 @@
             "removeOverride": "Supprimer le remplacement"
           },
           "backButton": "Retour",
-          "skipButton": "Utiliser les valeurs par défaut",
+          "resetButton": "Réinitialiser aux valeurs par défaut",
           "activateButton": "Activer le suivi"
         },
         "activating": {
@@ -841,7 +841,7 @@
               "productOverrides": "Remplacements de produits"
             },
             "backButton": "Retour",
-            "skipButton": "Utiliser les valeurs par défaut",
+            "resetButton": "Réinitialiser aux valeurs par défaut",
             "activateButton": "Activer le suivi"
           },
           "activating": {

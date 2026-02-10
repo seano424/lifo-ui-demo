@@ -721,7 +721,7 @@
             "removeOverride": "Overschrijving verwijderen"
           },
           "backButton": "Terug",
-          "skipButton": "Standaardwaarden gebruiken",
+          "resetButton": "Terugzetten naar standaard",
           "activateButton": "Tracking activeren"
         },
         "activating": {
@@ -839,7 +839,7 @@
               "productOverrides": "Productoverschrijvingen"
             },
             "backButton": "Terug",
-            "skipButton": "Standaardwaarden gebruiken",
+            "resetButton": "Terugzetten naar standaard",
             "activateButton": "Tracking activeren"
           },
           "activating": {
