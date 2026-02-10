@@ -14,9 +14,7 @@ import { StepSuccess } from './batch-tracking/step-success'
 import { useActiveStoreId, useStoreState } from '@/lib/stores/store-context'
 import { logger } from '@/lib/utils/logger'
 import { useSetupFlowStore } from '@/lib/stores/setup-flow-store'
-import { Typography } from '@/components/ui/typography'
-import { Badge } from '@/components/ui/badge'
-import { Store } from 'lucide-react'
+import { StoreIndicator } from '../store-indicator'
 
 // =============================================================================
 // TYPES
@@ -59,7 +57,6 @@ export interface ProductOverride {
  */
 export function BatchTrackingStep() {
   const context = 'BatchTrackingStep'
-
   // Get active store from Zustand store context
   const { activeStore } = useStoreState()
   const storeId = useActiveStoreId()
@@ -278,33 +275,10 @@ export function BatchTrackingStep() {
     }
   }
 
-  // =============================================================================
-  // RENDER
-  // =============================================================================
-
   return (
     <div className="flex flex-col gap-6">
-      {/* Store Indicator - shown across all sub-steps */}
-      {activeStore && (
-        <div className="border border-muted rounded-xl p-4 bg-muted/30">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-background rounded-lg flex items-center justify-center shrink-0 border border-muted">
-              <Store className="w-5 h-5 text-muted-foreground" />
-            </div>
-            <div className="flex-1">
-              <Typography variant="small" className="text-muted-foreground mb-0.5">
-                Configuring batch tracking for
-              </Typography>
-              <Typography variant="p" className="font-medium">
-                {activeStore.store_name}
-              </Typography>
-            </div>
-            <Badge variant="primary" className="text-xs shrink-0">
-              Active Store
-            </Badge>
-          </div>
-        </div>
-      )}
+      {/* Store Indicator - shown on desktop only */}
+      <StoreIndicator className="hidden lg:block" />
 
       {subStep === 0 && (
         <StepSquareConnected

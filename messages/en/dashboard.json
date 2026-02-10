@@ -657,6 +657,8 @@
     "batchTracking": {
       "title": "Set up batch tracking (recommended)",
       "description": "Configure how LIFO tracks your inventory",
+      "activeStore": "active store",
+      "configuringFor": "Configuring batch tracking for",
       "steps": {
         "squareConnected": {
           "title": "Square Connected Successfully",
@@ -793,6 +795,7 @@
       "batchTracking": {
         "title": "Set up batch tracking (recommended)",
         "description": "Configure how LIFO tracks your inventory",
+        "activeStore": "active store",
         "steps": {
           "squareConnected": {
             "title": "Square Connected Successfully",

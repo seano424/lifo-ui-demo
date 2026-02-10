@@ -656,6 +656,8 @@
     "batchTracking": {
       "title": "Batch tracking instellen (aanbevolen)",
       "description": "Configureer hoe LIFO uw voorraad volgt",
+      "activeStore": "actieve winkel",
+      "configuringFor": "Batch tracking configureren voor",
       "steps": {
         "squareConnected": {
           "title": "Square succesvol verbonden",
@@ -792,6 +794,7 @@
       "batchTracking": {
         "title": "Batch tracking instellen (aanbevolen)",
         "description": "Configureer hoe LIFO uw voorraad volgt",
+        "activeStore": "actieve winkel",
         "steps": {
           "squareConnected": {
             "title": "Square succesvol verbonden",

@@ -7,8 +7,9 @@ import { Button } from '@/components/ui/button'
 import { ShelfLifeChip } from './shelf-life-chip'
 // import { CategoryProductExpand } from './category-product-expand' // Hidden for now
 import { useTranslations } from 'next-intl'
-import { Zap, Pencil, Eye, ChevronDown, Info, RotateCcw } from 'lucide-react'
+import { Zap, Pencil, Eye, ChevronDown, RotateCcw } from 'lucide-react'
 import type { ProcessedCategory, ProductOverride } from '../batch-tracking-step'
+import { Badge } from '@/components/ui/badge'
 
 interface StepHowToTrackProps {
   categories: ProcessedCategory[]
@@ -59,7 +60,7 @@ export function StepHowToTrack({
     .filter(c => categoryModes[c.id] === 'auto')
     .slice(0, 4)
     .map(c => ({
-      product: `Sample from ${c.name}`,
+      product: `${c.name} Sample Product`,
       category: c.name,
       daysLeft: shelfLifeDays[c.id] || 14,
       qty: Math.floor(Math.random() * 30) + 8,
@@ -71,7 +72,7 @@ export function StepHowToTrack({
     const manualCategory = categories.find(c => categoryModes[c.id] === 'manual')
     if (manualCategory) {
       previewBatches.push({
-        product: `Sample from ${manualCategory.name}`,
+        product: `${manualCategory.name} Sample Product`,
         category: manualCategory.name,
         daysLeft: 14,
         qty: 15,
@@ -87,7 +88,7 @@ export function StepHowToTrack({
         <Typography variant="h3" className="mb-2">
           How should we track expiration dates?
         </Typography>
-        <Typography variant="p" className="text-muted-foreground">
+        <Typography variant="p" color="muted">
           Set a default shelf life for each category. When deliveries arrive, we'll calculate the
           expiry automatically. Choose "Manual entry" for categories where you'd rather enter dates
           yourself.
@@ -96,15 +97,15 @@ export function StepHowToTrack({
 
       {/* Categories */}
       <div className="flex flex-col gap-3">
-        <div className="flex items-center justify-between">
-          <Typography variant="h4" className="text-sm font-medium">
+        {/* <div className="flex items-center justify-between border-b border-secondary-100 pb-4">
+          <Typography variant="h4">
             {t('sections.categories')}
           </Typography>
-          <Typography variant="h4" className="text-sm font-medium text-muted-foreground">
+          <Typography variant="h4">
             {t('sections.defaultShelfLife')}
           </Typography>
-        </div>
-        <Card className="p-4 flex flex-col gap-3">
+        </div> */}
+        <Card className="flex flex-col gap-3">
           {categories.map(category => (
             <CategoryConfigRow
               key={category.id}
@@ -138,71 +139,57 @@ export function StepHowToTrack({
         <button
           type="button"
           onClick={() => setPreviewOpen(!previewOpen)}
-          className="w-full p-4 flex items-center justify-between group"
+          className="w-full flex items-center justify-between group"
         >
           <div className="flex items-center gap-2.5">
-            <div className="bg-muted p-1.5 rounded-lg group-hover:bg-muted/80 transition-colors">
-              <Eye className="w-3.5 h-3.5 text-muted-foreground" />
-            </div>
-            <Typography variant="p" className="text-sm font-medium">
-              Preview your dashboard
-            </Typography>
+            <Eye className="w-5 h-5 text-primary-900" />
+
+            <Typography variant="p">Preview your dashboard</Typography>
           </div>
           <ChevronDown
-            className={`w-4 h-4 text-muted-foreground transition-transform duration-200 ${previewOpen ? 'rotate-180' : ''}`}
+            className={`w-4 h-4 transition-transform duration-200 ${previewOpen ? 'rotate-180' : ''}`}
           />
         </button>
         {previewOpen && (
-          <div className="border-t">
+          <div className="py-4">
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                    <th className="px-4 py-2">Product</th>
-                    <th className="px-4 py-2">Est. Expiry</th>
-                    <th className="px-4 py-2 text-right">Qty</th>
+                  <tr className="text-left text-xs uppercase tracking-wider">
+                    <th className="py-2">Product</th>
+                    <th className="py-2">Est. Expiry</th>
+                    <th className="py-2 text-right">Qty</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y">
+                <tbody className="divide-y divide-secondary-100">
                   {previewBatches.map(batch => (
-                    <tr
-                      key={`${batch.product}-${batch.category}`}
-                      className="hover:bg-muted/50 transition-colors"
-                    >
-                      <td className="px-4 py-2.5">
-                        <div className="text-sm font-medium">{batch.product}</div>
-                        <span className="text-xs text-muted-foreground">{batch.category}</span>
+                    <tr key={`${batch.product}-${batch.category}`}>
+                      <td className="py-2.5 flex flex-col gap-1">
+                        <Typography variant="small" color="primary">
+                          {batch.product}
+                        </Typography>
+                        <Typography variant="extraSmall">{batch.category}</Typography>
                       </td>
-                      <td className="px-4 py-2.5">
+                      <td className="py-2.5">
                         {batch.confidence === 'manual' ? (
-                          <span className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-lg bg-muted text-muted-foreground border border-dashed">
+                          <Badge size="sm">
                             <Pencil className="w-3 h-3" /> Set on delivery
-                          </span>
+                          </Badge>
                         ) : (
-                          <span
-                            className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-lg ${
-                              batch.daysLeft && batch.daysLeft <= 3
-                                ? 'bg-foreground/10 text-foreground'
-                                : batch.daysLeft && batch.daysLeft <= 7
-                                  ? 'bg-muted text-foreground/70'
-                                  : 'bg-muted/50 text-muted-foreground'
-                            }`}
-                          >
-                            {batch.confidence !== 'high' && '~'}
+                          <Badge size="sm" variant={batch.daysLeft <= 3 ? 'danger' : 'primary'}>
                             {batch.daysLeft}d from delivery
-                          </span>
+                            {batch.confidence !== 'high' && '~'}
+                          </Badge>
                         )}
                       </td>
-                      <td className="px-4 py-2.5 text-sm text-foreground/60 text-right tabular-nums">
-                        {batch.qty}
-                      </td>
+                      <td className="px-2 py-2.5  text-right tabular-nums">{batch.qty}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
-            <div className="px-4 py-2 bg-muted/50 border-t">
-              <span className="text-xs text-muted-foreground">
+            <div className="px-2 pt-4 border-t border-secondary-100">
+              <span className="text-xs">
                 Sample of {trackedProducts} tracked products · Tilde (~) = estimated from default
                 shelf life
               </span>
@@ -212,29 +199,26 @@ export function StepHowToTrack({
       </Card>
 
       {/* Info box */}
-      <div className="flex items-start gap-3 bg-muted/50 border rounded-xl p-4">
-        <Info className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
-        <Typography variant="small" className="text-muted-foreground">
+      <div className="flex items-start gap-3 p-4 border border-muted rounded-lg shadow-sm">
+        <Typography variant="small">
           These are starting defaults. Your team can adjust any date when processing a delivery. You
           can change all of this later in Settings.
         </Typography>
       </div>
 
       {/* Summary */}
-      <Card className="p-4 bg-muted/50">
+      <Card className="p-4 border border-muted rounded-lg shadow-sm">
         <div className="flex items-center justify-between mb-2">
-          <Typography variant="p" className="text-sm font-medium">
-            {trackedProducts} products ready
-          </Typography>
+          <Typography variant="p">{trackedProducts} products ready</Typography>
         </div>
-        <div className="flex items-center gap-6 text-sm">
-          <div>
-            <span className="text-muted-foreground">Auto-dated categories:</span>
-            <span className="ml-2 font-semibold">{autoCount}</span>
+        <div className="flex items-center gap-6 ">
+          <div className="flex items-center gap-2">
+            <Typography variant="small">Auto-dated categories:</Typography>
+            <Typography variant="small">{autoCount}</Typography>
           </div>
-          <div>
-            <span className="text-muted-foreground">Manual categories:</span>
-            <span className="ml-2 font-semibold">{manualCount}</span>
+          <div className="flex items-center gap-2">
+            <Typography variant="small">Manual categories:</Typography>
+            <Typography variant="small">{manualCount}</Typography>
           </div>
         </div>
       </Card>

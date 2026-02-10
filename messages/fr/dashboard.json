@@ -658,6 +658,8 @@
     "batchTracking": {
       "title": "Configurer le suivi des lots (recommandé)",
       "description": "Configurez comment LIFO suit votre inventaire",
+      "activeStore": "magasin actif",
+      "configuringFor": "Configuration du suivi des lots pour",
       "steps": {
         "squareConnected": {
           "title": "Square connecté avec succès",
@@ -794,6 +796,7 @@
       "batchTracking": {
         "title": "Configurer le suivi des lots (recommandé)",
         "description": "Configurez comment LIFO suit votre inventaire",
+        "activeStore": "magasin actif",
         "steps": {
           "squareConnected": {
             "title": "Square connecté avec succès",

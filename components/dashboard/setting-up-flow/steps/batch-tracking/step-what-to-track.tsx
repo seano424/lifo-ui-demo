@@ -49,7 +49,7 @@ export function StepWhatToTrack({
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 mb-80">
       <div>
         <Typography variant="h3" className="mb-2">
           {t('title')}
@@ -61,10 +61,7 @@ export function StepWhatToTrack({
 
       {/* Categories */}
       <div className="flex flex-col gap-3">
-        <Typography variant="h4" className="text-sm font-medium">
-          {t('sections.categories')}
-        </Typography>
-        <Card className="p-4 flex flex-col gap-3">
+        <Card className="flex flex-col gap-3">
           {categories.length === 0 ? (
             <div className="py-8 text-center">
               <Package className="h-12 w-12 mx-auto mb-3 text-muted-foreground/50" />
@@ -107,12 +104,12 @@ export function StepWhatToTrack({
       </div>
 
       {/* Summary */}
-      <Card className="p-4 bg-muted/50">
+      <Card className="bg-secondary-100/30 p-4">
         <div className="flex items-center justify-between">
-          <Typography variant="p" className="text-sm font-medium">
+          <Typography variant="p" color="secondary" className="text-sm font-medium">
             {t('summary.tracking')}
           </Typography>
-          <Typography variant="p" className="text-sm font-semibold">
+          <Typography variant="p" color="secondary" className="text-sm font-semibold">
             {trackedProducts.toLocaleString()} {t('summary.of')} {totalProducts.toLocaleString()}{' '}
             {t('summary.products')}
           </Typography>
@@ -143,7 +140,7 @@ interface CategoryRowProps {
   onToggle: (categoryId: string, enabled: boolean) => void
 }
 
-function CategoryRow({ category, enabled, allSelected, onToggle }: CategoryRowProps) {
+function CategoryRow({ category, enabled, onToggle }: CategoryRowProps) {
   // Mute text when disabled
   const shouldMute = !enabled
 
