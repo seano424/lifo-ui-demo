@@ -92,7 +92,7 @@ export function StepCombinedTracking({
         product: `${manualCategory.name} Sample Product`,
         category: manualCategory.name,
         daysLeft: 14,
-        qty: 15,
+        qty: manualCategory.productCount,
         confidence: 'manual',
       })
     }
