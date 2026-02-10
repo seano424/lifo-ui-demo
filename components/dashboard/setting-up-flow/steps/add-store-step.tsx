@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { Card } from '@/components/ui/card'
 import { Typography } from '@/components/ui/typography'
 import { Button } from '@/components/ui/button'
 import { useTranslations } from 'next-intl'
@@ -32,7 +31,9 @@ import {
   Check,
   ChevronDown,
   ChevronUp,
+  ChevronRight,
   Info,
+  AlertCircle,
 } from 'lucide-react'
 
 // ─── Helper Components ────────────────────────────────────
@@ -45,10 +46,10 @@ interface StatusDotProps {
 
 function StatusDot({ health }: StatusDotProps) {
   const styles: Record<SyncHealth, string> = {
-    healthy: 'bg-gray-900 dark:bg-gray-100',
-    empty: 'bg-gray-400',
-    stale: 'bg-gray-500',
-    error: 'bg-gray-300 ring-2 ring-gray-400',
+    healthy: 'bg-foreground',
+    empty: 'bg-muted-foreground/40',
+    stale: 'bg-muted-foreground/60',
+    error: 'bg-muted-foreground/30 ring-2 ring-muted-foreground/40',
   }
 
   return <span className={cn('inline-block w-2 h-2 rounded-full', styles[health])} />
@@ -77,115 +78,118 @@ function StoreCard({ store, isExpanded, onToggle, onSyncNow, isSyncing, t }: Sto
     : store.store_id.slice(0, 8)
 
   return (
-    <Card className="overflow-hidden hover:border-gray-300 dark:hover:border-gray-700 transition-colors">
+    <div className="divide-y divide-border">
       {/* Store header — always visible */}
       <button
         type="button"
         onClick={onToggle}
-        className="w-full px-5 py-4 flex items-center justify-between hover:bg-muted/50 transition-colors text-left"
+        className="w-full p-4 hover:bg-muted transition-colors cursor-pointer grid grid-cols-1 md:grid-cols-12 gap-4 items-center text-left"
       >
-        <div className="flex items-center gap-3.5">
-          <div className="w-9 h-9 bg-muted rounded-lg flex items-center justify-center">
-            <Store className="w-4.5 h-4.5 text-muted-foreground" />
+        {/* Left side - Store info */}
+        <div className="flex items-center gap-4 md:col-span-5">
+          <div className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center shrink-0">
+            <Store className="w-5 h-5 text-muted-foreground" />
           </div>
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col">
             <div className="flex items-center gap-2">
-              <span className="text-sm font-semibold">{store.store_name}</span>
+              <Typography variant="p">{store.store_name}</Typography>
               <StatusDot health={syncHealth} />
             </div>
-            <span className="text-xs text-muted-foreground font-mono">{displayStoreId}</span>
+            <Typography variant="muted" className="font-mono">
+              {displayStoreId}
+            </Typography>
           </div>
         </div>
 
-        <div className="flex items-center gap-4">
-          {/* Inline stats — visible even when collapsed */}
-          <div className="hidden sm:flex items-center gap-4 text-xs text-muted-foreground">
-            <span className="flex items-center gap-1.5">
-              <Package className="w-3.5 h-3.5" />
-              {store.product_count} {t('steps.addStore.products').toLowerCase()}
-            </span>
-            <span className="flex items-center gap-1.5">
-              <FolderTree className="w-3.5 h-3.5" />
-              {store.category_count} {t('steps.addStore.categories').toLowerCase()}
-            </span>
-          </div>
+        {/* Middle - Stats (hidden on mobile) */}
+        <div className="hidden md:flex items-center gap-4 md:col-span-5">
+          <Typography variant="p" className="flex items-center gap-1.5 text-muted-foreground">
+            <Package className="w-4 h-4" />
+            {store.product_count} {t('steps.addStore.products').toLowerCase()}
+          </Typography>
+          <Typography variant="p" className="flex items-center gap-1.5 text-muted-foreground">
+            <FolderTree className="w-4 h-4" />
+            {store.category_count} {t('steps.addStore.categories').toLowerCase()}
+          </Typography>
+        </div>
+
+        {/* Right side - Expand indicator */}
+        <div className="hidden md:flex items-center justify-end md:col-span-2">
           {isExpanded ? (
-            <ChevronUp className="w-4 h-4 text-muted-foreground" />
+            <ChevronUp className="w-5 h-5 text-muted-foreground shrink-0" />
           ) : (
-            <ChevronDown className="w-4 h-4 text-muted-foreground" />
+            <ChevronDown className="w-5 h-5 text-muted-foreground shrink-0" />
           )}
         </div>
       </button>
 
       {/* Expanded detail */}
       {isExpanded && (
-        <div className="border-t">
+        <div className="divide-y divide-border">
           {/* Stats row */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 divide-x">
-            <div className="px-5 py-3.5">
-              <div className="text-xl font-bold">{store.product_count}</div>
-              <div className="text-xs text-muted-foreground mt-0.5">
+          <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-muted">
+            <div className="p-4">
+              <Typography variant="h4">{store.product_count}</Typography>
+              <Typography variant="muted" className="mt-0.5">
                 {t('steps.addStore.products')}
-              </div>
+              </Typography>
             </div>
-            <div className="px-5 py-3.5">
-              <div className="text-xl font-bold">{store.category_count}</div>
-              <div className="text-xs text-muted-foreground mt-0.5">
+            <div className="p-4">
+              <Typography variant="h4">{store.category_count}</Typography>
+              <Typography variant="muted" className="mt-0.5">
                 {t('steps.addStore.categories')}
-              </div>
+              </Typography>
             </div>
-            <div className="px-5 py-3.5">
+            <div className="p-4">
               <div className="flex items-center gap-1.5">
                 <StatusDot health={syncHealth} />
-                <span className="text-sm font-medium capitalize">
+                <Typography variant="p" className="capitalize">
                   {syncHealth === 'empty' ? 'No data' : syncHealth}
-                </span>
+                </Typography>
               </div>
-              <div className="text-xs text-muted-foreground mt-0.5">Sync status</div>
+              <Typography variant="muted" className="mt-0.5">
+                Sync status
+              </Typography>
             </div>
-            <div className="px-5 py-3.5">
+            <div className="p-4">
               <div className="flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5 text-muted-foreground" />
-                <span className="text-sm font-medium">{lastSync}</span>
+                <Clock className="w-4 h-4 text-muted-foreground" />
+                <Typography variant="p">{lastSync}</Typography>
               </div>
-              <div className="text-xs text-muted-foreground mt-0.5">Last synced</div>
+              <Typography variant="muted" className="mt-0.5">
+                Last synced
+              </Typography>
             </div>
           </div>
 
           {/* Actions bar */}
-          <div className="border-t px-5 py-3 flex items-center justify-between">
+          <div className="p-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2">
             <div className="flex items-center gap-2">
-              <button
-                type="button"
+              <Button
                 onClick={e => {
                   e.stopPropagation()
                   onSyncNow()
                 }}
                 disabled={isSyncing}
-                className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground px-2.5 py-1.5 rounded-lg hover:bg-muted transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                variant="outline"
+                size="sm"
               >
-                <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
+                <RefreshCw className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`} />
                 {isSyncing ? 'Syncing...' : 'Sync now'}
-              </button>
-              <button
-                type="button"
-                className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground px-2.5 py-1.5 rounded-lg hover:bg-muted transition-colors"
-              >
-                <ExternalLink className="w-3.5 h-3.5" />
+              </Button>
+              <Button variant="outline" size="sm">
+                <ExternalLink className="w-4 h-4" />
                 View in Square
-              </button>
+              </Button>
             </div>
-            <button
-              type="button"
-              className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-destructive px-2.5 py-1.5 rounded-lg hover:bg-muted transition-colors"
-            >
-              <Unlink className="w-3.5 h-3.5" />
+            <Button variant="ghost" size="sm">
+              <Unlink className="w-4 h-4" />
               Disconnect
-            </button>
+            </Button>
           </div>
         </div>
       )}
-    </Card>
+    </div>
   )
 }
 
@@ -209,11 +213,13 @@ function SummaryPanel({
   t,
 }: SummaryPanelProps) {
   return (
-    <Card className="overflow-hidden">
+    <div className="border border-muted rounded-xl overflow-hidden">
       {/* Panel header */}
-      <div className="px-5 py-4 border-b">
-        <h3 className="text-sm font-semibold">Import Summary</h3>
-        <p className="text-xs text-muted-foreground mt-0.5">Overview of your Square catalog sync</p>
+      <div className="p-4 border-b border-muted">
+        <Typography variant="h5">Import Summary</Typography>
+        <Typography variant="muted" className="mt-1">
+          Overview of your Square catalog sync
+        </Typography>
       </div>
 
       {isSyncing ? (
@@ -226,7 +232,7 @@ function SummaryPanel({
       ) : (
         <>
           {/* Timeline / progress indicator */}
-          <div className="px-5 py-4 space-y-4">
+          <div className="p-4 space-y-4">
             {/* Step 1: Connected */}
             <div className="flex items-start gap-3">
               <div className="mt-0.5 flex flex-col items-center">
@@ -236,10 +242,12 @@ function SummaryPanel({
                 <div className="w-px h-6 bg-border mt-1" />
               </div>
               <div>
-                <div className="text-sm font-medium">Square connected</div>
-                <div className="text-xs text-muted-foreground">
+                <Typography variant="p" className="font-medium">
+                  Square connected
+                </Typography>
+                <Typography variant="muted">
                   {syncedStoreCount} of {storeCount} stores synced
-                </div>
+                </Typography>
               </div>
             </div>
 
@@ -252,11 +260,13 @@ function SummaryPanel({
                 <div className="w-px h-6 bg-border mt-1" />
               </div>
               <div>
-                <div className="text-sm font-medium">Catalog imported</div>
-                <div className="text-xs text-muted-foreground">
+                <Typography variant="p" className="font-medium">
+                  Catalog imported
+                </Typography>
+                <Typography variant="muted">
                   {productCount} {t('steps.addStore.products').toLowerCase()}, {categoryCount}{' '}
                   {t('steps.addStore.categories').toLowerCase()}
-                </div>
+                </Typography>
               </div>
             </div>
 
@@ -264,51 +274,53 @@ function SummaryPanel({
             <div className="flex items-start gap-3">
               <div className="mt-0.5">
                 <div className="w-5 h-5 rounded-full border-2 border-muted-foreground/30 bg-background flex items-center justify-center">
-                  <span className="text-[10px] font-bold text-muted-foreground">3</span>
+                  <Typography variant="extraSmall" className="font-bold text-muted-foreground">
+                    3
+                  </Typography>
                 </div>
               </div>
               <div>
-                <div className="text-sm font-medium text-muted-foreground">
+                <Typography variant="p" className="font-medium text-muted-foreground">
                   Set up batch tracking
-                </div>
-                <div className="text-xs text-muted-foreground">
+                </Typography>
+                <Typography variant="muted">
                   Configure expiry date rules for your products
-                </div>
+                </Typography>
               </div>
             </div>
           </div>
 
           {/* Totals */}
-          <div className="border-t px-5 py-4">
+          <div className="border-t border-muted p-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <div className="text-2xl font-bold">{productCount}</div>
-                <div className="text-xs text-muted-foreground mt-0.5">
+                <Typography variant="h3">{productCount}</Typography>
+                <Typography variant="muted" className="mt-0.5">
                   Total {t('steps.addStore.products').toLowerCase()}
-                </div>
+                </Typography>
               </div>
               <div>
-                <div className="text-2xl font-bold">{categoryCount}</div>
-                <div className="text-xs text-muted-foreground mt-0.5">
+                <Typography variant="h3">{categoryCount}</Typography>
+                <Typography variant="muted" className="mt-0.5">
                   {t('steps.addStore.categories')}
-                </div>
+                </Typography>
               </div>
             </div>
           </div>
 
           {/* CTA */}
-          <div className="border-t p-4">
+          <div className="border-t border-muted p-4">
             <Button onClick={onContinue} size="lg" className="w-full">
               Continue to Batch Tracking Setup
-              <ArrowRight className="w-4 h-4 ml-2" />
+              <ArrowRight className="w-4 h-4" />
             </Button>
-            <p className="text-[11px] text-muted-foreground text-center mt-2.5">
+            <Typography variant="extraSmall" className="text-muted-foreground text-center mt-2.5">
               You can always come back to manage your Square connection
-            </p>
+            </Typography>
           </div>
         </>
       )}
-    </Card>
+    </div>
   )
 }
 
@@ -334,6 +346,7 @@ function formatRelativeTime(dateString: string): string {
 export function AddStoreStep() {
   const t = useTranslations('setupFlow')
   const [expandedStoreId, setExpandedStoreId] = useState<string | null>(null)
+  const [showFullSyncConfirm, setShowFullSyncConfirm] = useState(false)
 
   // Square integration hooks
   const { data: squareStatus } = useSquareStatus()
@@ -390,7 +403,7 @@ export function AddStoreStep() {
     setExpandedStoreId(expandedStoreId === storeId ? null : storeId)
   }
 
-  const handleSyncNow = async () => {
+  const handleSyncNow = async (forceFullSync = false) => {
     if (!connectionId) {
       toast.error('No Square connection found')
       return
@@ -398,12 +411,25 @@ export function AddStoreStep() {
 
     try {
       // Sync both catalog and inventory
-      await syncCatalogMutation.mutateAsync({ connectionId, fullSync: false })
-      await syncInventoryMutation.mutateAsync({ connectionId, fullSync: false })
+      await syncCatalogMutation.mutateAsync({ connectionId, fullSync: forceFullSync })
+      await syncInventoryMutation.mutateAsync({ connectionId, fullSync: forceFullSync })
       toast.success('Sync completed successfully')
+      setShowFullSyncConfirm(false) // Close confirmation if open
     } catch (error) {
       console.error('Sync failed:', error)
-      toast.error('Sync failed. Please try again.')
+
+      // Check if it's a duplicate key error
+      const errorMessage = error instanceof Error ? error.message : String(error)
+      if (errorMessage.includes('duplicate key') || errorMessage.includes('products_sku_key')) {
+        if (!forceFullSync) {
+          // Offer full sync as a recovery option
+          setShowFullSyncConfirm(true)
+        } else {
+          // Full sync also failed - this shouldn't happen
+          toast.error('Sync failed even with full sync. Please contact support.')
+        }
+      }
+      // Note: Generic errors are already handled by mutation onError in the hook
     }
   }
 
@@ -415,113 +441,151 @@ export function AddStoreStep() {
 
         <Typography variant="p">{t('steps.addStore.description')}</Typography>
 
-        {/* Square Connection Card */}
-        <Card
-          className="p-6 transition-colors cursor-pointer group hover:border-primary/50"
-          onClick={handleSquareConnect}
-        >
-          <div className="flex flex-col gap-4">
-            <div className="hidden dark:block">
-              <Image
-                src="/square/White/Square_Logo_2025_White.svg"
-                alt="Square"
-                width={150}
-                height={150}
-              />
-            </div>
-            <div className="block dark:hidden">
-              <Image
-                src="/square/Black/Square_Logo_2025_Black.svg"
-                alt="Square"
-                width={150}
-                height={150}
-              />
-            </div>
-
-            <Typography variant="h4">{t('steps.addStore.squareDescription')}</Typography>
+        {/* Main bordered container */}
+        <div className="flex flex-col border border-muted rounded-xl overflow-hidden">
+          <div className="p-4 flex flex-col gap-4">
+            <Typography variant="h5">Available Integrations</Typography>
+            <Typography variant="p">
+              Connect your POS system to automatically import products and track inventory
+            </Typography>
           </div>
-        </Card>
+
+          {/* Square Integration */}
+          <div className="divide-y divide-border border-t border-muted">
+            <button
+              type="button"
+              onClick={handleSquareConnect}
+              className="p-4 hover:bg-muted transition-colors cursor-pointer grid grid-cols-1 md:grid-cols-12 gap-4 items-center text-left w-full"
+            >
+              {/* Left side - Square logo and name */}
+              <div className="flex items-center gap-4 md:col-span-4">
+                <div className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center shrink-0">
+                  <Image src="/square/square-icon.svg" alt="Square" width={20} height={20} />
+                </div>
+                <Typography variant="p">Square</Typography>
+              </div>
+
+              {/* Middle - Description */}
+              <div className="md:col-span-6">
+                <Typography variant="p">{t('steps.addStore.squareDescription')}</Typography>
+              </div>
+
+              {/* Right side - Connect button */}
+              <div className="flex items-center gap-5 md:col-span-2 md:justify-end">
+                <Typography variant="p">Connect</Typography>
+                <ChevronRight className="w-5 h-5 text-muted-foreground shrink-0" />
+              </div>
+            </button>
+          </div>
+        </div>
       </div>
     )
   }
 
-  // Show connected state with new two-column layout
+  // Show connected state with bordered container layout
   return (
     <div className="flex flex-col gap-6">
       <Typography variant="h3">{t('steps.addStore.titleConnected')}</Typography>
 
       <Typography variant="p">{t('steps.addStore.descriptionConnected')}</Typography>
 
-      {/* Two Column Layout */}
-      <div className="grid grid-cols-1 gap-6">
-        {/* Left: Store list (2/3 width on desktop) */}
-        <div className="space-y-5">
-          {/* Section header */}
+      {/* Full Sync Confirmation Banner */}
+      {showFullSyncConfirm && (
+        <div className="border border-muted-foreground/30 rounded-xl overflow-hidden bg-muted/30">
+          <div className="p-4 flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 text-muted-foreground mt-0.5 shrink-0" />
+            <div className="flex-1">
+              <Typography variant="p" className="font-medium">
+                Products Already Exist
+              </Typography>
+              <Typography variant="small" className="text-muted-foreground mt-1">
+                Some products from Square are already in your catalog. Would you like to force a
+                full sync to update existing products? This may take longer but ensures all data is
+                up to date.
+              </Typography>
+              <div className="flex items-center gap-2 mt-3">
+                <Button
+                  onClick={() => handleSyncNow(true)}
+                  disabled={isSyncingData}
+                  variant="default"
+                  size="sm"
+                >
+                  <RefreshCw className={`w-4 h-4 ${isSyncingData ? 'animate-spin' : ''}`} />
+                  Force Full Sync
+                </Button>
+                <Button onClick={() => setShowFullSyncConfirm(false)} variant="ghost" size="sm">
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Main bordered container - matching integrations page style */}
+      <div className="flex flex-col border border-muted rounded-xl overflow-hidden">
+        {/* Header section */}
+        <div className="p-4 flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-sm font-semibold">{t('steps.addStore.yourStores')}</h2>
-              <p className="text-xs text-muted-foreground mt-0.5">
+              <Typography variant="h5">{t('steps.addStore.yourStores')}</Typography>
+              <Typography variant="muted" className="mt-1">
                 {squareStores.length} stores connected from Square
-              </p>
+              </Typography>
             </div>
-            <button
-              type="button"
-              onClick={handleSyncNow}
+            <Button
+              onClick={() => handleSyncNow(false)}
               disabled={isSyncingData}
-              className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground px-3 py-2 rounded-lg border hover:border-foreground/20 hover:bg-muted transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              variant="outline"
+              size="sm"
             >
-              <RefreshCw className={`w-3.5 h-3.5 ${isSyncingData ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`w-4 h-4 ${isSyncingData ? 'animate-spin' : ''}`} />
               {isSyncingData ? 'Syncing...' : 'Sync all stores'}
-            </button>
+            </Button>
           </div>
-
-          {/* Store cards */}
-          <div className="space-y-3">
-            {squareStores.map(store => (
-              <StoreCard
-                key={store.store_id}
-                store={store}
-                isExpanded={expandedStoreId === store.store_id}
-                onToggle={() => toggleStore(store.store_id)}
-                onSyncNow={handleSyncNow}
-                isSyncing={isSyncingData}
-                t={t}
-              />
-            ))}
-          </div>
-
-          {/* Help text */}
-          <Card className="flex items-start gap-3 px-5 py-4">
-            <div className="mt-0.5">
-              <Info className="w-4 h-4 text-muted-foreground" />
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">
-                Products and categories are imported from your Square catalog. LIFO adds batch-level
-                expiry tracking on top of your existing product data.
-              </p>
-              <button
-                type="button"
-                className="text-xs font-medium text-muted-foreground hover:text-foreground mt-2 transition-colors"
-              >
-                Learn more about Square sync →
-              </button>
-            </div>
-          </Card>
         </div>
 
-        {/* Right: Summary panel (1/3 width on desktop, moves below on mobile) */}
-        <div>
-          <SummaryPanel
-            productCount={productCount}
-            categoryCount={categoryCount}
-            storeCount={squareStores.length}
-            syncedStoreCount={syncedStoreCount}
-            isSyncing={isSyncing}
-            onContinue={handleContinueToBatchTracking}
-            t={t}
-          />
+        {/* Store list - bordered sections */}
+        <div className="divide-y divide-border border-t border-muted">
+          {squareStores.map(store => (
+            <StoreCard
+              key={store.store_id}
+              store={store}
+              isExpanded={expandedStoreId === store.store_id}
+              onToggle={() => toggleStore(store.store_id)}
+              onSyncNow={() => handleSyncNow(false)}
+              isSyncing={isSyncingData}
+              t={t}
+            />
+          ))}
         </div>
+
+        {/* Help footer */}
+        <div className="border-t border-muted p-4 flex items-start gap-3 bg-muted/30">
+          <Info className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
+          <div className="flex-1">
+            <Typography variant="small" className="text-muted-foreground">
+              Products and categories are imported from your Square catalog. LIFO adds batch-level
+              expiry tracking on top of your existing product data.
+            </Typography>
+            <Button variant="link" size="sm" className="mt-2 p-0 h-auto text-xs">
+              Learn more about Square sync →
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* Summary panel below main section */}
+      <div>
+        <SummaryPanel
+          productCount={productCount}
+          categoryCount={categoryCount}
+          storeCount={squareStores.length}
+          syncedStoreCount={syncedStoreCount}
+          isSyncing={isSyncing}
+          onContinue={handleContinueToBatchTracking}
+          t={t}
+        />
       </div>
     </div>
   )

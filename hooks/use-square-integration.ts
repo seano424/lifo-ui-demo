@@ -184,11 +184,32 @@ export function useSyncSquareCatalog() {
       const message = `Catalog synced: ${data.products_created || 0} created, ${data.products_updated || 0} updated`
       toast.success(message)
     },
-    onError: error => {
+    onError: (error, variables) => {
       if (process.env.NODE_ENV === 'development') console.error('Catalog sync failed:', error)
 
+      const parsedError = parseBackendError(error)
       const { title, description } = formatErrorForToast(error)
-      toast.error(title, { description })
+
+      // For duplicate key errors during incremental sync, suggest full sync
+      if (
+        parsedError.type === 'constraint' &&
+        parsedError.technical?.includes('products_sku_key') &&
+        !variables.fullSync
+      ) {
+        toast.error(title, {
+          description: description,
+          duration: 8000, // Longer duration for actionable errors
+          action: {
+            label: 'Force Full Sync',
+            onClick: () => {
+              // The component should handle this by showing a confirmation dialog
+              // and calling the mutation again with fullSync: true
+            },
+          },
+        })
+      } else {
+        toast.error(title, { description })
+      }
     },
   })
 }
