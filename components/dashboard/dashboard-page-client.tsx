@@ -22,8 +22,8 @@ export function DashboardPageClient() {
     )
   }
 
-  // Setup is complete when user has store and batches
-  const isSetupComplete = progress.hasStore && progress.hasBatches
+  // Setup is complete when user has store and batch tracking setup
+  const isSetupComplete = progress.hasStore && progress.hasBatchTrackingSetup
 
   // Show setup flow if not complete - the flow handles which step to show
   if (!isSetupComplete) {

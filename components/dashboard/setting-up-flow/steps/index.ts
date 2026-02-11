@@ -1,5 +1,2 @@
-export { CreateAccountStep } from './create-account-step'
-export { IntegrateDataStep } from './integrate-data-step'
-export { CreateBatchStep } from './create-batch-step'
-export { SetupNotificationsStep } from './setup-notifications-step'
+export { BatchTrackingStep } from './batch-tracking-step'
 export { AddStoreStep } from './add-store-step'

@@ -123,6 +123,22 @@ function parseConstraintError(errorMessage: string): ParsedError {
   }
 
   if (errorMessage.includes('unique constraint') || errorMessage.includes('duplicate key')) {
+    // Check for Square catalog sync specific errors
+    if (errorMessage.includes('products_sku_key') || errorMessage.includes('catalog sync')) {
+      const skuMatch = errorMessage.match(/\(sku\)=\(([^)]+)\)/)
+      const sku = skuMatch ? skuMatch[1] : 'unknown'
+
+      return {
+        type: 'constraint',
+        title: 'Product Already Exists',
+        message: `Product with SKU "${sku}" is already in your catalog.`,
+        suggestion:
+          'Try using "Force Full Sync" to update existing products, or check if the data is already synced.',
+        technical: errorMessage,
+        isRetryable: true, // Can retry with full sync
+      }
+    }
+
     return {
       type: 'constraint',
       title: 'Duplicate Entry',

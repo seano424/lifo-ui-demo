@@ -10,23 +10,25 @@ import {
   isStepCompleted,
   getProgressPercentage,
 } from '@/lib/hooks/use-setup-progress'
+import { StoreIndicator } from './store-indicator'
 
 const STEP_LABELS: Record<SetupStep, string> = {
-  'create-account': 'setupFlow.sidebar.steps.createAccount',
-  'add-store': 'setupFlow.sidebar.steps.addStore',
-  'create-first-batch': 'setupFlow.sidebar.steps.createBatch',
+  'add-store': 'setupFlow.sidebar.steps.connectSquare',
+  'batch-tracking-setup': 'setupFlow.sidebar.steps.batchTracking',
 }
 
 export function SetupStepsSidebar() {
   const t = useTranslations()
   const { currentStep, goToStep } = useSetupFlowStore()
-
   // Derive setup progress from database state
   const progress = useSetupProgress()
   const progressPercentage = getProgressPercentage(progress)
 
   return (
-    <div className="flex flex-col gap-6 p-6 rounded-2xl bg-muted/30 dark:bg-muted/10 min-w-[280px] h-full lg:min-w-[320px] shadow-xs lg:rounded-none">
+    <div className="flex flex-col gap-6 p-6 min-w-[280px] h-full lg:min-w-[320px]">
+      {/* Store Indicator - shown on mobile only */}
+      <StoreIndicator className="lg:hidden" />
+
       {/* Header */}
       <div className="flex flex-col gap-2">
         <Typography variant="h3">{t('setupFlow.sidebar.title')}</Typography>

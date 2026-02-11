@@ -1228,6 +1228,7 @@ export type Database = {
           sku: string
           square_item_id: string | null
           square_synced_at: string | null
+          square_variation_id: string | null
           typical_shelf_life_days: number
           unit_type: string
           updated_at: string | null
@@ -1254,6 +1255,7 @@ export type Database = {
           sku: string
           square_item_id?: string | null
           square_synced_at?: string | null
+          square_variation_id?: string | null
           typical_shelf_life_days: number
           unit_type: string
           updated_at?: string | null
@@ -1280,6 +1282,7 @@ export type Database = {
           sku?: string
           square_item_id?: string | null
           square_synced_at?: string | null
+          square_variation_id?: string | null
           typical_shelf_life_days?: number
           unit_type?: string
           updated_at?: string | null
@@ -1346,7 +1349,6 @@ export type Database = {
           selling_price: number | null
           shelf_life_override_days: number | null
           square_synced_at: string | null
-          square_variation_id: string | null
           store_id: string
           store_sku: string | null
           supplier_code: string | null
@@ -1365,7 +1367,6 @@ export type Database = {
           selling_price?: number | null
           shelf_life_override_days?: number | null
           square_synced_at?: string | null
-          square_variation_id?: string | null
           store_id: string
           store_sku?: string | null
           supplier_code?: string | null
@@ -1384,7 +1385,6 @@ export type Database = {
           selling_price?: number | null
           shelf_life_override_days?: number | null
           square_synced_at?: string | null
-          square_variation_id?: string | null
           store_id?: string
           store_sku?: string | null
           supplier_code?: string | null
@@ -3869,6 +3869,31 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_user_store_overviews: {
+        Args: never
+        Returns: {
+          address: string
+          business_name: string
+          category_count: number
+          city: string
+          country: string
+          created_at: string
+          is_active: boolean
+          is_square_store: boolean
+          onboarding_completed: boolean
+          owner_id: string
+          permissions: Json
+          postal_code: string
+          product_count: number
+          role_in_store: string
+          store_code: string
+          store_id: string
+          store_name: string
+          store_type: string
+          timezone: string
+          updated_at: string
+        }[]
+      }
       get_user_store_role: {
         Args: { p_store_id: string; p_user_id: string }
         Returns: {
@@ -3999,25 +4024,15 @@ export type Database = {
         Args: { check_store_id: string }
         Returns: boolean
       }
-      save_batch_tracking_setup:
-        | {
-            Args: {
-              p_category_settings?: Json
-              p_config: Json
-              p_product_overrides?: Json
-              p_store_id: string
-            }
-            Returns: Json
-          }
-        | {
-            Args: {
-              p_category_settings?: Json[]
-              p_config: Json
-              p_product_overrides?: Json[]
-              p_store_id: string
-            }
-            Returns: Json
-          }
+      save_batch_tracking_setup: {
+        Args: {
+          p_category_settings?: Json
+          p_config: Json
+          p_product_overrides?: Json
+          p_store_id: string
+        }
+        Returns: Json
+      }
       search_products_with_stock: {
         Args: {
           max_results?: number

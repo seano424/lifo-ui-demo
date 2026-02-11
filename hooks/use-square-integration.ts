@@ -27,9 +27,9 @@ import type {
 export function useSquareStatus() {
   const supabase = createClient()
 
-  return useQuery<SquareConnectionStatus, Error>({
+  return useQuery({
     queryKey: queryKeys.square.status(),
-    queryFn: async () => {
+    queryFn: async (): Promise<SquareConnectionStatus> => {
       const {
         data: { session },
       } = await supabase.auth.getSession()
@@ -39,9 +39,9 @@ export function useSquareStatus() {
 
       return await fastApiClient.getSquareStatus(session.access_token)
     },
-    staleTime: 2 * 60 * 1000, // 2 minutes
-    gcTime: 5 * 60 * 1000, // 5 minutes (formerly cacheTime)
-    refetchOnMount: true, // Always refetch on mount for fresh connection status
+    staleTime: 5 * 60 * 1000, // 5 minutes - connection status changes infrequently
+    gcTime: 10 * 60 * 1000, // 10 minutes (formerly cacheTime)
+    refetchOnMount: true, // Refetch on mount to ensure fresh data
     refetchOnWindowFocus: false,
     retry: (failureCount, error: Error) => {
       // Don't retry auth errors
@@ -59,11 +59,11 @@ export function useSquareStatus() {
 export function useSquareConnections(storeId: string | null) {
   const supabase = createClient()
 
-  return useQuery<ConnectionListResponse, Error>({
+  return useQuery({
     queryKey: storeId
       ? queryKeys.square.connectionsByStore(storeId)
       : queryKeys.square.connections(),
-    queryFn: async () => {
+    queryFn: async (): Promise<ConnectionListResponse> => {
       if (!storeId) {
         throw new Error('Store ID is required')
       }
@@ -98,8 +98,8 @@ export function useSquareConnections(storeId: string | null) {
 export function useInitiateSquareConnect() {
   const supabase = createClient()
 
-  return useMutation<OAuthAuthorizeResponse, Error>({
-    mutationFn: async () => {
+  return useMutation({
+    mutationFn: async (): Promise<OAuthAuthorizeResponse> => {
       const {
         data: { session },
       } = await supabase.auth.getSession()
@@ -109,7 +109,7 @@ export function useInitiateSquareConnect() {
 
       return await fastApiClient.initiateSquareConnect(session.access_token)
     },
-    onError: error => {
+    onError: (error: Error) => {
       if (process.env.NODE_ENV === 'development')
         console.error('Square connection initiation failed:', error)
 
@@ -127,8 +127,8 @@ export function useDisconnectSquare() {
   const queryClient = useQueryClient()
   const supabase = createClient()
 
-  return useMutation<DisconnectResponse, Error, { connectionId: string }>({
-    mutationFn: async ({ connectionId }) => {
+  return useMutation({
+    mutationFn: async ({ connectionId }: { connectionId: string }): Promise<DisconnectResponse> => {
       const {
         data: { session },
       } = await supabase.auth.getSession()
@@ -147,7 +147,7 @@ export function useDisconnectSquare() {
 
       toast.success('Square disconnected successfully')
     },
-    onError: error => {
+    onError: (error: Error) => {
       if (process.env.NODE_ENV === 'development') console.error('Square disconnect failed:', error)
 
       const { title, description } = formatErrorForToast(error)
@@ -164,8 +164,14 @@ export function useSyncSquareCatalog() {
   const queryClient = useQueryClient()
   const supabase = createClient()
 
-  return useMutation<SyncStats, Error, { connectionId: string; fullSync?: boolean }>({
-    mutationFn: async ({ connectionId, fullSync = false }) => {
+  return useMutation({
+    mutationFn: async ({
+      connectionId,
+      fullSync = false,
+    }: {
+      connectionId: string
+      fullSync?: boolean
+    }): Promise<SyncStats> => {
       const {
         data: { session },
       } = await supabase.auth.getSession()
@@ -175,7 +181,7 @@ export function useSyncSquareCatalog() {
 
       return await fastApiClient.syncSquareCatalog(connectionId, fullSync, session.access_token)
     },
-    onSuccess: data => {
+    onSuccess: (data: SyncStats) => {
       // Invalidate connections and status to refresh last_sync_at using query key factory
       queryClient.invalidateQueries({ queryKey: queryKeys.square.connections() })
       queryClient.invalidateQueries({ queryKey: queryKeys.square.status() })
@@ -184,11 +190,32 @@ export function useSyncSquareCatalog() {
       const message = `Catalog synced: ${data.products_created || 0} created, ${data.products_updated || 0} updated`
       toast.success(message)
     },
-    onError: error => {
+    onError: (error: Error, variables: { connectionId: string; fullSync?: boolean }) => {
       if (process.env.NODE_ENV === 'development') console.error('Catalog sync failed:', error)
 
+      const parsedError = parseBackendError(error)
       const { title, description } = formatErrorForToast(error)
-      toast.error(title, { description })
+
+      // For duplicate key errors during incremental sync, suggest full sync
+      if (
+        parsedError.type === 'constraint' &&
+        parsedError.technical?.includes('products_sku_key') &&
+        !variables.fullSync
+      ) {
+        toast.error(title, {
+          description: description,
+          duration: 8000, // Longer duration for actionable errors
+          action: {
+            label: 'Force Full Sync',
+            onClick: () => {
+              // The component should handle this by showing a confirmation dialog
+              // and calling the mutation again with fullSync: true
+            },
+          },
+        })
+      } else {
+        toast.error(title, { description })
+      }
     },
   })
 }
@@ -201,8 +228,14 @@ export function useSyncSquareInventory() {
   const queryClient = useQueryClient()
   const supabase = createClient()
 
-  return useMutation<SyncStats, Error, { connectionId: string; fullSync?: boolean }>({
-    mutationFn: async ({ connectionId, fullSync = false }) => {
+  return useMutation({
+    mutationFn: async ({
+      connectionId,
+      fullSync = false,
+    }: {
+      connectionId: string
+      fullSync?: boolean
+    }): Promise<SyncStats> => {
       const {
         data: { session },
       } = await supabase.auth.getSession()
@@ -212,7 +245,7 @@ export function useSyncSquareInventory() {
 
       return await fastApiClient.syncSquareInventory(connectionId, fullSync, session.access_token)
     },
-    onSuccess: data => {
+    onSuccess: (data: SyncStats) => {
       // Invalidate connections, status, and batch queries using query key factory
       queryClient.invalidateQueries({ queryKey: queryKeys.square.connections() })
       queryClient.invalidateQueries({ queryKey: queryKeys.square.status() })
@@ -222,7 +255,7 @@ export function useSyncSquareInventory() {
       const message = `Inventory synced: ${data.batches_updated || 0} batches updated`
       toast.success(message)
     },
-    onError: error => {
+    onError: (error: Error) => {
       if (process.env.NODE_ENV === 'development') console.error('Inventory sync failed:', error)
 
       const parsedError = parseBackendError(error)
@@ -252,12 +285,16 @@ export function useSyncSquareOrders() {
   const queryClient = useQueryClient()
   const supabase = createClient()
 
-  return useMutation<
-    SyncStats,
-    Error,
-    { connectionId: string; daysBack?: number; fullSync?: boolean }
-  >({
-    mutationFn: async ({ connectionId, daysBack = 7, fullSync = false }) => {
+  return useMutation({
+    mutationFn: async ({
+      connectionId,
+      daysBack = 7,
+      fullSync = false,
+    }: {
+      connectionId: string
+      daysBack?: number
+      fullSync?: boolean
+    }): Promise<SyncStats> => {
       const {
         data: { session },
       } = await supabase.auth.getSession()
@@ -272,7 +309,7 @@ export function useSyncSquareOrders() {
         session.access_token,
       )
     },
-    onSuccess: data => {
+    onSuccess: (data: SyncStats) => {
       // Invalidate connections, status, and batch queries using query key factory
       queryClient.invalidateQueries({ queryKey: queryKeys.square.connections() })
       queryClient.invalidateQueries({ queryKey: queryKeys.square.status() })
@@ -282,7 +319,7 @@ export function useSyncSquareOrders() {
       const message = `Orders synced: ${data.orders_fetched || 0} orders processed`
       toast.success(message)
     },
-    onError: error => {
+    onError: (error: Error) => {
       if (process.env.NODE_ENV === 'development') console.error('Orders sync failed:', error)
 
       const { title, description } = formatErrorForToast(error)
@@ -298,9 +335,9 @@ export function useSyncSquareOrders() {
 export function useSquareStatusPolling(enabled: boolean = false) {
   const supabase = createClient()
 
-  return useQuery<SquareConnectionStatus, Error>({
+  return useQuery({
     queryKey: queryKeys.square.statusPolling(),
-    queryFn: async () => {
+    queryFn: async (): Promise<SquareConnectionStatus> => {
       const {
         data: { session },
       } = await supabase.auth.getSession()

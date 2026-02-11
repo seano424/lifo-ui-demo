@@ -12,7 +12,7 @@ const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElemen
     <div
       ref={ref}
       className={cn(
-        'rounded-2xl flex flex-col gap-2 bg-card text-card-foreground ',
+        'rounded-2xl flex flex-col gap-2 text-card-foreground',
         className,
         // {
         //   'shadow-primary-300 shadow-xl': shadow === 'primary',

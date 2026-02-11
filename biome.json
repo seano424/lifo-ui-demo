@@ -26,6 +26,7 @@
       "!out/**",
       "!build/**",
       "!dist/**",
+      "!docs/wireframes/**",
       "!next-env.d.ts",
       "!types/supabase.ts",
       "!*.env*",
@@ -93,6 +94,7 @@
       "!out/**",
       "!build/**",
       "!dist/**",
+      "!docs/wireframes/**",
       "!next-env.d.ts",
       "!types/supabase.ts",
       "!docs/wireframes/**"

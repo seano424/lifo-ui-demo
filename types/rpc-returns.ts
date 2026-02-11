@@ -542,7 +542,7 @@ export interface BatchTrackingConfig {
   enabled: boolean
   setup_completed: boolean
   setup_completed_at?: string
-  product_selection_mode?: 'all' | 'categories' | 'products'
+  product_selection_mode?: 'all' | 'by_category' | 'individual'
   selected_category_ids?: string[]
   selected_product_ids?: string[]
   automation_schedule?: AutomationSchedule
@@ -574,12 +574,17 @@ export interface ProductTrackingOverride {
 }
 
 /** Response from save_batch_tracking_setup */
-export interface SaveBatchTrackingSetupResponse {
-  success: boolean
-  setup_completed: boolean
-  categories_updated: number
-  products_updated: number
-}
+export type SaveBatchTrackingSetupResponse =
+  | {
+      success: true
+      setup_completed: boolean
+      categories_updated: number
+      products_updated: number
+    }
+  | {
+      success: false
+      error: string
+    }
 
 /** Category with tracking settings from get_categories_with_tracking_settings */
 export interface CategoryWithTrackingSettings {
@@ -601,8 +606,8 @@ export interface ProductWithTrackingSettings {
   brand: string | null
   barcode: string | null
   image_url: string | null
-  category_id: string
-  category_name: string
+  category_id: string | null
+  category_name: string | null
   typical_shelf_life_days: number | null
   is_tracked_for_batches: boolean
   shelf_life_override_days: number | null

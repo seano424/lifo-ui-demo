@@ -656,15 +656,157 @@
       "title": "Bienvenue sur lifo AI, {name} !",
       "subtitle": "Suivez les produits par dates d'expiration. Créez des lots, consultez les articles qui expirent et recevez des notifications sur les lots qui expirent."
     },
+    "batchTracking": {
+      "title": "Configurer le suivi des lots (recommandé)",
+      "description": "Configurez comment LIFO suit votre inventaire",
+      "activeStore": "magasin actif",
+      "configuringFor": "Configuration du suivi des lots pour",
+      "shelfLifeChip": {
+        "manual": "Manuel",
+        "daysUnit": "j"
+      },
+      "steps": {
+        "squareConnected": {
+          "title": "Square connecté avec succès",
+          "description": "Votre catalogue Square a été synchronisé. Configurons le suivi des lots.",
+          "connectionActive": "Connexion active",
+          "productsImported": "Produits",
+          "categoriesFound": "Catégories",
+          "nextSteps": "Ensuite, nous configurerons quels produits suivre et comment.",
+          "nextButton": "Suivant",
+          "syncing": {
+            "title": "Synchronisation de votre catalogue Square...",
+            "description": "Cela prend généralement quelques secondes. Veuillez patienter pendant que nous importons vos produits et catégories."
+          }
+        },
+        "whatToTrack": {
+          "title": "Que voulez-vous suivre ?",
+          "description": "Choisissez les catégories à suivre et définissez la durée de conservation par défaut. Lors de l'arrivée des livraisons, nous calculerons automatiquement les dates d'expiration. Choisissez \"Saisie manuelle\" pour les catégories où vous préférez saisir les dates vous-même.",
+          "sections": {
+            "categories": "Catégories de produits",
+            "food": "Catégories alimentaires",
+            "nonFood": "Catégories non alimentaires",
+            "uncategorized": "Produits non catégorisés"
+          },
+          "noFoodCategories": "Aucune catégorie alimentaire trouvée",
+          "noCategories": "Aucune catégorie trouvée",
+          "selectAll": "Tout sélectionner",
+          "deselectAll": "Tout désélectionner",
+          "selectAllCategories": "Toutes les catégories",
+          "selecteAllProducts": "Tous les produits",
+          "buttons": {
+            "allToManual": "Tout en saisie manuelle",
+            "back": "Retour",
+            "reset": "Réinitialiser",
+            "activate": "Activer"
+          },
+          "legend": {
+            "autoCalculate": "= calcul automatique à partir de la date de livraison",
+            "manualEntry": "= vous saisirez les dates par livraison"
+          },
+          "preview": {
+            "title": "Aperçu de votre tableau de bord",
+            "setOnDelivery": "Défini à la livraison",
+            "daysFromDelivery": "j depuis la livraison",
+            "tableHeaders": {
+              "product": "Produit",
+              "estExpiry": "Expiration estimée",
+              "qty": "Qté"
+            },
+            "sampleInfo": "Échantillon de {count} produits suivis · Tilde (~) = estimé à partir de la durée de conservation par défaut"
+          },
+          "infoBox": {
+            "message": "Ce sont des valeurs par défaut de départ. Votre équipe peut ajuster n'importe quelle date lors du traitement d'une livraison. Vous pouvez modifier tout cela plus tard dans les Paramètres."
+          },
+          "summary": {
+            "productsReady": "{count} produits prêts",
+            "autoCategories": "Catégories auto-datées :",
+            "manualCategories": "Catégories manuelles :",
+            "tracking": "Suivi de",
+            "of": "sur",
+            "products": "produits"
+          },
+          "category": {
+            "product": "produit",
+            "products": "produits",
+            "switchToManual": "Passer en saisie manuelle",
+            "switchToAuto": "Passer en automatique"
+          },
+          "backButton": "Retour",
+          "nextButton": "Suivant"
+        },
+        "howToTrack": {
+          "title": "Comment devons-nous suivre les dates d'expiration ?",
+          "description": "Définissez une durée de conservation par défaut pour chaque catégorie. Lorsque les livraisons arrivent, nous calculerons automatiquement la date d'expiration. Choisissez \"Manuel\" pour les catégories où vous préférez entrer les dates vous-même.",
+          "sections": {
+            "categories": "Catégories de produits",
+            "defaultShelfLife": "Durée de conservation par défaut"
+          },
+          "infoBox": {
+            "message": "Ce sont les paramètres par défaut. Vous pourrez toujours les modifier plus tard dans les Paramètres."
+          },
+          "modes": {
+            "auto": {
+              "description": "Crée automatiquement des lots avec des dates d'expiration estimées basées sur",
+              "days": "jours de durée de conservation"
+            },
+            "manual": {
+              "description": "Vous entrerez manuellement les dates d'expiration lors du traitement des livraisons"
+            }
+          },
+          "summary": {
+            "title": "Résumé de la configuration",
+            "autoCategories": "Catégories automatiques",
+            "manualCategories": "Catégories manuelles",
+            "productOverrides": "Remplacements de produits"
+          },
+          "products": {
+            "expandButton": "Personnaliser les produits individuels",
+            "noProducts": "Aucun produit trouvé dans cette catégorie",
+            "showingLimit": "Affichage des 50 premiers produits. Vous pouvez en personnaliser davantage dans les Paramètres plus tard.",
+            "inheritsCategorySettings": "Hérite des paramètres de catégorie",
+            "customOverrideApplied": "Remplacement personnalisé appliqué",
+            "removeOverride": "Supprimer le remplacement"
+          },
+          "backButton": "Retour",
+          "resetButton": "Réinitialiser aux valeurs par défaut",
+          "activateButton": "Activer le suivi"
+        },
+        "activating": {
+          "title": "Activation du suivi des lots...",
+          "description": "Nous créons des lots pour vos catégories automatiques et configurons votre configuration. Cela ne prendra qu'un instant.",
+          "successTitle": "Suivi des lots activé !",
+          "successDescription": "Le suivi de votre inventaire est maintenant configuré et prêt."
+        },
+        "success": {
+          "title": "Suivi des lots activé !",
+          "description": "Le suivi de votre inventaire est maintenant configuré et prêt.",
+          "summary": {
+            "title": "Ce que nous avons configuré",
+            "autoCategories": "catégories automatiques",
+            "autoDescription": "Lots créés avec des dates d'expiration estimées",
+            "manualCategories": "catégories manuelles",
+            "manualDescription": "En attente de dates d'expiration réelles des livraisons",
+            "productOverrides": "remplacements de produits",
+            "overridesDescription": "Paramètres personnalisés pour des produits spécifiques"
+          },
+          "nextSteps": {
+            "title": "Prochaines étapes",
+            "step1": "Lors de votre prochaine livraison, LIFO créera automatiquement des lots avec les durées de conservation que vous avez définies",
+            "step2": "Les catégories manuelles apparaîtront dans 'Nécessite des dates d'expiration' jusqu'à ce que vous traitiez les livraisons",
+            "step3": "Vous pouvez ajuster n'importe quelle catégorie ou durée de conservation à tout moment dans les Paramètres"
+          },
+          "goToDashboard": "Aller au tableau de bord"
+        }
+      }
+    },
     "sidebar": {
       "title": "Votre liste de configuration",
       "subtitle": "Commencez avec votre gestion d'inventaire en ajoutant vos premiers produits. Voici quelques actions rapides pour vous aider à démarrer.",
       "complete": "terminé",
       "steps": {
-        "createAccount": "Créez votre compte",
-        "addStore": "Ajoutez votre magasin",
-        "createBatch": "Créez votre premier lot",
-        "setupNotifications": "Configurez les notifications"
+        "connectSquare": "Connectez votre compte Square",
+        "batchTracking": "Configurer le suivi des lots (recommandé)"
       }
     },
     "steps": {
@@ -674,7 +816,9 @@
       },
       "addStore": {
         "title": "Connectez votre compte Square",
+        "titleConnected": "Compte Square connecté !",
         "description": "Suivez les produits par dates d'expiration. Créez des lots, consultez les articles qui expirent et recevez des notifications sur les lots qui expirent.",
+        "descriptionConnected": "Suivez les produits par dates d'expiration. Consultez les articles qui expirent et recevez des notifications sur les produits qui expirent.",
         "realTime": "Temps réel",
         "recommended": "Recommandé",
         "squareDescription": "Connectez votre compte Square pour configurer le suivi en temps réel des produits par dates d'expiration",
@@ -686,14 +830,174 @@
         "importCSV": "Importer un CSV",
         "manualEntry": "Ajouter manuellement vos informations de magasin",
         "manualEntryDescription": "Ajoutez vos informations de magasin manuellement en entrant les champs requis ci-dessous.",
-        "manualEntryButton": "Ajouter le magasin"
+        "manualEntryButton": "Ajouter le magasin",
+        "loadingStores": "Chargement de vos magasins...",
+        "yourStores": "Vos magasins",
+        "products": "Produits",
+        "categories": "Catégories",
+        "activeStore": "Magasin actif",
+        "syncHealth": {
+          "noData": "Aucune donnée",
+          "healthy": "Sain",
+          "empty": "Vide",
+          "stale": "Obsolète",
+          "error": "Erreur"
+        },
+        "syncStatus": "Statut de synchronisation",
+        "lastSynced": "Dernière synchronisation",
+        "importSummary": {
+          "title": "Résumé de l'importation",
+          "subtitle": "Aperçu de votre synchronisation de catalogue Square",
+          "syncing": "Synchronisation de votre catalogue...",
+          "squareConnected": "Square connecté",
+          "storesSynced": "{syncedCount} sur {totalCount} magasins synchronisés",
+          "catalogImported": "Catalogue importé",
+          "setBatchTracking": "Configurer le suivi des lots",
+          "configureRules": "Configurez les règles de date d'expiration pour vos produits",
+          "total": "Total",
+          "continueButton": "Continuer vers la configuration du suivi des lots",
+          "returnNote": "Vous pouvez toujours revenir pour gérer votre connexion Square"
+        },
+        "timeAgo": {
+          "justNow": "À l'instant",
+          "minAgo": "Il y a {minutes} min",
+          "hourAgo": "Il y a {hours}h",
+          "dayAgo": "Il y a {days}j"
+        },
+        "integrations": {
+          "title": "Intégrations disponibles",
+          "subtitle": "Connectez votre système de point de vente pour importer automatiquement les produits et suivre l'inventaire"
+        },
+        "storesConnected": "{count} magasins connectés depuis Square",
+        "helpNote": "Les produits et catégories sont importés depuis votre catalogue Square. LIFO ajoute le suivi des dates d'expiration par lot en plus de vos données produit existantes."
       },
-      "createBatch": {
-        "title": "Créez votre premier lot",
-        "description": "Commencez à suivre votre inventaire en créant votre premier lot de produits.",
-        "placeholder": "Création de lot bientôt disponible",
-        "placeholderDescription": "Nous développons l'assistant de création de lots. Cela vous permettra d'ajouter des produits, de définir des dates d'expiration et de gérer l'inventaire.",
-        "createButton": "Créer un nouveau lot"
+      "batchTracking": {
+        "title": "Configurer le suivi des lots (recommandé)",
+        "description": "Configurez comment LIFO suit votre inventaire",
+        "activeStore": "magasin actif",
+        "steps": {
+          "squareConnected": {
+            "title": "Square connecté avec succès",
+            "description": "Votre catalogue Square a été synchronisé. Configurons le suivi des lots.",
+            "connectionActive": "Connexion active",
+            "productsImported": "Produits",
+            "categoriesFound": "Catégories",
+            "nextSteps": "Ensuite, nous configurerons quels produits suivre et comment.",
+            "nextButton": "Suivant",
+            "syncing": {
+              "title": "Synchronisation de votre catalogue Square...",
+              "description": "Cela prend généralement quelques secondes. Veuillez patienter pendant que nous importons vos produits et catégories."
+            }
+          },
+          "whatToTrack": {
+            "title": "Que voulez-vous suivre ?",
+            "description": "Choisissez les catégories à suivre et définissez la durée de conservation par défaut. Lors de l'arrivée des livraisons, nous calculerons automatiquement les dates d'expiration. Choisissez \"Saisie manuelle\" pour les catégories où vous préférez saisir les dates vous-même.",
+            "sections": {
+              "food": "Catégories alimentaires",
+              "nonFood": "Catégories non alimentaires",
+              "uncategorized": "Produits non catégorisés"
+            },
+            "noFoodCategories": "Aucune catégorie alimentaire trouvée",
+            "noCategories": "Aucune catégorie trouvée",
+            "selectAll": "Tout sélectionner",
+            "deselectAll": "Tout désélectionner",
+            "selectAllCategories": "Toutes les catégories",
+            "selecteAllProducts": "Tous les produits",
+            "buttons": {
+              "allToManual": "Tout en saisie manuelle",
+              "back": "Retour",
+              "reset": "Réinitialiser",
+              "activate": "Activer"
+            },
+            "legend": {
+              "autoCalculate": "= calcul automatique à partir de la date de livraison",
+              "manualEntry": "= vous saisirez les dates par livraison"
+            },
+            "preview": {
+              "title": "Aperçu de votre tableau de bord",
+              "setOnDelivery": "Défini à la livraison",
+              "daysFromDelivery": "j depuis la livraison",
+              "tableHeaders": {
+                "product": "Produit",
+                "estExpiry": "Expiration estimée",
+                "qty": "Qté"
+              },
+              "sampleInfo": "Échantillon de {count} produits suivis · Tilde (~) = estimé à partir de la durée de conservation par défaut"
+            },
+            "infoBox": {
+              "message": "Ce sont des valeurs par défaut de départ. Votre équipe peut ajuster n'importe quelle date lors du traitement d'une livraison. Vous pouvez modifier tout cela plus tard dans les Paramètres."
+            },
+            "summary": {
+              "productsReady": "{count} produits prêts",
+              "autoCategories": "Catégories auto-datées :",
+              "manualCategories": "Catégories manuelles :",
+              "tracking": "Suivi de",
+              "of": "sur",
+              "products": "produits"
+            },
+            "category": {
+              "product": "produit",
+              "products": "produits",
+              "switchToManual": "Passer en saisie manuelle",
+              "switchToAuto": "Passer en automatique"
+            },
+            "backButton": "Retour",
+            "nextButton": "Suivant"
+          },
+          "howToTrack": {
+            "title": "Comment devons-nous les suivre ?",
+            "description": "Configurez la durée de conservation et le mode de suivi pour chaque catégorie. Vous pouvez personnaliser les produits individuels dans chaque catégorie si nécessaire.",
+            "sections": {
+              "categories": "Catégories",
+              "defaultShelfLife": "Durée de conservation par défaut"
+            },
+            "infoBox": {
+              "message": "Ce sont les paramètres par défaut. Vous pourrez toujours les modifier plus tard dans les Paramètres."
+            },
+            "modes": {
+              "auto": {
+                "description": "Crée automatiquement des lots avec des dates d'expiration estimées basées sur",
+                "days": "jours de durée de conservation"
+              },
+              "manual": {
+                "description": "Vous entrerez manuellement les dates d'expiration lors du traitement des livraisons"
+              }
+            },
+            "summary": {
+              "title": "Résumé de la configuration",
+              "autoCategories": "Catégories automatiques",
+              "manualCategories": "Catégories manuelles",
+              "productOverrides": "Remplacements de produits"
+            },
+            "backButton": "Retour",
+            "resetButton": "Réinitialiser aux valeurs par défaut",
+            "activateButton": "Activer le suivi"
+          },
+          "activating": {
+            "title": "Activation du suivi des lots...",
+            "description": "Nous créons des lots pour vos catégories automatiques et configurons votre configuration. Cela ne prendra qu'un instant."
+          },
+          "success": {
+            "title": "Suivi des lots activé !",
+            "description": "Le suivi de votre inventaire est maintenant configuré et prêt.",
+            "summary": {
+              "title": "Ce que nous avons configuré",
+              "autoCategories": "catégories automatiques",
+              "autoDescription": "Lots créés avec des dates d'expiration estimées",
+              "manualCategories": "catégories manuelles",
+              "manualDescription": "En attente de dates d'expiration réelles des livraisons",
+              "productOverrides": "remplacements de produits",
+              "overridesDescription": "Paramètres personnalisés pour des produits spécifiques"
+            },
+            "nextSteps": {
+              "title": "Prochaines étapes",
+              "step1": "Lors de votre prochaine livraison, LIFO créera automatiquement des lots avec les durées de conservation que vous avez définies",
+              "step2": "Les catégories manuelles apparaîtront dans 'Nécessite des dates d'expiration' jusqu'à ce que vous traitiez les livraisons",
+              "step3": "Vous pouvez ajuster n'importe quelle catégorie ou durée de conservation à tout moment dans les Paramètres"
+            },
+            "goToDashboard": "Aller au tableau de bord"
+          }
+        }
       },
       "notifications": {
         "title": "Configurez les notifications",

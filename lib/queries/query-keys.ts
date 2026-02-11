@@ -10,6 +10,7 @@ export const queryKeys = {
     all: ['stores'] as const,
     userStores: (userId: string) => [...queryKeys.stores.all, 'userStores', userId] as const,
     detail: (storeId: string) => [...queryKeys.stores.all, 'detail', storeId] as const,
+    overviews: () => [...queryKeys.stores.all, 'overviews'] as const,
   },
 
   // Dashboard overview queries
@@ -355,6 +356,25 @@ export const queryKeys = {
     statusPolling: () => [...queryKeys.square.all, 'status', 'polling'] as const,
     connections: () => [...queryKeys.square.all, 'connections'] as const,
     connectionsByStore: (storeId: string) => [...queryKeys.square.connections(), storeId] as const,
+  },
+
+  // Batch tracking onboarding queries
+  batchTrackingOnboarding: {
+    all: ['batch-tracking-onboarding'] as const,
+    config: (storeId: string) =>
+      [...queryKeys.batchTrackingOnboarding.all, 'config', storeId] as const,
+    categories: (storeId: string) =>
+      [...queryKeys.batchTrackingOnboarding.all, 'categories', storeId] as const,
+    products: (
+      storeId: string,
+      filters: {
+        categoryId?: string | null
+        searchTerm?: string | null
+        onlyTracked?: boolean | null
+        pageSize?: number
+        offset?: number
+      },
+    ) => [...queryKeys.batchTrackingOnboarding.all, 'products', storeId, filters] as const,
   },
 
   // Keep fastapi namespace for any remaining direct calls (deprecated)
