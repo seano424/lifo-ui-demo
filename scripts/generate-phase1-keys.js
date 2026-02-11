@@ -116,8 +116,8 @@ function getAllCodeContent() {
 
   files.forEach(file => {
     try {
-      content += fs.readFileSync(file, 'utf8') + '\n'
-    } catch (error) {
+      content += `${fs.readFileSync(file, 'utf8')}\n`
+    } catch (_error) {
       // Skip files that can't be read
     }
   })
@@ -133,14 +133,13 @@ function findUsedNamespaces(codeContent) {
 
   // Match useTranslations('namespace')
   const useTranslationsPattern = /useTranslations\(['"]([^'"]+)['"]\)/g
-  let match
-  while ((match = useTranslationsPattern.exec(codeContent)) !== null) {
+  for (const match of codeContent.matchAll(useTranslationsPattern)) {
     namespaces.add(match[1])
   }
 
   // Match getTranslations('namespace')
   const getTranslationsPattern = /getTranslations\(['"]([^'"]+)['"]\)/g
-  while ((match = getTranslationsPattern.exec(codeContent)) !== null) {
+  for (const match of codeContent.matchAll(getTranslationsPattern)) {
     namespaces.add(match[1])
   }
 
@@ -240,7 +239,7 @@ function main() {
 
   // Write to file
   const outputFile = path.join(process.cwd(), 'scripts', 'phase1-keys.json')
-  fs.writeFileSync(outputFile, JSON.stringify(keysToRemove, null, 2) + '\n')
+  fs.writeFileSync(outputFile, `${JSON.stringify(keysToRemove, null, 2)}\n`)
 
   console.log(`\n💾 Saved to: ${outputFile}`)
   console.log(`\n💡 Next step:`)

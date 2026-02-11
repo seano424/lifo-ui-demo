@@ -99,7 +99,7 @@ function removeKeysFromFile(language, filename, keysToRemove) {
   cleanupEmptyObjects(translations)
 
   // Write back to file with pretty formatting
-  fs.writeFileSync(filePath, JSON.stringify(translations, null, 2) + '\n', 'utf8')
+  fs.writeFileSync(filePath, `${JSON.stringify(translations, null, 2)}\n`, 'utf8')
 
   return { removed, notFound }
 }
@@ -157,7 +157,7 @@ function main() {
     }
   }
 
-  console.log('\n' + '='.repeat(80))
+  console.log(`\n${'='.repeat(80)}`)
   console.log('✨ Cleanup Complete!\n')
   console.log(`📊 Results:`)
   console.log(`   Total keys removed: ${totalRemoved}`)

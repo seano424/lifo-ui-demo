@@ -109,8 +109,8 @@ describe('Unused Translation Keys', () => {
 
     files.forEach(file => {
       try {
-        content += fs.readFileSync(file, 'utf8') + '\n'
-      } catch (error) {
+        content += `${fs.readFileSync(file, 'utf8')}\n`
+      } catch (_error) {
         // Skip files that can't be read
       }
     })
@@ -201,14 +201,13 @@ describe('Unused Translation Keys', () => {
 
     // Match useTranslations('namespace') or useTranslations("namespace")
     const useTranslationsPattern = /useTranslations\(['"]([^'"]+)['"]\)/g
-    let match: RegExpExecArray | null
-    while ((match = useTranslationsPattern.exec(codeContent)) !== null) {
+    for (const match of codeContent.matchAll(useTranslationsPattern)) {
       namespaces.add(match[1])
     }
 
     // Match getTranslations('namespace') or getTranslations("namespace")
     const getTranslationsPattern = /getTranslations\(['"]([^'"]+)['"]\)/g
-    while ((match = getTranslationsPattern.exec(codeContent)) !== null) {
+    for (const match of codeContent.matchAll(getTranslationsPattern)) {
       namespaces.add(match[1])
     }
 

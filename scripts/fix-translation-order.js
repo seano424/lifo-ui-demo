@@ -83,7 +83,7 @@ function processFile(filename) {
     const reordered = reorderKeys(targetObj, referenceObj)
 
     // Write back to file
-    fs.writeFileSync(targetPath, JSON.stringify(reordered, null, 2) + '\n', 'utf8')
+    fs.writeFileSync(targetPath, `${JSON.stringify(reordered, null, 2)}\n`, 'utf8')
 
     console.log(`   ✅ ${lang}: Reordered to match ${REFERENCE_LANG}`)
   }
@@ -115,7 +115,7 @@ function main() {
   // Process each file
   files.forEach(processFile)
 
-  console.log('\n' + '='.repeat(80))
+  console.log(`\n${'='.repeat(80)}`)
   console.log('✨ Translation order fixed!\n')
   console.log('💡 Next step: npm run test:translations:consistency\n')
 }
