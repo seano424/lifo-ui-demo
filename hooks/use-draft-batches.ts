@@ -16,8 +16,6 @@ import {
   DraftBatchesByProductSchema,
   ActivateDraftBatchResponseSchema,
   IgnoreDraftBatchResponseSchema,
-  LogDeliveryResponseSchema,
-  RecentDeliveryProductSchema,
 } from '@/lib/validation/rpc-schemas'
 import type {
   DraftBatchesSummaryResponse,
@@ -25,9 +23,6 @@ import type {
   DraftBatchesByProduct,
   ActivateDraftBatchResponse,
   IgnoreDraftBatchResponse,
-  DeliveryResultItem,
-  LogDeliveryResponse,
-  RecentDeliveryProduct,
 } from '@/types/rpc-returns'
 
 // ============================================================================
@@ -41,17 +36,6 @@ export type {
   DraftBatchesByProduct as ProductWithDraftBatches,
   ActivateDraftBatchResponse as ActivateDraftBatchResult,
   IgnoreDraftBatchResponse as IgnoreDraftBatchResult,
-  DeliveryResultItem as DeliveryItemResult,
-  LogDeliveryResponse as LogDeliveryResult,
-  RecentDeliveryProduct,
-}
-
-/**
- * Item for delivery logging (input parameter type)
- */
-export interface DeliveryItem {
-  product_id: string
-  quantity: number
 }
 
 /**
@@ -148,50 +132,6 @@ async function fetchDraftBatchesByProduct(
   )
 }
 
-/**
- * Fetch recent delivery products for quick re-delivery
- */
-async function fetchRecentDeliveryProducts(
-  storeId: string,
-  limit: number = 20,
-): Promise<RecentDeliveryProduct[]> {
-  const supabase = createClient()
-  const context = 'fetchRecentDeliveryProducts'
-
-  return withPerformanceTracking(
-    context,
-    'Fetch recent delivery products',
-    { storeId, limit },
-    async () => {
-      const { data, error } = await supabase
-        .schema('inventory')
-        .rpc('get_recent_delivery_products', {
-          p_store_id: storeId,
-          p_limit: limit,
-        })
-
-      if (error) {
-        logger.queryWarn(context, 'RPC error', {
-          error: error.message,
-          code: error.code,
-          storeId,
-          limit,
-        })
-        throw new Error(`Failed to fetch recent delivery products: ${error.message}`)
-      }
-
-      const results = validateRpcArray(data, RecentDeliveryProductSchema, context)
-
-      logger.log(context, 'Recent delivery products fetched', {
-        storeId,
-        productCount: results.length,
-      })
-
-      return results
-    },
-  )
-}
-
 // ============================================================================
 // REACT QUERY HOOKS
 // ============================================================================
@@ -241,26 +181,6 @@ export function useDraftBatchesByProduct(
     queryFn: () => fetchDraftBatchesByProduct(effectiveStoreId!, options),
     enabled: !!effectiveStoreId,
     staleTime: 2 * 60 * 1000, // 2 minutes
-  })
-}
-
-/**
- * Hook to fetch recent delivery products for quick re-delivery
- *
- * @example
- * ```tsx
- * const { data: recentProducts } = useRecentDeliveryProducts(10)
- * ```
- */
-export function useRecentDeliveryProducts(limit: number = 20, storeId?: string) {
-  const activeStoreId = useActiveStoreId()
-  const effectiveStoreId = storeId || activeStoreId
-
-  return useQuery({
-    queryKey: queryKeys.batches.recentDeliveries(effectiveStoreId || '', limit),
-    queryFn: () => fetchRecentDeliveryProducts(effectiveStoreId!, limit),
-    enabled: !!effectiveStoreId,
-    staleTime: 5 * 60 * 1000, // 5 minutes
   })
 }
 
@@ -634,124 +554,6 @@ export function useIgnoreDraftBatch() {
   })
 }
 
-/**
- * Hook to log a delivery and create draft batches
- *
- * @example
- * ```tsx
- * const { mutateAsync: logDelivery, isPending } = useLogDelivery()
- *
- * const result = await logDelivery({
- *   items: [
- *     { product_id: 'product-1', quantity: 24 },
- *     { product_id: 'product-2', quantity: 12 }
- *   ]
- * })
- * ```
- */
-export function useLogDelivery() {
-  const queryClient = useQueryClient()
-  const supabase = createClient()
-  const activeStoreId = useActiveStoreId()
-
-  return useMutation({
-    mutationFn: async (params: {
-      items: DeliveryItem[]
-      userId?: string
-    }): Promise<LogDeliveryResponse> => {
-      const context = 'logDelivery'
-
-      if (!activeStoreId) {
-        throw new Error('No active store selected')
-      }
-
-      if (!params.items || params.items.length === 0) {
-        throw new Error('At least one delivery item is required')
-      }
-
-      // Get current user if userId not provided
-      let userId = params.userId
-      if (!userId) {
-        const {
-          data: { user },
-        } = await supabase.auth.getUser()
-        if (!user) {
-          throw new Error('User not authenticated')
-        }
-        userId = user.id
-      }
-
-      logger.log(context, 'Starting delivery logging', {
-        storeId: activeStoreId,
-        itemCount: params.items.length,
-        userId,
-      })
-
-      const startTime = performance.now()
-      const { data, error } = await supabase.schema('inventory').rpc('log_delivery_create_drafts', {
-        p_store_id: activeStoreId,
-        p_user_id: userId,
-        // Supabase types JSONB RPC parameters as Json - we need to cast the typed array to match
-        p_items: params.items as never,
-      })
-      const endTime = performance.now()
-
-      logger.log(context, `Log delivery RPC completed in ${(endTime - startTime).toFixed(2)}ms`, {
-        success: !error,
-        storeId: activeStoreId,
-        itemCount: params.items.length,
-      })
-
-      if (error) {
-        logger.error(context, 'RPC error', { error, storeId: activeStoreId })
-        throw error
-      }
-
-      return validateRpcResult(data, LogDeliveryResponseSchema, context)
-    },
-
-    onSuccess: (result, _variables) => {
-      if (result.success) {
-        toast.success('Delivery logged successfully', {
-          description: `Created ${result.drafts_created} draft batch${result.drafts_created !== 1 ? 'es' : ''} for ${result.total_items} product${result.total_items !== 1 ? 's' : ''}`,
-        })
-
-        // Invalidate all batch-related queries for the store
-        if (activeStoreId) {
-          queryClient.invalidateQueries({
-            queryKey: queryKeys.batches.byStore(activeStoreId),
-          })
-
-          // Invalidate product queries as stock levels changed
-          queryClient.invalidateQueries({
-            queryKey: queryKeys.products.byStore(activeStoreId),
-          })
-
-          // Invalidate recent deliveries query
-          queryClient.invalidateQueries({
-            queryKey: queryKeys.batches.recentDeliveries(activeStoreId),
-          })
-        }
-      } else {
-        toast.warning('Delivery partially logged', {
-          description: `${result.drafts_created} of ${result.total_items} items processed`,
-        })
-      }
-    },
-
-    onError: (error: Error, variables) => {
-      logger.error('logDelivery', 'Mutation error', {
-        error,
-        itemCount: variables.items.length,
-        storeId: activeStoreId,
-      })
-      toast.error('Failed to log delivery', {
-        description: error.message,
-      })
-    },
-  })
-}
-
 // ============================================================================
 // CONVENIENCE HOOKS
 // ============================================================================
@@ -764,51 +566,40 @@ export function useLogDelivery() {
  * const {
  *   summary,
  *   draftsByProduct,
- *   recentProducts,
  *   activateBatch,
  *   ignoreBatch,
- *   logDelivery,
  *   isActivating,
- *   isIgnoring,
- *   isLoggingDelivery
+ *   isIgnoring
  * } = useDraftBatchManagement()
  * ```
  */
 export function useDraftBatchManagement(storeId?: string) {
   const summary = useDraftBatchesSummary(storeId)
   const draftsByProduct = useDraftBatchesByProduct({}, storeId)
-  const recentProducts = useRecentDeliveryProducts(20, storeId)
   const activateMutation = useActivateDraftBatch()
   const ignoreMutation = useIgnoreDraftBatch()
-  const logDeliveryMutation = useLogDelivery()
 
   return {
     // Query data
     summary: summary.data,
     draftsByProduct: draftsByProduct.data,
-    recentProducts: recentProducts.data,
 
     // Query states
     isSummaryLoading: summary.isLoading,
     isDraftsByProductLoading: draftsByProduct.isLoading,
-    isRecentProductsLoading: recentProducts.isLoading,
 
     // Mutations
     activateBatch: activateMutation.mutateAsync,
     ignoreBatch: ignoreMutation.mutateAsync,
-    logDelivery: logDeliveryMutation.mutateAsync,
 
     // Mutation states
     isActivating: activateMutation.isPending,
     isIgnoring: ignoreMutation.isPending,
-    isLoggingDelivery: logDeliveryMutation.isPending,
 
     // Raw query/mutation objects for advanced usage
     summaryQuery: summary,
     draftsByProductQuery: draftsByProduct,
-    recentProductsQuery: recentProducts,
     activateMutation,
     ignoreMutation,
-    logDeliveryMutation,
   }
 }
