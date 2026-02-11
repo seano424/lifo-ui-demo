@@ -52,7 +52,7 @@ export function StepCombinedTracking({
   onBack,
 }: StepCombinedTrackingProps) {
   const t = useTranslations('setupFlow.batchTracking.steps')
-  const [previewOpen, setPreviewOpen] = useState(true) // Auto-expand preview
+  const [previewOpen, setPreviewOpen] = useState(false)
 
   const enabledIds = new Set(enabledCategories.map(c => c.id))
   const trackedProducts = enabledCategories.reduce((sum, cat) => sum + cat.productCount, 0)
@@ -190,7 +190,8 @@ export function StepCombinedTracking({
         {enabledCategories.length > 0 && (
           <Typography
             variant="small"
-            className="flex flex-col sm:flex-row items-center gap-4 py-4 border-t border-muted mt-2"
+            color="secondary"
+            className="flex flex-col sm:flex-row items-center gap-4 border-t border-muted mt-2 justify-center pt-8 pb-4"
           >
             <span className="flex items-center gap-1.5">
               <Zap className="w-3 h-3" /> = auto-calculate from delivery date
@@ -202,7 +203,7 @@ export function StepCombinedTracking({
         )}
       </div>
 
-      {/* Preview Dashboard - Auto-expanded */}
+      {/* Preview Dashboard */}
       {enabledCategories.length > 0 && (
         <Card className="overflow-auto sm:overflow-hidden p-4 border border-muted rounded-lg shadow-sm">
           <button

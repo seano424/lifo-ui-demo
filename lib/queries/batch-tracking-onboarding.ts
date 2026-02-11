@@ -274,48 +274,57 @@ export function useSaveBatchTrackingSetup() {
         mode: params.config.product_selection_mode,
       })
 
-      const { data, error } = await supabase.rpc('save_batch_tracking_setup', {
-        p_store_id: params.storeId,
-        p_config: params.config,
-        p_category_settings: params.categorySettings,
-        p_product_overrides: params.productOverrides,
-      })
+      // Run both the actual save operation and a minimum delay in parallel
+      // This ensures users always see the loading state for at least 1.5 seconds
+      const [validated] = await Promise.all([
+        (async () => {
+          const { data, error } = await supabase.rpc('save_batch_tracking_setup', {
+            p_store_id: params.storeId,
+            p_config: params.config,
+            p_category_settings: params.categorySettings,
+            p_product_overrides: params.productOverrides,
+          })
 
-      if (error) {
-        logger.queryWarn(context, 'RPC error', {
-          error: error.message,
-          code: error.code,
-          storeId: params.storeId,
-        })
-        throw new Error(`Failed to save batch tracking setup: ${error.message}`)
-      }
+          if (error) {
+            logger.queryWarn(context, 'RPC error', {
+              error: error.message,
+              code: error.code,
+              storeId: params.storeId,
+            })
+            throw new Error(`Failed to save batch tracking setup: ${error.message}`)
+          }
 
-      // Validate response with Zod schema
-      let validated: SaveBatchTrackingSetupResponse
-      try {
-        validated = SaveBatchTrackingSetupResponseSchema.parse(data)
-      } catch (validationError) {
-        logger.error(context, 'Validation error', {
-          data,
-          error: validationError,
-        })
-        throw new Error('Invalid response from save operation')
-      }
+          // Validate response with Zod schema
+          let validated: SaveBatchTrackingSetupResponse
+          try {
+            validated = SaveBatchTrackingSetupResponseSchema.parse(data)
+          } catch (validationError) {
+            logger.error(context, 'Validation error', {
+              data,
+              error: validationError,
+            })
+            throw new Error('Invalid response from save operation')
+          }
 
-      // Check if the operation was successful
-      if (!validated.success) {
-        logger.queryWarn(context, 'Save operation failed', {
-          error: validated.error,
-          storeId: params.storeId,
-        })
-        throw new Error(`Failed to save batch tracking setup: ${validated.error}`)
-      }
+          // Check if the operation was successful
+          if (!validated.success) {
+            logger.queryWarn(context, 'Save operation failed', {
+              error: validated.error,
+              storeId: params.storeId,
+            })
+            throw new Error(`Failed to save batch tracking setup: ${validated.error}`)
+          }
 
-      logger.log(context, 'Batch tracking setup saved successfully', {
-        storeId: params.storeId,
-        categoriesUpdated: validated.categories_updated,
-        productsUpdated: validated.products_updated,
-      })
+          logger.log(context, 'Batch tracking setup saved successfully', {
+            storeId: params.storeId,
+            categoriesUpdated: validated.categories_updated,
+            productsUpdated: validated.products_updated,
+          })
+
+          return validated
+        })(),
+        new Promise(resolve => setTimeout(resolve, 4000)), // 4 second minimum (for testing)
+      ])
 
       return validated
     },

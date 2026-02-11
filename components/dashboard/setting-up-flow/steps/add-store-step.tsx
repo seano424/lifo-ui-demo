@@ -20,8 +20,6 @@ import {
   Store,
   Package,
   FolderTree,
-  ExternalLink,
-  Unlink,
   Clock,
   Check,
   ChevronDown,
@@ -161,7 +159,7 @@ function StoreCard({ store, isExpanded, onToggle, t }: StoreCardProps) {
 
           {/* Actions bar */}
           {/* NOTE: Sync buttons temporarily hidden during onboarding until backend UPSERT fix is deployed */}
-          <div className="p-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2">
+          {/* <div className="p-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2">
             <div className="flex items-center gap-2">
               <Button variant="outline" size="sm">
                 <ExternalLink className="w-4 h-4" />
@@ -172,7 +170,7 @@ function StoreCard({ store, isExpanded, onToggle, t }: StoreCardProps) {
               <Unlink className="w-4 h-4" />
               Disconnect
             </Button>
-          </div>
+          </div> */}
         </div>
       )}
     </div>
@@ -496,9 +494,9 @@ export function AddStoreStep() {
               Products and categories are imported from your Square catalog. LIFO adds batch-level
               expiry tracking on top of your existing product data.
             </Typography>
-            <Button variant="link" size="sm" className="mt-2 p-0 h-auto text-xs">
+            {/* <Button variant="link" size="sm" className="mt-2 p-0 h-auto text-xs">
               Learn more about Square sync →
-            </Button>
+            </Button> */}
           </div>
         </div>
       </div>
