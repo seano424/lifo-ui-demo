@@ -8,7 +8,8 @@
       "cancel": "Cancel",
       "scan": "Scan",
       "discount": "Discount",
-      "donate": "Donate"
+      "donate": "Donate",
+      "dismiss": "Dismiss"
     },
     "forms": {
       "productName": "Product Name",
@@ -214,7 +215,8 @@
     "more": "More",
     "aria": {
       "toggleTheme": "Toggle theme",
-      "selectLanguage": "Select language"
+      "selectLanguage": "Select language",
+      "toggle": "Toggle"
     },
     "buttons": {
       "back": "Back",

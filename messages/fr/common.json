@@ -8,7 +8,8 @@
       "cancel": "Annuler",
       "scan": "Scanner",
       "discount": "Remise",
-      "donate": "Faire un don"
+      "donate": "Faire un don",
+      "dismiss": "Rejeter"
     },
     "forms": {
       "productName": "Nom du produit",
@@ -214,7 +215,8 @@
     "more": "Plus",
     "aria": {
       "toggleTheme": "Changer le thème",
-      "selectLanguage": "Sélectionner la langue"
+      "selectLanguage": "Sélectionner la langue",
+      "toggle": "Basculer"
     },
     "buttons": {
       "back": "Retour",

@@ -457,48 +457,8 @@
     "itemCount": "{count} items"
   },
   "batchList": {
-    "errorLoadingBatches": "Error Loading Batches",
-    "unexpectedError": "An unexpected error occurred",
-    "currentBatches": "{count} current batches",
-    "filters": "Filters",
-    "search": "Search",
-    "searchBatches": "Search",
-    "status": "Status",
-    "allStatuses": "All statuses",
-    "active": "Active",
-    "expired": "Expired",
-    "damaged": "Damaged",
-    "soldOut": "Sold Out",
-    "reserved": "Reserved",
-    "expiringSoon": "Expiring Soon",
-    "allDates": "All dates",
-    "expiringInDays": "Expiring in {days} days",
-    "location": "Location",
-    "locationCode": "Location code...",
-    "stockStatus": "Stock Status",
-    "allStockLevels": "All stock levels",
-    "inStock": "In Stock",
-    "outOfStock": "Out of Stock",
-    "supplier": "Supplier",
-    "supplierName": "Supplier name...",
-    "clear": "Clear",
-    "clearFilters": "Clear Filters",
-    "loadingMore": "Loading more...",
-    "loadMoreBatches": "Load More Batches",
-    "showingBatches": "Showing {count} batches",
-    "filteredFrom": "(filtered from {total})",
-    "noBatchesFound": "No batches found",
-    "noBatchesYet": "No batches yet",
-    "tryAdjustingFilters": "Try adjusting your search or filters",
-    "productNoBatches": "This product has no batches yet",
-    "getStartedFirstBatch": "Get started by adding your first batch",
     "convenience": {
-      "expiringSoon": "Expiring Soon",
-      "noBatchesExpiringSoon": "No batches expiring soon",
-      "productBatches": "Product Batches",
-      "productNoBatches": "This product has no batches yet",
-      "lowStockAlert": "Low Stock Alert",
-      "allBatchesSufficientStock": "All batches have sufficient stock"
+      "expiringSoon": "Expiring Soon"
     }
   },
   "batchSort": {
@@ -597,15 +557,7 @@
     "deleteProduct": "Delete Product"
   },
   "dashboardNav": {
-    "projects": "Projects",
     "more": "More",
-    "viewProject": "View Project",
-    "shareProject": "Share Project",
-    "deleteProject": "Delete Project",
-    "kpiCard": {
-      "failedToLoad": "Failed to load data",
-      "viewDetails": "View details"
-    },
     "pages": {
       "dashboard": "Dashboard Overview",
       "notifications": "Coming Soon: Notifications",
@@ -628,26 +580,6 @@
       "batches": "View and manage your store's inventory batches",
       "products": "View and manage your store's product inventory",
       "dashboard": "Here's what needs your attention today."
-    }
-  },
-  "timeSelector": {
-    "periods": {
-      "thisWeek": "This Week",
-      "lastWeek": "Last Week",
-      "thisMonth": "This Month",
-      "lastMonth": "Last Month",
-      "last7Days": "Last 7 Days",
-      "last30Days": "Last 30 Days",
-      "allTime": "All Time"
-    },
-    "compareLabels": {
-      "lastWeek": "Last Week",
-      "previousWeek": "Previous Week",
-      "lastMonth": "Last Month",
-      "previousMonth": "Previous Month",
-      "previous7Days": "Previous 7 Days",
-      "previous30Days": "Previous 30 Days",
-      "previousYear": "Previous Year"
     }
   },
   "setupFlow": {

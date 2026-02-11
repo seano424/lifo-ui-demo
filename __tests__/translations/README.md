@@ -12,6 +12,7 @@ All translation tests are organized under the `test:translations:*` namespace:
 - `test:translations:consistency` - Test key structure and ordering
 - `test:translations:missing` - Find missing translation keys
 - `test:translations:hardcoded` - Detect hardcoded text
+- `test:translations:unused` - Find unused translation keys
 
 ### Quick Start
 
@@ -62,6 +63,32 @@ npm run test:translations:missing
 ```bash
 npm run test:translations:hardcoded
 ```
+
+#### 4. Unused Translation Keys Test
+
+**File:** `translation-unused-keys.test.ts`
+
+**Purpose:** Identifies translation keys that are not used in the codebase
+
+**Run:**
+
+```bash
+npm run test:translations:unused
+```
+
+**What it checks:**
+- ✅ Finds keys with no references in the codebase
+- ✅ Identifies keys from deleted routes (Phase 4 cleanup)
+- ✅ Detects potentially dynamic usage patterns
+- ✅ Excludes namespaces that are used dynamically (common, errors, validation)
+- ✅ Provides confidence levels for each finding
+
+**Output includes:**
+- Summary statistics
+- High-confidence unused keys (safe to remove)
+- Keys from deleted routes
+- Low-confidence keys (may be used dynamically - needs manual review)
+- Estimated cleanup impact
 
 ## 🔧 Maintenance Tools
 

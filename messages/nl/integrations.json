@@ -9,9 +9,19 @@
     "title": "Square POS",
     "description": "Synchroniseer producten, voorraad en bestellingen vanuit Square",
     "connect": "Verbind Square-account",
-    "disconnect": "Verbreek verbinding",
+    "disconnect": {
+      "title": "Square verbreken?",
+      "description": "Dit zal uw Square-integratie deactiveren.",
+      "warning": "Wat gebeurt er wanneer u de verbinding verbreekt:",
+      "warningSync": "Automatische synchronisatie stopt",
+      "warningReconnect": "U kunt op elk moment opnieuw verbinding maken",
+      "warningData": "Uw historische gegevens blijven behouden",
+      "disconnecting": "Verbinding verbreken...",
+      "disconnect": "Verbreek verbinding",
+      "confirm": "Ja, verbreek verbinding",
+      "cancel": "Annuleren"
+    },
     "connected": "Verbonden",
-    "notConnectedDescription": "Verbind uw Square-account om automatisch producten, voorraadniveaus en bestelgegevens te synchroniseren met lifo AI.",
     "merchantName": "Handelaarsnaam",
     "storeName": "Winkelnaam",
     "merchantId": "Handelaars-ID",
@@ -78,35 +88,8 @@
       "connectedStore": "Verbonden locatie",
       "connectedStores": "{count} locaties verbonden"
     },
-    "disconnect": {
-      "title": "Square verbreken?",
-      "description": "Dit zal uw Square-integratie deactiveren.",
-      "warning": "Wat gebeurt er wanneer u de verbinding verbreekt:",
-      "warningSync": "Automatische synchronisatie stopt",
-      "warningReconnect": "U kunt op elk moment opnieuw verbinding maken",
-      "warningData": "Uw historische gegevens blijven behouden",
-      "disconnecting": "Verbinding verbreken...",
-      "disconnect": "Verbreek verbinding",
-      "confirm": "Ja, verbreek verbinding",
-      "cancel": "Annuleren"
-    },
-    "errors": {
-      "signInRequired": "Log in om Square te verbinden",
-      "notAuthenticated": "Niet geauthenticeerd",
-      "connectFailed": "Kon niet verbinden met Square",
-      "disconnectFailed": "Kon niet verbreken",
-      "syncCatalogFailed": "Kon catalogus niet synchroniseren",
-      "syncInventoryFailed": "Kon inventaris niet synchroniseren",
-      "syncOrdersFailed": "Kon bestellingen niet synchroniseren"
-    },
     "success": {
-      "disconnected": "Square succesvol losgekoppeld",
-      "catalogSynced": "Catalogus gesynchroniseerd",
-      "catalogSyncDetails": "{created} aangemaakt, {updated} bijgewerkt",
-      "inventorySynced": "Inventaris gesynchroniseerd",
-      "inventorySyncDetails": "{batches} batches bijgewerkt",
-      "ordersSynced": "Bestellingen gesynchroniseerd",
-      "ordersSyncDetails": "{orders} bestellingen verwerkt"
+      "disconnected": "Square succesvol losgekoppeld"
     }
   }
 }

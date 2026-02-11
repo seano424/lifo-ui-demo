@@ -141,23 +141,17 @@
         "quantity": "Hoeveelheid",
         "stock": "Voorraad",
         "costPrice": "Kostprijs",
-        "sellPrice": "Verkoopprijs",
         "status": "Status",
-        "createdAt": "Aangemaakt op",
         "location": "Locatie"
       },
       "actions": {
         "viewDetails": "Details bekijken",
-        "editBatch": "Batch bewerken",
-        "markAsExpired": "Markeren als verlopen",
-        "markAsDamaged": "Markeren als beschadigd",
         "deleteBatch": "Batch verwijderen"
       },
       "searchPlaceholder": "Zoek",
       "emptyState": {
         "title": "Geen batches gevonden",
-        "description": "Je hebt nog geen batches in je inventaris. Begin met het toevoegen van je eerste batch om vervaldatums bij te houden en voorraadniveaus te beheren.",
-        "addFirstBatch": "Eerste batch toevoegen"
+        "description": "Je hebt nog geen batches in je inventaris. Begin met het toevoegen van je eerste batch om vervaldatums bij te houden en voorraadniveaus te beheren."
       },
       "loadMore": "Meer batches laden ({remaining} resterend)",
       "loading": "Laden..."
@@ -178,28 +172,6 @@
       "expired": "Verlopen",
       "daysLeft": "{days}d over",
       "noExpiryDate": "Geen vervaldatum"
-    },
-    "draftBatches": {
-      "addExpiryDate": "Vervaldatum toevoegen",
-      "completeBatch": "Batch voltooien",
-      "incompleteBatch": "Incompleet - Voeg vervaldatum toe",
-      "needsExpiryDate": "{count} producten hebben vervaldatums nodig om AI-scoring mogelijk te maken",
-      "completeNow": "Nu voltooien",
-      "draftBatchWarning": "Deze batch heeft een vervaldatum nodig voordat deze door AI kan worden gescoord"
-    }
-  },
-  "deliveries": {
-    "mobile": {
-      "barcodeScanning": "Barcode scannen",
-      "csvBulkImport": "CSV bulk import"
-    },
-    "desktop": {
-      "manualEntry": "Handmatige invoer",
-      "csvBulkImport": "CSV bulk import"
-    },
-    "messages": {
-      "selectStore": "Selecteer een winkel om voorraadgegevens te uploaden.",
-      "selectStoreInventory": "Selecteer een winkel om voorraad toe te voegen."
     }
   },
   "manualDelivery": {
@@ -212,22 +184,12 @@
         "barcode": "Barcode:"
       }
     },
-    "batchDetails": {
-      "title": "Batch details"
-    },
     "buttons": {
       "addBatch": "Batch toevoegen",
       "clear": "Wissen",
-      "submitAll": "Alles indienen",
       "cancel": "Annuleren",
       "submitting": "Indienen...",
-      "submitToInventory": "Indienen bij voorraad",
-      "addMoreProducts": "Meer producten toevoegen",
-      "viewInInventory": "Bekijken in voorraad"
-    },
-    "batchItems": {
-      "title": "Batch items om in te dienen",
-      "description": "{count, plural, one {# batch klaar om in te dienen} other {# batches klaar om in te dienen}}"
+      "submitToInventory": "Indienen bij voorraad"
     },
     "confirmation": {
       "title": "Indiening bevestigen",
@@ -236,10 +198,6 @@
       "totals": {
         "totalItems": "Totaal items:",
         "totalValue": "Totale waarde:"
-      },
-      "itemDetails": {
-        "expires": "Verloopt:",
-        "total": "Totaal:"
       }
     },
     "success": {
@@ -248,9 +206,6 @@
         "allSuccess": "Succesvol {count, plural, one {# batch} other {# batches}} toegevoegd aan je voorraad.",
         "partialSuccess": "{successCount} van {totalCount} batches toegevoegd aan voorraad."
       }
-    },
-    "alerts": {
-      "gettingStarted": "Begin met het zoeken naar een product met behulp van de barcode of productnaam zoekfunctie hierboven. Na het selecteren van een product, kun je de vervaldatum, hoeveelheid en prijs toevoegen."
     }
   },
   "scanningCamera": {
@@ -520,26 +475,10 @@
     },
     "urgentAlerts": {
       "levels": {
-        "urgentOnly": "Alleen urgente items",
-        "priority": "Prioriteitsitems",
-        "allFlagged": "Alle gemarkeerde items",
-        "completeReview": "Volledige beoordeling"
+        "priority": "Prioriteitsitems"
       },
       "errors": {
-        "connectionError": "Verbindingsfout",
-        "unableToLoad": "Kan inventarismeldingen niet laden. Probeer het opnieuw.",
-        "loadingAlerts": "Meldingen laden..."
-      },
-      "messages": {
-        "nothingToShow": "Geen items hebben nu aandacht nodig - je bent helemaal bij!",
-        "itemNeedsAction": "{count, plural, one {item heeft} other {items hebben}} onmiddellijke actie nodig",
-        "itemMayNeedAction": "{count, plural, one {item heeft mogelijk} other {items hebben mogelijk}} binnenkort aandacht nodig",
-        "itemsFlagged": "{count, plural, one {item gemarkeerd} other {items gemarkeerd}} voor beoordeling",
-        "itemsMonitoring": "{count, plural, one {item gemarkeerd} other {items gemarkeerd}} voor monitoring"
-      },
-      "buttons": {
-        "viewInventory": "Bekijk inventaris",
-        "viewItems": "Bekijk items"
+        "unableToLoad": "Kan inventarismeldingen niet laden. Probeer het opnieuw."
       }
     },
     "alertQuickToggle": {
@@ -547,61 +486,21 @@
         "urgent": "Urgent",
         "default": "Standaard",
         "early": "Vroeg"
-      },
-      "tooltips": {
-        "urgentTitle": "Alleen urgente items die onmiddellijke actie vereisen",
-        "urgentSubtitle": "Minste waarschuwingen - meest restrictief",
-        "defaultTitle": "Items die binnenkort aandacht nodig hebben",
-        "defaultSubtitle": "Evenwichtige weergave - aanbevolen",
-        "earlyTitle": "Alle gemarkeerde items en vroege waarschuwingen",
-        "earlySubtitle": "Meeste waarschuwingen - maximale preventie"
       }
     },
     "actionableBatches": {
       "title": "Score-gebaseerde aanbevelingen",
       "loading": "Uitvoerbare batches laden...",
       "error": "Kan score-aanbevelingen niet laden. Probeer het opnieuw.",
-      "noActions": "Geen onmiddellijke acties vereist! Alle batches vallen binnen veilige score-drempels.",
       "urgencyLevels": {
         "critical": "Kritiek",
         "high": "Hoog Prioriteit",
         "medium": "Gemiddeld Prioriteit",
         "low": "Laag Prioriteit"
       },
-      "summaryLabels": {
-        "critical": "Kritiek",
-        "high": "Hoog Prioriteit",
-        "medium": "Gemiddeld Prioriteit",
-        "low": "Laag Prioriteit"
-      },
-      "batchDetails": {
-        "qty": "Aantal",
-        "daysToExpiry": "dagen tot vervaldatum",
-        "lossRisk": "Verliesrisico",
-        "score": "Score"
-      },
       "buttons": {
         "executeDonation": "Donatie uitvoeren",
-        "donateInstead": "Doneer in plaats daarvan",
-        "cancel": "Annuleren",
-        "confirmDonation": "Donatie bevestigen"
-      },
-      "scoringRecommendation": {
-        "label": "Score-aanbeveling",
-        "urgency": "Urgentie",
-        "score": "Score"
-      },
-      "donationDialog": {
-        "title": "Batch doneren",
-        "description": "Selecteer een ontvanger voor {productName}",
-        "quantity": "Hoeveelheid",
-        "expires": "Verloopt",
-        "selectRecipient": "Selecteer donatie-ontvanger",
-        "chooseRecipient": "Kies een ontvanger...",
-        "certified": "Gecertificeerd",
-        "notCertified": "Niet gecertificeerd",
-        "notesLabel": "Notities (optioneel)",
-        "notesPlaceholder": "Voeg notities toe over deze donatie..."
+        "cancel": "Annuleren"
       }
     }
   }

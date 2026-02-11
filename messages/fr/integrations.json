@@ -9,9 +9,19 @@
     "title": "Square POS",
     "description": "Synchronisez les produits, l'inventaire et les commandes depuis Square",
     "connect": "Connecter le compte Square",
-    "disconnect": "Déconnecter",
+    "disconnect": {
+      "title": "Déconnecter Square ?",
+      "description": "Cela désactivera votre intégration Square.",
+      "warning": "Ce qui se passe lorsque vous vous déconnectez :",
+      "warningSync": "La synchronisation automatique s'arrêtera",
+      "warningReconnect": "Vous pouvez vous reconnecter à tout moment",
+      "warningData": "Vos données historiques seront préservées",
+      "disconnecting": "Déconnexion en cours...",
+      "disconnect": "Déconnecter",
+      "confirm": "Oui, déconnecter",
+      "cancel": "Annuler"
+    },
     "connected": "Connecté",
-    "notConnectedDescription": "Connectez votre compte Square pour synchroniser automatiquement les produits, les niveaux d'inventaire et les données de commande avec lifo AI.",
     "merchantName": "Nom du marchand",
     "storeName": "Nom du magasin",
     "merchantId": "ID du marchand",
@@ -78,35 +88,8 @@
       "connectedStore": "Emplacement connecté",
       "connectedStores": "{count} emplacements connectés"
     },
-    "disconnect": {
-      "title": "Déconnecter Square ?",
-      "description": "Cela désactivera votre intégration Square.",
-      "warning": "Ce qui se passe lorsque vous vous déconnectez :",
-      "warningSync": "La synchronisation automatique s'arrêtera",
-      "warningReconnect": "Vous pouvez vous reconnecter à tout moment",
-      "warningData": "Vos données historiques seront préservées",
-      "disconnecting": "Déconnexion en cours...",
-      "disconnect": "Déconnecter",
-      "confirm": "Oui, déconnecter",
-      "cancel": "Annuler"
-    },
-    "errors": {
-      "signInRequired": "Veuillez vous connecter pour connecter Square",
-      "notAuthenticated": "Non authentifié",
-      "connectFailed": "Échec de la connexion à Square",
-      "disconnectFailed": "Échec de la déconnexion",
-      "syncCatalogFailed": "Échec de la synchronisation du catalogue",
-      "syncInventoryFailed": "Échec de la synchronisation de l'inventaire",
-      "syncOrdersFailed": "Échec de la synchronisation des commandes"
-    },
     "success": {
-      "disconnected": "Square déconnecté avec succès",
-      "catalogSynced": "Catalogue synchronisé",
-      "catalogSyncDetails": "{created} créés, {updated} mis à jour",
-      "inventorySynced": "Inventaire synchronisé",
-      "inventorySyncDetails": "{batches} lots mis à jour",
-      "ordersSynced": "Commandes synchronisées",
-      "ordersSyncDetails": "{orders} commandes traitées"
+      "disconnected": "Square déconnecté avec succès"
     }
   }
 }

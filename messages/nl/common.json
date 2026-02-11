@@ -8,7 +8,8 @@
       "cancel": "Annuleren",
       "scan": "Scannen",
       "discount": "Korting",
-      "donate": "Doneren"
+      "donate": "Doneren",
+      "dismiss": "Afwijzen"
     },
     "forms": {
       "productName": "Productnaam",
@@ -214,7 +215,8 @@
     "more": "Meer",
     "aria": {
       "toggleTheme": "Thema wisselen",
-      "selectLanguage": "Taal selecteren"
+      "selectLanguage": "Taal selecteren",
+      "toggle": "Schakelen"
     },
     "buttons": {
       "back": "Terug",

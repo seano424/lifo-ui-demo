@@ -421,6 +421,7 @@
     "expiringSoon": "Verloopt binnenkort",
     "needsDates": "Datums Nodig",
     "newDeliveries": "Nieuwe Leveringen",
+    "deliveries": "Leveringen",
     "ignored": "Genegeerd",
     "all": "Alle Batches",
     "inventory": "Voorraad",
@@ -428,8 +429,7 @@
     "squareCatalog": "Square Catalogus",
     "stock": "Voorraad",
     "newBatches": "Nieuwe Batches",
-    "integrations": "Integraties",
-    "deliveries": "Leveringen",
+    "ignoredBatches": "Genegeerd",
     "scanOut": "Scan Uit",
     "todos": "Te doen",
     "performance": "Prestaties",
@@ -437,6 +437,7 @@
     "analytics": "Analyses",
     "settings": "Instellingen",
     "support": "Ondersteuning",
+    "integrations": "Integraties",
     "helpCenter": "Helpcentrum",
     "logout": "Uitloggen",
     "batches": "Batches",
@@ -456,48 +457,8 @@
     "itemCount": "{count} items"
   },
   "batchList": {
-    "errorLoadingBatches": "Fout bij laden van batches",
-    "unexpectedError": "Er is een onverwachte fout opgetreden",
-    "currentBatches": "{count} huidige batches",
-    "filters": "Filters",
-    "search": "Zoeken",
-    "searchBatches": "Zoek batches...",
-    "status": "Status",
-    "allStatuses": "Alle statussen",
-    "active": "Actief",
-    "expired": "Verlopen",
-    "damaged": "Beschadigd",
-    "soldOut": "Uitverkocht",
-    "reserved": "Gereserveerd",
-    "expiringSoon": "Verloopt binnenkort",
-    "allDates": "Alle datums",
-    "expiringInDays": "Verloopt over {days} dagen",
-    "location": "Locatie",
-    "locationCode": "Locatiecode...",
-    "stockStatus": "Voorraadstatus",
-    "allStockLevels": "Alle voorraadniveaus",
-    "inStock": "Op voorraad",
-    "outOfStock": "Niet op voorraad",
-    "supplier": "Leverancier",
-    "supplierName": "Naam leverancier...",
-    "clear": "Wissen",
-    "clearFilters": "Filters wissen",
-    "loadingMore": "Meer laden...",
-    "loadMoreBatches": "Meer batches laden",
-    "showingBatches": "{count} batches weergegeven",
-    "filteredFrom": "(gefilterd van {total})",
-    "noBatchesFound": "Geen batches gevonden",
-    "noBatchesYet": "Nog geen batches",
-    "tryAdjustingFilters": "Probeer je zoekterm of filters aan te passen",
-    "productNoBatches": "Dit product heeft nog geen batches",
-    "getStartedFirstBatch": "Begin door je eerste batch toe te voegen",
     "convenience": {
-      "expiringSoon": "Verloopt binnenkort",
-      "noBatchesExpiringSoon": "Geen batches verlopen binnenkort",
-      "productBatches": "Product batches",
-      "productNoBatches": "Dit product heeft nog geen batches",
-      "lowStockAlert": "Lage voorraad waarschuwing",
-      "allBatchesSufficientStock": "Alle batches hebben voldoende voorraad"
+      "expiringSoon": "Verloopt binnenkort"
     }
   },
   "batchSort": {
@@ -596,15 +557,7 @@
     "deleteProduct": "Product verwijderen"
   },
   "dashboardNav": {
-    "projects": "Projecten",
     "more": "Meer",
-    "viewProject": "Project bekijken",
-    "shareProject": "Project delen",
-    "deleteProject": "Project verwijderen",
-    "kpiCard": {
-      "failedToLoad": "Gegevens laden mislukt",
-      "viewDetails": "Details bekijken"
-    },
     "pages": {
       "dashboard": "Dashboard overzicht",
       "notifications": "Binnenkort beschikbaar: Notificaties",
@@ -627,26 +580,6 @@
       "batches": "Bekijk en beheer de voorraad batches van uw winkel",
       "products": "Bekijk en beheer uw product voorraad",
       "dashboard": "Dit heeft vandaag uw aandacht nodig."
-    }
-  },
-  "timeSelector": {
-    "periods": {
-      "thisWeek": "Deze week",
-      "lastWeek": "Vorige week",
-      "thisMonth": "Deze maand",
-      "lastMonth": "Vorige maand",
-      "last7Days": "Laatste 7 dagen",
-      "last30Days": "Laatste 30 dagen",
-      "allTime": "Alle tijd"
-    },
-    "compareLabels": {
-      "lastWeek": "Vorige week",
-      "previousWeek": "Voorgaande week",
-      "lastMonth": "Vorige maand",
-      "previousMonth": "Voorgaande maand",
-      "previous7Days": "Voorgaande 7 dagen",
-      "previous30Days": "Voorgaande 30 dagen",
-      "previousYear": "Vorig jaar"
     }
   },
   "setupFlow": {
@@ -818,12 +751,12 @@
         "description": "Volg producten op vervaldatum. Maak batches aan, controleer verlopende artikelen en ontvang meldingen over verlopende batches.",
         "descriptionConnected": "Volg producten op vervaldatum. Controleer verlopende artikelen en ontvang meldingen over verlopende producten.",
         "realTime": "Real-time",
+        "integration": "Integratie",
+        "manual": "Handmatig",
         "recommended": "Aanbevolen",
         "squareDescription": "Verbind uw Square-account om real-time product tracking op vervaldatum in te stellen",
         "connect": "Verbinden",
         "oneTime": "Eenmalig",
-        "integration": "Integratie",
-        "manual": "Handmatig",
         "csvDescription": "Real-time data integraties zijn het krachtigst, maar eenmalige imports zijn nuttig om historische gegevens aan te vullen of uw bestaande gegevens te verrijken. Lees meer over het importeren van personen via CSV.",
         "importCSV": "CSV importeren",
         "manualEntry": "Voeg uw winkelinformatie handmatig toe",

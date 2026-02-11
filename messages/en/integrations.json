@@ -9,9 +9,19 @@
     "title": "Square POS",
     "description": "Sync products, inventory, and orders from Square",
     "connect": "Connect Square Account",
-    "disconnect": "Disconnect",
+    "disconnect": {
+      "title": "Disconnect Square?",
+      "description": "This will deactivate your Square integration.",
+      "warning": "What happens when you disconnect:",
+      "warningSync": "Automatic syncing will stop",
+      "warningReconnect": "You can reconnect at any time",
+      "warningData": "Your historical data will be preserved",
+      "disconnecting": "Disconnecting...",
+      "disconnect": "Disconnect",
+      "confirm": "Yes, Disconnect",
+      "cancel": "Cancel"
+    },
     "connected": "Connected",
-    "notConnectedDescription": "Connect your Square account to automatically sync products, inventory levels, and order data with lifo AI.",
     "merchantName": "Merchant Name",
     "storeName": "Store Name",
     "merchantId": "Merchant ID",
@@ -78,35 +88,8 @@
       "connectedStore": "Connected location",
       "connectedStores": "Connected {count} locations"
     },
-    "disconnect": {
-      "title": "Disconnect Square?",
-      "description": "This will deactivate your Square integration.",
-      "warning": "What happens when you disconnect:",
-      "warningSync": "Automatic syncing will stop",
-      "warningReconnect": "You can reconnect at any time",
-      "warningData": "Your historical data will be preserved",
-      "disconnecting": "Disconnecting...",
-      "disconnect": "Disconnect",
-      "confirm": "Yes, Disconnect",
-      "cancel": "Cancel"
-    },
-    "errors": {
-      "signInRequired": "Please sign in to connect Square",
-      "notAuthenticated": "Not authenticated",
-      "connectFailed": "Failed to connect Square",
-      "disconnectFailed": "Failed to disconnect",
-      "syncCatalogFailed": "Failed to sync catalog",
-      "syncInventoryFailed": "Failed to sync inventory",
-      "syncOrdersFailed": "Failed to sync orders"
-    },
     "success": {
-      "disconnected": "Square disconnected successfully",
-      "catalogSynced": "Catalog synced",
-      "catalogSyncDetails": "{created} created, {updated} updated",
-      "inventorySynced": "Inventory synced",
-      "inventorySyncDetails": "{batches} batches updated",
-      "ordersSynced": "Orders synced",
-      "ordersSyncDetails": "{orders} orders processed"
+      "disconnected": "Square disconnected successfully"
     }
   }
 }

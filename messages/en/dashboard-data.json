@@ -189,57 +189,25 @@
     "confirmDeleteProduct": "Are you sure you want to delete this product?"
   },
   "scanOut": {
-    "available": "Available",
-    "unknownProduct": "Unknown Product",
-    "unknownBrand": "Unknown Brand",
-    "scanProductToRemove": "Scan Product to Remove",
-    "pointCameraAtBarcode": "Point camera at product barcode",
-    "title": "Scan Out",
-    "description": "Scan items when they leave inventory",
     "actions": {
       "sold": "Sold",
       "sell": "Sell",
       "donate": "Donate",
       "dispose": "Dispose"
     },
-    "donationRecipientPlaceholder": "Donation recipient (optional)",
-    "disposalReasonPlaceholder": "Reason (e.g., Expired, Moldy, Damaged)",
     "scanning": {
-      "scanNextProduct": "Scan next product",
-      "scanProductBarcode": "Scan product barcode",
       "pointAtBarcode": "Point at barcode",
-      "productFound": "Product found!",
-      "notFoundInInventory": "Product not found in inventory",
-      "addToRemovalList": "Add to removal list"
+      "productFound": "Product found!"
     },
     "productDetails": {
       "title": "Product details",
       "brand": "Brand",
       "category": "Category",
       "barcode": "Barcode",
-      "availableStock": "Available stock",
       "units": "units",
-      "noBrand": "No brand",
-      "uncategorized": "Uncategorized",
-      "noBarcode": "No barcode"
-    },
-    "batchSelection": {
-      "title": "Select batch",
-      "selectBatch": "Select a batch to remove",
-      "expires": "Expires on",
-      "expired": "Expired",
-      "available": "available",
-      "selectThisBatch": "Select this batch"
-    },
-    "quantityInput": {
-      "title": "Quantity to remove",
-      "quantity": "Quantity",
-      "maxAvailable": "Maximum available: {max} units",
-      "enterQuantity": "Enter quantity to remove"
+      "uncategorized": "Uncategorized"
     },
     "reasonSelection": {
-      "title": "Reason for removal",
-      "selectReason": "Select a reason for this removal",
       "reasons": {
         "sale": "Sale",
         "donation": "Donation",
@@ -249,30 +217,16 @@
         "other": "Other"
       }
     },
-    "itemsList": {
-      "title": "Items to remove",
-      "noItems": "No items added yet",
-      "itemCount": "{count, plural, one {# item} other {# items}} to remove",
-      "quantity": "Qty",
-      "reason": "Reason",
-      "remove": "Remove"
-    },
     "confirmation": {
       "title": "Confirm removal",
       "description": "Review the items below before removing them from inventory.",
-      "submitText": "You are about to remove {count, plural, one {# item} other {# items}} from inventory:",
-      "itemDetails": {
-        "expires": "Expires:",
-        "reason": "Reason:",
-        "quantity": "Quantity:"
-      }
+      "submitText": "You are about to remove {count, plural, one {# item} other {# items}} from inventory:"
     },
     "success": {
       "title": "Items removed successfully!",
       "description": "Successfully removed {count, plural, one {# item} other {# items}} from your inventory.",
       "summary": {
         "totalItems": "Total items removed:",
-        "byReason": "By reason:",
         "sales": "Sales",
         "donations": "Donations",
         "waste": "Waste"
@@ -280,62 +234,15 @@
     },
     "buttons": {
       "scanProduct": "Scan product",
-      "selectBatch": "Select batch",
-      "addToList": "Add to list",
-      "removeFromInventory": "Remove from inventory",
       "cancel": "Cancel",
       "confirm": "Confirm",
       "back": "Back",
       "continue": "Continue",
       "finish": "Finish",
-      "scanNext": "Scan next",
-      "viewDashboard": "View dashboard",
       "submitting": "Submitting..."
     },
     "alerts": {
-      "maxQuantityExceeded": "Quantity cannot exceed available stock",
-      "quantityRequired": "Please enter a valid quantity",
-      "reasonRequired": "Please select a reason",
-      "noItemsToRemove": "No items to remove",
-      "scanError": "Scan error: {error}",
       "submissionError": "Submission error: {error}"
-    },
-    "captureExpiryDate": "Capture Expiry Date",
-    "pointCameraAtExpiry": "Point camera at expiry date",
-    "backToChangeProduct": "Back to Change Product",
-    "itemsToRemove": "Items to Remove ({count})",
-    "total": "Total",
-    "expires": "Expires",
-    "remove": "Remove",
-    "clearAll": "Clear All",
-    "submitAll": "Submit All ({count} items)",
-    "confirmCheckout": "Confirm Checkout",
-    "confirmSale": "Confirm Sale",
-    "confirmDonation": "Confirm Donation",
-    "confirmDisposal": "Confirm Disposal",
-    "reviewItemsBeforeRemoval": "Review the items below before removing them from inventory.",
-    "aboutToRemoveItems": "You are about to remove {count} items from inventory:",
-    "totalItemsRemoved": "Total Items Removed",
-    "totalValueRemoved": "Total Value Removed",
-    "processing": "Processing...",
-    "confirmRemoval": "Confirm Removal",
-    "inventoryUpdatedSuccessfully": "Inventory Updated Successfully!",
-    "successfullyRemoved": "Successfully removed {count} items from inventory.",
-    "partiallyRemoved": "Removed {success} of {total} items from inventory.",
-    "continueScanning": "Continue Scanning",
-    "viewInDashboard": "View in Dashboard",
-    "noActiveStore": "No active store selected",
-    "cameraNotReady": "Camera not ready",
-    "noBatchFoundWithExpiry": "No batch found with expiry date: {date}",
-    "noInventoryAvailable": "No inventory available for this product in the current store.",
-    "ocrProcessingFailed": "OCR processing failed",
-    "batchRemovalNote": "Batch removal: {productName} x{quantity}",
-    "recentlyRemoved": "Recently Removed ({count} items)",
-    "removedQuantityExpires": "Removed {quantity}x • Expires: {date}",
-    "andMoreItems": "... and {count} more items",
-    "donationRecipientRequired": "Please select a donation recipient for: {itemNames}",
-    "disposalReasonRequired": "Please provide a disposal reason for: {itemNames}",
-    "selectRecipientRequired": "Please select a recipient",
-    "cancel": "Cancel"
+    }
   }
 }
