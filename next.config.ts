@@ -16,8 +16,7 @@ const nextConfig: NextConfig = {
     ],
   },
 
-  // Security headers for PWA protection
-  // Based on Next.js PWA documentation: https://nextjs.org/docs/app/guides/progressive-web-apps
+  // Security headers
   async headers() {
     return [
       {
@@ -45,66 +44,6 @@ const nextConfig: NextConfig = {
             key: 'Content-Security-Policy',
             value:
               "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://app.posthog.com https://*.posthog.com https://eu.i.posthog.com; connect-src 'self' http://127.0.0.1:54321 http://localhost:54321 http://127.0.0.1:8000 http://localhost:8000 https://*.ngrok-free.dev https://*.ngrok.io https://jrgmetdsohowtxickqij.supabase.co https://world.openfoodfacts.org https://*.ondigitalocean.app https://fonts.googleapis.com https://fonts.gstatic.com https://app.posthog.com https://*.posthog.com https://eu.i.posthog.com https://*.jsdelivr.net; font-src 'self' https://fonts.gstatic.com data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:;",
-          },
-        ],
-      },
-      {
-        // Service worker specific headers for PWA reliability
-        source: '/sw.js',
-        headers: [
-          {
-            // Ensures service worker is interpreted correctly as JavaScript
-            key: 'Content-Type',
-            value: 'application/javascript; charset=utf-8',
-          },
-          {
-            // Prevents caching of service worker to ensure users get latest version
-            key: 'Cache-Control',
-            value: 'no-cache, no-store, must-revalidate',
-          },
-          {
-            // Implements strict Content Security Policy for service worker
-            // Allows connections to Supabase, OpenFoodFacts, DigitalOcean API, Google Fonts, PostHog, FastAPI backend, ngrok tunnels, and barcode scanner WASM
-            key: 'Content-Security-Policy',
-            value:
-              "default-src 'self'; script-src 'self' https://app.posthog.com https://*.posthog.com https://eu.i.posthog.com; connect-src 'self' http://127.0.0.1:54321 http://localhost:54321 http://127.0.0.1:8000 http://localhost:8000 https://*.ngrok-free.dev https://*.ngrok.io https://jrgmetdsohowtxickqij.supabase.co https://world.openfoodfacts.org https://*.ondigitalocean.app https://fonts.googleapis.com https://fonts.gstatic.com https://app.posthog.com https://*.posthog.com https://eu.i.posthog.com https://*.jsdelivr.net; font-src 'self' https://fonts.gstatic.com data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-          },
-        ],
-      },
-      {
-        // Manifest specific headers
-        source: '/manifest.json',
-        headers: [
-          {
-            // Ensures manifest is served with correct content type
-            key: 'Content-Type',
-            value: 'application/manifest+json; charset=utf-8',
-          },
-          {
-            // Cache manifest for a short time but allow revalidation
-            key: 'Cache-Control',
-            value: 'public, max-age=3600, must-revalidate',
-          },
-        ],
-      },
-      {
-        // PWA icons headers - specific icons
-        source: '/icon-192.png',
-        headers: [
-          {
-            // Cache icons for longer since they don't change often
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
-          },
-        ],
-      },
-      {
-        source: '/icon-512.png',
-        headers: [
-          {
-            // Cache icons for longer since they don't change often
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
           },
         ],
       },
