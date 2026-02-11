@@ -4,17 +4,8 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { BottomSheet } from '@/components/ui/bottom-sheet'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Textarea } from '@/components/ui/textarea'
 import { Typography } from '@/components/ui/typography'
 import { useStoreActions, useStorePermissions, useStoreSettings } from '@/hooks/use-store-settings'
 import { useCurrentUser } from '@/hooks/use-users'
@@ -30,13 +21,12 @@ import {
   createWebsiteValidator,
 } from '@/lib/utils/validation-utils'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { AlertCircle, Check, Edit, Globe, Plus, X } from 'lucide-react'
+import { AlertCircle } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { AddStoreFlow } from './add-store-flow'
-import { DeactivateStoreDialog } from './deactivate-store-dialog'
 
 interface StoreInformationProps {
   serverPermissions?: UserStorePermissions // Server-computed permissions
@@ -151,22 +141,22 @@ export default function StoreInformation({
   const effectiveStoreId = propStoreId || contextStoreId
 
   const { data: storeData, isLoading, error } = useStoreSettings(effectiveStoreId || undefined)
-  const { updateBasicInfo, isUpdating } = useStoreActions()
+  const { updateBasicInfo } = useStoreActions()
   const { data: userData } = useCurrentUser()
 
-  const permissions = useStorePermissions({
+  const _permissions = useStorePermissions({
     serverPermissions,
     storeId: effectiveStoreId || undefined,
   })
 
   const [isAddStoreOpen, setIsAddStoreOpen] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+  const [_hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
 
   const storeInfoSchema = createStoreInfoSchema(t, storeData?.country)
   const STORE_TYPES = createStoreTypes(t)
-  const SIZE_CATEGORIES = createSizeCategories(t)
-  const COUNTRIES = createCountries(t)
+  const _SIZE_CATEGORIES = createSizeCategories(t)
+  const _COUNTRIES = createCountries(t)
 
   const form = useForm<StoreInfoFormData>({
     resolver: zodResolver(storeInfoSchema),
@@ -242,7 +232,7 @@ export default function StoreInformation({
     return () => subscription.unsubscribe()
   }, [isEditing, form.watch]) // Removed form from dependencies as it's stable
 
-  const handleSave = (data: StoreInfoFormData) => {
+  const _handleSave = (data: StoreInfoFormData) => {
     try {
       const cleanedData = Object.fromEntries(
         Object.entries(data).map(([key, value]) => [key, value === '' ? null : value]),
@@ -264,7 +254,7 @@ export default function StoreInformation({
     }
   }
 
-  const handleCancel = () => {
+  const _handleCancel = () => {
     resetFormAndState()
     setIsEditing(false)
   }
@@ -352,8 +342,8 @@ export default function StoreInformation({
 
   return (
     <>
-      {/* Manage Multiple Stores Section */}
-      <Card className="mb-4">
+      {/* HIDDEN: Manage Multiple Stores Section temporarily disabled */}
+      {/* <Card className="mb-4">
         <CardHeader className="py-4">
           <div className="flex flex-col gap-4 sm:flex-row items-center justify-between">
             <div className="flex flex-col gap-2">
@@ -374,441 +364,118 @@ export default function StoreInformation({
             </Button>
           </div>
         </CardHeader>
-      </Card>
+      </Card> */}
 
       {/* Store Information Section */}
       <Card className="shadow-primary-300 border-t-0">
         <CardHeader>
-          <div className="flex flex-col gap-4 sm:flex-row items-center justify-between">
-            <div className="flex flex-col gap-2 pb-2">
-              <Typography variant="h3" className="flex items-center">
-                {t('storeInformation.title')}
-              </Typography>
-              <Typography variant="p" color="muted">
-                {t('storeInformation.description')}
-              </Typography>
-            </div>
-            <div className="flex items-center gap-2">
-              {!isEditing && permissions.canEditBasicInfo && (
-                <Button
-                  variant="subtleSecondary"
-                  onClick={() => setIsEditing(true)}
-                  className="flex items-center gap-2"
-                >
-                  <Edit className="h-4 w-4" />
-                  {t('storeInformation.editStore')}
-                </Button>
-              )}
-            </div>
+          <div className="flex flex-col gap-2 pb-2">
+            <Typography variant="h3" className="flex items-center">
+              {t('storeInformation.title')}
+            </Typography>
+            <Typography variant="p" color="muted">
+              Information synced from your Square account
+            </Typography>
           </div>
         </CardHeader>
 
         <CardContent className="flex flex-col gap-6 pt-4 border-t">
-          <form onSubmit={form.handleSubmit(handleSave)} className="flex flex-col gap-6">
-            <div className="flex flex-col gap-4">
-              <Typography variant="h4">{t('storeInformation.sections.storeDetails')}</Typography>
+          {/* Basic Information from Square */}
+          <div className="flex flex-col gap-4">
+            <Typography variant="h4">{t('storeInformation.sections.storeDetails')}</Typography>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
-                <div className="flex flex-col gap-2">
-                  <Label htmlFor="store_name">{t('storeInformation.fields.storeName')}</Label>
-                  {isEditing ? (
-                    <Input
-                      id="store_name"
-                      {...form.register('store_name')}
-                      placeholder={t('storeInformation.placeholders.storeName')}
-                    />
-                  ) : (
-                    <Typography variant="p">
-                      {storeData?.store_name || t('storeInformation.messages.notSet')}
-                    </Typography>
-                  )}
-                  {form.formState.errors.store_name && (
-                    <Typography variant="p" className="text-destructive">
-                      {form.formState.errors.store_name.message}
-                    </Typography>
-                  )}
-                </div>
-
-                <div className="flex flex-col gap-2">
-                  <Label htmlFor="store_code">{t('storeInformation.fields.storeCode')}</Label>
-                  {isEditing ? (
-                    <Input
-                      id="store_code"
-                      {...form.register('store_code')}
-                      placeholder={t('storeInformation.placeholders.storeCode')}
-                    />
-                  ) : (
-                    <Typography variant="p">
-                      {storeData?.store_code || t('storeInformation.messages.notSet')}
-                    </Typography>
-                  )}
-                  {form.formState.errors.store_code && (
-                    <Typography variant="p" className="text-destructive">
-                      {form.formState.errors.store_code.message}
-                    </Typography>
-                  )}
-                </div>
-
-                <div className="flex flex-col gap-2">
-                  <Label htmlFor="store_type">{t('storeInformation.fields.storeType')}</Label>
-                  {isEditing ? (
-                    <Select
-                      value={form.watch('store_type') || ''}
-                      onValueChange={value =>
-                        form.setValue('store_type', value as StoreInfoFormData['store_type'], {
-                          shouldDirty: true,
-                        })
-                      }
-                    >
-                      <SelectTrigger>
-                        <SelectValue
-                          placeholder={t('storeInformation.selectPlaceholders.storeType')}
-                        />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {STORE_TYPES.map(type => (
-                          <SelectItem key={type.value} value={type.value}>
-                            {type.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  ) : (
-                    <Typography variant="p">
-                      {STORE_TYPES.find(type => type.value === storeData?.store_type)?.label ||
-                        t('storeInformation.messages.notSet')}
-                    </Typography>
-                  )}
-                </div>
-
-                <div className="flex flex-col gap-2">
-                  <Label htmlFor="size_category">{t('storeInformation.fields.sizeCategory')}</Label>
-                  {isEditing ? (
-                    <Select
-                      value={form.watch('size_category') || ''}
-                      onValueChange={value =>
-                        form.setValue(
-                          'size_category',
-                          value as StoreInfoFormData['size_category'],
-                          {
-                            shouldDirty: true,
-                          },
-                        )
-                      }
-                    >
-                      <SelectTrigger>
-                        <SelectValue
-                          placeholder={t('storeInformation.selectPlaceholders.sizeCategory')}
-                        />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {SIZE_CATEGORIES.map(size => (
-                          <SelectItem key={size.value} value={size.value}>
-                            {size.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  ) : (
-                    <Typography variant="p">
-                      {SIZE_CATEGORIES.find(s => s.value === storeData?.size_category)?.label ||
-                        t('storeInformation.messages.notSet')}
-                    </Typography>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-4">
-              <Typography variant="h4">
-                {t('storeInformation.sections.addressInformation')}
-              </Typography>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="md:col-span-2 flex flex-col gap-2">
-                  <Label htmlFor="address">{t('storeInformation.fields.address')}</Label>
-                  {isEditing ? (
-                    <Input
-                      id="address"
-                      {...form.register('address')}
-                      placeholder={t('storeInformation.placeholders.address')}
-                    />
-                  ) : (
-                    <Typography variant="p">
-                      {storeData?.address || t('storeInformation.messages.notSet')}
-                    </Typography>
-                  )}
-                </div>
-
-                <div className="flex flex-col gap-2">
-                  <Label htmlFor="city">{t('storeInformation.fields.city')}</Label>
-                  {isEditing ? (
-                    <Input
-                      id="city"
-                      {...form.register('city')}
-                      placeholder={t('storeInformation.placeholders.city')}
-                    />
-                  ) : (
-                    <Typography variant="p">
-                      {storeData?.city || t('storeInformation.messages.notSet')}
-                    </Typography>
-                  )}
-                </div>
-
-                <div className="flex flex-col gap-2">
-                  <Label htmlFor="postal_code">{t('storeInformation.fields.postalCode')}</Label>
-                  {isEditing ? (
-                    <Input
-                      id="postal_code"
-                      {...form.register('postal_code')}
-                      placeholder={t('storeInformation.placeholders.postalCode')}
-                    />
-                  ) : (
-                    <Typography variant="p">
-                      {storeData?.postal_code || t('storeInformation.messages.notSet')}
-                    </Typography>
-                  )}
-                </div>
-
-                <div className="flex flex-col gap-2">
-                  <Label htmlFor="country">{t('storeInformation.fields.country')}</Label>
-                  {isEditing ? (
-                    <Select
-                      value={form.watch('country') || ''}
-                      onValueChange={value =>
-                        form.setValue('country', value as StoreInfoFormData['country'], {
-                          shouldDirty: true,
-                        })
-                      }
-                    >
-                      <SelectTrigger>
-                        <SelectValue
-                          placeholder={t('storeInformation.selectPlaceholders.country')}
-                        />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {COUNTRIES.map(country => (
-                          <SelectItem key={country.value} value={country.value}>
-                            {country.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  ) : (
-                    <Typography variant="p">
-                      {storeData?.country || t('storeInformation.messages.notSet')}
-                    </Typography>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-4">
-              <Typography variant="h4">
-                {t('storeInformation.sections.contactInformation')}
-              </Typography>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="flex flex-col gap-2">
-                  <Label htmlFor="phone">{t('storeInformation.fields.phone')}</Label>
-                  {isEditing ? (
-                    <Input
-                      id="phone"
-                      {...form.register('phone')}
-                      placeholder={t('storeInformation.placeholders.phone')}
-                    />
-                  ) : (
-                    <Typography variant="p">
-                      {storeData?.phone || t('storeInformation.messages.notSet')}
-                    </Typography>
-                  )}
-                </div>
-
-                <div className="flex flex-col gap-2">
-                  <Label htmlFor="email">{t('storeInformation.fields.email')}</Label>
-                  {isEditing ? (
-                    <Input
-                      id="email"
-                      type="email"
-                      {...form.register('email')}
-                      placeholder={t('storeInformation.placeholders.email')}
-                    />
-                  ) : (
-                    <Typography variant="p">
-                      {storeData?.email || t('storeInformation.messages.notSet')}
-                    </Typography>
-                  )}
-                  {form.formState.errors.email && (
-                    <Typography variant="p" className="text-destructive">
-                      {form.formState.errors.email.message}
-                    </Typography>
-                  )}
-                </div>
-
-                <div className="md:col-span-2 flex flex-col gap-2">
-                  <Label htmlFor="website_url">{t('storeInformation.fields.website')}</Label>
-                  {isEditing ? (
-                    <Input
-                      id="website_url"
-                      {...form.register('website_url')}
-                      placeholder={t('storeInformation.placeholders.website')}
-                    />
-                  ) : (
-                    <Typography variant="p">
-                      {storeData?.website_url ? (
-                        <a
-                          href={storeData.website_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-primary hover:underline flex items-center gap-1"
-                        >
-                          <Globe className="h-3 w-3" />
-                          {storeData.website_url}
-                        </a>
-                      ) : (
-                        t('storeInformation.messages.notSet')
-                      )}
-                    </Typography>
-                  )}
-                  {form.formState.errors.website_url && (
-                    <Typography variant="p" className="text-destructive">
-                      {form.formState.errors.website_url.message}
-                    </Typography>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-4">
-              <Typography variant="h4">
-                {t('storeInformation.sections.storeDescription')}
-              </Typography>
-
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+              {/* Store Name - from Square location name */}
               <div className="flex flex-col gap-2">
-                <Label htmlFor="description">{t('storeInformation.fields.description')}</Label>
-                {isEditing ? (
-                  <Textarea
-                    id="description"
-                    {...form.register('description')}
-                    placeholder={t('storeInformation.placeholders.description')}
-                    rows={3}
-                  />
-                ) : (
-                  <Typography variant="p">
-                    {storeData?.description || t('storeInformation.messages.noDescription')}
-                  </Typography>
-                )}
-                {form.formState.errors.description && (
-                  <Typography variant="p" className="text-destructive">
-                    {form.formState.errors.description.message}
-                  </Typography>
-                )}
+                <Label htmlFor="store_name">{t('storeInformation.fields.storeName')}</Label>
+                <Typography variant="p">
+                  {storeData?.store_name || t('storeInformation.messages.notSet')}
+                </Typography>
+                <Typography variant="small" className="text-muted-foreground">
+                  From Square location
+                </Typography>
+              </div>
+
+              {/* Business Name - from Square merchant */}
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="business_name">{t('storeInformation.fields.businessName')}</Label>
+                <Typography variant="p">
+                  {storeData?.business_name || t('storeInformation.messages.notSet')}
+                </Typography>
+                <Typography variant="small" className="text-muted-foreground">
+                  From Square merchant
+                </Typography>
+              </div>
+
+              {/* Store Code - read-only, generated from Square */}
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="store_code">{t('storeInformation.fields.storeCode')}</Label>
+                <Typography variant="p" className="font-mono">
+                  {storeData?.store_code || t('storeInformation.messages.notSet')}
+                </Typography>
+                <Typography variant="small" className="text-muted-foreground">
+                  Auto-generated from Square location ID
+                </Typography>
+              </div>
+
+              {/* Store Type - defaults to convenience */}
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="store_type">{t('storeInformation.fields.storeType')}</Label>
+                <Typography variant="p">
+                  {STORE_TYPES.find(type => type.value === storeData?.store_type)?.label ||
+                    'Convenience'}
+                </Typography>
+                <Typography variant="small" className="text-muted-foreground">
+                  Default type for Square stores
+                </Typography>
               </div>
             </div>
+          </div>
 
-            {permissions.canEditAdvancedSettings && (
-              <div className="flex flex-col gap-4">
-                <Typography variant="h4">
-                  {t('storeInformation.sections.businessSettings')}
+          {/* Location from Square */}
+          <div className="flex flex-col gap-4">
+            <Typography variant="h4">
+              {t('storeInformation.sections.locationInformation')}
+            </Typography>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* City - from Square location address */}
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="city">{t('storeInformation.fields.city')}</Label>
+                <Typography variant="p">
+                  {storeData?.city || t('storeInformation.messages.notSet')}
                 </Typography>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="flex flex-col gap-2">
-                    <Label htmlFor="default_markup_percent">
-                      {t('storeInformation.fields.defaultMarkup')}
-                    </Label>
-                    {isEditing ? (
-                      <Input
-                        id="default_markup_percent"
-                        type="number"
-                        min="0"
-                        max="100"
-                        step="0.1"
-                        {...form.register('default_markup_percent', {
-                          valueAsNumber: true,
-                        })}
-                      />
-                    ) : (
-                      <Typography variant="p">
-                        {storeData?.default_markup_percent
-                          ? `${storeData.default_markup_percent}%`
-                          : t('storeInformation.messages.notSet')}
-                      </Typography>
-                    )}
-                  </div>
-
-                  <div className="flex flex-col gap-2">
-                    <Label htmlFor="waste_reduction_target_percent">
-                      {t('storeInformation.fields.wasteReductionTarget')}
-                    </Label>
-                    {isEditing ? (
-                      <Input
-                        id="waste_reduction_target_percent"
-                        type="number"
-                        min="0"
-                        max="100"
-                        step="0.1"
-                        {...form.register('waste_reduction_target_percent', {
-                          valueAsNumber: true,
-                        })}
-                      />
-                    ) : (
-                      <Typography variant="p">
-                        {storeData?.waste_reduction_target_percent
-                          ? `${storeData.waste_reduction_target_percent}%`
-                          : t('storeInformation.messages.notSet')}
-                      </Typography>
-                    )}
-                  </div>
-                </div>
+                <Typography variant="small" className="text-muted-foreground">
+                  From Square location
+                </Typography>
               </div>
-            )}
 
-            {!permissions.canEditBasicInfo && !permissions.isLoading && (
-              <Alert>
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription>
-                  You have read-only access to store information. Contact your store{' '}
-                  {permissions.isEmployee ? 'manager or owner' : 'owner'} to make changes.
-                </AlertDescription>
-              </Alert>
-            )}
-
-            {isEditing && permissions.canEditBasicInfo && (
-              <div className="flex items-center gap-2 pt-4 border-t">
-                <Button
-                  type="submit"
-                  disabled={isUpdating || !hasUnsavedChanges}
-                  className="flex items-center gap-2"
-                >
-                  <Check className="h-4 w-4" />
-                  {isUpdating
-                    ? t('storeInformation.actions.saving')
-                    : t('storeInformation.actions.saveChanges')}
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handleCancel}
-                  disabled={isUpdating}
-                  className="flex items-center gap-2"
-                >
-                  <X className="h-4 w-4" />
-                  {t('storeInformation.actions.cancel')}
-                </Button>
-                {hasUnsavedChanges && (
-                  <Typography variant="p" className="text-muted-foreground ml-2">
-                    {t('storeInformation.actions.unsavedChanges')}
-                  </Typography>
-                )}
+              {/* Country - from Square merchant */}
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="country">{t('storeInformation.fields.country')}</Label>
+                <Typography variant="p">
+                  {storeData?.country || t('storeInformation.messages.notSet')}
+                </Typography>
+                <Typography variant="small" className="text-muted-foreground">
+                  From Square merchant
+                </Typography>
               </div>
-            )}
-          </form>
+            </div>
+          </div>
+
+          {/* Info Alert */}
+          <Alert>
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              Store information is automatically synced from your Square account. To update these
+              details, please make changes in your Square Dashboard.
+            </AlertDescription>
+          </Alert>
         </CardContent>
       </Card>
 
-      {/* Danger Zone - Store Deactivation */}
-      {permissions.isOwner && storeData && (
+      {/* HIDDEN: Danger Zone - Store Deactivation temporarily disabled */}
+      {/* {permissions.isOwner && storeData && (
         <Card className="border-destructive">
           <CardHeader>
             <Typography variant="h3" color="destructive">
@@ -828,7 +495,7 @@ export default function StoreInformation({
             </div>
           </CardContent>
         </Card>
-      )}
+      )} */}
       <BottomSheet
         isOpen={isAddStoreOpen}
         variant="fullHeight"

@@ -50,6 +50,7 @@
       "permissionError": "U heeft geen toestemming om winkelinstellingen te bekijken.",
       "sections": {
         "storeDetails": "Winkeldetails",
+        "locationInformation": "Locatie-informatie",
         "addressInformation": "Adresinformatie",
         "contactInformation": "Contactinformatie",
         "storeDescription": "Winkelbeschrijving",
@@ -288,6 +289,22 @@
     },
     "security": {
       "notice": "Dit is uw persoonlijke account. U kunt uw wachtwoord wijzigen in de login pagina."
+    },
+    "deletionWarning": {
+      "message": "Uw account is gepland voor verwijdering op {date} ({days} dag{plural} resterend).",
+      "cancelButton": "Verwijdering annuleren",
+      "cancellingButton": "Annuleren...",
+      "cancelAriaLabel": "Accountverwijdering annuleren"
+    },
+    "deleteAccount": {
+      "dangerZoneTitle": "Gevarenzone",
+      "dangerZoneDescription": "Verzoek tot accountverwijdering. Uw account blijft 30 dagen actief, zodat u van gedachten kunt veranderen.",
+      "button": "Account verwijderen",
+      "title": "Account verwijderen?",
+      "description": "Uw account blijft 30 dagen volledig actief. Daarna worden alle persoonlijke gegevens permanent verwijderd. U kunt dit op elk moment tijdens deze periode annuleren.",
+      "confirm": "Verwijdering plannen",
+      "cancel": "Annuleren",
+      "deleting": "Plannen..."
     }
   }
 }

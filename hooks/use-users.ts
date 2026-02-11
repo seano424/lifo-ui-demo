@@ -23,6 +23,7 @@ import {
   type UserCreate,
   type UserUpdate,
 } from '@/lib/types/user'
+import { RequestAccountDeletionResponseSchema } from '@/lib/validation/rpc-schemas'
 
 // Legacy UserRole type (for global roles)
 type UserRole = 'admin' | 'manager' | 'employee'
@@ -614,6 +615,63 @@ export function useUserActions() {
     toast.info('Role removal not yet implemented')
   }
 
+  // 🆕 NEW: Request account deletion with 30-day grace period
+  // This is the user-facing deletion flow - account stays active for 30 days
+  // For admin-initiated immediate deletion, use useImmediateDeletion() directly
+  const deleteAccount = async () => {
+    const supabase = createClient()
+
+    try {
+      // Get current user
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser()
+
+      if (userError || !user) {
+        throw new Error('Not authenticated')
+      }
+
+      // Request deletion with 30-day grace period
+      const { data, error } = await supabase.rpc('request_account_deletion', {
+        target_user_id: user.id,
+        deletion_type: 'user_request',
+      })
+
+      if (error) {
+        throw error
+      }
+
+      // Validate response with Zod schema
+      const parsed = RequestAccountDeletionResponseSchema.safeParse(data)
+      if (!parsed.success) {
+        console.error('Invalid request deletion response:', parsed.error)
+        throw new Error('Invalid response from server')
+      }
+
+      const result = parsed.data
+      if (!result.success) {
+        throw new Error(result.message || 'Failed to request account deletion')
+      }
+
+      // Invalidate queries so the warning banner appears
+      queryClient.invalidateQueries({ queryKey: queryKeys.accountDeletion.pendingDeletion() })
+
+      // Success - the banner will now show and user can cancel anytime
+      // TypeScript knows result.success is true, so deletion_scheduled_for exists
+      const scheduledDate = new Date(result.deletion_scheduled_for).toLocaleDateString()
+      toast.success(
+        `Account deletion scheduled for ${scheduledDate}. You can cancel anytime before then.`,
+        { duration: 5000 },
+      )
+    } catch (error) {
+      console.error('Failed to request account deletion:', error)
+      const message = error instanceof Error ? error.message : 'Failed to request deletion'
+      toast.error(message)
+      throw error
+    }
+  }
+
   return {
     createUser: createMutation.mutate,
     updateUser: updateMutation.mutate,
@@ -626,6 +684,7 @@ export function useUserActions() {
     lockUserPin,
     updateUserLanguage, // 🆕
     updateUserPhone, // 🆕
+    deleteAccount, // 🆕
     assignRole,
     removeRole,
     isCreating: createMutation.isPending,

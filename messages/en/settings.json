@@ -50,6 +50,7 @@
       "permissionError": "You don't have permission to view store settings.",
       "sections": {
         "storeDetails": "Store Details",
+        "locationInformation": "Location Information",
         "addressInformation": "Address Information",
         "contactInformation": "Contact Information",
         "storeDescription": "Store Description",
@@ -288,6 +289,22 @@
     },
     "security": {
       "notice": "This is your personal account. You can change your password in the login page."
+    },
+    "deletionWarning": {
+      "message": "Your account is scheduled for deletion on {date} ({days} day{plural} remaining).",
+      "cancelButton": "Cancel deletion",
+      "cancellingButton": "Cancelling...",
+      "cancelAriaLabel": "Cancel account deletion"
+    },
+    "deleteAccount": {
+      "dangerZoneTitle": "Danger Zone",
+      "dangerZoneDescription": "Request account deletion. Your account will remain active for 30 days, giving you time to change your mind.",
+      "button": "Delete account",
+      "title": "Delete account?",
+      "description": "Your account will remain fully active for 30 days. After that, all personal data will be permanently removed. You can cancel anytime during this period.",
+      "confirm": "Schedule deletion",
+      "cancel": "Cancel",
+      "deleting": "Scheduling..."
     }
   }
 }

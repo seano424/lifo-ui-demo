@@ -50,6 +50,7 @@
       "permissionError": "Vous n'avez pas la permission de voir les paramètres du magasin.",
       "sections": {
         "storeDetails": "Détails du magasin",
+        "locationInformation": "Informations de localisation",
         "addressInformation": "Informations d'adresse",
         "contactInformation": "Informations de contact",
         "storeDescription": "Description du magasin",
@@ -288,6 +289,22 @@
     },
     "security": {
       "notice": "Ce compte est personnel. Vous pouvez changer votre mot de passe dans la page de connexion."
+    },
+    "deletionWarning": {
+      "message": "Votre compte est programmé pour suppression le {date} ({days} jour{plural} restant{plural}).",
+      "cancelButton": "Annuler la suppression",
+      "cancellingButton": "Annulation...",
+      "cancelAriaLabel": "Annuler la suppression du compte"
+    },
+    "deleteAccount": {
+      "dangerZoneTitle": "Zone de danger",
+      "dangerZoneDescription": "Demander la suppression du compte. Votre compte restera actif pendant 30 jours, vous donnant le temps de changer d'avis.",
+      "button": "Supprimer le compte",
+      "title": "Supprimer le compte ?",
+      "description": "Votre compte restera entièrement actif pendant 30 jours. Après cela, toutes les données personnelles seront définitivement supprimées. Vous pouvez annuler à tout moment pendant cette période.",
+      "confirm": "Programmer la suppression",
+      "cancel": "Annuler",
+      "deleting": "Programmation..."
     }
   }
 }

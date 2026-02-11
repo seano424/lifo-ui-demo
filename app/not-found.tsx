@@ -1,42 +1,26 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
-import { Logo } from '@/components/ui/logo'
 import { Typography } from '@/components/ui/typography'
 import { motion } from 'framer-motion'
-import { ArrowLeft, Home } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import Link from 'next/link'
+import { ArrowLeft } from 'lucide-react'
 
 export default function NotFound() {
   const t = useTranslations('errors')
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-linear-to-b from-background to-background/90">
-      <div className="max-w-md w-full flex flex-col gap-8 text-center">
+    <div className="min-h-screen flex flex-col items-center justify-center container">
+      <div className="max-w-4xl w-full text-center">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
+          className="flex flex-col gap-8"
         >
-          <div className="flex justify-center mb-6">
-            <Logo variant="svg" size="lg" className="h-20 w-auto opacity-70" />
-          </div>
-
-          <motion.div
-            initial={{ scale: 0.9 }}
-            animate={{ scale: 1 }}
-            transition={{
-              duration: 0.5,
-              delay: 0.2,
-            }}
-          >
-            <Typography as="h1" color="primary">
-              404
-            </Typography>
-          </motion.div>
-
-          <Typography as="h2">{t('pageNotFoundTitle', { fallback: 'Page not found' })}</Typography>
+          <Typography className="tracking-tight text-6xl sm:text-7xl xl:text-9xl" variant="h1">
+            {t('pageNotFoundTitle', { fallback: 'Page not found' })}
+          </Typography>
 
           <Typography as="p" color="muted">
             {t('pageNotFoundDescription', {
@@ -44,35 +28,19 @@ export default function NotFound() {
             })}
           </Typography>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button asChild size="lg" variant="default">
-              <Link href="/" className="flex items-center gap-2">
-                <Home size={18} />
-                {t('backToHome', { fallback: 'Back to Home' })}
-              </Link>
-            </Button>
-
-            <Button asChild size="lg" variant="outline" onClick={() => window.history.back()}>
-              <div className="flex items-center gap-2 cursor-pointer">
-                <ArrowLeft size={18} />
-                {t('goBack', { fallback: 'Go Back' })}
-              </div>
+          <div className="flex flex-col gap-4 justify-center items-center">
+            <Button
+              size="xl"
+              asChild
+              variant="black"
+              className="rounded-full w-fit font-mono tracking-tight"
+              asLink
+              href="/"
+            >
+              {t('backToHome', { fallback: 'Back to Home' })}
+              <ArrowLeft className="w-4 h-4 -rotate-180" />
             </Button>
           </div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.6, duration: 0.5 }}
-          className="pt-16"
-        >
-          <Typography as="p" className="text-sm text-muted-foreground/60">
-            {t('needHelp', { fallback: 'Need help?' })}{' '}
-            <a href="mailto:contact@lifo-app.com" className="text-primary hover:underline">
-              {t('contactSupport', { fallback: 'Contact our support team' })}
-            </a>
-          </Typography>
         </motion.div>
       </div>
     </div>

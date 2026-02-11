@@ -426,6 +426,7 @@
     "all": "All Batches",
     "inventory": "Inventory",
     "catalog": "Catalog",
+    "squareCatalog": "Square Catalog",
     "stock": "Stock",
     "newBatches": "New Batches",
     "ignoredBatches": "Ignored",

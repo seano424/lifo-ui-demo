@@ -151,7 +151,7 @@ export function BatchTable({
               {headerGroup.headers.map(header => (
                 <TableHead
                   key={header.id}
-                  className="sticky top-0 z-10 py-3 px-4 border-b border-muted"
+                  className="sticky top-0 z-10 py-3 px-2 sm:px-4 border-b border-muted"
                   style={
                     header.column.columnDef.size
                       ? { width: header.column.columnDef.size }
@@ -182,7 +182,7 @@ export function BatchTable({
                   style={
                     cell.column.columnDef.size ? { width: cell.column.columnDef.size } : undefined
                   }
-                  className="py-3 px-4"
+                  className="py-3 px-2 sm:px-4"
                 >
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </TableCell>
