@@ -51,7 +51,7 @@ interface StoreCardProps {
   store: StoreOverview
   isExpanded: boolean
   onToggle: () => void
-  t: (key: string) => string
+  t: (key: string, params?: Record<string, number | string>) => string
 }
 
 function StoreCard({ store, isExpanded, onToggle, t }: StoreCardProps) {
@@ -64,7 +64,7 @@ function StoreCard({ store, isExpanded, onToggle, t }: StoreCardProps) {
     store.product_count === 0 && store.category_count === 0 ? 'empty' : 'healthy'
 
   // Format last sync time
-  const lastSync = formatRelativeTime(store.updated_at)
+  const lastSync = formatRelativeTime(store.updated_at, t)
 
   // Truncate store ID for display (show first 4 and last 4 chars)
   const displayStoreId = store.store_code
@@ -109,7 +109,7 @@ function StoreCard({ store, isExpanded, onToggle, t }: StoreCardProps) {
 
         {/* Right side - Active Store badge and Expand indicator */}
         <div className="hidden md:flex items-center justify-end gap-2 md:col-span-2">
-          {isCurrentStore && <Badge variant="primary">Active Store</Badge>}
+          {isCurrentStore && <Badge variant="primary">{t('steps.addStore.activeStore')}</Badge>}
           {isExpanded ? (
             <ChevronUp className="w-5 h-5 text-muted-foreground shrink-0" />
           ) : (
@@ -139,11 +139,11 @@ function StoreCard({ store, isExpanded, onToggle, t }: StoreCardProps) {
               <div className="flex items-center gap-1.5">
                 <StatusDot health={syncHealth} />
                 <Typography variant="p" className="capitalize">
-                  {syncHealth === 'empty' ? 'No data' : syncHealth}
+                  {t(`steps.addStore.syncHealth.${syncHealth === 'empty' ? 'noData' : syncHealth}`)}
                 </Typography>
               </div>
               <Typography variant="muted" className="mt-0.5">
-                Sync status
+                {t('steps.addStore.syncStatus')}
               </Typography>
             </div>
             <div className="p-4">
@@ -152,7 +152,7 @@ function StoreCard({ store, isExpanded, onToggle, t }: StoreCardProps) {
                 <Typography variant="p">{lastSync}</Typography>
               </div>
               <Typography variant="muted" className="mt-0.5">
-                Last synced
+                {t('steps.addStore.lastSynced')}
               </Typography>
             </div>
           </div>
@@ -184,7 +184,7 @@ interface SummaryPanelProps {
   syncedStoreCount: number
   isSyncing: boolean
   onContinue: () => void
-  t: (key: string) => string
+  t: (key: string, params?: Record<string, number | string>) => string
 }
 
 function SummaryPanel({
@@ -200,9 +200,9 @@ function SummaryPanel({
     <div className="border border-muted rounded-xl overflow-hidden">
       {/* Panel header */}
       <div className="p-4 border-b border-muted">
-        <Typography variant="h5">Import Summary</Typography>
+        <Typography variant="h5">{t('steps.addStore.importSummary.title')}</Typography>
         <Typography variant="muted" className="mt-1">
-          Overview of your Square catalog sync
+          {t('steps.addStore.importSummary.subtitle')}
         </Typography>
       </div>
 
@@ -210,7 +210,7 @@ function SummaryPanel({
         <div className="flex flex-col items-center gap-3 py-8 text-center">
           <Loader2 className="h-8 w-8 text-primary animate-spin" />
           <Typography variant="small" className="text-muted-foreground">
-            Syncing your catalog...
+            {t('steps.addStore.importSummary.syncing')}
           </Typography>
         </div>
       ) : (
@@ -227,10 +227,13 @@ function SummaryPanel({
               </div>
               <div>
                 <Typography variant="p" className="font-medium">
-                  Square connected
+                  {t('steps.addStore.importSummary.squareConnected')}
                 </Typography>
                 <Typography variant="muted">
-                  {syncedStoreCount} of {storeCount} stores synced
+                  {t('steps.addStore.importSummary.storesSynced', {
+                    syncedCount: syncedStoreCount,
+                    totalCount: storeCount,
+                  })}
                 </Typography>
               </div>
             </div>
@@ -245,7 +248,7 @@ function SummaryPanel({
               </div>
               <div>
                 <Typography variant="p" className="font-medium">
-                  Catalog imported
+                  {t('steps.addStore.importSummary.catalogImported')}
                 </Typography>
                 <Typography variant="muted">
                   {productCount} {t('steps.addStore.products').toLowerCase()}, {categoryCount}{' '}
@@ -265,10 +268,10 @@ function SummaryPanel({
               </div>
               <div>
                 <Typography variant="p" className="font-medium text-muted-foreground">
-                  Set up batch tracking
+                  {t('steps.addStore.importSummary.setBatchTracking')}
                 </Typography>
                 <Typography variant="muted">
-                  Configure expiry date rules for your products
+                  {t('steps.addStore.importSummary.configureRules')}
                 </Typography>
               </div>
             </div>
@@ -280,7 +283,8 @@ function SummaryPanel({
               <div>
                 <Typography variant="h3">{productCount}</Typography>
                 <Typography variant="muted" className="mt-0.5">
-                  Total {t('steps.addStore.products').toLowerCase()}
+                  {t('steps.addStore.importSummary.total')}{' '}
+                  {t('steps.addStore.products').toLowerCase()}
                 </Typography>
               </div>
               <div>
@@ -295,11 +299,11 @@ function SummaryPanel({
           {/* CTA */}
           <div className="border-t border-muted p-4">
             <Button onClick={onContinue} size="lg" className="w-full">
-              Continue to Batch Tracking Setup
+              {t('steps.addStore.importSummary.continueButton')}
               <ArrowRight className="w-4 h-4" />
             </Button>
             <Typography variant="extraSmall" className="text-muted-foreground text-center mt-2.5">
-              You can always come back to manage your Square connection
+              {t('steps.addStore.importSummary.returnNote')}
             </Typography>
           </div>
         </>
@@ -310,7 +314,10 @@ function SummaryPanel({
 
 // ─── Utility Functions ────────────────────────────────────
 
-function formatRelativeTime(dateString: string): string {
+function formatRelativeTime(
+  dateString: string,
+  t: (key: string, params?: Record<string, number>) => string,
+): string {
   const date = new Date(dateString)
   const now = new Date()
   const diffMs = now.getTime() - date.getTime()
@@ -318,10 +325,10 @@ function formatRelativeTime(dateString: string): string {
   const diffHours = Math.floor(diffMs / 3600000)
   const diffDays = Math.floor(diffMs / 86400000)
 
-  if (diffMins < 1) return 'Just now'
-  if (diffMins < 60) return `${diffMins} min ago`
-  if (diffHours < 24) return `${diffHours}h ago`
-  if (diffDays < 7) return `${diffDays}d ago`
+  if (diffMins < 1) return t('steps.addStore.timeAgo.justNow')
+  if (diffMins < 60) return t('steps.addStore.timeAgo.minAgo', { minutes: diffMins })
+  if (diffHours < 24) return t('steps.addStore.timeAgo.hourAgo', { hours: diffHours })
+  if (diffDays < 7) return t('steps.addStore.timeAgo.dayAgo', { days: diffDays })
   return date.toLocaleDateString()
 }
 
@@ -415,10 +422,8 @@ export function AddStoreStep() {
         {/* Main bordered container */}
         <div className="flex flex-col border border-muted rounded-xl overflow-hidden">
           <div className="p-4 flex flex-col gap-4">
-            <Typography variant="h5">Available Integrations</Typography>
-            <Typography variant="p">
-              Connect your POS system to automatically import products and track inventory
-            </Typography>
+            <Typography variant="h5">{t('steps.addStore.integrations.title')}</Typography>
+            <Typography variant="p">{t('steps.addStore.integrations.subtitle')}</Typography>
           </div>
 
           {/* Square Integration */}
@@ -443,7 +448,7 @@ export function AddStoreStep() {
 
               {/* Right side - Connect button */}
               <div className="flex items-center gap-5 md:col-span-2 md:justify-end">
-                <Typography variant="p">Connect</Typography>
+                <Typography variant="p">{t('steps.addStore.connect')}</Typography>
                 <ChevronRight className="w-5 h-5 text-muted-foreground shrink-0" />
               </div>
             </button>
@@ -468,7 +473,7 @@ export function AddStoreStep() {
           <div>
             <Typography variant="h5">{t('steps.addStore.yourStores')}</Typography>
             <Typography variant="muted" className="mt-1">
-              {squareStores.length} stores connected from Square
+              {t('steps.addStore.storesConnected', { count: squareStores.length })}
             </Typography>
           </div>
         </div>
@@ -491,8 +496,7 @@ export function AddStoreStep() {
           <Info className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
           <div className="flex-1">
             <Typography variant="small" className="text-muted-foreground">
-              Products and categories are imported from your Square catalog. LIFO adds batch-level
-              expiry tracking on top of your existing product data.
+              {t('steps.addStore.helpNote')}
             </Typography>
             {/* <Button variant="link" size="sm" className="mt-2 p-0 h-auto text-xs">
               Learn more about Square sync →

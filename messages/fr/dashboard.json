@@ -661,6 +661,10 @@
       "description": "Configurez comment LIFO suit votre inventaire",
       "activeStore": "magasin actif",
       "configuringFor": "Configuration du suivi des lots pour",
+      "shelfLifeChip": {
+        "manual": "Manuel",
+        "daysUnit": "j"
+      },
       "steps": {
         "squareConnected": {
           "title": "Square connecté avec succès",
@@ -677,22 +681,56 @@
         },
         "whatToTrack": {
           "title": "Que voulez-vous suivre ?",
-          "description": "Sélectionnez les catégories de produits que vous souhaitez suivre avec le suivi des lots. ",
+          "description": "Choisissez les catégories à suivre et définissez la durée de conservation par défaut. Lors de l'arrivée des livraisons, nous calculerons automatiquement les dates d'expiration. Choisissez \"Saisie manuelle\" pour les catégories où vous préférez saisir les dates vous-même.",
           "sections": {
             "categories": "Catégories de produits",
             "food": "Catégories alimentaires",
             "nonFood": "Catégories non alimentaires",
             "uncategorized": "Produits non catégorisés"
           },
+          "noFoodCategories": "Aucune catégorie alimentaire trouvée",
           "noCategories": "Aucune catégorie trouvée",
           "selectAll": "Tout sélectionner",
           "deselectAll": "Tout désélectionner",
           "selectAllCategories": "Toutes les catégories",
           "selecteAllProducts": "Tous les produits",
+          "buttons": {
+            "allToManual": "Tout en saisie manuelle",
+            "back": "Retour",
+            "reset": "Réinitialiser",
+            "activate": "Activer"
+          },
+          "legend": {
+            "autoCalculate": "= calcul automatique à partir de la date de livraison",
+            "manualEntry": "= vous saisirez les dates par livraison"
+          },
+          "preview": {
+            "title": "Aperçu de votre tableau de bord",
+            "setOnDelivery": "Défini à la livraison",
+            "daysFromDelivery": "j depuis la livraison",
+            "tableHeaders": {
+              "product": "Produit",
+              "estExpiry": "Expiration estimée",
+              "qty": "Qté"
+            },
+            "sampleInfo": "Échantillon de {count} produits suivis · Tilde (~) = estimé à partir de la durée de conservation par défaut"
+          },
+          "infoBox": {
+            "message": "Ce sont des valeurs par défaut de départ. Votre équipe peut ajuster n'importe quelle date lors du traitement d'une livraison. Vous pouvez modifier tout cela plus tard dans les Paramètres."
+          },
           "summary": {
+            "productsReady": "{count} produits prêts",
+            "autoCategories": "Catégories auto-datées :",
+            "manualCategories": "Catégories manuelles :",
             "tracking": "Suivi de",
             "of": "sur",
             "products": "produits"
+          },
+          "category": {
+            "product": "produit",
+            "products": "produits",
+            "switchToManual": "Passer en saisie manuelle",
+            "switchToAuto": "Passer en automatique"
           },
           "backButton": "Retour",
           "nextButton": "Suivant"
@@ -796,7 +834,42 @@
         "loadingStores": "Chargement de vos magasins...",
         "yourStores": "Vos magasins",
         "products": "Produits",
-        "categories": "Catégories"
+        "categories": "Catégories",
+        "activeStore": "Magasin actif",
+        "syncHealth": {
+          "noData": "Aucune donnée",
+          "healthy": "Sain",
+          "empty": "Vide",
+          "stale": "Obsolète",
+          "error": "Erreur"
+        },
+        "syncStatus": "Statut de synchronisation",
+        "lastSynced": "Dernière synchronisation",
+        "importSummary": {
+          "title": "Résumé de l'importation",
+          "subtitle": "Aperçu de votre synchronisation de catalogue Square",
+          "syncing": "Synchronisation de votre catalogue...",
+          "squareConnected": "Square connecté",
+          "storesSynced": "{syncedCount} sur {totalCount} magasins synchronisés",
+          "catalogImported": "Catalogue importé",
+          "setBatchTracking": "Configurer le suivi des lots",
+          "configureRules": "Configurez les règles de date d'expiration pour vos produits",
+          "total": "Total",
+          "continueButton": "Continuer vers la configuration du suivi des lots",
+          "returnNote": "Vous pouvez toujours revenir pour gérer votre connexion Square"
+        },
+        "timeAgo": {
+          "justNow": "À l'instant",
+          "minAgo": "Il y a {minutes} min",
+          "hourAgo": "Il y a {hours}h",
+          "dayAgo": "Il y a {days}j"
+        },
+        "integrations": {
+          "title": "Intégrations disponibles",
+          "subtitle": "Connectez votre système de point de vente pour importer automatiquement les produits et suivre l'inventaire"
+        },
+        "storesConnected": "{count} magasins connectés depuis Square",
+        "helpNote": "Les produits et catégories sont importés depuis votre catalogue Square. LIFO ajoute le suivi des dates d'expiration par lot en plus de vos données produit existantes."
       },
       "batchTracking": {
         "title": "Configurer le suivi des lots (recommandé)",
@@ -818,21 +891,55 @@
           },
           "whatToTrack": {
             "title": "Que voulez-vous suivre ?",
-            "description": "Sélectionnez les catégories de produits que vous souhaitez suivre avec le suivi des lots. ",
+            "description": "Choisissez les catégories à suivre et définissez la durée de conservation par défaut. Lors de l'arrivée des livraisons, nous calculerons automatiquement les dates d'expiration. Choisissez \"Saisie manuelle\" pour les catégories où vous préférez saisir les dates vous-même.",
             "sections": {
               "food": "Catégories alimentaires",
               "nonFood": "Catégories non alimentaires",
               "uncategorized": "Produits non catégorisés"
             },
             "noFoodCategories": "Aucune catégorie alimentaire trouvée",
+            "noCategories": "Aucune catégorie trouvée",
             "selectAll": "Tout sélectionner",
             "deselectAll": "Tout désélectionner",
             "selectAllCategories": "Toutes les catégories",
             "selecteAllProducts": "Tous les produits",
+            "buttons": {
+              "allToManual": "Tout en saisie manuelle",
+              "back": "Retour",
+              "reset": "Réinitialiser",
+              "activate": "Activer"
+            },
+            "legend": {
+              "autoCalculate": "= calcul automatique à partir de la date de livraison",
+              "manualEntry": "= vous saisirez les dates par livraison"
+            },
+            "preview": {
+              "title": "Aperçu de votre tableau de bord",
+              "setOnDelivery": "Défini à la livraison",
+              "daysFromDelivery": "j depuis la livraison",
+              "tableHeaders": {
+                "product": "Produit",
+                "estExpiry": "Expiration estimée",
+                "qty": "Qté"
+              },
+              "sampleInfo": "Échantillon de {count} produits suivis · Tilde (~) = estimé à partir de la durée de conservation par défaut"
+            },
+            "infoBox": {
+              "message": "Ce sont des valeurs par défaut de départ. Votre équipe peut ajuster n'importe quelle date lors du traitement d'une livraison. Vous pouvez modifier tout cela plus tard dans les Paramètres."
+            },
             "summary": {
+              "productsReady": "{count} produits prêts",
+              "autoCategories": "Catégories auto-datées :",
+              "manualCategories": "Catégories manuelles :",
               "tracking": "Suivi de",
               "of": "sur",
               "products": "produits"
+            },
+            "category": {
+              "product": "produit",
+              "products": "produits",
+              "switchToManual": "Passer en saisie manuelle",
+              "switchToAuto": "Passer en automatique"
             },
             "backButton": "Retour",
             "nextButton": "Suivant"

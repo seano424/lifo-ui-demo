@@ -660,6 +660,10 @@
       "description": "Configure how LIFO tracks your inventory",
       "activeStore": "active store",
       "configuringFor": "Configuring batch tracking for",
+      "shelfLifeChip": {
+        "manual": "Manual",
+        "daysUnit": "d"
+      },
       "steps": {
         "squareConnected": {
           "title": "Square Connected Successfully",
@@ -676,22 +680,56 @@
         },
         "whatToTrack": {
           "title": "What do you want to track?",
-          "description": "Select which product categories you want to track with batch tracking.",
+          "description": "Choose categories to track and set default shelf life. When deliveries arrive, we'll calculate expiry dates automatically. Choose \"Manual entry\" for categories where you'd rather enter dates yourself.",
           "sections": {
             "categories": "Product categories",
             "food": "Food Categories",
             "nonFood": "Non-Food Categories",
             "uncategorized": "Uncategorized Products"
           },
+          "noFoodCategories": "No food categories found",
           "noCategories": "No categories found",
           "selectAll": "Select all",
           "deselectAll": "Deselect all",
           "selectAllCategories": "Select all categories",
           "selecteAllProducts": "Select all products",
+          "buttons": {
+            "allToManual": "All to manual entry",
+            "back": "Back",
+            "reset": "Reset",
+            "activate": "Activate"
+          },
+          "legend": {
+            "autoCalculate": "= auto-calculate from delivery date",
+            "manualEntry": "= you'll enter dates per delivery"
+          },
+          "preview": {
+            "title": "Preview your dashboard",
+            "setOnDelivery": "Set on delivery",
+            "daysFromDelivery": "d from delivery",
+            "tableHeaders": {
+              "product": "Product",
+              "estExpiry": "Est. Expiry",
+              "qty": "Qty"
+            },
+            "sampleInfo": "Sample of {count} tracked products · Tilde (~) = estimated from default shelf life"
+          },
+          "infoBox": {
+            "message": "These are starting defaults. Your team can adjust any date when processing a delivery. You can change all of this later in Settings."
+          },
           "summary": {
+            "productsReady": "{count} products ready",
+            "autoCategories": "Auto-dated categories:",
+            "manualCategories": "Manual categories:",
             "tracking": "Tracking",
             "of": "of",
             "products": "products"
+          },
+          "category": {
+            "product": "product",
+            "products": "products",
+            "switchToManual": "Switch to manual entry",
+            "switchToAuto": "Switch to automatic"
           },
           "backButton": "Back",
           "nextButton": "Next"
@@ -795,7 +833,42 @@
         "loadingStores": "Loading your stores...",
         "yourStores": "Your Stores",
         "products": "Products",
-        "categories": "Categories"
+        "categories": "Categories",
+        "activeStore": "Active Store",
+        "syncHealth": {
+          "noData": "No data",
+          "healthy": "Healthy",
+          "empty": "Empty",
+          "stale": "Stale",
+          "error": "Error"
+        },
+        "syncStatus": "Sync status",
+        "lastSynced": "Last synced",
+        "importSummary": {
+          "title": "Import Summary",
+          "subtitle": "Overview of your Square catalog sync",
+          "syncing": "Syncing your catalog...",
+          "squareConnected": "Square connected",
+          "storesSynced": "{syncedCount} of {totalCount} stores synced",
+          "catalogImported": "Catalog imported",
+          "setBatchTracking": "Set up batch tracking",
+          "configureRules": "Configure expiry date rules for your products",
+          "total": "Total",
+          "continueButton": "Continue to Batch Tracking Setup",
+          "returnNote": "You can always come back to manage your Square connection"
+        },
+        "timeAgo": {
+          "justNow": "Just now",
+          "minAgo": "{minutes} min ago",
+          "hourAgo": "{hours}h ago",
+          "dayAgo": "{days}d ago"
+        },
+        "integrations": {
+          "title": "Available Integrations",
+          "subtitle": "Connect your POS system to automatically import products and track inventory"
+        },
+        "storesConnected": "{count} stores connected from Square",
+        "helpNote": "Products and categories are imported from your Square catalog. LIFO adds batch-level expiry tracking on top of your existing product data."
       },
       "batchTracking": {
         "title": "Set up batch tracking (recommended)",
@@ -817,21 +890,55 @@
           },
           "whatToTrack": {
             "title": "What do you want to track?",
-            "description": "Select which product categories you want to track with batch tracking.",
+            "description": "Choose categories to track and set default shelf life. When deliveries arrive, we'll calculate expiry dates automatically. Choose \"Manual entry\" for categories where you'd rather enter dates yourself.",
             "sections": {
               "food": "Food Categories",
               "nonFood": "Non-Food Categories",
               "uncategorized": "Uncategorized Products"
             },
             "noFoodCategories": "No food categories found",
+            "noCategories": "No categories found",
             "selectAll": "Select all",
             "deselectAll": "Deselect all",
             "selectAllCategories": "Select all categories",
             "selecteAllProducts": "Select all products",
+            "buttons": {
+              "allToManual": "All to manual entry",
+              "back": "Back",
+              "reset": "Reset",
+              "activate": "Activate"
+            },
+            "legend": {
+              "autoCalculate": "= auto-calculate from delivery date",
+              "manualEntry": "= you'll enter dates per delivery"
+            },
+            "preview": {
+              "title": "Preview your dashboard",
+              "setOnDelivery": "Set on delivery",
+              "daysFromDelivery": "d from delivery",
+              "tableHeaders": {
+                "product": "Product",
+                "estExpiry": "Est. Expiry",
+                "qty": "Qty"
+              },
+              "sampleInfo": "Sample of {count} tracked products · Tilde (~) = estimated from default shelf life"
+            },
+            "infoBox": {
+              "message": "These are starting defaults. Your team can adjust any date when processing a delivery. You can change all of this later in Settings."
+            },
             "summary": {
+              "productsReady": "{count} products ready",
+              "autoCategories": "Auto-dated categories:",
+              "manualCategories": "Manual categories:",
               "tracking": "Tracking",
               "of": "of",
               "products": "products"
+            },
+            "category": {
+              "product": "product",
+              "products": "products",
+              "switchToManual": "Switch to manual entry",
+              "switchToAuto": "Switch to automatic"
             },
             "backButton": "Back",
             "nextButton": "Next"

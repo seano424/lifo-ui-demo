@@ -279,7 +279,7 @@ export function BatchTrackingStep() {
 
       // Save configuration (includes smart minimum 2s duration)
       await saveMutation.mutateAsync({
-        storeId,
+        storeId: storeId!,
         config: {
           enabled: true,
           setup_completed: true,

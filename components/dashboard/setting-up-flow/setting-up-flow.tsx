@@ -39,7 +39,7 @@ export function SettingUpFlow() {
   }
 
   return (
-    <div className="flex flex-col gap-4 lg:flex-row w-full h-full p-6 lg:py-0">
+    <div className="flex flex-col gap-4 lg:flex-row w-full h-full">
       {/* Sidebar */}
       <aside className="h-full relative lg:max-w-xs">
         <SetupStepsSidebar />

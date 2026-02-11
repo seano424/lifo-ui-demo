@@ -103,12 +103,10 @@ export function StepCombinedTracking({
       {/* Header */}
       <div>
         <Typography variant="h3" className="mb-2">
-          What do you want to track?
+          {t('whatToTrack.title')}
         </Typography>
         <Typography variant="p" className="text-muted-foreground">
-          Choose categories to track and set default shelf life. When deliveries arrive, we'll
-          calculate expiry dates automatically. Choose "Manual entry" for categories where you'd
-          rather enter dates yourself.
+          {t('whatToTrack.description')}
         </Typography>
       </div>
 
@@ -135,7 +133,7 @@ export function StepCombinedTracking({
                     />
                     <Typography
                       variant="p"
-                      className={`font-medium min-w-fit transition-colors ${
+                      className={`font-medium min-w-fit whitespace-nowrap transition-colors ${
                         !allSelected ? 'text-muted-foreground' : ''
                       }`}
                     >
@@ -145,17 +143,9 @@ export function StepCombinedTracking({
                 )}
                 {enabledCategories.length > 0 && (
                   <div className="hidden sm:flex items-center gap-2 w-full justify-end">
-                    {/* <Button
-                      variant="outline"
-                      size="xs"
-                      onClick={() => handleSetAllMode('auto')}
-                    >
-                      <Zap className="w-3 h-3" />
-                      Reset all to default settings
-                    </Button> */}
                     <Button variant="outline" size="xs" onClick={() => handleSetAllMode('manual')}>
                       <Type className="w-3 h-3" />
-                      All to manual entry
+                      {t('whatToTrack.buttons.allToManual')}
                     </Button>
                   </div>
                 )}
@@ -194,10 +184,10 @@ export function StepCombinedTracking({
             className="flex flex-col sm:flex-row items-center gap-4 border-t border-muted mt-2 justify-center pt-8 pb-4"
           >
             <span className="flex items-center gap-1.5">
-              <Zap className="w-3 h-3" /> = auto-calculate from delivery date
+              <Zap className="w-3 h-3" /> {t('whatToTrack.legend.autoCalculate')}
             </span>
             <span className="flex items-center gap-1.5">
-              <Type className="w-3 h-3" /> = you'll enter dates per delivery
+              <Type className="w-3 h-3" /> {t('whatToTrack.legend.manualEntry')}
             </span>
           </Typography>
         )}
@@ -213,7 +203,7 @@ export function StepCombinedTracking({
           >
             <div className="flex items-center gap-2.5">
               <Eye className="w-5 h-5" />
-              <Typography variant="p">Preview your dashboard</Typography>
+              <Typography variant="p">{t('whatToTrack.preview.title')}</Typography>
             </div>
             <ChevronDown
               className={`w-4 h-4 transition-transform duration-200 ${previewOpen ? 'rotate-180' : ''}`}
@@ -239,11 +229,12 @@ export function StepCombinedTracking({
                     <div className="flex items-center gap-3 shrink-0">
                       {batch.confidence === 'manual' ? (
                         <Badge size="sm" variant="elevated">
-                          <Type className="w-3 h-3" /> Set on delivery
+                          <Type className="w-3 h-3" /> {t('whatToTrack.preview.setOnDelivery')}
                         </Badge>
                       ) : (
                         <Badge size="sm" variant={batch.daysLeft <= 3 ? 'destructive' : 'elevated'}>
-                          {batch.daysLeft}d from delivery
+                          {batch.daysLeft}
+                          {t('whatToTrack.preview.daysFromDelivery')}
                           {batch.confidence !== 'high' && '~'}
                         </Badge>
                       )}
@@ -263,9 +254,11 @@ export function StepCombinedTracking({
                 <table className="w-full">
                   <thead>
                     <tr className="text-left text-xs uppercase tracking-wider">
-                      <th className="py-2">Product</th>
-                      <th className="py-2">Est. Expiry</th>
-                      <th className="py-2 text-right">Qty</th>
+                      <th className="py-2">{t('whatToTrack.preview.tableHeaders.product')}</th>
+                      <th className="py-2">{t('whatToTrack.preview.tableHeaders.estExpiry')}</th>
+                      <th className="py-2 text-right">
+                        {t('whatToTrack.preview.tableHeaders.qty')}
+                      </th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-secondary-100">
@@ -284,14 +277,15 @@ export function StepCombinedTracking({
                         <td className="py-2.5">
                           {batch.confidence === 'manual' ? (
                             <Badge size="sm" variant="elevated">
-                              <Type className="w-3 h-3" /> Set on delivery
+                              <Type className="w-3 h-3" /> {t('whatToTrack.preview.setOnDelivery')}
                             </Badge>
                           ) : (
                             <Badge
                               size="sm"
                               variant={batch.daysLeft <= 3 ? 'destructive' : 'elevated'}
                             >
-                              {batch.daysLeft}d from delivery
+                              {batch.daysLeft}
+                              {t('whatToTrack.preview.daysFromDelivery')}
                               {batch.confidence !== 'high' && '~'}
                             </Badge>
                           )}
@@ -307,8 +301,7 @@ export function StepCombinedTracking({
 
               <div className="pt-4 border-t border-secondary-100">
                 <span className="text-xs">
-                  Sample of {trackedProducts} tracked products · Tilde (~) = estimated from default
-                  shelf life
+                  {t('whatToTrack.preview.sampleInfo', { count: trackedProducts })}
                 </span>
               </div>
             </div>
@@ -319,10 +312,7 @@ export function StepCombinedTracking({
       {/* Info Box */}
       {enabledCategories.length > 0 && (
         <div className="flex items-start gap-3 p-4 border border-muted rounded-lg shadow-sm">
-          <Typography variant="small">
-            These are starting defaults. Your team can adjust any date when processing a delivery.
-            You can change all of this later in Settings.
-          </Typography>
+          <Typography variant="small">{t('whatToTrack.infoBox.message')}</Typography>
         </div>
       )}
 
@@ -330,18 +320,20 @@ export function StepCombinedTracking({
       {enabledCategories.length > 0 && (
         <Card className="p-4 border border-muted rounded-lg shadow-sm">
           <div className="flex items-center justify-between mb-2">
-            <Typography variant="p">{trackedProducts} products ready</Typography>
+            <Typography variant="p">
+              {t('whatToTrack.summary.productsReady', { count: trackedProducts })}
+            </Typography>
           </div>
           <div className="flex flex-col sm:flex-row sm:items-center gap-6">
             <div className="flex items-center gap-2">
               <Typography variant="small" color="secondary">
-                Auto-dated categories:
+                {t('whatToTrack.summary.autoCategories')}
               </Typography>
               <Typography variant="small">{autoCount}</Typography>
             </div>
             <div className="flex items-center gap-2">
               <Typography variant="small" color="secondary">
-                Manual categories:
+                {t('whatToTrack.summary.manualCategories')}
               </Typography>
               <Typography variant="small">{manualCount}</Typography>
             </div>
@@ -352,18 +344,18 @@ export function StepCombinedTracking({
       {/* Navigation */}
       <div className="flex justify-between">
         <Button variant="outline" onClick={onBack}>
-          Back
+          {t('whatToTrack.buttons.back')}
         </Button>
         <div className="flex gap-3">
           {enabledCategories.length > 0 && (
             <Button variant="outline" onClick={onResetToDefaults}>
               <RotateCcw className="w-3 h-3 mr-1.5" />
-              Reset
+              {t('whatToTrack.buttons.reset')}
             </Button>
           )}
           <Button onClick={onActivate} disabled={!canProceed}>
             <Zap className="w-3.5 h-3.5 mr-2" />
-            Activate
+            {t('whatToTrack.buttons.activate')}
           </Button>
         </div>
       </div>
@@ -396,6 +388,7 @@ function CategoryRowWithConfig({
   onUpdateMode,
   onUpdateShelfLife,
 }: CategoryRowWithConfigProps) {
+  const t = useTranslations('setupFlow.batchTracking.steps')
   const shouldMute = !enabled
 
   return (
@@ -416,7 +409,10 @@ function CategoryRowWithConfig({
             {category.name}
           </Typography>
           <Typography variant="small" className="text-muted-foreground">
-            {category.productCount} {category.productCount === 1 ? 'product' : 'products'}
+            {category.productCount}{' '}
+            {category.productCount === 1
+              ? t('whatToTrack.category.product')
+              : t('whatToTrack.category.products')}
           </Typography>
         </div>
       </div>
@@ -439,7 +435,11 @@ function CategoryRowWithConfig({
               onUpdateMode(category.id, newMode)
             }}
             className="hidden sm:block p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-            title={mode === 'auto' ? 'Switch to manual entry' : 'Switch to automatic'}
+            title={
+              mode === 'auto'
+                ? t('whatToTrack.category.switchToManual')
+                : t('whatToTrack.category.switchToAuto')
+            }
           >
             {mode === 'auto' ? <Zap className="w-3.5 h-3.5" /> : <Type className="w-3.5 h-3.5" />}
           </button>

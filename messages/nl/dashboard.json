@@ -659,6 +659,10 @@
       "description": "Configureer hoe LIFO uw voorraad volgt",
       "activeStore": "actieve winkel",
       "configuringFor": "Batch tracking configureren voor",
+      "shelfLifeChip": {
+        "manual": "Handmatig",
+        "daysUnit": "d"
+      },
       "steps": {
         "squareConnected": {
           "title": "Square succesvol verbonden",
@@ -675,22 +679,56 @@
         },
         "whatToTrack": {
           "title": "Wat wilt u volgen?",
-          "description": "Selecteer welke productcategorieën u wilt volgen met batch tracking. ",
+          "description": "Kies categorieën om te volgen en stel de standaard houdbaarheid in. Bij aankomst van leveringen berekenen we automatisch de vervaldata. Kies \"Handmatige invoer\" voor categorieën waarbij u de data liever zelf invoert.",
           "sections": {
             "categories": "Productcategorieën",
             "food": "Voedselcategorieën",
             "nonFood": "Niet-voedselcategorieën",
             "uncategorized": "Ongecategoriseerde producten"
           },
+          "noFoodCategories": "Geen voedselcategorieën gevonden",
           "noCategories": "Geen categorieën gevonden",
           "selectAll": "Alles selecteren",
           "deselectAll": "Alles deselecteren",
           "selectAllCategories": "Alle categorieën selecteren",
           "selecteAllProducts": "Alle producten selecteren",
+          "buttons": {
+            "allToManual": "Alles naar handmatige invoer",
+            "back": "Terug",
+            "reset": "Herstellen",
+            "activate": "Activeren"
+          },
+          "legend": {
+            "autoCalculate": "= automatisch berekenen vanaf leverdatum",
+            "manualEntry": "= u voert data per levering in"
+          },
+          "preview": {
+            "title": "Bekijk uw dashboard",
+            "setOnDelivery": "Ingesteld bij levering",
+            "daysFromDelivery": "d vanaf levering",
+            "tableHeaders": {
+              "product": "Product",
+              "estExpiry": "Geschatte vervaldatum",
+              "qty": "Aantal"
+            },
+            "sampleInfo": "Voorbeeld van {count} gevolgde producten · Tilde (~) = geschat op basis van standaard houdbaarheid"
+          },
+          "infoBox": {
+            "message": "Dit zijn standaardinstellingen. Uw team kan elke datum aanpassen bij het verwerken van een levering. U kunt dit alles later wijzigen in Instellingen."
+          },
           "summary": {
+            "productsReady": "{count} producten klaar",
+            "autoCategories": "Auto-gedateerde categorieën:",
+            "manualCategories": "Handmatige categorieën:",
             "tracking": "Volgen",
             "of": "van",
             "products": "producten"
+          },
+          "category": {
+            "product": "product",
+            "products": "producten",
+            "switchToManual": "Overschakelen naar handmatige invoer",
+            "switchToAuto": "Overschakelen naar automatisch"
           },
           "backButton": "Terug",
           "nextButton": "Volgende"
@@ -794,7 +832,42 @@
         "loadingStores": "Uw winkels laden...",
         "yourStores": "Uw winkels",
         "products": "Producten",
-        "categories": "Categorieën"
+        "categories": "Categorieën",
+        "activeStore": "Actieve winkel",
+        "syncHealth": {
+          "noData": "Geen gegevens",
+          "healthy": "Gezond",
+          "empty": "Leeg",
+          "stale": "Verouderd",
+          "error": "Fout"
+        },
+        "syncStatus": "Synchronisatiestatus",
+        "lastSynced": "Laatst gesynchroniseerd",
+        "importSummary": {
+          "title": "Importoverzicht",
+          "subtitle": "Overzicht van uw Square catalogussynchronisatie",
+          "syncing": "Uw catalogus synchroniseren...",
+          "squareConnected": "Square verbonden",
+          "storesSynced": "{syncedCount} van {totalCount} winkels gesynchroniseerd",
+          "catalogImported": "Catalogus geïmporteerd",
+          "setBatchTracking": "Batch tracking instellen",
+          "configureRules": "Configureer vervaldatumregels voor uw producten",
+          "total": "Totaal",
+          "continueButton": "Doorgaan naar Batch Tracking Setup",
+          "returnNote": "U kunt altijd terugkomen om uw Square-verbinding te beheren"
+        },
+        "timeAgo": {
+          "justNow": "Zojuist",
+          "minAgo": "{minutes} min geleden",
+          "hourAgo": "{hours}u geleden",
+          "dayAgo": "{days}d geleden"
+        },
+        "integrations": {
+          "title": "Beschikbare integraties",
+          "subtitle": "Verbind uw kassasysteem om producten automatisch te importeren en voorraad bij te houden"
+        },
+        "storesConnected": "{count} winkels verbonden vanuit Square",
+        "helpNote": "Producten en categorieën worden geïmporteerd uit uw Square-catalogus. LIFO voegt batch-niveau vervaldatum tracking toe bovenop uw bestaande productgegevens."
       },
       "batchTracking": {
         "title": "Batch tracking instellen (aanbevolen)",
@@ -816,21 +889,55 @@
           },
           "whatToTrack": {
             "title": "Wat wilt u volgen?",
-            "description": "Selecteer welke productcategorieën u wilt volgen met batch tracking. ",
+            "description": "Kies categorieën om te volgen en stel de standaard houdbaarheid in. Bij aankomst van leveringen berekenen we automatisch de vervaldata. Kies \"Handmatige invoer\" voor categorieën waarbij u de data liever zelf invoert.",
             "sections": {
               "food": "Voedselcategorieën",
               "nonFood": "Niet-voedselcategorieën",
               "uncategorized": "Ongecategoriseerde producten"
             },
             "noFoodCategories": "Geen voedselcategorieën gevonden",
+            "noCategories": "Geen categorieën gevonden",
             "selectAll": "Alles selecteren",
             "deselectAll": "Alles deselecteren",
             "selectAllCategories": "Alle categorieën selecteren",
             "selecteAllProducts": "Alle producten selecteren",
+            "buttons": {
+              "allToManual": "Alles naar handmatige invoer",
+              "back": "Terug",
+              "reset": "Herstellen",
+              "activate": "Activeren"
+            },
+            "legend": {
+              "autoCalculate": "= automatisch berekenen vanaf leverdatum",
+              "manualEntry": "= u voert data per levering in"
+            },
+            "preview": {
+              "title": "Bekijk uw dashboard",
+              "setOnDelivery": "Ingesteld bij levering",
+              "daysFromDelivery": "d vanaf levering",
+              "tableHeaders": {
+                "product": "Product",
+                "estExpiry": "Geschatte vervaldatum",
+                "qty": "Aantal"
+              },
+              "sampleInfo": "Voorbeeld van {count} gevolgde producten · Tilde (~) = geschat op basis van standaard houdbaarheid"
+            },
+            "infoBox": {
+              "message": "Dit zijn standaardinstellingen. Uw team kan elke datum aanpassen bij het verwerken van een levering. U kunt dit alles later wijzigen in Instellingen."
+            },
             "summary": {
+              "productsReady": "{count} producten klaar",
+              "autoCategories": "Auto-gedateerde categorieën:",
+              "manualCategories": "Handmatige categorieën:",
               "tracking": "Volgen",
               "of": "van",
               "products": "producten"
+            },
+            "category": {
+              "product": "product",
+              "products": "producten",
+              "switchToManual": "Overschakelen naar handmatige invoer",
+              "switchToAuto": "Overschakelen naar automatisch"
             },
             "backButton": "Terug",
             "nextButton": "Volgende"

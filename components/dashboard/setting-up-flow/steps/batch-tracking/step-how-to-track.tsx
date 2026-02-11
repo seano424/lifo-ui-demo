@@ -202,7 +202,7 @@ export function StepHowToTrack({
       <div className="flex items-start gap-3 p-4 border border-muted rounded-lg shadow-sm">
         <Typography variant="small">
           These are starting defaults. Your team can adjust any date when processing a delivery. You
-          can change all of this later in Settings.
+          can change all of this later in settings.
         </Typography>
       </div>
 

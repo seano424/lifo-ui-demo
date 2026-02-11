@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import { Type, ZapIcon } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 interface ShelfLifeChipProps {
   mode: 'auto' | 'manual'
@@ -29,6 +30,7 @@ export function ShelfLifeChip({
   onDaysChange,
   className,
 }: ShelfLifeChipProps) {
+  const t = useTranslations('setupFlow.batchTracking.shelfLifeChip')
   const [editing, setEditing] = useState(false)
   const [tempDays, setTempDays] = useState(days?.toString() || '')
 
@@ -87,7 +89,7 @@ export function ShelfLifeChip({
             className="inline-flex items-center gap-1.5 px-3 py-3 text-sm font-medium text-muted-foreground hover:bg-muted transition-colors"
           >
             <Type className="w-3 h-3" />
-            Manual
+            {t('manual')}
           </button>
         </div>
       </div>
@@ -110,7 +112,8 @@ export function ShelfLifeChip({
           )}
         >
           <ZapIcon className="w-3 h-3" />
-          {days ?? DEFAULT_SHELF_LIFE}d
+          {days ?? DEFAULT_SHELF_LIFE}
+          {t('daysUnit')}
         </button>
 
         {/* Manual button */}
@@ -125,7 +128,7 @@ export function ShelfLifeChip({
           )}
         >
           <Type className="w-3 h-3" />
-          Manual
+          {t('manual')}
         </button>
       </div>
     </div>
