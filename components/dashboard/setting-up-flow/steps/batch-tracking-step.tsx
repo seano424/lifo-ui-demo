@@ -102,6 +102,7 @@ export function BatchTrackingStep() {
   const [categoryModes, setCategoryModes] = useState<Record<string, 'auto' | 'manual'>>({})
   const [shelfLifeDays, setShelfLifeDays] = useState<Record<string, number | null>>({})
   const [productOverrides, setProductOverrides] = useState<Record<string, ProductOverride>>({})
+  const [hasInitialized, setHasInitialized] = useState(false)
 
   // Reset state when store changes
   useEffect(() => {
@@ -112,14 +113,15 @@ export function BatchTrackingStep() {
     setCategoryModes({})
     setShelfLifeDays({})
     setProductOverrides({})
+    setHasInitialized(false)
 
     // Reset to step 1
     setSubStep(1)
   }, [storeId])
 
-  // Initialize state when categories load
+  // Initialize state when categories load (only once)
   useEffect(() => {
-    if (processedCategories.length > 0 && enabledCategories.length === 0) {
+    if (processedCategories.length > 0 && !hasInitialized) {
       // Set initial enabled categories (all food categories)
       setEnabledCategories(processedCategories.filter(c => c.enabled))
 
@@ -134,8 +136,9 @@ export function BatchTrackingStep() {
       }
       setCategoryModes(modes)
       setShelfLifeDays(days)
+      setHasInitialized(true)
     }
-  }, [processedCategories, enabledCategories.length])
+  }, [processedCategories, hasInitialized])
 
   // Clean up stale categories when processedCategories changes
   useEffect(() => {
@@ -302,8 +305,7 @@ export function BatchTrackingStep() {
       // No manual navigation needed - React Query invalidation handles it
     } catch (error) {
       logger.error(context, 'Failed to activate batch tracking', { error, storeId })
-      // TODO: Show error toast
-      // For now, go back to step 1
+      // Go back to step 1
       setSubStep(1)
       setShowSuccess(false)
     }

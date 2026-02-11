@@ -17,6 +17,7 @@ import type {
   SaveBatchTrackingSetupResponse,
 } from '@/types/rpc-returns'
 import {
+  BatchTrackingSetupResponseSchema,
   CategoryWithTrackingSettingsSchema,
   ProductWithTrackingSettingsSchema,
   SaveBatchTrackingSetupResponseSchema,
@@ -90,9 +91,8 @@ export function useBatchTrackingSetup(storeId: string) {
         throw new Error(`Failed to fetch batch tracking setup: ${error.message}`)
       }
 
-      const typedData = data as unknown as
-        | import('@/types/rpc-returns').BatchTrackingSetupResponse
-        | null
+      // Validate response with Zod schema
+      const typedData = data ? BatchTrackingSetupResponseSchema.parse(data) : null
 
       logger.log(context, 'Batch tracking setup fetched successfully', {
         storeId,

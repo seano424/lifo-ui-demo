@@ -165,9 +165,14 @@ DECLARE
 BEGIN
   -- Get current authenticated user
   v_user_id := auth.uid();
-  
+
   IF v_user_id IS NULL THEN
     RAISE EXCEPTION 'Not authenticated';
+  END IF;
+
+  -- Validate store_id first
+  IF p_store_id IS NULL THEN
+    RAISE EXCEPTION 'store_id is required';
   END IF;
 
   -- CRITICAL: Verify user has access to this store
@@ -178,11 +183,6 @@ BEGIN
       AND is_active = true
   ) THEN
     RAISE EXCEPTION 'Unauthorized: User does not have access to store %', p_store_id;
-  END IF;
-
-  -- Validate store_id
-  IF p_store_id IS NULL THEN
-    RAISE EXCEPTION 'store_id is required';
   END IF;
 
   RETURN QUERY

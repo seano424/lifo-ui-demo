@@ -65,6 +65,8 @@ export function StepCombinedTracking({
   const handleToggleAll = (checked: boolean) => {
     if (checked) {
       categories.forEach(cat => onToggleCategory(cat.id, true))
+    } else {
+      categories.forEach(cat => onToggleCategory(cat.id, false))
     }
   }
 
@@ -156,7 +158,6 @@ export function StepCombinedTracking({
                 const enabled = enabledIds.has(category.id)
                 const mode = categoryModes[category.id] || 'auto'
                 const days = shelfLifeDays[category.id]
-                const isLastEnabled = enabled && enabledCategories.length === 1
 
                 return (
                   <CategoryRowWithConfig
@@ -165,7 +166,6 @@ export function StepCombinedTracking({
                     enabled={enabled}
                     mode={mode}
                     days={days}
-                    disabled={isLastEnabled}
                     onToggle={onToggleCategory}
                     onUpdateMode={onUpdateMode}
                     onUpdateShelfLife={onUpdateShelfLife}

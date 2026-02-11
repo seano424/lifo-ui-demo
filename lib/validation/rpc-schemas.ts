@@ -313,6 +313,53 @@ export const RestoreIgnoredBatchResponseSchema = z.object({
  * Schema for get_categories_with_tracking_settings RPC response
  * Validates categories with their tracking and automation settings
  */
+/**
+ * Schema for automation schedule configuration
+ * Validates scheduling parameters for automated batch creation
+ */
+const AutomationScheduleSchema = z.object({
+  enabled: z.boolean(),
+  run_time: z.string(),
+  days: z.array(z.string()),
+})
+
+/**
+ * Schema for batch tracking configuration
+ * Validates the overall batch tracking setup for a store
+ */
+const BatchTrackingConfigSchema = z.object({
+  enabled: z.boolean(),
+  setup_completed: z.boolean(),
+  setup_completed_at: z.string().optional(),
+  product_selection_mode: z.enum(['all', 'by_category', 'individual']).optional(),
+  selected_category_ids: z.array(z.string()).optional(),
+  selected_product_ids: z.array(z.string()).optional(),
+  automation_schedule: AutomationScheduleSchema.optional(),
+})
+
+/**
+ * Schema for category tracking settings
+ * Validates tracking configuration for individual categories
+ */
+const CategoryTrackingSettingSchema = z.object({
+  category_id: z.string(),
+  is_tracked: z.boolean(),
+  auto_create_batches: z.boolean(),
+  default_shelf_life_days: z.number().nullable(),
+})
+
+/**
+ * Schema for get_batch_tracking_setup RPC response
+ * Validates the complete batch tracking configuration including settings
+ */
+export const BatchTrackingSetupResponseSchema = z.object({
+  config: BatchTrackingConfigSchema,
+  category_settings: z.array(CategoryTrackingSettingSchema),
+  product_override_count: z.number(),
+  tracked_product_count: z.number(),
+  automated_product_count: z.number(),
+})
+
 export const CategoryWithTrackingSettingsSchema = z.object({
   category_id: z.string(),
   category_code: z.string(),
@@ -513,6 +560,7 @@ export type RecentDeliveryProduct = z.infer<typeof RecentDeliveryProductSchema>
 export type IgnoredBatchesSummaryResponse = z.infer<typeof IgnoredBatchesSummaryResponseSchema>
 export type IgnoredBatchesByProduct = z.infer<typeof IgnoredBatchesByProductSchema>
 export type RestoreIgnoredBatchResponse = z.infer<typeof RestoreIgnoredBatchResponseSchema>
+export type BatchTrackingSetupResponse = z.infer<typeof BatchTrackingSetupResponseSchema>
 export type CategoryWithTrackingSettings = z.infer<typeof CategoryWithTrackingSettingsSchema>
 export type ProductWithTrackingSettings = z.infer<typeof ProductWithTrackingSettingsSchema>
 export type SaveBatchTrackingSetupResponse = z.infer<typeof SaveBatchTrackingSetupResponseSchema>

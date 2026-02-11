@@ -542,7 +542,7 @@ export interface BatchTrackingConfig {
   enabled: boolean
   setup_completed: boolean
   setup_completed_at?: string
-  product_selection_mode?: 'all' | 'categories' | 'products'
+  product_selection_mode?: 'all' | 'by_category' | 'individual'
   selected_category_ids?: string[]
   selected_product_ids?: string[]
   automation_schedule?: AutomationSchedule
