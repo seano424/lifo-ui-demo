@@ -574,12 +574,17 @@ export interface ProductTrackingOverride {
 }
 
 /** Response from save_batch_tracking_setup */
-export interface SaveBatchTrackingSetupResponse {
-  success: boolean
-  setup_completed: boolean
-  categories_updated: number
-  products_updated: number
-}
+export type SaveBatchTrackingSetupResponse =
+  | {
+      success: true
+      setup_completed: boolean
+      categories_updated: number
+      products_updated: number
+    }
+  | {
+      success: false
+      error: string
+    }
 
 /** Category with tracking settings from get_categories_with_tracking_settings */
 export interface CategoryWithTrackingSettings {

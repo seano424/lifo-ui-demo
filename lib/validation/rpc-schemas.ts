@@ -349,13 +349,20 @@ export const ProductWithTrackingSettingsSchema = z.object({
 /**
  * Schema for save_batch_tracking_setup RPC response
  * Validates batch tracking setup save results
+ * Handles both success and error responses
  */
-export const SaveBatchTrackingSetupResponseSchema = z.object({
-  success: z.boolean(),
-  setup_completed: z.boolean(),
-  categories_updated: z.number(),
-  products_updated: z.number(),
-})
+export const SaveBatchTrackingSetupResponseSchema = z.discriminatedUnion('success', [
+  z.object({
+    success: z.literal(true),
+    setup_completed: z.boolean(),
+    categories_updated: z.number(),
+    products_updated: z.number(),
+  }),
+  z.object({
+    success: z.literal(false),
+    error: z.string(),
+  }),
+])
 
 // =============================================================================
 // TYPE INFERENCE HELPERS

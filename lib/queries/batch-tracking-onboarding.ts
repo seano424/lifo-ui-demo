@@ -302,6 +302,15 @@ export function useSaveBatchTrackingSetup() {
         throw new Error('Invalid response from save operation')
       }
 
+      // Check if the operation was successful
+      if (!validated.success) {
+        logger.queryWarn(context, 'Save operation failed', {
+          error: validated.error,
+          storeId: params.storeId,
+        })
+        throw new Error(`Failed to save batch tracking setup: ${validated.error}`)
+      }
+
       logger.log(context, 'Batch tracking setup saved successfully', {
         storeId: params.storeId,
         categoriesUpdated: validated.categories_updated,
