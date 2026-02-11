@@ -17,8 +17,11 @@ interface DeliveryBannerProps {
 /**
  * Delivery Banner Component
  *
- * Shows a dark banner when there are draft batches needing expiry dates.
- * Can be dismissed, but reappears when new drafts are created.
+ * Shows a dark banner when there are incomplete batches needing expiry dates.
+ * Can be dismissed, but reappears when new incomplete batches are created.
+ *
+ * Note: The dedicated "draft batch workflow" was removed in PR #310.
+ * This component is preserved for future untracked stock feature.
  */
 export function DeliveryBanner({ totalDrafts, isClosing = false, onDismiss }: DeliveryBannerProps) {
   const t = useTranslations('dashboard.redesign.deliveryBanner')

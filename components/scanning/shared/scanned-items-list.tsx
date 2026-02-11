@@ -22,7 +22,7 @@ export interface ScannedItem {
   barcode: string
   productName: string
   brand?: string
-  expiryDate: string | null // Nullable for draft batches without expiry dates
+  expiryDate: string | null // Nullable for incomplete batches without expiry dates
   quantity: number
   price: number
   timestamp: Date
