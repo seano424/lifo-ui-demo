@@ -125,24 +125,26 @@ export function StepCombinedTracking({
           ) : (
             <>
               {/* Select All Toggle */}
-              <div className="hidden flex-col-reverse sm:flex-row gap-4 sm:gap-0 sm:items-center sm:justify-between py-2 sm:flex pb-3">
-                <div className="flex items-center gap-3">
-                  <Toggle
-                    checked={allSelected}
-                    onCheckedChange={handleToggleAll}
-                    disabled={categories.length <= 1}
-                  />
-                  <Typography
-                    variant="p"
-                    className={`font-medium transition-colors ${
-                      !allSelected ? 'text-muted-foreground' : ''
-                    }`}
-                  >
-                    {t('whatToTrack.selectAllCategories')}
-                  </Typography>
-                </div>
+              <div className="hidden flex-col-reverse sm:flex-row gap-4 sm:gap-0 sm:items-center sm:justify-between py-2 sm:flex border-b border-muted pb-4">
+                {categories.length > 1 && (
+                  <div className="flex items-center gap-3">
+                    <Toggle
+                      checked={allSelected}
+                      onCheckedChange={handleToggleAll}
+                      disabled={categories.length <= 1}
+                    />
+                    <Typography
+                      variant="p"
+                      className={`font-medium min-w-fit transition-colors ${
+                        !allSelected ? 'text-muted-foreground' : ''
+                      }`}
+                    >
+                      {t('whatToTrack.selectAllCategories')}
+                    </Typography>
+                  </div>
+                )}
                 {enabledCategories.length > 0 && (
-                  <div className="hidden sm:flex items-center gap-2">
+                  <div className="hidden sm:flex items-center gap-2 w-full justify-end">
                     {/* <Button
                       variant="outline"
                       size="xs"
@@ -398,12 +400,13 @@ function CategoryRowWithConfig({
   return (
     <div className="flex flex-col sm:flex-row sm:items-center justify-between py-2 gap-4 border-b border-muted pb-4 sm:pb-0 sm:border-none">
       {/* Left: Category Info + Toggle */}
-      <div className="flex items-center gap-3 flex-1 min-w-0">
+      <div className="flex items-center gap-3 flex-1 min-w-0 min-h-12">
         <Toggle
           checked={enabled}
           disabled={disabled}
           onCheckedChange={(checked: boolean) => onToggle(category.id, checked)}
         />
+
         <div className="flex-1 min-w-0">
           <Typography
             variant="p"
