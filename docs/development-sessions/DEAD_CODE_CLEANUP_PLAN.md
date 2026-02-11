@@ -174,16 +174,18 @@ Before removing any file, verify it's NOT:
 **Goal:** Remove all zero-import files (safest wins)
 
 **Checklist:**
-- [ ] Delete `lib/services/metrics.ts`
-- [ ] Delete `hooks/use-kpi-trends.ts`
-- [ ] Delete `hooks/use-expiry-dashboard-summary.ts`
-- [ ] Delete `lib/utils/language-detection.ts`
-- [ ] Delete `lib/stores/batch-tracking-onboarding-store.ts`
-- [ ] Run `npm run check` to verify no type errors
-- [ ] Run `npm run build` to verify build succeeds
-- [ ] Commit with message: `chore: remove unused services, hooks, and utilities`
+- [x] Delete `lib/services/metrics.ts`
+- [x] Delete `hooks/use-kpi-trends.ts`
+- [x] Delete `hooks/use-expiry-dashboard-summary.ts`
+- [x] Delete `lib/utils/language-detection.ts`
+- [x] Delete `lib/stores/batch-tracking-onboarding-store.ts`
+- [x] Run `npm run check` to verify no type errors
+- [x] Run `npm run build` to verify build succeeds
+- [x] Commit with message: `chore: remove unused services, hooks, and utilities`
 
 **Note:** `lib/hooks/use-setup-progress.ts` removed from this phase - still actively used by setup flow
+
+**Results:** ✅ Removed 854 lines of dead code, all checks passed
 
 **Estimated Time:** 30 minutes
 **Risk Level:** ✅ Minimal (zero imports = safe removal)
@@ -290,10 +292,10 @@ After each phase:
 
 | Phase | Status | Files Removed | Lines Saved | Completed Date |
 |-------|--------|---------------|-------------|----------------|
-| Phase 1 | ⏳ Not Started | 0/5 | 0/~500 | - |
+| Phase 1 | ✅ Complete | 5/5 | 854 | 2026-02-11 |
 | Phase 2 | ⏳ Not Started | 0/6 | 0/~400 | - |
 | Phase 3 | ⏳ Not Started | 0/2 | 0/~50 | - |
-| **Total** | **0%** | **0/13** | **0/~950** | - |
+| **Total** | **38%** | **5/13** | **854/~1300** | - |
 
 ---
 
