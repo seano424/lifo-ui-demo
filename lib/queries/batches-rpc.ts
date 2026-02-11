@@ -83,7 +83,6 @@ export async function fetchBatchesPageRPC(
         p_page_size: pageSize,
         p_product_id: filters.product_id ?? undefined,
         p_status: filters.status ?? undefined,
-        p_exclude_drafts: filters.excludeDrafts ?? undefined,
         p_location_code: filters.location_code ?? undefined,
         p_supplier: filters.supplier ?? undefined,
         p_has_stock: filters.hasStock ?? undefined,
