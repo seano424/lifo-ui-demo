@@ -15,6 +15,11 @@ import { useSetupFlowStore } from '@/lib/stores/setup-flow-store'
 import { StoreIndicator } from '../store-indicator'
 
 // =============================================================================
+// DEMO MODE - Toggle this to test the animation without database changes
+// =============================================================================
+const DEMO_MODE = false // Set to true to preview animation without saving
+
+// =============================================================================
 // TYPES
 // =============================================================================
 
@@ -217,7 +222,7 @@ export function BatchTrackingStep() {
   }
 
   const handleActivate = async () => {
-    if (!storeId) {
+    if (!storeId && !DEMO_MODE) {
       logger.error(context, 'Cannot activate batch tracking without storeId')
       return
     }
@@ -225,6 +230,32 @@ export function BatchTrackingStep() {
     setSubStep('activating')
 
     try {
+      if (DEMO_MODE) {
+        // ============================================================
+        // DEMO MODE: Preview animation without database changes
+        // ============================================================
+        logger.log(context, '🎨 DEMO MODE: Simulating batch tracking activation', {
+          enabledCount: enabledCategories.length,
+          overridesCount: Object.keys(productOverrides).length,
+        })
+
+        // Simulate the smart minimum duration (2 seconds)
+        await new Promise(resolve => setTimeout(resolve, 2000))
+
+        logger.log(context, '🎨 DEMO MODE: Simulated activation complete')
+
+        // Show success animation for 1.5 seconds
+        setShowSuccess(true)
+        await new Promise(resolve => setTimeout(resolve, 1500))
+
+        logger.log(context, '🎨 DEMO MODE: Animation complete - staying on this screen')
+        // In demo mode, we stay here. In real mode, setup flow auto-exits to dashboard.
+        return
+      }
+
+      // ============================================================
+      // REAL MODE: Actual database save
+      // ============================================================
       logger.log(context, 'Activating batch tracking', {
         storeId,
         enabledCount: enabledCategories.length,
