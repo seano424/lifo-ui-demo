@@ -35,16 +35,6 @@ export function MarketingFooter() {
                   {t('links.homepage')}
                 </Typography>
               </Link>
-              <Link href="/features">
-                <Typography variant="small" className="hover:text-primary transition-colors">
-                  {t('links.features')}
-                </Typography>
-              </Link>
-              <Link href="/pricing">
-                <Typography variant="small" className="hover:text-primary transition-colors">
-                  {t('links.pricing')}
-                </Typography>
-              </Link>
               <Link href="/contact">
                 <Typography variant="small" className="hover:text-primary transition-colors">
                   {t('links.contact')}

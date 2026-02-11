@@ -6,6 +6,7 @@
 'use client'
 
 import { AlertTriangle, RefreshCw, X } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { formatErrorForDisplay } from '@/lib/utils/error-parser'
 import { Button } from '@/components/ui/button'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
@@ -24,6 +25,7 @@ export function SyncErrorAlert({
   onDismiss,
   isRetrying = false,
 }: SyncErrorAlertProps) {
+  const t = useTranslations('common')
   const [isDismissed, setIsDismissed] = useState(false)
 
   if (!error || isDismissed) return null
@@ -48,7 +50,7 @@ export function SyncErrorAlert({
             onClick={handleDismiss}
           >
             <X className="h-4 w-4" />
-            <span className="sr-only">Dismiss</span>
+            <span className="sr-only">{t('actions.dismiss')}</span>
           </Button>
         )}
       </AlertTitle>

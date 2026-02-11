@@ -141,23 +141,17 @@
         "quantity": "Quantité",
         "stock": "Stock",
         "costPrice": "Prix de revient",
-        "sellPrice": "Prix de vente",
         "status": "Statut",
-        "createdAt": "Créé le",
         "location": "Emplacement"
       },
       "actions": {
         "viewDetails": "Voir les détails",
-        "editBatch": "Modifier le lot",
-        "markAsExpired": "Marquer comme expiré",
-        "markAsDamaged": "Marquer comme endommagé",
         "deleteBatch": "Supprimer le lot"
       },
       "searchPlaceholder": "Rechercher",
       "emptyState": {
         "title": "Aucun lot trouvé",
-        "description": "Vous n'avez encore aucun lot dans votre inventaire. Commencez par ajouter votre premier lot pour suivre les dates d'expiration et gérer les niveaux de stock.",
-        "addFirstBatch": "Ajouter le premier lot"
+        "description": "Vous n'avez encore aucun lot dans votre inventaire. Commencez par ajouter votre premier lot pour suivre les dates d'expiration et gérer les niveaux de stock."
       },
       "loadMore": "Charger plus de lots ({remaining} restants)",
       "loading": "Chargement en cours..."
@@ -178,28 +172,6 @@
       "expired": "Expiré",
       "daysLeft": "{days}j restants",
       "noExpiryDate": "Aucune date d'expiration"
-    },
-    "draftBatches": {
-      "addExpiryDate": "Ajouter une date d'expiration",
-      "completeBatch": "Compléter le lot",
-      "incompleteBatch": "Incomplet - Ajouter une date d'expiration",
-      "needsExpiryDate": "{count} produits nécessitent des dates d'expiration pour activer le scoring IA",
-      "completeNow": "Compléter maintenant",
-      "draftBatchWarning": "Ce lot nécessite une date d'expiration avant de pouvoir être évalué par l'IA"
-    }
-  },
-  "deliveries": {
-    "mobile": {
-      "barcodeScanning": "Scan de codes-barres",
-      "csvBulkImport": "Import CSV en masse"
-    },
-    "desktop": {
-      "manualEntry": "Saisie manuelle",
-      "csvBulkImport": "Import CSV en masse"
-    },
-    "messages": {
-      "selectStore": "Veuillez sélectionner un magasin pour télécharger les données d'inventaire.",
-      "selectStoreInventory": "Veuillez sélectionner un magasin pour ajouter de l'inventaire."
     }
   },
   "manualDelivery": {
@@ -212,22 +184,12 @@
         "barcode": "Code-barres :"
       }
     },
-    "batchDetails": {
-      "title": "Détails du lot"
-    },
     "buttons": {
       "addBatch": "Ajouter lot",
       "clear": "Effacer",
-      "submitAll": "Soumettre tout",
       "cancel": "Annuler",
       "submitting": "Soumission...",
-      "submitToInventory": "Soumettre à l'inventaire",
-      "addMoreProducts": "Ajouter plus de produits",
-      "viewInInventory": "Voir dans l'inventaire"
-    },
-    "batchItems": {
-      "title": "Articles de lot à soumettre",
-      "description": "{count, plural, one {# lot prêt à soumettre} other {# lots prêts à soumettre}}"
+      "submitToInventory": "Soumettre à l'inventaire"
     },
     "confirmation": {
       "title": "Confirmer la soumission",
@@ -236,10 +198,6 @@
       "totals": {
         "totalItems": "Total d'articles :",
         "totalValue": "Valeur totale :"
-      },
-      "itemDetails": {
-        "expires": "Expire :",
-        "total": "Total :"
       }
     },
     "success": {
@@ -248,9 +206,6 @@
         "allSuccess": "Ajouté avec succès {count, plural, one {# lot} other {# lots}} à votre inventaire.",
         "partialSuccess": "Ajouté {successCount} sur {totalCount} lots à l'inventaire."
       }
-    },
-    "alerts": {
-      "gettingStarted": "Commencez par rechercher un produit en utilisant le code-barres ou la recherche par nom de produit ci-dessus. Après avoir sélectionné un produit, vous pourrez ajouter la date d'expiration, la quantité et le prix."
     }
   },
   "scanningCamera": {
@@ -520,26 +475,10 @@
     },
     "urgentAlerts": {
       "levels": {
-        "urgentOnly": "Articles urgents uniquement",
-        "priority": "Articles prioritaires",
-        "allFlagged": "Tous les articles signalés",
-        "completeReview": "Révision complète"
+        "priority": "Articles prioritaires"
       },
       "errors": {
-        "connectionError": "Erreur de connexion",
-        "unableToLoad": "Impossible de charger les alertes d'inventaire. Veuillez réessayer.",
-        "loadingAlerts": "Chargement des alertes..."
-      },
-      "messages": {
-        "nothingToShow": "Aucun article ne nécessite d'attention pour le moment - tout est en ordre !",
-        "itemNeedsAction": "{count, plural, one {article nécessite} other {articles nécessitent}} une action immédiate",
-        "itemMayNeedAction": "{count, plural, one {article pourrait nécessiter} other {articles pourraient nécessiter}} de l'attention bientôt",
-        "itemsFlagged": "{count, plural, one {article signalé} other {articles signalés}} pour révision",
-        "itemsMonitoring": "{count, plural, one {article signalé} other {articles signalés}} pour surveillance"
-      },
-      "buttons": {
-        "viewInventory": "Voir l'inventaire",
-        "viewItems": "Voir les articles"
+        "unableToLoad": "Impossible de charger les alertes d'inventaire. Veuillez réessayer."
       }
     },
     "alertQuickToggle": {
@@ -547,61 +486,21 @@
         "urgent": "Urgent",
         "default": "Défaut",
         "early": "Précoce"
-      },
-      "tooltips": {
-        "urgentTitle": "Seuls les éléments urgents nécessitant une action immédiate",
-        "urgentSubtitle": "Moins d'alertes - plus restrictif",
-        "defaultTitle": "Éléments nécessitant une attention prochainement",
-        "defaultSubtitle": "Vue équilibrée - recommandé",
-        "earlyTitle": "Tous les éléments signalés et alertes précoces",
-        "earlySubtitle": "Plus d'alertes - prévention maximale"
       }
     },
     "actionableBatches": {
       "title": "Recommandations basées sur le score",
       "loading": "Chargement des lots exploitables...",
       "error": "Impossible de charger les recommandations de score. Veuillez réessayer.",
-      "noActions": "Aucune action immédiate requise ! Tous les lots sont dans les seuils de sécurité.",
       "urgencyLevels": {
         "critical": "Critique",
         "high": "Élevé Prioritaire",
         "medium": "Moyen Prioritaire",
         "low": "Faible Prioritaire"
       },
-      "summaryLabels": {
-        "critical": "Critique",
-        "high": "Élevé Prioritaire",
-        "medium": "Moyen Prioritaire",
-        "low": "Faible Prioritaire"
-      },
-      "batchDetails": {
-        "qty": "Qté",
-        "daysToExpiry": "jours avant expiration",
-        "lossRisk": "Risque de perte",
-        "score": "Score"
-      },
       "buttons": {
         "executeDonation": "Exécuter la donation",
-        "donateInstead": "Donner plutôt",
-        "cancel": "Annuler",
-        "confirmDonation": "Confirmer la donation"
-      },
-      "scoringRecommendation": {
-        "label": "Recommandation de score",
-        "urgency": "Urgence",
-        "score": "Score"
-      },
-      "donationDialog": {
-        "title": "Donner le lot",
-        "description": "Sélectionnez un destinataire pour {productName}",
-        "quantity": "Quantité",
-        "expires": "Expire",
-        "selectRecipient": "Sélectionner le destinataire de la donation",
-        "chooseRecipient": "Choisir un destinataire...",
-        "certified": "Certifié",
-        "notCertified": "Non certifié",
-        "notesLabel": "Notes (optionnel)",
-        "notesPlaceholder": "Ajoutez des notes sur cette donation..."
+        "cancel": "Annuler"
       }
     }
   }

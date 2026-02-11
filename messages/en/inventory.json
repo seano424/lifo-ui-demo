@@ -141,23 +141,17 @@
         "quantity": "Quantity",
         "stock": "Stock",
         "costPrice": "Cost Price",
-        "sellPrice": "Sell Price",
         "status": "Status",
-        "createdAt": "Created At",
         "location": "Location"
       },
       "actions": {
         "viewDetails": "View Details",
-        "editBatch": "Edit Batch",
-        "markAsExpired": "Mark as Expired",
-        "markAsDamaged": "Mark as Damaged",
         "deleteBatch": "Delete Batch"
       },
       "searchPlaceholder": "Search",
       "emptyState": {
         "title": "No batches found",
-        "description": "Try adjusting your search or filters. ",
-        "addFirstBatch": "Add First Batch"
+        "description": "Try adjusting your search or filters. "
       },
       "loadMore": "Load More Batches ({remaining} remaining)",
       "loading": "Loading more..."
@@ -178,28 +172,6 @@
       "expired": "Expired",
       "daysLeft": "{days}d left",
       "noExpiryDate": "No expiry date"
-    },
-    "draftBatches": {
-      "addExpiryDate": "Add Expiry Date",
-      "completeBatch": "Complete Batch",
-      "incompleteBatch": "Incomplete - Add Expiry Date",
-      "needsExpiryDate": "{count} products need expiry dates to enable AI scoring",
-      "completeNow": "Complete Now",
-      "draftBatchWarning": "This batch needs an expiry date before it can be scored by AI"
-    }
-  },
-  "deliveries": {
-    "mobile": {
-      "barcodeScanning": "Barcode Scanning",
-      "csvBulkImport": "CSV Bulk Import"
-    },
-    "desktop": {
-      "manualEntry": "Manual Entry",
-      "csvBulkImport": "CSV Bulk Import"
-    },
-    "messages": {
-      "selectStore": "Please select a store to upload inventory data.",
-      "selectStoreInventory": "Please select a store to add inventory."
     }
   },
   "manualDelivery": {
@@ -212,22 +184,12 @@
         "barcode": "Barcode:"
       }
     },
-    "batchDetails": {
-      "title": "Batch Details"
-    },
     "buttons": {
       "addBatch": "Add Batch",
       "clear": "Clear",
-      "submitAll": "Submit All",
       "cancel": "Cancel",
       "submitting": "Submitting...",
-      "submitToInventory": "Submit to Inventory",
-      "addMoreProducts": "Add More Products",
-      "viewInInventory": "View in Inventory"
-    },
-    "batchItems": {
-      "title": "Batch items to submit",
-      "description": "{count, plural, one {# batch ready to submit} other {# batches ready to submit}}"
+      "submitToInventory": "Submit to Inventory"
     },
     "confirmation": {
       "title": "Confirm Submission",
@@ -236,10 +198,6 @@
       "totals": {
         "totalItems": "Total Items:",
         "totalValue": "Total Value:"
-      },
-      "itemDetails": {
-        "expires": "Expires:",
-        "total": "Total:"
       }
     },
     "success": {
@@ -248,9 +206,6 @@
         "allSuccess": "Successfully added {count, plural, one {# batch} other {# batches}} to your inventory.",
         "partialSuccess": "Added {successCount} of {totalCount} batches to inventory."
       }
-    },
-    "alerts": {
-      "gettingStarted": "Start by searching for a product using the barcode or product name search above. After selecting a product, you'll be able to add expiry date, quantity, and price."
     }
   },
   "scanningCamera": {
@@ -408,7 +363,6 @@
       }
     }
   },
-
   "csvUpload": {
     "title": "Ultra-Fast CSV Upload",
     "subtitle": "Lightning-fast processing",
@@ -521,26 +475,10 @@
     },
     "urgentAlerts": {
       "levels": {
-        "urgentOnly": "Urgent Items Only",
-        "priority": "Priority Items",
-        "allFlagged": "All Flagged Items",
-        "completeReview": "Complete Review"
+        "priority": "Priority Items"
       },
       "errors": {
-        "connectionError": "Connection Error",
-        "unableToLoad": "Unable to load inventory alerts. Please try again.",
-        "loadingAlerts": "Loading alerts..."
-      },
-      "messages": {
-        "nothingToShow": "No items need attention right now - you're all caught up!",
-        "itemNeedsAction": "{count, plural, one {item needs} other {items need}} immediate action",
-        "itemMayNeedAction": "{count, plural, one {item may need} other {items may need}} attention soon",
-        "itemsFlagged": "{count, plural, one {item flagged} other {items flagged}} for review",
-        "itemsMonitoring": "{count, plural, one {item flagged} other {items flagged}} for monitoring"
-      },
-      "buttons": {
-        "viewInventory": "View inventory",
-        "viewItems": "View items"
+        "unableToLoad": "Unable to load inventory alerts. Please try again."
       }
     },
     "alertQuickToggle": {
@@ -548,61 +486,21 @@
         "urgent": "Urgent",
         "default": "Default",
         "early": "Early"
-      },
-      "tooltips": {
-        "urgentTitle": "Only urgent items requiring immediate action",
-        "urgentSubtitle": "Fewest alerts - most restrictive",
-        "defaultTitle": "Items needing attention soon",
-        "defaultSubtitle": "Balanced view - recommended",
-        "earlyTitle": "All flagged items and early warnings",
-        "earlySubtitle": "Most alerts - maximum prevention"
       }
     },
     "actionableBatches": {
       "title": "Scoring-Based Recommendations",
       "loading": "Loading actionable batches...",
       "error": "Failed to load scoring recommendations. Please try again.",
-      "noActions": "No immediate actions required! All batches are within safe scoring thresholds.",
       "urgencyLevels": {
         "critical": "Critical",
         "high": "High Priority",
         "medium": "Medium Priority",
         "low": "Low Priority"
       },
-      "summaryLabels": {
-        "critical": "Critical",
-        "high": "High Priority",
-        "medium": "Medium Priority",
-        "low": "Low Priority"
-      },
-      "batchDetails": {
-        "qty": "Qty",
-        "daysToExpiry": "days to expiry",
-        "lossRisk": "Loss Risk",
-        "score": "Score"
-      },
       "buttons": {
         "executeDonation": "Execute Donation",
-        "donateInstead": "Donate Instead",
-        "cancel": "Cancel",
-        "confirmDonation": "Confirm Donation"
-      },
-      "scoringRecommendation": {
-        "label": "Scoring Recommendation",
-        "urgency": "Urgency",
-        "score": "Score"
-      },
-      "donationDialog": {
-        "title": "Donate Batch",
-        "description": "Select a recipient for {productName}",
-        "quantity": "Quantity",
-        "expires": "Expires",
-        "selectRecipient": "Select Donation Recipient",
-        "chooseRecipient": "Choose a recipient...",
-        "certified": "Certified",
-        "notCertified": "Not certified",
-        "notesLabel": "Notes (optional)",
-        "notesPlaceholder": "Add any notes about this donation..."
+        "cancel": "Cancel"
       }
     }
   }

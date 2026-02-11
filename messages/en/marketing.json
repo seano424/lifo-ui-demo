@@ -7,7 +7,6 @@
       "resources": "Resources",
       "product": "Product",
       "pricing": "Pricing",
-      "builtFor": "Built for",
       "helpCenter": "Help Center",
       "helpCenterDesc": "Get all the answers you need right here",
       "contactUs": "Contact Us",
@@ -28,7 +27,6 @@
     },
     "auth": {
       "login": "Login",
-      "businessSignup": "Business Signup",
       "signup": "Signup",
       "logout": "Logout",
       "goToDashboard": "Dashboard",
@@ -293,8 +291,14 @@
           "3": "Email support"
         },
         "fees": [
-          { "type": "Margin of products sold", "percentage": "30%" },
-          { "type": "Tax credit", "percentage": "20%" }
+          {
+            "type": "Margin of products sold",
+            "percentage": "30%"
+          },
+          {
+            "type": "Tax credit",
+            "percentage": "20%"
+          }
         ],
         "sellingPoint": "Get started on managing your inventory"
       },
@@ -312,8 +316,14 @@
           "4": "Advanced analytics"
         },
         "fees": [
-          { "type": "Margin of products sold", "percentage": "30%" },
-          { "type": "Tax credit", "percentage": "20%" }
+          {
+            "type": "Margin of products sold",
+            "percentage": "30%"
+          },
+          {
+            "type": "Tax credit",
+            "percentage": "20%"
+          }
         ],
         "sellingPoint": "Manage roles in your shop effectively"
       },
@@ -330,300 +340,16 @@
           "4": "Custom pricing per POS"
         },
         "fees": [
-          { "type": "Margin of products sold", "percentage": "Custom%" },
-          { "type": "Tax credit", "percentage": "Custom%" }
+          {
+            "type": "Margin of products sold",
+            "percentage": "Custom%"
+          },
+          {
+            "type": "Tax credit",
+            "percentage": "Custom%"
+          }
         ],
         "sellingPoint": "Manage multiple POS and get advanced analytics"
-      }
-    }
-  },
-  "support": {
-    "mainPage": {
-      "title": "Support Center",
-      "subtitle": "Find guides and articles to help you get the most out of lifo",
-      "sections": {
-        "gettingStarted": {
-          "title": "Getting Started",
-          "description": "Everything you need to know to start using lifo effectively"
-        },
-        "workflowsProcesses": {
-          "title": "Workflows & Processes",
-          "description": "Step-by-step guides for core lifo workflows"
-        }
-      },
-      "articles": {
-        "quickStartGuide": {
-          "title": "Quick Start Guide",
-          "description": "Get up and running with lifo in under 10 minutes",
-          "readTime": "5 min"
-        },
-        "inventoryManagement": {
-          "title": "Inventory Management",
-          "description": "Real-time views, alerts, and reconciliation",
-          "readTime": "5 min"
-        },
-        "scanInProcess": {
-          "title": "Scan-In Process",
-          "description": "Recording deliveries, returns, and new inventory",
-          "readTime": "4 min"
-        },
-        "multiStoreManagement": {
-          "title": "Multi-Store Management",
-          "description": "Managing multiple locations and staff access",
-          "readTime": "5 min",
-          "comingSoon": true
-        },
-        "userRolesPermissions": {
-          "title": "User Roles & Permissions",
-          "description": "Understanding different access levels and capabilities",
-          "readTime": "6 min",
-          "comingSoon": true
-        },
-        "scanOutProcess": {
-          "title": "Scan-Out Process",
-          "description": "Recording sales, discounts, donations, and waste",
-          "readTime": "8 min",
-          "comingSoon": true
-        }
-      },
-      "contactSupport": {
-        "title": "Need More Help?",
-        "description": "Can't find what you're looking for? Our team is here to help.",
-        "buttons": {
-          "contactSupport": "Contact Support",
-          "emailUs": "Email Us"
-        }
-      },
-      "common": {
-        "comingSoon": "Coming Soon",
-        "readTime": "min read"
-      }
-    },
-    "quickStartGuide": {
-      "title": "Quick Start Guide",
-      "description": "Get up and running with lifo in just a few simple steps",
-      "readTime": "5 min read",
-      "intro": "Welcome to lifo! This guide will help you set up your inventory management system and get started with your first products in minutes.",
-      "steps": {
-        "initialSetup": {
-          "title": "Step 1: Initial Setup",
-          "description": "Configure your basic account settings and preferences:",
-          "items": [
-            "Complete your business profile",
-            "Set up your first store location",
-            "Configure notification preferences",
-            "Choose your currency and units"
-          ]
-        },
-        "teamSetup": {
-          "title": "Step 2: Team Setup",
-          "description": "Add team members and configure their access levels:",
-          "items": [
-            "Invite team members via email",
-            "Assign roles and permissions",
-            "Set up store access controls",
-            "Configure approval workflows"
-          ]
-        },
-        "firstProducts": {
-          "title": "Step 3: Add Your First Products",
-          "description": "Start building your product catalog:",
-          "items": [
-            "Scan or manually add product information",
-            "Set up product categories",
-            "Configure pricing and cost data",
-            "Upload product images"
-          ]
-        }
-      },
-      "nextSteps": {
-        "title": "Next Steps",
-        "items": [
-          {
-            "title": "Scan Your First Batch",
-            "description": "Process your first delivery using the scan-in workflow",
-            "linkText": "Learn about scan-in →"
-          },
-          {
-            "title": "Explore Features",
-            "description": "Discover advanced inventory management tools",
-            "linkText": "View inventory guide →"
-          }
-        ]
-      }
-    },
-    "inventoryManagement": {
-      "title": "Inventory Management",
-      "description": "Master your inventory with lifo's comprehensive management tools",
-      "readTime": "5 min read",
-      "intro": "Effective inventory management is crucial for business success. lifo provides comprehensive tools to track, analyze, and optimize your inventory levels.",
-      "features": {
-        "inventoryTracking": {
-          "title": "Inventory Tracking",
-          "description": "Track inventory levels in real-time with automated updates from scan-in/out operations",
-          "items": [
-            {
-              "title": "Real-time Updates",
-              "description": "Automatic inventory adjustments with every scan"
-            },
-            {
-              "title": "Multi-location Support",
-              "description": "Track inventory across different warehouses"
-            },
-            {
-              "title": "Batch Tracking",
-              "description": "Monitor inventory by delivery batches"
-            },
-            {
-              "title": "Product Variants",
-              "description": "Separate tracking for sizes, colors, and configurations"
-            }
-          ]
-        },
-        "analyticsReporting": {
-          "title": "Analytics & Reporting",
-          "description": "Gain insights into your inventory performance with comprehensive analytics",
-          "items": [
-            {
-              "title": "Turnover Rates",
-              "description": "Identify fast and slow-moving products"
-            },
-            {
-              "title": "Stock Aging",
-              "description": "Track how long inventory stays in warehouse"
-            },
-            {
-              "title": "Demand Forecasting",
-              "description": "Predict future inventory needs"
-            },
-            {
-              "title": "Cost Analysis",
-              "description": "Monitor carrying costs and storage fees"
-            }
-          ]
-        },
-        "stockAlerts": {
-          "title": "Stock Alerts & Notifications",
-          "description": "Stay informed about critical inventory levels with automated alerts",
-          "items": [
-            {
-              "title": "Low Stock Alerts",
-              "description": "Notifications when inventory drops below threshold"
-            },
-            {
-              "title": "Overstock Warnings",
-              "description": "Alerts for excess inventory accumulation"
-            },
-            {
-              "title": "Expiry Notifications",
-              "description": "Track products approaching expiration dates"
-            },
-            {
-              "title": "Custom Thresholds",
-              "description": "Set specific alert levels for different products"
-            }
-          ]
-        },
-        "lifoOptimization": {
-          "title": "lifo Optimization",
-          "description": "Leverage Last-In-First-Out methodology for optimal inventory management",
-          "items": [
-            {
-              "title": "Automatic lifo Sorting",
-              "description": "System prioritizes newest inventory for fulfillment"
-            },
-            {
-              "title": "Cost Optimization",
-              "description": "Maximize profitability with intelligent inventory selection"
-            },
-            {
-              "title": "Freshness Management",
-              "description": "Ensure customers receive the freshest products"
-            },
-            {
-              "title": "Tax Benefits",
-              "description": "Optimize tax implications with lifo accounting"
-            }
-          ]
-        }
-      }
-    },
-    "scanInProcess": {
-      "title": "Scan-In Process",
-      "description": "Master the scan-in workflow for adding products to your inventory",
-      "readTime": "4 min read",
-      "intro": "The scan-in process is the foundation of inventory management in lifo. Use this process when receiving deliveries, returns, or adding new inventory.",
-      "basicSteps": {
-        "title": "Basic Scan-In Steps",
-        "steps": [
-          {
-            "number": 1,
-            "description": "Navigate to \"Scan In\" from the main dashboard"
-          },
-          {
-            "number": 2,
-            "description": "Select the delivery or batch you're processing"
-          },
-          {
-            "number": 3,
-            "description": "Scan product barcodes or enter manually"
-          },
-          {
-            "number": 4,
-            "description": "Verify product details and quantities"
-          },
-          {
-            "number": 5,
-            "description": "Confirm and save the batch"
-          }
-        ]
-      },
-      "newProducts": {
-        "title": "Adding New Products",
-        "description": "When scanning unknown barcodes, lifo will prompt you to create a new product:",
-        "items": [
-          {
-            "problem": "Product Information",
-            "solution": "Fill in product name and description"
-          },
-          {
-            "problem": "Categories & Attributes",
-            "solution": "Set category and any custom attributes"
-          },
-          {
-            "problem": "Product Images",
-            "solution": "Add product images if available"
-          },
-          {
-            "problem": "Pricing",
-            "solution": "Set pricing information"
-          }
-        ]
-      },
-      "imageRecognition": {
-        "title": "Image Recognition",
-        "description": "lifo can recognize products from images when barcodes are damaged or missing. Simply take a photo of the product and the system will suggest matches."
-      },
-      "troubleshooting": {
-        "title": "Troubleshooting",
-        "items": [
-          {
-            "problem": "Barcode Won't Scan",
-            "solution": "Clean the barcode, improve lighting, or enter manually"
-          },
-          {
-            "problem": "Wrong Product",
-            "solution": "Check if there are multiple barcodes on the packaging"
-          },
-          {
-            "problem": "Quantity Mismatch",
-            "solution": "Double-check physical count against system records"
-          },
-          {
-            "problem": "Duplicate Products",
-            "solution": "Use the batch review feature to identify duplicates"
-          }
-        ]
       }
     }
   },

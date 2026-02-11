@@ -1,8 +1,6 @@
 import { OfflineIndicator } from '@/components/offline-indicator'
 import { IntlProvider } from '@/components/providers/intl-provider'
 import { LanguageProvider } from '@/components/providers/language-provider'
-// import PWAInstallPrompt from '@/components/pwa-install-prompt'
-import ServiceWorkerRegistrar from '@/components/service-worker-registrar'
 import { Toaster } from '@/components/ui/toaster'
 import { ReactQueryProvider } from '@/lib/react-query/provider'
 import type { Metadata } from 'next'
@@ -20,7 +18,6 @@ export const metadata: Metadata = {
   title: 'Expiry Tracking for Retailers | lifo',
   description:
     "lifo helps retailers reduce waste by tracking what's expiring and when to act—discount, donate, or sell in time.",
-  manifest: '/manifest.json',
   icons: {
     icon: [
       {
@@ -32,11 +29,6 @@ export const metadata: Metadata = {
         media: '(prefers-color-scheme: dark)',
       },
     ],
-  },
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: 'default',
-    title: 'lifo',
   },
 }
 
@@ -96,8 +88,6 @@ export default async function RootLayout({
               <IntlProvider initialMessages={messages}>{children}</IntlProvider>
             </LanguageProvider>
           </ReactQueryProvider>
-          <ServiceWorkerRegistrar />
-          {/* <PWAInstallPrompt /> */}
           <OfflineIndicator />
           <Toaster
             position="top-right"

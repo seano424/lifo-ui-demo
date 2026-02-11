@@ -11,7 +11,7 @@ import type React from 'react'
 import { useCallback } from 'react'
 
 export interface InventoryFormData {
-  expiryDate: string | null // Nullable for draft batches without expiry dates
+  expiryDate: string | null // Nullable for incomplete batches without expiry dates
   quantity: number
   price: number
   batchNumber?: string
@@ -90,7 +90,7 @@ export default function InventoryForm({
     [onChange],
   )
 
-  // Allow submission without expiry date (creates draft batch)
+  // Allow submission without expiry date (creates incomplete batch)
   const canSubmit = data.quantity > 0 && data.price > 0
 
   if (mode === 'confirm') {

@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { cn } from '@/lib/utils'
 
 interface ToggleProps {
@@ -16,6 +17,8 @@ interface ToggleProps {
  * Replaces standard UI library toggle with custom styling.
  */
 export function Toggle({ checked, onCheckedChange, disabled = false, className }: ToggleProps) {
+  const t = useTranslations('common')
+
   return (
     <button
       type="button"
@@ -30,7 +33,7 @@ export function Toggle({ checked, onCheckedChange, disabled = false, className }
         className,
       )}
     >
-      <span className="sr-only">Toggle</span>
+      <span className="sr-only">{t('aria.toggle')}</span>
       <span
         aria-hidden="true"
         className={cn(

@@ -8,7 +8,8 @@
       "cancel": "Annuleren",
       "scan": "Scannen",
       "discount": "Korting",
-      "donate": "Doneren"
+      "donate": "Doneren",
+      "dismiss": "Afwijzen"
     },
     "forms": {
       "productName": "Productnaam",
@@ -159,15 +160,6 @@
     "edit": "Bewerken",
     "saving": "Opslaan...",
     "optional": "optioneel",
-    "pwa": {
-      "installPrompt": {
-        "title": "lifo Installeren",
-        "subtitle": "Experimentele PWA",
-        "installButton": "Installeren",
-        "dismissAriaLabel": "Negeren",
-        "closeAriaLabel": "Sluiten"
-      }
-    },
     "cookieConsent": {
       "message": "We gebruiken cookies om uw ervaring te verbeteren en websiteverkeer te analyseren. Door te accepteren gaat u akkoord met ons gebruik van cookies.",
       "accept": "Accepteren",
@@ -214,7 +206,8 @@
     "more": "Meer",
     "aria": {
       "toggleTheme": "Thema wisselen",
-      "selectLanguage": "Taal selecteren"
+      "selectLanguage": "Taal selecteren",
+      "toggle": "Schakelen"
     },
     "buttons": {
       "back": "Terug",

@@ -49,8 +49,6 @@ function isPublicRoute(request: NextRequest): boolean {
     pathname.startsWith('/onboarding/create-account') ||
     pathname.startsWith('/onboarding/success') ||
     pathname.startsWith('/contact') ||
-    pathname.startsWith('/features') ||
-    pathname.startsWith('/pricing') ||
     pathname.startsWith('/support') ||
     pathname.startsWith('/privacy') ||
     pathname.startsWith('/terms') ||

@@ -111,22 +111,6 @@ const MarketingNav = ({ menu }: MarketingNavProps) => {
   //   //     },
   //   //   ],
   //   // },
-  //   // {
-  //   //   title: t('features'),
-  //   //   url: '/features',
-  //   // },
-  //   // {
-  //   //   title: t('pricing'),
-  //   //   url: '/pricing',
-  //   // },
-  //   // {
-  //   //   title: t('support'),
-  //   //   url: '/support',
-  //   // },
-  //   // {
-  //   //   title: t('contactUs'),
-  //   //   url: '/contact',
-  //   // },
   // ]
 
   const menuItems = menu || []

@@ -10,108 +10,40 @@
     "expired": "Expiré",
     "completed": "Terminé",
     "resolved": "Résolu",
-    "expiringToday": "Aujourd'hui",
-    "expiringSoon": "Dans les 2-3 jours",
-    "expiringWeek": "Dans les 4-7 jours"
+    "expiringSoon": "Dans les 2-3 jours"
   },
   "pending": {
-    "errorLoading": "Erreur lors du chargement des tâches en attente",
-    "loading": "Chargement des tâches en attente...",
-    "noPendingHeading": "Aucune tâche en attente !",
-    "allCaughtUp": "Tout est à jour ! Aucun article ne nécessite d'attention immédiate.",
-    "noMatch": "Aucune tâche en attente ne correspond à vos filtres"
+    "loading": "Chargement des tâches en attente..."
   },
   "inProgress": {
-    "errorLoading": "Erreur lors du chargement des tâches en cours",
-    "loading": "Chargement des tâches en cours...",
-    "noTodosHeading": "Aucune tâche en cours",
-    "noItems": "Aucun article n'est actuellement en traitement.",
-    "noMatch": "Aucune tâche en cours ne correspond à vos filtres"
+    "loading": "Chargement des tâches en cours..."
   },
   "completed": {
-    "errorLoading": "Erreur lors du chargement des tâches terminées",
-    "loading": "Chargement des tâches terminées...",
-    "noCompletedHeading": "Aucune tâche terminée",
-    "notFound": "Aucune tâche terminée trouvée.",
-    "noMatch": "Aucune tâche terminée ne correspond à vos filtres"
+    "loading": "Chargement des tâches terminées..."
   },
   "expiring": {
-    "errorLoading": "Erreur lors du chargement des tâches expirantes",
-    "loading": "Chargement des tâches expirantes...",
-    "noExpiringHeading": "Aucun article expirant !",
-    "allGood": "Tous les articles sont frais. Aucun article n'expire bientôt.",
-    "noMatch": "Aucune tâche expirante ne correspond à vos filtres"
+    "loading": "Chargement des tâches expirantes..."
   },
   "expired": {
-    "errorLoading": "Erreur lors du chargement des tâches expirées",
-    "loading": "Chargement des tâches expirées...",
-    "noExpiredHeading": "Aucun article expiré !",
-    "allCleared": "Excellent travail ! Tous les articles expirés ont été traités.",
-    "noMatch": "Aucune tâche expirée ne correspond à vos filtres"
-  },
-  "expiringToday": {
-    "errorLoading": "Erreur lors du chargement des articles expirant aujourd'hui",
-    "loading": "Chargement des articles expirant aujourd'hui...",
-    "noItemsHeading": "Aucun article n'expire aujourd'hui !",
-    "allGood": "Super ! Aucun article urgent n'expire aujourd'hui.",
-    "noMatch": "Aucun article expirant aujourd'hui ne correspond à vos filtres"
+    "loading": "Chargement des tâches expirées..."
   },
   "expiringSoon": {
-    "errorLoading": "Erreur lors du chargement des articles expirant bientôt",
-    "loading": "Chargement des articles expirant bientôt...",
-    "noItemsHeading": "Aucun article n'expire bientôt !",
-    "allGood": "Tout va bien ! Aucun article n'expire dans les 2-3 prochains jours.",
-    "noMatch": "Aucun article expirant bientôt ne correspond à vos filtres"
+    "loading": "Chargement des articles expirant bientôt..."
   },
-  "expiringWeek": {
-    "errorLoading": "Erreur lors du chargement des articles expirant cette semaine",
-    "loading": "Chargement des articles expirant cette semaine...",
-    "noItemsHeading": "Aucun article n'expire cette semaine !",
-    "allGood": "Tout est frais ! Aucun article n'expire dans 4-7 jours.",
-    "noMatch": "Aucun article expirant cette semaine ne correspond à vos filtres"
-  },
-  "emptyStateWithFilters": "Essayez d'ajuster vos filtres pour voir plus d'articles.",
   "card": {
     "suggestion": "Suggestion",
     "suggested": "Suggesté",
     "daysLeft": "Expire dans {days, plural, =1 {1 jour} other {# jours}}",
-    "daysLeftOne": "Expire dans 1 jour",
-    "expiresIn": "Expire dans {days} jours",
-    "expiresToday": "Expire aujourd'hui",
-    "expiresTomorrow": "Expire demain",
     "expired": "Expiré il y a {days} jours",
-    "expiredStatus": "Expiré",
-    "expiredYesterday": "Expiré hier",
-    "currentlyDiscounted": "Actuellement remisé : {percent}%",
-    "suggestedDiscount": "Remise suggérée : {percent}%",
-    "healthyMaintain": "Suggestion : Sain et à maintenir",
     "expiringSoon": "Expire bientôt",
-    "activeHealthy": "Actif et sain",
-    "editTodo": "Modifier la tâche",
-    "unitsLeft": "{quantity} restant(s)",
-    "allSold": "Tout vendu !",
     "donated": "Donné !",
     "disposed": "Tout éliminé !",
-    "completedOn": "Terminé le {date}",
-    "donatedOn": "Donné le {date}",
-    "disposedOn": "Éliminé le {date}",
-    "noRecommendation": "Aucune recommandation",
-    "tapToManage": "Tapez pour gérer",
-    "tapToReview": "Examiner et résoudre",
-    "tapToTakeAction": "Passer à l'action",
-    "tapToViewDetails": "Voir les détails",
     "completed": "Terminé",
     "remaining": "restant(s)",
-    "donatedAction": "donné(s)",
-    "disposedAction": "éliminé(s)",
     "units": "unités",
     "unit": "unité",
-    "soldUnits": "vendu(s)",
     "revenue": "revenu",
     "total": "total",
-    "discountApplied": "remise appliquée",
-    "discountAppliedToUnits": "{count, plural, =1 {remise appliquée à 1 unité} other {remise appliquée à # unités}}",
-    "unitPrice": "Prix unitaire",
     "totalValue": "Valeur totale"
   },
   "recommendations": {
@@ -129,101 +61,51 @@
     "donate": "Faire un don",
     "sell": "Vendre",
     "dispose": "Éliminer",
-    "monitorStock": "Surveiller le stock",
     "details": "Détails",
     "sold": "Vendu",
     "donated": "Donné",
-    "disposed": "Éliminé",
-    "soldAtDiscount": "Vendu avec {percent}% de réduction"
-  },
-  "bottomSheet": {
-    "units": "{count} unités"
-  },
-  "completionStatus": {
-    "pending": "En attente",
-    "in_progress": "En cours",
-    "completed": "Terminé"
+    "disposed": "Éliminé"
   },
   "discount": {
     "success": "Remise de {percent}% appliquée avec succès à {product}",
     "error": "Échec de l'application de la remise : {error}",
-    "selectPercentage": "Sélectionnez le pourcentage de remise",
-    "customDiscount": "Ou définissez une remise personnalisée",
     "newPrice": "Nouveau prix : €{price}",
     "processing": "Traitement de la remise...",
-    "setPrice": "Définir le prix €{price}",
     "apply": "Appliquer {percent}% de remise",
     "action": "Remise"
   },
   "donate": {
-    "selectRecipient": "Veuillez sélectionner un destinataire de don",
     "success": "{quantity} unités données avec succès à {recipient}",
     "error": "Échec du traitement du don : {error}",
     "loadingRecipients": "Chargement des destinataires de dons...",
-    "noRecipients": "Aucun destinataire de don disponible pour ce magasin.",
-    "contactAdmin": "Contactez votre administrateur pour configurer les destinataires de dons.",
-    "howMany": "Combien d'unités donner ?",
-    "markForDonation": "Marquer pour don : {quantity} unités",
     "processing": "Traitement du don...",
-    "donateAll": "Tout donner",
     "donate": "Donner {quantity}"
   },
   "dispose": {
     "reasons": {
       "expired": "Expiré/Date de péremption dépassée",
       "damaged": "Emballage endommagé",
-      "spoiled": "Gâté/Problèmes de qualité",
-      "recalled": "Rappel de produit",
-      "contaminated": "Contaminé",
       "other": "Autre raison"
     },
-    "provideReason": "Veuillez fournir une raison d'élimination",
     "success": "{quantity} unités éliminées avec succès",
     "error": "Échec de l'élimination des articles : {error}",
-    "whyDisposing": "Pourquoi éliminez-vous ceci ?",
-    "customReasonPlaceholder": "Entrez une raison d'élimination personnalisée",
-    "howMany": "Combien d'unités éliminer ?",
-    "markAsDisposed": "Marquer comme éliminé : {quantity} unités",
     "processing": "Traitement de l'élimination...",
-    "disposeAll": "Tout éliminer",
     "dispose": "Éliminer {quantity}"
   },
   "sold": {
     "timing": {
       "justNow": "À l'instant",
       "today": "Plus tôt aujourd'hui",
-      "yesterday": "Hier",
-      "thisWeek": "Cette semaine"
+      "yesterday": "Hier"
     },
     "success": "{quantity} unités marquées comme vendues avec succès",
     "error": "Échec du marquage des articles comme vendus : {error}",
-    "whenSell": "Quand cela a-t-il été vendu ?",
-    "howMany": "Combien d'unités avez-vous vendu ?",
-    "markAsSold": "Marquer comme vendu : {quantity} unités",
     "processing": "Traitement de la vente...",
-    "sellAll": "Tout vendre",
     "sell": "Vendre {quantity}"
   },
   "details": {
-    "validation": {
-      "batchNumberRequired": "Le numéro de lot est requis",
-      "batchNumberTooLong": "Le numéro de lot doit contenir moins de {max} caractères",
-      "batchNumberInvalid": "Le numéro de lot ne peut contenir que des lettres, chiffres, traits d'union, underscores et espaces",
-      "expiryDateRequired": "La date d'expiration est requise",
-      "expiryDateTooFarPast": "La date d'expiration ne peut pas être plus de {years} ans dans le passé",
-      "expiryDateTooFarFuture": "La date d'expiration ne peut pas être plus de {years} ans dans le futur",
-      "quantityNegative": "La quantité ne peut pas être négative",
-      "quantityInteger": "La quantité doit être un nombre entier",
-      "costPriceNegative": "Le prix de revient ne peut pas être négatif",
-      "sellingPriceNegative": "Le prix de vente ne peut pas être négatif",
-      "priceExceedsMax": "Les prix ne peuvent pas dépasser €{max}"
-    },
     "error": {
-      "invalidData": "Données invalides : Le numéro de lot existe peut-être déjà ou contient des caractères invalides",
-      "updateFailed": "Échec de la mise à jour : {error}",
-      "unexpected": "Une erreur inattendue s'est produite lors de la mise à jour du lot",
-      "batchNotFound": "Ce lot n'existe plus. Il a peut-être été supprimé ou vous n'avez peut-être pas la permission d'y accéder.",
-      "batchDeleted": "Ce lot a été supprimé pendant la mise à jour. La page se rafraîchira automatiquement."
+      "unexpected": "Une erreur inattendue s'est produite lors de la mise à jour du lot"
     },
     "status": {
       "expired": "Expiré",
@@ -245,23 +127,12 @@
       "sellingPrice": "Prix de vente",
       "currentPrice": "Prix actuel",
       "potentialLoss": "Perte potentielle",
-      "lastAction": "Dernière action",
-      "lastActionTime": "Heure de la dernière action",
-      "lastActionQuantity": "Quantité de la dernière action",
       "recommendation": "Recommandation",
-      "priorityScore": "Score de priorité",
       "urgency": "Urgence"
     },
-    "daysAgo": "{days, plural, =1 {il y a 1 jour} other {il y a # jours}}",
     "daysLeft": "{days, plural, =1 {1 jour} other {# jours}}",
     "daysRemaining": "{days, plural, =1 {1 jour restant} other {# jours restants}}",
-    "inventoryPricing": "Inventaire et tarification",
-    "percentOff": "% de réduction",
     "actionHistory": "Historique des actions",
-    "lastAction": "Dernière action",
-    "lastActionTime": "Heure de la dernière action",
-    "lastActionQuantity": "Quantité de la dernière action",
-    "noActionsYet": "Aucune action effectuée pour l'instant",
     "totalActions": "Actions totales",
     "actions": {
       "sold": "Vendu :",
@@ -269,29 +140,18 @@
       "donated": "Donné :",
       "disposed": "Éliminé :"
     },
-    "aiInsights": "Analyses IA",
     "recommendation": "Recommandation",
-    "priorityScore": "Score de priorité",
     "urgency": "Urgence"
   },
   "filters": {
     "title": "Filtrer",
-    "filtersTitle": "{count, plural, =0 {Ajouter un filtre} other {Filtres (#)}}",
-    "sortTitle": "Trier",
-    "noFiltersApplied": "Aucun filtre appliqué",
     "searchPlaceholder": "Rechercher",
-    "activeFilters": "Filtres actifs",
-    "clearAll": "Effacer tous les filtres",
     "clear": "Effacer",
     "all": "Tous",
     "reset": "Réinitialiser",
     "apply": "Appliquer",
-    "showFilters": "Afficher les filtres",
-    "hideFilters": "Masquer les filtres",
     "currentSort": "Tri actuel",
-    "resetSort": "Réinitialiser le tri",
     "sortBy": "Trier par",
-    "sortDirection": "Direction du tri",
     "ascending": "Asc",
     "descending": "Desc",
     "expiry": {
@@ -301,17 +161,11 @@
       "recentlyExpired": "Récemment expiré",
       "expiring": {
         "all": "Tous expirants",
-        "3days": "3 jours",
-        "1week": "1 semaine",
-        "2weeks": "2 semaines",
-        "1month": "1 mois"
+        "3days": "3 jours"
       },
       "expired": {
         "all": "Tous expirés",
-        "3days": "Derniers 3 jours",
-        "1week": "Dernière semaine",
-        "2weeks": "Derniers 2 semaines",
-        "1month": "Dernier mois"
+        "3days": "Derniers 3 jours"
       },
       "general": {
         "all": "Tous les dates",
@@ -333,7 +187,6 @@
       "all": "Toutes les actions",
       "discount": "Remise",
       "donate": "Don",
-      "donatePrepared": "Don préparé",
       "dispose": "Éliminer",
       "maintain": "Maintenir",
       "sold": "Vendu",
@@ -344,23 +197,7 @@
       "active": "Actif",
       "expired": "Expiré",
       "title": "Statut du lot"
-    },
-    "batchStatus": {
-      "all": "Tous les statuts",
-      "active": "Actif",
-      "expired": "Expiré",
-      "completed": "Terminé",
-      "title": "Statut du lot"
-    },
-    "urgencyCount": "Urgence ({count})",
-    "filterByUrgency": "Filtrer par urgence",
-    "actionsCount": "Actions ({count})",
-    "filterByAction": "Filtrer par action",
-    "statusCount": "Statut ({count})",
-    "filterByStatus": "Filtrer par statut",
-    "activeUrgency": "Urgence : {urgency}",
-    "activeAction": "Action : {action}",
-    "activeStatus": "Statut : {status}"
+    }
   },
   "search": {
     "placeholder": "Rechercher des produits...",
@@ -368,7 +205,6 @@
   },
   "sort": {
     "sortBy": "Trier par",
-    "sortDirection": "Trier {direction}",
     "asc": "Asc",
     "desc": "Desc",
     "urgency": {
@@ -399,25 +235,14 @@
       "label": "Alphabétique",
       "description": "Trier alphabétiquement par nom de produit"
     },
-    "lastAction": {
-      "label": "Dernière action",
-      "description": "Trier par date de la dernière action effectuée"
-    },
-    "actionDate": {
-      "label": "Date d'action",
-      "description": "Trier par date de la dernière action effectuée"
-    },
     "effectiveness": {
       "label": "Efficacité",
       "description": "Trier par score d'efficacité de l'action"
     }
   },
   "list": {
-    "noTodosFound": "Aucune tâche trouvée",
     "emptyState": "{emptyStateMessage}",
-    "adjustFilters": "Essayez d'ajuster vos filtres pour voir plus d'articles.",
     "loadingMore": "Chargement de plus de tâches...",
-    "scrollToLoad": "Faites défiler pour charger plus ({count} chargés)",
     "updating": "Mise à jour..."
   },
   "common": {

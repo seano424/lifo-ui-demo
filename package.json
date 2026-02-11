@@ -16,6 +16,7 @@
     "test:translations:missing": "jest translation-missing-keys",
     "test:translations:hardcoded": "jest hardcoded-text",
     "test:translations:consistency": "jest translation-consistency",
+    "test:translations:unused": "jest translation-unused-keys",
     "fix-translation-order": "node scripts/fix-translation-order.js",
     "supabase": "supabase",
     "supabase:login": "supabase login",

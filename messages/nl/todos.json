@@ -10,108 +10,40 @@
     "expired": "Verlopen",
     "completed": "Voltooid",
     "resolved": "Opgelost",
-    "expiringToday": "Vandaag",
-    "expiringSoon": "2-3 dagen weg",
-    "expiringWeek": "4-7 dagen weg"
+    "expiringSoon": "2-3 dagen weg"
   },
   "pending": {
-    "errorLoading": "Fout bij het laden van taken in afwachting",
-    "loading": "Taken in afwachting laden...",
-    "noPendingHeading": "Geen taken in afwachting!",
-    "allCaughtUp": "Helemaal bij! Geen items hebben onmiddellijke aandacht nodig.",
-    "noMatch": "Geen taken in afwachting komen overeen met uw filters"
+    "loading": "Taken in afwachting laden..."
   },
   "inProgress": {
-    "errorLoading": "Fout bij het laden van taken in uitvoering",
-    "loading": "Taken in uitvoering laden...",
-    "noTodosHeading": "Geen taken in uitvoering",
-    "noItems": "Er worden momenteel geen items bewerkt.",
-    "noMatch": "Geen taken in uitvoering komen overeen met uw filters"
+    "loading": "Taken in uitvoering laden..."
   },
   "completed": {
-    "errorLoading": "Fout bij het laden van voltooide taken",
-    "loading": "Voltooide taken laden...",
-    "noCompletedHeading": "Geen voltooide taken",
-    "notFound": "Geen voltooide taken gevonden.",
-    "noMatch": "Geen voltooide taken komen overeen met uw filters"
+    "loading": "Voltooide taken laden..."
   },
   "expiring": {
-    "errorLoading": "Fout bij het laden van verlopen taken",
-    "loading": "Verlopen taken laden...",
-    "noExpiringHeading": "Geen items die verlopen!",
-    "allGood": "Alle items zijn vers. Geen items verlopen binnenkort.",
-    "noMatch": "Geen verlopen taken komen overeen met uw filters"
+    "loading": "Verlopen taken laden..."
   },
   "expired": {
-    "errorLoading": "Fout bij het laden van verlopen taken",
-    "loading": "Verlopen taken laden...",
-    "noExpiredHeading": "Geen verlopen items!",
-    "allCleared": "Goed gedaan! Alle verlopen items zijn opgeruimd.",
-    "noMatch": "Geen verlopen taken komen overeen met uw filters"
-  },
-  "expiringToday": {
-    "errorLoading": "Fout bij het laden van items die vandaag verlopen",
-    "loading": "Items die vandaag verlopen laden...",
-    "noItemsHeading": "Geen items die vandaag verlopen!",
-    "allGood": "Super! Geen dringende items die vandaag verlopen.",
-    "noMatch": "Geen items die vandaag verlopen komen overeen met uw filters"
+    "loading": "Verlopen taken laden..."
   },
   "expiringSoon": {
-    "errorLoading": "Fout bij het laden van items die binnenkort verlopen",
-    "loading": "Items die binnenkort verlopen laden...",
-    "noItemsHeading": "Geen items die binnenkort verlopen!",
-    "allGood": "Alles is goed! Geen items verlopen binnen 2-3 dagen.",
-    "noMatch": "Geen items die binnenkort verlopen komen overeen met uw filters"
+    "loading": "Items die binnenkort verlopen laden..."
   },
-  "expiringWeek": {
-    "errorLoading": "Fout bij het laden van items die deze week verlopen",
-    "loading": "Items die deze week verlopen laden...",
-    "noItemsHeading": "Geen items die deze week verlopen!",
-    "allGood": "Alles is vers! Geen items verlopen binnen 4-7 dagen.",
-    "noMatch": "Geen items die deze week verlopen komen overeen met uw filters"
-  },
-  "emptyStateWithFilters": "Probeer uw filters aan te passen om meer taken te zien.",
   "card": {
     "suggestion": "Suggestie",
     "suggested": "Voorgesteld",
     "daysLeft": "Verloopt over {days, plural, =1 {1 dag} other {# dagen}}",
-    "daysLeftOne": "Verloopt over 1 dag",
-    "expiresIn": "Verloopt over {days} dagen",
-    "expiresToday": "Verloopt vandaag",
-    "expiresTomorrow": "Verloopt morgen",
     "expired": "Verlopen {days} dagen geleden",
-    "expiredStatus": "Verlopen",
-    "expiredYesterday": "Gisteren verlopen",
-    "currentlyDiscounted": "Momenteel afgeprijsd: {percent}%",
-    "suggestedDiscount": "Voorgestelde korting: {percent}%",
-    "healthyMaintain": "Suggestie: Gezond en behouden",
     "expiringSoon": "Verloopt binnenkort",
-    "activeHealthy": "Actief en gezond",
-    "editTodo": "Taak bewerken",
-    "unitsLeft": "{quantity, plural, =0 {0 left} =1 {1 left} other {# left}}",
-    "allSold": "Alles verkocht!",
     "donated": "Gedoneerd!",
     "disposed": "Alles weggegooid!",
-    "completedOn": "Voltooid op {date}",
-    "donatedOn": "Gedoneerd op {date}",
-    "disposedOn": "Weggegooid op {date}",
-    "noRecommendation": "Geen aanbeveling",
-    "tapToManage": "Tik om te beheren",
-    "tapToReview": "Bekijk en los op",
-    "tapToTakeAction": "Onderneem actie",
-    "tapToViewDetails": "Bekijk details",
     "completed": "Voltooid",
     "remaining": "over",
-    "donatedAction": "gedoneerd",
-    "disposedAction": "weggegooid",
     "units": "eenheden",
     "unit": "eenheid",
-    "soldUnits": "verkocht",
     "revenue": "opbrengst",
     "total": "totaal",
-    "discountApplied": "korting toegepast",
-    "discountAppliedToUnits": "{count, plural, =1 {korting toegepast op 1 eenheid} other {korting toegepast op # eenheden}}",
-    "unitPrice": "Prijs per eenheid",
     "totalValue": "Totale waarde"
   },
   "recommendations": {
@@ -129,101 +61,51 @@
     "donate": "Doneren",
     "sell": "Verkopen",
     "dispose": "Weggooien",
-    "monitorStock": "Voorraad monitoren",
     "details": "Details",
     "sold": "Verkocht",
     "donated": "Gedoneerd",
-    "disposed": "Weggegooid",
-    "soldAtDiscount": "Verkocht met {percent}% korting"
-  },
-  "bottomSheet": {
-    "units": "{count} eenheden"
-  },
-  "completionStatus": {
-    "pending": "In behandeling",
-    "in_progress": "Bezig",
-    "completed": "Voltooid"
+    "disposed": "Weggegooid"
   },
   "discount": {
     "success": "{percent}% korting succesvol toegepast op {product}",
     "error": "Korting toepassen mislukt: {error}",
-    "selectPercentage": "Selecteer kortingspercentage",
-    "customDiscount": "Of stel een aangepaste korting in",
     "newPrice": "Nieuwe prijs: €{price}",
     "processing": "Korting verwerken...",
-    "setPrice": "Prijs instellen €{price}",
     "apply": "{percent}% korting toepassen",
     "action": "Korting"
   },
   "donate": {
-    "selectRecipient": "Selecteer een donatieontvanger",
     "success": "{quantity} eenheden succesvol gedoneerd aan {recipient}",
     "error": "Donatie verwerken mislukt: {error}",
     "loadingRecipients": "Donatieontvangers laden...",
-    "noRecipients": "Geen donatieontvangers beschikbaar voor deze winkel.",
-    "contactAdmin": "Neem contact op met uw beheerder om donatieontvangers in te stellen.",
-    "howMany": "Hoeveel eenheden doneren?",
-    "markForDonation": "Markeren voor donatie: {quantity} eenheden",
     "processing": "Donatie verwerken...",
-    "donateAll": "Alles doneren",
     "donate": "Doneer {quantity}"
   },
   "dispose": {
     "reasons": {
       "expired": "Verlopen/Vervaldatum verstreken",
       "damaged": "Beschadigde verpakking",
-      "spoiled": "Bedorven/Kwaliteitsproblemen",
-      "recalled": "Product teruggeroepen",
-      "contaminated": "Besmet",
       "other": "Andere reden"
     },
-    "provideReason": "Geef een reden voor weggooien",
     "success": "{quantity} eenheden succesvol weggegooid",
     "error": "Items weggooien mislukt: {error}",
-    "whyDisposing": "Waarom gooit u dit weg?",
-    "customReasonPlaceholder": "Voer aangepaste reden voor weggooien in",
-    "howMany": "Hoeveel eenheden weggooien?",
-    "markAsDisposed": "Markeren als weggegooid: {quantity} eenheden",
     "processing": "Weggooien verwerken...",
-    "disposeAll": "Alles weggooien",
     "dispose": "Gooi {quantity} weg"
   },
   "sold": {
     "timing": {
       "justNow": "Zojuist",
       "today": "Eerder vandaag",
-      "yesterday": "Gisteren",
-      "thisWeek": "Deze week"
+      "yesterday": "Gisteren"
     },
     "success": "{quantity} eenheden succesvol gemarkeerd als verkocht",
     "error": "Items markeren als verkocht mislukt: {error}",
-    "whenSell": "Wanneer is dit verkocht?",
-    "howMany": "Hoeveel eenheden heeft u verkocht?",
-    "markAsSold": "Markeren als verkocht: {quantity} eenheden",
     "processing": "Verkoop verwerken...",
-    "sellAll": "Alles verkopen",
     "sell": "Verkoop {quantity}"
   },
   "details": {
-    "validation": {
-      "batchNumberRequired": "Batchnummer is verplicht",
-      "batchNumberTooLong": "Batchnummer moet minder dan {max} tekens bevatten",
-      "batchNumberInvalid": "Batchnummer mag alleen letters, cijfers, koppeltekens, underscores en spaties bevatten",
-      "expiryDateRequired": "Vervaldatum is verplicht",
-      "expiryDateTooFarPast": "Vervaldatum kan niet meer dan {years} jaar in het verleden liggen",
-      "expiryDateTooFarFuture": "Vervaldatum kan niet meer dan {years} jaar in de toekomst liggen",
-      "quantityNegative": "Aantal kan niet negatief zijn",
-      "quantityInteger": "Aantal moet een heel getal zijn",
-      "costPriceNegative": "Kostprijs kan niet negatief zijn",
-      "sellingPriceNegative": "Verkoopprijs kan niet negatief zijn",
-      "priceExceedsMax": "Prijzen kunnen niet meer dan €{max} bedragen"
-    },
     "error": {
-      "invalidData": "Ongeldige gegevens: Batchnummer bestaat mogelijk al of bevat ongeldige tekens",
-      "updateFailed": "Update mislukt: {error}",
-      "unexpected": "Er is een onverwachte fout opgetreden bij het bijwerken van de batch",
-      "batchNotFound": "Deze batch bestaat niet meer. Deze is mogelijk verwijderd of u heeft geen toestemming om deze te openen.",
-      "batchDeleted": "Deze batch is verwijderd tijdens de update. De pagina wordt automatisch ververst."
+      "unexpected": "Er is een onverwachte fout opgetreden bij het bijwerken van de batch"
     },
     "status": {
       "expired": "Verlopen",
@@ -245,23 +127,12 @@
       "sellingPrice": "Verkoopprijs",
       "currentPrice": "Huidige prijs",
       "potentialLoss": "Potentieel verlies",
-      "lastAction": "Laatste actie",
-      "lastActionTime": "Tijd van laatste actie",
-      "lastActionQuantity": "Hoeveelheid van laatste actie",
       "recommendation": "Aanbeveling",
-      "priorityScore": "Prioriteitsscore",
       "urgency": "Urgentie"
     },
-    "daysAgo": "{days, plural, =1 {1 dag geleden} other {# dagen geleden}}",
     "daysLeft": "{days, plural, =1 {1 dag} other {# dagen}}",
     "daysRemaining": "{days, plural, =1 {1 dag resterend} other {# dagen resterend}}",
-    "inventoryPricing": "Voorraad en prijzen",
-    "percentOff": "% korting",
     "actionHistory": "Actiegeschiedenis",
-    "lastAction": "Laatste actie",
-    "lastActionTime": "Tijd laatste actie",
-    "lastActionQuantity": "Hoeveelheid laatste actie",
-    "noActionsYet": "Nog geen acties ondernomen",
     "totalActions": "Totaal acties",
     "actions": {
       "sold": "Verkocht:",
@@ -269,29 +140,18 @@
       "donated": "Gedoneerd:",
       "disposed": "Weggegooid:"
     },
-    "aiInsights": "AI-inzichten",
     "recommendation": "Aanbeveling",
-    "priorityScore": "Prioriteitsscore",
     "urgency": "Urgentie"
   },
   "filters": {
     "title": "Filter",
-    "filtersTitle": "{count, plural, =0 {Filter toevoegen} other {Filters (#)}}",
-    "sortTitle": "Sorteren",
-    "noFiltersApplied": "Geen filters toegepast",
     "searchPlaceholder": "Zoek",
-    "activeFilters": "Actieve filters toegepast",
-    "clearAll": "Alle filters wissen",
     "clear": "Wissen",
     "all": "Alle",
     "reset": "Resetten",
     "apply": "Toepassen",
-    "showFilters": "Filters tonen",
-    "hideFilters": "Filters verbergen",
     "currentSort": "Huidige sortering",
-    "resetSort": "Sortering resetten",
     "sortBy": "Sorteren op",
-    "sortDirection": "Sorteerrichting",
     "ascending": "Asc",
     "descending": "Desc",
     "expiry": {
@@ -301,17 +161,11 @@
       "recentlyExpired": "Recent verlopen",
       "expiring": {
         "all": "Alle verlopende",
-        "3days": "3 dagen",
-        "1week": "1 week",
-        "2weeks": "2 weken",
-        "1month": "1 maand"
+        "3days": "3 dagen"
       },
       "expired": {
         "all": "Alle verlopen",
-        "3days": "Laatste 3 dagen",
-        "1week": "Vorige week",
-        "2weeks": "Laatste 2 weken",
-        "1month": "Vorige maand"
+        "3days": "Laatste 3 dagen"
       },
       "general": {
         "all": "Alle datums",
@@ -333,7 +187,6 @@
       "all": "Alle acties",
       "discount": "Korting",
       "donate": "Doneren",
-      "donatePrepared": "Doneren voorbereid",
       "dispose": "Wegdoen",
       "maintain": "Onderhouden",
       "sold": "Verkocht",
@@ -344,23 +197,7 @@
       "active": "Actief",
       "expired": "Verlopen",
       "title": "Batch status"
-    },
-    "batchStatus": {
-      "all": "Alle statussen",
-      "active": "Actief",
-      "expired": "Verlopen",
-      "completed": "Voltooid",
-      "title": "Batchstatus"
-    },
-    "urgencyCount": "Urgentie ({count})",
-    "filterByUrgency": "Filteren op urgentie",
-    "actionsCount": "Acties ({count})",
-    "filterByAction": "Filteren op actie",
-    "statusCount": "Status ({count})",
-    "filterByStatus": "Filteren op status",
-    "activeUrgency": "Urgentie: {urgency}",
-    "activeAction": "Actie: {action}",
-    "activeStatus": "Status: {status}"
+    }
   },
   "search": {
     "placeholder": "Zoek producten...",
@@ -368,7 +205,6 @@
   },
   "sort": {
     "sortBy": "Sorteren op",
-    "sortDirection": "Sorteren {direction}",
     "asc": "Oplopend",
     "desc": "Aflopend",
     "urgency": {
@@ -399,25 +235,14 @@
       "label": "Alfabetisch",
       "description": "Alfabetisch sorteren op productnaam"
     },
-    "lastAction": {
-      "label": "Laatste actie",
-      "description": "Sorteren op wanneer actie voor het laatst is ondernomen"
-    },
-    "actionDate": {
-      "label": "Actiedatum",
-      "description": "Sorteren op wanneer actie voor het laatst is ondernomen"
-    },
     "effectiveness": {
       "label": "Effectiviteit",
       "description": "Sorteren op actie-effectiviteitsscore"
     }
   },
   "list": {
-    "noTodosFound": "Geen taken gevonden",
     "emptyState": "{emptyStateMessage}",
-    "adjustFilters": "Probeer uw filters aan te passen om meer taken te zien.",
     "loadingMore": "Meer taken laden...",
-    "scrollToLoad": "Scroll om meer te laden ({count} geladen)",
     "updating": "Bijwerken..."
   },
   "common": {

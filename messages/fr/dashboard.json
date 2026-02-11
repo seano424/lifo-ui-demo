@@ -421,14 +421,15 @@
     "expiringSoon": "Expire bientôt",
     "needsDates": "Nécessite Dates",
     "newDeliveries": "Nouvelles Livraisons",
-    "squareCatalog": "Catalogue Square",
+    "deliveries": "Livraisons",
     "ignored": "Ignoré",
     "all": "Tous les Lots",
     "inventory": "Inventaire",
     "catalog": "Catalogue",
+    "squareCatalog": "Catalogue Square",
     "stock": "Stock",
     "newBatches": "Nouveaux Lots",
-    "deliveries": "Livraisons",
+    "ignoredBatches": "Ignoré",
     "scanOut": "Sorties",
     "todos": "À faire",
     "performance": "Performance",
@@ -456,48 +457,8 @@
     "itemCount": "{count} articles"
   },
   "batchList": {
-    "errorLoadingBatches": "Erreur lors du chargement des lots",
-    "unexpectedError": "Une erreur inattendue s'est produite",
-    "currentBatches": "{count} lots actuels",
-    "filters": "Filtres",
-    "search": "Rechercher",
-    "searchBatches": "Rechercher des lots...",
-    "status": "Statut",
-    "allStatuses": "Tous les statuts",
-    "active": "Actif",
-    "expired": "Expiré",
-    "damaged": "Endommagé",
-    "soldOut": "Épuisé",
-    "reserved": "Réservé",
-    "expiringSoon": "Expire bientôt",
-    "allDates": "Toutes les dates",
-    "expiringInDays": "Expire dans {days} jours",
-    "location": "Emplacement",
-    "locationCode": "Code d'emplacement...",
-    "stockStatus": "État du stock",
-    "allStockLevels": "Tous les niveaux de stock",
-    "inStock": "En stock",
-    "outOfStock": "Rupture de stock",
-    "supplier": "Fournisseur",
-    "supplierName": "Nom du fournisseur...",
-    "clear": "Effacer",
-    "clearFilters": "Effacer les filtres",
-    "loadingMore": "Chargement en cours...",
-    "loadMoreBatches": "Charger plus de lots",
-    "showingBatches": "Affichage de {count} lots",
-    "filteredFrom": "(filtré sur {total})",
-    "noBatchesFound": "Aucun lot trouvé",
-    "noBatchesYet": "Aucun lot pour le moment",
-    "tryAdjustingFilters": "Essayez d'ajuster votre recherche ou vos filtres",
-    "productNoBatches": "Ce produit n'a pas encore de lots",
-    "getStartedFirstBatch": "Commencez par ajouter votre premier lot",
     "convenience": {
-      "expiringSoon": "Expire bientôt",
-      "noBatchesExpiringSoon": "Aucun lot n'expire bientôt",
-      "productBatches": "Lots de produits",
-      "productNoBatches": "Ce produit n'a pas encore de lots",
-      "lowStockAlert": "Alerte stock faible",
-      "allBatchesSufficientStock": "Tous les lots ont un stock suffisant"
+      "expiringSoon": "Expire bientôt"
     }
   },
   "batchSort": {
@@ -579,11 +540,9 @@
     "deleteProduct": "Supprimer le produit",
     "confirmDeleteProduct": "Êtes-vous sûr de vouloir supprimer ce produit ?"
   },
-
   "todos": {
     "pageDescription": "Suggestions personnalisées pour optimiser votre inventaire et réduire les déchets"
   },
-
   "buttons": {
     "export": "Exporter",
     "addBatch": "Ajouter un lot",
@@ -598,15 +557,7 @@
     "deleteProduct": "Supprimer le produit"
   },
   "dashboardNav": {
-    "projects": "Projets",
     "more": "Plus",
-    "viewProject": "Voir le projet",
-    "shareProject": "Partager le projet",
-    "deleteProject": "Supprimer le projet",
-    "kpiCard": {
-      "failedToLoad": "Échec du chargement des données",
-      "viewDetails": "Voir les détails"
-    },
     "pages": {
       "dashboard": "Vue d'ensemble du tableau de bord",
       "notifications": "Bientôt disponible : Notifications",
@@ -629,26 +580,6 @@
       "batches": "Visualisez et gérez les lots d'inventaire de votre magasin",
       "products": "Visualisez et gérez l'inventaire des produits de votre magasin",
       "dashboard": "Voici ce qui nécessite votre attention aujourd'hui."
-    }
-  },
-  "timeSelector": {
-    "periods": {
-      "thisWeek": "Cette semaine",
-      "lastWeek": "Semaine dernière",
-      "thisMonth": "Ce mois",
-      "lastMonth": "Mois dernier",
-      "last7Days": "7 derniers jours",
-      "last30Days": "30 derniers jours",
-      "allTime": "Toutes périodes"
-    },
-    "compareLabels": {
-      "lastWeek": "Semaine dernière",
-      "previousWeek": "Semaine précédente",
-      "lastMonth": "Mois dernier",
-      "previousMonth": "Mois précédent",
-      "previous7Days": "7 jours précédents",
-      "previous30Days": "30 jours précédents",
-      "previousYear": "Année précédente"
     }
   },
   "setupFlow": {
@@ -820,12 +751,12 @@
         "description": "Suivez les produits par dates d'expiration. Créez des lots, consultez les articles qui expirent et recevez des notifications sur les lots qui expirent.",
         "descriptionConnected": "Suivez les produits par dates d'expiration. Consultez les articles qui expirent et recevez des notifications sur les produits qui expirent.",
         "realTime": "Temps réel",
+        "integration": "Integration",
+        "manual": "Manuel",
         "recommended": "Recommandé",
         "squareDescription": "Connectez votre compte Square pour configurer le suivi en temps réel des produits par dates d'expiration",
         "connect": "Connecter",
         "oneTime": "Ponctuel",
-        "integration": "Integration",
-        "manual": "Manuel",
         "csvDescription": "Les intégrations de données en temps réel sont les plus puissantes, mais les importations ponctuelles sont utiles pour compléter les données historiques ou enrichir vos données existantes. En savoir plus sur l'importation de personnes via CSV.",
         "importCSV": "Importer un CSV",
         "manualEntry": "Ajouter manuellement vos informations de magasin",

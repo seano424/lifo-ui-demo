@@ -2,6 +2,7 @@
 
 import { addDays, format } from 'date-fns'
 import { Calendar } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
@@ -43,6 +44,8 @@ export function ExpiryPresetButtons({
   suggestedDays,
   className,
 }: ExpiryPresetButtonsProps) {
+  const t = useTranslations('inventory')
+
   const calculateDate = (days: number) => {
     return addDays(new Date(), days)
   }
@@ -105,7 +108,9 @@ export function ExpiryPresetButtons({
       {/* Selected Date Display */}
       {selectedDays !== null && selectedDays !== undefined && (
         <div className="text-center flex flex-col gap-1">
-          <p className="text-sm text-foreground dark:text-foreground">Expiry date</p>
+          <p className="text-sm text-foreground dark:text-foreground">
+            {t('inventoryForm.labels.expiryDate')}
+          </p>
           <p className="text-lg  text-foreground dark:text-foreground">
             {formatDate(calculateDate(selectedDays))}
           </p>

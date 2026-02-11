@@ -8,7 +8,8 @@
       "cancel": "Annuler",
       "scan": "Scanner",
       "discount": "Remise",
-      "donate": "Faire un don"
+      "donate": "Faire un don",
+      "dismiss": "Rejeter"
     },
     "forms": {
       "productName": "Nom du produit",
@@ -159,15 +160,6 @@
     "edit": "Modifier",
     "saving": "Enregistrement...",
     "optional": "facultatif",
-    "pwa": {
-      "installPrompt": {
-        "title": "Installer lifo",
-        "subtitle": "PWA Expérimental",
-        "installButton": "Installer",
-        "dismissAriaLabel": "Ignorer",
-        "closeAriaLabel": "Fermer"
-      }
-    },
     "cookieConsent": {
       "message": "Nous utilisons des cookies pour améliorer votre expérience et analyser le trafic du site. En acceptant, vous acceptez notre utilisation des cookies.",
       "accept": "Accepter",
@@ -214,7 +206,8 @@
     "more": "Plus",
     "aria": {
       "toggleTheme": "Changer le thème",
-      "selectLanguage": "Sélectionner la langue"
+      "selectLanguage": "Sélectionner la langue",
+      "toggle": "Basculer"
     },
     "buttons": {
       "back": "Retour",

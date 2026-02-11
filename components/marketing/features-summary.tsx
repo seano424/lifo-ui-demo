@@ -1,7 +1,6 @@
 'use client'
 import { Bell, Calendar, Clock, Tablet } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import { Button } from '@/components/ui/button'
 import { Typography } from '@/components/ui/typography'
 
 interface FeatureProps {
@@ -64,20 +63,6 @@ export function FeaturesSummary() {
             title={t('compatibility.title')}
             description={t('compatibility.description')}
           />
-        </div>
-
-        <div className="flex flex-col gap-4 items-center justify-center">
-          <Button
-            asLink
-            href="/features"
-            size="lg"
-            hasArrowUpIcon
-            className="capitalize"
-            variant="secondary"
-          >
-            {t('discoverButton')}
-          </Button>
-          <Typography variant="p">{t('noCommitment')}</Typography>
         </div>
       </div>
     </section>
