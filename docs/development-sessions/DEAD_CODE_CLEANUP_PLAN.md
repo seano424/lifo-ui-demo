@@ -262,6 +262,48 @@ Before removing any file, verify it's NOT:
 
 ---
 
+### Phase 4: Route Removal & Deep Cleanup (Week 4)
+**Goal:** Remove unused dashboard routes and all associated dead code
+
+**Routes Removed (18):**
+- **Support Pages (4):** `/dashboard/support`, `/dashboard/support/inventory-management`, `/dashboard/support/quick-start-guide`, `/dashboard/support/scan-in`
+- **Dashboard Pages (12):** `/dashboard/account`, `/dashboard/action-log`, `/dashboard/billing`, `/dashboard/deliveries`, `/dashboard/milestones`, `/dashboard/notifications`, `/dashboard/performance`, `/dashboard/playground`, `/dashboard/todos`, `/dashboard/upgrade`, `/dashboard/users`, `/dashboard/scan-out`
+- **API Routes (2):** `/api/delivery-note-upload`, `/api/delivery-note-ocr/mock`
+
+**Removed Components & Files:**
+- [x] Delete route page files (18 pages)
+- [x] Delete `components/todos/` directory (39 files, ~5000 lines)
+- [x] Delete `components/support/` directory (5 files)
+- [x] Delete `components/delivery-note-upload/` directory (7 files)
+- [x] Delete `components/deliveries/` directory (1 file)
+- [x] Delete `components/scanning/scan-out/` directory (3 files)
+- [x] Delete `components/actions/action-log.tsx`
+- [x] Delete `components/dashboard/delivery-banner.tsx`
+- [x] Delete `hooks/use-delivery-note-upload.ts` (321 lines)
+- [x] Delete `hooks/use-delivery-scanning-session.ts` (194 lines)
+- [x] Delete `lib/mock-data/delivery-note-samples.ts` (404 lines)
+- [x] Delete test file: `__tests__/components/scanning/use-scan-out-actions.test.tsx`
+
+**Fixed Imports & References:**
+- [x] Restore `lib/utils/performance.ts` - utility file, not related to performance page
+- [x] Restore `components/notifications/notification-bell-expiry.tsx` - actively used in dashboard nav
+- [x] Restore `components/todos/filters/todo-search-bar.tsx` - used by batches/products lists
+- [x] Remove deliveries links from `components/dashboard/dashboard-welcome.tsx`
+- [x] Remove deliveries links from `components/batches/batches-header.tsx`
+- [x] Remove deliveries links from `components/products/products-header.tsx`
+- [x] Remove scan-out export from `components/scanning/index.ts`
+
+**Verification:**
+- [x] Run `npm run check` - passes
+- [x] Run `npm run build` - succeeds, 54 routes (down from 72)
+- [x] Commit with message: `chore(phase-4): remove 18 unused routes and 13,945 lines of dead code`
+
+**Results:** ✅ Removed 18 routes, 88 files, 13,945 lines of code
+**Actual Time:** 60 minutes
+**Risk Level:** ⚠️ Medium - required careful import tracking and restoration of some files
+
+---
+
 ## 🛡️ Risk Assessment & Rollback
 
 ### Risk Levels
@@ -305,7 +347,8 @@ After each phase:
 | Phase 1 | ✅ Complete | 5/5 | 854 | 2026-02-11 |
 | Phase 2 | ✅ Complete | 8/8 | 1997 | 2026-02-11 |
 | Phase 3 | ✅ Complete | 3/3 | 13 (comments) | 2026-02-11 |
-| **Total** | **100%** | **16/16** | **2864 lines** | **2026-02-11** |
+| Phase 4 | ✅ Complete | 88/88 | 13,945 | 2026-02-11 |
+| **Total** | **100%** | **104/104** | **16,809 lines** | **2026-02-11** |
 
 ---
 
@@ -349,10 +392,13 @@ After each phase:
 - ✅ Codebase cleaner and more maintainable
 
 **Overall Success:**
-- ~950 lines of dead code removed (revised after verification)
+- **16,809 lines of dead code removed** across 4 phases
+- **18 unused routes removed** (72 → 54 routes)
+- **104 files deleted** (routes, components, hooks, utilities)
 - No regression in functionality
 - Improved code maintainability
 - Easier onboarding for new developers
+- Faster build times and smaller bundle size
 
 ---
 
