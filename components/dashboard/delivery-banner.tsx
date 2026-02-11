@@ -5,13 +5,13 @@ import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Typography } from '../ui/typography'
 import { cn } from '@/lib/utils'
-import type { DraftBatchesSummary } from '@/hooks/use-draft-batches'
 
+// TODO: Update this component for future untracked stock feature
 interface DeliveryBannerProps {
   totalDrafts: number
   isClosing?: boolean
   onDismiss: () => void
-  summary: DraftBatchesSummary | undefined
+  summary?: unknown // Placeholder for future use
 }
 
 /**

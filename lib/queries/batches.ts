@@ -59,14 +59,13 @@ export type BatchSort = {
 export type BatchFilters = {
   storeId?: string
   product_id?: string
-  status?: 'draft' | 'active' | 'expired' | 'damaged' | 'sold_out' | 'reserved' | 'ignored'
+  status?: 'active' | 'expired' | 'damaged' | 'sold_out' | 'reserved' | 'ignored'
   location_code?: string
   supplier?: string
-  expiringInDays?: number // Batches expiring within X days (excludes draft batches with no expiry date)
+  expiringInDays?: number // Batches expiring within X days
   hasStock?: boolean // Only batches with current_quantity > 0
   search?: string // Search across batch number, product name, brand, barcode, SKU, location, supplier
   sort?: BatchSort
-  excludeDrafts?: boolean // Exclude draft batches (default: false - shows all statuses)
   // Date range filtering
   expiry_date_from?: string
   expiry_date_to?: string
@@ -230,11 +229,6 @@ export async function fetchBatchesPage(
         query = query.eq('status', filters.status)
       }
 
-      // Exclude draft batches if requested
-      if (filters.excludeDrafts) {
-        query = query.neq('status', 'draft')
-      }
-
       if (filters.location_code) {
         query = query.eq('location_code', filters.location_code)
       }
@@ -250,7 +244,6 @@ export async function fetchBatchesPage(
       if (filters.expiringInDays) {
         const expiryThreshold = new Date()
         expiryThreshold.setDate(expiryThreshold.getDate() + filters.expiringInDays)
-        // Exclude draft batches (null expiry_date) when filtering by expiry
         query = query
           .not('expiry_date', 'is', null)
           .lte('expiry_date', expiryThreshold.toISOString().split('T')[0])

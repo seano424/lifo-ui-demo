@@ -1,14 +1,6 @@
 'use client'
 
-import {
-  ChartNoAxesCombined,
-  Layers,
-  PackagePlus,
-  SettingsIcon,
-  Zap,
-  CalendarFold,
-  Package,
-} from 'lucide-react'
+import { ChartNoAxesCombined, Layers, SettingsIcon, Zap, CalendarFold, Package } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import * as React from 'react'
@@ -24,7 +16,6 @@ import {
 } from '@/components/ui/sidebar'
 import { useExpiryTodosCount } from '@/hooks/use-expiry-todos-count'
 import { useCurrentUser } from '@/hooks/use-users'
-import { useDraftBatchCount } from '@/components/draft-batch-notification'
 import { TeamSwitcher } from './team-switcher'
 
 import { Logo } from './ui/logo'
@@ -32,7 +23,6 @@ import { Logo } from './ui/logo'
 function useNavigationData() {
   const t = useTranslations('navigation')
   const { count: expiryTodosCount } = useExpiryTodosCount()
-  const draftBatchCount = useDraftBatchCount()
 
   return React.useMemo(
     () => ({
@@ -61,12 +51,6 @@ function useNavigationData() {
               url: '/dashboard/expiring',
               icon: CalendarFold,
               badge: expiryTodosCount > 0 ? expiryTodosCount : undefined,
-            },
-            {
-              title: t('deliveries'),
-              url: '/dashboard/inventory/new',
-              icon: PackagePlus,
-              badge: draftBatchCount,
             },
             // {
             //   title: t('ignored'),
@@ -114,7 +98,7 @@ function useNavigationData() {
         },
       ],
     }),
-    [t, expiryTodosCount, draftBatchCount],
+    [t, expiryTodosCount],
   )
 }
 

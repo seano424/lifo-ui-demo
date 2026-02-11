@@ -3,7 +3,6 @@ import { Badge } from '@/components/ui/badge'
 export const getStatusBadge = (status: string, tStatus: (key: string) => string) => {
   const variants = {
     active: 'default' as const,
-    draft: 'secondary' as const,
     expired: 'destructive' as const,
     damaged: 'destructive' as const,
     sold_out: 'secondary' as const,
@@ -11,7 +10,6 @@ export const getStatusBadge = (status: string, tStatus: (key: string) => string)
   }
   const statusMap: { [key: string]: string } = {
     active: 'active',
-    draft: 'draft',
     expired: 'expired',
     damaged: 'damaged',
     sold_out: 'soldOut',
@@ -19,9 +17,7 @@ export const getStatusBadge = (status: string, tStatus: (key: string) => string)
   }
   const translationKey = statusMap[status] || 'active'
   const translatedStatus =
-    tStatus(
-      translationKey as 'active' | 'draft' | 'expired' | 'damaged' | 'soldOut' | 'reserved',
-    ) || status
+    tStatus(translationKey as 'active' | 'expired' | 'damaged' | 'soldOut' | 'reserved') || status
   return (
     <Badge variant={variants[status as keyof typeof variants] || 'outline'}>
       {translatedStatus}
@@ -33,9 +29,9 @@ export const getExpiryBadge = (
   expiryDate: string | null,
   tExpiry: (key: string, params?: { days: number }) => string,
 ) => {
-  // Handle null/missing expiry dates (draft batches)
   if (!expiryDate) {
-    return <Badge variant="secondary">{tExpiry('noExpiryDate')}</Badge>
+    // Should not happen as all batches now require expiry dates
+    return <Badge variant="secondary">No expiry date</Badge>
   }
 
   const today = new Date()
@@ -54,15 +50,8 @@ export const getExpiryBadge = (
 }
 
 /**
- * Check if a batch is in draft status (needs expiry date to be completed)
- */
-export const isDraftBatch = (batch: { status?: string; expiry_date?: string | null }): boolean => {
-  return batch.status === 'draft' || !batch.expiry_date
-}
-
-/**
  * Check if a batch can be scored by the AI (has expiry date and is active)
  */
 export const canBeScored = (batch: { status?: string; expiry_date?: string | null }): boolean => {
-  return !isDraftBatch(batch) && batch.status === 'active'
+  return batch.status === 'active' && !!batch.expiry_date
 }
