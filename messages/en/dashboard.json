@@ -735,7 +735,9 @@
         },
         "activating": {
           "title": "Activating batch tracking...",
-          "description": "We're creating batches for your auto categories and setting up your configuration. This will just take a moment."
+          "description": "We're creating batches for your auto categories and setting up your configuration. This will just take a moment.",
+          "successTitle": "Batch Tracking Activated!",
+          "successDescription": "Your inventory tracking is now configured and ready to go."
         },
         "success": {
           "title": "Batch Tracking Activated!",

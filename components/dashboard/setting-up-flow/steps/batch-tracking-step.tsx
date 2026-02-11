@@ -9,7 +9,6 @@ import { getDefaultShelfLife } from '@/lib/batch-tracking/shelf-life-lookup'
 import { StepSquareConnected } from './batch-tracking/step-square-connected'
 import { StepCombinedTracking } from './batch-tracking/step-combined-tracking'
 import { ActivatingState } from './batch-tracking/activating-state'
-import { StepSuccess } from './batch-tracking/step-success'
 import { useActiveStoreId, useStoreState } from '@/lib/stores/store-context'
 import { logger } from '@/lib/utils/logger'
 import { useSetupFlowStore } from '@/lib/stores/setup-flow-store'
@@ -19,7 +18,7 @@ import { StoreIndicator } from '../store-indicator'
 // TYPES
 // =============================================================================
 
-export type WizardSubStep = 0 | 1 | 'activating' | 'success'
+export type WizardSubStep = 0 | 1 | 'activating'
 
 export interface ProcessedCategory {
   id: string
@@ -65,6 +64,7 @@ export function BatchTrackingStep() {
   // Internal sub-step navigation
   // Start at step 1 (What to Track) since step 0 (Square Connected) is now shown in Add Store Step
   const [subStep, setSubStep] = useState<WizardSubStep>(1)
+  const [showSuccess, setShowSuccess] = useState(false)
 
   // Fetch data from backend
   const { data: categories, isLoading: isSyncing } = useCategoriesWithTrackingSettings(
@@ -246,7 +246,7 @@ export function BatchTrackingStep() {
         auto_create_batches: override.mode === 'auto',
       }))
 
-      // Save configuration
+      // Save configuration (includes smart minimum 2s duration)
       await saveMutation.mutateAsync({
         storeId,
         config: {
@@ -263,13 +263,18 @@ export function BatchTrackingStep() {
 
       logger.log(context, 'Batch tracking activated successfully', { storeId })
 
-      // Move to success screen
-      setSubStep('success')
+      // Show success animation for 1.5 seconds
+      setShowSuccess(true)
+      await new Promise(resolve => setTimeout(resolve, 1500))
+
+      // Setup flow will auto-exit to dashboard when it detects hasBatchTrackingSetup: true
+      // No manual navigation needed - React Query invalidation handles it
     } catch (error) {
       logger.error(context, 'Failed to activate batch tracking', { error, storeId })
       // TODO: Show error toast
       // For now, go back to step 1
       setSubStep(1)
+      setShowSuccess(false)
     }
   }
 
@@ -307,15 +312,7 @@ export function BatchTrackingStep() {
         />
       )}
 
-      {subStep === 'activating' && <ActivatingState />}
-
-      {subStep === 'success' && (
-        <StepSuccess
-          autoCategories={enabledCategories.filter(c => categoryModes[c.id] === 'auto').length}
-          manualCategories={enabledCategories.filter(c => categoryModes[c.id] === 'manual').length}
-          productOverrides={Object.keys(productOverrides).length}
-        />
-      )}
+      {subStep === 'activating' && <ActivatingState showSuccess={showSuccess} />}
     </div>
   )
 }

@@ -274,70 +274,69 @@ export function useSaveBatchTrackingSetup() {
         mode: params.config.product_selection_mode,
       })
 
-      // Run both the actual save operation and a minimum delay in parallel
-      // This ensures users always see the loading state for at least 1.5 seconds
-      const [validated] = await Promise.all([
-        (async () => {
-          const { data, error } = await supabase.rpc('save_batch_tracking_setup', {
-            p_store_id: params.storeId,
-            p_config: params.config,
-            p_category_settings: params.categorySettings,
-            p_product_overrides: params.productOverrides,
-          })
+      // Smart minimum duration: Only add delay if API call is faster than 2 seconds
+      // This ensures fast operations still feel substantial without penalizing slow ones
+      const startTime = Date.now()
 
-          if (error) {
-            logger.queryWarn(context, 'RPC error', {
-              error: error.message,
-              code: error.code,
-              storeId: params.storeId,
-            })
-            throw new Error(`Failed to save batch tracking setup: ${error.message}`)
-          }
+      const { data, error } = await supabase.rpc('save_batch_tracking_setup', {
+        p_store_id: params.storeId,
+        p_config: params.config,
+        p_category_settings: params.categorySettings,
+        p_product_overrides: params.productOverrides,
+      })
 
-          // Validate response with Zod schema
-          let validated: SaveBatchTrackingSetupResponse
-          try {
-            validated = SaveBatchTrackingSetupResponseSchema.parse(data)
-          } catch (validationError) {
-            logger.error(context, 'Validation error', {
-              data,
-              error: validationError,
-            })
-            throw new Error('Invalid response from save operation')
-          }
+      if (error) {
+        logger.queryWarn(context, 'RPC error', {
+          error: error.message,
+          code: error.code,
+          storeId: params.storeId,
+        })
+        throw new Error(`Failed to save batch tracking setup: ${error.message}`)
+      }
 
-          // Check if the operation was successful
-          if (!validated.success) {
-            logger.queryWarn(context, 'Save operation failed', {
-              error: validated.error,
-              storeId: params.storeId,
-            })
-            throw new Error(`Failed to save batch tracking setup: ${validated.error}`)
-          }
+      // Validate response with Zod schema
+      let validated: SaveBatchTrackingSetupResponse
+      try {
+        validated = SaveBatchTrackingSetupResponseSchema.parse(data)
+      } catch (validationError) {
+        logger.error(context, 'Validation error', {
+          data,
+          error: validationError,
+        })
+        throw new Error('Invalid response from save operation')
+      }
 
-          logger.log(context, 'Batch tracking setup saved successfully', {
-            storeId: params.storeId,
-            categoriesUpdated: validated.categories_updated,
-            productsUpdated: validated.products_updated,
-          })
+      // Check if the operation was successful
+      if (!validated.success) {
+        logger.queryWarn(context, 'Save operation failed', {
+          error: validated.error,
+          storeId: params.storeId,
+        })
+        throw new Error(`Failed to save batch tracking setup: ${validated.error}`)
+      }
 
-          return validated
-        })(),
-        new Promise(resolve => setTimeout(resolve, 4000)), // 4 second minimum (for testing)
-      ])
+      logger.log(context, 'Batch tracking setup saved successfully', {
+        storeId: params.storeId,
+        categoriesUpdated: validated.categories_updated,
+        productsUpdated: validated.products_updated,
+      })
+
+      // Calculate elapsed time and add delay if needed to reach minimum 2 seconds
+      const elapsed = Date.now() - startTime
+      const minimumDuration = 2000 // 2 seconds
+      const remainingTime = Math.max(0, minimumDuration - elapsed)
+
+      if (remainingTime > 0) {
+        await new Promise(resolve => setTimeout(resolve, remainingTime))
+      }
 
       return validated
     },
     onSuccess: (_data, variables) => {
-      // Invalidate relevant queries to refresh data
+      // Invalidate all batch tracking onboarding queries
+      // This automatically invalidates config, categories, and products queries
       queryClient.invalidateQueries({
         queryKey: queryKeys.batchTrackingOnboarding.all,
-      })
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.batchTrackingOnboarding.categories(variables.storeId),
-      })
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.batchTrackingOnboarding.products(variables.storeId, {}),
       })
 
       logger.log('useSaveBatchTrackingSetup', 'Queries invalidated after successful save', {

@@ -736,7 +736,9 @@
         },
         "activating": {
           "title": "Activation du suivi des lots...",
-          "description": "Nous créons des lots pour vos catégories automatiques et configurons votre configuration. Cela ne prendra qu'un instant."
+          "description": "Nous créons des lots pour vos catégories automatiques et configurons votre configuration. Cela ne prendra qu'un instant.",
+          "successTitle": "Suivi des lots activé !",
+          "successDescription": "Le suivi de votre inventaire est maintenant configuré et prêt."
         },
         "success": {
           "title": "Suivi des lots activé !",

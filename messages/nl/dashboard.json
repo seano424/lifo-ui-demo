@@ -734,7 +734,9 @@
         },
         "activating": {
           "title": "Batch tracking activeren...",
-          "description": "We maken batches voor uw automatische categorieën en stellen uw configuratie in. Dit duurt slechts een moment."
+          "description": "We maken batches voor uw automatische categorieën en stellen uw configuratie in. Dit duurt slechts een moment.",
+          "successTitle": "Batch tracking geactiveerd!",
+          "successDescription": "Uw voorraadtracking is nu geconfigureerd en klaar voor gebruik."
         },
         "success": {
           "title": "Batch tracking geactiveerd!",
