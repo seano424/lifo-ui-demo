@@ -196,35 +196,39 @@ Before removing any file, verify it's NOT:
 **Goal:** Consolidate component variants and remove duplicates
 
 **Todo Card Cleanup:**
-- [ ] Verify `todo-card-v3.tsx` is actively used in routes
-- [ ] Check if `todo-card-v2.tsx` has unique features needed by v3
-- [ ] Search for all imports of `todo-card.tsx` and `todo-card-v2.tsx`
-- [ ] Migrate any v2 usage to v3 (if any)
-- [ ] Delete `components/todos/todo-card.tsx` (v1)
-- [ ] Delete `components/todos/todo-card-v2.tsx`
-- [ ] Rename `todo-card-v3.tsx` → `todo-card.tsx`
-- [ ] Update imports to use new `todo-card.tsx` path
+- [x] Verify `todo-card-v3.tsx` is actively used in routes
+- [x] Check if `todo-card-v2.tsx` has unique features needed by v3
+- [x] Search for all imports of `todo-card.tsx` and `todo-card-v2.tsx`
+- [x] Migrate any v2 usage to v3 (if any)
+- [x] Delete `components/todos/todo-card.tsx` (v1)
+- [x] Delete `components/todos/todo-card-v2.tsx`
+- [x] Rename `todo-card-v3.tsx` → `todo-card.tsx`
+- [x] Update imports to use new `todo-card.tsx` path
 
 **Filter Bar Cleanup:**
-- [ ] Verify `unified-search-filters-bar-v2.tsx` is in use
-- [ ] Search for imports of `unified-search-filters-bar.tsx` (v1)
-- [ ] Delete `components/todos/filters/unified-search-filters-bar.tsx` (v1)
-- [ ] Rename `unified-search-filters-bar-v2.tsx` → `unified-search-filters-bar.tsx`
-- [ ] Update imports to use new path
+- [x] Verify `unified-search-filters-bar-v2.tsx` is in use
+- [x] Search for imports of `unified-search-filters-bar.tsx` (v1)
+- [x] Delete `components/todos/filters/unified-search-filters-bar.tsx` (v1)
+- [x] Rename `unified-search-filters-bar-v2.tsx` → `unified-search-filters-bar.tsx`
+- [x] Update imports to use new path
+- [x] Rename UnifiedSearchFiltersBarV2 → UnifiedSearchFiltersBar throughout
 
 **Dashboard & Notification Cleanup:**
-- [ ] Delete `components/dashboard/TimeSelector.tsx`
-- [ ] Delete `components/dashboard/TrendIndicator.tsx`
-- [ ] Delete `components/notifications/notification-bell.tsx`
+- [x] Delete `components/dashboard/TimeSelector.tsx`
+- [x] Delete `components/dashboard/TrendIndicator.tsx`
+- [x] Delete `components/notifications/notification-bell.tsx`
+- [x] **Bonus:** Delete `components/dashboard/kpi-card.tsx` (unused)
+- [x] **Bonus:** Delete `lib/queries/dashboard-kpi-trends.ts` (354 lines, unused)
 
 **Verification:**
-- [ ] Run `npm run check`
-- [ ] Run `npm run build`
-- [ ] Test todo list functionality manually
-- [ ] Test dashboard displays correctly
-- [ ] Commit with message: `chore: consolidate component variants and remove duplicates`
+- [x] Run `npm run check`
+- [x] Run `npm run build`
+- [x] Test todo list functionality manually
+- [x] Test dashboard displays correctly
+- [x] Commit with message: `chore: consolidate component variants and remove duplicates`
 
-**Estimated Time:** 1-2 hours
+**Results:** ✅ Removed 1997 lines (net), consolidated 8 files, all checks passed
+**Actual Time:** 30 minutes
 **Risk Level:** ⚠️ Medium (requires testing)
 
 ---
@@ -293,9 +297,9 @@ After each phase:
 | Phase | Status | Files Removed | Lines Saved | Completed Date |
 |-------|--------|---------------|-------------|----------------|
 | Phase 1 | ✅ Complete | 5/5 | 854 | 2026-02-11 |
-| Phase 2 | ⏳ Not Started | 0/6 | 0/~400 | - |
+| Phase 2 | ✅ Complete | 8/8 | 1997 | 2026-02-11 |
 | Phase 3 | ⏳ Not Started | 0/2 | 0/~50 | - |
-| **Total** | **38%** | **5/13** | **854/~1300** | - |
+| **Total** | **93%** | **13/15** | **2851/~2900** | - |
 
 ---
 
