@@ -686,6 +686,8 @@
           "noCategories": "Aucune catégorie trouvée",
           "selectAll": "Tout sélectionner",
           "deselectAll": "Tout désélectionner",
+          "selectAllCategories": "Toutes les catégories",
+          "selecteAllProducts": "Tous les produits",
           "summary": {
             "tracking": "Suivi de",
             "of": "sur",
@@ -822,6 +824,8 @@
             "noFoodCategories": "Aucune catégorie alimentaire trouvée",
             "selectAll": "Tout sélectionner",
             "deselectAll": "Tout désélectionner",
+            "selectAllCategories": "Toutes les catégories",
+            "selecteAllProducts": "Tous les produits",
             "summary": {
               "tracking": "Suivi de",
               "of": "sur",

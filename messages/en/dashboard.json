@@ -685,6 +685,8 @@
           "noCategories": "No categories found",
           "selectAll": "Select all",
           "deselectAll": "Deselect all",
+          "selectAllCategories": "Select all categories",
+          "selecteAllProducts": "Select all products",
           "summary": {
             "tracking": "Tracking",
             "of": "of",
@@ -821,6 +823,8 @@
             "noFoodCategories": "No food categories found",
             "selectAll": "Select all",
             "deselectAll": "Deselect all",
+            "selectAllCategories": "Select all categories",
+            "selecteAllProducts": "Select all products",
             "summary": {
               "tracking": "Tracking",
               "of": "of",

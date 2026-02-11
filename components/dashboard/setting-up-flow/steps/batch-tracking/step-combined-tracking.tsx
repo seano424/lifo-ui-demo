@@ -127,14 +127,18 @@ export function StepCombinedTracking({
               {/* Select All Toggle */}
               <div className="hidden flex-col-reverse sm:flex-row gap-4 sm:gap-0 sm:items-center sm:justify-between py-2 sm:flex pb-3">
                 <div className="flex items-center gap-3">
-                  <Toggle checked={allSelected} onCheckedChange={handleToggleAll} />
+                  <Toggle
+                    checked={allSelected}
+                    onCheckedChange={handleToggleAll}
+                    disabled={categories.length <= 1}
+                  />
                   <Typography
                     variant="p"
                     className={`font-medium transition-colors ${
                       !allSelected ? 'text-muted-foreground' : ''
                     }`}
                   >
-                    {t('whatToTrack.selectAll')}
+                    {t('whatToTrack.selectAllCategories')}
                   </Typography>
                 </div>
                 {enabledCategories.length > 0 && (
@@ -160,6 +164,7 @@ export function StepCombinedTracking({
                 const enabled = enabledIds.has(category.id)
                 const mode = categoryModes[category.id] || 'auto'
                 const days = shelfLifeDays[category.id]
+                const isLastEnabled = enabled && enabledCategories.length === 1
 
                 return (
                   <CategoryRowWithConfig
@@ -168,6 +173,7 @@ export function StepCombinedTracking({
                     enabled={enabled}
                     mode={mode}
                     days={days}
+                    disabled={isLastEnabled}
                     onToggle={onToggleCategory}
                     onUpdateMode={onUpdateMode}
                     onUpdateShelfLife={onUpdateShelfLife}
@@ -371,6 +377,7 @@ interface CategoryRowWithConfigProps {
   enabled: boolean
   mode: 'auto' | 'manual'
   days: number | null
+  disabled?: boolean
   onToggle: (categoryId: string, enabled: boolean) => void
   onUpdateMode: (categoryId: string, mode: 'auto' | 'manual') => void
   onUpdateShelfLife: (categoryId: string, days: number | null) => void
@@ -381,6 +388,7 @@ function CategoryRowWithConfig({
   enabled,
   mode,
   days,
+  disabled = false,
   onToggle,
   onUpdateMode,
   onUpdateShelfLife,
@@ -393,6 +401,7 @@ function CategoryRowWithConfig({
       <div className="flex items-center gap-3 flex-1 min-w-0">
         <Toggle
           checked={enabled}
+          disabled={disabled}
           onCheckedChange={(checked: boolean) => onToggle(category.id, checked)}
         />
         <div className="flex-1 min-w-0">

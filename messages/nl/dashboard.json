@@ -684,6 +684,8 @@
           "noCategories": "Geen categorieën gevonden",
           "selectAll": "Alles selecteren",
           "deselectAll": "Alles deselecteren",
+          "selectAllCategories": "Alle categorieën selecteren",
+          "selecteAllProducts": "Alle producten selecteren",
           "summary": {
             "tracking": "Volgen",
             "of": "van",
@@ -820,6 +822,8 @@
             "noFoodCategories": "Geen voedselcategorieën gevonden",
             "selectAll": "Alles selecteren",
             "deselectAll": "Alles deselecteren",
+            "selectAllCategories": "Alle categorieën selecteren",
+            "selecteAllProducts": "Alle producten selecteren",
             "summary": {
               "tracking": "Volgen",
               "of": "van",
