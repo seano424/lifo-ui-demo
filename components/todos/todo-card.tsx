@@ -1,296 +1,384 @@
 'use client'
 
-import { Badge } from '@/components/ui/badge'
-import { Typography } from '@/components/ui/typography'
 import type { TodoItem } from '@/lib/queries/todos-rpc'
-
 import { cn } from '@/lib/utils'
 import { migrateRecommendation } from '@/lib/utils/recommendation-migration'
-import { logger } from '@/lib/utils/logger'
-import { parseISODateAsLocal } from '@/lib/utils/date-conversion'
-import { Calendar, Package, PenLine, CheckIcon } from 'lucide-react'
-import { startOfDay, isToday, differenceInDays, addDays, isBefore } from 'date-fns'
+import { Typography } from '../ui/typography'
+import { format } from 'date-fns'
 import { useTranslations } from 'next-intl'
+import { useMemo } from 'react'
+import { useCurrency } from '@/hooks/use-currency'
+import { calculateTodoDateInfo, type ActionButtonConfig } from '@/lib/utils/todo-status'
 
-interface TodoCardProps {
+interface TodoCardV3Props {
   todo: TodoItem
+  currencySymbol?: string
   onClick?: () => void
 }
 
-// Move urgency config outside component for better performance
-const URGENCY_CONFIG = {
-  critical: {
-    color: 'bg-destructive',
-    textColor: 'text-destructive',
-    bgColor: 'group-hover:bg-destructive bg-destructive',
-    badge: 'bg-destructive text-destructive border-destructive',
-    badgeVariant: 'default' as const,
-    borderColor: 'border-destructive',
-  },
-  high: {
-    color: 'bg-destructive',
-    textColor: 'text-destructive',
-    bgColor: 'group-hover:bg-red-50 bg-destructive',
-    badge: 'bg-destructive text-destructive border-destructive',
-    badgeVariant: 'default' as const,
-    borderColor: 'border-destructive',
-  },
-  medium: {
-    color: 'bg-primary-500',
-    textColor: 'text-primary-800',
-    bgColor: 'group-hover:bg-primary-50 bg-primary-500',
-    badge: 'bg-primary-100 text-primary-800 border-primary-500',
-    badgeVariant: 'primary' as const,
-    borderColor: 'border-primary-500',
-  },
-  low: {
-    color: 'bg-secondary-500',
-    textColor: 'text-secondary-700',
-    bgColor: 'group-hover:bg-secondary-50 bg-secondary-500',
-    badge: 'bg-secondary-100 text-secondary-800 border-secondary-500',
-    badgeVariant: 'secondary' as const,
-    borderColor: 'border-secondary-500',
-  },
-  none: {
-    color: 'bg-gray-500',
-    textColor: 'text-foreground',
-    bgColor: 'group-hover:bg-gray-50 bg-gray-500',
-    badge: 'bg-gray-100 text-foreground border-gray-200',
-    badgeVariant: 'secondary' as const,
-    borderColor: 'border-gray-500',
-  },
-  default: {
-    color: 'bg-gray-500',
-    textColor: 'text-foreground',
-    bgColor: 'group-hover:bg-gray-50 bg-gray-500',
-    badge: 'bg-gray-100 text-foreground border-gray-200',
-    badgeVariant: 'secondary' as const,
-    borderColor: 'border-gray-500',
-  },
-} as const
-
-export function TodoCard({ todo, onClick }: TodoCardProps) {
+export function TodoCardV3({
+  todo,
+  currencySymbol: providedCurrencySymbol,
+  onClick,
+}: TodoCardV3Props) {
   const t = useTranslations('todos')
+  const defaultCurrencySymbol = useCurrency()
+  const currencySymbol = providedCurrencySymbol ?? defaultCurrencySymbol
+
+  // Validate required fields
+  if (!todo) {
+    throw new Error('TodoCardV3: todo prop is required')
+  }
+
+  // Memoize date calculations for performance
+  const dateInfo = useMemo(() => calculateTodoDateInfo(todo.expiry_date), [todo.expiry_date])
+  const { expiryDate, isExpiring, isExpiringToday, isExpiringTomorrow, daysUntilExpiry } = dateInfo
+
+  // Get action button configuration (used as category badge)
+  const actionButton = useMemo((): ActionButtonConfig => {
+    // For completed items, show what was actually done (past tense)
+    if (todo.completion_status === 'completed' && todo.last_action_type) {
+      switch (todo.last_action_type) {
+        case 'sold':
+          if (todo.last_discount_percent != null && todo.last_discount_percent > 0) {
+            return {
+              text: t('actions.soldAtDiscount', {
+                percent: todo.last_discount_percent,
+              }),
+              variant: 'outline',
+            }
+          }
+          return {
+            text: t('actions.sold'),
+            variant: 'outline',
+          }
+        case 'donate':
+          return {
+            text: t('actions.donated'),
+            variant: 'outline',
+          }
+        case 'dispose':
+          return {
+            text: t('actions.disposed'),
+            variant: 'destructive',
+          }
+        case 'discount':
+          if (todo.last_discount_percent != null && todo.last_discount_percent > 0) {
+            return {
+              text: t('actions.soldAtDiscount', {
+                percent: todo.last_discount_percent,
+              }),
+              variant: 'outline',
+            }
+          }
+          return {
+            text: t('actions.discount'),
+            variant: 'outline',
+          }
+      }
+    }
+
+    const standardRecommendation = isExpiring
+      ? 'dispose'
+      : migrateRecommendation(todo.ai_recommendation)
+
+    // Expired items
+    if (isExpiring) {
+      return {
+        text: t('actions.dispose'),
+        variant: 'destructive',
+      }
+    }
+
+    // Items with discount recommendation
+    if (
+      todo.last_discount_percent != null &&
+      todo.last_discount_percent > 0 &&
+      !todo.completion_status
+    ) {
+      return {
+        text: `${todo.last_discount_percent}% Discount`,
+        variant: 'outline',
+      }
+    }
+
+    // Default action based on recommendation
+    switch (standardRecommendation) {
+      case 'donate':
+        return {
+          text: t('actions.donate'),
+          variant: 'outline',
+        }
+      case 'dispose':
+        return {
+          text: t('actions.dispose'),
+          variant: 'destructive',
+        }
+      case 'discount':
+        return {
+          text: t('actions.discount'),
+          variant: 'outline',
+        }
+      default:
+        return {
+          text: t('actions.monitorStock'),
+          variant: 'ghost',
+        }
+    }
+  }, [
+    todo.completion_status,
+    todo.last_action_type,
+    todo.last_discount_percent,
+    isExpiring,
+    todo.ai_recommendation,
+    t,
+  ])
+
+  // Calculate value at risk
+  const valueAtRisk =
+    todo.current_quantity != null && todo.unit_price != null
+      ? todo.current_quantity * todo.unit_price
+      : null
+
+  // Calculate stock percentage for progress bar
+  const stockData = useMemo(() => {
+    const currentQty = todo.current_quantity ?? 0
+    const totalSold = todo.total_sold_quantity ?? 0
+    const lastActionQty = todo.last_action_quantity ?? 0
+    const lastActionType = todo.last_action_type
+
+    // Calculate initial quantity (current + sold + other actions)
+    let initialQty = currentQty
+
+    if (totalSold > 0) {
+      initialQty = currentQty + totalSold
+    } else if (lastActionType === 'donate' || lastActionType === 'dispose') {
+      initialQty = currentQty + lastActionQty
+    }
+
+    const percentage = initialQty > 0 ? (currentQty / initialQty) * 100 : 100
+
+    return {
+      currentQty,
+      initialQty,
+      percentage: Math.round(percentage),
+    }
+  }, [
+    todo.current_quantity,
+    todo.total_sold_quantity,
+    todo.last_action_quantity,
+    todo.last_action_type,
+  ])
+
+  // Determine if this is an urgent item (for expiry indicator styling)
+  const isUrgent = useMemo(() => {
+    return isExpiring || isExpiringToday || isExpiringTomorrow || daysUntilExpiry <= 7
+  }, [isExpiring, isExpiringToday, isExpiringTomorrow, daysUntilExpiry])
+
+  // Format expiry date for display
+  const formattedDate = useMemo(() => {
+    if (todo.completion_status === 'completed') {
+      // For completed items, you might want to show completion date if available
+      // For now, showing expiry date
+      return format(expiryDate, 'MMM d, yyyy')
+    }
+    return format(expiryDate, 'MMM d, yyyy')
+  }, [expiryDate, todo.completion_status])
+
+  // Get action label - "Suggested" for pending items, "Completed" for completed items
+  const actionLabel = useMemo(() => {
+    if (todo.completion_status === 'completed') {
+      return t('card.completed')
+    }
+    return t('card.suggested')
+  }, [todo.completion_status, t])
+
+  // Calculate completion details for completed items
+  const completionDetails = useMemo(() => {
+    // const currentQty = todo.current_quantity ?? 0
+    const lastActionType = todo.last_action_type
+    const lastActionQty = todo.last_action_quantity ?? 0
+    const totalSold = todo.total_sold_quantity ?? 0
+    const unitPrice = todo.unit_price ?? 0
+    const isCompleted = todo.completion_status === 'completed'
+
+    if (!isCompleted) return null
+
+    // Case 1: Completed with sales - show total sold and revenue
+    if (totalSold > 0) {
+      const actualSellingPrice = todo.current_selling_price ?? todo.selling_price ?? unitPrice
+      const revenue = totalSold * actualSellingPrice
+      return {
+        label: t('card.soldUnits'),
+        value: totalSold,
+        secondaryLabel: t('card.revenue'),
+        secondaryValue: `${currencySymbol}${revenue.toFixed(0)}`,
+      }
+    }
+
+    // Case 2: Donate action
+    if (lastActionType === 'donate' && lastActionQty > 0) {
+      return {
+        label: t('card.donatedAction'),
+        value: lastActionQty,
+        secondaryLabel: t('card.units'),
+        secondaryValue: null,
+      }
+    }
+
+    // Case 3: Dispose action
+    if (lastActionType === 'dispose' && lastActionQty > 0) {
+      return {
+        label: t('card.disposedAction'),
+        value: lastActionQty,
+        secondaryLabel: t('card.units'),
+        secondaryValue: null,
+      }
+    }
+
+    return null
+  }, [
+    todo.completion_status,
+    // todo.current_quantity,
+    todo.last_action_type,
+    todo.last_action_quantity,
+    todo.total_sold_quantity,
+    todo.unit_price,
+    todo.current_selling_price,
+    todo.selling_price,
+    currencySymbol,
+    t,
+  ])
+
+  // Get context-aware footer message based on expiration status
+  // const footerMessage = useMemo(() => {
+  //   if (todo.available_quantity === 0) {
+  //     return t('card.tapToViewDetails')
+  //   }
+  //   if (isExpiring) {
+  //     return t('card.tapToReview') // "Review & resolve"
+  //   }
+  //   if (isExpiringToday) {
+  //     return t('card.tapToTakeAction') // "Take action"
+  //   }
+  //   // For items expiring in the future (including tomorrow, this week, etc.)
+  //   return t('card.tapToViewDetails') // "View details"
+  // }, [isExpiring, isExpiringToday, t, todo.available_quantity])
 
   const handleCardClick = () => {
     onClick?.()
   }
 
-  const expiryDate = todo.expiry_date ? parseISODateAsLocal(todo.expiry_date) : new Date()
-  const today = new Date()
-
-  // Use date-fns for reliable date comparisons
-  const expiryStartOfDay = startOfDay(expiryDate)
-  const todayStartOfDay = startOfDay(today)
-  const tomorrowStartOfDay = addDays(todayStartOfDay, 1)
-
-  const isExpiringSoon = isBefore(expiryStartOfDay, tomorrowStartOfDay) || isToday(expiryDate)
-  const isExpiring = isBefore(expiryStartOfDay, todayStartOfDay)
-  const isExpiringToday = isToday(expiryDate)
-
-  // Get standardized recommendation and translate it
-  const getRecommendationText = (recommendation: string | null | undefined): string => {
-    // Frontend safeguard: Override bad recommendations for expired items
-    if (isExpiring && recommendation !== 'dispose') {
-      logger.warn('TodoCard', 'Overriding AI recommendation for expired item', {
-        batchId: todo.batch_id,
-        originalRecommendation: recommendation,
-        overriddenTo: 'dispose',
-        expiryDate: todo.expiry_date,
-        daysOverdue: differenceInDays(todayStartOfDay, expiryStartOfDay),
-      })
-      return t('recommendations.dispose')
-    }
-
-    if (!recommendation) return t('card.noRecommendation')
-
-    // Migrate legacy recommendations to standard format
-    const standardRec = migrateRecommendation(recommendation)
-
-    // Try to get translation, fallback to formatted text if translation doesn't exist
-    try {
-      return t(`recommendations.${standardRec}`)
-    } catch {
-      // Fallback: capitalize and format if translation missing
-      return standardRec.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault()
+      handleCardClick()
     }
   }
 
-  // Calculate days since expiry for expiring items using date-fns
-  const getExpiringText = () => {
-    if (!isExpiring) return ''
-
-    const diffDays = differenceInDays(todayStartOfDay, expiryStartOfDay)
-
-    if (diffDays === 1) return t('card.expiredYesterday')
-    return t('card.expired', { days: diffDays })
-  }
-
-  // Simple lookup for urgency configuration - no memoization needed since config is static
-  const urgencyConfig =
-    URGENCY_CONFIG[todo.urgency_level as keyof typeof URGENCY_CONFIG] || URGENCY_CONFIG.default
-
-  // Get standardized recommendation for badge display
-  // Frontend safeguard: Override bad recommendations for expired items
-  const standardRecommendation = isExpiring
-    ? 'dispose'
-    : migrateRecommendation(todo.ai_recommendation)
-
-  const wasDiscounted = todo.last_discount_percent != null && todo.last_discount_percent > 0
-  const wasDonated = todo.last_action_type === 'donate'
-  const wasDisposed = todo.last_action_type === 'dispose'
   const isCompleted = todo.completion_status === 'completed'
-  const lastActionType = todo.last_action_type
-  const completionDate = todo.last_action_time ? new Date(todo.last_action_time) : null
-
-  const getCompletionDateText = () => {
-    const date = completionDate?.toLocaleDateString() ?? ''
-    switch (lastActionType) {
-      case 'donate':
-        return t('card.donatedOn', { date })
-      case 'dispose':
-        return t('card.disposedOn', { date })
-      case 'sold':
-        return t('card.completedOn', { date })
-      default:
-        return t('card.completedOn', { date })
-    }
-  }
+  const unitPrice = todo.unit_price ?? 0
 
   return (
-    <button
-      type="button"
-      className={cn(
-        'cursor-pointer transition-all duration-1000',
-        'border rounded-2xl p-4 flex flex-col',
-        urgencyConfig.borderColor,
-      )}
+    <div
+      role="button"
+      tabIndex={0}
       onClick={handleCardClick}
+      onKeyDown={handleKeyDown}
+      aria-label={`Todo item: ${todo.product_name}`}
+      className="flex gap-2 w-full flex-1 group"
     >
-      <div className="flex gap-3 items-start relative group">
-        <Badge
-          variant="outline"
-          className={cn(
-            'border-2 rounded-full cursor-pointer',
-            'sm:h-6 sm:w-6 h-5 w-5 p-0 bg-brand-white dark:bg-background transition-all duration-200 items-center justify-center',
-            urgencyConfig.badge,
-          )}
-        >
-          {isCompleted && (
-            <CheckIcon className="h-4 w-4 text-primary dark:text-secondary-400 stroke-3" />
-          )}
-        </Badge>
-
-        <div className="flex flex-col min-w-0 flex-1 gap-4">
-          <div className="flex flex-col gap-2 items-start text-left min-w-0">
-            <Typography variant="h4" className="truncate w-full pb-1">
-              {todo.product_name}
-            </Typography>
-          </div>
-
-          {/* Details */}
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center flex-wrap divide-x divide-muted">
-              <Typography variant="muted" className="flex items-center gap-1 pr-2">
-                <Calendar className="h-3 w-3" />
-                {expiryDate.toLocaleDateString()}
+      {/* <div className="h-6 w-6 bg-card border-2 border-muted rounded-full sm:group-hover:border-primary/40 transition-all duration-400 mt-2" /> */}
+      <div
+        className={cn(
+          'bg-card w-full flex flex-col gap-3 rounded-[14px] p-[18px] cursor-pointer transition-all shadow-[0_1px_2px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.03)]',
+          'sm:group-hover:shadow-lg sm:group-hover:shadow-primary-400/50 sm:group-hover:-translate-y-0.5 transition-all duration-400 cursor-pointer overflow-hidden',
+          'sm:hover:-translate-y-px sm:active:scale-[0.98]',
+        )}
+      >
+        {/* Top Row: Status + Date */}
+        <div className="flex justify-between items-center">
+          {/* Status - LEFT side, primary scan element */}
+          <div className="flex items-center gap-1.5">
+            {isUrgent ? (
+              <Typography variant="small" color="destructive" className=" ">
+                {isExpiring
+                  ? t('card.expiredStatus')
+                  : isExpiringToday
+                    ? t('card.expiresToday')
+                    : isExpiringTomorrow
+                      ? t('card.expiresTomorrow')
+                      : t('card.daysLeft', { days: daysUntilExpiry })}
               </Typography>
-
-              {!isCompleted && (
-                <Typography variant="muted" className="flex items-center gap-1 px-2">
-                  <Package className="h-3 w-3" />
-                  {t('card.unitsLeft', {
-                    quantity: todo.current_quantity ?? 0,
-                  })}
-                </Typography>
-              )}
-
-              {isCompleted && lastActionType === 'sold' && (
-                <Typography variant="small" className="flex items-center gap-1 px-2">
-                  🎉 {t('card.allSold')}
-                </Typography>
-              )}
-              {/* {isCompleted && lastActionType === 'sold' && (
-              )} */}
-
-              {isCompleted && wasDonated && (
-                <Typography variant="small" className="flex items-center gap-1">
-                  🎁 {t('card.donated')}
-                </Typography>
-              )}
-
-              {isCompleted && wasDisposed && (
-                <Typography variant="small" className="flex items-center gap-1">
-                  🗑️ {t('card.disposed')}
-                </Typography>
-              )}
-            </div>
-
-            <div className="flex flex-wrap items-center gap-2">
-              {/* AI Recommendation Badge */}
-              {!isCompleted && (
-                <Badge variant={urgencyConfig.badgeVariant}>
-                  {getRecommendationText(todo.ai_recommendation)}
-                </Badge>
-              )}
-
-              {isCompleted && wasDisposed && (
-                <Badge variant={'default'}>{t('card.disposed')}</Badge>
-              )}
-
-              {todo.last_discount_percent != null &&
-                todo.last_discount_percent > 0 &&
-                !wasDiscounted &&
-                !isCompleted && (
-                  <Badge variant={urgencyConfig.badgeVariant}>
-                    {t('card.suggestedDiscount', {
-                      percent: todo.last_discount_percent,
-                    })}
-                  </Badge>
-                )}
-
-              {wasDiscounted && (
-                <Badge variant={urgencyConfig.badgeVariant}>
-                  {t('card.currentlyDiscounted', {
-                    percent: todo.last_discount_percent ?? 0,
-                  })}
-                </Badge>
-              )}
-
-              {/* Only show "Healthy & Maintain" if not expired/expiring and no discount */}
-              {standardRecommendation === 'maintain' &&
-                (todo.last_discount_percent == null || todo.last_discount_percent === 0) &&
-                !isCompleted &&
-                !isExpiring &&
-                !isExpiringToday &&
-                !isExpiringSoon && (
-                  <Badge variant={urgencyConfig.badgeVariant}>{t('card.healthyMaintain')}</Badge>
-                )}
-
-              {isCompleted ? (
-                <Badge variant="primary">{getCompletionDateText()}</Badge>
-              ) : isExpiringToday ? (
-                <Badge variant="default">{t('card.expiresToday')}</Badge>
-              ) : isExpiring ? (
-                <Badge variant="default">{getExpiringText()}</Badge>
-              ) : isExpiringSoon ? (
-                <Badge variant="primary">{t('card.expiringSoon')}</Badge>
-              ) : wasDonated ? (
-                <Badge className="hidden" variant="primary">
-                  {t('card.donated')}
-                </Badge>
-              ) : null}
-            </div>
+            ) : (
+              <Typography variant="extraSmall" color="muted" className=" ">
+                {daysUntilExpiry}d until expiry
+              </Typography>
+            )}
           </div>
+
+          {/* Date - RIGHT side */}
+          <Typography variant="extraSmall" color="muted">
+            {formattedDate}
+          </Typography>
         </div>
 
-        <div className="absolute right-4 top-0 opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-muted rounded p-1.5 group/edit">
-          <PenLine className="h-4 w-4" />
-          <div className="absolute right-2 text-xs w-min text-nowrap bg-brand-dark  text-white rounded-lg py-1 px-2.5 -top-full opacity-0 group-hover/edit:opacity-100 transition-all duration-1000 delay-300">
-            {t('card.editTodo')}
-          </div>
+        {/* Product Name */}
+        <Typography variant="h4">{todo.product_name}</Typography>
+
+        {/* Inline Meta Row */}
+        <div className="flex items-center">
+          {!isCompleted ? (
+            <>
+              <Typography variant="small" color="default">
+                {stockData.currentQty} {t('card.units')}
+              </Typography>
+              <span className="mx-2 h-1 w-1 rounded-full bg-black/[0.2]"></span>
+              <Typography variant="small" color="muted">
+                {currencySymbol}
+                {unitPrice.toFixed(2)}/{t('card.unit')}
+              </Typography>
+              <span className="mx-2 h-1 w-1 rounded-full bg-black/[0.2]"></span>
+              <Typography variant="small" color="default">
+                {currencySymbol}
+                {valueAtRisk != null ? valueAtRisk.toFixed(2) : '0.00'} total
+              </Typography>
+            </>
+          ) : (
+            <div className="flex items-center">
+              {completionDetails ? (
+                <>
+                  <Typography variant="small" color="default">
+                    {completionDetails.value} {completionDetails.label}
+                  </Typography>
+                  {completionDetails.secondaryValue && (
+                    <>
+                      <span className="mx-2 h-1 w-1 rounded-full bg-black/[0.2]"></span>
+                      <Typography variant="small" color="default">
+                        {completionDetails.secondaryValue} {completionDetails.secondaryLabel}
+                      </Typography>
+                    </>
+                  )}
+                </>
+              ) : (
+                <Typography variant="small" color="default">
+                  {t('card.completed')}
+                </Typography>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Suggestion Row - Border Only */}
+        <div className="pt-3.5 mt-auto border-t border-muted/60 flex justify-between items-center">
+          <Typography variant="small" color="muted">
+            {actionLabel}
+          </Typography>
+          <Typography className=" text-secondary" variant="small">
+            {actionButton.text}
+          </Typography>
         </div>
       </div>
-    </button>
+    </div>
   )
 }

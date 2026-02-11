@@ -11,7 +11,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { isUrgencyLevel, isActionType } from '@/lib/todo-filter-config'
 import type { SortDirection, SortField, TodoFiltersState } from './filters/types'
-import { UnifiedSearchFiltersBarV2 } from './filters/unified-search-filters-bar-v2'
+import { UnifiedSearchFiltersBar } from './filters/unified-search-filters-bar'
 import { ExpiringTodayTab } from './expiry-tabs/expiring-today-tab'
 import { ExpiringSoonTab } from './expiry-tabs/expiring-soon-tab'
 import { ExpiringWeekTab } from './expiry-tabs/expiring-week-tab'
@@ -430,7 +430,7 @@ export function TodosExpiryList({ initialFilters, pageSize = 20 }: TodosExpiryLi
       </div>
 
       {/* Unified Search Bar V2 with Filter Dropdown */}
-      <UnifiedSearchFiltersBarV2
+      <UnifiedSearchFiltersBar
         searchTerm={filters.product_name}
         onSearchChange={handleSearchChange}
         isLoading={false}

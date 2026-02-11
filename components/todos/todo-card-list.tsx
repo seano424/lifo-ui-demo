@@ -1,7 +1,7 @@
 'use client'
 
 import { BatchModal } from '@/components/batches/batch-modal'
-import { TodoCardV3 } from '@/components/todos/todo-card-v3'
+import { TodoCardV3 } from '@/components/todos/todo-card'
 import { InfiniteScrollErrorBoundary } from '@/components/ui/error-boundary'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useCurrency } from '@/hooks/use-currency'

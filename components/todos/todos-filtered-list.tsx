@@ -11,7 +11,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { isUrgencyLevel, isActionType, isBatchStatus } from '@/lib/todo-filter-config'
 import type { SortDirection, SortField, TodoFiltersState } from './filters/types'
-import { UnifiedSearchFiltersBarV2 } from './filters/unified-search-filters-bar-v2'
+import { UnifiedSearchFiltersBar } from './filters/unified-search-filters-bar'
 import { CompletedTabWithCounts } from './todos-main-tabs/completed-tab'
 import { InProgressTabWithCounts } from './todos-main-tabs/in-progress-tab'
 import { PendingTabWithCounts } from './todos-main-tabs/pending-tab'
@@ -432,7 +432,7 @@ export function TodosFilteredList({ initialFilters, pageSize = 20 }: TodosFilter
       </div>
 
       {/* Unified Search Bar V2 with Filter Dropdown */}
-      <UnifiedSearchFiltersBarV2
+      <UnifiedSearchFiltersBar
         searchTerm={filters.product_name}
         onSearchChange={handleSearchChange}
         isLoading={false}
