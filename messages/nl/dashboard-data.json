@@ -166,7 +166,8 @@
     "organic": "Biologisch",
     "gluten_free": "Glutenvrij",
     "vegan": "Veganistisch",
-    "vegetarian": "Vegetarisch"
+    "vegetarian": "Vegetarisch",
+    "uncategorized": "Ongecategoriseerd"
   },
   "productTable": {
     "product": "Product",

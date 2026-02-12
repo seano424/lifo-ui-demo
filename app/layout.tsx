@@ -19,16 +19,32 @@ export const metadata: Metadata = {
   description:
     "lifo helps retailers reduce waste by tracking what's expiring and when to act—discount, donate, or sell in time.",
   icons: {
-    icon: [
+    icon: '/logos/logo.png',
+    apple: '/logos/logo.png',
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: defaultUrl,
+    title: 'lifo: Expiry Tracking for Retailers',
+    description:
+      "lifo helps retailers reduce waste by tracking what's expiring and when to act—discount, donate, or sell in time.",
+    siteName: 'lifo',
+    images: [
       {
-        url: '/logos/logo-light-theme.svg',
-        media: '(prefers-color-scheme: light)',
-      },
-      {
-        url: '/logos/logo-dark-theme.svg',
-        media: '(prefers-color-scheme: dark)',
+        url: '/logos/logo.png',
+        width: 1078,
+        height: 1078,
+        alt: 'lifo logo',
       },
     ],
+  },
+  twitter: {
+    card: 'summary',
+    title: 'lifo: Expiry Tracking for Retailers',
+    description:
+      "lifo helps retailers reduce waste by tracking what's expiring and when to act—discount, donate, or sell in time.",
+    images: ['/logos/logo.png'],
   },
 }
 
