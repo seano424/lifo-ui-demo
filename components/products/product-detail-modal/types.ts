@@ -4,6 +4,7 @@ import type { BatchWithProduct } from '@/lib/queries/batches'
 
 export interface BatchListProps {
   batches: BatchWithProduct[]
+  totalStock: number
   highlightedBatchId: string | null
   editingBatchId: string | null
   onStartEdit: (batchId: string) => void

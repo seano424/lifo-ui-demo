@@ -5,13 +5,16 @@ import { Button } from '@/components/ui/button'
 import type { TrackingSettingsProps } from './types'
 import { useProductActions } from '@/hooks/use-products'
 import { useState, useEffect } from 'react'
-import { ChevronRight } from 'lucide-react'
+import { ChevronDown, Settings } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 import { toast } from 'sonner'
 import { updateStoreCategoryShelfLife } from '@/lib/queries/products'
 import { useQueryClient } from '@tanstack/react-query'
 import { queryKeys } from '@/lib/queries/query-keys'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Badge } from '@/components/ui/badge'
 
 const MIN_SHELF_LIFE_DAYS = 1
 const DEFAULT_SHELF_LIFE_DAYS = 14
@@ -128,40 +131,44 @@ export function TrackingSettings({
   }
 
   return (
-    <div className="px-5 py-3 border-t border-border/50">
-      <button
-        type="button"
-        className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground font-medium transition-colors"
+    <div className="px-4 flex flex-col gap-4">
+      <Button
+        variant="ghost"
         onClick={() => setIsOpen(!isOpen)}
+        className="w-full flex items-center justify-between px-0"
       >
-        <ChevronRight className={cn('h-3 w-3 transition-transform', isOpen && 'rotate-90')} />
-        Tracking settings
-      </button>
+        <Typography variant="small" className="flex items-center gap-2">
+          Tracking settings
+        </Typography>
+        <ChevronDown className={cn('size-3 transition-transform', isOpen && 'rotate-180')} />
+      </Button>
 
       {isOpen && (
-        <div className="mt-3 pl-0.5 space-y-3">
+        <div className="gap-4 flex flex-col">
           {/* Tracking mode */}
-          <div className="flex items-center gap-3">
-            <Typography variant="small" className="text-muted-foreground w-24">
+          <div className="flex gap-4 items-center justify-between border-b border-border/50 pb-4">
+            <Label variant="small" className="capitalize">
+              Category
+            </Label>
+            <Badge variant="mutedRounded">{categoryName}</Badge>
+          </div>
+
+          <div className="flex gap-4 items-center justify-between border-b border-border/50 pb-4">
+            <Label variant="small" className="capitalize">
               Mode
-            </Typography>
-            <div className="flex gap-1 bg-muted rounded-lg p-0.5">
+            </Label>
+            <div className="flex gap-1 bg-muted text-foreground rounded-full p-2 w-fit">
               {(['auto', 'manual'] as const).map(mode => (
-                <button
+                <Button
                   key={mode}
                   type="button"
+                  size="sm"
                   onClick={() => handleTrackingModeToggle(mode)}
                   disabled={isUpdating}
-                  className={cn(
-                    'text-xs font-medium px-3 py-1 rounded-md transition-all',
-                    trackingMode === mode
-                      ? 'bg-background text-foreground shadow-sm'
-                      : 'text-muted-foreground hover:text-foreground',
-                    isUpdating && 'opacity-50 cursor-not-allowed',
-                  )}
+                  variant={trackingMode === mode ? 'subtleSecondary' : 'ghost'}
                 >
                   {mode.charAt(0).toUpperCase() + mode.slice(1)}
-                </button>
+                </Button>
               ))}
             </div>
           </div>
@@ -169,46 +176,41 @@ export function TrackingSettings({
           {/* Shelf life (only shown in auto mode) */}
           {trackingMode === 'auto' && (
             <>
-              <div className="flex items-center gap-3">
-                <Typography variant="small" className="text-muted-foreground w-24">
-                  Shelf life
-                </Typography>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="number"
-                    value={editedShelfLife}
-                    onChange={e => {
-                      setEditedShelfLife(e.target.value)
-                      setIsDirty(true)
-                    }}
-                    disabled={isSaving || isUpdating}
-                    className={cn(
-                      'w-16 border rounded-lg px-2.5 py-1 text-sm bg-background focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50',
-                      isDirty ? 'border-primary' : 'border-border',
-                    )}
-                    min={MIN_SHELF_LIFE_DAYS}
-                  />
-                  <Typography variant="small" className="text-muted-foreground">
-                    days
-                  </Typography>
+              <div className="flex gap-4 items-center justify-between border-b border-border/50 pb-4">
+                <Label variant="small">Shelf life</Label>
+                <div className="flex gap-1">
+                  <div className="items-center flex gap-1 bg-muted text-foreground rounded-full py-2 px-3 w-fit">
+                    <Input
+                      type="number"
+                      value={editedShelfLife}
+                      onChange={e => {
+                        setEditedShelfLife(e.target.value)
+                        setIsDirty(true)
+                      }}
+                      disabled={isSaving || isUpdating}
+                      className="max-w-12"
+                      min={MIN_SHELF_LIFE_DAYS}
+                      size="sm"
+                    />
+                    <Typography className="capitalize" variant="small" color="muted">
+                      days
+                    </Typography>
+                  </div>
                   <Button
-                    size="sm"
+                    variant="subtleSecondary"
                     onClick={handleSave}
                     disabled={!isDirty || isSaving || isUpdating}
                     loading={isSaving}
                     loadingText="Saving..."
-                    className="ml-2"
                   >
                     Save
                   </Button>
                 </div>
               </div>
 
-              <div className="flex items-center gap-3">
-                <Typography variant="small" className="text-muted-foreground w-24">
-                  Source
-                </Typography>
-                <span className="inline-flex items-center text-xs font-medium px-2 py-0.5 rounded-md bg-muted text-muted-foreground">
+              <div className="flex gap-4 items-center justify-between border-b border-border/50 pb-4">
+                <Label variant="small">Source</Label>
+                <Badge variant="mutedRounded">
                   {shelfLifeSource === 'product_override' &&
                     `Custom override (${shelfLifeDays} days)`}
                   {shelfLifeSource === 'store_category_override' &&
@@ -217,7 +219,7 @@ export function TrackingSettings({
                   {shelfLifeSource === 'category_base' && `Inherited from ${categoryName}`}
                   {shelfLifeSource === 'default' && 'System default (14 days)'}
                   {!shelfLifeSource && `Product default (${categoryName})`}
-                </span>
+                </Badge>
               </div>
             </>
           )}

@@ -213,6 +213,8 @@
   --color-sidebar-accent: hsl(var(--sidebar-accent));
   --color-sidebar-accent-foreground: hsl(var(--sidebar-accent-foreground));
   --color-sidebar-border: hsl(var(--sidebar-border));
+  --color-sand: hsl(var(--sand));
+  --color-sand-foreground: hsl(var(--sand-foreground));
 
   /* Your existing custom brand colors (updated with vibrant colors) */
   --color-brand-dark: hsl(225 42% 8%);
@@ -246,6 +248,9 @@
   --color-secondary-800: hsl(227 100% 63%);
   --color-secondary-900: hsl(227 100% 58%);
   --color-secondary-950: hsl(227 100% 40%);
+
+  --color-sand: #f6f1ec;
+  --color-sand-foreground: hsl(40 26% 90%);
 
   /* Font families */
   --font-sans:

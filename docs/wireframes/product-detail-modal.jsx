@@ -460,7 +460,7 @@ function ProductDetailModal({
   return (
     <ModalOverlay onClose={onClose}>
       {/* ——— Sticky Header ——— */}
-      <div className="flex-shrink-0 px-5 pt-5 pb-4 border-b border-gray-100">
+      <div className="shrink-0 px-5 pt-5 pb-4 border-b border-gray-100">
         <div className="flex items-start justify-between">
           <div>
             <h2 className="text-[17px] font-semibold text-gray-900 leading-tight">
@@ -548,7 +548,7 @@ function ProductDetailModal({
       </div>
 
       {/* ——— Sticky Footer ——— */}
-      <div className="flex-shrink-0 px-5 py-3 border-t border-gray-100 bg-gray-50/50 flex items-center justify-between">
+      <div className="shrink-0 px-5 py-3 border-t border-gray-100 bg-gray-50/50 flex items-center justify-between">
         <span className="text-[11px] text-gray-400">
           {trackedQty} of {PRODUCT.totalStock} units tracked
         </span>

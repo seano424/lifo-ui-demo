@@ -7,8 +7,9 @@ import { useProduct } from '@/hooks/use-products'
 import { BatchList } from './product-detail-modal/batch-list'
 import { UntrackedAlert } from './product-detail-modal/untracked-alert'
 import { TrackingSettings } from './product-detail-modal/tracking-settings'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useActiveStoreId } from '@/lib/stores/store-context'
+import { Badge } from '@/components/ui/badge'
 
 interface ProductDetailModalProps {
   isOpen: boolean
@@ -34,13 +35,20 @@ export function ProductDetailModal({
   const [highlightedBatchId, setHighlightedBatchId] = useState<string | null>(highlightBatchId)
   const [editingBatchId, setEditingBatchId] = useState<string | null>(null)
 
-  // Clear highlight after 3 seconds
-  useEffect(() => {
-    if (highlightedBatchId) {
-      const timeout = setTimeout(() => setHighlightedBatchId(null), 3000)
-      return () => clearTimeout(timeout)
+  // Clear highlight when a different batch is clicked
+  const handleStartEdit = (batchId: string) => {
+    if (highlightedBatchId && highlightedBatchId !== batchId) {
+      setHighlightedBatchId(null)
     }
-  }, [highlightedBatchId])
+    setEditingBatchId(batchId)
+  }
+
+  // Clear highlight and editing state when modal closes
+  const handleClose = () => {
+    setHighlightedBatchId(null)
+    setEditingBatchId(null)
+    onClose()
+  }
 
   // Calculate untracked quantity
   // NOTE: This calculation is blocked on store_products.quantity migration
@@ -54,70 +62,103 @@ export function ProductDetailModal({
   // const untrackedQty = (product?.square_quantity || 0) - totalTrackedQty
   const untrackedQty = 0 // Shell until migration lands
 
-  // Sort batches by expiry date (soonest first)
+  // Sort batches: active first (soonest expiry), then no-date/draft, then expired (most recently expired first)
   const sortedBatches = [...(batches || [])].sort((a, b) => {
-    if (!a.expiry_date) return 1 // No date goes to end
-    if (!b.expiry_date) return -1
-    return new Date(a.expiry_date).getTime() - new Date(b.expiry_date).getTime()
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+
+    // Check if batches are no-date or draft status
+    const aNoDate = !a.expiry_date || a.status === 'draft'
+    const bNoDate = !b.expiry_date || b.status === 'draft'
+
+    // If both have no date/draft, maintain original order
+    if (aNoDate && bNoDate) return 0
+
+    // If only one has no date/draft, we need to check if the other is expired
+    if (aNoDate || bNoDate) {
+      const dateToCheck = aNoDate ? b.expiry_date : a.expiry_date
+      if (dateToCheck) {
+        const expiry = new Date(dateToCheck)
+        expiry.setHours(0, 0, 0, 0)
+        const isExpired = expiry < today
+
+        if (isExpired) {
+          // No-date comes before expired
+          return aNoDate ? -1 : 1
+        } else {
+          // Active comes before no-date
+          return aNoDate ? 1 : -1
+        }
+      }
+      return 0
+    }
+
+    // Both have dates - check expiration
+    const aExpiry = new Date(a.expiry_date || '')
+    const bExpiry = new Date(b.expiry_date || '')
+    aExpiry.setHours(0, 0, 0, 0)
+    bExpiry.setHours(0, 0, 0, 0)
+
+    const aExpired = aExpiry < today
+    const bExpired = bExpiry < today
+
+    // If one is expired and the other isn't, non-expired comes first
+    if (aExpired && !bExpired) return 1
+    if (!aExpired && bExpired) return -1
+
+    // Both expired or both active: sort by expiry date
+    if (aExpired && bExpired) {
+      // Both expired: most recently expired first (descending)
+      return bExpiry.getTime() - aExpiry.getTime()
+    } else {
+      // Both active: soonest expiry first (ascending)
+      return aExpiry.getTime() - bExpiry.getTime()
+    }
   })
 
   return (
     <BottomSheet
-      className="min-w-xl"
       isOpen={isOpen}
-      onClose={onClose}
+      onClose={handleClose}
+      className="lg:min-w-2xl"
       titleElement={
-        <div className="flex flex-col gap-2 py-4">
-          <Typography variant="h3">{product?.name || 'Product Details'}</Typography>
-          {product?.sku && (
-            <Typography variant="small" className="text-muted-foreground font-mono">
-              {product.sku}
+        <div className="flex flex-col gap-1 py-4">
+          <Typography variant="h3" className="font-semibold">
+            {product?.name || 'Product Details'}
+          </Typography>
+          <div className="flex items-center gap-2">
+            <Typography variant="p" color="muted">
+              {product?.brand}
             </Typography>
-          )}
+            <span className="text-sm text-muted-foreground">•</span>
+            <Typography variant="p" color="muted">
+              {product?.category_display_name}
+            </Typography>
+          </div>
         </div>
       }
     >
-      <div className="flex flex-col h-full max-h-[90vh]">
-        <div className="flex-1 overflow-y-auto">
-          {/* Product info section */}
-          <div className="px-5 py-3 border-b border-border/50">
-            <div className="flex items-center gap-2 flex-wrap">
-              {product?.category_display_name && (
-                <span className="inline-flex items-center text-xs font-medium px-2 py-0.5 rounded-md bg-muted text-muted-foreground">
-                  {product.category_display_name}
-                </span>
-              )}
-              {product?.brand && (
-                <span className="inline-flex items-center text-xs font-medium px-2 py-0.5 rounded-md bg-muted text-muted-foreground">
-                  {product.brand}
-                </span>
-              )}
-              <div className="flex-1" />
-              <Typography variant="h4" className="font-semibold">
-                {product?.total_stock || 0}
-              </Typography>
-              <Typography variant="small" className="text-muted-foreground">
-                total units
-              </Typography>
-            </div>
-          </div>
+      <div className="flex flex-col gap-4 pb-20 px-4">
+        {/* TODO: Untracked alert: replace with actual calculation once store_products.quantity exists */}
+        {untrackedQty > 0 && (
+          <UntrackedAlert count={untrackedQty} productId={productId} autoExpand={focusAddDate} />
+        )}
 
-          {/* Untracked alert */}
-          {untrackedQty > 0 && (
-            <UntrackedAlert count={untrackedQty} productId={productId} autoExpand={focusAddDate} />
-          )}
-
-          {/* Batch list */}
+        {/* Batch list */}
+        <div className="select-none bg-background py-4 rounded-3xl">
           <BatchList
             batches={sortedBatches}
+            totalStock={product?.total_stock || 0}
             highlightedBatchId={highlightedBatchId}
             editingBatchId={editingBatchId}
-            onStartEdit={setEditingBatchId}
+            onStartEdit={handleStartEdit}
             onCancelEdit={() => setEditingBatchId(null)}
             isLoading={isLoadingBatches}
           />
+        </div>
 
-          {/* Tracking settings */}
+        {/* Tracking settings */}
+        <div className="bg-background py-4 rounded-3xl">
           <TrackingSettings
             productId={productId}
             categoryId={product?.category_id || ''}
@@ -129,9 +170,9 @@ export function ProductDetailModal({
         </div>
 
         {/* Footer */}
-        <div className="flex-shrink-0 px-5 py-3 border-t border-border/50 bg-muted/30 flex items-center justify-between">
-          <Typography variant="small" className="text-muted-foreground">
-            {totalTrackedQty} of {product?.total_stock || 0} units tracked
+        <div className="shrink-0 px-5 flex items-center justify-center">
+          <Typography variant="small" color="muted">
+            {totalTrackedQty} of {product?.total_stock || 0} units tracked with expiry dates
           </Typography>
         </div>
       </div>
