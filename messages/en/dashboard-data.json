@@ -166,7 +166,8 @@
     "organic": "Organic",
     "gluten_free": "Gluten Free",
     "vegan": "Vegan",
-    "vegetarian": "Vegetarian"
+    "vegetarian": "Vegetarian",
+    "uncategorized": "Uncategorized"
   },
   "productTable": {
     "product": "Product",

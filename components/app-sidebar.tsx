@@ -16,7 +16,6 @@ import {
 } from '@/components/ui/sidebar'
 import { useExpiryTodosCount } from '@/hooks/use-expiry-todos-count'
 import { useCurrentUser } from '@/hooks/use-users'
-import { TeamSwitcher } from './team-switcher'
 
 import { Logo } from './ui/logo'
 
@@ -146,11 +145,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent className="group-data-[collapsible=icon]:pt-4 pt-4">
         <NavMain sections={navigationData.navSections} />
-        {mounted && (
-          <div className="group-data-[collapsible=icon]:hidden sm:hidden p-4 mt-4">
-            <TeamSwitcher />
-          </div>
-        )}
       </SidebarContent>
       <SidebarFooter className="py-4">{mounted && <NavUser user={user} />}</SidebarFooter>
       <SidebarRail />

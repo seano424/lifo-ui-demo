@@ -1,7 +1,7 @@
 'use client'
 
 import { createBatchTableColumns } from '@/components/batches/batch-table-columns'
-import { BatchModal } from '@/components/batches/batch-modal'
+import { ProductDetailModal } from '@/components/products/product-detail-modal'
 import { CardDescription, CardTitle } from '@/components/ui/card'
 import {
   Table,
@@ -11,7 +11,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { useCurrency } from '@/hooks/use-currency'
 import { useStoreState } from '@/lib/stores/store-context'
 import type { BatchSort, BatchSortField, BatchWithProduct } from '@/lib/queries/batches'
 import {
@@ -61,14 +60,13 @@ export function BatchTable({
   const t = useTranslations('batches.table')
   const tExpiry = useTranslations('batches.expiry')
   const tStatus = useTranslations('batches.status')
-  const currencySymbol = useCurrency()
   const { activeStore } = useStoreState()
 
-  const [selectedBatch, setSelectedBatch] = useState<BatchWithProduct | null>(null)
+  const [selectedProductId, setSelectedProductId] = useState<string | null>(null)
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false)
 
   const handleBatchClick = (batch: BatchWithProduct) => {
-    setSelectedBatch(batch)
+    setSelectedProductId(batch.product_id)
     setIsBottomSheetOpen(true)
   }
 
@@ -192,15 +190,16 @@ export function BatchTable({
         </TableBody>
       </Table>
 
-      <BatchModal
-        isOpen={isBottomSheetOpen}
-        onClose={() => {
-          setIsBottomSheetOpen(false)
-          setSelectedBatch(null)
-        }}
-        batch={selectedBatch}
-        currencySymbol={currencySymbol}
-      />
+      {selectedProductId && (
+        <ProductDetailModal
+          isOpen={isBottomSheetOpen}
+          onClose={() => {
+            setIsBottomSheetOpen(false)
+            setSelectedProductId(null)
+          }}
+          productId={selectedProductId}
+        />
+      )}
 
       {!isLoading && !isFetching && hasActiveStore && data.length === 0 && (
         <div className="flex select-none flex-col items-center justify-center py-16 rounded-lg">

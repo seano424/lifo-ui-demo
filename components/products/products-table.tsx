@@ -1,7 +1,7 @@
 'use client'
 
 import { createProductTableColumns } from '@/components/products/product-table-columns'
-import { ProductModal } from '@/components/products/product-modal'
+import { ProductDetailModal } from '@/components/products/product-detail-modal'
 import { CardDescription, CardTitle } from '@/components/ui/card'
 import {
   Table,
@@ -55,7 +55,7 @@ export function ProductsTable({
 
   const { getCategoryName } = useCategoryTranslation()
 
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
+  const [selectedProductId, setSelectedProductId] = useState<string | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   const [sorting, setSorting] = useState<SortingState>(() => {
@@ -84,7 +84,7 @@ export function ProductsTable({
   }, [currentSort])
 
   const handleProductClick = (product: Product) => {
-    setSelectedProduct(product)
+    setSelectedProductId(product.product_id)
     setIsModalOpen(true)
   }
 
@@ -164,14 +164,16 @@ export function ProductsTable({
         </TableBody>
       </Table>
 
-      <ProductModal
-        isOpen={isModalOpen}
-        onClose={() => {
-          setIsModalOpen(false)
-          setSelectedProduct(null)
-        }}
-        product={selectedProduct}
-      />
+      {selectedProductId && (
+        <ProductDetailModal
+          isOpen={isModalOpen}
+          onClose={() => {
+            setIsModalOpen(false)
+            setSelectedProductId(null)
+          }}
+          productId={selectedProductId}
+        />
+      )}
 
       {!isLoading && !isFetching && hasActiveStore && data.length === 0 && (
         <div className="flex flex-col items-center justify-center py-16 rounded-lg bg-muted/10">

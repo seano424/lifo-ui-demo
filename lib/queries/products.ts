@@ -61,6 +61,19 @@ export type Product = BaseProduct & {
   category_display_name?: string
   category_display_name_fr?: string
   category_display_name_nl?: string
+  // Shelf life overrides and calculated values
+  shelf_life_override_days?: number | null
+  category_default_shelf_life_days?: number | null
+  category_typical_shelf_life_days?: number | null
+  effective_shelf_life?: number
+  shelf_life_source?:
+    | 'product_override'
+    | 'store_category_override'
+    | 'product_base'
+    | 'category_base'
+    | 'default'
+  // Tracking mode (inferred from shelf life configuration)
+  tracking_mode?: 'auto' | 'manual'
   // Aggregated batch data (from RPC or client-side calculation)
   total_stock?: number
   active_batches_count?: number
@@ -132,7 +145,6 @@ export async function fetchProducts(
             category_code,
             display_name_en,
             display_name_fr,
-            display_name_nl,
             typical_shelf_life_days
           )
         )
@@ -287,7 +299,6 @@ export async function fetchProductsPage(
             category_code,
             display_name_en,
             display_name_fr,
-            display_name_nl,
             typical_shelf_life_days
           )
         )
@@ -681,6 +692,7 @@ export interface UpdateProductData {
   is_active?: boolean
   store_sku?: string
   supplier_code?: string
+  shelf_life_override_days?: number | null
 }
 
 export async function updateProduct(
@@ -713,6 +725,8 @@ export async function updateProduct(
       if (updates.is_active !== undefined) storeUpdates.is_active = updates.is_active
       if (updates.store_sku !== undefined) storeUpdates.store_sku = updates.store_sku
       if (updates.supplier_code !== undefined) storeUpdates.supplier_code = updates.supplier_code
+      if (updates.shelf_life_override_days !== undefined)
+        storeUpdates.shelf_life_override_days = updates.shelf_life_override_days
 
       if (Object.keys(globalUpdates).length > 0) {
         globalUpdates.updated_at = new Date().toISOString()
@@ -870,6 +884,73 @@ export async function fetchCategories(serverClient?: ServerClient): Promise<Cate
   })
 }
 
+/**
+ * Updates the default shelf life for a category at a specific store.
+ * This is a store-wide setting that applies to all products in the category (unless they have product-specific overrides).
+ * Creates a new store_category_settings row if one doesn't exist (upsert).
+ */
+export async function updateStoreCategoryShelfLife(
+  storeId: string,
+  categoryId: string,
+  shelfLifeDays: number | null,
+): Promise<void> {
+  const supabase = createClient()
+  const context = 'updateStoreCategoryShelfLife'
+
+  // Validate inputs
+  if (!storeId || !categoryId) {
+    throw new Error('Store ID and Category ID are required')
+  }
+
+  if (shelfLifeDays !== null && (shelfLifeDays < 1 || shelfLifeDays > 365)) {
+    throw new Error('Shelf life must be between 1 and 365 days')
+  }
+
+  return withPerformanceTracking(
+    context,
+    'Update store category shelf life',
+    { storeId, categoryId, shelfLifeDays },
+    async () => {
+      try {
+        // Upsert: Update if exists, insert if not
+        const { error } = await supabase.schema('inventory').from('store_category_settings').upsert(
+          {
+            store_id: storeId,
+            category_id: categoryId,
+            default_shelf_life_days: shelfLifeDays,
+            updated_at: new Date().toISOString(),
+          },
+          {
+            onConflict: 'store_id,category_id',
+          },
+        )
+
+        if (error) {
+          logger.queryWarn(context, 'Error updating store category shelf life', {
+            error: error.message,
+            code: error.code,
+            storeId,
+            categoryId,
+            shelfLifeDays,
+          })
+          throw new Error(`Failed to update category shelf life: ${error.message}`)
+        }
+
+        logger.log(context, 'Store category shelf life updated successfully', {
+          storeId,
+          categoryId,
+          shelfLifeDays,
+        })
+      } catch (err) {
+        logger.queryWarn(context, 'Unexpected error', {
+          error: err instanceof Error ? err.message : String(err),
+        })
+        throw err
+      }
+    },
+  )
+}
+
 export async function fetchProductById(
   productId: string,
   storeId: string,
@@ -913,7 +994,6 @@ export async function fetchProductById(
             category_code,
             display_name_en,
             display_name_fr,
-            display_name_nl,
             typical_shelf_life_days
           )
         )
@@ -936,6 +1016,27 @@ export async function fetchProductById(
           }
 
           throw new Error(`Failed to fetch product: ${error.message}`)
+        }
+
+        // Fetch store category settings for shelf life overrides
+        let storeCategorySettings = null
+        if (data.products?.category_id) {
+          const { data: settingsData, error: settingsError } = await supabase
+            .schema('inventory')
+            .from('store_category_settings')
+            .select('default_shelf_life_days')
+            .eq('store_id', storeId)
+            .eq('category_id', data.products.category_id)
+            .maybeSingle()
+
+          if (settingsError) {
+            logger.queryWarn(context, 'Error fetching store category settings', {
+              error: settingsError.message,
+              code: settingsError.code,
+            })
+          }
+
+          storeCategorySettings = settingsData
         }
 
         const { data: batchAggregations, error: batchError } = await supabase
@@ -978,9 +1079,48 @@ export async function fetchProductById(
           category_code: string
           display_name_en: string
           display_name_fr: string
-          display_name_nl: string
+          display_name_nl?: string
+          typical_shelf_life_days?: number | null
         } | null
         const categoryData = (data.products?.categories as unknown as CategoryData) || null
+
+        // Calculate effective shelf life and source (4-tier fallback)
+        const productOverride = data.shelf_life_override_days
+        const storeCategoryOverride = storeCategorySettings?.default_shelf_life_days
+        const productBase = data.products?.typical_shelf_life_days
+        const categoryBase = categoryData?.typical_shelf_life_days
+        const defaultFallback = 14
+
+        let effectiveShelfLife: number
+        let shelfLifeSource: Product['shelf_life_source']
+
+        if (productOverride != null && productOverride > 0) {
+          effectiveShelfLife = productOverride
+          shelfLifeSource = 'product_override'
+        } else if (storeCategoryOverride != null && storeCategoryOverride > 0) {
+          effectiveShelfLife = storeCategoryOverride
+          shelfLifeSource = 'store_category_override'
+        } else if (productBase != null && productBase > 0) {
+          effectiveShelfLife = productBase
+          shelfLifeSource = 'product_base'
+        } else if (categoryBase != null && categoryBase > 0) {
+          effectiveShelfLife = categoryBase
+          shelfLifeSource = 'category_base'
+        } else {
+          effectiveShelfLife = defaultFallback
+          shelfLifeSource = 'default'
+        }
+
+        // Infer tracking mode from configuration presence
+        // If product or category has shelf life configured → auto mode
+        // If no shelf life anywhere → manual mode (user enters dates manually)
+        const trackingMode: 'auto' | 'manual' =
+          productOverride != null ||
+          storeCategoryOverride != null ||
+          productBase != null ||
+          categoryBase != null
+            ? 'auto'
+            : 'manual'
 
         const combinedProduct = {
           ...data.products,
@@ -993,6 +1133,14 @@ export async function fetchProductById(
           store_is_active: data.is_active,
           store_sku: data.store_sku,
           supplier_code: data.supplier_code,
+          // Shelf life data
+          shelf_life_override_days: productOverride,
+          category_default_shelf_life_days: storeCategoryOverride,
+          category_typical_shelf_life_days: categoryBase,
+          effective_shelf_life: effectiveShelfLife,
+          shelf_life_source: shelfLifeSource,
+          tracking_mode: trackingMode,
+          // Batch aggregations
           total_stock,
           active_batches_count,
           avg_days_to_expiry: null,
@@ -1003,6 +1151,9 @@ export async function fetchProductById(
           storeId,
           totalStock: total_stock,
           activeBatches: active_batches_count,
+          effectiveShelfLife,
+          shelfLifeSource,
+          trackingMode,
         })
 
         return combinedProduct as unknown as Product

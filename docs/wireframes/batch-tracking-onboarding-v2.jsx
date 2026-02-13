@@ -416,7 +416,7 @@ function RadioOption({ selected, onSelect, label, description, children }) {
     >
       <div className="flex items-start gap-3">
         <div
-          className={`mt-0.5 w-[18px] h-[18px] rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
+          className={`mt-0.5 w-[18px] h-[18px] rounded-full border-2 flex items-center justify-center shrink-0 transition-colors ${
             selected ? 'border-gray-900' : 'border-gray-300'
           }`}
         >
@@ -457,7 +457,7 @@ function SectionCard({
         className={`w-full px-6 py-4 flex items-center gap-4 transition-colors ${!standalone ? 'hover:bg-gray-50/50' : ''}`}
         disabled={standalone}
       >
-        <div className="bg-gray-100 p-2 rounded-xl flex-shrink-0">
+        <div className="bg-gray-100 p-2 rounded-xl shrink-0">
           {I[icon]('w-4.5 h-4.5 text-gray-600')}
         </div>
         <div className="flex-1 text-left">
@@ -1097,7 +1097,7 @@ function FirstRunBanner({ scopeDone, automationDone, onDismiss }) {
         <button
           type="button"
           onClick={onDismiss}
-          className="text-gray-500 hover:text-white transition-colors p-1 flex-shrink-0"
+          className="text-gray-500 hover:text-white transition-colors p-1 shrink-0"
         >
           {I.x('w-4 h-4')}
         </button>
@@ -1110,7 +1110,7 @@ function ChecklistItemDark({ done, label, optional }) {
   return (
     <div className="flex items-center gap-2">
       <div
-        className={`w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0 ${
+        className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 ${
           done ? 'bg-white' : 'border border-gray-600'
         }`}
       >
@@ -1498,7 +1498,7 @@ export default function LIFOSetupWireframeV2() {
         {isFirstRun && (
           <div className="mt-6 bg-gray-50 border border-gray-200 border-dashed rounded-2xl p-5">
             <div className="flex items-start gap-3">
-              {I.info('w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0')}
+              {I.info('w-4 h-4 text-gray-400 mt-0.5 shrink-0')}
               <div>
                 <p className="text-sm font-medium text-gray-600">
                   You can always change these later

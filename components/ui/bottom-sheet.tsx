@@ -83,16 +83,16 @@ const BottomSheet = React.forwardRef<HTMLDivElement, BottomSheetProps>(
           <DialogPrimitive.Content
             ref={ref}
             className={cn(
-              'fixed z-50 bg-background shadow-xl',
+              'fixed z-50 bg-[#F9F8F8] dark:bg-muted/60 shadow-xl',
               className,
               'focus:outline-none',
               isMobile
                 ? [
-                    'inset-x-0 bottom-0 rounded-t-2xl',
+                    'inset-x-0 bottom-0 rounded-t-4xl',
                     'data-[state=open]:animate-in data-[state=closed]:animate-out',
                     'data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom',
                     'data-[state=open]:duration-300 data-[state=closed]:duration-200',
-                    variant === 'fullHeight' ? 'h-[90vh]' : 'max-h-[85vh]',
+                    variant === 'fullHeight' ? 'h-[90vh]' : 'h-[75vh]',
                   ]
                 : [
                     'left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%]',
@@ -102,7 +102,7 @@ const BottomSheet = React.forwardRef<HTMLDivElement, BottomSheetProps>(
                     'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
                     'data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-top-[48%]',
                     'data-[state=open]:duration-200 data-[state=closed]:duration-150',
-                    variant === 'fullHeight' ? 'h-[90vh]' : 'max-h-[85vh]',
+                    variant === 'fullHeight' ? 'h-[90vh]' : 'h-[75vh]',
                   ],
             )}
             style={{
@@ -121,18 +121,18 @@ const BottomSheet = React.forwardRef<HTMLDivElement, BottomSheetProps>(
                 </div>
               )}
 
-              <div className="flex items-center justify-between px-6 py-2 border-b border-muted">
+              <div className="flex items-center justify-between px-6 py-2">
                 <DialogPrimitive.Title>{titleElement || title}</DialogPrimitive.Title>
                 <DialogPrimitive.Close
                   className={cn(
-                    'rounded-full p-2 border',
+                    'rounded-full p-2 bg-background',
                     'ring-offset-background transition-opacity',
                     'hover:opacity-70 focus:outline-none focus:ring-0 focus:ring-offset-0',
                     'disabled:pointer-events-none',
                   )}
                   onClick={onClose}
                 >
-                  <XIcon className="h-4 w-4" />
+                  <XIcon className="size-7" />
                   <span className="sr-only">Close</span>
                 </DialogPrimitive.Close>
               </div>
@@ -140,7 +140,7 @@ const BottomSheet = React.forwardRef<HTMLDivElement, BottomSheetProps>(
               <div
                 ref={contentRef}
                 className={cn(
-                  'flex-1 overflow-y-auto',
+                  'flex-1 min-h-0 overflow-y-auto',
                   'scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent',
                 )}
               >
