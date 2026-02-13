@@ -268,7 +268,7 @@
         "title": "Free Trial",
         "subtitle": "Pilot shops",
         "price": "Free",
-        "period": "1 month",
+        "period": "/forever",
         "description": "All features, with no limitation, for a 1-month free trial.",
         "features": {
           "0": "1 day of Onboarding and Training",
@@ -281,7 +281,7 @@
       "light": {
         "title": "Light",
         "subtitle": "Small shops, 1 seat only",
-        "price": "9€",
+        "price": "9",
         "period": "/month",
         "description": "For small shops starting their inventory management journey.",
         "features": {
@@ -305,7 +305,7 @@
       "pro": {
         "title": "Pro",
         "subtitle": "Bigger shops, 2+ FTE",
-        "price": "39€",
+        "price": "39",
         "period": "/month",
         "description": "For growing businesses that need team collaboration and advanced features.",
         "features": {

@@ -192,8 +192,8 @@
           "minusThisWeek": "-{count} cette semaine",
           "plusPercent": "+{percent}%",
           "minusPercent": "-{percent}%",
-          "lessValue": "€{amount} de moins en risque",
-          "moreValue": "€{amount} de plus en risque",
+          "lessValue": "{amount} de moins en risque",
+          "moreValue": "{amount} de plus en risque",
           "batches": "{count} lots"
         },
         "expiringThisWeek": {
@@ -327,8 +327,8 @@
       "actionsTaken": "Actions prises",
       "actionsTakenPeriod": "{totalActions} cette période",
       "discountsApplied": "Remises appliquées",
-      "saved": "€{discountValue} économisé",
-      "averageScore": "Score moyen : {avgScore}% • €{discountValue} remises appliquées",
+      "saved": "{discountValue} économisé",
+      "averageScore": "Score moyen : {avgScore}% • {discountValue} remises appliquées",
       "discountsAppliedText": "remises appliquées",
       "showDetails": "Afficher les détails",
       "hideDetails": "Masquer les détails"
@@ -536,7 +536,7 @@
     "viewBatches": "Voir les lots",
     "editProduct": "Modifier le produit",
     "updatePrice": "Mettre à jour le prix",
-    "enterNewPrice": "Entrez le nouveau prix (€) :",
+    "enterNewPrice": "Entrez le nouveau prix () :",
     "deleteProduct": "Supprimer le produit",
     "confirmDeleteProduct": "Êtes-vous sûr de vouloir supprimer ce produit ?"
   },

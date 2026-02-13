@@ -9,12 +9,14 @@ export default function Contact() {
   const t = useTranslations('contactpage')
 
   return (
-    <main className="min-h-screen relative overflow-hidden pt-32 container">
-      <div className="container relative z-10 flex flex-col gap-6">
+    <section className="bg-white dark:bg-gray-900 min-h-screen pt-20 px-4 relative overflow-hidden">
+      <div className="py-8 px-4 mx-auto max-w-screen-xl lg:py-16 lg:px-6 flex flex-col gap-10">
         {/* Header */}
-        <div className="flex flex-col items-center justify-center gap-4">
-          <Typography variant="h1">{t('title')}</Typography>
-          <Typography variant="p" color="muted">
+        <div className="flex flex-col gap-4 items-center justify-center">
+          <Typography variant="h2" className="font-extrabold tracking-tight">
+            {t('title')}
+          </Typography>
+          <Typography variant="h5" className="max-w-xl text-center">
             {t('description')}
           </Typography>
         </div>
@@ -97,6 +99,6 @@ export default function Contact() {
           </div>
         </div>
       </div>
-    </main>
+    </section>
   )
 }

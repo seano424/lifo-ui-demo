@@ -185,7 +185,7 @@
     "viewBatches": "Batches bekijken",
     "editProduct": "Product bewerken",
     "updatePrice": "Prijs bijwerken",
-    "enterNewPrice": "Voer nieuwe prijs in (€):",
+    "enterNewPrice": "Voer nieuwe prijs in ():",
     "deleteProduct": "Product verwijderen",
     "confirmDeleteProduct": "Weet u zeker dat u dit product wilt verwijderen?"
   },

@@ -281,7 +281,7 @@
       "light": {
         "title": "Léger",
         "subtitle": "Petits magasins, 1 place seulement",
-        "price": "9€",
+        "price": "9",
         "period": "/mois",
         "description": "Pour les petits magasins qui commencent leur parcours de gestion d'inventaire.",
         "features": {
@@ -305,7 +305,7 @@
       "pro": {
         "title": "Pro",
         "subtitle": "Grands magasins, 2+ ETP",
-        "price": "39€",
+        "price": "39",
         "period": "/mois",
         "description": "Pour les entreprises en croissance qui ont besoin de collaboration d'équipe et de fonctionnalités avancées.",
         "features": {

@@ -307,7 +307,7 @@
     "labels": {
       "expiryDate": "Date d'expiration",
       "quantity": "Quantité",
-      "pricePerUnit": "Prix par unité (€)",
+      "pricePerUnit": "Prix par unité ()",
       "batchNumber": "Numéro de lot",
       "editableNote": "(modifiable)"
     },
@@ -348,7 +348,7 @@
         "barcode": "Code-barres",
         "expiryDate": "Date d'expiration",
         "quantity": "Quantité",
-        "price": "Prix (€)"
+        "price": "Prix ()"
       },
       "placeholders": {
         "productName": "Saisissez le nom du produit",

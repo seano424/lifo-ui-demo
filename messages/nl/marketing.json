@@ -281,7 +281,7 @@
       "light": {
         "title": "Light",
         "subtitle": "Kleine winkels, slechts 1 plaats",
-        "price": "9€",
+        "price": "9",
         "period": "/maand",
         "description": "Voor kleine winkels die beginnen met hun voorraadbeheerjournaal.",
         "features": {
@@ -305,7 +305,7 @@
       "pro": {
         "title": "Pro",
         "subtitle": "Grotere winkels, 2+ FTE",
-        "price": "39€",
+        "price": "39",
         "period": "/maand",
         "description": "Voor groeiende bedrijven die teamsamenwerking en geavanceerde functies nodig hebben.",
         "features": {

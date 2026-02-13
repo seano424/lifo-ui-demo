@@ -125,9 +125,9 @@
     "error": "Korting toepassen mislukt: {error}",
     "selectPercentage": "Selecteer kortingspercentage",
     "customDiscount": "Of stel een aangepaste korting in",
-    "newPrice": "Nieuwe prijs: €{price}",
+    "newPrice": "Nieuwe prijs: {price}",
     "processing": "Korting verwerken...",
-    "setPrice": "Prijs instellen €{price}",
+    "setPrice": "Prijs instellen {price}",
     "apply": "{percent}% korting toepassen",
     "action": "Korting"
   },
@@ -192,7 +192,7 @@
       "quantityInteger": "Aantal moet een heel getal zijn",
       "costPriceNegative": "Kostprijs kan niet negatief zijn",
       "sellingPriceNegative": "Verkoopprijs kan niet negatief zijn",
-      "priceExceedsMax": "Prijzen kunnen niet meer dan €{max} bedragen"
+      "priceExceedsMax": "Prijzen kunnen niet meer dan {max} bedragen"
     },
     "error": {
       "invalidData": "Ongeldige gegevens: Batchnummer bestaat mogelijk al of bevat ongeldige tekens",

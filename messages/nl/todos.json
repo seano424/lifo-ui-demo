@@ -69,7 +69,7 @@
   "discount": {
     "success": "{percent}% korting succesvol toegepast op {product}",
     "error": "Korting toepassen mislukt: {error}",
-    "newPrice": "Nieuwe prijs: €{price}",
+    "newPrice": "Nieuwe prijs: {price}",
     "processing": "Korting verwerken...",
     "apply": "{percent}% korting toepassen",
     "action": "Korting"

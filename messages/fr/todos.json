@@ -69,7 +69,7 @@
   "discount": {
     "success": "Remise de {percent}% appliquée avec succès à {product}",
     "error": "Échec de l'application de la remise : {error}",
-    "newPrice": "Nouveau prix : €{price}",
+    "newPrice": "Nouveau prix : {price}",
     "processing": "Traitement de la remise...",
     "apply": "Appliquer {percent}% de remise",
     "action": "Remise"

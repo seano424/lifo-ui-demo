@@ -1,5 +1,6 @@
 'use client'
 
+import React from 'react'
 import {
   Accordion,
   AccordionContent,
@@ -9,14 +10,6 @@ import {
 import { Button } from '@/components/ui/button'
 import { CompactLanguageSwitcher } from '@/components/ui/compact-language-switcher'
 import { Logo } from '@/components/ui/logo'
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-} from '@/components/ui/navigation-menu'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import { hasEnvVars } from '@/lib/utils'
 import { Menu } from 'lucide-react'
@@ -25,111 +18,53 @@ import Link from 'next/link'
 import { AuthButton } from '../auth-button'
 import { EnvVarWarning } from '../env-var-warning'
 import { Typography } from '../ui/typography'
-// import { CompactThemeSwitcher } from '../compact-theme-switcher'
-// import { useCurrentUser } from '@/hooks/use-users'
 
 interface MenuItem {
   title: string
   url: string
-  description?: string
-  icon?: React.ReactNode
   items?: MenuItem[]
+  icon?: React.ReactNode
+  description?: string
 }
 
-interface MarketingNavProps {
-  logo?: {
-    url: string
-    src: string
-    alt: string
-    title: string
-  }
-  menu?: MenuItem[]
-}
-
-const MarketingNav = ({ menu }: MarketingNavProps) => {
+const MarketingNav = React.memo(() => {
   const t = useTranslations('marketing.nav')
-  // const { data: currentUser } = useCurrentUser()
+  const menuItems = [
+    {
+      title: 'Home',
+      url: '/',
+    },
+    {
+      title: 'Pricing',
+      url: '/pricing',
+    },
+    {
+      title: 'Contact',
+      url: '/contact',
+    },
+  ]
 
-  // const defaultMenu = [
-  //   // {
-  //   //   title: t('product'),
-  //   //   url: '#',
-  //   //   items: [
-  //   //     {
-  //   //       title: t('blog'),
-  //   //       description: t('blogDesc'),
-  //   //       // icon: <Book className="size-5 shrink-0" />,
-  //   //       url: '#',
-  //   //     },
-  //   //     {
-  //   //       title: t('company'),
-  //   //       description: t('companyDesc'),
-  //   //       // icon: <Trees className="size-5 shrink-0" />,
-  //   //       url: '#',
-  //   //     },
-  //   //     {
-  //   //       title: t('careers'),
-  //   //       description: t('careersDesc'),
-  //   //       // icon: <Sunset className="size-5 shrink-0" />,
-  //   //       url: '#',
-  //   //     },
-  //   //     {
-  //   //       title: t('support'),
-  //   //       description: t('supportDesc'),
-  //   //       // icon: <Zap className="size-5 shrink-0" />,
-  //   //       url: '#',
-  //   //     },
-  //   //   ],
-  //   // },
-  //   // {
-  //   //   title: t('resources'),
-  //   //   url: '#',
-  //   //   items: [
-  //   //     {
-  //   //       title: t('contactUs'),
-  //   //       description: t('contactUsDesc'),
-  //   //       // icon: <Sunset className="size-5 shrink-0" />,
-  //   //       url: '/contact',
-  //   //     },
-  //   //     {
-  //   //       title: t('helpCenter'),
-  //   //       description: t('helpCenterDesc'),
-  //   //       // icon: <Zap className="size-5 shrink-0" />,
-  //   //       url: '#',
-  //   //     },
-  //   //     {
-  //   //       title: t('status'),
-  //   //       description: t('statusDesc'),
-  //   //       // icon: <Trees className="size-5 shrink-0" />,
-  //   //       url: '#',
-  //   //     },
-  //   //     {
-  //   //       title: t('terms'),
-  //   //       description: t('termsDesc'),
-  //   //       // icon: <Book className="size-5 shrink-0" />,
-  //   //       url: '#',
-  //   //     },
-  //   //   ],
-  //   // },
-  // ]
-
-  const menuItems = menu || []
   return (
     <section>
-      <nav className="hidden justify-between md:flex mx-auto px-4 max-w-7xl">
-        <div className="flex items-center gap-8">
+      <nav className="hidden justify-between md:flex mx-auto max-w-7xl px-4">
+        <div className="flex justify-between lg:grid lg:grid-cols-3 items-center gap-8 w-full">
           {/* <NavbarLogo variant="text" href="/" /> */}
 
           <Logo variant="svg" size="md" priority href="/" withText />
-          <NavigationMenu>
-            <NavigationMenuList>{menuItems.map(item => renderMenuItem(item))}</NavigationMenuList>
-          </NavigationMenu>
-        </div>
-
-        <div className="flex items-center gap-2">
-          {/* <CompactThemeSwitcher /> */}
-          {/* <CompactLanguageSwitcher /> */}
-          {!hasEnvVars ? <EnvVarWarning /> : <AuthButton />}
+          <div className="items-center gap-8 hidden lg:flex place-self-center bg-secondary-100/20 text-secondary-900 rounded-full px-4 py-2 dark:bg-secondary-900/0 dark:text-secondary-100">
+            {menuItems.map(item => (
+              <Link
+                key={item.title}
+                href={item.url}
+                className="rounded-2xl px-4 py-2 dark:bg-secondary-900/0 dark:text-secondary-100"
+              >
+                {item.title}
+              </Link>
+            ))}
+          </div>
+          <div className="place-self-end self-center">
+            {!hasEnvVars ? <EnvVarWarning /> : <AuthButton />}
+          </div>
         </div>
       </nav>
 
@@ -139,18 +74,6 @@ const MarketingNav = ({ menu }: MarketingNavProps) => {
           <Link href="/">
             <Logo variant="svg" size="sm" priority />
           </Link>
-          {/* <div className="items-center gap-12 hidden sm:flex">
-            {menuItems.map(item => (
-              <Link key={item.title} href={item.url}>
-                {item.title}
-              </Link>
-            ))}
-            {currentUser ? (
-              <Link href={'/dashboard'}>Dashboard</Link>
-            ) : (
-              <Link href={'/auth/sign-up'}>Sign Up</Link>
-            )}
-          </div> */}
           <Sheet>
             <SheetTrigger asChild>
               <Button variant="outline" size="icon" aria-label={t('menuButton')}>
@@ -186,37 +109,7 @@ const MarketingNav = ({ menu }: MarketingNavProps) => {
       </div>
     </section>
   )
-}
-
-const renderMenuItem = (item: MenuItem) => {
-  if (item.items) {
-    return (
-      <NavigationMenuItem key={item.title}>
-        <NavigationMenuTrigger className="rounded-2xl tracking-wide  text-base">
-          {item.title}
-        </NavigationMenuTrigger>
-        <NavigationMenuContent className="bg-popover text-popover-foreground w-full min-w-80">
-          {item.items.map(subItem => (
-            <NavigationMenuLink asChild key={subItem.title}>
-              <SubMenuLink item={subItem} />
-            </NavigationMenuLink>
-          ))}
-        </NavigationMenuContent>
-      </NavigationMenuItem>
-    )
-  }
-
-  return (
-    <NavigationMenuItem key={item.title}>
-      <NavigationMenuLink
-        href={item.url}
-        className="group inline-flex h-10 w-max items-center justify-center bg-background px-4 py-2 transition-all duration-75 ease-in-out hover:bg-primary-100/20 hover:text-brand-primary rounded-xl tracking-wide  text-base dark:hover:bg-secondary-900/90 dark:hover:text-foreground"
-      >
-        {item.title}
-      </NavigationMenuLink>
-    </NavigationMenuItem>
-  )
-}
+})
 
 const renderMobileMenuItem = (item: MenuItem) => {
   if (item.items) {

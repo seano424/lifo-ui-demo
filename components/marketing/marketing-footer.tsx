@@ -40,6 +40,11 @@ export function MarketingFooter() {
                   {t('links.contact')}
                 </Typography>
               </Link>
+              <Link href="/pricing">
+                <Typography variant="small" className="hover:text-primary transition-colors">
+                  {t('links.pricing')}
+                </Typography>
+              </Link>
             </div>
           </div>
 

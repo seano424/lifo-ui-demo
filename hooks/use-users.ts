@@ -123,9 +123,11 @@ export function useCurrentUser() {
 
       return transformedUser as User
     },
-    staleTime: 1000, // Check for fresh data every second - balance between performance and freshness
-    gcTime: 5 * 60 * 1000, // Keep cache for 5 minutes
+    staleTime: 5 * 60 * 1000, // Auth state rarely changes - check every 5 minutes
+    gcTime: 10 * 60 * 1000, // Keep cache for 10 minutes
     retry: false,
+    // Keep showing previous data while refetching to prevent flickering
+    placeholderData: previousData => previousData,
   })
 }
 

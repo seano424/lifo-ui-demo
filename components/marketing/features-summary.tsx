@@ -16,7 +16,7 @@ function Feature({ icon, title, description }: FeatureProps) {
         {icon}
       </div>
       <div className="flex flex-col gap-2">
-        <Typography variant="h3" className="capitalize">
+        <Typography variant="h3" className="capitalize font-heading font-extrabold tracking-tight">
           {title}
         </Typography>
         <Typography variant="p">{description}</Typography>
