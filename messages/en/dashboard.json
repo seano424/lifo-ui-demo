@@ -192,8 +192,8 @@
           "minusThisWeek": "-{count} this week",
           "plusPercent": "+{percent}%",
           "minusPercent": "-{percent}%",
-          "lessValue": "€{amount} less at risk",
-          "moreValue": "€{amount} more at risk",
+          "lessValue": "{amount} less at risk",
+          "moreValue": "{amount} more at risk",
           "batches": "{count} batches"
         },
         "expiringThisWeek": {
@@ -327,8 +327,8 @@
       "actionsTaken": "Actions Taken",
       "actionsTakenPeriod": "{totalActions} this period",
       "discountsApplied": "Discounts Applied",
-      "saved": "€{discountValue} saved",
-      "averageScore": "Average Score: {avgScore}% • €{discountValue} discounts applied",
+      "saved": "{discountValue} saved",
+      "averageScore": "Average Score: {avgScore}% • {discountValue} discounts applied",
       "discountsAppliedText": "discounts applied",
       "showDetails": "Show Details",
       "hideDetails": "Hide Details"
@@ -536,7 +536,7 @@
     "viewBatches": "View Batches",
     "editProduct": "Edit Product",
     "updatePrice": "Update Price",
-    "enterNewPrice": "Enter new price (€):",
+    "enterNewPrice": "Enter new price ():",
     "deleteProduct": "Delete Product",
     "confirmDeleteProduct": "Are you sure you want to delete this product?"
   },

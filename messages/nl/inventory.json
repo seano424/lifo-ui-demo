@@ -307,7 +307,7 @@
     "labels": {
       "expiryDate": "Vervaldatum",
       "quantity": "Hoeveelheid",
-      "pricePerUnit": "Prijs per eenheid (€)",
+      "pricePerUnit": "Prijs per eenheid ()",
       "batchNumber": "Batch/Lotnummer",
       "editableNote": "(bewerkbaar)"
     },
@@ -348,7 +348,7 @@
         "barcode": "Barcode",
         "expiryDate": "Vervaldatum",
         "quantity": "Hoeveelheid",
-        "price": "Prijs (€)"
+        "price": "Prijs ()"
       },
       "placeholders": {
         "productName": "Voer productnaam in",

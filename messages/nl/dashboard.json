@@ -192,8 +192,8 @@
           "minusThisWeek": "-{count} deze week",
           "plusPercent": "+{percent}%",
           "minusPercent": "-{percent}%",
-          "lessValue": "€{amount} minder risico",
-          "moreValue": "€{amount} meer risico",
+          "lessValue": "{amount} minder risico",
+          "moreValue": "{amount} meer risico",
           "batches": "{count} batches"
         },
         "expiringThisWeek": {
@@ -327,8 +327,8 @@
       "actionsTaken": "Acties Ondernomen",
       "actionsTakenPeriod": "{totalActions} deze periode",
       "discountsApplied": "Kortingen Toegepast",
-      "saved": "€{discountValue} bespaard",
-      "averageScore": "Gemiddelde Score: {avgScore}% • €{discountValue} kortingen toegepast",
+      "saved": "{discountValue} bespaard",
+      "averageScore": "Gemiddelde Score: {avgScore}% • {discountValue} kortingen toegepast",
       "discountsAppliedText": "kortingen toegepast",
       "showDetails": "Details Tonen",
       "hideDetails": "Details Verbergen"
@@ -536,7 +536,7 @@
     "viewBatches": "Batches bekijken",
     "editProduct": "Product bewerken",
     "updatePrice": "Prijs bijwerken",
-    "enterNewPrice": "Voer nieuwe prijs in (€):",
+    "enterNewPrice": "Voer nieuwe prijs in ():",
     "deleteProduct": "Product verwijderen",
     "confirmDeleteProduct": "Weet u zeker dat u dit product wilt verwijderen?"
   },

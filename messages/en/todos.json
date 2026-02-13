@@ -69,7 +69,7 @@
   "discount": {
     "success": "Successfully applied {percent}% discount to {product}",
     "error": "Failed to apply discount: {error}",
-    "newPrice": "New price: €{price}",
+    "newPrice": "New price: {price}",
     "processing": "Processing Discount...",
     "apply": "Apply {percent}% Discount",
     "action": "Discount"

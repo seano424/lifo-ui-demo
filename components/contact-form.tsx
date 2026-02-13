@@ -75,7 +75,7 @@ export function ContactForm() {
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2 items-start">
           <Label htmlFor="name" required>
             {t('name')}
           </Label>
@@ -91,7 +91,7 @@ export function ContactForm() {
           />
         </div>
 
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2 items-start">
           <Label htmlFor="email" required>
             {t('email')}
           </Label>
@@ -108,7 +108,7 @@ export function ContactForm() {
         </div>
       </div>
 
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2 items-start">
         <Label htmlFor="subject" required>
           {t('subject')}
         </Label>
@@ -124,14 +124,14 @@ export function ContactForm() {
         />
       </div>
 
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2 items-start">
         <Label htmlFor="message" required>
           {t('message')}
         </Label>
         <Textarea
           id="message"
           name="message"
-          rows={5}
+          rows={20}
           required
           value={formData.message}
           onChange={handleChange}
@@ -147,7 +147,6 @@ export function ContactForm() {
           disabled={status.loading}
           loading={status.loading}
           loadingText={t('sending')}
-          className="w-full md:w-auto py-3 text-lg  rounded-2xl bg-linear-to-r from-primary-900 to-secondary-800 text-white hover:opacity-90 transition-opacity shadow-lg shadow-primary-800/20"
         >
           {t('submit')}
         </Button>

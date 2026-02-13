@@ -1,5 +1,6 @@
 'use client'
 
+import { memo, useCallback } from 'react'
 import { useTranslations } from 'next-intl'
 import { useCurrentUser } from '@/hooks/use-users'
 import { cn } from '@/lib/utils'
@@ -10,21 +11,34 @@ type AuthButtonProps = {
   isMobile?: boolean
 }
 
-export function AuthButton({ isMobile }: AuthButtonProps) {
+export const AuthButton = memo(function AuthButton({ isMobile }: AuthButtonProps) {
   const t = useTranslations('marketing.auth')
   const { data: user, isLoading } = useCurrentUser()
 
-  const logout = async () => {
+  const logout = useCallback(async () => {
     const supabase = createClient()
     await supabase.auth.signOut()
     window.location.href = '/'
-  }
+  }, [])
 
+  // Reserve space to prevent layout shift - matches actual button sizes
   if (isLoading) {
     return (
-      <div className="flex items-center gap-4">
-        <div className="w-28 h-10 bg-gray-200 animate-pulse rounded-2xl" />
-        <div className="w-24 h-10 bg-gray-200 animate-pulse rounded-2xl" />
+      <div
+        className={cn('flex items-center gap-2', isMobile && 'flex-col gap-4 items-start w-full')}
+      >
+        <div
+          className={cn(
+            'h-10 bg-muted/50 animate-pulse rounded-2xl',
+            isMobile ? 'w-full' : 'w-[140px]',
+          )}
+        />
+        <div
+          className={cn(
+            'h-10 bg-muted/50 animate-pulse rounded-2xl',
+            isMobile ? 'w-full' : 'w-[80px]',
+          )}
+        />
       </div>
     )
   }
@@ -35,7 +49,7 @@ export function AuthButton({ isMobile }: AuthButtonProps) {
     >
       <Button
         asChild
-        size="default"
+        size="sm"
         variant={'secondary'}
         asLink
         href="/dashboard"
@@ -44,13 +58,7 @@ export function AuthButton({ isMobile }: AuthButtonProps) {
         {t('goToDashboard')}
       </Button>
 
-      <Button
-        // asChild
-        size="default"
-        variant={'gray'}
-        onClick={logout}
-        className={cn(isMobile && 'w-full')}
-      >
+      <Button size="sm" variant={'gray'} onClick={logout} className={cn(isMobile && 'w-full')}>
         {t('logout')}
       </Button>
     </div>
@@ -58,10 +66,10 @@ export function AuthButton({ isMobile }: AuthButtonProps) {
     <>
       {/* Desktop */}
       <div className={cn('flex gap-2 items-center font-mono', isMobile && 'hidden')}>
-        <Button asChild variant={'secondary'} asLink href="/auth/sign-up">
+        <Button asChild size="sm" variant={'secondary'} asLink href="/auth/sign-up">
           {t('signup')}
         </Button>
-        <Button asChild variant="gray" asLink href="/auth/login">
+        <Button asChild size="sm" variant="gray" asLink href="/auth/login">
           {t('login')}
         </Button>
       </div>
@@ -73,12 +81,20 @@ export function AuthButton({ isMobile }: AuthButtonProps) {
           !isMobile && 'hidden',
         )}
       >
-        <Button asChild variant={'gray'} asLink href="/auth/login" className="uppercase w-full">
+        <Button
+          asChild
+          size="sm"
+          variant={'gray'}
+          asLink
+          href="/auth/login"
+          className="uppercase w-full"
+        >
           {t('login')}
         </Button>
 
         <Button
           asChild
+          size="sm"
           variant={'secondary'}
           asLink
           href="/auth/sign-up"
@@ -89,4 +105,4 @@ export function AuthButton({ isMobile }: AuthButtonProps) {
       </div>
     </>
   )
-}
+})

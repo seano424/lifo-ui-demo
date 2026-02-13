@@ -9451,7 +9451,7 @@ BEGIN
 
   -- Financial score: Based on potential loss value
   v_potential_loss := NEW.current_quantity * NEW.selling_price;
-  -- Normalize to 0-1 scale (€500 = 1.0)
+  -- Normalize to 0-1 scale (500 = 1.0)
   v_financial_score := LEAST(1.0, v_potential_loss / 500.0);
 
   -- Quantity score: Higher quantities = higher risk

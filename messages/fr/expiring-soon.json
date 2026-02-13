@@ -125,9 +125,9 @@
     "error": "Échec de l'application de la remise : {error}",
     "selectPercentage": "Sélectionnez le pourcentage de remise",
     "customDiscount": "Ou définissez une remise personnalisée",
-    "newPrice": "Nouveau prix : €{price}",
+    "newPrice": "Nouveau prix : {price}",
     "processing": "Traitement de la remise...",
-    "setPrice": "Définir le prix €{price}",
+    "setPrice": "Définir le prix {price}",
     "apply": "Appliquer {percent}% de remise",
     "action": "Remise"
   },
@@ -192,7 +192,7 @@
       "quantityInteger": "La quantité doit être un nombre entier",
       "costPriceNegative": "Le prix de revient ne peut pas être négatif",
       "sellingPriceNegative": "Le prix de vente ne peut pas être négatif",
-      "priceExceedsMax": "Les prix ne peuvent pas dépasser €{max}"
+      "priceExceedsMax": "Les prix ne peuvent pas dépasser {max}"
     },
     "error": {
       "invalidData": "Données invalides : Le numéro de lot existe peut-être déjà ou contient des caractères invalides",

@@ -185,7 +185,7 @@
     "viewBatches": "Voir les lots",
     "editProduct": "Modifier le produit",
     "updatePrice": "Mettre à jour le prix",
-    "enterNewPrice": "Entrez le nouveau prix (€) :",
+    "enterNewPrice": "Entrez le nouveau prix () :",
     "deleteProduct": "Supprimer le produit",
     "confirmDeleteProduct": "Êtes-vous sûr de vouloir supprimer ce produit ?"
   },

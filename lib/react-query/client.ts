@@ -35,7 +35,7 @@ export function createQueryClient() {
   return new QueryClient({
     defaultOptions: {
       queries: {
-        staleTime: 30 * 1000, // 30 seconds
+        staleTime: 60 * 1000, // 1 minute (reduced refetches for better UX)
         gcTime: 5 * 60 * 1000, // 5 minutes
         retry: (failureCount, error: unknown) => {
           // Don't retry auth errors - they need user intervention
