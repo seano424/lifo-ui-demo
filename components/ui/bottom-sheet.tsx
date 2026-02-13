@@ -109,19 +109,26 @@ const BottomSheet = React.forwardRef<HTMLDivElement, BottomSheetProps>(
               transform: isMobile && dragY > 0 ? `translateY(${dragY}px)` : undefined,
               transition: isDragging ? 'none' : undefined,
             }}
-            onTouchStart={handleTouchStart}
-            onTouchMove={handleTouchMove}
-            onTouchEnd={handleTouchEnd}
             aria-describedby={undefined}
           >
             <div className="flex flex-col h-full">
               {isMobile && (
-                <div className="flex justify-center pt-2 pb-1">
+                <div
+                  className="flex justify-center pt-2 pb-1"
+                  onTouchStart={handleTouchStart}
+                  onTouchMove={handleTouchMove}
+                  onTouchEnd={handleTouchEnd}
+                >
                   <div className="w-12 h-1 bg-muted-foreground/20 rounded-full" />
                 </div>
               )}
 
-              <div className="flex items-center justify-between px-6 py-2">
+              <div
+                className="flex items-center justify-between px-6 py-2"
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
+              >
                 <DialogPrimitive.Title>{titleElement || title}</DialogPrimitive.Title>
                 <DialogPrimitive.Close
                   className={cn(
