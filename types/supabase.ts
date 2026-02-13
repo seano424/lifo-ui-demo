@@ -1158,6 +1158,93 @@ export type Database = {
         }
         Relationships: []
       }
+      product_integration_links: {
+        Row: {
+          claim_source: string | null
+          created_at: string | null
+          external_id: string
+          external_name: string | null
+          external_parent_id: string | null
+          external_sku: string | null
+          integration_type: string
+          is_authoritative: boolean | null
+          link_id: string
+          metadata: Json | null
+          name_mismatch_logged: boolean | null
+          product_id: string
+          synced_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          claim_source?: string | null
+          created_at?: string | null
+          external_id: string
+          external_name?: string | null
+          external_parent_id?: string | null
+          external_sku?: string | null
+          integration_type: string
+          is_authoritative?: boolean | null
+          link_id: string
+          metadata?: Json | null
+          name_mismatch_logged?: boolean | null
+          product_id: string
+          synced_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          claim_source?: string | null
+          created_at?: string | null
+          external_id?: string
+          external_name?: string | null
+          external_parent_id?: string | null
+          external_sku?: string | null
+          integration_type?: string
+          is_authoritative?: boolean | null
+          link_id?: string
+          metadata?: Json | null
+          name_mismatch_logged?: boolean | null
+          product_id?: string
+          synced_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_integration_links_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "expiring_products"
+            referencedColumns: ["product_id"]
+          },
+          {
+            foreignKeyName: "product_integration_links_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "my_store_products"
+            referencedColumns: ["product_id"]
+          },
+          {
+            foreignKeyName: "product_integration_links_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["product_id"]
+          },
+          {
+            foreignKeyName: "product_integration_links_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products_needing_barcodes"
+            referencedColumns: ["product_id"]
+          },
+          {
+            foreignKeyName: "product_integration_links_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products_with_categories"
+            referencedColumns: ["product_id"]
+          },
+        ]
+      }
       product_recognition_cache: {
         Row: {
           barcode: string

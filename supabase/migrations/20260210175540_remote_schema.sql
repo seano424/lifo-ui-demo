@@ -366,9 +366,9 @@ drop policy "batches_update_policy" on "inventory"."batches";
 
 drop policy "Store managers can remove products from stores" on "inventory"."store_products";
 
-alter table "inventory"."products" drop constraint "products_square_item_id_unique";
+alter table "inventory"."products" drop constraint if exists "products_square_item_id_unique";
 
-alter table "inventory"."store_products" drop constraint "store_products_square_variation_id_unique";
+alter table "inventory"."store_products" drop constraint if exists "store_products_square_variation_id_unique";
 
 alter table "inventory"."batches" drop constraint "batches_verification_check";
 
@@ -384,15 +384,24 @@ drop index if exists "inventory"."products_square_item_id_unique";
 
 drop index if exists "inventory"."store_products_square_variation_id_unique";
 
-alter table "inventory"."products" add column "square_variation_id" character varying(255);
+alter table "inventory"."products" add column if not exists "square_variation_id" character varying(255);
 
-alter table "inventory"."store_products" drop column "square_variation_id";
+alter table "inventory"."store_products" drop column if exists "square_variation_id";
 
-CREATE INDEX idx_products_square_variation_id ON inventory.products USING btree (square_variation_id) WHERE (square_variation_id IS NOT NULL);
+CREATE INDEX if not exists idx_products_square_variation_id ON inventory.products USING btree (square_variation_id) WHERE (square_variation_id IS NOT NULL);
 
-CREATE UNIQUE INDEX products_square_variation_id_key ON inventory.products USING btree (square_variation_id);
+CREATE UNIQUE INDEX if not exists products_square_variation_id_key ON inventory.products USING btree (square_variation_id);
 
-alter table "inventory"."products" add constraint "products_square_variation_id_key" UNIQUE using index "products_square_variation_id_key";
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint
+        WHERE conname = 'products_square_variation_id_key'
+        AND conrelid = 'inventory.products'::regclass
+    ) THEN
+        ALTER TABLE "inventory"."products" ADD CONSTRAINT "products_square_variation_id_key" UNIQUE USING INDEX "products_square_variation_id_key";
+    END IF;
+END $$;
 
 alter table "inventory"."batches" add constraint "batches_verification_check" CHECK (((verification_status)::text = ANY ((ARRAY['verified'::character varying, 'pending'::character varying, 'flagged'::character varying, 'rejected'::character varying])::text[]))) not valid;
 
@@ -520,7 +529,7 @@ using ((EXISTS ( SELECT 1
 
 drop index if exists "scoring"."idx_product_scores_recommendations";
 
-CREATE INDEX idx_product_scores_recommendations ON scoring.product_scores USING btree (store_id, recommendation, calculated_at DESC) INCLUDE (batch_id, composite_score, urgency_level, discount_percent) WHERE ((recommendation)::text = ANY ((ARRAY['discount_aggressive'::character varying, 'discount_moderate'::character varying, 'alert'::character varying])::text[]));
+CREATE INDEX if not exists idx_product_scores_recommendations ON scoring.product_scores USING btree (store_id, recommendation, calculated_at DESC) INCLUDE (batch_id, composite_score, urgency_level, discount_percent) WHERE ((recommendation)::text = ANY ((ARRAY['discount_aggressive'::character varying, 'discount_moderate'::character varying, 'alert'::character varying])::text[]));
 
 drop policy "Only privileged users can delete transactions" on "sales"."transactions";
 
@@ -572,17 +581,17 @@ drop function if exists "user_mgmt"."request_account_deletion"(deletion_reason t
 
 alter table "user_mgmt"."roles" alter column "role_id" set default extensions.uuid_generate_v4();
 
-alter table "user_mgmt"."users" add column "deleted_at" timestamp without time zone;
+alter table "user_mgmt"."users" add column if not exists "deleted_at" timestamp without time zone;
 
-alter table "user_mgmt"."users" add column "deletion_requested_at" timestamp without time zone;
+alter table "user_mgmt"."users" add column if not exists "deletion_requested_at" timestamp without time zone;
 
-CREATE INDEX idx_gdpr_deletion_log_deletion_completed_at ON user_mgmt.gdpr_deletion_log USING btree (deletion_completed_at);
+CREATE INDEX if not exists idx_gdpr_deletion_log_deletion_completed_at ON user_mgmt.gdpr_deletion_log USING btree (deletion_completed_at);
 
-CREATE INDEX idx_gdpr_deletion_log_user_id ON user_mgmt.gdpr_deletion_log USING btree (user_id);
+CREATE INDEX if not exists idx_gdpr_deletion_log_user_id ON user_mgmt.gdpr_deletion_log USING btree (user_id);
 
-CREATE INDEX idx_users_active_deleted ON user_mgmt.users USING btree (is_active, deleted_at) WHERE (is_active = true);
+CREATE INDEX if not exists idx_users_active_deleted ON user_mgmt.users USING btree (is_active, deleted_at) WHERE (is_active = true);
 
-CREATE INDEX idx_users_pending_deletion ON user_mgmt.users USING btree (deletion_requested_at) WHERE ((deletion_requested_at IS NOT NULL) AND (deleted_at IS NULL));
+CREATE INDEX if not exists idx_users_pending_deletion ON user_mgmt.users USING btree (deletion_requested_at) WHERE ((deletion_requested_at IS NOT NULL) AND (deleted_at IS NULL));
 
 set check_function_bodies = off;
 
