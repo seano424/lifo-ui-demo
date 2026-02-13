@@ -150,9 +150,7 @@ function SignUpSuccessContent() {
               <div className="pt-2">
                 {email ? (
                   <Typography variant="p" className="text-base text-muted-foreground">
-                    {t.rich('checkEmail', {
-                      email: _ => <span className=" text-foreground">{email}</span>,
-                    })}
+                    {t('checkEmail', { email })}
                   </Typography>
                 ) : (
                   <Typography variant="p" className="text-base text-destructive">
