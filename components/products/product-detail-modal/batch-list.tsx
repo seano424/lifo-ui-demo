@@ -7,14 +7,12 @@ import { useCurrency } from '@/hooks/use-currency'
 import { useBatchActions } from '@/hooks/use-batches'
 import { ChevronDown, Package } from 'lucide-react'
 import type { Database } from '@/types/supabase-extended'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { useState } from 'react'
 
 export function BatchList({
   batches,
-  totalStock,
   highlightedBatchId,
   editingBatchId,
   onStartEdit,
@@ -23,7 +21,7 @@ export function BatchList({
 }: BatchListProps) {
   const currencySymbol = useCurrency()
   const { updateBatch } = useBatchActions()
-  const [isOpen, setIsOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(true)
   const handleSave = (
     batchId: string,
     updates: { expiry_date?: string; current_quantity?: number },
@@ -50,60 +48,33 @@ export function BatchList({
   }
 
   return (
-    <div className="flex flex-col gap-2">
-      {/* Section header */}
-      <div className="flex flex-col gap-4">
-        <div className="flex items-center gap-2 justify-between border-b border-border/50 pb-4 px-4">
-          <Typography variant="small">Total units</Typography>
-
-          <Badge variant="elevatedRounded">{totalStock}</Badge>
+    <div className="flex flex-col gap-4">
+      <Button
+        variant="ghost"
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full flex items-center justify-between px-0"
+      >
+        <Typography variant="small" className="flex items-center gap-2">
+          Batches
+        </Typography>
+        <ChevronDown className={cn('size-3 transition-transform', isOpen && 'rotate-180')} />
+      </Button>
+      {isOpen && (
+        <div className="flex flex-col gap-4">
+          {batches.map(batch => (
+            <BatchRow
+              key={batch.batch_id}
+              batch={batch}
+              isHighlighted={batch.batch_id === highlightedBatchId}
+              isEditing={batch.batch_id === editingBatchId}
+              onStartEdit={() => onStartEdit(batch.batch_id)}
+              onSave={updates => handleSave(batch.batch_id, updates)}
+              onCancel={onCancelEdit}
+              currencySymbol={currencySymbol}
+            />
+          ))}
         </div>
-
-        <div className="flex items-center gap-2 justify-between border-b border-border/50 pb-4 px-4">
-          <Typography variant="small">Tracked batches</Typography>
-          <Badge variant="mutedRounded">{batches.length} batches</Badge>
-        </div>
-
-        <div className="flex items-center gap-2 justify-between border-b border-border/50 pb-4 px-4">
-          <Typography variant="small">Sorted by</Typography>
-          <Badge variant="mutedRounded">Expiry date · Expired last</Badge>
-        </div>
-      </div>
-
-      {/* Batch rows */}
-      <div className="overflow-hidden px-4">
-        <div>
-          <Button
-            variant="ghost"
-            onClick={() => setIsOpen(!isOpen)}
-            className="w-full flex items-center justify-between px-0"
-          >
-            <Typography variant="small" className="flex items-center gap-2">
-              Batches
-            </Typography>
-            <ChevronDown className={cn('size-3 transition-transform', isOpen && 'rotate-180')} />
-          </Button>
-          {/* <Typography className='flex items-center gap-2 mb-4'>
-            <Package className='size-4 text-secondary' />
-            <span>
-              Batches
-            </span>
-          </Typography> */}
-          {isOpen &&
-            batches.map(batch => (
-              <BatchRow
-                key={batch.batch_id}
-                batch={batch}
-                isHighlighted={batch.batch_id === highlightedBatchId}
-                isEditing={batch.batch_id === editingBatchId}
-                onStartEdit={() => onStartEdit(batch.batch_id)}
-                onSave={updates => handleSave(batch.batch_id, updates)}
-                onCancel={onCancelEdit}
-                currencySymbol={currencySymbol}
-              />
-            ))}
-        </div>
-      </div>
+      )}
     </div>
   )
 }

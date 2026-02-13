@@ -44,7 +44,7 @@ export function BatchRow({
 
   const formatCurrency = (value: number) => `${currencySymbol}${value.toFixed(2)}`
 
-  const barWidth = getUrgencyBarWidth(daysToExpiry)
+  // const barWidth = getUrgencyBarWidth(daysToExpiry)
 
   const handleSave = () => {
     const updates: { expiry_date?: string; current_quantity?: number } = {}
@@ -67,18 +67,17 @@ export function BatchRow({
   }
   // Display mode UI
   return (
-    <div className={isEditing ? '' : ''}>
+    <>
       <div
         onClick={isEditing ? onCancel : onStartEdit}
         onKeyDown={e => e.key === 'Enter' && onStartEdit()}
         className={cn(
-          'group py-2 flex gap-4 items-center cursor-pointer transition-colors',
+          'group flex gap-4 items-center cursor-pointer transition-colors',
           daysToExpiry && daysToExpiry < 0 ? 'opacity-50' : '',
         )}
       >
         {/* Urgency micro-bar */}
-
-        <div className="flex flex-col items-center">
+        {/* <div className="flex flex-col items-center">
           <div className="w-2 h-6 bg-muted rounded-full overflow-hidden relative">
             <div
               className={cn(
@@ -88,7 +87,7 @@ export function BatchRow({
               style={{ height: `${barWidth}%` }}
             />
           </div>
-        </div>
+        </div> */}
 
         {/* Batch info */}
         <div className="flex-1 min-w-0 flex flex-col gap-1">
@@ -102,7 +101,7 @@ export function BatchRow({
             </Typography>
           </div>
 
-          <Typography variant="extraSmall" color="muted">
+          <Typography variant="small" color="muted">
             {formatDate(batch.expiry_date)}
           </Typography>
         </div>
@@ -110,9 +109,9 @@ export function BatchRow({
         {/* Days left */}
         <div className="flex items-center gap-3">
           <DaysLeftLabel days={daysToExpiry} />
-          <span className="text-muted-foreground/50 group-hover:text-muted-foreground transition-colors text-xs">
+          <Typography variant="extraSmall" color="muted">
             Edit →
-          </span>
+          </Typography>
         </div>
       </div>
 
@@ -150,7 +149,7 @@ export function BatchRow({
           </div>
         </div>
       )}
-    </div>
+    </>
   )
 }
 
@@ -165,24 +164,24 @@ function calculateDaysToExpiry(expiryDate: string | null): number | null {
 }
 
 // Helper: Get urgency bar width based on days
-function getUrgencyBarWidth(days: number | null): number {
-  if (days === null) return 15
-  if (days <= 0) return 100 // Expired
-  if (days <= 3) return 85 // Critical
-  if (days <= 7) return 55 // High
-  if (days <= 14) return 35 // Medium
-  return 15 // Low
-}
+// function getUrgencyBarWidth(days: number | null): number {
+//   if (days === null) return 15
+//   if (days <= 0) return 100 // Expired
+//   if (days <= 3) return 85 // Critical
+//   if (days <= 7) return 55 // High
+//   if (days <= 14) return 35 // Medium
+//   return 15 // Low
+// }
 
 // Helper: Get urgency color class
-function getUrgencyColor(days: number | null): string {
-  if (days === null) return 'bg-muted-foreground/30'
-  if (days <= 0) return 'bg-destructive'
-  if (days <= 3) return 'bg-destructive/80'
-  if (days <= 7) return 'bg-primary-500'
-  if (days <= 14) return 'bg-primary-500'
-  return 'bg-muted-foreground/50'
-}
+// function getUrgencyColor(days: number | null): string {
+//   if (days === null) return 'bg-muted-foreground/30'
+//   if (days <= 0) return 'bg-destructive'
+//   if (days <= 3) return 'bg-destructive/80'
+//   if (days <= 7) return 'bg-primary-500'
+//   if (days <= 14) return 'bg-primary-500'
+//   return 'bg-muted-foreground/50'
+// }
 
 // Component: Days left label with styling
 function DaysLeftLabel({ days }: { days: number | null }) {
@@ -199,7 +198,7 @@ function DaysLeftLabel({ days }: { days: number | null }) {
   }
 
   return (
-    <Badge variant={days <= 3 ? 'destructiveRounded' : days <= 7 ? 'mutedRounded' : 'plainRounded'}>
+    <Badge variant={days <= 3 ? 'mutedRounded' : days <= 7 ? 'mutedRounded' : 'plainRounded'}>
       {days}d left
     </Badge>
   )

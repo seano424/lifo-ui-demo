@@ -13,7 +13,6 @@ import { updateStoreCategoryShelfLife } from '@/lib/queries/products'
 import { useQueryClient } from '@tanstack/react-query'
 import { queryKeys } from '@/lib/queries/query-keys'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 
 const MIN_SHELF_LIFE_DAYS = 1
@@ -27,7 +26,7 @@ export function TrackingSettings({
   categoryName,
   initialTrackingMode = 'auto',
 }: TrackingSettingsProps) {
-  const [isOpen, setIsOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(true)
   const [editedShelfLife, setEditedShelfLife] = useState(String(shelfLifeDays))
   const [trackingMode, setTrackingMode] = useState<'auto' | 'manual'>(initialTrackingMode)
   const [isDirty, setIsDirty] = useState(false)
@@ -131,7 +130,7 @@ export function TrackingSettings({
   }
 
   return (
-    <div className="px-4 flex flex-col gap-4">
+    <div className="flex flex-col gap-4">
       <Button
         variant="ghost"
         onClick={() => setIsOpen(!isOpen)}
@@ -146,17 +145,15 @@ export function TrackingSettings({
       {isOpen && (
         <div className="gap-4 flex flex-col">
           {/* Tracking mode */}
-          <div className="flex gap-4 items-center justify-between border-b border-border/50 pb-4">
-            <Label variant="small" className="capitalize">
-              Category
-            </Label>
+          <div className="flex gap-4 items-center justify-between">
+            <Typography variant="small">Category</Typography>
             <Badge variant="mutedRounded">{categoryName}</Badge>
           </div>
 
-          <div className="flex gap-4 items-center justify-between border-b border-border/50 pb-4">
-            <Label variant="small" className="capitalize">
+          <div className="flex gap-4 items-center justify-between">
+            <Typography variant="small" className="capitalize">
               Mode
-            </Label>
+            </Typography>
             <div className="flex gap-1 bg-muted text-foreground rounded-full p-2 w-fit">
               {(['auto', 'manual'] as const).map(mode => (
                 <Button
@@ -176,10 +173,10 @@ export function TrackingSettings({
           {/* Shelf life (only shown in auto mode) */}
           {trackingMode === 'auto' && (
             <>
-              <div className="flex gap-4 items-center justify-between border-b border-border/50 pb-4">
-                <Label variant="small">Shelf life</Label>
+              <div className="flex gap-4 items-center justify-between">
+                <Typography variant="small">Shelf life</Typography>
                 <div className="flex gap-1">
-                  <div className="items-center flex gap-1 bg-muted text-foreground rounded-full py-2 px-3 w-fit">
+                  <div className="items-center flex gap-1 bg-primary-100 text-foreground rounded-full py-2 px-3 w-fit">
                     <Input
                       type="number"
                       value={editedShelfLife}
@@ -188,28 +185,29 @@ export function TrackingSettings({
                         setIsDirty(true)
                       }}
                       disabled={isSaving || isUpdating}
-                      className="max-w-12"
+                      className="max-w-32"
                       min={MIN_SHELF_LIFE_DAYS}
                       size="sm"
                     />
-                    <Typography className="capitalize" variant="small" color="muted">
+                    <Typography className="capitalize" variant="small">
                       days
                     </Typography>
                   </div>
                   <Button
-                    variant="subtleSecondary"
+                    variant="black"
                     onClick={handleSave}
                     disabled={!isDirty || isSaving || isUpdating}
                     loading={isSaving}
-                    loadingText="Saving..."
+                    loadingText="Saving"
+                    className="min-w-32"
                   >
                     Save
                   </Button>
                 </div>
               </div>
 
-              <div className="flex gap-4 items-center justify-between border-b border-border/50 pb-4">
-                <Label variant="small">Source</Label>
+              <div className="flex gap-4 items-center justify-between">
+                <Typography variant="small">Source</Typography>
                 <Badge variant="mutedRounded">
                   {shelfLifeSource === 'product_override' &&
                     `Custom override (${shelfLifeDays} days)`}

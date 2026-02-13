@@ -9,6 +9,7 @@ import { UntrackedAlert } from './product-detail-modal/untracked-alert'
 import { TrackingSettings } from './product-detail-modal/tracking-settings'
 import { useState } from 'react'
 import { useActiveStoreId } from '@/lib/stores/store-context'
+import { Badge } from '../ui/badge'
 
 interface ProductDetailModalProps {
   isOpen: boolean
@@ -119,7 +120,7 @@ export function ProductDetailModal({
     <BottomSheet
       isOpen={isOpen}
       onClose={handleClose}
-      className="lg:min-w-2xl"
+      className="lg:min-w-lg"
       titleElement={
         <div className="flex flex-col gap-1 py-4">
           <Typography variant="h3" className="font-semibold">
@@ -137,35 +138,56 @@ export function ProductDetailModal({
         </div>
       }
     >
-      <div className="flex flex-col gap-4 pb-20 px-4">
+      <div className="flex flex-col justify-between gap-4 h-full px-4 pb-4">
         {/* TODO: Untracked alert: replace with actual calculation once store_products.quantity exists */}
-        {untrackedQty > 0 && (
-          <UntrackedAlert count={untrackedQty} productId={productId} autoExpand={focusAddDate} />
-        )}
+        <div className="flex flex-col gap-4">
+          {untrackedQty > 0 && (
+            <UntrackedAlert count={untrackedQty} productId={productId} autoExpand={focusAddDate} />
+          )}
 
-        {/* Batch list */}
-        <div className="select-none bg-background py-4 rounded-3xl">
-          <BatchList
-            batches={sortedBatches}
-            totalStock={product?.total_stock || 0}
-            highlightedBatchId={highlightedBatchId}
-            editingBatchId={editingBatchId}
-            onStartEdit={handleStartEdit}
-            onCancelEdit={() => setEditingBatchId(null)}
-            isLoading={isLoadingBatches}
-          />
-        </div>
+          {/* Section header */}
+          <div className="flex flex-col gap-4 px-4 bg-muted rounded-3xl p-4">
+            <div className="flex items-center gap-2 justify-between">
+              <Typography variant="small">Total units</Typography>
 
-        {/* Tracking settings */}
-        <div className="bg-background py-4 rounded-3xl">
-          <TrackingSettings
-            productId={productId}
-            categoryId={product?.category_id || ''}
-            shelfLifeDays={product?.effective_shelf_life || 14}
-            shelfLifeSource={product?.shelf_life_source}
-            categoryName={product?.category_display_name || 'Unknown'}
-            initialTrackingMode={product?.tracking_mode || 'auto'}
-          />
+              <Badge variant="secondaryRounded">{product?.total_stock || 0}</Badge>
+            </div>
+
+            <div className="flex items-center gap-2 justify-between">
+              <Typography variant="small">Tracked batches</Typography>
+              <Badge variant="secondaryRounded">{batches.length} batches</Badge>
+            </div>
+
+            {/* <div className="flex items-center gap-2 justify-between">
+              <Typography variant="small">Sorted by</Typography>
+              <Badge variant="mutedRounded">Expiry date · Expired last</Badge>
+            </div> */}
+          </div>
+
+          {/* Batch list */}
+          <div className="select-none px-4 bg-muted rounded-3xl p-4">
+            <BatchList
+              batches={sortedBatches}
+              totalStock={product?.total_stock || 0}
+              highlightedBatchId={highlightedBatchId}
+              editingBatchId={editingBatchId}
+              onStartEdit={handleStartEdit}
+              onCancelEdit={() => setEditingBatchId(null)}
+              isLoading={isLoadingBatches}
+            />
+          </div>
+
+          {/* Tracking settings */}
+          <div className="px-4 bg-muted rounded-3xl p-4">
+            <TrackingSettings
+              productId={productId}
+              categoryId={product?.category_id || ''}
+              shelfLifeDays={product?.effective_shelf_life || 14}
+              shelfLifeSource={product?.shelf_life_source}
+              categoryName={product?.category_display_name || 'Unknown'}
+              initialTrackingMode={product?.tracking_mode || 'auto'}
+            />
+          </div>
         </div>
 
         {/* Footer */}
