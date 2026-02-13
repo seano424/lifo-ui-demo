@@ -70,11 +70,9 @@ export function TeamSwitcher({ compact = false }: TeamSwitcherProps) {
           <SidebarMenuItem>
             <SidebarMenuButton
               disabled
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground flex items-center gap-4 px-4 py-2 rounded-2xl border group-data-[state=collapsed]:border-none"
+              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground flex items-center gap-2 px-4 py-3 rounded-2xl border group-data-[state=collapsed]:border-none"
             >
-              <div className="flex aspect-square size-8 items-center justify-center rounded-2xl bg-muted">
-                <StoreIcon className="w-4 h-4 text-muted-foreground" />
-              </div>
+              <StoreIcon className="w-4 h-4 text-muted-foreground" />
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="text-muted-foreground">{t('noStoresAvailable')}</span>
               </div>
