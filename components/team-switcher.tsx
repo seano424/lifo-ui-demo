@@ -23,6 +23,7 @@ import { Settings, Store as StoreIcon } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { Button } from './ui/button'
 import { Skeleton } from './ui/skeleton'
+import { Typography } from './ui/typography'
 
 interface TeamSwitcherProps {
   compact?: boolean
@@ -129,18 +130,25 @@ export function TeamSwitcher({ compact = false }: TeamSwitcherProps) {
                     onClick={() => handleStoreSwitch(store)}
                     className={cn(
                       'gap-2 p-2 border-b border-b-border rounded-none',
-                      index === userStores.length - 1 && 'border-b-0',
+                      // index === userStores.length - 1 && 'border-b-0',
                       index === 0 && 'border-t border-t-border/50',
                     )}
                     disabled={isChangingStore}
                   >
                     <div className="flex items-center gap-5 justify-between w-full">
                       <div className="flex flex-1 flex-col gap-1 justify-between">
-                        <span>{store.store_name}</span>
+                        <Typography
+                          variant="small"
+                          color={activeStore?.store_id === store.store_id ? 'primary' : 'muted'}
+                        >
+                          {store.store_name}
+                        </Typography>
 
                         <div className="flex items-center gap-1 text-xs text-muted-foreground">
                           {/* <MapPin className="size-3" /> */}
-                          <span>{store.address}</span>
+                          <Typography variant="extraSmall" color="muted">
+                            {store.address}
+                          </Typography>
                         </div>
                       </div>
                       {/* <div className="flex items-center gap-2">

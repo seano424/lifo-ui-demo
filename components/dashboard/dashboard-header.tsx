@@ -1,9 +1,8 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { useStoreState } from '@/lib/stores/store-context'
-import { createClient } from '@/lib/supabase/client'
+import { useCurrentUser } from '@/hooks/use-users'
 import { cn } from '@/lib/utils'
 import { Typography } from '../ui/typography'
 import { Button } from '../ui/button'
@@ -16,24 +15,10 @@ interface DashboardHeaderProps {
 export function DashboardHeader({ timeRange, onTimeRangeChange }: DashboardHeaderProps) {
   const t = useTranslations('dashboard.redesign.header')
   const { activeStore } = useStoreState()
-  const [userName, setUserName] = useState<string>('there')
+  const { data: currentUser, isLoading } = useCurrentUser()
 
-  // Get current user name
-  useEffect(() => {
-    const fetchUser = async () => {
-      const supabase = createClient()
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-
-      if (user?.user_metadata?.full_name) {
-        const firstName = user.user_metadata.full_name.split(' ')[0]
-        setUserName(firstName)
-      }
-    }
-
-    fetchUser()
-  }, [])
+  // Extract first name from full_name, with fallback to 'there'
+  const userName = currentUser?.full_name ? currentUser.full_name.split(' ')[0] : 'there'
 
   // Determine greeting based on time of day
   const hour = new Date().getHours()
@@ -58,7 +43,13 @@ export function DashboardHeader({ timeRange, onTimeRangeChange }: DashboardHeade
     <div className="flex-col gap-4 items-center justify-center sm:flex-row flex sm:items-end sm:justify-between">
       {/* Left: Greeting + Store/Date */}
       <div className="flex flex-col gap-2 text-center sm:text-left">
-        <Typography variant="h2">{t(`greeting.${greetingKey}`, { name: userName })}</Typography>
+        {!isLoading ? (
+          <Typography variant="h2">{t(`greeting.${greetingKey}`, { name: userName })}</Typography>
+        ) : (
+          <Typography variant="h2" className="opacity-0">
+            Loading...
+          </Typography>
+        )}
         <Typography variant="p" color="muted" className="max-w-xs sm:max-w-none mx-auto sm:mx-0">
           {activeStore?.store_name} · {formattedDate}
         </Typography>
