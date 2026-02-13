@@ -9,7 +9,6 @@ import { UntrackedAlert } from './product-detail-modal/untracked-alert'
 import { TrackingSettings } from './product-detail-modal/tracking-settings'
 import { useState } from 'react'
 import { useActiveStoreId } from '@/lib/stores/store-context'
-import { Badge } from '@/components/ui/badge'
 
 interface ProductDetailModalProps {
   isOpen: boolean
