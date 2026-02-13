@@ -28,12 +28,16 @@ export const AuthButton = memo(function AuthButton({ isMobile }: AuthButtonProps
         className={cn('flex items-center gap-2', isMobile && 'flex-col gap-4 items-start w-full')}
       >
         <div
-          className="h-10 bg-muted/50 animate-pulse rounded-2xl"
-          style={{ width: isMobile ? '100%' : '140px' }}
+          className={cn(
+            'h-10 bg-muted/50 animate-pulse rounded-2xl',
+            isMobile ? 'w-full' : 'w-[140px]',
+          )}
         />
         <div
-          className="h-10 bg-muted/50 animate-pulse rounded-2xl"
-          style={{ width: isMobile ? '100%' : '80px' }}
+          className={cn(
+            'h-10 bg-muted/50 animate-pulse rounded-2xl',
+            isMobile ? 'w-full' : 'w-[80px]',
+          )}
         />
       </div>
     )

@@ -1,13 +1,20 @@
-'use client'
-
 import { Check } from 'lucide-react'
-import { useTranslations } from 'next-intl'
+import { getTranslations } from 'next-intl/server'
 import Link from 'next/link'
+import type { Metadata } from 'next'
 import { Typography } from '@/components/ui/typography'
 import { RevealAnimation } from '@/components/ui/reveal-animation'
 
-export default function PricingPage() {
-  const t = useTranslations('pricingpage')
+type PlanFeatures = Record<string, string>
+
+export const metadata: Metadata = {
+  title: 'Pricing - LIFO.AI',
+  description:
+    'Choose the perfect plan for your food waste management needs. From free trial to enterprise solutions.',
+}
+
+export default async function PricingPage() {
+  const t = await getTranslations('pricingpage')
 
   const plans = [
     {
@@ -80,16 +87,16 @@ export default function PricingPage() {
 
                     {/* Features List */}
                     <ul className="flex flex-col gap-4 text-left">
-                      {Object.keys(
-                        JSON.parse(JSON.stringify(t.raw(`plans.${plan.id}.features`))),
-                      ).map(featureKey => (
-                        <li key={featureKey} className="flex items-center space-x-3">
-                          <Check className="shrink-0 w-5 h-5 text-green-500 dark:text-green-400" />
-                          <Typography variant="p" color="muted">
-                            {t(`plans.${plan.id}.features.${featureKey}`)}
-                          </Typography>
-                        </li>
-                      ))}
+                      {Object.entries(t.raw(`plans.${plan.id}.features`) as PlanFeatures).map(
+                        ([featureKey]) => (
+                          <li key={featureKey} className="flex items-center space-x-3">
+                            <Check className="shrink-0 w-5 h-5 text-green-500 dark:text-green-400" />
+                            <Typography variant="p" color="muted">
+                              {t(`plans.${plan.id}.features.${featureKey}`)}
+                            </Typography>
+                          </li>
+                        ),
+                      )}
                     </ul>
                   </div>
 

@@ -1,6 +1,7 @@
 import { OfflineIndicator } from '@/components/offline-indicator'
 import { IntlProvider } from '@/components/providers/intl-provider'
 import { LanguageProvider } from '@/components/providers/language-provider'
+import { PostHogProvider } from '@/components/providers/posthog-provider'
 import { Toaster } from '@/components/ui/toaster'
 import { ReactQueryProvider } from '@/lib/react-query/provider'
 import type { Metadata } from 'next'
@@ -93,35 +94,37 @@ export default async function RootLayout({
       className={`${raleway.variable} ${inter.variable} ${robotoMono.variable} ${debugScreens}`}
     >
       <body className={`font-sans antialiased`}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem={true}
-          disableTransitionOnChange
-        >
-          <ReactQueryProvider>
-            <LanguageProvider>
-              <IntlProvider initialMessages={messages}>{children}</IntlProvider>
-            </LanguageProvider>
-          </ReactQueryProvider>
-          <OfflineIndicator />
-          <Toaster
-            position="top-right"
-            richColors
-            className="toaster"
-            closeButton
-            closeOnClickOutside
-            toastOptions={{
-              className: 'toast',
-              duration: 4000,
-              style: {
-                background: 'hsl(var(--background))',
-                color: 'hsl(var(--foreground))',
-                border: '1px solid hsl(var(--border))',
-              },
-            }}
-          />
-        </ThemeProvider>
+        <PostHogProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem={true}
+            disableTransitionOnChange
+          >
+            <ReactQueryProvider>
+              <LanguageProvider>
+                <IntlProvider initialMessages={messages}>{children}</IntlProvider>
+              </LanguageProvider>
+            </ReactQueryProvider>
+            <OfflineIndicator />
+            <Toaster
+              position="top-right"
+              richColors
+              className="toaster"
+              closeButton
+              closeOnClickOutside
+              toastOptions={{
+                className: 'toast',
+                duration: 4000,
+                style: {
+                  background: 'hsl(var(--background))',
+                  color: 'hsl(var(--foreground))',
+                  border: '1px solid hsl(var(--border))',
+                },
+              }}
+            />
+          </ThemeProvider>
+        </PostHogProvider>
       </body>
     </html>
   )

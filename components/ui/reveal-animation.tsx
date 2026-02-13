@@ -80,16 +80,11 @@ export const RevealAnimation = memo(function RevealAnimation({
     [duration, delay],
   )
 
-  const className_combined = useMemo(
-    () => `${width === 'full' ? 'w-full' : ''} ${className}`,
-    [width, className],
-  )
-
   return (
     <div style={containerStyle}>
       <motion.div
         ref={ref}
-        className={className_combined}
+        className={`${width === 'full' ? 'w-full' : ''} ${className}`}
         initial={hiddenVariant}
         animate={controls}
         variants={visibleVariants}

@@ -123,8 +123,8 @@ export function useCurrentUser() {
 
       return transformedUser as User
     },
-    staleTime: 5 * 60 * 1000, // Auth state rarely changes - check every 5 minutes
-    gcTime: 10 * 60 * 1000, // Keep cache for 10 minutes
+    staleTime: 30 * 1000, // Auth state can change - check every 30 seconds for logout detection
+    gcTime: 5 * 60 * 1000, // Keep cache for 5 minutes
     retry: false,
     // Keep showing previous data while refetching to prevent flickering
     placeholderData: previousData => previousData,
@@ -185,7 +185,7 @@ export function useCurrentUserStoreRole() {
       return currentUserStoreRole
     },
     enabled: !!activeStoreId,
-    staleTime: 5 * 60 * 1000,
+    staleTime: 30 * 1000, // Store roles can change - check every 30 seconds
     retry: (failureCount, error: Error) => {
       if (error?.message?.includes('Not authenticated') || error?.message?.includes('not found')) {
         return false
@@ -241,7 +241,7 @@ export function useCurrentUserRoles() {
       return globalRoles
     },
     enabled: !!storeRole && !isLoading && !error,
-    staleTime: 5 * 60 * 1000,
+    staleTime: 30 * 1000, // Roles can change - check every 30 seconds
   })
 }
 
@@ -255,7 +255,7 @@ export function useCurrentUserHasRole(roleName: string) {
       return roles.includes(roleName as UserRole)
     },
     enabled: !!roles && !!roleName,
-    staleTime: 5 * 60 * 1000,
+    staleTime: 30 * 1000, // Role checks can change - check every 30 seconds
   })
 }
 
