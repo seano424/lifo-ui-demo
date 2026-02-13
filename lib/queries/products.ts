@@ -897,6 +897,15 @@ export async function updateStoreCategoryShelfLife(
   const supabase = createClient()
   const context = 'updateStoreCategoryShelfLife'
 
+  // Validate inputs
+  if (!storeId || !categoryId) {
+    throw new Error('Store ID and Category ID are required')
+  }
+
+  if (shelfLifeDays !== null && (shelfLifeDays < 1 || shelfLifeDays > 365)) {
+    throw new Error('Shelf life must be between 1 and 365 days')
+  }
+
   return withPerformanceTracking(
     context,
     'Update store category shelf life',

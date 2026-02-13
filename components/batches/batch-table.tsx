@@ -63,12 +63,10 @@ export function BatchTable({
   const { activeStore } = useStoreState()
 
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null)
-  const [selectedBatchId, setSelectedBatchId] = useState<string | null>(null)
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false)
 
   const handleBatchClick = (batch: BatchWithProduct) => {
     setSelectedProductId(batch.product_id)
-    setSelectedBatchId(batch.batch_id)
     setIsBottomSheetOpen(true)
   }
 
@@ -198,10 +196,8 @@ export function BatchTable({
           onClose={() => {
             setIsBottomSheetOpen(false)
             setSelectedProductId(null)
-            setSelectedBatchId(null)
           }}
           productId={selectedProductId}
-          highlightBatchId={selectedBatchId}
         />
       )}
 

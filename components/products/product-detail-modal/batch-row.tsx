@@ -9,10 +9,10 @@ import { cn } from '@/lib/utils'
 import { useState, useEffect } from 'react'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
+import { toast } from 'sonner'
 
 export function BatchRow({
   batch,
-  // isHighlighted,
   isEditing,
   onStartEdit,
   onSave,
@@ -54,7 +54,14 @@ export function BatchRow({
     }
 
     const newQty = parseInt(editedQty, 10)
-    if (!Number.isNaN(newQty) && newQty !== batch.current_quantity) {
+
+    // Validate quantity
+    if (Number.isNaN(newQty) || newQty < 0) {
+      toast.error('Quantity must be a positive number')
+      return
+    }
+
+    if (newQty !== batch.current_quantity) {
       updates.current_quantity = newQty
     }
 

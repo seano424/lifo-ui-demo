@@ -299,8 +299,37 @@ export function useBatchActions() {
       )
 
       if (activeStoreId) {
+        // Optimistically update batches.byStore
         queryClient.setQueriesData(
           { queryKey: queryKeys.batches.byStore(activeStoreId) },
+          (oldData: unknown) => {
+            if (!isInfiniteData(oldData)) return oldData
+
+            return {
+              ...oldData,
+              pages: oldData.pages.map(page => {
+                if (!page || !page.data || !Array.isArray(page.data)) return page
+
+                return {
+                  ...page,
+                  data: page.data.map((batch: Batch) =>
+                    batch.batch_id === batchId
+                      ? {
+                          ...batch,
+                          ...updates,
+                          updated_at: new Date().toISOString(),
+                        }
+                      : batch,
+                  ),
+                }
+              }),
+            }
+          },
+        )
+
+        // Optimistically update batches.byProduct for all products
+        queryClient.setQueriesData(
+          { queryKey: ['batches', 'byProduct', activeStoreId] },
           (oldData: unknown) => {
             if (!isInfiniteData(oldData)) return oldData
 
@@ -333,6 +362,16 @@ export function useBatchActions() {
     onError: (err, _variables, context) => {
       if (context?.previousBatch) {
         queryClient.setQueryData(queryKeys.batches.detail(context.batchId), context.previousBatch)
+
+        // Rollback optimistic updates
+        if (activeStoreId) {
+          queryClient.invalidateQueries({
+            queryKey: queryKeys.batches.byStore(activeStoreId),
+          })
+          queryClient.invalidateQueries({
+            queryKey: ['batches', 'byProduct', activeStoreId],
+          })
+        }
       }
       console.error('Failed to update batch:', err)
       toast.error('Failed to update batch')

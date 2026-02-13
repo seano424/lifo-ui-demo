@@ -5,7 +5,6 @@ import type { BatchWithProduct } from '@/lib/queries/batches'
 export interface BatchListProps {
   batches: BatchWithProduct[]
   totalStock: number
-  highlightedBatchId: string | null
   editingBatchId: string | null
   onStartEdit: (batchId: string) => void
   onCancelEdit: () => void
@@ -14,7 +13,6 @@ export interface BatchListProps {
 
 export interface BatchRowProps {
   batch: BatchWithProduct
-  isHighlighted: boolean
   isEditing: boolean
   onStartEdit: () => void
   onSave: (updates: { expiry_date?: string; current_quantity?: number }) => void

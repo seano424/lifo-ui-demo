@@ -13,7 +13,6 @@ import { useState } from 'react'
 
 export function BatchList({
   batches,
-  highlightedBatchId,
   editingBatchId,
   onStartEdit,
   onCancelEdit,
@@ -65,7 +64,6 @@ export function BatchList({
             <BatchRow
               key={batch.batch_id}
               batch={batch}
-              isHighlighted={batch.batch_id === highlightedBatchId}
               isEditing={batch.batch_id === editingBatchId}
               onStartEdit={() => onStartEdit(batch.batch_id)}
               onSave={updates => handleSave(batch.batch_id, updates)}

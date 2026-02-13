@@ -14,6 +14,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { queryKeys } from '@/lib/queries/query-keys'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
+import { logger } from '@/lib/utils/logger'
 
 const MIN_SHELF_LIFE_DAYS = 1
 const DEFAULT_SHELF_LIFE_DAYS = 14
@@ -43,9 +44,10 @@ export function TrackingSettings({
   // Validate shelf life on mount and when it changes
   useEffect(() => {
     if (shelfLifeDays < MIN_SHELF_LIFE_DAYS) {
-      console.warn(
-        `[TrackingSettings] Invalid shelf life received: ${shelfLifeDays}. Using default: ${DEFAULT_SHELF_LIFE_DAYS}`,
-      )
+      logger.warn('TrackingSettings', 'Invalid shelf life received', {
+        received: shelfLifeDays,
+        default: DEFAULT_SHELF_LIFE_DAYS,
+      })
       setEditedShelfLife(String(DEFAULT_SHELF_LIFE_DAYS))
     } else {
       setEditedShelfLife(String(shelfLifeDays))
@@ -81,13 +83,15 @@ export function TrackingSettings({
       // Update store_category_settings.default_shelf_life_days (store-wide category default)
       await updateStoreCategoryShelfLife(activeStoreId, categoryId, newShelfLife)
 
-      // Invalidate product queries to refetch with new shelf life
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.products.detail(productId),
-      })
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.products.all,
-      })
+      // Refetch product queries to ensure immediate consistency
+      await Promise.all([
+        queryClient.refetchQueries({
+          queryKey: queryKeys.products.detail(productId),
+        }),
+        queryClient.refetchQueries({
+          queryKey: queryKeys.products.all,
+        }),
+      ])
 
       toast.success(`Updated shelf life for ${categoryName} category`)
       setIsDirty(false)

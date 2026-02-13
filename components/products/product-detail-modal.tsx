@@ -15,7 +15,6 @@ interface ProductDetailModalProps {
   isOpen: boolean
   onClose: () => void
   productId: string
-  highlightBatchId?: string | null
   focusAddDate?: boolean
 }
 
@@ -23,7 +22,6 @@ export function ProductDetailModal({
   isOpen,
   onClose,
   productId,
-  highlightBatchId = null,
   focusAddDate = false,
 }: ProductDetailModalProps) {
   const activeStoreId = useActiveStoreId()
@@ -32,20 +30,10 @@ export function ProductDetailModal({
     storeId: activeStoreId || undefined,
   })
 
-  const [highlightedBatchId, setHighlightedBatchId] = useState<string | null>(highlightBatchId)
   const [editingBatchId, setEditingBatchId] = useState<string | null>(null)
 
-  // Clear highlight when a different batch is clicked
-  const handleStartEdit = (batchId: string) => {
-    if (highlightedBatchId && highlightedBatchId !== batchId) {
-      setHighlightedBatchId(null)
-    }
-    setEditingBatchId(batchId)
-  }
-
-  // Clear highlight and editing state when modal closes
+  // Clear editing state when modal closes
   const handleClose = () => {
-    setHighlightedBatchId(null)
     setEditingBatchId(null)
     onClose()
   }
@@ -155,7 +143,7 @@ export function ProductDetailModal({
 
             <div className="flex items-center gap-2 justify-between">
               <Typography variant="small">Tracked batches</Typography>
-              <Badge variant="secondaryRounded">{batches.length} batches</Badge>
+              <Badge variant="secondaryRounded">{batches?.length || 0} batches</Badge>
             </div>
 
             {/* <div className="flex items-center gap-2 justify-between">
@@ -167,11 +155,10 @@ export function ProductDetailModal({
           {/* Batch list */}
           <div className="select-none px-4 bg-muted rounded-3xl p-4">
             <BatchList
-              batches={sortedBatches}
+              batches={sortedBatches || []}
               totalStock={product?.total_stock || 0}
-              highlightedBatchId={highlightedBatchId}
               editingBatchId={editingBatchId}
-              onStartEdit={handleStartEdit}
+              onStartEdit={(batchId: string) => setEditingBatchId(batchId)}
               onCancelEdit={() => setEditingBatchId(null)}
               isLoading={isLoadingBatches}
             />
