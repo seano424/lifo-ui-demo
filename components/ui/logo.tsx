@@ -17,6 +17,7 @@ interface LogoProps {
   href?: string // Make it clickable
   priority?: boolean // Image loading priority (default: false)
   withText?: boolean
+  onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void
 }
 
 const sizeMap = {
@@ -41,6 +42,7 @@ export function Logo({
   darkMode,
   priority = false,
   withText = false,
+  onClick,
 }: LogoProps) {
   const { resolvedTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
@@ -104,6 +106,7 @@ export function Logo({
           'inline-block',
           withText && 'flex items-center gap-2  font-extrabold font-heading',
         )}
+        onClick={onClick}
       >
         {logoElement}
         <span className={cn(textSizeMap[size])}>{withText && 'lifo'}</span>

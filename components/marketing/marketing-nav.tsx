@@ -15,6 +15,7 @@ import { hasEnvVars } from '@/lib/utils'
 import { Menu } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { AuthButton } from '../auth-button'
 import { EnvVarWarning } from '../env-var-warning'
 import { Typography } from '../ui/typography'
@@ -29,6 +30,7 @@ interface MenuItem {
 
 const MarketingNav = React.memo(() => {
   const t = useTranslations('marketing.nav')
+  const pathname = usePathname()
   const menuItems = [
     {
       title: 'Home',
@@ -50,13 +52,29 @@ const MarketingNav = React.memo(() => {
         <div className="flex justify-between lg:grid lg:grid-cols-3 items-center gap-8 w-full">
           {/* <NavbarLogo variant="text" href="/" /> */}
 
-          <Logo variant="svg" size="md" priority href="/" withText />
-          <div className="items-center gap-8 hidden lg:flex place-self-center bg-secondary-100/20 text-secondary-900 rounded-full px-4 py-2 dark:bg-secondary-900/0 dark:text-secondary-100">
+          <Logo
+            variant="svg"
+            size="md"
+            priority
+            href="/"
+            withText
+            onClick={e => {
+              if (pathname === '/') {
+                e.preventDefault()
+              }
+            }}
+          />
+          <div className="items-center gap-8 hidden lg:flex place-self-center bg-secondary-100/20 rounded-full px-4 py-2 dark:bg-secondary-900/0 dark:text-secondary-100">
             {menuItems.map(item => (
               <Link
                 key={item.title}
                 href={item.url}
-                className="rounded-2xl px-4 py-2 dark:bg-secondary-900/0 dark:text-secondary-100"
+                className="rounded-2xl px-4 py-2 dark:bg-secondary-900/0 dark:text-secondary-100 hover:text-secondary-900 transition-colors duration-200"
+                onClick={e => {
+                  if (pathname === item.url) {
+                    e.preventDefault()
+                  }
+                }}
               >
                 {item.title}
               </Link>
@@ -71,7 +89,14 @@ const MarketingNav = React.memo(() => {
       {/* Mobile */}
       <div className="block md:hidden container mx-auto">
         <div className="flex items-center justify-between">
-          <Link href="/">
+          <Link
+            href="/"
+            onClick={e => {
+              if (pathname === '/') {
+                e.preventDefault()
+              }
+            }}
+          >
             <Logo variant="svg" size="sm" priority />
           </Link>
           <Sheet>
@@ -83,14 +108,21 @@ const MarketingNav = React.memo(() => {
             <SheetContent className="overflow-y-auto">
               <SheetHeader>
                 <SheetTitle>
-                  <Link href="/">
+                  <Link
+                    href="/"
+                    onClick={e => {
+                      if (pathname === '/') {
+                        e.preventDefault()
+                      }
+                    }}
+                  >
                     <Logo variant="svg" size="sm" priority />
                   </Link>
                 </SheetTitle>
               </SheetHeader>
               <div className="flex flex-col h-full gap-10 p-4">
                 <Accordion type="single" collapsible className="flex w-full flex-col gap-4">
-                  {menuItems.map(item => renderMobileMenuItem(item))}
+                  {menuItems.map(item => renderMobileMenuItem(item, pathname))}
                 </Accordion>
 
                 <div className="flex flex-col gap-3">
@@ -111,7 +143,7 @@ const MarketingNav = React.memo(() => {
   )
 })
 
-const renderMobileMenuItem = (item: MenuItem) => {
+const renderMobileMenuItem = (item: MenuItem, pathname: string) => {
   if (item.items) {
     return (
       <AccordionItem key={item.title} value={item.title} className="border-b-0">
@@ -120,7 +152,7 @@ const renderMobileMenuItem = (item: MenuItem) => {
         </AccordionTrigger>
         <AccordionContent className="mt-2">
           {item.items.map(subItem => (
-            <SubMenuLink key={subItem.title} item={subItem} />
+            <SubMenuLink key={subItem.title} item={subItem} pathname={pathname} />
           ))}
         </AccordionContent>
       </AccordionItem>
@@ -128,17 +160,30 @@ const renderMobileMenuItem = (item: MenuItem) => {
   }
 
   return (
-    <Link key={item.title} href={item.url}>
+    <Link
+      key={item.title}
+      href={item.url}
+      onClick={e => {
+        if (pathname === item.url) {
+          e.preventDefault()
+        }
+      }}
+    >
       {item.title}
     </Link>
   )
 }
 
-const SubMenuLink = ({ item }: { item: MenuItem }) => {
+const SubMenuLink = ({ item, pathname }: { item: MenuItem; pathname: string }) => {
   return (
     <Link
       className="flex flex-row gap-4 rounded-2xl p-3 leading-none no-underline transition-colors outline-none select-none hover:bg-muted hover:text-accent-foreground"
       href={item.url}
+      onClick={e => {
+        if (pathname === item.url) {
+          e.preventDefault()
+        }
+      }}
     >
       <div className="text-foreground">{item.icon}</div>
       <div>
