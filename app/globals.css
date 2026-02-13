@@ -333,7 +333,7 @@
 @layer base {
   :root {
     /* Light mode - Clean and bright */
-    --background: 0 0% 100%;
+    --background: 0 0% 97%;
     --foreground: 225 42% 8%;
     --card: 0 0% 97%;
     --card-foreground: 225 42% 8%;

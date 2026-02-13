@@ -20,10 +20,14 @@ export function DashboardNav() {
 
       <div className="flex items-center gap-2">
         <CompactThemeSwitcher />
-        <CompactLanguageSwitcher />
+        <div className="hidden lg:block">
+          <CompactLanguageSwitcher />
+        </div>
         <NotificationBellExpiry />
         <TeamSwitcher compact />
-        <UserButton />
+        <div className="hidden lg:block">
+          <UserButton />
+        </div>
       </div>
     </header>
   )
