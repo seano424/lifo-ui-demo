@@ -1,7 +1,7 @@
 import { AppSidebar } from '@/components/app-sidebar'
 import { DeletionWarningBanner } from '@/components/account/deletion-warning-banner'
 import { DashboardNav } from '@/components/dashboard/dashboard-nav'
-import { QueryBoundary } from '@/components/query-boundary'
+import { QueryErrorBoundary } from '@/components/query-error-boundary'
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
 import { prefetchDashboardData } from '@/lib/react-query/prefetch'
 import { HydrationBoundary } from '@tanstack/react-query'
@@ -11,13 +11,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   return (
     <HydrationBoundary state={dashboardData.dehydratedState}>
-      <QueryBoundary
-        fallback={
-          <div className="flex h-screen w-screen items-center justify-center">
-            <div className="text-muted-foreground">Loading...</div>
-          </div>
-        }
-      >
+      <QueryErrorBoundary>
         <SidebarProvider>
           <AppSidebar />
           <SidebarInset className="overflow-y-auto relative">
@@ -26,7 +20,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
             {children}
           </SidebarInset>
         </SidebarProvider>
-      </QueryBoundary>
+      </QueryErrorBoundary>
     </HydrationBoundary>
   )
 }
