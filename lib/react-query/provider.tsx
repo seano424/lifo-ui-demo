@@ -2,12 +2,7 @@
 
 'use client'
 
-import {
-  isServer,
-  type QueryClient,
-  QueryClientProvider,
-  defaultShouldDehydrateQuery,
-} from '@tanstack/react-query'
+import { isServer, type QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import dynamic from 'next/dynamic'
 import { createQueryClient } from './client'
 

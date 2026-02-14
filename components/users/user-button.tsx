@@ -1,12 +1,13 @@
 'use client'
 
 import { UserIcon } from 'lucide-react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { useCurrentUser } from '@/hooks/use-users'
 
-export default function UserButton() {
+function UserButtonContent() {
   const { data: user, isLoading, isError } = useCurrentUser()
 
   if (isLoading) {
@@ -42,4 +43,21 @@ export default function UserButton() {
       </Avatar>
     </Button>
   )
+}
+
+export default function UserButton() {
+  const [mounted, setMounted] = useState(false)
+
+  // Ensure component only renders on client after QueryClientProvider is ready
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  // Don't render anything until client-side mount completes
+  // This ensures QueryClientProvider is available before calling React Query hooks
+  if (!mounted) {
+    return <Skeleton className="h-10 w-10 rounded-full" />
+  }
+
+  return <UserButtonContent />
 }
