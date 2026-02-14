@@ -219,7 +219,7 @@ export class FastAPIClient {
     const timeoutId = setTimeout(() => controller.abort(), this.timeout)
 
     // Get publishable key from environment
-    const publishableKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    const publishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
 
     // Debug logging (can be removed in production)
     if (process.env.NODE_ENV === 'development') {
@@ -498,7 +498,7 @@ export class FastAPIClient {
     const timeoutId = setTimeout(() => controller.abort(), this.timeout)
 
     // Get publishable key from environment
-    const publishableKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    const publishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
 
     try {
       const response = await fetch(url.toString(), {
@@ -604,7 +604,7 @@ export class FastAPIClient {
     const timeoutId = setTimeout(() => controller.abort(), this.timeout)
 
     // Get publishable key from environment
-    const publishableKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    const publishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
 
     try {
       const response = await fetch(url.toString(), {

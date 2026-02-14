@@ -15,6 +15,8 @@ export const AuthButton = memo(function AuthButton({ isMobile }: AuthButtonProps
   const t = useTranslations('marketing.auth')
   const { data: user, isLoading } = useCurrentUser()
 
+  console.log('user', user)
+
   const logout = useCallback(async () => {
     const supabase = createClient()
     await supabase.auth.signOut()

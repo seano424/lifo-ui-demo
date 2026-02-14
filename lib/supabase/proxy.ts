@@ -1,3 +1,5 @@
+// lib/supabase/proxy.ts
+
 import { createServerClient } from '@supabase/ssr'
 import { type NextRequest, NextResponse } from 'next/server'
 
@@ -6,7 +8,7 @@ export async function updateSession(request: NextRequest) {
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
     {
       cookies: {
         getAll() {
@@ -51,8 +53,7 @@ function isPublicRoute(request: NextRequest): boolean {
     pathname.startsWith('/contact') ||
     pathname.startsWith('/support') ||
     pathname.startsWith('/privacy') ||
-    pathname.startsWith('/terms') ||
-    request.nextUrl.searchParams.has('code')
+    pathname.startsWith('/terms')
   )
 }
 
