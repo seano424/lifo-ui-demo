@@ -91,7 +91,7 @@ export async function signInWithGoogle() {
       if (url.hostname === '127.0.0.1') {
         url.hostname = 'localhost'
       }
-      // Validate it's a safe origin (localhost, your domains, or staging)
+      // Validate it's a safe origin (localhost, production, or staging)
       const allowedDomains = [
         'localhost',
         'lifo-app.com',
@@ -99,10 +99,9 @@ export async function signInWithGoogle() {
         'clownfish-app-y2uru.ondigitalocean.app',
       ]
 
-      const isAllowed =
-        allowedDomains.some(
-          domain => url.hostname === domain || url.hostname.endsWith(`.${domain}`),
-        ) || url.hostname.endsWith('.vercel.app')
+      const isAllowed = allowedDomains.some(
+        domain => url.hostname === domain || url.hostname.endsWith(`.${domain}`),
+      )
 
       if (!isAllowed) {
         return 'http://localhost:3000'
