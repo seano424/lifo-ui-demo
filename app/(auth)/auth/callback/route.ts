@@ -35,8 +35,8 @@ export async function GET(request: NextRequest) {
         redirectPath = '/auth/update-password'
       }
 
-      // Ensure redirect path is safe
-      if (!redirectPath.startsWith('/')) {
+      // Ensure redirect path is safe - must be relative and not protocol-relative
+      if (!redirectPath || !redirectPath.startsWith('/') || redirectPath.startsWith('//')) {
         redirectPath = '/dashboard'
       }
 

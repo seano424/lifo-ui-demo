@@ -9,8 +9,14 @@ export default async function proxy(request: NextRequest) {
   const { searchParams, pathname } = new URL(request.url)
   const code = searchParams.get('code')
 
-  // Handle OAuth callback code exchange in proxy with proper async cookie handling
-  // exchangeCodeForSession() returns before setAll fires, so we must await it
+  // Handle OAuth callback code exchange in middleware (not route handler)
+  //
+  // WHY MIDDLEWARE: Route handlers have a race condition where exchangeCodeForSession()
+  // resolves before @supabase/ssr's internal onAuthStateChange fires setAll(). This causes
+  // the response to be sent before cookies are attached. In middleware, we can explicitly
+  // wait for the setAll Promise to resolve before returning the response.
+  //
+  // SECURITY: This also ensures redirect path validation happens before any response is sent.
   if (code && pathname === '/auth/callback') {
     const type = searchParams.get('type')
     const next = searchParams.get('next')

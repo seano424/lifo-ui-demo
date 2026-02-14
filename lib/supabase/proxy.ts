@@ -53,6 +53,7 @@ function isPublicRoute(request: NextRequest): boolean {
     pathname.startsWith('/contact') ||
     pathname.startsWith('/support') ||
     pathname.startsWith('/privacy') ||
+    pathname.startsWith('/pricing') ||
     pathname.startsWith('/terms')
   )
 }

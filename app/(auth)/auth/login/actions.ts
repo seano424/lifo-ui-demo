@@ -79,12 +79,27 @@ export async function signInWithGoogle() {
   const supabase = await createClient()
   const headersList = await headers()
 
-  // Get the origin from headers, but normalize 127.0.0.1 to localhost
-  // This ensures PKCE code verifier can be found (browser treats them as different origins)
-  let origin = headersList.get('origin') || 'http://localhost:3000'
-  if (origin.includes('127.0.0.1')) {
-    origin = origin.replace('127.0.0.1', 'localhost')
-  }
+  // Get the origin from headers and validate it safely
+  // Normalize 127.0.0.1 to localhost for PKCE code verifier compatibility
+  const rawOrigin = headersList.get('origin')
+  const origin = (() => {
+    if (!rawOrigin) return 'http://localhost:3000'
+
+    try {
+      const url = new URL(rawOrigin)
+      // Normalize 127.0.0.1 to localhost
+      if (url.hostname === '127.0.0.1') {
+        url.hostname = 'localhost'
+      }
+      // Validate it's a safe origin (localhost or your domain)
+      if (url.hostname !== 'localhost' && !url.hostname.endsWith('.vercel.app')) {
+        return 'http://localhost:3000'
+      }
+      return url.origin
+    } catch {
+      return 'http://localhost:3000'
+    }
+  })()
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
