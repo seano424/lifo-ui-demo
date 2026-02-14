@@ -20,17 +20,23 @@ export function QueryBoundary({
   fallback?: React.ReactNode
 }) {
   const [isReady, setIsReady] = useState(false)
+  const [isMounted, setIsMounted] = useState(false)
 
   useEffect(() => {
+    // Mark as mounted (client-side only)
+    setIsMounted(true)
+
     // Wait a tick to ensure QueryClient provider is mounted
     // This gives the provider time to initialize before children render
+    // Extra delay for HMR situations
     const timer = setTimeout(() => {
       setIsReady(true)
-    }, 10)
+    }, 50)
     return () => clearTimeout(timer)
   }, [])
 
-  if (!isReady) {
+  // During SSR or before mount, always show fallback
+  if (!isMounted || !isReady) {
     return <>{fallback}</>
   }
 
