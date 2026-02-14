@@ -73,8 +73,11 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
         toast.error(result.error)
         setIsGoogleLoading(false)
       } else if (result?.url) {
-        // Redirect to Google OAuth URL
-        window.location.href = result.url
+        // Delay redirect slightly to allow server action stream to close
+        // This prevents Firefox "Error in input stream" error
+        setTimeout(() => {
+          window.location.replace(result.url)
+        }, 100)
       }
     } catch (error: unknown) {
       const errorMsg = error instanceof Error ? error.message : tErrors('genericError')
