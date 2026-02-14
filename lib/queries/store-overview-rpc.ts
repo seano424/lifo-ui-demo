@@ -8,6 +8,14 @@ import type { StorePermissions } from './stores'
 type ServerClient = Awaited<ReturnType<typeof createServerClient>>
 
 /**
+ * Raw RPC response from get_user_store_overviews.
+ * Permissions field needs type casting before use.
+ */
+type StoreOverviewRpcRow = Omit<StoreOverview, 'permissions'> & {
+  permissions: unknown
+}
+
+/**
  * A store overview row returned by get_user_store_overviews RPC.
  * Includes store details, the user's role, and aggregated counts.
  */
@@ -65,7 +73,7 @@ export async function fetchStoreOverviews(serverClient?: ServerClient): Promise<
         throw error
       }
 
-      const overviews = (data ?? []).map(row => ({
+      const overviews = (data ?? []).map((row: StoreOverviewRpcRow) => ({
         ...row,
         permissions: (row.permissions as StorePermissions) || {},
       })) as StoreOverview[]

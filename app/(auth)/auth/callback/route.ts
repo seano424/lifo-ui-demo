@@ -1,37 +1,62 @@
-import { redirect } from 'next/navigation'
+// app/(auth)/auth/callback/route.ts
+
 import type { NextRequest } from 'next/server'
+import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { logger } from '@/lib/utils/logger'
 
 export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url)
+  const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
-  const next = searchParams.get('next')
-  const type = searchParams.get('type') // recovery, signup, email_change, etc.
+  const next = searchParams.get('next') ?? '/dashboard'
+  const type = searchParams.get('type')
 
   if (code) {
-    const supabase = await createClient()
+    try {
+      // Use the server utility which properly handles cookies via await cookies()
+      const supabase = await createClient()
+      const { error } = await supabase.auth.exchangeCodeForSession(code)
 
-    const { error } = await supabase.auth.exchangeCodeForSession(code)
-
-    if (!error) {
-      // Determine where to redirect based on auth type
-      if (type === 'recovery') {
-        // Password reset - redirect to update password form
-        redirect('/auth/update-password')
-      } else if (next) {
-        // Use the next parameter if provided
-        redirect(next)
-      } else {
-        // Default redirect for successful auth (login/signup)
-        redirect('/dashboard')
+      if (error) {
+        logger.error('callback', 'Code exchange failed', {
+          error: error.message,
+          code: error.name,
+        })
+        const errorUrl = new URL('/auth/error', origin)
+        if (error.message?.includes('expired') || error.message?.includes('invalid')) {
+          errorUrl.searchParams.set('reason', 'invalid_code')
+        }
+        return NextResponse.redirect(errorUrl)
       }
-    } else {
-      console.error('Auth callback error:', error)
-      // Redirect to error page with error details
-      redirect(`/auth/error?error=${encodeURIComponent(error.message)}`)
+
+      // Determine redirect destination
+      let redirectPath = next
+      if (type === 'recovery') {
+        redirectPath = '/auth/update-password'
+      }
+
+      // Ensure redirect path is safe - must be relative and not protocol-relative
+      if (!redirectPath || !redirectPath.startsWith('/') || redirectPath.startsWith('//')) {
+        redirectPath = '/dashboard'
+      }
+
+      const isLocalEnv = process.env.NODE_ENV === 'development'
+      const forwardedHost = request.headers.get('x-forwarded-host')
+
+      // Cookies are automatically attached to the response by the cookies() API
+      if (isLocalEnv) {
+        return NextResponse.redirect(`${origin}${redirectPath}`)
+      } else if (forwardedHost) {
+        return NextResponse.redirect(`https://${forwardedHost}${redirectPath}`)
+      }
+      return NextResponse.redirect(`${origin}${redirectPath}`)
+    } catch (error) {
+      logger.error('callback', 'Unexpected error during code exchange', {
+        error: error instanceof Error ? error.message : String(error),
+      })
+      return NextResponse.redirect(new URL('/auth/error', origin))
     }
   }
 
-  // If no code is provided, redirect to login
-  redirect('/auth/login?error=No authorization code provided')
+  return NextResponse.redirect(new URL('/auth/auth-code-error', origin))
 }

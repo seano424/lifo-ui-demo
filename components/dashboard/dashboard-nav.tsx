@@ -1,3 +1,5 @@
+'use client'
+
 import DashboardBreadcrumbs from '@/components/dashboard/dashboard-breadcrumbs'
 import { NotificationBellExpiry } from '@/components/notifications/notification-bell-expiry'
 import { TeamSwitcher } from '@/components/team-switcher'

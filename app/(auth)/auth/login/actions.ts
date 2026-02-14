@@ -3,6 +3,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { logger } from '@/lib/utils/logger'
+import { headers } from 'next/headers'
 
 interface GetUserByUsernameResult {
   success: boolean
@@ -72,4 +73,56 @@ export async function loginWithCredentials(_prevState: unknown, formData: FormDa
   }
 
   redirect('/dashboard')
+}
+
+export async function signInWithGoogle() {
+  const supabase = await createClient()
+  const headersList = await headers()
+
+  // Get the origin from headers and validate it safely
+  // Normalize 127.0.0.1 to localhost for PKCE code verifier compatibility
+  const rawOrigin = headersList.get('origin')
+  const origin = (() => {
+    if (!rawOrigin) return 'http://localhost:3000'
+
+    try {
+      const url = new URL(rawOrigin)
+      // Normalize 127.0.0.1 to localhost
+      if (url.hostname === '127.0.0.1') {
+        url.hostname = 'localhost'
+      }
+      // Validate it's a safe origin (localhost or your domain)
+      if (url.hostname !== 'localhost' && !url.hostname.endsWith('.vercel.app')) {
+        return 'http://localhost:3000'
+      }
+      return url.origin
+    } catch {
+      return 'http://localhost:3000'
+    }
+  })()
+
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: `${origin}/auth/callback`,
+      skipBrowserRedirect: true,
+      queryParams: {
+        access_type: 'offline',
+        prompt: 'consent',
+      },
+    },
+  })
+
+  if (error) {
+    logger.error('GoogleSignIn', 'Failed to initiate Google sign-in:', error)
+    return { error: 'Failed to sign in with Google' }
+  }
+
+  if (data?.url) {
+    // Return the URL for client-side redirect instead of server-side redirect
+    // This prevents the "error" toast from showing before redirect
+    return { url: data.url }
+  }
+
+  return { error: 'Failed to get authorization URL' }
 }
