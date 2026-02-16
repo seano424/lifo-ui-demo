@@ -6,9 +6,6 @@ CREATE OR REPLACE VIEW inventory.store_inventory_stats AS
 SELECT
   sp.store_id,
   sp.product_id,
-  -- Integration-reported quantity (from Square, Shopify, etc.)
-  COALESCE(sp.quantity, 0) as quantity,
-  sp.quantity_updated_at,
   -- Batch-derived total stock (LIFO's truth)
   COALESCE(
     SUM(b.current_quantity) FILTER (WHERE b.status IN ('active', 'draft')),
@@ -34,7 +31,10 @@ SELECT
   COALESCE(
     SUM(b.current_quantity - b.reserved_quantity) FILTER (WHERE b.status IN ('active', 'draft')),
     0
-  ) as available_quantity
+  ) as available_quantity,
+  -- Integration-reported quantity (from Square, Shopify, etc.)
+  COALESCE(sp.quantity, 0) as quantity,
+  sp.quantity_updated_at
 FROM inventory.store_products sp
 LEFT JOIN inventory.batches b
   ON b.product_id = sp.product_id
