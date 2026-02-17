@@ -12,7 +12,11 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { useCategoryTranslation } from '@/hooks/use-category-translation'
+import { useQueryClient } from '@tanstack/react-query'
+import { fetchProductWithBatches } from '@/lib/queries/products'
 import type { Product, ProductSort, SortField } from '@/lib/queries/products'
+import { queryKeys } from '@/lib/queries/query-keys'
+import { useActiveStoreId } from '@/lib/stores/store-context'
 import {
   flexRender,
   getCoreRowModel,
@@ -28,8 +32,9 @@ const VALID_COLUMN_IDS = [
   'name',
   'category',
   'brand',
-  'total_stock',
   'active_batches_count',
+  'store_quantity',
+  'needs_expiry',
   'created_at',
 ]
 
@@ -54,9 +59,20 @@ export function ProductsTable({
   const tTable = useTranslations('productTable')
 
   const { getCategoryName } = useCategoryTranslation()
+  const queryClient = useQueryClient()
+  const activeStoreId = useActiveStoreId()
 
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
+
+  const handleProductHover = (productId: string) => {
+    if (!activeStoreId) return
+    queryClient.prefetchQuery({
+      queryKey: queryKeys.products.detailWithBatches(productId, activeStoreId),
+      queryFn: () => fetchProductWithBatches(productId, activeStoreId),
+      staleTime: 30 * 1000,
+    })
+  }
 
   const [sorting, setSorting] = useState<SortingState>(() => {
     if (VALID_COLUMN_IDS.includes(currentSort.field)) {
@@ -146,6 +162,7 @@ export function ProductsTable({
             <TableRow
               key={row.id}
               onClick={() => handleProductClick(row.original)}
+              onMouseEnter={() => handleProductHover(row.original.product_id)}
               className="cursor-pointer transition-all duration-100 ease-in-out hover:bg-muted/30"
             >
               {row.getVisibleCells().map(cell => (

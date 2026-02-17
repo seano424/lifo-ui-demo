@@ -9,7 +9,13 @@ import { useState, useEffect, useRef } from 'react'
 import { AlertCircle } from 'lucide-react'
 import { toast } from 'sonner'
 
-export function UntrackedAlert({ count, productId, autoExpand = false }: UntrackedAlertProps) {
+export function UntrackedAlert({
+  count,
+  productId,
+  autoExpand = false,
+  costPrice,
+  sellingPrice,
+}: UntrackedAlertProps) {
   const [expanded, setExpanded] = useState(autoExpand)
   const [date, setDate] = useState('')
   const [qty, setQty] = useState('')
@@ -52,8 +58,8 @@ export function UntrackedAlert({ count, productId, autoExpand = false }: Untrack
         expiry_date: date,
         initial_quantity: quantity,
         current_quantity: quantity,
-        cost_price: 0, // Default to 0, can be edited later
-        selling_price: 0, // Default to 0, can be edited later
+        cost_price: costPrice ?? sellingPrice ?? undefined,
+        selling_price: sellingPrice ?? costPrice ?? undefined,
         status: 'active',
         store_id: '', // Will be set by useBatchActions hook
       } as Parameters<typeof createBatch>[0])
@@ -69,22 +75,22 @@ export function UntrackedAlert({ count, productId, autoExpand = false }: Untrack
   }
 
   return (
-    <div className="mx-5 my-4 border border-dashed border-border rounded-xl bg-muted/30">
+    <div className="border border-dashed border-border rounded-xl bg-muted/30">
       <button
         type="button"
         className="w-full px-4 py-3 flex items-center justify-between text-left hover:bg-muted/50 transition-colors rounded-xl"
         onClick={() => setExpanded(!expanded)}
       >
         <div className="flex items-center gap-2.5">
-          <div className="w-5 h-5 rounded-md bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center">
-            <AlertCircle className="h-3 w-3 text-orange-600 dark:text-orange-500" />
+          <div className="rounded-md bg-primary-500 flex items-center justify-center p-1">
+            <AlertCircle className="size-6 text-white" />
           </div>
           <div>
             <Typography variant="p" className="font-medium">
               {count} units have no expiry date
             </Typography>
-            <Typography variant="small" className="text-muted-foreground">
-              {expanded ? '▾ Collapse' : '▸ Add batch'}
+            <Typography variant="p" className="text-muted-foreground">
+              {expanded ? '▾ Collapse' : '▸ Add Dates'}
             </Typography>
           </div>
         </div>
@@ -128,7 +134,7 @@ export function UntrackedAlert({ count, productId, autoExpand = false }: Untrack
               {isCreating ? 'Adding...' : '+ Add batch'}
             </Button>
           </div>
-          <Typography variant="small" className="text-muted-foreground mt-2">
+          <Typography variant="p" className="text-muted-foreground mt-2">
             Quantity defaults to all {count} untracked units if left blank.
           </Typography>
         </div>

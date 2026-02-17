@@ -144,6 +144,10 @@ export const queryKeys = {
       [...queryKeys.products.byStore(storeId), 'infinite', { filters }] as const,
     details: () => [...queryKeys.products.all, 'detail'] as const,
     detail: (id: string) => [...queryKeys.products.details(), id] as const,
+    // Combined product+batches query — child of detail so batch mutations cascade
+    // storeId is part of the key so store switches don't serve stale cross-store data
+    detailWithBatches: (id: string, storeId: string) =>
+      [...queryKeys.products.detail(id), storeId, 'withBatches'] as const,
   },
 
   // Categories queries
