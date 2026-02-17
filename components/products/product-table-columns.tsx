@@ -25,7 +25,7 @@ export const PRODUCT_TABLE_COLUMN_CONFIG = [
     width: 100,
     align: 'right',
     hasMultipleLines: false,
-    sortable: false,
+    sortable: true,
   },
   {
     id: 'active_batches_count',
@@ -41,7 +41,7 @@ export const PRODUCT_TABLE_COLUMN_CONFIG = [
     width: 110,
     align: 'right',
     hasMultipleLines: false,
-    sortable: false,
+    sortable: true,
   },
   {
     id: 'created_at',
@@ -100,7 +100,16 @@ export function createProductTableColumns({
     },
     {
       id: 'store_quantity',
-      header: () => <div className="text-right pr-1">{t('totalStock')}</div>,
+      header: () => (
+        <SortableHeader
+          field="store_quantity"
+          currentSort={currentSort}
+          updateSort={updateSort}
+          className="justify-end"
+        >
+          {t('totalStock')}
+        </SortableHeader>
+      ),
       cell: ({ row }) => <div className="text-right">{row.original.store_quantity ?? 0}</div>,
       size: 180,
     },
@@ -122,7 +131,16 @@ export function createProductTableColumns({
     },
     {
       id: 'needs_expiry',
-      header: () => <div className="text-right pr-1">{t('datesMissing')}</div>,
+      header: () => (
+        <SortableHeader
+          field="needs_expiry"
+          currentSort={currentSort}
+          updateSort={updateSort}
+          className="justify-end"
+        >
+          {t('datesMissing')}
+        </SortableHeader>
+      ),
       cell: ({ row }) => {
         const storeQty = row.original.store_quantity ?? 0
         const batchQty = row.original.batch_quantity ?? 0

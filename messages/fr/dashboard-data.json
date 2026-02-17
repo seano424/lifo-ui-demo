@@ -92,6 +92,10 @@
     "activeBatchesDesc": "Trier par nombre de lots actifs",
     "dateAdded": "Date d'ajout",
     "dateAddedDesc": "Trier par date d'ajout du produit",
+    "totalStock": "Stock total",
+    "totalStockDesc": "Trier par quantité en stock synchronisée avec le TPV",
+    "datesMissing": "Dates manquantes",
+    "datesMissingDesc": "Trier par quantité non suivie (stock sans dates d'expiration)",
     "quickSort": {
       "newestFirst": "Plus récent d'abord",
       "aToZ": "A-Z",

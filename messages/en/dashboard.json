@@ -497,6 +497,10 @@
     "activeBatchesDesc": "Sort by number of active batches",
     "dateAdded": "Date Added",
     "dateAddedDesc": "Sort by when product was added",
+    "totalStock": "Total Stock",
+    "totalStockDesc": "Sort by POS-synced stock quantity",
+    "datesMissing": "Dates Missing",
+    "datesMissingDesc": "Sort by untracked quantity (stock without expiry dates)",
     "quickSort": {
       "newestFirst": "Newest First",
       "aToZ": "A-Z",

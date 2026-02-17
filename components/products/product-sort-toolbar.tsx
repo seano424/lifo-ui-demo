@@ -1,6 +1,7 @@
 'use client'
 
 import {
+  AlertCircle,
   ArrowDown,
   ArrowUp,
   ArrowUpDown,
@@ -8,6 +9,7 @@ import {
   Building,
   Calendar,
   Package,
+  ShoppingCart,
   SortAsc,
   Tag,
 } from 'lucide-react'
@@ -81,6 +83,18 @@ export function ProductsSortToolbar({
       label: t('dateAdded'),
       icon: Calendar,
       description: t('dateAddedDesc'),
+    },
+    {
+      field: 'store_quantity',
+      label: t('totalStock'),
+      icon: ShoppingCart,
+      description: t('totalStockDesc'),
+    },
+    {
+      field: 'needs_expiry',
+      label: t('datesMissing'),
+      icon: AlertCircle,
+      description: t('datesMissingDesc'),
     },
   ]
 

@@ -92,6 +92,8 @@ export type SortField =
   | 'batch_quantity'
   | 'active_batches_count'
   | 'created_at'
+  | 'store_quantity'
+  | 'needs_expiry'
 
 export type SortDirection = 'asc' | 'desc'
 

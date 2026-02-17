@@ -47,11 +47,13 @@ export async function fetchProductsPageRPC(
         p_category_code: filters.category ?? undefined,
         p_brand: filters.brand ?? undefined,
         p_search: filters.search ?? undefined,
-        // Map batch_quantity back to total_stock for the legacy get_products_paginated RPC
+        // Map frontend sort field names to RPC column names
         p_sort_field:
           filters.sort?.field === 'batch_quantity'
             ? 'total_stock'
-            : filters.sort?.field || 'created_at',
+            : filters.sort?.field === 'needs_expiry'
+              ? 'untracked_qty'
+              : filters.sort?.field || 'created_at',
         p_sort_direction: filters.sort?.direction || 'desc',
         p_page_size: pageSize,
         p_page_offset: page * pageSize,

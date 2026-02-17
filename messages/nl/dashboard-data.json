@@ -92,6 +92,10 @@
     "activeBatchesDesc": "Sorteer op aantal actieve batches",
     "dateAdded": "Datum toegevoegd",
     "dateAddedDesc": "Sorteer op wanneer product werd toegevoegd",
+    "totalStock": "Totale voorraad",
+    "totalStockDesc": "Sorteer op POS-gesynchroniseerde voorraad",
+    "datesMissing": "Datums ontbreekt",
+    "datesMissingDesc": "Sorteer op niet-gevolgde hoeveelheid (voorraad zonder vervaldatum)",
     "quickSort": {
       "newestFirst": "Nieuwste eerst",
       "aToZ": "A-Z",
