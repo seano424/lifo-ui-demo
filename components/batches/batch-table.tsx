@@ -78,7 +78,7 @@ export function BatchTable({
     const storeId = activeStore?.store_id
     if (!storeId) return
     queryClient.prefetchQuery({
-      queryKey: queryKeys.products.detailWithBatches(productId),
+      queryKey: queryKeys.products.detailWithBatches(productId, storeId),
       queryFn: () => fetchProductWithBatches(productId, storeId),
       staleTime: 30 * 1000,
     })

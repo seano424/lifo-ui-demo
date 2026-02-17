@@ -128,7 +128,7 @@ export function BatchRow({
       </div>
 
       {isEditing && (
-        <div className="flex flex-col items-start md:flex-row md:items-end md:gap-1 md:justify-between border-y border-border p-4 gap-4">
+        <div className="flex flex-col items-start sm:flex-row sm:items-end sm:gap-1 sm:justify-between border-y border-border p-4 gap-4">
           <div className="flex items-end gap-1">
             <div className="flex flex-col gap-1">
               <Label className="text-sm text-foreground">Quantity</Label>
@@ -182,7 +182,7 @@ function getUrgencyBarWidth(days: number | null): number {
 // Helper: Get urgency color class
 function getUrgencyColor(days: number | null): string {
   if (days === null) return 'bg-muted-foreground/30'
-  if (days <= 0) return 'bg-muted'
+  if (days <= 0) return 'bg-destructive'
   if (days <= 3) return 'bg-destructive/80'
   if (days <= 7) return 'bg-primary-500'
   if (days <= 14) return 'bg-primary-500'
@@ -201,7 +201,7 @@ function DaysLeftLabel({ days }: { days: number | null }) {
 
   if (days < 0) {
     return (
-      <Typography variant="p" color="muted">
+      <Typography variant="p" color="destructive">
         Expired
       </Typography>
     )

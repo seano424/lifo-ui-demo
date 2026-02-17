@@ -120,7 +120,7 @@ export function useProductWithBatches(productId: string) {
   const activeStoreId = useActiveStoreId()
 
   return useQuery({
-    queryKey: queryKeys.products.detailWithBatches(productId),
+    queryKey: queryKeys.products.detailWithBatches(productId, activeStoreId || ''),
     queryFn: () => {
       if (!activeStoreId) {
         throw new Error('No active store selected')
@@ -128,6 +128,8 @@ export function useProductWithBatches(productId: string) {
       return fetchProductWithBatches(productId, activeStoreId)
     },
     enabled: !!productId && !!activeStoreId,
+    // Match prefetch staleTime so the prefetched data isn't immediately refetched on modal open
+    staleTime: 30_000,
   })
 }
 

@@ -200,14 +200,17 @@ export function TrackingSettings({
                       days
                     </Typography>
                   </div>
-                  <button
+                  <Button
                     type="button"
+                    variant="ghost"
+                    size="sm"
                     onClick={handleSave}
-                    disabled={!isDirty || isSaving || isUpdating}
-                    className="px-4 py-2"
+                    disabled={!isDirty}
+                    loading={isSaving || isUpdating}
+                    loadingText="Saving..."
                   >
                     Save
-                  </button>
+                  </Button>
                 </div>
               </div>
 

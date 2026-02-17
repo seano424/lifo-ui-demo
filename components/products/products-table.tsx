@@ -28,7 +28,15 @@ import { Package } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useEffect, useMemo, useState } from 'react'
 
-const VALID_COLUMN_IDS = ['name', 'category', 'brand', 'active_batches_count', 'created_at']
+const VALID_COLUMN_IDS = [
+  'name',
+  'category',
+  'brand',
+  'active_batches_count',
+  'store_quantity',
+  'needs_expiry',
+  'created_at',
+]
 
 interface ProductsTableProps {
   data: Product[]
@@ -60,7 +68,7 @@ export function ProductsTable({
   const handleProductHover = (productId: string) => {
     if (!activeStoreId) return
     queryClient.prefetchQuery({
-      queryKey: queryKeys.products.detailWithBatches(productId),
+      queryKey: queryKeys.products.detailWithBatches(productId, activeStoreId),
       queryFn: () => fetchProductWithBatches(productId, activeStoreId),
       staleTime: 30 * 1000,
     })

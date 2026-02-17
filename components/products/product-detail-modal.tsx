@@ -1,6 +1,7 @@
 'use client'
 
 import { BottomSheet } from '@/components/ui/bottom-sheet'
+import { Skeleton } from '@/components/ui/skeleton'
 import { Typography } from '@/components/ui/typography'
 import { useProductWithBatches } from '@/hooks/use-products'
 import { BatchList } from './product-detail-modal/batch-list'
@@ -99,7 +100,7 @@ export function ProductDetailModal({
 
   return (
     <BottomSheet
-      isOpen={isOpen && isReady}
+      isOpen={isOpen}
       onClose={handleClose}
       className="lg:min-w-2xl"
       titleElement={
@@ -122,69 +123,75 @@ export function ProductDetailModal({
       }
     >
       <div className="flex flex-col justify-between gap-4 h-full px-4 pb-4">
-        <div className="flex flex-col gap-4">
-          {untrackedQty > 0 && (
-            <UntrackedAlert
-              count={untrackedQty}
-              productId={productId}
-              autoExpand={focusAddDate}
-              costPrice={product?.store_cost_price}
-              sellingPrice={product?.store_selling_price}
-            />
-          )}
+        {!isReady ? (
+          <div className="flex flex-col gap-4">
+            <Skeleton className="h-24 w-full rounded-3xl" />
+            <Skeleton className="h-32 w-full rounded-3xl" />
+            <Skeleton className="h-12 w-full rounded-3xl" />
+          </div>
+        ) : (
+          <>
+            <div className="flex flex-col gap-4">
+              {untrackedQty > 0 && (
+                <UntrackedAlert
+                  count={untrackedQty}
+                  productId={productId}
+                  autoExpand={focusAddDate}
+                  costPrice={product?.store_cost_price}
+                  sellingPrice={product?.store_selling_price}
+                />
+              )}
 
-          {/* Section header */}
-          <div className="flex flex-col gap-4 px-4 bg-muted rounded-3xl p-4">
-            <div className="flex items-center gap-2 justify-between">
-              <Typography variant="p">Total units</Typography>
+              {/* Section header */}
+              <div className="flex flex-col gap-4 px-4 bg-muted rounded-3xl p-4">
+                <div className="flex items-center gap-2 justify-between">
+                  <Typography variant="p">Total units</Typography>
 
-              <Typography>{product?.store_quantity ?? product?.batch_quantity ?? 0}</Typography>
+                  <Typography>{product?.store_quantity ?? product?.batch_quantity ?? 0}</Typography>
+                </div>
+
+                <div className="flex items-center gap-2 justify-between">
+                  <Typography variant="p">Total units with expiry dates</Typography>
+                  <Typography>
+                    {totalTrackedQty} of {product?.store_quantity ?? product?.batch_quantity ?? 0}{' '}
+                    units
+                  </Typography>
+                </div>
+              </div>
+
+              {/* Batch list */}
+              <div className="select-none px-4 bg-muted rounded-3xl p-4">
+                <BatchList
+                  batches={sortedBatches || []}
+                  storeQuantity={product?.store_quantity ?? null}
+                  editingBatchId={editingBatchId}
+                  onStartEdit={(batchId: string) => setEditingBatchId(batchId)}
+                  onCancelEdit={() => setEditingBatchId(null)}
+                />
+              </div>
+
+              {/* Tracking settings */}
+              <div className="px-4 bg-muted rounded-3xl p-4">
+                <TrackingSettings
+                  productId={productId}
+                  categoryId={product?.category_id || ''}
+                  shelfLifeDays={product?.effective_shelf_life || 14}
+                  shelfLifeSource={product?.shelf_life_source}
+                  categoryName={product?.category_display_name || 'Unknown'}
+                  initialTrackingMode={product?.tracking_mode || 'auto'}
+                />
+              </div>
             </div>
 
-            <div className="flex items-center gap-2 justify-between">
-              <Typography variant="p">Total units with expiry dates</Typography>
-              <Typography>
+            {/* Footer */}
+            <div className="shrink-0 px-5 flex items-center justify-center">
+              <Typography variant="p" color="muted">
                 {totalTrackedQty} of {product?.store_quantity ?? product?.batch_quantity ?? 0} units
+                tracked with expiry dates
               </Typography>
             </div>
-
-            {/* <div className="flex items-center gap-2 justify-between">
-              <Typography variant="p">Sorted by</Typography>
-              <Badge variant="mutedRounded">Expiry date · Expired last</Badge>
-            </div> */}
-          </div>
-
-          {/* Batch list */}
-          <div className="select-none px-4 bg-muted rounded-3xl p-4">
-            <BatchList
-              batches={sortedBatches || []}
-              storeQuantity={product?.store_quantity ?? null}
-              editingBatchId={editingBatchId}
-              onStartEdit={(batchId: string) => setEditingBatchId(batchId)}
-              onCancelEdit={() => setEditingBatchId(null)}
-            />
-          </div>
-
-          {/* Tracking settings */}
-          <div className="px-4 bg-muted rounded-3xl p-4">
-            <TrackingSettings
-              productId={productId}
-              categoryId={product?.category_id || ''}
-              shelfLifeDays={product?.effective_shelf_life || 14}
-              shelfLifeSource={product?.shelf_life_source}
-              categoryName={product?.category_display_name || 'Unknown'}
-              initialTrackingMode={product?.tracking_mode || 'auto'}
-            />
-          </div>
-        </div>
-
-        {/* Footer */}
-        <div className="shrink-0 px-5 flex items-center justify-center">
-          <Typography variant="p" color="muted">
-            {totalTrackedQty} of {product?.store_quantity ?? product?.batch_quantity ?? 0} units
-            tracked with expiry dates
-          </Typography>
-        </div>
+          </>
+        )}
       </div>
     </BottomSheet>
   )

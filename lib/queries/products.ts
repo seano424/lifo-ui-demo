@@ -1147,7 +1147,28 @@ export async function fetchProductWithBatches(
           avg_days_to_expiry: null,
         } as unknown as Product
 
-        const batches = (row.batches ?? []) as unknown as BatchWithProduct[]
+        // Typed intermediate narrows the Json type to the fields the RPC actually returns.
+        // If the SQL in get_product_with_batches changes, update this type to match.
+        type RpcBatchJson = Pick<
+          BatchWithProduct,
+          | 'batch_id'
+          | 'product_id'
+          | 'store_id'
+          | 'batch_number'
+          | 'status'
+          | 'expiry_date'
+          | 'manufacture_date'
+          | 'received_date'
+          | 'current_quantity'
+          | 'reserved_quantity'
+          | 'cost_price'
+          | 'selling_price'
+          | 'location_code'
+          | 'supplier'
+          | 'created_at'
+          | 'updated_at'
+        >
+        const batches = (row.batches ?? []) as RpcBatchJson[] as BatchWithProduct[]
 
         logger.query(context, 'Product with batches fetched successfully via RPC', {
           productId,
