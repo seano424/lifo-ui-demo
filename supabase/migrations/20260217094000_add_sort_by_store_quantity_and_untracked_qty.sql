@@ -63,6 +63,7 @@ RETURNS TABLE(
 LANGUAGE plpgsql
 STABLE
 SECURITY DEFINER
+SET search_path = ''
 AS $$
 BEGIN
   IF NOT business.user_has_store_access(p_store_id) THEN
@@ -273,3 +274,5 @@ ALTER FUNCTION public.get_products_paginated(
 COMMENT ON FUNCTION public.get_products_paginated(
   uuid, text, text, text, text, integer, integer
 ) IS 'Public wrapper for inventory.get_products_paginated. Supports store_quantity and untracked_qty sort fields.';
+
+GRANT EXECUTE ON FUNCTION public.get_products_paginated(uuid, text, text, text, text, integer, integer) TO authenticated;

@@ -976,7 +976,7 @@ export async function fetchProductById(
     { productId, storeId },
     async () => {
       try {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // biome-ignore lint/suspicious/noExplicitAny: RPC returns dynamic JSON structure
         const { data, error } = await (supabase.schema('inventory') as any).rpc(
           'get_product_detail',
           {

@@ -63,6 +63,7 @@ RETURNS TABLE(
 LANGUAGE plpgsql
 STABLE
 SECURITY DEFINER
+SET search_path = ''
 AS $$
 BEGIN
   -- Authorization check using existing function
@@ -269,3 +270,5 @@ ALTER FUNCTION public.get_products_paginated(
 COMMENT ON FUNCTION public.get_products_paginated(
   uuid, text, text, text, text, integer, integer
 ) IS 'Public wrapper for inventory.get_products_paginated. Returns store_quantity (POS-synced) from store_products.quantity.';
+
+GRANT EXECUTE ON FUNCTION public.get_products_paginated(uuid, text, text, text, text, integer, integer) TO authenticated;

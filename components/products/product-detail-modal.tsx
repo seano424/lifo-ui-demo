@@ -104,20 +104,26 @@ export function ProductDetailModal({
     <BottomSheet
       isOpen={isOpen}
       onClose={handleClose}
-      className="lg:min-w-lg"
+      className="lg:min-w-2xl"
       titleElement={
         <div className="flex flex-col gap-1 py-4">
           <Typography variant="h3" className="font-semibold">
             {product?.name || 'Product Details'}
           </Typography>
           <div className="flex items-center gap-2">
-            <Typography variant="p" color="muted">
-              {product?.brand}
-            </Typography>
-            <span className="text-sm text-muted-foreground">•</span>
-            <Typography variant="p" color="muted">
-              {product?.category_display_name}
-            </Typography>
+            {product?.brand && (
+              <Typography variant="p" color="muted">
+                {product.brand}
+              </Typography>
+            )}
+            {product?.brand && product?.category_display_name && (
+              <span className="text-sm text-muted-foreground">•</span>
+            )}
+            {product?.category_display_name && (
+              <Typography variant="p" color="muted">
+                {product.category_display_name}
+              </Typography>
+            )}
           </div>
         </div>
       }
