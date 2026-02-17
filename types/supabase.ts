@@ -2260,10 +2260,49 @@ export type Database = {
           product_id: string
           shelf_life_override_days: number
           sku: string
-          square_quantity: number
-          square_quantity_updated_at: string
           store_cost_price: number
           store_is_active: boolean
+          store_quantity: number
+          store_quantity_updated_at: string
+          store_selling_price: number
+          store_sku: string
+          supplier_code: string
+          typical_shelf_life_days: number
+          unit_type: string
+          updated_at: string
+        }[]
+      }
+      get_product_with_batches: {
+        Args: { p_product_id: string; p_store_id: string }
+        Returns: {
+          active_batches_count: number
+          barcode: string
+          base_cost_price: number
+          base_selling_price: number
+          batch_quantity: number
+          batches: Json
+          brand: string
+          category_code: string
+          category_default_shelf_life_days: number
+          category_display_name: string
+          category_display_name_fr: string
+          category_display_name_nl: string
+          category_id: string
+          category_typical_shelf_life_days: number
+          created_at: string
+          created_by: string
+          description: string
+          image_url: string
+          last_verified: string
+          name: string
+          open_food_facts_data: Json
+          product_id: string
+          shelf_life_override_days: number
+          sku: string
+          store_cost_price: number
+          store_is_active: boolean
+          store_quantity: number
+          store_quantity_updated_at: string
           store_selling_price: number
           store_sku: string
           supplier_code: string

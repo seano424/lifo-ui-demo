@@ -55,6 +55,8 @@ export function BatchList({
       {isOpen && (
         <div className="flex flex-col gap-4">
           {batches.map(batch => {
+            // store_quantity is POS-synced and can change externally, so this is a UX
+            // guardrail only — not a DB-level constraint. See untracked_qty in the RPC.
             const maxQuantity =
               storeQuantity != null
                 ? storeQuantity - totalBatchQty + (batch.current_quantity || 0)

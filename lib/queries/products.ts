@@ -977,14 +977,10 @@ export async function fetchProductById(
     { productId, storeId },
     async () => {
       try {
-        // biome-ignore lint/suspicious/noExplicitAny: RPC returns dynamic JSON structure
-        const { data, error } = await (supabase.schema('inventory') as any).rpc(
-          'get_product_detail',
-          {
-            p_product_id: productId,
-            p_store_id: storeId,
-          },
-        )
+        const { data, error } = await supabase.schema('inventory').rpc('get_product_detail', {
+          p_product_id: productId,
+          p_store_id: storeId,
+        })
 
         if (error) {
           logger.queryWarn(context, 'RPC failed', {
@@ -996,46 +992,8 @@ export async function fetchProductById(
           throw new Error(`Failed to fetch product: ${error.message}`)
         }
 
-        type ProductDetailRow = {
-          // products
-          product_id: string
-          name: string
-          brand: string | null
-          category_id: string | null
-          barcode: string | null
-          typical_shelf_life_days: number | null
-          base_cost_price: number
-          base_selling_price: number
-          description: string | null
-          image_url: string | null
-          sku: string | null
-          unit_type: string | null
-          created_at: string | null
-          updated_at: string | null
-          created_by: string | null
-          last_verified: string | null
-          open_food_facts_data: unknown
-          // store_products
-          store_cost_price: number | null
-          store_selling_price: number | null
-          store_is_active: boolean
-          store_sku: string | null
-          supplier_code: string | null
-          shelf_life_override_days: number | null
-          store_quantity: number | null
-          store_quantity_updated_at: string | null
-          // categories
-          category_code: string | null
-          category_display_name: string | null
-          category_display_name_fr: string | null
-          category_display_name_nl: string | null
-          category_typical_shelf_life_days: number | null
-          // store_category_settings
-          category_default_shelf_life_days: number | null
-          // batch aggregates
-          batch_quantity: number
-          active_batches_count: number
-        }
+        type ProductDetailRow =
+          Database['inventory']['Functions']['get_product_detail']['Returns'][number]
 
         // RPC returns a table — expect exactly one row
         const row: ProductDetailRow | null = Array.isArray(data) ? (data[0] ?? null) : null
@@ -1123,14 +1081,10 @@ export async function fetchProductWithBatches(
     { productId, storeId },
     async () => {
       try {
-        // biome-ignore lint/suspicious/noExplicitAny: RPC returns dynamic JSON structure
-        const { data, error } = await (supabase.schema('inventory') as any).rpc(
-          'get_product_with_batches',
-          {
-            p_product_id: productId,
-            p_store_id: storeId,
-          },
-        )
+        const { data, error } = await supabase.schema('inventory').rpc('get_product_with_batches', {
+          p_product_id: productId,
+          p_store_id: storeId,
+        })
 
         if (error) {
           logger.queryWarn(context, 'RPC failed', {
@@ -1142,48 +1096,8 @@ export async function fetchProductWithBatches(
           throw new Error(`Failed to fetch product with batches: ${error.message}`)
         }
 
-        type ProductWithBatchesRow = {
-          // products
-          product_id: string
-          name: string
-          brand: string | null
-          category_id: string | null
-          barcode: string | null
-          typical_shelf_life_days: number | null
-          base_cost_price: number
-          base_selling_price: number
-          description: string | null
-          image_url: string | null
-          sku: string | null
-          unit_type: string | null
-          created_at: string | null
-          updated_at: string | null
-          created_by: string | null
-          last_verified: string | null
-          open_food_facts_data: unknown
-          // store_products
-          store_cost_price: number | null
-          store_selling_price: number | null
-          store_is_active: boolean
-          store_sku: string | null
-          supplier_code: string | null
-          shelf_life_override_days: number | null
-          store_quantity: number | null
-          store_quantity_updated_at: string | null
-          // categories
-          category_code: string | null
-          category_display_name: string | null
-          category_display_name_fr: string | null
-          category_display_name_nl: string | null
-          category_typical_shelf_life_days: number | null
-          // store_category_settings
-          category_default_shelf_life_days: number | null
-          // batch aggregates
-          batch_quantity: number
-          active_batches_count: number
-          // full batch list
-          batches: unknown[]
-        }
+        type ProductWithBatchesRow =
+          Database['inventory']['Functions']['get_product_with_batches']['Returns'][number]
 
         const row: ProductWithBatchesRow | null = Array.isArray(data) ? (data[0] ?? null) : null
         if (!row) {
