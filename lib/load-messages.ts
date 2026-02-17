@@ -28,8 +28,8 @@ export function clearMessageCache(): void {
 export async function loadMessages(locale: string): Promise<Record<string, unknown>> {
   const cacheKey = locale
 
-  // Return cached messages if available
-  if (messageCache.has(cacheKey)) {
+  // Return cached messages if available (skip cache in development for hot-reload)
+  if (process.env.NODE_ENV !== 'development' && messageCache.has(cacheKey)) {
     return messageCache.get(cacheKey)!
   }
   try {

@@ -35,6 +35,8 @@ type StoreProductWithProduct = {
   is_active: boolean
   store_sku: string | null
   supplier_code: string | null
+  quantity: number | null
+  quantity_updated_at: string | null
   created_at: string
   updated_at: string
   products:
@@ -75,19 +77,19 @@ export type Product = BaseProduct & {
   // Tracking mode (inferred from shelf life configuration)
   tracking_mode?: 'auto' | 'manual'
   // Aggregated batch data (from RPC or client-side calculation)
-  total_stock?: number
+  batch_quantity?: number
   active_batches_count?: number
   avg_days_to_expiry?: number | null
-  // Square POS synced quantity (from store_products.quantity)
-  square_quantity?: number | null
-  square_quantity_updated_at?: string | null
+  // Store synced quantity (from store_products.quantity — integration-agnostic)
+  store_quantity?: number | null
+  store_quantity_updated_at?: string | null
 }
 
 export type SortField =
   | 'name'
   | 'category'
   | 'brand'
-  | 'total_stock'
+  | 'batch_quantity'
   | 'active_batches_count'
   | 'created_at'
 
@@ -191,7 +193,7 @@ export async function fetchProducts(
     const productAggregations = new Map<
       string,
       {
-        total_stock: number
+        batch_quantity: number
         active_batches_count: number
       }
     >()
@@ -199,12 +201,12 @@ export async function fetchProducts(
     if (batchAggregations) {
       batchAggregations.forEach(batch => {
         const current = productAggregations.get(batch.product_id) || {
-          total_stock: 0,
+          batch_quantity: 0,
           active_batches_count: 0,
         }
 
         if (Number(batch.current_quantity) > 0) {
-          current.total_stock += Number(batch.current_quantity) || 0
+          current.batch_quantity += Number(batch.current_quantity) || 0
         }
 
         if (batch.status === 'active') {
@@ -218,7 +220,7 @@ export async function fetchProducts(
     const transformedData = (storeProductsData as unknown as StoreProductWithProduct[]).map(
       (storeProduct: StoreProductWithProduct) => {
         const aggregation = productAggregations.get(storeProduct.product_id) || {
-          total_stock: 0,
+          batch_quantity: 0,
           active_batches_count: 0,
         }
 
@@ -235,7 +237,9 @@ export async function fetchProducts(
           store_is_active: storeProduct.is_active,
           store_sku: storeProduct.store_sku,
           supplier_code: storeProduct.supplier_code,
-          total_stock: aggregation.total_stock,
+          store_quantity: storeProduct.quantity,
+          store_quantity_updated_at: storeProduct.quantity_updated_at,
+          batch_quantity: aggregation.batch_quantity,
           active_batches_count: aggregation.active_batches_count,
           avg_days_to_expiry: null,
         }
@@ -323,11 +327,11 @@ export async function fetchProductsPage(
         }
 
         const isInMemorySort =
-          filters.sort?.field === 'total_stock' ||
+          filters.sort?.field === 'batch_quantity' ||
           filters.sort?.field === 'active_batches_count' ||
           filters.sort?.field === 'category'
         const isStockBasedSort =
-          filters.sort?.field === 'total_stock' || filters.sort?.field === 'active_batches_count'
+          filters.sort?.field === 'batch_quantity' || filters.sort?.field === 'active_batches_count'
 
         if (isInMemorySort) {
           if (isStockBasedSort) {
@@ -445,7 +449,7 @@ export async function fetchProductsPage(
         const productAggregations = new Map<
           string,
           {
-            total_stock: number
+            batch_quantity: number
             active_batches_count: number
           }
         >()
@@ -453,12 +457,12 @@ export async function fetchProductsPage(
         if (batchAggregations) {
           batchAggregations.forEach(batch => {
             const current = productAggregations.get(batch.product_id) || {
-              total_stock: 0,
+              batch_quantity: 0,
               active_batches_count: 0,
             }
 
             if (Number(batch.current_quantity) > 0) {
-              current.total_stock += Number(batch.current_quantity) || 0
+              current.batch_quantity += Number(batch.current_quantity) || 0
             }
 
             if (batch.status === 'active') {
@@ -472,7 +476,7 @@ export async function fetchProductsPage(
         const transformedData = filteredStoreProductsData.map(
           (storeProduct: StoreProductWithProduct) => {
             const aggregation = productAggregations.get(storeProduct.product_id) || {
-              total_stock: 0,
+              batch_quantity: 0,
               active_batches_count: 0,
             }
 
@@ -493,17 +497,19 @@ export async function fetchProductsPage(
               store_is_active: storeProduct.is_active,
               store_sku: storeProduct.store_sku,
               supplier_code: storeProduct.supplier_code,
-              total_stock: aggregation.total_stock,
+              store_quantity: storeProduct.quantity,
+              store_quantity_updated_at: storeProduct.quantity_updated_at,
+              batch_quantity: aggregation.batch_quantity,
               active_batches_count: aggregation.active_batches_count,
               avg_days_to_expiry: null,
             }
           },
         )
 
-        if (filters.sort?.field === 'total_stock') {
+        if (filters.sort?.field === 'batch_quantity') {
           transformedData.sort((a, b) => {
-            const aStock = a.total_stock || 0
-            const bStock = b.total_stock || 0
+            const aStock = a.batch_quantity || 0
+            const bStock = b.batch_quantity || 0
             return filters.sort!.direction === 'asc' ? aStock - bStock : bStock - aStock
           })
         } else if (filters.sort?.field === 'active_batches_count') {
@@ -1013,8 +1019,8 @@ export async function fetchProductById(
           store_sku: string | null
           supplier_code: string | null
           shelf_life_override_days: number | null
-          square_quantity: number | null
-          square_quantity_updated_at: string | null
+          store_quantity: number | null
+          store_quantity_updated_at: string | null
           // categories
           category_code: string | null
           category_display_name: string | null
@@ -1024,7 +1030,7 @@ export async function fetchProductById(
           // store_category_settings
           category_default_shelf_life_days: number | null
           // batch aggregates
-          total_stock: number
+          batch_quantity: number
           active_batches_count: number
         }
 
@@ -1083,7 +1089,7 @@ export async function fetchProductById(
         logger.query(context, 'Product fetched successfully via RPC', {
           productId,
           storeId,
-          totalStock: row.total_stock,
+          batchQuantity: row.batch_quantity,
           activeBatches: row.active_batches_count,
           effectiveShelfLife,
           shelfLifeSource,

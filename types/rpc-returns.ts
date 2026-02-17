@@ -1025,7 +1025,7 @@ export interface ProductRow {
   typical_shelf_life_days: number | null
   base_cost_price: number | null
   base_selling_price: number | null
-  total_stock: number
+  batch_quantity: number
   active_batches_count: number
   avg_days_to_expiry: number | null
   created_by: string | null
@@ -1051,6 +1051,7 @@ export interface ProductRow {
   calculated_total_stock: number
   calculated_active_batches_count: number
   total_count: number
+  store_quantity: number | null
 }
 
 /** Batch row from get_batches_page */

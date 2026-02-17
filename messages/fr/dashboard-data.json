@@ -177,6 +177,8 @@
     "uncategorized": "Non catégorisé",
     "brand": "Marque",
     "totalStock": "Stock total",
+    "batchesTracked": "Lots suivis",
+    "datesMissing": "Dates manquantes",
     "activeBatches": "Lots actifs",
     "dateAdded": "Date d'ajout",
     "openMenu": "Ouvrir le menu",

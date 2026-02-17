@@ -13,7 +13,7 @@ import { useState } from 'react'
 
 export function BatchList({
   batches,
-  squareQuantity,
+  storeQuantity,
   editingBatchId,
   onStartEdit,
   onCancelEdit,
@@ -59,7 +59,7 @@ export function BatchList({
         className="w-full flex items-center justify-between px-0"
       >
         <Typography variant="p" className="flex items-center gap-2">
-          Batches
+          Batches ({totalBatchQty} of {storeQuantity} units)
         </Typography>
         <ChevronDown className={cn('size-3 transition-transform', isOpen && 'rotate-180')} />
       </Button>
@@ -67,8 +67,8 @@ export function BatchList({
         <div className="flex flex-col gap-4">
           {batches.map(batch => {
             const maxQuantity =
-              squareQuantity != null
-                ? squareQuantity - totalBatchQty + (batch.current_quantity || 0)
+              storeQuantity != null
+                ? storeQuantity - totalBatchQty + (batch.current_quantity || 0)
                 : null
             return (
               <BatchRow

@@ -177,6 +177,8 @@
     "uncategorized": "Niet gecategoriseerd",
     "brand": "Merk",
     "totalStock": "Totale voorraad",
+    "batchesTracked": "Gevolgde batches",
+    "datesMissing": "Datums ontbreekt",
     "activeBatches": "Actieve batches",
     "dateAdded": "Datum toegevoegd",
     "openMenu": "Menu openen",

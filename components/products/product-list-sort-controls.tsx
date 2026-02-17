@@ -45,7 +45,7 @@ export function ProductListSortControls({
           <SelectItem value="brand" hideCheckIcon>
             {t('brand')}
           </SelectItem>
-          <SelectItem value="total_stock" hideCheckIcon>
+          <SelectItem value="batch_quantity" hideCheckIcon>
             {t('stock')}
           </SelectItem>
           <SelectItem value="active_batches_count" hideCheckIcon>

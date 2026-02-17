@@ -44,7 +44,7 @@ export function ProductDetailModal({
       ?.filter(b => b.status === 'active')
       .reduce((sum, b) => sum + (b.current_quantity || 0), 0) || 0
 
-  const untrackedQty = Math.max(0, (product?.square_quantity || 0) - totalTrackedQty)
+  const untrackedQty = Math.max(0, (product?.store_quantity || 0) - totalTrackedQty)
 
   // Sort batches: active first (soonest expiry), then no-date/draft, then expired (most recently expired first)
   const sortedBatches = [...(batches || [])].sort((a, b) => {
@@ -139,7 +139,9 @@ export function ProductDetailModal({
             <div className="flex items-center gap-2 justify-between">
               <Typography variant="p">Total units</Typography>
 
-              <Badge variant="secondaryRounded">{product?.total_stock || 0}</Badge>
+              <Badge variant="secondaryRounded">
+                {product?.store_quantity ?? product?.batch_quantity ?? 0}
+              </Badge>
             </div>
 
             <div className="flex items-center gap-2 justify-between">
@@ -157,8 +159,8 @@ export function ProductDetailModal({
           <div className="select-none px-4 bg-muted rounded-3xl p-4">
             <BatchList
               batches={sortedBatches || []}
-              totalStock={product?.total_stock || 0}
-              squareQuantity={product?.square_quantity ?? null}
+              batchQuantity={product?.batch_quantity || 0}
+              storeQuantity={product?.store_quantity ?? null}
               editingBatchId={editingBatchId}
               onStartEdit={(batchId: string) => setEditingBatchId(batchId)}
               onCancelEdit={() => setEditingBatchId(null)}
@@ -182,7 +184,8 @@ export function ProductDetailModal({
         {/* Footer */}
         <div className="shrink-0 px-5 flex items-center justify-center">
           <Typography variant="p" color="muted">
-            {totalTrackedQty} of {product?.total_stock || 0} units tracked with expiry dates
+            {totalTrackedQty} of {product?.store_quantity ?? product?.batch_quantity ?? 0} units
+            tracked with expiry dates
           </Typography>
         </div>
       </div>

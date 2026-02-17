@@ -177,6 +177,8 @@
     "uncategorized": "Uncategorized",
     "brand": "Brand",
     "totalStock": "Total Stock",
+    "batchesTracked": "Batches Tracked",
+    "datesMissing": "Dates Missing",
     "activeBatches": "Active Batches",
     "dateAdded": "Date Added",
     "openMenu": "Open menu",

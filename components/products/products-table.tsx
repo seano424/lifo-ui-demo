@@ -24,14 +24,7 @@ import { Package } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useEffect, useMemo, useState } from 'react'
 
-const VALID_COLUMN_IDS = [
-  'name',
-  'category',
-  'brand',
-  'total_stock',
-  'active_batches_count',
-  'created_at',
-]
+const VALID_COLUMN_IDS = ['name', 'category', 'brand', 'active_batches_count', 'created_at']
 
 interface ProductsTableProps {
   data: Product[]

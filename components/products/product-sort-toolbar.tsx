@@ -65,7 +65,7 @@ export function ProductsSortToolbar({
       description: t('brandDesc'),
     },
     {
-      field: 'total_stock',
+      field: 'batch_quantity',
       label: t('stockLevel'),
       icon: Boxes,
       description: t('stockLevelDesc'),
@@ -194,7 +194,7 @@ export function QuickSortButtons({ onSortChange, currentSort, isLoading }: Quick
       sort: { field: 'created_at', direction: 'desc' },
     },
     { label: t('aToZ'), sort: { field: 'name', direction: 'asc' } },
-    { label: t('lowStock'), sort: { field: 'total_stock', direction: 'asc' } },
+    { label: t('lowStock'), sort: { field: 'batch_quantity', direction: 'asc' } },
     {
       label: t('mostBatches'),
       sort: { field: 'active_batches_count', direction: 'desc' },

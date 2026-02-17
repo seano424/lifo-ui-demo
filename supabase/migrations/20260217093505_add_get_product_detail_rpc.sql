@@ -11,6 +11,8 @@
 -- Note: categories.display_name_nl does not exist yet — returns NULL.
 --       When the column is added, update this function to select it.
 
+DROP FUNCTION IF EXISTS inventory.get_product_detail(uuid, uuid);
+
 CREATE OR REPLACE FUNCTION inventory.get_product_detail(
   p_product_id uuid,
   p_store_id uuid
@@ -41,8 +43,8 @@ RETURNS TABLE(
   store_sku                        varchar,
   supplier_code                    varchar,
   shelf_life_override_days         integer,
-  square_quantity                  numeric,
-  square_quantity_updated_at       timestamp,
+  store_quantity                   numeric,
+  store_quantity_updated_at        timestamp,
   -- categories
   category_code                    text,
   category_display_name            text,
@@ -52,7 +54,7 @@ RETURNS TABLE(
   -- store_category_settings
   category_default_shelf_life_days integer,
   -- batch aggregates
-  total_stock                      numeric,
+  batch_quantity                   numeric,
   active_batches_count             bigint
 )
 LANGUAGE plpgsql
@@ -103,8 +105,8 @@ BEGIN
     sp.store_sku,
     sp.supplier_code,
     sp.shelf_life_override_days,
-    sp.quantity               AS square_quantity,
-    sp.quantity_updated_at    AS square_quantity_updated_at,
+    sp.quantity               AS store_quantity,
+    sp.quantity_updated_at    AS store_quantity_updated_at,
     -- categories (LEFT JOIN — null when product has no category)
     c.category_code,
     c.display_name_en         AS category_display_name,
@@ -114,7 +116,7 @@ BEGIN
     -- store_category_settings (LEFT JOIN — null when no override set)
     scs.default_shelf_life_days AS category_default_shelf_life_days,
     -- batch aggregates (0 when no batches exist)
-    COALESCE(ba.total_stock, 0::numeric)          AS total_stock,
+    COALESCE(ba.total_stock, 0::numeric)          AS batch_quantity,
     COALESCE(ba.active_batches_count, 0::bigint)  AS active_batches_count
   FROM inventory.store_products sp
   JOIN inventory.products p

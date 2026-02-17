@@ -90,7 +90,7 @@ export function BatchRow({
       >
         {/* Urgency micro-bar */}
         <div className="flex flex-col items-center">
-          <div className="w-2 h-6 bg-muted border border-muted rounded-full overflow-hidden relative">
+          <div className="w-2 h-6 bg-white border border-white rounded-full overflow-hidden relative">
             <div
               className={cn(
                 'absolute bottom-0 w-full rounded-full transition-all',

@@ -47,7 +47,11 @@ export async function fetchProductsPageRPC(
         p_category_code: filters.category ?? undefined,
         p_brand: filters.brand ?? undefined,
         p_search: filters.search ?? undefined,
-        p_sort_field: filters.sort?.field || 'created_at',
+        // Map batch_quantity back to total_stock for the legacy get_products_paginated RPC
+        p_sort_field:
+          filters.sort?.field === 'batch_quantity'
+            ? 'total_stock'
+            : filters.sort?.field || 'created_at',
         p_sort_direction: filters.sort?.direction || 'desc',
         p_page_size: pageSize,
         p_page_offset: page * pageSize,
@@ -87,9 +91,10 @@ export async function fetchProductsPageRPC(
         category_display_name_fr: row.category_display_name_fr,
 
         // Aggregated batch data (from RPC - no client-side aggregation needed!)
-        total_stock: row.total_stock,
+        batch_quantity: row.total_stock,
         active_batches_count: row.active_batches_count,
         avg_days_to_expiry: null, // Future: can be added to RPC
+        store_quantity: row.store_quantity ?? null,
       }))
 
       logger.log(context, 'Products fetched successfully via RPC', {
