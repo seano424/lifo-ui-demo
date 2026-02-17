@@ -533,6 +533,7 @@
     "brand": "Merk",
     "totalStock": "Totale voorraad",
     "batchesTracked": "Gevolgde batches",
+    "totalUnitsWithExpiryDates": "Totale eenheden met vervaldatums",
     "datesMissing": "Datums ontbreekt",
     "activeBatches": "Actieve batches",
     "dateAdded": "Datum toegevoegd",

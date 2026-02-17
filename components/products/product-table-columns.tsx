@@ -29,8 +29,8 @@ export const PRODUCT_TABLE_COLUMN_CONFIG = [
   },
   {
     id: 'active_batches_count',
-    headerKey: 'batchesTracked',
-    width: 120,
+    headerKey: 'totalUnitsWithExpiryDates',
+    width: 150,
     align: 'right',
     hasMultipleLines: false,
     sortable: true,
@@ -123,11 +123,11 @@ export function createProductTableColumns({
           updateSort={updateSort}
           className="justify-end"
         >
-          {t('batchesTracked')}
+          {t('totalUnitsWithExpiryDates')}
         </SortableHeader>
       ),
       cell: ({ row }) => <div className="text-right">{row.original.batch_quantity ?? 0}</div>,
-      size: 180,
+      size: 300,
     },
     {
       id: 'needs_expiry',
