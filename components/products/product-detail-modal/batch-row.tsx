@@ -128,7 +128,7 @@ export function BatchRow({
       </div>
 
       {isEditing && (
-        <div className="flex items-end gap-1 justify-between border-y border-border p-4">
+        <div className="flex flex-col items-start md:flex-row md:items-end md:gap-1 md:justify-between border-y border-border p-4 gap-4">
           <div className="flex items-end gap-1">
             <div className="flex flex-col gap-1">
               <Label className="text-sm text-foreground">Quantity</Label>
@@ -146,7 +146,7 @@ export function BatchRow({
             </div>
           </div>
           <div className="flex items-end gap-1">
-            <Button variant="ghost" onClick={onCancel}>
+            <Button variant="outline" onClick={onCancel}>
               Cancel
             </Button>
             <Button variant="black" onClick={handleSave}>
