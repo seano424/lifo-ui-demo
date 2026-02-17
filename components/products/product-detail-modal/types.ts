@@ -4,12 +4,10 @@ import type { BatchWithProduct } from '@/lib/queries/batches'
 
 export interface BatchListProps {
   batches: BatchWithProduct[]
-  batchQuantity: number
   storeQuantity: number | null
   editingBatchId: string | null
   onStartEdit: (batchId: string) => void
   onCancelEdit: () => void
-  isLoading: boolean
 }
 
 export interface BatchRowProps {

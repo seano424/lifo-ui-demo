@@ -3,6 +3,7 @@ import type { createClient as createServerClient } from '@/lib/supabase/server'
 import { logger } from '@/lib/utils/logger'
 import { withPerformanceTracking } from '@/lib/utils/performance'
 import type { Database } from '@/types/supabase-extended'
+import type { BatchWithProduct } from '@/lib/queries/batches'
 
 type ServerClient = Awaited<ReturnType<typeof createServerClient>>
 
@@ -1099,6 +1100,151 @@ export async function fetchProductById(
         })
 
         return product
+      } catch (err) {
+        logger.queryWarn(context, 'Unexpected error', {
+          error: err instanceof Error ? err.message : String(err),
+        })
+        throw err
+      }
+    },
+  )
+}
+
+export async function fetchProductWithBatches(
+  productId: string,
+  storeId: string,
+): Promise<{ product: Product; batches: BatchWithProduct[] }> {
+  const supabase = createClient()
+  const context = 'fetchProductWithBatches'
+
+  return withPerformanceTracking(
+    context,
+    'Fetch product with batches',
+    { productId, storeId },
+    async () => {
+      try {
+        // biome-ignore lint/suspicious/noExplicitAny: RPC returns dynamic JSON structure
+        const { data, error } = await (supabase.schema('inventory') as any).rpc(
+          'get_product_with_batches',
+          {
+            p_product_id: productId,
+            p_store_id: storeId,
+          },
+        )
+
+        if (error) {
+          logger.queryWarn(context, 'RPC failed', {
+            error: error.message,
+            code: error.code,
+            productId,
+            storeId,
+          })
+          throw new Error(`Failed to fetch product with batches: ${error.message}`)
+        }
+
+        type ProductWithBatchesRow = {
+          // products
+          product_id: string
+          name: string
+          brand: string | null
+          category_id: string | null
+          barcode: string | null
+          typical_shelf_life_days: number | null
+          base_cost_price: number
+          base_selling_price: number
+          description: string | null
+          image_url: string | null
+          sku: string | null
+          unit_type: string | null
+          created_at: string | null
+          updated_at: string | null
+          created_by: string | null
+          last_verified: string | null
+          open_food_facts_data: unknown
+          // store_products
+          store_cost_price: number | null
+          store_selling_price: number | null
+          store_is_active: boolean
+          store_sku: string | null
+          supplier_code: string | null
+          shelf_life_override_days: number | null
+          store_quantity: number | null
+          store_quantity_updated_at: string | null
+          // categories
+          category_code: string | null
+          category_display_name: string | null
+          category_display_name_fr: string | null
+          category_display_name_nl: string | null
+          category_typical_shelf_life_days: number | null
+          // store_category_settings
+          category_default_shelf_life_days: number | null
+          // batch aggregates
+          batch_quantity: number
+          active_batches_count: number
+          // full batch list
+          batches: unknown[]
+        }
+
+        const row: ProductWithBatchesRow | null = Array.isArray(data) ? (data[0] ?? null) : null
+        if (!row) {
+          throw new Error(`Product with ID "${productId}" not found in store "${storeId}"`)
+        }
+
+        // Calculate effective shelf life and source (4-tier fallback)
+        const productOverride = row.shelf_life_override_days
+        const storeCategoryOverride = row.category_default_shelf_life_days
+        const productBase = row.typical_shelf_life_days
+        const categoryBase = row.category_typical_shelf_life_days
+        const defaultFallback = 14
+
+        let effectiveShelfLife: number
+        let shelfLifeSource: Product['shelf_life_source']
+
+        if (productOverride != null && productOverride > 0) {
+          effectiveShelfLife = productOverride
+          shelfLifeSource = 'product_override'
+        } else if (storeCategoryOverride != null && storeCategoryOverride > 0) {
+          effectiveShelfLife = storeCategoryOverride
+          shelfLifeSource = 'store_category_override'
+        } else if (productBase != null && productBase > 0) {
+          effectiveShelfLife = productBase
+          shelfLifeSource = 'product_base'
+        } else if (categoryBase != null && categoryBase > 0) {
+          effectiveShelfLife = categoryBase
+          shelfLifeSource = 'category_base'
+        } else {
+          effectiveShelfLife = defaultFallback
+          shelfLifeSource = 'default'
+        }
+
+        const trackingMode: 'auto' | 'manual' =
+          productOverride != null ||
+          storeCategoryOverride != null ||
+          productBase != null ||
+          categoryBase != null
+            ? 'auto'
+            : 'manual'
+
+        const product = {
+          ...row,
+          effective_shelf_life: effectiveShelfLife,
+          shelf_life_source: shelfLifeSource,
+          tracking_mode: trackingMode,
+          avg_days_to_expiry: null,
+        } as unknown as Product
+
+        const batches = (row.batches ?? []) as unknown as BatchWithProduct[]
+
+        logger.query(context, 'Product with batches fetched successfully via RPC', {
+          productId,
+          storeId,
+          batchCount: batches.length,
+          effectiveShelfLife,
+          shelfLifeSource,
+          trackingMode,
+        })
+
+        return { product, batches }
       } catch (err) {
         logger.queryWarn(context, 'Unexpected error', {
           error: err instanceof Error ? err.message : String(err),

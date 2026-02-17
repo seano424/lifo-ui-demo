@@ -2,14 +2,11 @@
 
 import { BottomSheet } from '@/components/ui/bottom-sheet'
 import { Typography } from '@/components/ui/typography'
-import { useBatchesForProduct } from '@/hooks/use-batches'
-import { useProduct } from '@/hooks/use-products'
+import { useProductWithBatches } from '@/hooks/use-products'
 import { BatchList } from './product-detail-modal/batch-list'
 import { UntrackedAlert } from './product-detail-modal/untracked-alert'
 import { TrackingSettings } from './product-detail-modal/tracking-settings'
 import { useState } from 'react'
-import { useActiveStoreId } from '@/lib/stores/store-context'
-import { Badge } from '../ui/badge'
 
 interface ProductDetailModalProps {
   isOpen: boolean
@@ -24,11 +21,11 @@ export function ProductDetailModal({
   productId,
   focusAddDate = false,
 }: ProductDetailModalProps) {
-  const activeStoreId = useActiveStoreId()
-  const { data: product } = useProduct(productId)
-  const { data: batches, isLoading: isLoadingBatches } = useBatchesForProduct(productId, {
-    storeId: activeStoreId || undefined,
-  })
+  const { data, isLoading } = useProductWithBatches(productId)
+  const product = data?.product
+  const batches = data?.batches
+
+  const isReady = !isLoading && !!data
 
   const [editingBatchId, setEditingBatchId] = useState<string | null>(null)
 
@@ -102,7 +99,7 @@ export function ProductDetailModal({
 
   return (
     <BottomSheet
-      isOpen={isOpen}
+      isOpen={isOpen && isReady}
       onClose={handleClose}
       className="lg:min-w-2xl"
       titleElement={
@@ -110,21 +107,17 @@ export function ProductDetailModal({
           <Typography variant="h3" className="font-semibold">
             {product?.name || 'Product Details'}
           </Typography>
-          <div className="flex items-center gap-2">
-            {product?.brand && (
+          {product?.brand && product?.category_display_name && (
+            <div className="flex items-center gap-2">
               <Typography variant="p" color="muted">
                 {product.brand}
               </Typography>
-            )}
-            {product?.brand && product?.category_display_name && (
               <span className="text-sm text-muted-foreground">•</span>
-            )}
-            {product?.category_display_name && (
               <Typography variant="p" color="muted">
                 {product.category_display_name}
               </Typography>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       }
     >
@@ -145,14 +138,14 @@ export function ProductDetailModal({
             <div className="flex items-center gap-2 justify-between">
               <Typography variant="p">Total units</Typography>
 
-              <Badge variant="secondaryRounded">
-                {product?.store_quantity ?? product?.batch_quantity ?? 0}
-              </Badge>
+              <Typography>{product?.store_quantity ?? product?.batch_quantity ?? 0}</Typography>
             </div>
 
             <div className="flex items-center gap-2 justify-between">
-              <Typography variant="p">Tracked batches</Typography>
-              <Badge variant="secondaryRounded">{batches?.length || 0} batches</Badge>
+              <Typography variant="p">Total units with expiry dates</Typography>
+              <Typography>
+                {totalTrackedQty} of {product?.store_quantity ?? product?.batch_quantity ?? 0} units
+              </Typography>
             </div>
 
             {/* <div className="flex items-center gap-2 justify-between">
@@ -165,12 +158,10 @@ export function ProductDetailModal({
           <div className="select-none px-4 bg-muted rounded-3xl p-4">
             <BatchList
               batches={sortedBatches || []}
-              batchQuantity={product?.batch_quantity || 0}
               storeQuantity={product?.store_quantity ?? null}
               editingBatchId={editingBatchId}
               onStartEdit={(batchId: string) => setEditingBatchId(batchId)}
               onCancelEdit={() => setEditingBatchId(null)}
-              isLoading={isLoadingBatches}
             />
           </div>
 

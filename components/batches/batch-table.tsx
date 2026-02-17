@@ -13,6 +13,8 @@ import {
 } from '@/components/ui/table'
 import { useStoreState } from '@/lib/stores/store-context'
 import type { BatchSort, BatchSortField, BatchWithProduct } from '@/lib/queries/batches'
+import { fetchProductWithBatches } from '@/lib/queries/products'
+import { queryKeys } from '@/lib/queries/query-keys'
 import {
   flexRender,
   getCoreRowModel,
@@ -20,6 +22,7 @@ import {
   type SortingState,
   useReactTable,
 } from '@tanstack/react-table'
+import { useQueryClient } from '@tanstack/react-query'
 import { Package } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
@@ -61,6 +64,7 @@ export function BatchTable({
   const tExpiry = useTranslations('batches.expiry')
   const tStatus = useTranslations('batches.status')
   const { activeStore } = useStoreState()
+  const queryClient = useQueryClient()
 
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null)
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false)
@@ -68,6 +72,16 @@ export function BatchTable({
   const handleBatchClick = (batch: BatchWithProduct) => {
     setSelectedProductId(batch.product_id)
     setIsBottomSheetOpen(true)
+  }
+
+  const handleBatchHover = (productId: string) => {
+    const storeId = activeStore?.store_id
+    if (!storeId) return
+    queryClient.prefetchQuery({
+      queryKey: queryKeys.products.detailWithBatches(productId),
+      queryFn: () => fetchProductWithBatches(productId, storeId),
+      staleTime: 30 * 1000,
+    })
   }
 
   // Helper function to check if batch is expiring soon (matches expiryTodosCount logic)
@@ -169,6 +183,7 @@ export function BatchTable({
             <TableRow
               key={row.id}
               onClick={() => handleBatchClick(row.original)}
+              onMouseEnter={() => handleBatchHover(row.original.product_id)}
               className={cn(
                 'cursor-pointer transition-all duration-100 ease-in-out',
                 isExpiringSoon(row.original) ? 'hover:bg-muted/30' : 'hover:bg-muted/30',

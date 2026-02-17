@@ -435,6 +435,10 @@ export function useBatchActions() {
         queryClient.invalidateQueries({
           queryKey: queryKeys.batches.byProduct(activeStoreId || '', data.product_id),
         })
+        // Invalidate the combined product+batches cache used by the detail modal
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.products.detailWithBatches(data.product_id),
+        })
       }
     },
 

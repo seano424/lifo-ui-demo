@@ -17,7 +17,6 @@ export function BatchList({
   editingBatchId,
   onStartEdit,
   onCancelEdit,
-  isLoading,
 }: BatchListProps) {
   const currencySymbol = useCurrency()
   const { updateBatch } = useBatchActions()
@@ -37,16 +36,6 @@ export function BatchList({
     onCancelEdit()
   }
 
-  if (isLoading) {
-    return (
-      <div className="space-y-2 py-4">
-        <BatchSkeleton />
-        <BatchSkeleton />
-        <BatchSkeleton />
-      </div>
-    )
-  }
-
   if (batches.length === 0) {
     return <EmptyBatchesState />
   }
@@ -59,7 +48,7 @@ export function BatchList({
         className="w-full flex items-center justify-between px-0"
       >
         <Typography variant="p" className="flex items-center gap-2">
-          Batches ({totalBatchQty} of {storeQuantity} units)
+          Batches ({totalBatchQty} of {storeQuantity ?? '?'} units)
         </Typography>
         <ChevronDown className={cn('size-3 transition-transform', isOpen && 'rotate-180')} />
       </Button>
@@ -102,21 +91,6 @@ function EmptyBatchesState() {
       <Typography variant="p" className="text-muted-foreground mb-4">
         Add an expiry date to start tracking this product's inventory by batch.
       </Typography>
-    </div>
-  )
-}
-
-// Loading skeleton
-function BatchSkeleton() {
-  return (
-    <div className="px-5 py-3 flex items-center gap-3 animate-pulse">
-      <div className="w-8 h-6 bg-muted rounded" />
-      <div className="flex-1 space-y-2">
-        <div className="h-4 bg-muted rounded w-32" />
-        <div className="h-3 bg-muted rounded w-48" />
-      </div>
-      <div className="h-4 bg-muted rounded w-16" />
-      <div className="h-4 bg-muted rounded w-12" />
     </div>
   )
 }
