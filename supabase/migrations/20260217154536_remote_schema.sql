@@ -42,6 +42,8 @@ alter table "business"."store_users" drop constraint "store_users_role_in_store_
 
 alter table "business"."stores" drop constraint "stores_size_category_check";
 
+alter table "inventory"."batches" drop constraint "batches_source_check";
+
 alter table "inventory"."batches" drop constraint "batches_verification_check";
 
 alter table "inventory"."ocr_processing_batches" drop constraint "ocr_processing_batches_processing_status_check";
@@ -69,11 +71,23 @@ drop index if exists "scoring"."idx_product_scores_recommendations";
 
 alter table "inventory"."product_integration_links" enable row level security;
 
+alter table "integrations"."square_connections" add column "initial_sync_error" text;
+
+alter table "integrations"."square_connections" add column "initial_sync_status" character varying(50) default 'pending'::character varying;
+
+alter table "inventory"."store_products" add column "quantity" numeric(12,4) default 0;
+
+alter table "inventory"."store_products" add column "quantity_updated_at" timestamp without time zone;
+
 CREATE UNIQUE INDEX product_integration_links_pkey ON inventory.product_integration_links USING btree (link_id);
 
 CREATE INDEX idx_product_scores_recommendations ON scoring.product_scores USING btree (store_id, recommendation, calculated_at DESC) INCLUDE (batch_id, composite_score, urgency_level, discount_percent) WHERE ((recommendation)::text = ANY ((ARRAY['discount_aggressive'::character varying, 'discount_moderate'::character varying, 'alert'::character varying])::text[]));
 
 alter table "inventory"."product_integration_links" add constraint "product_integration_links_pkey" PRIMARY KEY using index "product_integration_links_pkey";
+
+alter table "integrations"."square_connections" add constraint "square_connections_initial_sync_status_check" CHECK (((initial_sync_status)::text = ANY ((ARRAY['pending'::character varying, 'syncing'::character varying, 'completed'::character varying, 'failed'::character varying])::text[]))) not valid;
+
+alter table "integrations"."square_connections" validate constraint "square_connections_initial_sync_status_check";
 
 alter table "inventory"."product_integration_links" add constraint "product_integration_links_product_id_fkey" FOREIGN KEY (product_id) REFERENCES inventory.products(product_id) ON DELETE CASCADE not valid;
 
@@ -91,6 +105,10 @@ alter table "business"."stores" add constraint "stores_size_category_check" CHEC
 
 alter table "business"."stores" validate constraint "stores_size_category_check";
 
+alter table "inventory"."batches" add constraint "batches_source_check" CHECK (((batch_source)::text = ANY (ARRAY['manual'::text, 'barcode'::text, 'scanned'::text, 'scan'::text, 'barcode_scan'::text, 'csv_import'::text, 'api'::text, 'pos_integration'::text, 'split'::text, 'square_sync'::text]))) not valid;
+
+alter table "inventory"."batches" validate constraint "batches_source_check";
+
 alter table "inventory"."batches" add constraint "batches_verification_check" CHECK (((verification_status)::text = ANY ((ARRAY['verified'::character varying, 'pending'::character varying, 'flagged'::character varying, 'rejected'::character varying])::text[]))) not valid;
 
 alter table "inventory"."batches" validate constraint "batches_verification_check";
@@ -101,24 +119,73 @@ alter table "inventory"."ocr_processing_batches" validate constraint "ocr_proces
 
 set check_function_bodies = off;
 
-create or replace view "inventory"."store_inventory_stats" as  SELECT sp.store_id,
-    sp.product_id,
-    COALESCE(sum(b.current_quantity) FILTER (WHERE ((b.status)::text = ANY ((ARRAY['active'::character varying, 'draft'::character varying])::text[]))), (0)::numeric) AS total_stock,
-    count(b.batch_id) FILTER (WHERE ((b.status)::text = 'active'::text)) AS active_batches_count,
-    count(b.batch_id) FILTER (WHERE ((b.status)::text = 'draft'::text)) AS incomplete_batches_count,
-    avg(
-        CASE
-            WHEN (b.expiry_date IS NOT NULL) THEN (b.expiry_date - CURRENT_DATE)
-            ELSE NULL::integer
-        END) FILTER (WHERE (((b.status)::text = 'active'::text) AND (b.expiry_date IS NOT NULL))) AS avg_days_to_expiry,
-    min(b.expiry_date) FILTER (WHERE ((b.status)::text = 'active'::text)) AS earliest_expiry_date,
-    max(b.expiry_date) FILTER (WHERE ((b.status)::text = 'active'::text)) AS latest_expiry_date,
-    COALESCE(sum(b.reserved_quantity) FILTER (WHERE ((b.status)::text = 'active'::text)), (0)::numeric) AS total_reserved_quantity,
-    COALESCE(sum((b.current_quantity - b.reserved_quantity)) FILTER (WHERE ((b.status)::text = ANY ((ARRAY['active'::character varying, 'draft'::character varying])::text[]))), (0)::numeric) AS available_quantity
-   FROM (inventory.store_products sp
-     LEFT JOIN inventory.batches b ON (((b.product_id = sp.product_id) AND (b.store_id = sp.store_id))))
-  GROUP BY sp.store_id, sp.product_id;
+CREATE OR REPLACE FUNCTION public.get_user_store_overviews()
+ RETURNS TABLE(store_id uuid, store_name text, store_code text, business_name text, address text, city text, postal_code text, country text, timezone text, store_type text, is_active boolean, onboarding_completed boolean, owner_id uuid, created_at timestamp with time zone, updated_at timestamp with time zone, role_in_store text, permissions jsonb, product_count bigint, category_count bigint, is_square_store boolean)
+ LANGUAGE plpgsql
+ STABLE SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+DECLARE
+  current_user_id uuid;
+BEGIN
+  current_user_id := auth.uid();
 
+  IF current_user_id IS NULL THEN
+    RAISE EXCEPTION 'Not authenticated';
+  END IF;
+
+  RETURN QUERY
+  SELECT
+    s.store_id,
+    s.store_name::text,
+    s.store_code::text,
+    s.business_name::text,
+    s.address::text,
+    s.city::text,
+    s.postal_code::text,
+    s.country::text,
+    s.timezone::text,
+    s.store_type::text,
+    s.is_active,
+    s.onboarding_completed,
+    s.owner_id,
+    s.created_at::timestamptz,
+    s.updated_at::timestamptz,
+    su.role_in_store::text,
+    su.permissions,
+    COALESCE(counts.product_count, 0)   AS product_count,
+    COALESCE(counts.category_count, 0)  AS category_count,
+    COALESCE(sq.has_square, false)      AS is_square_store
+  FROM business.store_users su
+  INNER JOIN business.stores s
+    ON su.store_id = s.store_id
+  -- Subquery: product + category counts per store
+  LEFT JOIN LATERAL (
+    SELECT
+      COUNT(DISTINCT sp.product_id)  AS product_count,
+      COUNT(DISTINCT p.category_id)  AS category_count
+    FROM inventory.store_products sp
+    INNER JOIN inventory.products p
+      ON sp.product_id = p.product_id
+    WHERE sp.store_id = s.store_id
+      AND sp.is_active = true
+  ) counts ON true
+  -- Subquery: square connection check per store
+  LEFT JOIN LATERAL (
+    SELECT true AS has_square
+    FROM integrations.square_connections sc
+    WHERE sc.store_id = s.store_id
+      AND sc.is_active = true
+      AND sc.connection_status = 'active'
+    LIMIT 1
+  ) sq ON true
+  WHERE su.user_id = current_user_id
+    AND su.is_active = true
+    AND s.is_active = true
+  ORDER BY counts.product_count DESC, s.store_name ASC;
+END;
+$function$
+;
 
 CREATE OR REPLACE FUNCTION public.get_categories_with_tracking_settings(p_store_id uuid)
  RETURNS TABLE(category_id uuid, category_code text, display_name_en text, display_name_fr text, typical_shelf_life_days integer, is_tracked boolean, auto_create_batches boolean, default_shelf_life_days integer, product_count bigint)
@@ -647,9 +714,5 @@ using ((EXISTS ( SELECT 1
      JOIN business.store_users su2 ON ((su1.store_id = su2.store_id)))
   WHERE ((su1.user_id = ( SELECT auth.uid() AS uid)) AND (su2.user_id = users.user_id) AND ((su1.role_in_store)::text = ANY ((ARRAY['owner'::character varying, 'manager'::character varying])::text[])) AND (su1.is_active = true)))));
 
-
-CREATE TRIGGER protect_buckets_delete BEFORE DELETE ON storage.buckets FOR EACH STATEMENT EXECUTE FUNCTION storage.protect_delete();
-
-CREATE TRIGGER protect_objects_delete BEFORE DELETE ON storage.objects FOR EACH STATEMENT EXECUTE FUNCTION storage.protect_delete();
 
 
