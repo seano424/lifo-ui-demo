@@ -159,7 +159,7 @@ export function useStorePermissions(options: UseStorePermissionsOptions = {}): E
     !isHydrated ||
     permissionsQuery.isLoading ||
     userLoading ||
-    (!permissionsQuery.data && !serverPermissions)
+    (!!activeStoreId && !permissionsQuery.data && !serverPermissions)
 
   return {
     ...finalPermissions,
