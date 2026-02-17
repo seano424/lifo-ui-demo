@@ -78,6 +78,9 @@ export type Product = BaseProduct & {
   total_stock?: number
   active_batches_count?: number
   avg_days_to_expiry?: number | null
+  // Square POS synced quantity (from store_products.quantity)
+  square_quantity?: number | null
+  square_quantity_updated_at?: string | null
 }
 
 export type SortField =
@@ -965,130 +968,77 @@ export async function fetchProductById(
     { productId, storeId },
     async () => {
       try {
-        const { data, error } = await supabase
-          .schema('inventory')
-          .from('store_products')
-          .select(
-            `
-        *,
-        products:product_id (
-          product_id,
-          name,
-          brand,
-          category_id,
-          barcode,
-          typical_shelf_life_days,
-          base_cost_price,
-          base_selling_price,
-          description,
-          image_url,
-          sku,
-          unit_type,
-          created_at,
-          updated_at,
-          created_by,
-          last_verified,
-          open_food_facts_data,
-          categories:category_id (
-            category_id,
-            category_code,
-            display_name_en,
-            display_name_fr,
-            typical_shelf_life_days
-          )
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { data, error } = await (supabase.schema('inventory') as any).rpc(
+          'get_product_detail',
+          {
+            p_product_id: productId,
+            p_store_id: storeId,
+          },
         )
-      `,
-          )
-          .eq('product_id', productId)
-          .eq('store_id', storeId)
-          .single()
 
         if (error) {
-          logger.queryWarn(context, 'Query failed', {
+          logger.queryWarn(context, 'RPC failed', {
             error: error.message,
             code: error.code,
             productId,
             storeId,
           })
-
-          if (error.code === 'PGRST116') {
-            throw new Error(`Product with ID "${productId}" not found in store "${storeId}"`)
-          }
-
           throw new Error(`Failed to fetch product: ${error.message}`)
         }
 
-        // Fetch store category settings for shelf life overrides
-        let storeCategorySettings = null
-        if (data.products?.category_id) {
-          const { data: settingsData, error: settingsError } = await supabase
-            .schema('inventory')
-            .from('store_category_settings')
-            .select('default_shelf_life_days')
-            .eq('store_id', storeId)
-            .eq('category_id', data.products.category_id)
-            .maybeSingle()
-
-          if (settingsError) {
-            logger.queryWarn(context, 'Error fetching store category settings', {
-              error: settingsError.message,
-              code: settingsError.code,
-            })
-          }
-
-          storeCategorySettings = settingsData
+        type ProductDetailRow = {
+          // products
+          product_id: string
+          name: string
+          brand: string | null
+          category_id: string | null
+          barcode: string | null
+          typical_shelf_life_days: number | null
+          base_cost_price: number
+          base_selling_price: number
+          description: string | null
+          image_url: string | null
+          sku: string | null
+          unit_type: string | null
+          created_at: string | null
+          updated_at: string | null
+          created_by: string | null
+          last_verified: string | null
+          open_food_facts_data: unknown
+          // store_products
+          store_cost_price: number | null
+          store_selling_price: number | null
+          store_is_active: boolean
+          store_sku: string | null
+          supplier_code: string | null
+          shelf_life_override_days: number | null
+          square_quantity: number | null
+          square_quantity_updated_at: string | null
+          // categories
+          category_code: string | null
+          category_display_name: string | null
+          category_display_name_fr: string | null
+          category_display_name_nl: string | null
+          category_typical_shelf_life_days: number | null
+          // store_category_settings
+          category_default_shelf_life_days: number | null
+          // batch aggregates
+          total_stock: number
+          active_batches_count: number
         }
 
-        const { data: batchAggregations, error: batchError } = await supabase
-          .schema('inventory')
-          .from('batches')
-          .select(
-            `
-        current_quantity,
-        status
-      `,
-          )
-          .eq('store_id', storeId)
-          .eq('product_id', productId)
-
-        if (batchError) {
-          logger.queryWarn(context, 'Error fetching batch data', {
-            error: batchError.message,
-            code: batchError.code,
-            productId,
-            storeId,
-          })
+        // RPC returns a table — expect exactly one row
+        const row: ProductDetailRow | null = Array.isArray(data) ? (data[0] ?? null) : null
+        if (!row) {
+          throw new Error(`Product with ID "${productId}" not found in store "${storeId}"`)
         }
-
-        let total_stock = 0
-        let active_batches_count = 0
-
-        if (batchAggregations) {
-          batchAggregations.forEach(batch => {
-            if (Number(batch.current_quantity) > 0) {
-              total_stock += Number(batch.current_quantity) || 0
-            }
-
-            if (batch.status === 'active') {
-              active_batches_count += 1
-            }
-          })
-        }
-
-        type CategoryData = {
-          category_code: string
-          display_name_en: string
-          display_name_fr: string
-          display_name_nl?: string
-          typical_shelf_life_days?: number | null
-        } | null
-        const categoryData = (data.products?.categories as unknown as CategoryData) || null
 
         // Calculate effective shelf life and source (4-tier fallback)
-        const productOverride = data.shelf_life_override_days
-        const storeCategoryOverride = storeCategorySettings?.default_shelf_life_days
-        const productBase = data.products?.typical_shelf_life_days
-        const categoryBase = categoryData?.typical_shelf_life_days
+        const productOverride = row.shelf_life_override_days
+        const storeCategoryOverride = row.category_default_shelf_life_days
+        const productBase = row.typical_shelf_life_days
+        const categoryBase = row.category_typical_shelf_life_days
         const defaultFallback = 14
 
         let effectiveShelfLife: number
@@ -1122,41 +1072,25 @@ export async function fetchProductById(
             ? 'auto'
             : 'manual'
 
-        const combinedProduct = {
-          ...data.products,
-          category_code: categoryData?.category_code,
-          category_display_name: categoryData?.display_name_en,
-          category_display_name_fr: categoryData?.display_name_fr,
-          category_display_name_nl: categoryData?.display_name_nl,
-          store_cost_price: data.cost_price,
-          store_selling_price: data.selling_price,
-          store_is_active: data.is_active,
-          store_sku: data.store_sku,
-          supplier_code: data.supplier_code,
-          // Shelf life data
-          shelf_life_override_days: productOverride,
-          category_default_shelf_life_days: storeCategoryOverride,
-          category_typical_shelf_life_days: categoryBase,
+        const product = {
+          ...row,
           effective_shelf_life: effectiveShelfLife,
           shelf_life_source: shelfLifeSource,
           tracking_mode: trackingMode,
-          // Batch aggregations
-          total_stock,
-          active_batches_count,
           avg_days_to_expiry: null,
-        }
+        } as unknown as Product
 
-        logger.query(context, 'Product fetched successfully', {
+        logger.query(context, 'Product fetched successfully via RPC', {
           productId,
           storeId,
-          totalStock: total_stock,
-          activeBatches: active_batches_count,
+          totalStock: row.total_stock,
+          activeBatches: row.active_batches_count,
           effectiveShelfLife,
           shelfLifeSource,
           trackingMode,
         })
 
-        return combinedProduct as unknown as Product
+        return product
       } catch (err) {
         logger.queryWarn(context, 'Unexpected error', {
           error: err instanceof Error ? err.message : String(err),

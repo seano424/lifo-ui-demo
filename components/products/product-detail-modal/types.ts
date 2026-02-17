@@ -5,6 +5,7 @@ import type { BatchWithProduct } from '@/lib/queries/batches'
 export interface BatchListProps {
   batches: BatchWithProduct[]
   totalStock: number
+  squareQuantity: number | null
   editingBatchId: string | null
   onStartEdit: (batchId: string) => void
   onCancelEdit: () => void
@@ -14,6 +15,7 @@ export interface BatchListProps {
 export interface BatchRowProps {
   batch: BatchWithProduct
   isEditing: boolean
+  maxQuantity: number | null
   onStartEdit: () => void
   onSave: (updates: { expiry_date?: string; current_quantity?: number }) => void
   onCancel: () => void
@@ -24,6 +26,8 @@ export interface UntrackedAlertProps {
   count: number
   productId: string
   autoExpand?: boolean
+  costPrice?: number | null
+  sellingPrice?: number | null
 }
 
 export interface TrackingSettingsProps {

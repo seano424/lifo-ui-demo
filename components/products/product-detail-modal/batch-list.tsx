@@ -13,6 +13,7 @@ import { useState } from 'react'
 
 export function BatchList({
   batches,
+  squareQuantity,
   editingBatchId,
   onStartEdit,
   onCancelEdit,
@@ -21,6 +22,10 @@ export function BatchList({
   const currencySymbol = useCurrency()
   const { updateBatch } = useBatchActions()
   const [isOpen, setIsOpen] = useState(true)
+
+  const totalBatchQty = batches
+    .filter(b => b.status === 'active')
+    .reduce((sum, b) => sum + (b.current_quantity || 0), 0)
   const handleSave = (
     batchId: string,
     updates: { expiry_date?: string; current_quantity?: number },
@@ -53,24 +58,31 @@ export function BatchList({
         onClick={() => setIsOpen(!isOpen)}
         className="w-full flex items-center justify-between px-0"
       >
-        <Typography variant="small" className="flex items-center gap-2">
+        <Typography variant="p" className="flex items-center gap-2">
           Batches
         </Typography>
         <ChevronDown className={cn('size-3 transition-transform', isOpen && 'rotate-180')} />
       </Button>
       {isOpen && (
         <div className="flex flex-col gap-4">
-          {batches.map(batch => (
-            <BatchRow
-              key={batch.batch_id}
-              batch={batch}
-              isEditing={batch.batch_id === editingBatchId}
-              onStartEdit={() => onStartEdit(batch.batch_id)}
-              onSave={updates => handleSave(batch.batch_id, updates)}
-              onCancel={onCancelEdit}
-              currencySymbol={currencySymbol}
-            />
-          ))}
+          {batches.map(batch => {
+            const maxQuantity =
+              squareQuantity != null
+                ? squareQuantity - totalBatchQty + (batch.current_quantity || 0)
+                : null
+            return (
+              <BatchRow
+                key={batch.batch_id}
+                batch={batch}
+                isEditing={batch.batch_id === editingBatchId}
+                maxQuantity={maxQuantity}
+                onStartEdit={() => onStartEdit(batch.batch_id)}
+                onSave={updates => handleSave(batch.batch_id, updates)}
+                onCancel={onCancelEdit}
+                currencySymbol={currencySymbol}
+              />
+            )
+          })}
         </div>
       )}
     </div>
@@ -87,7 +99,7 @@ function EmptyBatchesState() {
       <Typography variant="p" className="font-medium mb-1">
         No batches tracked yet
       </Typography>
-      <Typography variant="small" className="text-muted-foreground mb-4">
+      <Typography variant="p" className="text-muted-foreground mb-4">
         Add an expiry date to start tracking this product's inventory by batch.
       </Typography>
     </div>

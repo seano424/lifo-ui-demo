@@ -39,16 +39,12 @@ export function ProductDetailModal({
   }
 
   // Calculate untracked quantity
-  // NOTE: This calculation is blocked on store_products.quantity migration
-  // For Phase 1, hardcoded to 0 until migration lands
   const totalTrackedQty =
     batches
       ?.filter(b => b.status === 'active')
       .reduce((sum, b) => sum + (b.current_quantity || 0), 0) || 0
 
-  // TODO: Replace with actual calculation once store_products.quantity exists:
-  // const untrackedQty = (product?.square_quantity || 0) - totalTrackedQty
-  const untrackedQty = 0 // Shell until migration lands
+  const untrackedQty = Math.max(0, (product?.square_quantity || 0) - totalTrackedQty)
 
   // Sort batches: active first (soonest expiry), then no-date/draft, then expired (most recently expired first)
   const sortedBatches = [...(batches || [])].sort((a, b) => {
@@ -127,27 +123,32 @@ export function ProductDetailModal({
       }
     >
       <div className="flex flex-col justify-between gap-4 h-full px-4 pb-4">
-        {/* TODO: Untracked alert: replace with actual calculation once store_products.quantity exists */}
         <div className="flex flex-col gap-4">
           {untrackedQty > 0 && (
-            <UntrackedAlert count={untrackedQty} productId={productId} autoExpand={focusAddDate} />
+            <UntrackedAlert
+              count={untrackedQty}
+              productId={productId}
+              autoExpand={focusAddDate}
+              costPrice={product?.store_cost_price}
+              sellingPrice={product?.store_selling_price}
+            />
           )}
 
           {/* Section header */}
           <div className="flex flex-col gap-4 px-4 bg-muted rounded-3xl p-4">
             <div className="flex items-center gap-2 justify-between">
-              <Typography variant="small">Total units</Typography>
+              <Typography variant="p">Total units</Typography>
 
               <Badge variant="secondaryRounded">{product?.total_stock || 0}</Badge>
             </div>
 
             <div className="flex items-center gap-2 justify-between">
-              <Typography variant="small">Tracked batches</Typography>
+              <Typography variant="p">Tracked batches</Typography>
               <Badge variant="secondaryRounded">{batches?.length || 0} batches</Badge>
             </div>
 
             {/* <div className="flex items-center gap-2 justify-between">
-              <Typography variant="small">Sorted by</Typography>
+              <Typography variant="p">Sorted by</Typography>
               <Badge variant="mutedRounded">Expiry date · Expired last</Badge>
             </div> */}
           </div>
@@ -157,6 +158,7 @@ export function ProductDetailModal({
             <BatchList
               batches={sortedBatches || []}
               totalStock={product?.total_stock || 0}
+              squareQuantity={product?.square_quantity ?? null}
               editingBatchId={editingBatchId}
               onStartEdit={(batchId: string) => setEditingBatchId(batchId)}
               onCancelEdit={() => setEditingBatchId(null)}
@@ -179,7 +181,7 @@ export function ProductDetailModal({
 
         {/* Footer */}
         <div className="shrink-0 px-5 flex items-center justify-center">
-          <Typography variant="small" color="muted">
+          <Typography variant="p" color="muted">
             {totalTrackedQty} of {product?.total_stock || 0} units tracked with expiry dates
           </Typography>
         </div>
