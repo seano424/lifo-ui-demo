@@ -13,6 +13,7 @@ export interface ConnectedStoreInfo {
   connection_id: string
   connection_status: 'active' | 'expired' | 'revoked' | 'error'
   last_sync_at?: string
+  initial_sync_status?: 'pending' | 'syncing' | 'completed' | 'failed'
 }
 
 /**
@@ -32,6 +33,7 @@ export interface SquareConnectionStatus {
   connection_id?: string
   connection_status?: 'active' | 'expired' | 'revoked' | 'error'
   last_sync_at?: string
+  initial_sync_status?: 'pending' | 'syncing' | 'completed' | 'failed'
 }
 
 /**

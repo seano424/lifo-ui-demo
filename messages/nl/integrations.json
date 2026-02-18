@@ -86,7 +86,11 @@
       "store": "Winkel",
       "merchant": "Handelaar",
       "connectedStore": "Verbonden locatie",
-      "connectedStores": "{count} locaties verbonden"
+      "connectedStores": "{count} locaties verbonden",
+      "syncingCatalog": "Catalogus en voorraad synchroniseren...",
+      "syncCompleted": "Synchronisatie voltooid! Doorsturen...",
+      "syncFailed": "Synchronisatie heeft een probleem ondervonden. U kunt opnieuw proberen vanuit het dashboard.",
+      "syncWarningTitle": "Synchronisatie waarschuwing"
     },
     "success": {
       "disconnected": "Square succesvol losgekoppeld"

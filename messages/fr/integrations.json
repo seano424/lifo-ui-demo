@@ -86,7 +86,11 @@
       "store": "Magasin",
       "merchant": "Marchand",
       "connectedStore": "Emplacement connecté",
-      "connectedStores": "{count} emplacements connectés"
+      "connectedStores": "{count} emplacements connectés",
+      "syncingCatalog": "Synchronisation de votre catalogue et inventaire...",
+      "syncCompleted": "Synchronisation terminée ! Redirection...",
+      "syncFailed": "La synchronisation a rencontré un problème. Vous pouvez réessayer depuis le tableau de bord.",
+      "syncWarningTitle": "Avertissement de synchronisation"
     },
     "success": {
       "disconnected": "Square déconnecté avec succès"
