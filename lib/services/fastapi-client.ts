@@ -749,6 +749,16 @@ export class FastAPIClient {
   }
 
   /**
+   * Extra headers required when the backend is served through an ngrok tunnel.
+   * ngrok free tier returns an HTML interstitial page for browser requests unless
+   * this header is present, which causes JSON.parse to blow up with "Unexpected token '<'".
+   * Always included — ignored harmlessly by non-ngrok servers.
+   */
+  private get ngrokHeaders(): Record<string, string> {
+    return { 'ngrok-skip-browser-warning': '1' }
+  }
+
+  /**
    * Check if FastAPI is enabled via environment variables
    */
   static isEnabled(): boolean {
@@ -776,6 +786,7 @@ export class FastAPIClient {
         headers: {
           Authorization: `Bearer ${userToken}`,
           'Content-Type': 'application/json',
+          ...this.ngrokHeaders,
         },
         body: JSON.stringify({}),
         signal: controller.signal,
@@ -818,6 +829,7 @@ export class FastAPIClient {
         headers: {
           Authorization: `Bearer ${userToken}`,
           'Content-Type': 'application/json',
+          ...this.ngrokHeaders,
         },
         signal: controller.signal,
       })
@@ -864,6 +876,7 @@ export class FastAPIClient {
         headers: {
           Authorization: `Bearer ${userToken}`,
           'Content-Type': 'application/json',
+          ...this.ngrokHeaders,
         },
         signal: controller.signal,
       })
@@ -908,6 +921,7 @@ export class FastAPIClient {
         headers: {
           Authorization: `Bearer ${userToken}`,
           'Content-Type': 'application/json',
+          ...this.ngrokHeaders,
         },
         body: JSON.stringify({ connection_id: connectionId }),
         signal: controller.signal,
@@ -956,6 +970,7 @@ export class FastAPIClient {
         headers: {
           Authorization: `Bearer ${userToken}`,
           'Content-Type': 'application/json',
+          ...this.ngrokHeaders,
         },
         signal: controller.signal,
       })
@@ -1003,6 +1018,7 @@ export class FastAPIClient {
         headers: {
           Authorization: `Bearer ${userToken}`,
           'Content-Type': 'application/json',
+          ...this.ngrokHeaders,
         },
         signal: controller.signal,
       })
@@ -1059,6 +1075,7 @@ export class FastAPIClient {
         headers: {
           Authorization: `Bearer ${userToken}`,
           'Content-Type': 'application/json',
+          ...this.ngrokHeaders,
         },
         signal: controller.signal,
       })
