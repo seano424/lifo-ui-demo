@@ -476,6 +476,8 @@ export type Database = {
           connection_status: string
           created_at: string
           disconnected_at: string | null
+          initial_sync_error: string | null
+          initial_sync_status: string | null
           is_active: boolean
           last_sync_at: string | null
           last_token_refresh_at: string | null
@@ -498,6 +500,8 @@ export type Database = {
           connection_status?: string
           created_at?: string
           disconnected_at?: string | null
+          initial_sync_error?: string | null
+          initial_sync_status?: string | null
           is_active?: boolean
           last_sync_at?: string | null
           last_token_refresh_at?: string | null
@@ -520,6 +524,8 @@ export type Database = {
           connection_status?: string
           created_at?: string
           disconnected_at?: string | null
+          initial_sync_error?: string | null
+          initial_sync_status?: string | null
           is_active?: boolean
           last_sync_at?: string | null
           last_token_refresh_at?: string | null
@@ -1433,6 +1439,8 @@ export type Database = {
           is_active: boolean | null
           is_tracked_for_batches: boolean | null
           product_id: string
+          quantity: number | null
+          quantity_updated_at: string | null
           selling_price: number | null
           shelf_life_override_days: number | null
           square_synced_at: string | null
@@ -1451,6 +1459,8 @@ export type Database = {
           is_active?: boolean | null
           is_tracked_for_batches?: boolean | null
           product_id: string
+          quantity?: number | null
+          quantity_updated_at?: string | null
           selling_price?: number | null
           shelf_life_override_days?: number | null
           square_synced_at?: string | null
@@ -1469,6 +1479,8 @@ export type Database = {
           is_active?: boolean | null
           is_tracked_for_batches?: boolean | null
           product_id?: string
+          quantity?: number | null
+          quantity_updated_at?: string | null
           selling_price?: number | null
           shelf_life_override_days?: number | null
           square_synced_at?: string | null
@@ -2222,6 +2234,83 @@ export type Database = {
           status: string
         }[]
       }
+      get_product_detail: {
+        Args: { p_product_id: string; p_store_id: string }
+        Returns: {
+          active_batches_count: number
+          barcode: string
+          base_cost_price: number
+          base_selling_price: number
+          batch_quantity: number
+          brand: string
+          category_code: string
+          category_default_shelf_life_days: number
+          category_display_name: string
+          category_display_name_fr: string
+          category_display_name_nl: string
+          category_id: string
+          category_typical_shelf_life_days: number
+          created_at: string
+          created_by: string
+          description: string
+          image_url: string
+          last_verified: string
+          name: string
+          open_food_facts_data: Json
+          product_id: string
+          shelf_life_override_days: number
+          sku: string
+          store_cost_price: number
+          store_is_active: boolean
+          store_quantity: number
+          store_quantity_updated_at: string
+          store_selling_price: number
+          store_sku: string
+          supplier_code: string
+          typical_shelf_life_days: number
+          unit_type: string
+          updated_at: string
+        }[]
+      }
+      get_product_with_batches: {
+        Args: { p_product_id: string; p_store_id: string }
+        Returns: {
+          active_batches_count: number
+          barcode: string
+          base_cost_price: number
+          base_selling_price: number
+          batch_quantity: number
+          batches: Json
+          brand: string
+          category_code: string
+          category_default_shelf_life_days: number
+          category_display_name: string
+          category_display_name_fr: string
+          category_display_name_nl: string
+          category_id: string
+          category_typical_shelf_life_days: number
+          created_at: string
+          created_by: string
+          description: string
+          image_url: string
+          last_verified: string
+          name: string
+          open_food_facts_data: Json
+          product_id: string
+          shelf_life_override_days: number
+          sku: string
+          store_cost_price: number
+          store_is_active: boolean
+          store_quantity: number
+          store_quantity_updated_at: string
+          store_selling_price: number
+          store_sku: string
+          supplier_code: string
+          typical_shelf_life_days: number
+          unit_type: string
+          updated_at: string
+        }[]
+      }
       get_products_paginated: {
         Args: {
           p_brand?: string
@@ -2260,6 +2349,7 @@ export type Database = {
           sku: string
           store_cost_price: number
           store_is_active: boolean
+          store_quantity: number
           store_selling_price: number
           store_sku: string
           supplier_code: string
@@ -2267,6 +2357,7 @@ export type Database = {
           total_stock: number
           typical_shelf_life_days: number
           unit_type: string
+          untracked_qty: number
           updated_at: string
           verification_count: number
         }[]
@@ -3510,6 +3601,7 @@ export type Database = {
           sku: string
           store_cost_price: number
           store_is_active: boolean
+          store_quantity: number
           store_selling_price: number
           store_sku: string
           supplier_code: string
@@ -3517,6 +3609,7 @@ export type Database = {
           total_stock: number
           typical_shelf_life_days: number
           unit_type: string
+          untracked_qty: number
           updated_at: string
           verification_count: number
         }[]
