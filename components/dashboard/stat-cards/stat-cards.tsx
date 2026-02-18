@@ -74,15 +74,9 @@ export function StatCards({ daysFilter }: StatCardsProps) {
         accentClass="bg-muted"
       />
 
-      {/* Act on [period] (label varies by filter) */}
+      {/* Act on Today — always pinned to today/overdue, not affected by filter */}
       <StatCard
-        label={
-          daysFilter === 30
-            ? t('actOnToday.label30')
-            : daysFilter === 90
-              ? t('actOnToday.label90')
-              : t('actOnToday.label')
-        }
+        label={t('actOnToday.label')}
         value={`${t('trends.batches', { count: data.act_on_today_count })}`}
         subtitle={t('actOnToday.subtitle')}
         href="/dashboard/expiring"

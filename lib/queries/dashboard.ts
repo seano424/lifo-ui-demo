@@ -222,9 +222,9 @@ export async function fetchDashboardRedesignSummary(
   // --- Active batches ---
   const activeBatches = activeBatchesResult.data ?? []
 
-  // Act on [period]: active batches expiring within the filter window (or already overdue)
+  // Act on Today: active batches already expired or expiring today (daily action queue)
   const act_on_today_count = activeBatches.filter(
-    b => b.expiry_date !== null && b.expiry_date <= futureEndStr,
+    b => b.expiry_date !== null && b.expiry_date <= todayStr,
   ).length
 
   // Coverage: unique products with at least one active batch

@@ -204,8 +204,6 @@
         },
         "actOnToday": {
           "label": "Act on Today",
-          "label30": "Act This Month",
-          "label90": "Act Next 3 Months",
           "subtitle": "Need immediate attention",
           "cta": "View expiring"
         },
