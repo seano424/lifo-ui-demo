@@ -86,7 +86,11 @@
       "store": "Store",
       "merchant": "Merchant",
       "connectedStore": "Connected location",
-      "connectedStores": "Connected {count} locations"
+      "connectedStores": "Connected {count} locations",
+      "syncingCatalog": "Syncing your catalog and inventory...",
+      "syncCompleted": "Sync completed! Redirecting...",
+      "syncFailed": "Sync encountered an issue. You can retry from the dashboard.",
+      "syncWarningTitle": "Sync Warning"
     },
     "success": {
       "disconnected": "Square disconnected successfully"

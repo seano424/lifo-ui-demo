@@ -1,6 +1,7 @@
 /**
  * Square Callback Processor Component
  * Handles OAuth callback flow with polling and state management
+ * Includes post-connection sync progress tracking
  */
 
 'use client'
@@ -8,16 +9,16 @@
 import { useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
-import { CheckCircle2, XCircle, Loader2, AlertCircle } from 'lucide-react'
+import { CheckCircle2, XCircle, Loader2, AlertCircle, AlertTriangle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { useSquareStatusPolling } from '@/hooks/use-square-integration'
 import type { ConnectedStoreInfo } from '@/lib/types/integrations'
 
-type CallbackStatus = 'processing' | 'success' | 'error'
+type CallbackStatus = 'processing' | 'syncing' | 'success' | 'error' | 'sync_failed'
 
-const MAX_POLLING_TIME_MS = 60000 // 60 seconds max polling time
+const MAX_POLLING_TIME_MS = 120000 // 120 seconds max polling time (large catalogs may take time)
 
 export function SquareCallbackProcessor() {
   const router = useRouter()
@@ -34,12 +35,13 @@ export function SquareCallbackProcessor() {
   const urlErrorMessage = searchParams?.get('error_message')
 
   // Poll Square status to check connection completion
-  // Only poll if status is processing AND shouldPoll is true (handles timeout)
+  // Keep polling during processing and syncing states
+  const isPolling = (status === 'processing' || status === 'syncing') && shouldPoll
   const {
     data: squareStatus,
     isError,
     error,
-  } = useSquareStatusPolling(status === 'processing' && shouldPoll)
+  } = useSquareStatusPolling(isPolling)
 
   useEffect(() => {
     // Check for URL error first (user denied authorization)
@@ -52,20 +54,37 @@ export function SquareCallbackProcessor() {
     }
 
     // Check polling result
-    if (status === 'processing' && squareStatus) {
+    if ((status === 'processing' || status === 'syncing') && squareStatus) {
       if (squareStatus.is_connected) {
-        // Success! Connection established
-        setStatus('success')
+        const syncStatus = squareStatus.initial_sync_status
 
-        // Redirect to Square management page after 2 seconds
-        setTimeout(() => {
-          router.push('/dashboard/integrations/square')
-        }, 2000)
+        if (syncStatus === 'syncing' || syncStatus === 'pending') {
+          // Connection established, sync in progress
+          setStatus('syncing')
+        } else if (syncStatus === 'completed') {
+          // Sync completed successfully
+          setStatus('success')
+          setTimeout(() => {
+            router.push('/dashboard/integrations/square')
+          }, 2000)
+        } else if (syncStatus === 'failed') {
+          // Sync failed but connection is active — user can retry from dashboard
+          setStatus('sync_failed')
+          setTimeout(() => {
+            router.push('/dashboard/integrations/square')
+          }, 3000)
+        } else {
+          // No sync status yet (legacy or sync hasn't started) — treat as success
+          setStatus('success')
+          setTimeout(() => {
+            router.push('/dashboard/integrations/square')
+          }, 2000)
+        }
       } else {
-        // Check if we've exceeded max polling time using timestamp
+        // Not connected yet — check timeout
         const elapsedTime = Date.now() - pollingStartTime
         if (elapsedTime >= MAX_POLLING_TIME_MS) {
-          setShouldPoll(false) // Stop polling
+          setShouldPoll(false)
           setStatus('error')
           setErrorMessage(
             'Connection verification timed out. Please try again or contact support if the issue persists.',
@@ -75,8 +94,8 @@ export function SquareCallbackProcessor() {
     }
 
     // Handle polling error
-    if (isError && status === 'processing') {
-      setShouldPoll(false) // Stop polling on error
+    if (isError && (status === 'processing' || status === 'syncing')) {
+      setShouldPoll(false)
       setStatus('error')
       setErrorMessage(
         error?.message ||
@@ -85,22 +104,32 @@ export function SquareCallbackProcessor() {
     }
   }, [squareStatus, isError, error, status, pollingStartTime, router, urlError, urlErrorMessage])
 
+  const isLoading = status === 'processing' || status === 'syncing'
+  const isSuccess = status === 'success'
+  const isErrorState = status === 'error'
+  const isSyncFailed = status === 'sync_failed'
+
   return (
     <div className="flex min-h-[60vh] flex-col items-center justify-center">
       <Card className="w-full max-w-md">
         <CardHeader>
           <div className="flex items-center justify-center">
-            {status === 'processing' && (
+            {isLoading && (
               <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary-100">
                 <Loader2 className="h-8 w-8 animate-spin text-primary-800" />
               </div>
             )}
-            {status === 'success' && (
+            {isSuccess && (
               <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary-100">
                 <CheckCircle2 className="h-8 w-8 text-primary" />
               </div>
             )}
-            {status === 'error' && (
+            {isSyncFailed && (
+              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-yellow-100">
+                <AlertTriangle className="h-8 w-8 text-yellow-600" />
+              </div>
+            )}
+            {isErrorState && (
               <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-destructive">
                 <XCircle className="h-8 w-8 text-destructive" />
               </div>
@@ -109,13 +138,17 @@ export function SquareCallbackProcessor() {
 
           <CardTitle className="text-center">
             {status === 'processing' && t('processing')}
+            {status === 'syncing' && t('success')}
             {status === 'success' && t('success')}
+            {status === 'sync_failed' && t('syncWarningTitle')}
             {status === 'error' && t('error')}
           </CardTitle>
 
           <CardDescription className="text-center">
             {status === 'processing' && t('processingDescription')}
-            {status === 'success' && t('successDescription')}
+            {status === 'syncing' && t('syncingCatalog')}
+            {status === 'success' && t('syncCompleted')}
+            {status === 'sync_failed' && t('syncFailed')}
             {status === 'error' && t('errorDescription')}
           </CardDescription>
         </CardHeader>
@@ -138,7 +171,28 @@ export function SquareCallbackProcessor() {
             </div>
           )}
 
-          {status === 'success' && squareStatus && (
+          {status === 'syncing' && (
+            <div className="flex flex-col gap-2 text-sm text-foreground">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="h-4 w-4 text-primary" />
+                <span>{t('verifyingAuthorization')}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="h-4 w-4 text-primary" />
+                <span>{t('fetchingBusinessInfo')}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="h-4 w-4 text-primary" />
+                <span>{t('creatingStore')}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="h-2 w-2 animate-pulse rounded-full bg-primary-600" />
+                <span>{t('syncingCatalog')}</span>
+              </div>
+            </div>
+          )}
+
+          {isSuccess && squareStatus && (
             <div className="flex flex-col gap-3 rounded-lg bg-primary-50 p-4 text-sm">
               {squareStatus.merchant_name && (
                 <div className="flex justify-between">
@@ -168,7 +222,15 @@ export function SquareCallbackProcessor() {
             </div>
           )}
 
-          {status === 'error' && (
+          {isSyncFailed && (
+            <Alert>
+              <AlertTriangle className="h-4 w-4" />
+              <AlertTitle>{t('syncWarningTitle')}</AlertTitle>
+              <AlertDescription>{t('syncFailed')}</AlertDescription>
+            </Alert>
+          )}
+
+          {isErrorState && (
             <>
               <Alert variant="destructive">
                 <AlertCircle className="h-4 w-4" />
