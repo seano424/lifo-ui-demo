@@ -13,7 +13,6 @@ import { updateStoreCategoryShelfLife } from '@/lib/queries/products'
 import { useQueryClient } from '@tanstack/react-query'
 import { queryKeys } from '@/lib/queries/query-keys'
 import { Input } from '@/components/ui/input'
-import { Badge } from '@/components/ui/badge'
 import { logger } from '@/lib/utils/logger'
 
 const MIN_SHELF_LIFE_DAYS = 1
@@ -27,7 +26,7 @@ export function TrackingSettings({
   categoryName,
   initialTrackingMode = 'auto',
 }: TrackingSettingsProps) {
-  const [isOpen, setIsOpen] = useState(true)
+  const [isOpen, setIsOpen] = useState(false)
   const [editedShelfLife, setEditedShelfLife] = useState(String(shelfLifeDays))
   const [trackingMode, setTrackingMode] = useState<'auto' | 'manual'>(initialTrackingMode)
   const [isDirty, setIsDirty] = useState(false)
@@ -140,7 +139,7 @@ export function TrackingSettings({
         onClick={() => setIsOpen(!isOpen)}
         className="w-full flex items-center justify-between px-0"
       >
-        <Typography variant="small" className="flex items-center gap-2">
+        <Typography variant="p" className="flex items-center gap-2">
           Tracking settings
         </Typography>
         <ChevronDown className={cn('size-3 transition-transform', isOpen && 'rotate-180')} />
@@ -150,26 +149,30 @@ export function TrackingSettings({
         <div className="gap-4 flex flex-col">
           {/* Tracking mode */}
           <div className="flex gap-4 items-center justify-between">
-            <Typography variant="small">Category</Typography>
-            <Badge variant="mutedRounded">{categoryName}</Badge>
+            <Typography variant="p">Category</Typography>
+            <Typography variant="p">{categoryName}</Typography>
           </div>
 
           <div className="flex gap-4 items-center justify-between">
-            <Typography variant="small" className="capitalize">
+            <Typography variant="p" className="capitalize">
               Mode
             </Typography>
             <div className="flex gap-1 bg-muted text-foreground rounded-full p-2 w-fit">
               {(['auto', 'manual'] as const).map(mode => (
-                <Button
+                <button
                   key={mode}
                   type="button"
-                  size="sm"
                   onClick={() => handleTrackingModeToggle(mode)}
                   disabled={isUpdating}
-                  variant={trackingMode === mode ? 'subtleSecondary' : 'ghost'}
+                  className={cn(
+                    'px-4 py-2 rounded-full',
+                    trackingMode === mode
+                      ? 'bg-muted-foreground/10 text-foreground'
+                      : 'bg-muted text-muted-foreground',
+                  )}
                 >
                   {mode.charAt(0).toUpperCase() + mode.slice(1)}
-                </Button>
+                </button>
               ))}
             </div>
           </div>
@@ -178,9 +181,9 @@ export function TrackingSettings({
           {trackingMode === 'auto' && (
             <>
               <div className="flex gap-4 items-center justify-between">
-                <Typography variant="small">Shelf life</Typography>
+                <Typography variant="p">Shelf life</Typography>
                 <div className="flex gap-1">
-                  <div className="items-center flex gap-1 bg-primary-100 text-foreground rounded-full py-2 px-3 w-fit">
+                  <div className="items-center flex gap-1 bg-muted-foreground/10 text-foreground rounded-full p-2 w-fit">
                     <Input
                       type="number"
                       value={editedShelfLife}
@@ -189,30 +192,31 @@ export function TrackingSettings({
                         setIsDirty(true)
                       }}
                       disabled={isSaving || isUpdating}
-                      className="max-w-32"
+                      className="max-w-20"
                       min={MIN_SHELF_LIFE_DAYS}
                       size="sm"
                     />
-                    <Typography className="capitalize" variant="small">
+                    <Typography className="capitalize" variant="p">
                       days
                     </Typography>
                   </div>
                   <Button
-                    variant="black"
+                    type="button"
+                    variant="ghost"
+                    size="sm"
                     onClick={handleSave}
-                    disabled={!isDirty || isSaving || isUpdating}
-                    loading={isSaving}
-                    loadingText="Saving"
-                    className="min-w-32"
+                    disabled={!isDirty}
+                    loading={isSaving || isUpdating}
+                    loadingText="Saving..."
                   >
                     Save
                   </Button>
                 </div>
               </div>
 
-              <div className="flex gap-4 items-center justify-between">
-                <Typography variant="small">Source</Typography>
-                <Badge variant="mutedRounded">
+              <div className="flex gap-4 items-center justify-between mt-2">
+                <Typography variant="p">Source</Typography>
+                <Typography variant="p">
                   {shelfLifeSource === 'product_override' &&
                     `Custom override (${shelfLifeDays} days)`}
                   {shelfLifeSource === 'store_category_override' &&
@@ -221,7 +225,7 @@ export function TrackingSettings({
                   {shelfLifeSource === 'category_base' && `Inherited from ${categoryName}`}
                   {shelfLifeSource === 'default' && 'System default (14 days)'}
                   {!shelfLifeSource && `Product default (${categoryName})`}
-                </Badge>
+                </Typography>
               </div>
             </>
           )}

@@ -20,17 +20,25 @@ export const PRODUCT_TABLE_COLUMN_CONFIG = [
     sortable: true,
   },
   {
-    id: 'total_stock',
+    id: 'store_quantity',
     headerKey: 'totalStock',
-    width: 110,
+    width: 100,
     align: 'right',
     hasMultipleLines: false,
     sortable: true,
   },
   {
     id: 'active_batches_count',
-    headerKey: 'activeBatches',
-    width: 130,
+    headerKey: 'totalUnitsWithExpiryDates',
+    width: 150,
+    align: 'right',
+    hasMultipleLines: false,
+    sortable: true,
+  },
+  {
+    id: 'needs_expiry',
+    headerKey: 'datesMissing',
+    width: 110,
     align: 'right',
     hasMultipleLines: false,
     sortable: true,
@@ -86,22 +94,15 @@ export function createProductTableColumns({
           <div className="truncate" title={row.original.name}>
             {row.original.name || t('unnamedProduct')}
           </div>
-          <div
-            className="text-sm text-muted-foreground truncate font-mono"
-            title={row.original.sku}
-          >
-            SKU: {row.original.sku || t('notAvailable')}
-          </div>
         </div>
       ),
-      size: 130,
+      size: 200,
     },
     {
-      id: 'total_stock',
-      accessorKey: 'total_stock',
+      id: 'store_quantity',
       header: () => (
         <SortableHeader
-          field="total_stock"
+          field="store_quantity"
           currentSort={currentSort}
           updateSort={updateSort}
           className="justify-end"
@@ -109,33 +110,44 @@ export function createProductTableColumns({
           {t('totalStock')}
         </SortableHeader>
       ),
-      cell: ({ row }) => (
-        <div className="text-right">
-          <div>{row.original.total_stock || 0}</div>
-          {/* <div className="text-xs text-muted-foreground">{row.original.unit_type || 'units'}</div> */}
-        </div>
-      ),
-      size: 100,
+      cell: ({ row }) => <div className="text-right">{row.original.store_quantity ?? 0}</div>,
+      size: 180,
     },
     {
       id: 'active_batches_count',
       accessorKey: 'active_batches_count',
       header: () => (
         <SortableHeader
-          field="active_batches_count"
+          field="batch_quantity"
           currentSort={currentSort}
           updateSort={updateSort}
           className="justify-end"
         >
-          {t('activeBatches')}
+          {t('totalUnitsWithExpiryDates')}
         </SortableHeader>
       ),
-      cell: ({ row }) => (
-        <Typography variant="small" className="flex items-center gap-2 justify-end text-right">
-          <span>{row.original.active_batches_count || 0}</span>
-        </Typography>
+      cell: ({ row }) => <div className="text-right">{row.original.batch_quantity ?? 0}</div>,
+      size: 300,
+    },
+    {
+      id: 'needs_expiry',
+      header: () => (
+        <SortableHeader
+          field="needs_expiry"
+          currentSort={currentSort}
+          updateSort={updateSort}
+          className="justify-end"
+        >
+          {t('datesMissing')}
+        </SortableHeader>
       ),
-      size: 150,
+      cell: ({ row }) => {
+        const storeQty = row.original.store_quantity ?? 0
+        const batchQty = row.original.batch_quantity ?? 0
+        const needsExpiry = Math.max(0, storeQty - batchQty)
+        return <div className="text-right">{needsExpiry}</div>
+      },
+      size: 180,
     },
     {
       id: 'created_at',

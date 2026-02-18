@@ -8,6 +8,7 @@ import {
   createProduct,
   deleteProduct,
   fetchProductById,
+  fetchProductWithBatches,
   type Product,
   type ProductFilters,
   type ProductSort,
@@ -111,7 +112,24 @@ export function useProduct(productId: string) {
       }
       return fetchProductById(productId, activeStoreId)
     },
-    enabled: !!productId && !!activeStoreId, // Only fetch if both exist
+    enabled: !!productId && !!activeStoreId,
+  })
+}
+
+export function useProductWithBatches(productId: string) {
+  const activeStoreId = useActiveStoreId()
+
+  return useQuery({
+    queryKey: queryKeys.products.detailWithBatches(productId, activeStoreId || ''),
+    queryFn: () => {
+      if (!activeStoreId) {
+        throw new Error('No active store selected')
+      }
+      return fetchProductWithBatches(productId, activeStoreId)
+    },
+    enabled: !!productId && !!activeStoreId,
+    // Match prefetch staleTime so the prefetched data isn't immediately refetched on modal open
+    staleTime: 30_000,
   })
 }
 

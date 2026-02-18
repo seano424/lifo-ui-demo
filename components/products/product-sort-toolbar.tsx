@@ -1,6 +1,7 @@
 'use client'
 
 import {
+  AlertCircle,
   ArrowDown,
   ArrowUp,
   ArrowUpDown,
@@ -8,6 +9,7 @@ import {
   Building,
   Calendar,
   Package,
+  ShoppingCart,
   SortAsc,
   Tag,
 } from 'lucide-react'
@@ -65,7 +67,7 @@ export function ProductsSortToolbar({
       description: t('brandDesc'),
     },
     {
-      field: 'total_stock',
+      field: 'batch_quantity',
       label: t('stockLevel'),
       icon: Boxes,
       description: t('stockLevelDesc'),
@@ -81,6 +83,18 @@ export function ProductsSortToolbar({
       label: t('dateAdded'),
       icon: Calendar,
       description: t('dateAddedDesc'),
+    },
+    {
+      field: 'store_quantity',
+      label: t('totalStock'),
+      icon: ShoppingCart,
+      description: t('totalStockDesc'),
+    },
+    {
+      field: 'needs_expiry',
+      label: t('datesMissing'),
+      icon: AlertCircle,
+      description: t('datesMissingDesc'),
     },
   ]
 
@@ -194,7 +208,7 @@ export function QuickSortButtons({ onSortChange, currentSort, isLoading }: Quick
       sort: { field: 'created_at', direction: 'desc' },
     },
     { label: t('aToZ'), sort: { field: 'name', direction: 'asc' } },
-    { label: t('lowStock'), sort: { field: 'total_stock', direction: 'asc' } },
+    { label: t('lowStock'), sort: { field: 'batch_quantity', direction: 'asc' } },
     {
       label: t('mostBatches'),
       sort: { field: 'active_batches_count', direction: 'desc' },

@@ -31,8 +31,10 @@ export function DashboardPageClient() {
   // Employees should skip directly to the dashboard
   const canConfigureBatchTracking = permissions.isOwner || permissions.isManager
 
-  // Show setup flow if not complete AND user has permission to configure it
-  if (!isSetupComplete && canConfigureBatchTracking) {
+  // Show setup flow if:
+  // - No store yet (brand new user — must be the owner/creator)
+  // - OR setup incomplete AND user has permission to configure it (owner/manager, not employee)
+  if (!isSetupComplete && (canConfigureBatchTracking || !progress.hasStore)) {
     return <SettingUpFlow />
   }
 

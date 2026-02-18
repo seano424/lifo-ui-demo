@@ -6,8 +6,9 @@ const DEFAULT_COLUMN_WIDTHS = {
   name: 300,
   category: 140,
   brand: 140,
-  total_stock: 100,
-  active_batches_count: 130,
+  store_quantity: 100,
+  active_batches_count: 120,
+  needs_expiry: 110,
   created_at: 110,
   actions: 60,
 }

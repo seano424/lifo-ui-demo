@@ -13,14 +13,18 @@ import { useState } from 'react'
 
 export function BatchList({
   batches,
+  storeQuantity,
   editingBatchId,
   onStartEdit,
   onCancelEdit,
-  isLoading,
 }: BatchListProps) {
   const currencySymbol = useCurrency()
   const { updateBatch } = useBatchActions()
   const [isOpen, setIsOpen] = useState(true)
+
+  const totalBatchQty = batches
+    .filter(b => b.status === 'active')
+    .reduce((sum, b) => sum + (b.current_quantity || 0), 0)
   const handleSave = (
     batchId: string,
     updates: { expiry_date?: string; current_quantity?: number },
@@ -30,16 +34,6 @@ export function BatchList({
       updates: updates as Database['inventory']['Tables']['batches']['Update'],
     })
     onCancelEdit()
-  }
-
-  if (isLoading) {
-    return (
-      <div className="space-y-2 py-4">
-        <BatchSkeleton />
-        <BatchSkeleton />
-        <BatchSkeleton />
-      </div>
-    )
   }
 
   if (batches.length === 0) {
@@ -53,24 +47,33 @@ export function BatchList({
         onClick={() => setIsOpen(!isOpen)}
         className="w-full flex items-center justify-between px-0"
       >
-        <Typography variant="small" className="flex items-center gap-2">
-          Batches
+        <Typography variant="p" className="flex items-center gap-2">
+          Batches ({totalBatchQty} of {storeQuantity ?? '?'} units)
         </Typography>
         <ChevronDown className={cn('size-3 transition-transform', isOpen && 'rotate-180')} />
       </Button>
       {isOpen && (
         <div className="flex flex-col gap-4">
-          {batches.map(batch => (
-            <BatchRow
-              key={batch.batch_id}
-              batch={batch}
-              isEditing={batch.batch_id === editingBatchId}
-              onStartEdit={() => onStartEdit(batch.batch_id)}
-              onSave={updates => handleSave(batch.batch_id, updates)}
-              onCancel={onCancelEdit}
-              currencySymbol={currencySymbol}
-            />
-          ))}
+          {batches.map(batch => {
+            // store_quantity is POS-synced and can change externally, so this is a UX
+            // guardrail only — not a DB-level constraint. See untracked_qty in the RPC.
+            const maxQuantity =
+              storeQuantity != null
+                ? storeQuantity - totalBatchQty + (batch.current_quantity || 0)
+                : null
+            return (
+              <BatchRow
+                key={batch.batch_id}
+                batch={batch}
+                isEditing={batch.batch_id === editingBatchId}
+                maxQuantity={maxQuantity}
+                onStartEdit={() => onStartEdit(batch.batch_id)}
+                onSave={updates => handleSave(batch.batch_id, updates)}
+                onCancel={onCancelEdit}
+                currencySymbol={currencySymbol}
+              />
+            )
+          })}
         </div>
       )}
     </div>
@@ -87,24 +90,9 @@ function EmptyBatchesState() {
       <Typography variant="p" className="font-medium mb-1">
         No batches tracked yet
       </Typography>
-      <Typography variant="small" className="text-muted-foreground mb-4">
+      <Typography variant="p" className="text-muted-foreground mb-4">
         Add an expiry date to start tracking this product's inventory by batch.
       </Typography>
-    </div>
-  )
-}
-
-// Loading skeleton
-function BatchSkeleton() {
-  return (
-    <div className="px-5 py-3 flex items-center gap-3 animate-pulse">
-      <div className="w-8 h-6 bg-muted rounded" />
-      <div className="flex-1 space-y-2">
-        <div className="h-4 bg-muted rounded w-32" />
-        <div className="h-3 bg-muted rounded w-48" />
-      </div>
-      <div className="h-4 bg-muted rounded w-16" />
-      <div className="h-4 bg-muted rounded w-12" />
     </div>
   )
 }

@@ -93,7 +93,7 @@ export default async function RootLayout({
       data-scroll-behavior="smooth"
       className={`${raleway.variable} ${inter.variable} ${robotoMono.variable} ${debugScreens}`}
     >
-      <body className={`font-sans antialiased`}>
+      <body className={`font-sans antialiased`} suppressHydrationWarning>
         <PostHogProvider>
           <ThemeProvider
             attribute="class"
