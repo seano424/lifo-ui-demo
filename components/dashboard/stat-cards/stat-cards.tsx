@@ -1,6 +1,5 @@
 'use client'
 
-import { AlertTriangle, Layers, Shield, DollarSign } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useCurrency } from '@/hooks/use-currency'
 import { useDashboardRedesignSummary } from '@/hooks/use-dashboard-redesign'
@@ -13,33 +12,9 @@ interface StatCardsProps {
 export function StatCards({ daysFilter }: StatCardsProps) {
   const t = useTranslations('dashboard.redesign.stats')
   const currencySymbol = useCurrency()
-  const { data, isLoading } = useDashboardRedesignSummary(daysFilter)
+  const { data } = useDashboardRedesignSummary(daysFilter)
 
-  // Show loading skeletons while fetching
-  if (isLoading || !data) {
-    return (
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard
-          label=""
-          value=""
-          subtitle=""
-          icon={AlertTriangle}
-          accentClass="bg-muted"
-          isLoading
-        />
-        <StatCard label="" value="" subtitle="" icon={Layers} accentClass="bg-muted" isLoading />
-        <StatCard label="" value="" subtitle="" icon={Shield} accentClass="bg-muted" isLoading />
-        <StatCard
-          label=""
-          value=""
-          subtitle=""
-          icon={DollarSign}
-          accentClass="bg-muted"
-          isLoading
-        />
-      </div>
-    )
-  }
+  if (!data) return null
 
   // Calculate trends and format values
   const expiringDiff = data.expiring_count - data.expiring_count_prev
@@ -54,19 +29,8 @@ export function StatCards({ daysFilter }: StatCardsProps) {
     isPositive: expiringDiff <= 0, // Fewer expiring items is good
   }
 
-  const batchesDiff = data.active_batches - data.active_batches_prev
-  const batchesTrend = {
-    direction: (batchesDiff < 0 ? 'down' : 'up') as 'up' | 'down',
-    value:
-      batchesDiff === 0
-        ? t('trends.noChange')
-        : batchesDiff > 0
-          ? t('trends.plusThisWeek', { count: Math.abs(batchesDiff) })
-          : t('trends.minusThisWeek', { count: Math.abs(batchesDiff) }),
-    isPositive: batchesDiff >= 0, // More batches is generally good
-  }
-
-  const coveragePercent = Math.round((data.products_tracked / data.products_total) * 100)
+  const coveragePercent =
+    data.products_total > 0 ? Math.round((data.products_tracked / data.products_total) * 100) : 0
   const coveragePrevPercent = data.coverage_percent_prev || 0
   const coverageDiff = coveragePercent - coveragePrevPercent
   const coverageTrend = {
@@ -87,31 +51,34 @@ export function StatCards({ daysFilter }: StatCardsProps) {
       valueDiff === 0
         ? t('trends.noChange')
         : valueDiff < 0
-          ? t('trends.lessValue', { amount: Math.abs(valueDiff).toFixed(0) })
-          : t('trends.moreValue', { amount: Math.abs(valueDiff).toFixed(0) }),
+          ? t('trends.lessValue', { amount: Math.round(Math.abs(valueDiff)).toLocaleString() })
+          : t('trends.moreValue', { amount: Math.round(Math.abs(valueDiff)).toLocaleString() }),
     isPositive: valueDiff <= 0, // Less value at risk is good
   }
 
   return (
-    <div className="flex gap-4 flex-wrap">
-      {/* Expiring This Week */}
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {/* Expiring (label varies by filter) */}
       <StatCard
-        label={t('expiringThisWeek.label')}
+        label={
+          daysFilter === 30
+            ? t('expiringThisWeek.label30')
+            : daysFilter === 90
+              ? t('expiringThisWeek.label90')
+              : t('expiringThisWeek.label')
+        }
         value={`${t('trends.batches', { count: data.expiring_count })}`}
         subtitle={t('expiringThisWeek.subtitle', { units: data.expiring_units })}
         trend={expiringTrend}
-        icon={AlertTriangle}
-        accentClass="bg-muted"
       />
 
-      {/* Active Batches */}
+      {/* Act on Today — always pinned to today/overdue, not affected by filter */}
       <StatCard
-        label={t('activeBatches.label')}
-        value={`${t('trends.batches', { count: data.active_batches })}`}
-        subtitle={t('activeBatches.subtitle', { products: data.active_products })}
-        trend={batchesTrend}
-        icon={Layers}
-        accentClass="bg-muted"
+        label={t('actOnToday.label')}
+        value={`${t('trends.batches', { count: data.act_on_today_count })}`}
+        subtitle={t('actOnToday.subtitle')}
+        href="/dashboard/expiring"
+        hrefLabel={t('actOnToday.cta')}
       />
 
       {/* Coverage */}
@@ -123,18 +90,14 @@ export function StatCards({ daysFilter }: StatCardsProps) {
           total: data.products_total,
         })}
         trend={coverageTrend}
-        icon={Shield}
-        accentClass="bg-muted"
       />
 
       {/* Value at Risk */}
       <StatCard
         label={t('valueAtRisk.label')}
-        value={`${currencySymbol}${data.value_at_risk.toFixed(0)}`}
+        value={`${currencySymbol}${Math.round(data.value_at_risk).toLocaleString()}`}
         subtitle={t('valueAtRisk.subtitle')}
         trend={valueTrend}
-        icon={DollarSign}
-        accentClass="bg-muted"
       />
     </div>
   )

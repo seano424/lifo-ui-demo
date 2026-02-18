@@ -188,8 +188,8 @@
           "noChange": "Geen wijziging",
           "fewerThanLast": "{count, plural, =1 {1 minder} other {# minder}} dan vorige periode",
           "moreThanLast": "{count, plural, =1 {1 meer} other {# meer}} dan vorige periode",
-          "plusThisWeek": "+{count} deze week",
-          "minusThisWeek": "-{count} deze week",
+          "plusThisPeriod": "+{count} deze periode",
+          "minusThisPeriod": "-{count} deze periode",
           "plusPercent": "+{percent}%",
           "minusPercent": "-{percent}%",
           "lessValue": "{amount} minder risico",
@@ -198,11 +198,14 @@
         },
         "expiringThisWeek": {
           "label": "Verloopt Deze Week",
+          "label30": "Verloopt Deze Maand",
+          "label90": "Verloopt Komende 3 Maanden",
           "subtitle": "{units, plural, =1 {1 eenheid} other {# eenheden}}"
         },
-        "activeBatches": {
-          "label": "Actieve Batches",
-          "subtitle": "{products, plural, =1 {1 product} other {# producten}}"
+        "actOnToday": {
+          "label": "Actie Vandaag",
+          "subtitle": "Directe aandacht vereist",
+          "cta": "Bekijk verlopen"
         },
         "coverage": {
           "label": "Dekking",
