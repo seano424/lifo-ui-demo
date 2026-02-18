@@ -1,5 +1,4 @@
 // React Query hooks for dashboard redesign
-// Uses mock data layer until backend RPCs are implemented
 
 import { useQuery, keepPreviousData } from '@tanstack/react-query'
 import {

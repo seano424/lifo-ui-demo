@@ -148,7 +148,13 @@ export async function fetchDashboardRedesignSummary(
 
   const today = new Date()
   today.setHours(0, 0, 0, 0)
-  const toDateStr = (d: Date) => d.toISOString().split('T')[0]
+  // Use local date parts to avoid UTC offset shifting the date when toISOString() is called
+  const toDateStr = (d: Date) => {
+    const year = d.getFullYear()
+    const month = String(d.getMonth() + 1).padStart(2, '0')
+    const day = String(d.getDate()).padStart(2, '0')
+    return `${year}-${month}-${day}`
+  }
 
   const todayStr = toDateStr(today)
 
@@ -201,6 +207,15 @@ export async function fetchDashboardRedesignSummary(
         .eq('store_id', storeId)
         .eq('is_active', true),
     ])
+
+  if (expiringResult.error)
+    throw new Error(`Failed to fetch expiring batches: ${expiringResult.error.message}`)
+  if (prevExpiringResult.error)
+    throw new Error(`Failed to fetch previous batches: ${prevExpiringResult.error.message}`)
+  if (activeBatchesResult.error)
+    throw new Error(`Failed to fetch active batches: ${activeBatchesResult.error.message}`)
+  if (storeProductsResult.error)
+    throw new Error(`Failed to fetch store products: ${storeProductsResult.error.message}`)
 
   // --- Expiring (current window) ---
   const expiringBatches = expiringResult.data ?? []

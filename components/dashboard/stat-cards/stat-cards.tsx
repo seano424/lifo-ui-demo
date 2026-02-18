@@ -1,6 +1,5 @@
 'use client'
 
-import { AlertTriangle, Clock, Shield, DollarSign } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useCurrency } from '@/hooks/use-currency'
 import { useDashboardRedesignSummary } from '@/hooks/use-dashboard-redesign'
@@ -30,7 +29,8 @@ export function StatCards({ daysFilter }: StatCardsProps) {
     isPositive: expiringDiff <= 0, // Fewer expiring items is good
   }
 
-  const coveragePercent = Math.round((data.products_tracked / data.products_total) * 100)
+  const coveragePercent =
+    data.products_total > 0 ? Math.round((data.products_tracked / data.products_total) * 100) : 0
   const coveragePrevPercent = data.coverage_percent_prev || 0
   const coverageDiff = coveragePercent - coveragePrevPercent
   const coverageTrend = {
@@ -51,8 +51,8 @@ export function StatCards({ daysFilter }: StatCardsProps) {
       valueDiff === 0
         ? t('trends.noChange')
         : valueDiff < 0
-          ? t('trends.lessValue', { amount: Math.abs(valueDiff).toFixed(0) })
-          : t('trends.moreValue', { amount: Math.abs(valueDiff).toFixed(0) }),
+          ? t('trends.lessValue', { amount: Math.round(Math.abs(valueDiff)).toLocaleString() })
+          : t('trends.moreValue', { amount: Math.round(Math.abs(valueDiff)).toLocaleString() }),
     isPositive: valueDiff <= 0, // Less value at risk is good
   }
 
@@ -70,8 +70,6 @@ export function StatCards({ daysFilter }: StatCardsProps) {
         value={`${t('trends.batches', { count: data.expiring_count })}`}
         subtitle={t('expiringThisWeek.subtitle', { units: data.expiring_units })}
         trend={expiringTrend}
-        icon={AlertTriangle}
-        accentClass="bg-muted"
       />
 
       {/* Act on Today — always pinned to today/overdue, not affected by filter */}
@@ -81,8 +79,6 @@ export function StatCards({ daysFilter }: StatCardsProps) {
         subtitle={t('actOnToday.subtitle')}
         href="/dashboard/expiring"
         hrefLabel={t('actOnToday.cta')}
-        icon={Clock}
-        accentClass="bg-muted"
       />
 
       {/* Coverage */}
@@ -94,18 +90,14 @@ export function StatCards({ daysFilter }: StatCardsProps) {
           total: data.products_total,
         })}
         trend={coverageTrend}
-        icon={Shield}
-        accentClass="bg-muted"
       />
 
       {/* Value at Risk */}
       <StatCard
         label={t('valueAtRisk.label')}
-        value={`${currencySymbol}${data.value_at_risk.toFixed(0)}`}
+        value={`${currencySymbol}${Math.round(data.value_at_risk).toLocaleString()}`}
         subtitle={t('valueAtRisk.subtitle')}
         trend={valueTrend}
-        icon={DollarSign}
-        accentClass="bg-muted"
       />
     </div>
   )

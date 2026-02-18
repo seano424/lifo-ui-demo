@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import type { LucideIcon } from 'lucide-react'
 import { ArrowRight } from 'lucide-react'
 import { Card } from '@/components/ui/card'
 import { badgeVariants } from '@/components/ui/badge'
@@ -20,22 +19,11 @@ interface StatCardProps {
   trend?: TrendData
   href?: string
   hrefLabel?: string
-  icon: LucideIcon
-  accentClass: string
 }
 
-export function StatCard({
-  label,
-  value,
-  subtitle,
-  trend,
-  href,
-  hrefLabel = 'View all',
-  // icon: Icon,
-}: StatCardProps) {
+export function StatCard({ label, value, subtitle, trend, href, hrefLabel }: StatCardProps) {
   return (
     <Card className="relative cursor-default p-5 transition-all duration-200 flex flex-col gap-3 flex-1 bg-card">
-      {/* <Icon className="h-6 w-6" aria-hidden="true" /> */}
       <Typography variant="p" color="primary">
         {label}
       </Typography>
