@@ -1,6 +1,8 @@
+import Link from 'next/link'
 import type { LucideIcon } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
 import { Card } from '@/components/ui/card'
-import { Skeleton } from '@/components/ui/skeleton'
+import { badgeVariants } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 import { TrendBadge } from './trend-badge'
 import { Typography } from '@/components/ui/typography'
@@ -16,9 +18,10 @@ interface StatCardProps {
   value: string | number
   subtitle: string
   trend?: TrendData
+  href?: string
+  hrefLabel?: string
   icon: LucideIcon
   accentClass: string
-  isLoading?: boolean
 }
 
 export function StatCard({
@@ -26,35 +29,29 @@ export function StatCard({
   value,
   subtitle,
   trend,
+  href,
+  hrefLabel = 'View all',
   // icon: Icon,
-  accentClass,
-  isLoading = false,
 }: StatCardProps) {
-  if (isLoading) {
-    return (
-      <Card className="relative cursor-default p-5 transition-all duration-200">
-        <div className="mb-3 flex items-start justify-between">
-          <Skeleton className="h-4 w-24" />
-          <Skeleton className={cn('h-10 w-10 rounded-xl', accentClass)} />
-        </div>
-        <Skeleton className="mb-1 h-9 w-20" />
-        <Skeleton className="mb-3 h-3 w-32" />
-        <Skeleton className="h-5 w-28 rounded-full" />
-      </Card>
-    )
-  }
-
   return (
     <Card className="relative cursor-default p-5 transition-all duration-200 flex flex-col gap-3 flex-1 bg-card">
       {/* <Icon className="h-6 w-6" aria-hidden="true" /> */}
       <Typography variant="p" color="primary">
         {label}
       </Typography>
-      <Typography variant="h4">{value}</Typography>
-      <Typography variant="h5" color="muted">
-        {subtitle}
-      </Typography>
+      <div className="flex flex-col gap-1 min-h-24">
+        <Typography variant="h4">{value}</Typography>
+        <Typography variant="h5" color="muted">
+          {subtitle}
+        </Typography>
+      </div>
       {trend && <TrendBadge {...trend} />}
+      {href && !trend && (
+        <Link href={href} className={cn(badgeVariants({ variant: 'secondary' }), 'w-full')}>
+          {hrefLabel}
+          <ArrowRight className="h-3 w-3" aria-hidden="true" />
+        </Link>
+      )}
     </Card>
   )
 }

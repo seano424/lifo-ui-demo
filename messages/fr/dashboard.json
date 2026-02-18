@@ -206,7 +206,8 @@
           "label": "À Faire Aujourd'hui",
           "label30": "À Faire Ce Mois",
           "label90": "À Faire Dans 3 Mois",
-          "subtitle": "Attention immédiate requise"
+          "subtitle": "Attention immédiate requise",
+          "cta": "Voir expirants"
         },
         "coverage": {
           "label": "Couverture",

@@ -1,7 +1,7 @@
 // React Query hooks for dashboard redesign
 // Uses mock data layer until backend RPCs are implemented
 
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, keepPreviousData } from '@tanstack/react-query'
 import {
   fetchDashboardRedesignSummary,
   fetchTopExpiringBatches,
@@ -33,6 +33,7 @@ export function useDashboardRedesignSummary(daysFilter: 7 | 30 | 90 = 7) {
       return fetchDashboardRedesignSummary(activeStoreId, daysFilter)
     },
     enabled: !!activeStoreId,
+    placeholderData: keepPreviousData,
     refetchInterval: 30000, // Auto-refresh every 30 seconds
     staleTime: 10000, // Consider data stale after 10 seconds
     retry: 3,

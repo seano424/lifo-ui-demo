@@ -206,7 +206,8 @@
           "label": "Actie Vandaag",
           "label30": "Actie Deze Maand",
           "label90": "Actie Komende 3 Maanden",
-          "subtitle": "Directe aandacht vereist"
+          "subtitle": "Directe aandacht vereist",
+          "cta": "Bekijk verlopen"
         },
         "coverage": {
           "label": "Dekking",

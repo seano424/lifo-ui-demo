@@ -13,33 +13,9 @@ interface StatCardsProps {
 export function StatCards({ daysFilter }: StatCardsProps) {
   const t = useTranslations('dashboard.redesign.stats')
   const currencySymbol = useCurrency()
-  const { data, isLoading } = useDashboardRedesignSummary(daysFilter)
+  const { data } = useDashboardRedesignSummary(daysFilter)
 
-  // Show loading skeletons while fetching
-  if (isLoading || !data) {
-    return (
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard
-          label=""
-          value=""
-          subtitle=""
-          icon={AlertTriangle}
-          accentClass="bg-muted"
-          isLoading
-        />
-        <StatCard label="" value="" subtitle="" icon={Clock} accentClass="bg-muted" isLoading />
-        <StatCard label="" value="" subtitle="" icon={Shield} accentClass="bg-muted" isLoading />
-        <StatCard
-          label=""
-          value=""
-          subtitle=""
-          icon={DollarSign}
-          accentClass="bg-muted"
-          isLoading
-        />
-      </div>
-    )
-  }
+  if (!data) return null
 
   // Calculate trends and format values
   const expiringDiff = data.expiring_count - data.expiring_count_prev
@@ -81,7 +57,7 @@ export function StatCards({ daysFilter }: StatCardsProps) {
   }
 
   return (
-    <div className="flex gap-4 flex-wrap">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {/* Expiring (label varies by filter) */}
       <StatCard
         label={
@@ -109,6 +85,8 @@ export function StatCards({ daysFilter }: StatCardsProps) {
         }
         value={`${t('trends.batches', { count: data.act_on_today_count })}`}
         subtitle={t('actOnToday.subtitle')}
+        href="/dashboard/expiring"
+        hrefLabel={t('actOnToday.cta')}
         icon={Clock}
         accentClass="bg-muted"
       />
