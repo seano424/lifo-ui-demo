@@ -37,11 +37,7 @@ export function SquareCallbackProcessor() {
   // Poll Square status to check connection completion
   // Keep polling during processing and syncing states
   const isPolling = (status === 'processing' || status === 'syncing') && shouldPoll
-  const {
-    data: squareStatus,
-    isError,
-    error,
-  } = useSquareStatusPolling(isPolling)
+  const { data: squareStatus, isError, error } = useSquareStatusPolling(isPolling)
 
   useEffect(() => {
     // Check for URL error first (user denied authorization)

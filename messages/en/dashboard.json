@@ -188,8 +188,8 @@
           "noChange": "No change",
           "fewerThanLast": "{count, plural, =1 {1 fewer} other {# fewer}} than last period",
           "moreThanLast": "{count, plural, =1 {1 more} other {# more}} than last period",
-          "plusThisWeek": "+{count} this week",
-          "minusThisWeek": "-{count} this week",
+          "plusThisPeriod": "+{count} this period",
+          "minusThisPeriod": "-{count} this period",
           "plusPercent": "+{percent}%",
           "minusPercent": "-{percent}%",
           "lessValue": "{amount} less at risk",
@@ -198,11 +198,15 @@
         },
         "expiringThisWeek": {
           "label": "Expiring This Week",
+          "label30": "Expiring This Month",
+          "label90": "Expiring Next 3 Months",
           "subtitle": "{units, plural, =1 {1 unit} other {# units}}"
         },
-        "activeBatches": {
-          "label": "Active Batches",
-          "subtitle": "{products, plural, =1 {1 product} other {# products}}"
+        "actOnToday": {
+          "label": "Act on Today",
+          "label30": "Act This Month",
+          "label90": "Act Next 3 Months",
+          "subtitle": "Need immediate attention"
         },
         "coverage": {
           "label": "Coverage",

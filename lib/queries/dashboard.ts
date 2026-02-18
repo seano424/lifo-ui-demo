@@ -1,5 +1,7 @@
-// Mock data layer for dashboard redesign
-// This is frontend-only mock data - no Supabase RPCs or migrations yet
+// Real data layer for dashboard redesign - queries Supabase directly
+// No RPCs or migrations required
+
+import { createClient } from '@/lib/supabase/client'
 
 // ============================================================================
 // TYPE DEFINITIONS
@@ -9,15 +11,13 @@
  * Dashboard redesign summary with KPI metrics and trends
  */
 export interface DashboardRedesignSummary {
-  // Expiring This Week
+  // Expiring within daysFilter window
   expiring_count: number
   expiring_units: number
   expiring_count_prev: number
 
-  // Active Batches
-  active_batches: number
-  active_products: number
-  active_batches_prev: number
+  // Act on Today (active batches expiring today or already overdue)
+  act_on_today_count: number
 
   // Coverage
   products_tracked: number
@@ -51,52 +51,6 @@ export interface AutomationRule {
   type: 'category' | 'product'
   products_count: number
   status: 'active' | 'paused'
-}
-
-// ============================================================================
-// MOCK DATA
-// ============================================================================
-
-const MOCK_SUMMARY_7D: DashboardRedesignSummary = {
-  expiring_count: 3,
-  expiring_units: 50,
-  expiring_count_prev: 5,
-  active_batches: 67,
-  active_products: 42,
-  active_batches_prev: 59,
-  products_tracked: 73,
-  products_total: 89,
-  coverage_percent_prev: 77,
-  value_at_risk: 340.0,
-  value_at_risk_prev: 460.0,
-}
-
-const MOCK_SUMMARY_30D: DashboardRedesignSummary = {
-  expiring_count: 12,
-  expiring_units: 180,
-  expiring_count_prev: 15,
-  active_batches: 67,
-  active_products: 42,
-  active_batches_prev: 62,
-  products_tracked: 73,
-  products_total: 89,
-  coverage_percent_prev: 75,
-  value_at_risk: 1240.0,
-  value_at_risk_prev: 1580.0,
-}
-
-const MOCK_SUMMARY_90D: DashboardRedesignSummary = {
-  expiring_count: 28,
-  expiring_units: 420,
-  expiring_count_prev: 32,
-  active_batches: 67,
-  active_products: 42,
-  active_batches_prev: 64,
-  products_tracked: 73,
-  products_total: 89,
-  coverage_percent_prev: 72,
-  value_at_risk: 3200.0,
-  value_at_risk_prev: 3800.0,
 }
 
 const MOCK_EXPIRING_BATCHES: BatchForTable[] = [
@@ -179,28 +133,124 @@ const MOCK_AUTOMATION_RULES: AutomationRule[] = [
 ]
 
 // ============================================================================
-// MOCK FETCH FUNCTIONS
+// FETCH FUNCTIONS
 // ============================================================================
 
 /**
  * Fetch dashboard redesign summary with KPI metrics
- * Mock version with simulated network delay
+ * Queries Supabase directly — no RPC or migration required
  */
 export async function fetchDashboardRedesignSummary(
-  _storeId: string,
+  storeId: string,
   daysFilter: 7 | 30 | 90 = 7,
 ): Promise<DashboardRedesignSummary> {
-  // Simulate network delay (300ms)
-  await new Promise(resolve => setTimeout(resolve, 300))
+  const supabase = createClient()
 
-  // Return mock data based on days filter
-  if (daysFilter === 30) {
-    return MOCK_SUMMARY_30D
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const toDateStr = (d: Date) => d.toISOString().split('T')[0]
+
+  const todayStr = toDateStr(today)
+
+  const futureEnd = new Date(today)
+  futureEnd.setDate(futureEnd.getDate() + daysFilter)
+  const futureEndStr = toDateStr(futureEnd)
+
+  const pastStart = new Date(today)
+  pastStart.setDate(pastStart.getDate() - daysFilter)
+  const pastStartStr = toDateStr(pastStart)
+
+  const [expiringResult, prevExpiringResult, activeBatchesResult, storeProductsResult] =
+    await Promise.all([
+      // 1. Batches expiring within the current daysFilter window
+      supabase
+        .schema('inventory')
+        .from('batches')
+        .select('batch_id, current_quantity, selling_price, product_id')
+        .eq('store_id', storeId)
+        .eq('status', 'active')
+        .gte('expiry_date', todayStr)
+        .lte('expiry_date', futureEndStr)
+        .gt('current_quantity', 0),
+
+      // 2. Batches whose expiry fell in the previous equivalent window (for trend comparison)
+      //    Uses initial_quantity since current_quantity may be 0 for already-actioned batches
+      supabase
+        .schema('inventory')
+        .from('batches')
+        .select('batch_id, initial_quantity, selling_price')
+        .eq('store_id', storeId)
+        .neq('status', 'draft')
+        .gte('expiry_date', pastStartStr)
+        .lt('expiry_date', todayStr),
+
+      // 3. All currently active batches — used for act_on_today, coverage, and prev coverage
+      supabase
+        .schema('inventory')
+        .from('batches')
+        .select('batch_id, product_id, expiry_date, received_date')
+        .eq('store_id', storeId)
+        .eq('status', 'active')
+        .gt('current_quantity', 0),
+
+      // 4. Total products in the store's catalog
+      supabase
+        .schema('inventory')
+        .from('store_products')
+        .select('product_id')
+        .eq('store_id', storeId)
+        .eq('is_active', true),
+    ])
+
+  // --- Expiring (current window) ---
+  const expiringBatches = expiringResult.data ?? []
+  const expiring_count = expiringBatches.length
+  const expiring_units = expiringBatches.reduce((sum, b) => sum + Number(b.current_quantity), 0)
+  const value_at_risk = expiringBatches.reduce(
+    (sum, b) => sum + Number(b.current_quantity) * Number(b.selling_price),
+    0,
+  )
+
+  // --- Expiring (previous window) ---
+  const prevExpiringBatches = prevExpiringResult.data ?? []
+  const expiring_count_prev = prevExpiringBatches.length
+  const value_at_risk_prev = prevExpiringBatches.reduce(
+    (sum, b) => sum + Number(b.initial_quantity) * Number(b.selling_price),
+    0,
+  )
+
+  // --- Active batches ---
+  const activeBatches = activeBatchesResult.data ?? []
+
+  // Act on [period]: active batches expiring within the filter window (or already overdue)
+  const act_on_today_count = activeBatches.filter(
+    b => b.expiry_date !== null && b.expiry_date <= futureEndStr,
+  ).length
+
+  // Coverage: unique products with at least one active batch
+  const uniqueActiveProducts = new Set(activeBatches.map(b => b.product_id))
+  const products_tracked = uniqueActiveProducts.size
+  const products_total = storeProductsResult.data?.length ?? products_tracked
+
+  // Previous coverage: products tracked from batches received before the current period
+  const prevActiveBatches = activeBatches.filter(
+    b => b.received_date !== null && b.received_date < pastStartStr,
+  )
+  const prevUniqueProducts = new Set(prevActiveBatches.map(b => b.product_id))
+  const coverage_percent_prev =
+    products_total > 0 ? Math.round((prevUniqueProducts.size / products_total) * 100) : null
+
+  return {
+    expiring_count,
+    expiring_units,
+    expiring_count_prev,
+    act_on_today_count,
+    products_tracked,
+    products_total,
+    coverage_percent_prev,
+    value_at_risk,
+    value_at_risk_prev,
   }
-  if (daysFilter === 90) {
-    return MOCK_SUMMARY_90D
-  }
-  return MOCK_SUMMARY_7D
 }
 
 /**

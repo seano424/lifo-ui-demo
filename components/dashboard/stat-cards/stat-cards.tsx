@@ -1,6 +1,6 @@
 'use client'
 
-import { AlertTriangle, Layers, Shield, DollarSign } from 'lucide-react'
+import { AlertTriangle, Clock, Shield, DollarSign } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useCurrency } from '@/hooks/use-currency'
 import { useDashboardRedesignSummary } from '@/hooks/use-dashboard-redesign'
@@ -27,7 +27,7 @@ export function StatCards({ daysFilter }: StatCardsProps) {
           accentClass="bg-muted"
           isLoading
         />
-        <StatCard label="" value="" subtitle="" icon={Layers} accentClass="bg-muted" isLoading />
+        <StatCard label="" value="" subtitle="" icon={Clock} accentClass="bg-muted" isLoading />
         <StatCard label="" value="" subtitle="" icon={Shield} accentClass="bg-muted" isLoading />
         <StatCard
           label=""
@@ -52,18 +52,6 @@ export function StatCards({ daysFilter }: StatCardsProps) {
           ? t('trends.fewerThanLast', { count: Math.abs(expiringDiff) })
           : t('trends.moreThanLast', { count: Math.abs(expiringDiff) }),
     isPositive: expiringDiff <= 0, // Fewer expiring items is good
-  }
-
-  const batchesDiff = data.active_batches - data.active_batches_prev
-  const batchesTrend = {
-    direction: (batchesDiff < 0 ? 'down' : 'up') as 'up' | 'down',
-    value:
-      batchesDiff === 0
-        ? t('trends.noChange')
-        : batchesDiff > 0
-          ? t('trends.plusThisWeek', { count: Math.abs(batchesDiff) })
-          : t('trends.minusThisWeek', { count: Math.abs(batchesDiff) }),
-    isPositive: batchesDiff >= 0, // More batches is generally good
   }
 
   const coveragePercent = Math.round((data.products_tracked / data.products_total) * 100)
@@ -94,9 +82,15 @@ export function StatCards({ daysFilter }: StatCardsProps) {
 
   return (
     <div className="flex gap-4 flex-wrap">
-      {/* Expiring This Week */}
+      {/* Expiring (label varies by filter) */}
       <StatCard
-        label={t('expiringThisWeek.label')}
+        label={
+          daysFilter === 30
+            ? t('expiringThisWeek.label30')
+            : daysFilter === 90
+              ? t('expiringThisWeek.label90')
+              : t('expiringThisWeek.label')
+        }
         value={`${t('trends.batches', { count: data.expiring_count })}`}
         subtitle={t('expiringThisWeek.subtitle', { units: data.expiring_units })}
         trend={expiringTrend}
@@ -104,13 +98,18 @@ export function StatCards({ daysFilter }: StatCardsProps) {
         accentClass="bg-muted"
       />
 
-      {/* Active Batches */}
+      {/* Act on [period] (label varies by filter) */}
       <StatCard
-        label={t('activeBatches.label')}
-        value={`${t('trends.batches', { count: data.active_batches })}`}
-        subtitle={t('activeBatches.subtitle', { products: data.active_products })}
-        trend={batchesTrend}
-        icon={Layers}
+        label={
+          daysFilter === 30
+            ? t('actOnToday.label30')
+            : daysFilter === 90
+              ? t('actOnToday.label90')
+              : t('actOnToday.label')
+        }
+        value={`${t('trends.batches', { count: data.act_on_today_count })}`}
+        subtitle={t('actOnToday.subtitle')}
+        icon={Clock}
         accentClass="bg-muted"
       />
 
