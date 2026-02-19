@@ -99,6 +99,9 @@ COMMENT ON FUNCTION public.get_categories_with_tracking_settings(uuid) IS
 -- ============================================================================
 -- 2. Fix: get_products_for_tracking_setup
 -- ============================================================================
+DROP FUNCTION IF EXISTS public.get_products_for_tracking_setup(
+  uuid, uuid, text, boolean, integer, integer
+);
 
 CREATE OR REPLACE FUNCTION public.get_products_for_tracking_setup(
   p_store_id uuid, 
