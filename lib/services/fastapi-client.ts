@@ -1065,7 +1065,7 @@ export class FastAPIClient {
 
     // URL encode the connectionId to prevent injection
     const encodedConnectionId = encodeURIComponent(connectionId)
-    const url = `${this.baseUrl}/api/v1/integrations/square/connections/${encodedConnectionId}/sync/orders?days_back=${daysBack}&full_sync=${fullSync}`
+    const url = `${this.baseUrl}/api/v1/integrations/square/connections/${encodedConnectionId}/sync/orders?hours_back=${daysBack * 24}&full_sync=${fullSync}`
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), this.timeout)
 
