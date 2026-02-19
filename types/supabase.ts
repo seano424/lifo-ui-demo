@@ -1934,6 +1934,8 @@ export type Database = {
           incomplete_batches_count: number | null
           latest_expiry_date: string | null
           product_id: string | null
+          quantity: number | null
+          quantity_updated_at: string | null
           store_id: string | null
           total_reserved_quantity: number | null
           total_stock: number | null
