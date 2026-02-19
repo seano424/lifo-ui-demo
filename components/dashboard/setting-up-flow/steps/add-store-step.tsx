@@ -9,43 +9,10 @@ import { useSquareStatus, useInitiateSquareConnect } from '@/hooks/use-square-in
 import { useStoreOverviews } from '@/hooks/use-store-overviews'
 import type { StoreOverview } from '@/lib/queries/store-overview-rpc'
 import { toast } from 'sonner'
-import { cn } from '@/lib/utils'
-import { useCategoriesWithTrackingSettings } from '@/lib/queries/batch-tracking-onboarding'
-import { useActiveStoreId, useStoreState } from '@/lib/stores/store-context'
+import { useStoreState } from '@/lib/stores/store-context'
 import { useSetupFlowStore } from '@/lib/stores/setup-flow-store'
 import { Badge } from '@/components/ui/badge'
-import {
-  Loader2,
-  ArrowRight,
-  Store,
-  Package,
-  FolderTree,
-  Clock,
-  Check,
-  ChevronDown,
-  ChevronUp,
-  ChevronRight,
-  Info,
-} from 'lucide-react'
-
-// ─── Helper Components ────────────────────────────────────
-
-type SyncHealth = 'healthy' | 'empty' | 'stale' | 'error'
-
-interface StatusDotProps {
-  health: SyncHealth
-}
-
-function StatusDot({ health }: StatusDotProps) {
-  const styles: Record<SyncHealth, string> = {
-    healthy: 'bg-foreground',
-    empty: 'bg-muted-foreground/40',
-    stale: 'bg-muted-foreground/60',
-    error: 'bg-muted-foreground/30 ring-2 ring-muted-foreground/40',
-  }
-
-  return <span className={cn('inline-block w-2 h-2 rounded-full', styles[health])} />
-}
+import { Package, FolderTree, ChevronDown, ChevronUp, ChevronRight, Info } from 'lucide-react'
 
 interface StoreCardProps {
   store: StoreOverview
@@ -54,46 +21,16 @@ interface StoreCardProps {
   t: (key: string, params?: Record<string, number | string>) => string
 }
 
-function StoreCard({ store, isExpanded, onToggle, t }: StoreCardProps) {
+function StoreCard({ store, isExpanded, t }: StoreCardProps) {
   // Get active store to determine if this is the current store
   const { activeStore } = useStoreState()
   const isCurrentStore = activeStore?.store_id === store.store_id
 
-  // Derive sync health from store data
-  const syncHealth: SyncHealth =
-    store.product_count === 0 && store.category_count === 0 ? 'empty' : 'healthy'
-
-  // Format last sync time
-  const lastSync = formatRelativeTime(store.updated_at, t)
-
-  // Truncate store ID for display (show first 4 and last 4 chars)
-  const displayStoreId = store.store_code
-    ? `${store.store_code.slice(0, 4)}...${store.store_code.slice(-4)}`
-    : store.store_id.slice(0, 8)
-
   return (
-    <div className={cn('divide-y divide-border', isCurrentStore && 'border-l-4 border-l-primary')}>
-      {/* Store header — always visible */}
-      <button
-        type="button"
-        onClick={onToggle}
-        className="w-full p-4 hover:bg-muted transition-colors cursor-pointer grid grid-cols-1 md:grid-cols-12 gap-4 items-center text-left"
-      >
+    <div>
+      <div className="w-full p-4 gap-4 items-center text-left">
         {/* Left side - Store info */}
-        <div className="flex items-center gap-4 md:col-span-5">
-          <div className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center shrink-0">
-            <Store className="w-5 h-5 text-muted-foreground" />
-          </div>
-          <div className="flex flex-col">
-            <div className="flex items-center gap-2">
-              <Typography variant="p">{store.store_name}</Typography>
-              <StatusDot health={syncHealth} />
-            </div>
-            <Typography variant="muted" className="font-mono">
-              {displayStoreId}
-            </Typography>
-          </div>
-        </div>
+        <Typography variant="p">{store.store_name}</Typography>
 
         {/* Middle - Stats (hidden on mobile) */}
         <div className="hidden md:flex items-center gap-4 md:col-span-5">
@@ -116,252 +53,17 @@ function StoreCard({ store, isExpanded, onToggle, t }: StoreCardProps) {
             <ChevronDown className="w-5 h-5 text-muted-foreground shrink-0" />
           )}
         </div>
-      </button>
-
-      {/* Expanded detail */}
-      {isExpanded && (
-        <div className="divide-y divide-border">
-          {/* Stats row */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-muted">
-            <div className="p-4">
-              <Typography variant="h4">{store.product_count}</Typography>
-              <Typography variant="muted" className="mt-0.5">
-                {t('steps.addStore.products')}
-              </Typography>
-            </div>
-            <div className="p-4">
-              <Typography variant="h4">{store.category_count}</Typography>
-              <Typography variant="muted" className="mt-0.5">
-                {t('steps.addStore.categories')}
-              </Typography>
-            </div>
-            <div className="p-4">
-              <div className="flex items-center gap-1.5">
-                <StatusDot health={syncHealth} />
-                <Typography variant="p" className="capitalize">
-                  {t(`steps.addStore.syncHealth.${syncHealth === 'empty' ? 'noData' : syncHealth}`)}
-                </Typography>
-              </div>
-              <Typography variant="muted" className="mt-0.5">
-                {t('steps.addStore.syncStatus')}
-              </Typography>
-            </div>
-            <div className="p-4">
-              <div className="flex items-center gap-1.5">
-                <Clock className="w-4 h-4 text-muted-foreground" />
-                <Typography variant="p">{lastSync}</Typography>
-              </div>
-              <Typography variant="muted" className="mt-0.5">
-                {t('steps.addStore.lastSynced')}
-              </Typography>
-            </div>
-          </div>
-
-          {/* Actions bar */}
-          {/* NOTE: Sync buttons temporarily hidden during onboarding until backend UPSERT fix is deployed */}
-          {/* <div className="p-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2">
-            <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm">
-                <ExternalLink className="w-4 h-4" />
-                View in Square
-              </Button>
-            </div>
-            <Button variant="ghost" size="sm">
-              <Unlink className="w-4 h-4" />
-              Disconnect
-            </Button>
-          </div> */}
-        </div>
-      )}
-    </div>
-  )
-}
-
-interface SummaryPanelProps {
-  productCount: number
-  categoryCount: number
-  storeCount: number
-  syncedStoreCount: number
-  isSyncing: boolean
-  onContinue: () => void
-  t: (key: string, params?: Record<string, number | string>) => string
-}
-
-function SummaryPanel({
-  productCount,
-  categoryCount,
-  storeCount,
-  syncedStoreCount,
-  isSyncing,
-  onContinue,
-  t,
-}: SummaryPanelProps) {
-  return (
-    <div className="border border-muted rounded-xl overflow-hidden">
-      {/* Panel header */}
-      <div className="p-4 border-b border-muted">
-        <Typography variant="h5">{t('steps.addStore.importSummary.title')}</Typography>
-        <Typography variant="muted" className="mt-1">
-          {t('steps.addStore.importSummary.subtitle')}
-        </Typography>
       </div>
-
-      {isSyncing ? (
-        <div className="flex flex-col items-center gap-3 py-8 text-center">
-          <Loader2 className="h-8 w-8 text-primary animate-spin" />
-          <Typography variant="small" className="text-muted-foreground">
-            {t('steps.addStore.importSummary.syncing')}
-          </Typography>
-        </div>
-      ) : (
-        <>
-          {/* Timeline / progress indicator */}
-          <div className="p-4 space-y-4">
-            {/* Step 1: Connected */}
-            <div className="flex items-start gap-3">
-              <div className="mt-0.5 flex flex-col items-center">
-                <div className="w-5 h-5 rounded-full bg-primary flex items-center justify-center">
-                  <Check className="w-3 h-3 text-primary-foreground" />
-                </div>
-                <div className="w-px h-6 bg-border mt-1" />
-              </div>
-              <div>
-                <Typography variant="p" className="font-medium">
-                  {t('steps.addStore.importSummary.squareConnected')}
-                </Typography>
-                <Typography variant="muted">
-                  {t('steps.addStore.importSummary.storesSynced', {
-                    syncedCount: syncedStoreCount,
-                    totalCount: storeCount,
-                  })}
-                </Typography>
-              </div>
-            </div>
-
-            {/* Step 2: Catalog imported */}
-            <div className="flex items-start gap-3">
-              <div className="mt-0.5 flex flex-col items-center">
-                <div className="w-5 h-5 rounded-full bg-primary flex items-center justify-center">
-                  <Check className="w-3 h-3 text-primary-foreground" />
-                </div>
-                <div className="w-px h-6 bg-border mt-1" />
-              </div>
-              <div>
-                <Typography variant="p" className="font-medium">
-                  {t('steps.addStore.importSummary.catalogImported')}
-                </Typography>
-                <Typography variant="muted">
-                  {productCount} {t('steps.addStore.products').toLowerCase()}, {categoryCount}{' '}
-                  {t('steps.addStore.categories').toLowerCase()}
-                </Typography>
-              </div>
-            </div>
-
-            {/* Step 3: Batch tracking (next) */}
-            <div className="flex items-start gap-3">
-              <div className="mt-0.5">
-                <div className="w-5 h-5 rounded-full border-2 border-muted-foreground/30 bg-background flex items-center justify-center">
-                  <Typography variant="extraSmall" className="font-bold text-muted-foreground">
-                    3
-                  </Typography>
-                </div>
-              </div>
-              <div>
-                <Typography variant="p" className="font-medium text-muted-foreground">
-                  {t('steps.addStore.importSummary.setBatchTracking')}
-                </Typography>
-                <Typography variant="muted">
-                  {t('steps.addStore.importSummary.configureRules')}
-                </Typography>
-              </div>
-            </div>
-          </div>
-
-          {/* Totals */}
-          <div className="border-t border-muted p-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Typography variant="h3">{productCount}</Typography>
-                <Typography variant="muted" className="mt-0.5">
-                  {t('steps.addStore.importSummary.total')}{' '}
-                  {t('steps.addStore.products').toLowerCase()}
-                </Typography>
-              </div>
-              <div>
-                <Typography variant="h3">{categoryCount}</Typography>
-                <Typography variant="muted" className="mt-0.5">
-                  {t('steps.addStore.categories')}
-                </Typography>
-              </div>
-            </div>
-          </div>
-
-          {/* CTA */}
-          <div className="border-t border-muted p-4">
-            <Button onClick={onContinue} size="lg" className="w-full">
-              {t('steps.addStore.importSummary.continueButton')}
-              <ArrowRight className="w-4 h-4" />
-            </Button>
-            <Typography variant="extraSmall" className="text-muted-foreground text-center mt-2.5">
-              {t('steps.addStore.importSummary.returnNote')}
-            </Typography>
-          </div>
-        </>
-      )}
     </div>
   )
 }
 
-// ─── Utility Functions ────────────────────────────────────
-
-function formatRelativeTime(
-  dateString: string,
-  t: (key: string, params?: Record<string, number>) => string,
-): string {
-  const date = new Date(dateString)
-  const now = new Date()
-  const diffMs = now.getTime() - date.getTime()
-  const diffMins = Math.floor(diffMs / 60000)
-  const diffHours = Math.floor(diffMs / 3600000)
-  const diffDays = Math.floor(diffMs / 86400000)
-
-  if (diffMins < 1) return t('steps.addStore.timeAgo.justNow')
-  if (diffMins < 60) return t('steps.addStore.timeAgo.minAgo', { minutes: diffMins })
-  if (diffHours < 24) return t('steps.addStore.timeAgo.hourAgo', { hours: diffHours })
-  if (diffDays < 7) return t('steps.addStore.timeAgo.dayAgo', { days: diffDays })
-  return date.toLocaleDateString()
-}
-
-// ─── Main Component ───────────────────────────────────────
-
-/**
- * AddStoreStep - Square store review during onboarding
- *
- * TEMPORARY STATE: Sync buttons are currently hidden in the onboarding flow.
- *
- * Context:
- * - Initial catalog sync happens successfully during OAuth callback
- * - This step shows users their imported stores for review
- * - Manual re-sync buttons are hidden due to backend duplicate key bug
- *
- * Backend Issue:
- * - Catalog sync uses INSERT instead of UPSERT
- * - Causes duplicate key errors when syncing existing products
- * - Affects both regular and full sync modes
- *
- * To Re-enable Sync:
- * 1. Wait for backend to implement UPSERT in catalog sync endpoint
- * 2. Uncomment sync buttons in StoreCard component (actions bar)
- * 3. Uncomment "Sync all stores" button in header section
- * 4. Test that sync works without duplicate key errors
- * 5. Remove these temporary notes
- */
 export function AddStoreStep() {
   const t = useTranslations('setupFlow')
   const [expandedStoreId, setExpandedStoreId] = useState<string | null>(null)
 
   // Square integration hooks
-  const { data: squareStatus } = useSquareStatus()
+  const { data: squareStatus, isLoading: isLoadingStatus } = useSquareStatus()
   const initiateSquareConnect = useInitiateSquareConnect()
 
   // Store overviews hook
@@ -370,23 +72,18 @@ export function AddStoreStep() {
   // Filter to only show Square stores
   const squareStores = stores?.filter(store => store.is_square_store) ?? []
 
-  // Get store ID and catalog data
-  const storeId = useActiveStoreId()
-  const { data: categories, isLoading: isSyncing } = useCategoriesWithTrackingSettings(
-    storeId || '',
-  )
-
   // Setup flow navigation
   const { goToNextStep } = useSetupFlowStore()
 
+  // Wait for status to load before deciding which view to show.
+  // Without this guard, squareStatus is undefined during (re)fetch and
+  // isSquareConnected defaults to false, causing a flash of the "connect" UI
+  // even for users who are already connected.
+  if (isLoadingStatus) {
+    return null
+  }
+
   const isSquareConnected = squareStatus?.is_connected || false
-
-  // Calculate catalog stats
-  const categoryCount = categories?.length || 0
-  const productCount = categories?.reduce((sum, cat) => sum + cat.product_count, 0) || 0
-
-  // Count synced stores (stores with products)
-  const syncedStoreCount = squareStores.filter(store => store.product_count > 0).length
 
   const handleSquareConnect = async () => {
     try {
@@ -415,71 +112,72 @@ export function AddStoreStep() {
   if (!isSquareConnected) {
     return (
       <div className="flex flex-col gap-6">
-        <Typography variant="h3">{t('steps.addStore.title')}</Typography>
+        <div className="flex flex-col gap-2 p-4 text-center">
+          <Typography variant="h2" className="font-extrabold">
+            {t('steps.addStore.title')}
+          </Typography>
 
-        <Typography variant="p">{t('steps.addStore.description')}</Typography>
+          <Typography variant="p" color="muted" className="max-w-lg mx-auto">
+            {t('steps.addStore.description')}
+          </Typography>
+        </div>
 
         {/* Main bordered container */}
-        <div className="flex flex-col border border-muted rounded-xl overflow-hidden">
-          <div className="p-4 flex flex-col gap-4">
-            <Typography variant="h5">{t('steps.addStore.integrations.title')}</Typography>
-            <Typography variant="p">{t('steps.addStore.integrations.subtitle')}</Typography>
-          </div>
-
-          {/* Square Integration */}
-          <div className="divide-y divide-border border-t border-muted">
-            <button
-              type="button"
-              onClick={handleSquareConnect}
-              className="p-4 hover:bg-muted transition-colors cursor-pointer grid grid-cols-1 md:grid-cols-12 gap-4 items-center text-left w-full"
-            >
-              {/* Left side - Square logo and name */}
-              <div className="flex items-center gap-4 md:col-span-4">
-                <div className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center shrink-0">
-                  <Image src="/square/square-icon.svg" alt="Square" width={20} height={20} />
+        <div className="flex flex-col rounded-xl overflow-hidden max-w-2xl mx-auto">
+          <button
+            type="button"
+            onClick={handleSquareConnect}
+            className="p-4 hover:bg-muted transition-colors cursor-pointer grid grid-cols-1 gap-4 items-center text-left w-full group"
+          >
+            <div className="flex gap-4">
+              <div className="size-10 bg-secondary-100 rounded-lg flex items-center justify-center">
+                <Image src="/square/square-icon.svg" alt="Square" width={20} height={20} />
+              </div>
+              <div className="flex items-center justify-between w-full">
+                <div className="flex flex-col gap-1">
+                  <Typography variant="p">Square</Typography>
+                  <Typography variant="p" color="muted">
+                    {t('steps.addStore.squareDescription')}
+                  </Typography>
                 </div>
-                <Typography variant="p">Square</Typography>
+                <ChevronRight className="w-5 h-5 text-muted-foreground shrink-0 group-hover:text-foreground" />
               </div>
-
-              {/* Middle - Description */}
-              <div className="md:col-span-6">
-                <Typography variant="p">{t('steps.addStore.squareDescription')}</Typography>
-              </div>
-
-              {/* Right side - Connect button */}
-              <div className="flex items-center gap-5 md:col-span-2 md:justify-end">
+            </div>
+            {/* <div className="flex items-center gap-5 justify-end">
                 <Typography variant="p">{t('steps.addStore.connect')}</Typography>
                 <ChevronRight className="w-5 h-5 text-muted-foreground shrink-0" />
-              </div>
-            </button>
-          </div>
+              </div> */}
+          </button>
         </div>
       </div>
     )
   }
 
-  // Show connected state with bordered container layout
   return (
     <div className="flex flex-col gap-6">
-      <Typography variant="h3">{t('steps.addStore.titleConnected')}</Typography>
+      <div className="flex flex-col gap-2 p-4 text-center">
+        <Typography variant="h2" className="font-extrabold">
+          {t('steps.addStore.titleConnected')}
+        </Typography>
 
-      <Typography variant="p">{t('steps.addStore.descriptionConnected')}</Typography>
+        <Typography variant="p" color="muted" className="max-w-lg mx-auto">
+          {t('steps.addStore.descriptionConnected')}
+        </Typography>
+      </div>
 
       {/* Main bordered container - matching integrations page style */}
-      <div className="flex flex-col border border-muted rounded-xl overflow-hidden">
+      <div className="flex flex-col gap-4 items-center text-center rounded-xl overflow-hidden">
         {/* Header section */}
         {/* NOTE: Sync button temporarily hidden until backend UPSERT fix is deployed */}
-        <div className="p-4 flex flex-col gap-4">
-          <div>
-            <Typography variant="h5">{t('steps.addStore.yourStores')}</Typography>
-            <Typography variant="muted" className="mt-1">
-              {t('steps.addStore.storesConnected', { count: squareStores.length })}
-            </Typography>
-          </div>
+        <div className="flex flex-col gap-1">
+          <Typography variant="h5">{t('steps.addStore.yourStores')}</Typography>
+          <Typography variant="small">
+            {t('steps.addStore.storesConnected', { count: squareStores.length })}
+          </Typography>
         </div>
 
         {/* Store list - bordered sections */}
-        <div className="divide-y divide-border border-t border-muted">
+        <div className="flex gap-2 items-center flex-wrap divide-x divide-border">
           {squareStores.map(store => (
             <StoreCard
               key={store.store_id}
@@ -492,30 +190,24 @@ export function AddStoreStep() {
         </div>
 
         {/* Help footer */}
-        <div className="border-t border-muted p-4 flex items-start gap-3 bg-muted/30">
-          <Info className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
-          <div className="flex-1">
-            <Typography variant="small" className="text-muted-foreground">
-              {t('steps.addStore.helpNote')}
-            </Typography>
-            {/* <Button variant="link" size="sm" className="mt-2 p-0 h-auto text-xs">
-              Learn more about Square sync →
-            </Button> */}
+        <div className="border border-border rounded-xl overflow-hidden max-w-2xl mx-auto p-4 grid grid-cols-1 gap-4 items-center text-left w-full group">
+          <div className="flex gap-4">
+            <div className="size-10 bg-secondary-100 rounded-lg flex items-center justify-center">
+              <Info className="size-5 text-primary-600 stroke-3" />
+            </div>
+            <div className="flex items-center justify-between w-full">
+              <Typography variant="small" color="muted">
+                {t('steps.addStore.helpNote')}
+              </Typography>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Summary panel below main section */}
-      <div>
-        <SummaryPanel
-          productCount={productCount}
-          categoryCount={categoryCount}
-          storeCount={squareStores.length}
-          syncedStoreCount={syncedStoreCount}
-          isSyncing={isSyncing}
-          onContinue={handleContinueToBatchTracking}
-          t={t}
-        />
+      <div className="flex justify-end">
+        <Button onClick={handleContinueToBatchTracking} className="w-full sm:w-fit">
+          {t('steps.addStore.importSummary.continueButton')}
+        </Button>
       </div>
     </div>
   )

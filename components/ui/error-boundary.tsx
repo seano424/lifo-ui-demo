@@ -52,7 +52,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
             </CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col gap-4">
-            <p className="text-muted-foreground">
+            <p>
               An error occurred while loading this component. Please try refreshing the page or
               contact support if the problem persists.
             </p>

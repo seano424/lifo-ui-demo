@@ -740,7 +740,7 @@ export function BatchAutomationSection({
         {/* Intro text */}
         <div className="bg-gray-50 rounded-xl p-4 mb-4">
           <p className="text-sm text-gray-600">
-            Set default expiration timelines by category or product. When inventory arrives, LIFO
+            Set default expiration timelines by category or product. When inventory arrives,Lifo
             will calculate the expiry date automatically based on these presets.
           </p>
         </div>
@@ -1077,7 +1077,7 @@ function FirstRunBanner({ scopeDone, automationDone, onDismiss }) {
           <div>
             <h2 className="text-base font-semibold">Set up batch tracking</h2>
             <p className="text-sm text-gray-400 mt-1">
-              Configure how LIFO tracks your inventory. This usually takes about 2 minutes.
+              Configure howLifo tracks your inventory. This usually takes about 2 minutes.
             </p>
             <div className="flex items-center gap-6 mt-4">
               <ChecklistItemDark done={scopeDone} label="Choose what to track" />
@@ -1345,7 +1345,7 @@ function SaveFooter({ isDirty, isFirstRun, onSave, onDiscard }) {
 // MAIN PAGE COMPONENT
 // ═══════════════════════════════════════════════════════════════
 
-export default function LIFOSetupWireframeV2() {
+export default function LifoSetupWireframeV2() {
   // Mode toggle for demo
   const [isFirstRun, setIsFirstRun] = useState(true)
   const [showFirstRunBanner, setShowFirstRunBanner] = useState(true)
@@ -1422,7 +1422,7 @@ export default function LIFOSetupWireframeV2() {
           </h1>
           <p className="text-sm text-gray-400 mt-1">
             {isFirstRun
-              ? 'Configure how LIFO tracks your inventory and automates batch creation.'
+              ? 'Configure howLifo tracks your inventory and automates batch creation.'
               : 'Manage your tracking preferences and automation settings.'}
           </p>
         </div>

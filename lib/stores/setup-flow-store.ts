@@ -7,9 +7,11 @@ export const SETUP_STEPS: SetupStep[] = ['add-store', 'batch-tracking-setup']
 
 export interface SetupFlowState {
   currentStep: SetupStep
+  batchTrackingSubStep: string | null
 
   // Actions
   setCurrentStep: (step: SetupStep) => void
+  setBatchTrackingSubStep: (subStep: string | null) => void
   goToNextStep: () => void
   goToPrevStep: () => void
   goToStep: (step: SetupStep) => void
@@ -21,6 +23,7 @@ export interface SetupFlowState {
 
 const initialState = {
   currentStep: 'add-store' as SetupStep,
+  batchTrackingSubStep: null as string | null,
 }
 
 export const useSetupFlowStore = create<SetupFlowState>()(
@@ -30,6 +33,10 @@ export const useSetupFlowStore = create<SetupFlowState>()(
 
       setCurrentStep: (step: SetupStep) => {
         set({ currentStep: step })
+      },
+
+      setBatchTrackingSubStep: (subStep: string | null) => {
+        set({ batchTrackingSubStep: subStep })
       },
 
       goToNextStep: () => {
@@ -68,6 +75,7 @@ export const useSetupFlowStore = create<SetupFlowState>()(
       name: 'lifo-setup-flow',
       partialize: state => ({
         currentStep: state.currentStep,
+        batchTrackingSubStep: state.batchTrackingSubStep,
       }),
     },
   ),

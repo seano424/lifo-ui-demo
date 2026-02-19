@@ -4,7 +4,7 @@ import { useState } from 'react'
 
 /*
  * ─────────────────────────────────────────────────────────
- *  LIFO — Square Integration Wireframe (Grayscale)
+ * Lifo — Square Integration Wireframe (Grayscale)
  *
  *  DESIGN DECISIONS & RATIONALE (for Claude Code handoff):
  *
@@ -654,7 +654,7 @@ export default function SquareIntegrationWireframe() {
               <div>
                 <p className="text-sm text-gray-600">
                   Products and categories are imported from your Square catalog.
-                  LIFO adds batch-level expiry tracking on top of your existing
+                 Lifo adds batch-level expiry tracking on top of your existing
                   product data.
                 </p>
                 <button className="text-xs font-medium text-gray-500 hover:text-gray-900 mt-2 transition-colors">

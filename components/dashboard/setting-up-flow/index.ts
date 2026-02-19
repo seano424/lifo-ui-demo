@@ -1,3 +1,3 @@
 export { SettingUpFlow } from './setting-up-flow'
-export { SetupStepsSidebar } from './setup-steps-sidebar'
+export { SetupStepsProgress } from './setup-steps-progress'
 export * from './steps'

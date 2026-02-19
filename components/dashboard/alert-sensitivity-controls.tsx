@@ -189,9 +189,7 @@ export function AlertSensitivityControls({
                       <div className="w-2 h-2 bg-primary rounded-full" />
                       <Typography variant="small">{t('levels.balancedTitle')}</Typography>
                     </div>
-                    <Typography variant="muted" className="text-muted-foreground">
-                      {t('selectDescriptions.balanced')}
-                    </Typography>
+                    <Typography variant="small">{t('selectDescriptions.balanced')}</Typography>
                   </div>
                 </SelectItem>
                 <SelectItem value="proactive">
@@ -200,9 +198,7 @@ export function AlertSensitivityControls({
                       <div className="w-2 h-2 bg-primary-500 rounded-full" />
                       <Typography variant="small">{t('levels.proactiveTitle')}</Typography>
                     </div>
-                    <Typography variant="muted" className="text-muted-foreground">
-                      {t('selectDescriptions.proactive')}
-                    </Typography>
+                    <Typography variant="small">{t('selectDescriptions.proactive')}</Typography>
                   </div>
                 </SelectItem>
               </SelectContent>

@@ -67,7 +67,7 @@ export function ActivatingState({ showSuccess = false }: ActivatingStateProps) {
 
         <div className="flex flex-col gap-3 w-full max-w-md">
           <Typography variant="h3">{showSuccess ? t('successTitle') : t('title')}</Typography>
-          <Typography variant="p" className="text-muted-foreground">
+          <Typography variant="p">
             {showSuccess ? t('successDescription') : t('description')}
           </Typography>
 
@@ -82,9 +82,7 @@ export function ActivatingState({ showSuccess = false }: ActivatingStateProps) {
             />
           </div>
 
-          <Typography variant="small" className="text-muted-foreground">
-            {progress}%
-          </Typography>
+          <Typography variant="small">{progress}%</Typography>
         </div>
       </Card>
     </div>

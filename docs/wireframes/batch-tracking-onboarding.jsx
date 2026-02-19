@@ -838,7 +838,7 @@ const ErrorState = ({ onRetry, onContinue }) => (
 )
 
 // Main App Component
-export default function LIFOOnboardingWireframes() {
+export default function LifoOnboardingWireframes() {
   const [currentScreen, setCurrentScreen] = useState(1)
   const [showLoading, setShowLoading] = useState(false)
   const [showError, setShowError] = useState(false)

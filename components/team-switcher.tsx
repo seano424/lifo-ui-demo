@@ -74,7 +74,7 @@ export function TeamSwitcher({ compact = false }: TeamSwitcherProps) {
             >
               <StoreIcon className="w-4 h-4 text-muted-foreground" />
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="text-muted-foreground">{t('noStoresAvailable')}</span>
+                <span>{t('noStoresAvailable')}</span>
               </div>
             </SidebarMenuButton>
           </SidebarMenuItem>

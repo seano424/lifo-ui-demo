@@ -208,7 +208,7 @@ export default function SquareManagementPage() {
                             <Badge variant="primary">{t('currentLocation')}</Badge>
                           )}
                         </div>
-                        <Typography variant="muted" className="font-mono">
+                        <Typography variant="small" className="font-mono">
                           {t('locationId')}: {store.location_id}
                         </Typography>
                       </div>

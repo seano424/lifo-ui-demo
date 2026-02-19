@@ -89,9 +89,7 @@ export function UntrackedAlert({
             <Typography variant="p" className="font-medium">
               {count} units have no expiry date
             </Typography>
-            <Typography variant="p" className="text-muted-foreground">
-              {expanded ? '▾ Collapse' : '▸ Add Dates'}
-            </Typography>
+            <Typography variant="p">{expanded ? '▾ Collapse' : '▸ Add Dates'}</Typography>
           </div>
         </div>
       </button>

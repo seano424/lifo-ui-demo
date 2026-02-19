@@ -114,7 +114,7 @@ function DialogDescription({
 }: React.ComponentProps<typeof DialogPrimitive.Description>) {
   return (
     <DialogPrimitive.Description data-slot="dialog-description" asChild {...props}>
-      <Typography variant="muted" className={className}>
+      <Typography variant="small" className={className}>
         {children}
       </Typography>
     </DialogPrimitive.Description>

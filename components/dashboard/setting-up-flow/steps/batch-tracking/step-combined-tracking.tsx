@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { Card } from '@/components/ui/card'
 import { Typography } from '@/components/ui/typography'
 import { Button } from '@/components/ui/button'
@@ -8,7 +8,8 @@ import { Badge } from '@/components/ui/badge'
 import { Toggle } from './toggle'
 import { ShelfLifeChip } from './shelf-life-chip'
 import { useTranslations } from 'next-intl'
-import { Package, Zap, Type, Eye, ChevronDown, RotateCcw } from 'lucide-react'
+import { Package, Zap, Type, Eye, ChevronDown, RotateCcw, Info } from 'lucide-react'
+import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip'
 import type { ProcessedCategory, ProductOverride } from '../batch-tracking-step'
 
 interface StepCombinedTrackingProps {
@@ -55,6 +56,17 @@ export function StepCombinedTracking({
   const [previewOpen, setPreviewOpen] = useState(false)
 
   const enabledIds = new Set(enabledCategories.map(c => c.id))
+
+  const sortedCategories = useMemo(
+    () =>
+      [...categories].sort((a, b) => {
+        const scoreA = enabledIds.has(a.id) ? (categoryModes[a.id] === 'auto' ? 0 : 1) : 2
+        const scoreB = enabledIds.has(b.id) ? (categoryModes[b.id] === 'auto' ? 0 : 1) : 2
+        return scoreA - scoreB
+      }),
+    [categories, enabledIds, categoryModes],
+  )
+
   const trackedProducts = enabledCategories.reduce((sum, cat) => sum + cat.productCount, 0)
   const autoCount = enabledCategories.filter(c => categoryModes[c.id] === 'auto').length
   const manualCount = enabledCategories.filter(c => categoryModes[c.id] === 'manual').length
@@ -104,12 +116,30 @@ export function StepCombinedTracking({
     <div className="flex flex-col gap-6 mb-80">
       {/* Header */}
       <div>
-        <Typography variant="h3" className="mb-2">
-          {t('whatToTrack.title')}
-        </Typography>
-        <Typography variant="p" className="text-muted-foreground">
-          {t('whatToTrack.description')}
-        </Typography>
+        <div className="flex items-center gap-2 mb-2">
+          <Typography variant="h3">{t('whatToTrack.title')}</Typography>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                className="text-muted-foreground hover:text-foreground transition-colors"
+                aria-label="What's this?"
+              >
+                <Info className="w-4 h-4" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent className="max-w-xs">
+              <p className="font-semibold mb-1">⚡ Auto-track</p>
+              <p className="mb-2">
+                We calculate expiry dates based on delivery date + shelf life. Nothing to enter on
+                delivery.
+              </p>
+              <p className="font-semibold mb-1">✋ Manual entry</p>
+              <p>You'll scan or enter the expiry date when the delivery arrives.</p>
+            </TooltipContent>
+          </Tooltip>
+        </div>
+        <Typography variant="p">{t('whatToTrack.description')}</Typography>
       </div>
 
       {/* Categories */}
@@ -118,9 +148,7 @@ export function StepCombinedTracking({
           {categories.length === 0 ? (
             <div className="py-8 text-center">
               <Package className="h-12 w-12 mx-auto mb-3 text-muted-foreground/50" />
-              <Typography variant="small" className="text-muted-foreground">
-                {t('whatToTrack.noCategories')}
-              </Typography>
+              <Typography variant="small">{t('whatToTrack.noCategories')}</Typography>
             </div>
           ) : (
             <>
@@ -154,7 +182,7 @@ export function StepCombinedTracking({
               </div>
 
               {/* Category List with Inline Configuration */}
-              {categories.map(category => {
+              {sortedCategories.map(category => {
                 const enabled = enabledIds.has(category.id)
                 const mode = categoryModes[category.id] || 'auto'
                 const days = shelfLifeDays[category.id]
@@ -408,7 +436,7 @@ function CategoryRowWithConfig({
           >
             {category.name}
           </Typography>
-          <Typography variant="small" className="text-muted-foreground">
+          <Typography variant="small">
             {category.productCount}{' '}
             {category.productCount === 1
               ? t('whatToTrack.category.product')

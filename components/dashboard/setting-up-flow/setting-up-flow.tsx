@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { SetupStepsSidebar } from './setup-steps-sidebar'
+import { SetupStepsProgress } from './setup-steps-progress'
 import { AddStoreStep, BatchTrackingStep } from './steps'
 import { useSetupFlowStore, type SetupStep } from '@/lib/stores/setup-flow-store'
 
@@ -39,16 +39,11 @@ export function SettingUpFlow() {
   }
 
   return (
-    <div className="flex flex-col gap-4 lg:flex-row w-full h-full">
-      {/* Sidebar */}
-      <aside className="h-full relative lg:max-w-xs">
-        <SetupStepsSidebar />
-      </aside>
-
-      {/* Step content */}
-      <main className="px-6 lg:p-6 w-full">
+    <div className="container py-8 max-w-4xl mx-auto">
+      <div className="flex flex-col gap-6 bg-white rounded-xl p-6 select-none">
+        <SetupStepsProgress />
         <StepComponent />
-      </main>
+      </div>
     </div>
   )
 }

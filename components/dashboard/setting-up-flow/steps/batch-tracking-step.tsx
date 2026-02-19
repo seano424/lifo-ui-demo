@@ -6,13 +6,15 @@ import {
   useSaveBatchTrackingSetup,
 } from '@/lib/queries/batch-tracking-onboarding'
 import { getDefaultShelfLife } from '@/lib/batch-tracking/shelf-life-lookup'
-import { StepSquareConnected } from './batch-tracking/step-square-connected'
-import { StepCombinedTracking } from './batch-tracking/step-combined-tracking'
+import { StepWhatToTrack } from './batch-tracking/step-what-to-track'
+import { StepHowToTrack } from './batch-tracking/step-how-to-track'
+import { StepIntro } from './batch-tracking/step-intro'
+import { StepReview } from './batch-tracking/step-review'
 import { ActivatingState } from './batch-tracking/activating-state'
-import { useActiveStoreId, useStoreState } from '@/lib/stores/store-context'
+import { useActiveStoreId } from '@/lib/stores/store-context'
 import { logger } from '@/lib/utils/logger'
 import { useSetupFlowStore } from '@/lib/stores/setup-flow-store'
-import { StoreIndicator } from '../store-indicator'
+// import { StoreIndicator } from '../store-indicator'
 
 // =============================================================================
 // DEMO MODE - Toggle this to test the animation without database changes
@@ -23,7 +25,7 @@ const DEMO_MODE = false // Set to true to preview animation without saving
 // TYPES
 // =============================================================================
 
-export type WizardSubStep = 0 | 1 | 'activating'
+export type WizardSubStep = 'intro' | 'what-to-track' | 'how-to-track' | 'review' | 'activating'
 
 export interface ProcessedCategory {
   id: string
@@ -60,21 +62,23 @@ export interface ProductOverride {
 export function BatchTrackingStep() {
   const context = 'BatchTrackingStep'
   // Get active store from Zustand store context
-  const { activeStore } = useStoreState()
   const storeId = useActiveStoreId()
 
   // Setup flow navigation (for going back to Add Store step)
-  const { goToPrevStep } = useSetupFlowStore()
+  const { goToPrevStep, setBatchTrackingSubStep } = useSetupFlowStore()
 
   // Internal sub-step navigation
-  // Start at step 1 (What to Track) since step 0 (Square Connected) is now shown in Add Store Step
-  const [subStep, setSubStep] = useState<WizardSubStep>(1)
+  const [subStep, setSubStep] = useState<WizardSubStep>('intro')
   const [showSuccess, setShowSuccess] = useState(false)
 
+  // Sync sub-step into store so the sidebar can reflect it
+  useEffect(() => {
+    setBatchTrackingSubStep(subStep)
+    return () => setBatchTrackingSubStep(null)
+  }, [subStep, setBatchTrackingSubStep])
+
   // Fetch data from backend
-  const { data: categories, isLoading: isSyncing } = useCategoriesWithTrackingSettings(
-    storeId || '',
-  )
+  const { data: categories } = useCategoriesWithTrackingSettings(storeId || '')
   const saveMutation = useSaveBatchTrackingSetup()
 
   // Process categories with shelf life lookup
@@ -103,6 +107,7 @@ export function BatchTrackingStep() {
   const [shelfLifeDays, setShelfLifeDays] = useState<Record<string, number | null>>({})
   const [productOverrides, setProductOverrides] = useState<Record<string, ProductOverride>>({})
   const [hasInitialized, setHasInitialized] = useState(false)
+  const [isSkipping, setIsSkipping] = useState(false)
 
   // Reset state when store changes
   useEffect(() => {
@@ -115,9 +120,10 @@ export function BatchTrackingStep() {
     setProductOverrides({})
     setHasInitialized(false)
 
-    // Reset to step 1
-    setSubStep(1)
-  }, [storeId])
+    // Reset to intro
+    setSubStep('intro')
+    setBatchTrackingSubStep('intro')
+  }, [storeId, setBatchTrackingSubStep])
 
   // Initialize state when categories load (only once)
   useEffect(() => {
@@ -224,9 +230,58 @@ export function BatchTrackingStep() {
     setProductOverrides({})
   }
 
-  const handleActivate = async () => {
+  const handleSkip = async () => {
+    if (!storeId) {
+      logger.error(context, 'Cannot skip batch tracking setup without storeId')
+      return
+    }
+
+    setIsSkipping(true)
+
+    try {
+      logger.log(context, 'Skipping batch tracking setup — saving all categories as manual', {
+        storeId,
+        categoryCount: processedCategories.length,
+      })
+
+      // Save all categories as manual defaults with their typical shelf life days
+      const categorySettings = processedCategories.map(cat => ({
+        category_id: cat.id,
+        is_tracked: true,
+        auto_create_batches: false,
+        default_shelf_life_days: cat.days,
+      }))
+
+      await saveMutation.mutateAsync({
+        storeId,
+        config: {
+          enabled: true,
+          setup_completed: true,
+          setup_completed_at: new Date().toISOString(),
+          product_selection_mode: 'by_category',
+          selected_category_ids: processedCategories.map(c => c.id),
+          selected_product_ids: [],
+        },
+        categorySettings,
+        productOverrides: [],
+      })
+
+      logger.log(context, 'Skip save complete — setup flow will exit to dashboard', { storeId })
+      // React Query invalidation from saveMutation.onSuccess handles navigation
+    } catch (error) {
+      logger.error(context, 'Failed to skip batch tracking setup', { error, storeId })
+      setIsSkipping(false)
+    }
+  }
+
+  const handleActivate = () => {
+    // Advances to the review screen — actual save happens in handleConfirm
+    setSubStep('review')
+  }
+
+  const handleConfirm = async () => {
     if (!storeId && !DEMO_MODE) {
-      logger.error(context, 'Cannot activate batch tracking without storeId')
+      logger.error(context, 'Cannot confirm batch tracking without storeId')
       return
     }
 
@@ -305,8 +360,8 @@ export function BatchTrackingStep() {
       // No manual navigation needed - React Query invalidation handles it
     } catch (error) {
       logger.error(context, 'Failed to activate batch tracking', { error, storeId })
-      // Go back to step 1
-      setSubStep(1)
+      // Go back to review so user can try again
+      setSubStep('review')
       setShowSuccess(false)
     }
   }
@@ -314,34 +369,53 @@ export function BatchTrackingStep() {
   return (
     <div className="flex flex-col gap-6">
       {/* Store Indicator - shown on desktop only */}
-      <StoreIndicator className="hidden lg:block" />
+      {/* <StoreIndicator className="hidden lg:block" /> */}
 
-      {subStep === 0 && (
-        <StepSquareConnected
-          isSyncing={isSyncing}
-          categoryCount={processedCategories.length}
-          productCount={processedCategories.reduce((sum, cat) => sum + cat.productCount, 0)}
-          storeName={activeStore?.store_name || 'Your Store'}
-          onNext={() => setSubStep(1)}
+      {subStep === 'intro' && (
+        <StepIntro
+          categories={processedCategories}
+          isSkipping={isSkipping}
+          onSetup={() => setSubStep('what-to-track')}
+          onSkip={handleSkip}
+          onBack={goToPrevStep}
         />
       )}
 
-      {subStep === 1 && (
-        <StepCombinedTracking
+      {subStep === 'what-to-track' && (
+        <StepWhatToTrack
           categories={processedCategories}
           enabledCategories={enabledCategories}
+          onToggleCategory={handleToggleCategory}
+          onNext={() => setSubStep('how-to-track')}
+          onBack={() => setSubStep('intro')}
+        />
+      )}
+
+      {subStep === 'how-to-track' && (
+        <StepHowToTrack
+          categories={enabledCategories}
           categoryModes={categoryModes}
           shelfLifeDays={shelfLifeDays}
           productOverrides={productOverrides}
           storeId={storeId}
-          onToggleCategory={handleToggleCategory}
           onUpdateMode={handleUpdateCategoryMode}
           onUpdateShelfLife={handleUpdateShelfLife}
           onUpdateProductOverride={handleUpdateProductOverride}
           onClearProductOverride={handleClearProductOverride}
           onResetToDefaults={handleResetToDefaults}
           onActivate={handleActivate}
-          onBack={goToPrevStep}
+          onBack={() => setSubStep('what-to-track')}
+        />
+      )}
+
+      {subStep === 'review' && (
+        <StepReview
+          enabledCategories={enabledCategories}
+          categoryModes={categoryModes}
+          shelfLifeDays={shelfLifeDays}
+          isSaving={saveMutation.isPending}
+          onBack={() => setSubStep('how-to-track')}
+          onConfirm={handleConfirm}
         />
       )}
 

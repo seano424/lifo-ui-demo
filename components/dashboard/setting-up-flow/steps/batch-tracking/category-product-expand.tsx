@@ -76,9 +76,7 @@ export function CategoryProductExpand({
 
           {!isLoading && (!products || products.length === 0) && (
             <div className="py-6 text-center">
-              <Typography variant="small" className="text-muted-foreground">
-                {t('noProducts')}
-              </Typography>
+              <Typography variant="small">{t('noProducts')}</Typography>
             </div>
           )}
 

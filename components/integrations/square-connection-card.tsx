@@ -94,7 +94,7 @@ export function SquareConnectionCard({ status, isLoading, onConnect }: SquareCon
                 <Typography variant="h2">Square</Typography>
                 <Badge variant="secondary">{t('connected')}</Badge>
               </div>
-              {/* <Typography variant="muted">
+              {/* <Typography variant="small">
                 {status?.merchant_name || 'N/A'}
               </Typography> */}
             </div>
@@ -113,7 +113,7 @@ export function SquareConnectionCard({ status, isLoading, onConnect }: SquareCon
           <div className="flex flex-col gap-4">
             <div className="flex items-center gap-1">
               <MapPin className="h-4 w-4 text-muted-foreground" />
-              <Typography variant="muted">
+              <Typography variant="small">
                 {hasMultipleLocations
                   ? t('connectedLocationsDescription', { count: stores.length })
                   : t('connectedLocationsDescriptionSingle')}
@@ -150,11 +150,11 @@ export function SquareConnectionCard({ status, isLoading, onConnect }: SquareCon
                           )}
                         </div>
                         <div className="flex flex-col gap-1">
-                          <Typography variant="muted" className="text-xs font-mono">
+                          <Typography variant="small" className="text-xs font-mono">
                             {t('locationId')}: {store.location_id}
                           </Typography>
                           {store.last_sync_at && (
-                            <Typography variant="muted" className="text-xs">
+                            <Typography variant="small" className="text-xs">
                               {t('lastSync')}:{' '}
                               {formatDistanceToNow(new Date(store.last_sync_at), {
                                 addSuffix: true,

@@ -81,9 +81,7 @@ export function StepSuccess({
                 <Typography variant="small" className="font-semibold">
                   {autoCategories} {t('summary.autoCategories')}
                 </Typography>
-                <Typography variant="small" className="text-muted-foreground">
-                  {t('summary.autoDescription')}
-                </Typography>
+                <Typography variant="small">{t('summary.autoDescription')}</Typography>
               </div>
             </div>
 
@@ -100,9 +98,7 @@ export function StepSuccess({
                 <Typography variant="small" className="font-semibold">
                   {manualCategories} {t('summary.manualCategories')}
                 </Typography>
-                <Typography variant="small" className="text-muted-foreground">
-                  {t('summary.manualDescription')}
-                </Typography>
+                <Typography variant="small">{t('summary.manualDescription')}</Typography>
               </div>
             </div>
 
@@ -120,9 +116,7 @@ export function StepSuccess({
                   <Typography variant="small" className="font-semibold">
                     {productOverrides} {t('summary.productOverrides')}
                   </Typography>
-                  <Typography variant="small" className="text-muted-foreground">
-                    {t('summary.overridesDescription')}
-                  </Typography>
+                  <Typography variant="small">{t('summary.overridesDescription')}</Typography>
                 </div>
               </div>
             )}

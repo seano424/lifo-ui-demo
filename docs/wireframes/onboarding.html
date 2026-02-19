@@ -1,0 +1,1711 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+    <title>Lifo – Onboarding Redesign</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,400&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --lifo-green: #2db87a;
+        --lifo-green-light: #e8f8f0;
+        --lifo-green-dark: #1a8f5c;
+        --lifo-emerald: #34d399;
+        --surface: #fafbfc;
+        --surface-warm: #f8f7f4;
+        --text-primary: #1a1d23;
+        --text-secondary: #6b7280;
+        --text-muted: #9ca3af;
+        --border: #e5e7eb;
+        --border-light: #f0f1f3;
+        --white: #ffffff;
+        --amber: #f59e0b;
+        --amber-light: #fef3c7;
+        --red: #ef4444;
+        --red-light: #fee2e2;
+        --blue: #3b82f6;
+        --blue-light: #dbeafe;
+        --purple: #8b5cf6;
+        --purple-light: #ede9fe;
+        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+        --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06);
+        --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.08);
+        --shadow-xl: 0 24px 60px rgba(0, 0, 0, 0.1);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: 'DM Sans', sans-serif;
+        background: var(--white);
+        color: var(--text-primary);
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+
+      /* ===== FULL SCREEN ONBOARDING WRAPPER ===== */
+      .onboarding-wrapper {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+      }
+
+      /* ===== TOP BAR ===== */
+      .top-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 20px 40px;
+        position: relative;
+        z-index: 10;
+      }
+
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .logo-mark {
+        width: 36px;
+        height: 36px;
+        position: relative;
+      }
+
+      .logo-mark svg {
+        width: 100%;
+        height: 100%;
+      }
+
+      .logo-text {
+        font-family: 'Fraunces', serif;
+        font-weight: 700;
+        font-size: 22px;
+        color: var(--text-primary);
+        letter-spacing: -0.5px;
+      }
+
+      .store-badge {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        background: var(--surface);
+        border-radius: 100px;
+        font-size: 13px;
+        color: var(--text-secondary);
+        border: 1px solid var(--border-light);
+      }
+
+      .store-badge .dot {
+        width: 8px;
+        height: 8px;
+        background: var(--lifo-green);
+        border-radius: 50%;
+      }
+
+      /* ===== PROGRESS BAR ===== */
+      .progress-container {
+        padding: 0 40px;
+        margin-bottom: 8px;
+      }
+
+      .progress-track {
+        height: 3px;
+        background: var(--border-light);
+        border-radius: 10px;
+        overflow: hidden;
+        max-width: 480px;
+        margin: 0 auto;
+      }
+
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          var(--lifo-green),
+          var(--lifo-emerald)
+        );
+        border-radius: 10px;
+        transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .step-indicator {
+        text-align: center;
+        font-size: 12px;
+        color: var(--text-muted);
+        margin-top: 12px;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        font-weight: 500;
+      }
+
+      /* ===== MAIN CONTENT AREA ===== */
+      .step-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 20px 40px 60px;
+        max-width: 680px;
+        margin: 0 auto;
+        width: 100%;
+      }
+
+      .step-content.wide {
+        max-width: 780px;
+      }
+
+      /* ===== HEADINGS ===== */
+      .step-heading {
+        font-family: 'Fraunces', serif;
+        font-size: 42px;
+        font-weight: 700;
+        line-height: 1.15;
+        text-align: center;
+        margin-bottom: 12px;
+        letter-spacing: -1px;
+        color: var(--text-primary);
+      }
+
+      .step-subheading {
+        font-size: 16px;
+        color: var(--text-secondary);
+        text-align: center;
+        line-height: 1.6;
+        max-width: 440px;
+        margin-bottom: 40px;
+      }
+
+      /* ===== SCREEN 1: CONNECT SQUARE ===== */
+      .connect-card {
+        width: 100%;
+        max-width: 480px;
+        border: 1.5px solid var(--border);
+        border-radius: 16px;
+        padding: 28px 28px;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        background: var(--white);
+      }
+
+      .connect-card:hover {
+        border-color: var(--lifo-green);
+        box-shadow:
+          0 0 0 3px rgba(45, 184, 122, 0.1),
+          var(--shadow-md);
+        transform: translateY(-1px);
+      }
+
+      .connect-icon {
+        width: 52px;
+        height: 52px;
+        background: #000;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+
+      .connect-icon svg {
+        width: 28px;
+        height: 28px;
+        fill: white;
+      }
+
+      .connect-info {
+        flex: 1;
+      }
+
+      .connect-info h3 {
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 4px;
+      }
+
+      .connect-info p {
+        font-size: 14px;
+        color: var(--text-secondary);
+        line-height: 1.4;
+      }
+
+      .connect-arrow {
+        color: var(--text-muted);
+        transition: transform 0.2s ease;
+      }
+
+      .connect-card:hover .connect-arrow {
+        transform: translateX(3px);
+        color: var(--lifo-green);
+      }
+
+      /* ===== SCREEN 2: CONNECTED SUCCESS ===== */
+      .success-badge {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--lifo-green-light), #d1fae5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 28px;
+        animation: successPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)
+          forwards;
+      }
+
+      @keyframes successPop {
+        0% {
+          transform: scale(0);
+          opacity: 0;
+        }
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+
+      .success-badge svg {
+        width: 36px;
+        height: 36px;
+        color: var(--lifo-green);
+      }
+
+      .stores-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        width: 100%;
+        max-width: 480px;
+        margin-top: 8px;
+        margin-bottom: 32px;
+      }
+
+      .store-card {
+        border: 1.5px solid var(--border);
+        border-radius: 14px;
+        padding: 20px;
+        text-align: center;
+        transition: all 0.2s ease;
+      }
+
+      .store-card.active {
+        border-color: var(--lifo-green);
+        background: var(--lifo-green-light);
+      }
+
+      .store-card h4 {
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 8px;
+      }
+
+      .store-meta {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+        font-size: 12px;
+        color: var(--text-secondary);
+      }
+
+      .store-meta span {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      /* ===== SCREEN 3: TRACKING METHOD ===== */
+      .method-cards {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        width: 100%;
+        max-width: 520px;
+      }
+
+      .method-card {
+        border: 1.5px solid var(--border);
+        border-radius: 16px;
+        padding: 24px 28px;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .method-card:hover {
+        border-color: var(--text-muted);
+      }
+
+      .method-card.selected {
+        border-color: var(--lifo-green);
+        background: var(--lifo-green-light);
+      }
+
+      .method-card.selected::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        background: var(--lifo-green);
+        border-radius: 0 4px 4px 0;
+      }
+
+      .method-header {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 8px;
+      }
+
+      .method-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        flex-shrink: 0;
+      }
+
+      .method-icon.auto {
+        background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+      }
+
+      .method-icon.manual {
+        background: linear-gradient(135deg, var(--blue-light), #bfdbfe);
+      }
+
+      .method-header h3 {
+        font-size: 16px;
+        font-weight: 600;
+      }
+
+      .method-card p {
+        font-size: 14px;
+        color: var(--text-secondary);
+        line-height: 1.5;
+        margin-left: 54px;
+      }
+
+      .method-preview {
+        margin-top: 14px;
+        margin-left: 54px;
+        padding: 12px 16px;
+        background: rgba(0, 0, 0, 0.03);
+        border-radius: 8px;
+        font-size: 13px;
+        color: var(--text-secondary);
+        font-family: 'DM Sans', monospace;
+        line-height: 1.7;
+      }
+
+      /* ===== SCREEN 4: WHAT TO TRACK ===== */
+      .track-options {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        width: 100%;
+        max-width: 520px;
+        margin-bottom: 16px;
+      }
+
+      .track-option {
+        border: 1.5px solid var(--border);
+        border-radius: 16px;
+        padding: 22px 24px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        cursor: pointer;
+        transition: all 0.25s ease;
+      }
+
+      .track-option:hover {
+        border-color: var(--text-muted);
+      }
+
+      .track-option.selected {
+        border-color: var(--lifo-green);
+        background: var(--lifo-green-light);
+      }
+
+      .track-check {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        border: 2px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        transition: all 0.2s ease;
+      }
+
+      .track-option.selected .track-check {
+        background: var(--lifo-green);
+        border-color: var(--lifo-green);
+      }
+
+      .track-option.selected .track-check svg {
+        display: block;
+      }
+
+      .track-check svg {
+        display: none;
+        width: 14px;
+        height: 14px;
+        color: white;
+      }
+
+      .track-info h3 {
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 3px;
+      }
+
+      .track-info p {
+        font-size: 14px;
+        color: var(--text-secondary);
+      }
+
+      .product-count {
+        font-size: 13px;
+        color: var(--text-muted);
+        text-align: center;
+        margin-top: 4px;
+        font-weight: 500;
+      }
+
+      /* ===== SCREEN 5: CATEGORY CONFIG ===== */
+      .config-header-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        margin-bottom: 6px;
+      }
+
+      .set-all-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        color: var(--text-secondary);
+        margin-bottom: 20px;
+        justify-content: center;
+      }
+
+      .set-all-btn {
+        padding: 5px 14px;
+        border-radius: 100px;
+        border: 1px solid var(--border);
+        background: var(--white);
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-family: inherit;
+        color: var(--text-secondary);
+      }
+
+      .set-all-btn:hover {
+        border-color: var(--lifo-green);
+        color: var(--lifo-green);
+      }
+
+      .set-all-btn.active {
+        background: var(--lifo-green);
+        border-color: var(--lifo-green);
+        color: white;
+      }
+
+      .category-list {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        max-height: 400px;
+        overflow-y: auto;
+        padding-right: 4px;
+      }
+
+      .category-row {
+        display: grid;
+        grid-template-columns: 40px 1fr auto auto;
+        align-items: center;
+        gap: 14px;
+        padding: 14px 18px;
+        border-radius: 12px;
+        transition: background 0.15s ease;
+      }
+
+      .category-row:hover {
+        background: var(--surface);
+      }
+
+      .cat-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        flex-shrink: 0;
+      }
+
+      .cat-icon.beverages {
+        background: #dbeafe;
+      }
+      .cat-icon.butter {
+        background: #fef3c7;
+      }
+      .cat-icon.canned {
+        background: #e0e7ff;
+      }
+      .cat-icon.cheese {
+        background: #fef9c3;
+      }
+      .cat-icon.chilled {
+        background: #cffafe;
+      }
+      .cat-icon.dairy {
+        background: #fce7f3;
+      }
+      .cat-icon.deli {
+        background: #fee2e2;
+      }
+      .cat-icon.dry {
+        background: #f3e8ff;
+      }
+      .cat-icon.bakery {
+        background: #ffedd5;
+      }
+      .cat-icon.fish {
+        background: #ccfbf1;
+      }
+      .cat-icon.herbs {
+        background: #d1fae5;
+      }
+      .cat-icon.meat {
+        background: #ffe4e6;
+      }
+
+      .cat-name {
+        font-size: 14px;
+        font-weight: 500;
+      }
+
+      .cat-badge {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        padding: 5px 12px;
+        border-radius: 100px;
+        font-size: 12px;
+        font-weight: 500;
+      }
+
+      .cat-badge.auto {
+        background: var(--lifo-green-light);
+        color: var(--lifo-green-dark);
+      }
+
+      .cat-badge.manual {
+        background: var(--blue-light);
+        color: var(--blue);
+      }
+
+      .cat-shelf {
+        font-size: 13px;
+        color: var(--text-secondary);
+        min-width: 70px;
+        text-align: right;
+        font-weight: 500;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .shelf-urgent {
+        color: var(--red);
+      }
+      .shelf-warning {
+        color: var(--amber);
+      }
+      .shelf-ok {
+        color: var(--lifo-green);
+      }
+      .shelf-long {
+        color: var(--text-muted);
+      }
+
+      /* ===== SCREEN 6: REVIEW ===== */
+      .review-section {
+        width: 100%;
+        margin-bottom: 20px;
+      }
+
+      .review-section-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 12px;
+      }
+
+      .review-section-header h3 {
+        font-size: 14px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .review-section-header h3 .count {
+        background: var(--surface);
+        padding: 2px 9px;
+        border-radius: 100px;
+        font-size: 12px;
+        color: var(--text-secondary);
+        font-weight: 500;
+      }
+
+      .review-change {
+        font-size: 13px;
+        color: var(--lifo-green);
+        cursor: pointer;
+        font-weight: 500;
+        border: none;
+        background: none;
+        font-family: inherit;
+      }
+
+      .review-change:hover {
+        text-decoration: underline;
+      }
+
+      .review-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .review-chip {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 14px;
+        background: var(--surface);
+        border-radius: 10px;
+        font-size: 13px;
+        font-weight: 500;
+      }
+
+      .review-chip .chip-icon {
+        width: 24px;
+        height: 24px;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+      }
+
+      .review-chip .chip-shelf {
+        color: var(--text-muted);
+        font-weight: 400;
+        margin-left: 2px;
+      }
+
+      /* ===== BUTTONS ===== */
+      .btn-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        max-width: 520px;
+        margin-top: 32px;
+      }
+
+      .btn-back {
+        padding: 12px 28px;
+        border-radius: 12px;
+        border: 1.5px solid var(--border);
+        background: var(--white);
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-family: inherit;
+        color: var(--text-secondary);
+      }
+
+      .btn-back:hover {
+        border-color: var(--text-muted);
+        color: var(--text-primary);
+      }
+
+      .btn-continue {
+        padding: 12px 32px;
+        border-radius: 12px;
+        border: none;
+        background: var(--lifo-green);
+        color: white;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        font-family: inherit;
+        box-shadow: 0 2px 8px rgba(45, 184, 122, 0.3);
+      }
+
+      .btn-continue:hover {
+        background: var(--lifo-green-dark);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 16px rgba(45, 184, 122, 0.35);
+      }
+
+      .btn-final {
+        padding: 14px 36px;
+        border-radius: 14px;
+        border: none;
+        background: linear-gradient(
+          135deg,
+          var(--lifo-green),
+          var(--lifo-emerald)
+        );
+        color: white;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        font-family: inherit;
+        box-shadow: 0 4px 20px rgba(45, 184, 122, 0.3);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .btn-final:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 30px rgba(45, 184, 122, 0.35);
+      }
+
+      /* ===== NAVIGATION TABS ===== */
+      .screen-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: var(--white);
+        border-top: 1px solid var(--border-light);
+        display: flex;
+        justify-content: center;
+        gap: 4px;
+        padding: 12px 20px;
+        z-index: 100;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.04);
+      }
+
+      .screen-tab {
+        padding: 8px 18px;
+        border-radius: 8px;
+        border: none;
+        background: none;
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        color: var(--text-muted);
+        transition: all 0.2s ease;
+        font-family: inherit;
+      }
+
+      .screen-tab:hover {
+        background: var(--surface);
+        color: var(--text-secondary);
+      }
+
+      .screen-tab.active {
+        background: var(--lifo-green-light);
+        color: var(--lifo-green-dark);
+      }
+
+      /* ===== STEP VISIBILITY ===== */
+      .step {
+        display: none;
+      }
+      .step.active {
+        display: flex;
+      }
+
+      /* ===== SKIP LINK ===== */
+      .skip-link {
+        font-size: 13px;
+        color: var(--text-muted);
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        margin-bottom: 32px;
+        transition: color 0.2s ease;
+      }
+
+      .skip-link:hover {
+        color: var(--text-secondary);
+      }
+
+      /* ===== INFO NOTE ===== */
+      .info-note {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 14px 18px;
+        background: var(--surface);
+        border-radius: 12px;
+        font-size: 13px;
+        color: var(--text-secondary);
+        line-height: 1.5;
+        max-width: 520px;
+        width: 100%;
+        margin-top: 20px;
+      }
+
+      .info-note svg {
+        flex-shrink: 0;
+        margin-top: 1px;
+        color: var(--lifo-green);
+      }
+
+      /* ===== CONFETTI ===== */
+      .confetti-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 999;
+      }
+
+      .confetti-piece {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        border-radius: 2px;
+        animation: confettiFall 2.5s ease-out forwards;
+        opacity: 0;
+      }
+
+      @keyframes confettiFall {
+        0% {
+          transform: translateY(-20px) rotate(0deg);
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(100vh) rotate(720deg);
+          opacity: 0;
+        }
+      }
+
+      /* ===== SUBTLE BG PATTERN ===== */
+      .bg-pattern {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 0;
+        opacity: 0.35;
+        background-image:
+          radial-gradient(
+            circle at 20% 80%,
+            rgba(45, 184, 122, 0.06) 0%,
+            transparent 50%
+          ),
+          radial-gradient(
+            circle at 80% 20%,
+            rgba(52, 211, 153, 0.05) 0%,
+            transparent 50%
+          );
+      }
+
+      .onboarding-wrapper > *:not(.bg-pattern) {
+        position: relative;
+        z-index: 1;
+      }
+
+      /* Scrollbar */
+      .category-list::-webkit-scrollbar {
+        width: 4px;
+      }
+      .category-list::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      .category-list::-webkit-scrollbar-thumb {
+        background: var(--border);
+        border-radius: 10px;
+      }
+
+      /* ===== FADE IN ANIMATION ===== */
+      @keyframes fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(16px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .step.active {
+        animation: fadeUp 0.4s ease forwards;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="onboarding-wrapper">
+      <div class="bg-pattern"></div>
+
+      <!-- TOP BAR -->
+      <div class="top-bar">
+        <div class="logo">
+          <div class="logo-mark">
+            <svg
+              viewBox="0 0 40 40"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <circle
+                cx="14"
+                cy="20"
+                r="10"
+                fill="#2DB87A"
+                opacity="0.7"
+              />
+              <circle
+                cx="26"
+                cy="20"
+                r="10"
+                fill="#34D399"
+                opacity="0.7"
+              />
+              <circle
+                cx="20"
+                cy="14"
+                r="10"
+                fill="#6EE7B7"
+                opacity="0.5"
+              />
+            </svg>
+          </div>
+          <span class="logo-text">lifo</span>
+        </div>
+        <div class="store-badge">
+          <span class="dot"></span>
+          Sean's Playground Store
+        </div>
+      </div>
+
+      <!-- PROGRESS -->
+      <div class="progress-container">
+        <div class="progress-track">
+          <div
+            class="progress-fill"
+            id="progressFill"
+            style="width: 16%"
+          ></div>
+        </div>
+        <div
+          class="step-indicator"
+          id="stepIndicator"
+        >
+          Step 1 of 6
+        </div>
+      </div>
+
+      <!-- STEP 1: CONNECT -->
+      <div
+        class="step-content step active"
+        id="step1"
+      >
+        <h1 class="step-heading">Connect your<br />Square account</h1>
+        <p class="step-subheading">
+          Link your catalog so Lifo can add batch-level expiry tracking on top
+          of your existing products.
+        </p>
+
+        <div
+          class="connect-card"
+          onclick="goToStep(2)"
+        >
+          <div class="connect-icon">
+            <svg viewBox="0 0 24 24">
+              <rect
+                x="4"
+                y="4"
+                width="16"
+                height="16"
+                rx="3"
+                fill="white"
+              />
+            </svg>
+          </div>
+          <div class="connect-info">
+            <h3>Square</h3>
+            <p>
+              Connect to sync products, categories, and sales data in real time
+            </p>
+          </div>
+          <svg
+            class="connect-arrow"
+            width="20"
+            height="20"
+            viewBox="0 0 20 20"
+            fill="none"
+          >
+            <path
+              d="M7 5l5 5-5 5"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </div>
+      </div>
+
+      <!-- STEP 2: CONNECTED -->
+      <div
+        class="step-content step"
+        id="step2"
+      >
+        <div
+          class="success-badge"
+          style="animation-delay: 0s"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M20 6L9 17l-5-5" />
+          </svg>
+        </div>
+        <h1 class="step-heading">You're connected!</h1>
+        <p class="step-subheading">
+          We found your stores. Lifo adds expiry tracking on top of your
+          existing Square catalog — nothing changes on your POS.
+        </p>
+
+        <div class="stores-grid">
+          <div class="store-card active">
+            <h4>LIFO App Number 2</h4>
+            <div class="store-meta">
+              <span>📦 1 product</span>
+              <span>🏷 1 category</span>
+            </div>
+          </div>
+          <div class="store-card">
+            <h4>LIFO App</h4>
+            <div class="store-meta">
+              <span>📦 0 products</span>
+              <span>🏷 0 categories</span>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="btn-row"
+          style="max-width: 480px"
+        >
+          <button
+            class="btn-back"
+            onclick="goToStep(1)"
+          >
+            Back
+          </button>
+          <button
+            class="btn-continue"
+            onclick="goToStep(3)"
+          >
+            Continue
+          </button>
+        </div>
+      </div>
+
+      <!-- STEP 3: TRACKING METHOD -->
+      <div
+        class="step-content step"
+        id="step3"
+      >
+        <h1 class="step-heading">How should we<br />track expiry dates?</h1>
+        <p class="step-subheading">
+          Choose your default method. You can always change this per-category
+          later.
+        </p>
+        <a
+          href="#"
+          class="skip-link"
+          >Skip and configure later →</a
+        >
+
+        <div class="method-cards">
+          <div
+            class="method-card selected"
+            onclick="selectMethod(this)"
+          >
+            <div class="method-header">
+              <div class="method-icon auto">⚡</div>
+              <h3>Auto-track</h3>
+            </div>
+            <p>
+              We calculate expiry dates from the delivery date + shelf life you
+              set. Nothing to enter on delivery.
+            </p>
+            <div class="method-preview">
+              Beverages → 30d from delivery ✓<br />
+              Butter & Spreads → 21d from delivery ✓
+            </div>
+          </div>
+
+          <div
+            class="method-card"
+            onclick="selectMethod(this)"
+          >
+            <div class="method-header">
+              <div class="method-icon manual">✏️</div>
+              <h3>Manual entry</h3>
+            </div>
+            <p>
+              You'll enter the expiry date when each delivery arrives. Best for
+              products with variable shelf life.
+            </p>
+          </div>
+        </div>
+
+        <div
+          class="btn-row"
+          style="max-width: 520px"
+        >
+          <button
+            class="btn-back"
+            onclick="goToStep(2)"
+          >
+            Back
+          </button>
+          <button
+            class="btn-continue"
+            onclick="goToStep(4)"
+          >
+            Continue
+          </button>
+        </div>
+      </div>
+
+      <!-- STEP 4: WHAT TO TRACK -->
+      <div
+        class="step-content step"
+        id="step4"
+      >
+        <h1 class="step-heading">What would you<br />like to track?</h1>
+        <p class="step-subheading">
+          Choose which products appear in your expiry dashboard.
+        </p>
+
+        <div class="track-options">
+          <div
+            class="track-option selected"
+            onclick="selectTrack(this)"
+          >
+            <div class="track-check">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="3"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M20 6L9 17l-5-5" />
+              </svg>
+            </div>
+            <div class="track-info">
+              <h3>Track everything</h3>
+              <p>All 35 products across all categories</p>
+            </div>
+          </div>
+
+          <div
+            class="track-option"
+            onclick="selectTrack(this)"
+          >
+            <div class="track-check">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="3"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M20 6L9 17l-5-5" />
+              </svg>
+            </div>
+            <div class="track-info">
+              <h3>Choose categories manually</h3>
+              <p>Select which categories to track</p>
+            </div>
+          </div>
+        </div>
+
+        <p class="product-count">35 of 35 products</p>
+
+        <div
+          class="btn-row"
+          style="max-width: 520px"
+        >
+          <button
+            class="btn-back"
+            onclick="goToStep(3)"
+          >
+            Back
+          </button>
+          <button
+            class="btn-continue"
+            onclick="goToStep(5)"
+          >
+            Continue
+          </button>
+        </div>
+      </div>
+
+      <!-- STEP 5: CONFIGURE CATEGORIES -->
+      <div
+        class="step-content step wide"
+        id="step5"
+      >
+        <h1 class="step-heading">Set shelf life<br />by category</h1>
+        <p class="step-subheading">
+          Configure how Lifo monitors and manages product batches.
+        </p>
+
+        <div class="set-all-row">
+          Set all to:
+          <button class="set-all-btn active">⚡ Auto-track</button>
+          <button class="set-all-btn">✏️ Manual</button>
+        </div>
+
+        <div class="category-list">
+          <div class="category-row">
+            <div class="cat-icon beverages">🥤</div>
+            <span class="cat-name">Beverages</span>
+            <span class="cat-badge auto">⚡ Auto</span>
+            <span class="cat-shelf shelf-ok">30 days</span>
+          </div>
+          <div class="category-row">
+            <div class="cat-icon butter">🧈</div>
+            <span class="cat-name">Butter & Spreads</span>
+            <span class="cat-badge auto">⚡ Auto</span>
+            <span class="cat-shelf shelf-ok">21 days</span>
+          </div>
+          <div class="category-row">
+            <div class="cat-icon canned">🥫</div>
+            <span class="cat-name">Canned & Jarred</span>
+            <span class="cat-badge auto">⚡ Auto</span>
+            <span class="cat-shelf shelf-long">365 days</span>
+          </div>
+          <div class="category-row">
+            <div class="cat-icon cheese">🧀</div>
+            <span class="cat-name">Cheese</span>
+            <span class="cat-badge auto">⚡ Auto</span>
+            <span class="cat-shelf shelf-warning">14 days</span>
+          </div>
+          <div class="category-row">
+            <div class="cat-icon chilled">❄️</div>
+            <span class="cat-name">Chilled Packaged</span>
+            <span class="cat-badge auto">⚡ Auto</span>
+            <span class="cat-shelf shelf-warning">14 days</span>
+          </div>
+          <div class="category-row">
+            <div class="cat-icon dairy">🥛</div>
+            <span class="cat-name">Dairy & Eggs</span>
+            <span class="cat-badge auto">⚡ Auto</span>
+            <span class="cat-shelf shelf-warning">7 days</span>
+          </div>
+          <div class="category-row">
+            <div class="cat-icon deli">🥩</div>
+            <span class="cat-name">Deli & Prepared Foods</span>
+            <span class="cat-badge auto">⚡ Auto</span>
+            <span class="cat-shelf shelf-urgent">5 days</span>
+          </div>
+          <div class="category-row">
+            <div class="cat-icon dry">🫘</div>
+            <span class="cat-name">Dry Goods</span>
+            <span class="cat-badge auto">⚡ Auto</span>
+            <span class="cat-shelf shelf-warning">14 days</span>
+          </div>
+          <div class="category-row">
+            <div class="cat-icon bakery">🍞</div>
+            <span class="cat-name">Fresh Bakery</span>
+            <span class="cat-badge auto">⚡ Auto</span>
+            <span class="cat-shelf shelf-urgent">3 days</span>
+          </div>
+          <div class="category-row">
+            <div class="cat-icon fish">🐟</div>
+            <span class="cat-name">Fresh Fish & Seafood</span>
+            <span class="cat-badge auto">⚡ Auto</span>
+            <span class="cat-shelf shelf-urgent">3 days</span>
+          </div>
+          <div class="category-row">
+            <div class="cat-icon herbs">🌿</div>
+            <span class="cat-name">Fresh Herbs & Aromatics</span>
+            <span class="cat-badge auto">⚡ Auto</span>
+            <span class="cat-shelf shelf-urgent">5 days</span>
+          </div>
+          <div class="category-row">
+            <div class="cat-icon meat">🥩</div>
+            <span class="cat-name">Fresh Meat</span>
+            <span class="cat-badge auto">⚡ Auto</span>
+            <span class="cat-shelf shelf-urgent">5 days</span>
+          </div>
+        </div>
+
+        <div
+          class="btn-row"
+          style="max-width: 700px"
+        >
+          <button
+            class="btn-back"
+            onclick="goToStep(4)"
+          >
+            Back
+          </button>
+          <button
+            class="btn-continue"
+            onclick="goToStep(6)"
+          >
+            Continue
+          </button>
+        </div>
+      </div>
+
+      <!-- STEP 6: REVIEW -->
+      <div
+        class="step-content step wide"
+        id="step6"
+      >
+        <h1 class="step-heading">Review & go live</h1>
+        <p class="step-subheading">
+          Everything looks good? You can always change these in Settings.
+        </p>
+
+        <div class="review-section">
+          <div class="review-section-header">
+            <h3>⚡ Auto-track <span class="count">12 categories</span></h3>
+            <button
+              class="review-change"
+              onclick="goToStep(5)"
+            >
+              Change
+            </button>
+          </div>
+          <div class="review-grid">
+            <div class="review-chip">
+              <span
+                class="chip-icon beverages"
+                style="background: #dbeafe"
+                >🥤</span
+              >
+              Beverages <span class="chip-shelf">30d</span>
+            </div>
+            <div class="review-chip">
+              <span
+                class="chip-icon"
+                style="background: #fef3c7"
+                >🧈</span
+              >
+              Butter <span class="chip-shelf">21d</span>
+            </div>
+            <div class="review-chip">
+              <span
+                class="chip-icon"
+                style="background: #e0e7ff"
+                >🥫</span
+              >
+              Canned <span class="chip-shelf">365d</span>
+            </div>
+            <div class="review-chip">
+              <span
+                class="chip-icon"
+                style="background: #fef9c3"
+                >🧀</span
+              >
+              Cheese <span class="chip-shelf">14d</span>
+            </div>
+            <div class="review-chip">
+              <span
+                class="chip-icon"
+                style="background: #cffafe"
+                >❄️</span
+              >
+              Chilled <span class="chip-shelf">14d</span>
+            </div>
+            <div class="review-chip">
+              <span
+                class="chip-icon"
+                style="background: #fce7f3"
+                >🥛</span
+              >
+              Dairy <span class="chip-shelf">7d</span>
+            </div>
+            <div class="review-chip">
+              <span
+                class="chip-icon"
+                style="background: #fee2e2"
+                >🥩</span
+              >
+              Deli <span class="chip-shelf">5d</span>
+            </div>
+            <div class="review-chip">
+              <span
+                class="chip-icon"
+                style="background: #f3e8ff"
+                >🫘</span
+              >
+              Dry <span class="chip-shelf">14d</span>
+            </div>
+            <div class="review-chip">
+              <span
+                class="chip-icon"
+                style="background: #ffedd5"
+                >🍞</span
+              >
+              Bakery <span class="chip-shelf">3d</span>
+            </div>
+            <div class="review-chip">
+              <span
+                class="chip-icon"
+                style="background: #ccfbf1"
+                >🐟</span
+              >
+              Fish <span class="chip-shelf">3d</span>
+            </div>
+            <div class="review-chip">
+              <span
+                class="chip-icon"
+                style="background: #d1fae5"
+                >🌿</span
+              >
+              Herbs <span class="chip-shelf">5d</span>
+            </div>
+            <div class="review-chip">
+              <span
+                class="chip-icon"
+                style="background: #ffe4e6"
+                >🥩</span
+              >
+              Meat <span class="chip-shelf">5d</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="info-note">
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <circle
+              cx="12"
+              cy="12"
+              r="10"
+            />
+            <path d="M12 16v-4M12 8h.01" />
+          </svg>
+          <span
+            >When you turn on tracking, Lifo will start monitoring your Square
+            sales and creating batches based on these rules. Your POS is
+            unaffected.</span
+          >
+        </div>
+
+        <div
+          class="btn-row"
+          style="max-width: 700px; margin-top: 28px"
+        >
+          <button
+            class="btn-back"
+            onclick="goToStep(5)"
+          >
+            Back
+          </button>
+          <button class="btn-final">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+            </svg>
+            Turn on expiry tracking
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN NAV (for demo purposes) -->
+    <div class="screen-nav">
+      <button
+        class="screen-tab active"
+        onclick="goToStep(1)"
+      >
+        1. Connect
+      </button>
+      <button
+        class="screen-tab"
+        onclick="goToStep(2)"
+      >
+        2. Connected
+      </button>
+      <button
+        class="screen-tab"
+        onclick="goToStep(3)"
+      >
+        3. Method
+      </button>
+      <button
+        class="screen-tab"
+        onclick="goToStep(4)"
+      >
+        4. Scope
+      </button>
+      <button
+        class="screen-tab"
+        onclick="goToStep(5)"
+      >
+        5. Configure
+      </button>
+      <button
+        class="screen-tab"
+        onclick="goToStep(6)"
+      >
+        6. Review
+      </button>
+    </div>
+
+    <div
+      class="confetti-container"
+      id="confetti"
+    ></div>
+
+    <script>
+      const progressSteps = {
+        1: 16,
+        2: 33,
+        3: 50,
+        4: 66,
+        5: 83,
+        6: 100,
+      }
+
+      let currentStep = 1
+
+      function goToStep(n) {
+        document
+          .querySelectorAll('.step')
+          .forEach((s) => s.classList.remove('active'))
+        document.getElementById('step' + n).classList.add('active')
+
+        document.getElementById('progressFill').style.width =
+          progressSteps[n] + '%'
+        document.getElementById('stepIndicator').textContent =
+          'Step ' + n + ' of 6'
+
+        document.querySelectorAll('.screen-tab').forEach((t, i) => {
+          t.classList.toggle('active', i === n - 1)
+        })
+
+        // Trigger confetti on step 2
+        if (n === 2 && currentStep === 1) {
+          triggerConfetti()
+        }
+
+        currentStep = n
+      }
+
+      function selectMethod(el) {
+        document
+          .querySelectorAll('.method-card')
+          .forEach((c) => c.classList.remove('selected'))
+        el.classList.add('selected')
+      }
+
+      function selectTrack(el) {
+        document
+          .querySelectorAll('.track-option')
+          .forEach((c) => c.classList.remove('selected'))
+        el.classList.add('selected')
+      }
+
+      function triggerConfetti() {
+        const container = document.getElementById('confetti')
+        container.innerHTML = ''
+        const colors = [
+          '#2DB87A',
+          '#34D399',
+          '#6EE7B7',
+          '#FCD34D',
+          '#F59E0B',
+          '#60A5FA',
+          '#A78BFA',
+        ]
+
+        for (let i = 0; i < 50; i++) {
+          const piece = document.createElement('div')
+          piece.className = 'confetti-piece'
+          piece.style.left = Math.random() * 100 + '%'
+          piece.style.background =
+            colors[Math.floor(Math.random() * colors.length)]
+          piece.style.animationDelay = Math.random() * 0.8 + 's'
+          piece.style.animationDuration = 2 + Math.random() * 1.5 + 's'
+          piece.style.width = 6 + Math.random() * 8 + 'px'
+          piece.style.height = 6 + Math.random() * 8 + 'px'
+          piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px'
+          container.appendChild(piece)
+        }
+
+        setTimeout(() => (container.innerHTML = ''), 4000)
+      }
+    </script>
+  </body>
+</html>

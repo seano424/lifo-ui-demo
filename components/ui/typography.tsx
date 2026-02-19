@@ -13,7 +13,6 @@ const typographyVariants = cva('', {
       h4: 'scroll-m-20 text-xl lg:text-2xl',
       h5: 'scroll-m-20 text-lg lg:text-xl',
       p: 'text-base leading-5 font-sans',
-      muted: 'text-sm text-muted-foreground font-sans',
       small: 'text-sm font-sans',
       blockquote: 'mt-6 border-l-2 pl-6 italic font-sans',
       code: 'rounded-2xl bg-muted px-1.5 py-1 font-mono text-sm font-extrabold font-sans',
@@ -21,7 +20,7 @@ const typographyVariants = cva('', {
     },
     color: {
       default: 'text-foreground',
-      muted: 'text-muted-foreground',
+      muted: 'text-slate-500 dark:text-slate-400',
       primary: 'text-primary dark:text-primary-300',
       destructive: 'text-destructive dark:text-destructive-foreground',
       secondary: 'text-secondary dark:text-secondary-300',

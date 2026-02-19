@@ -238,7 +238,7 @@ export default function IntegrationsPage() {
                         <div key={store.store_id} className="flex items-center justify-between p-2">
                           <div>
                             <Typography variant="p">{store.store_name}</Typography>
-                            <Typography variant="muted">
+                            <Typography variant="small">
                               Location ID: {store.location_id}
                             </Typography>
                           </div>

@@ -203,12 +203,8 @@ export default function UnifiedSettingsPage() {
                 title={t('notifications.comingSoonTitle')}
                 description={t('notifications.comingSoonDescription')}
               >
-                <Typography variant="p" className="text-muted-foreground">
-                  {t('notifications.checkBackSoon')}
-                </Typography>
-                <Typography variant="h4" className="text-muted-foreground">
-                  👀
-                </Typography>
+                <Typography variant="p">{t('notifications.checkBackSoon')}</Typography>
+                <Typography variant="h4">👀</Typography>
               </ComingSoon>
             </TabsContent>
 
@@ -219,12 +215,8 @@ export default function UnifiedSettingsPage() {
                   title={t('billing.comingSoonTitle')}
                   description={t('billing.comingSoonDescription')}
                 >
-                  <Typography variant="p" className="text-muted-foreground">
-                    {t('billing.checkBackSoon')}
-                  </Typography>
-                  <Typography variant="h4" className="text-muted-foreground">
-                    💳
-                  </Typography>
+                  <Typography variant="p">{t('billing.checkBackSoon')}</Typography>
+                  <Typography variant="h4">💳</Typography>
                 </ComingSoon>
               </TabsContent>
             )}
@@ -236,10 +228,10 @@ export default function UnifiedSettingsPage() {
                   title={t('security.comingSoonTitle')}
                   description={t('security.comingSoonDescription')}
                 >
-                  <Typography variant="p" className="text-muted-foreground">
+                  <Typography variant="p" >
                     {t('security.checkBackSoon')}
                   </Typography>
-                  <Typography variant="h4" className="text-muted-foreground">
+                  <Typography variant="h4" >
                     🔒
                   </Typography>
                 </ComingSoon>

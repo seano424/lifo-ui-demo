@@ -63,11 +63,7 @@ export function ProductOverrideRow({
         <Typography variant="p" className="font-medium text-sm">
           {productName}
         </Typography>
-        {!hasOverride && (
-          <Typography variant="small" className="text-muted-foreground">
-            {t('inheritsCategorySettings')}
-          </Typography>
-        )}
+        {!hasOverride && <Typography variant="small">{t('inheritsCategorySettings')}</Typography>}
         {hasOverride && (
           <Typography variant="small" className="text-blue-600 dark:text-blue-400">
             {t('customOverrideApplied')}
