@@ -37,10 +37,7 @@ export function SquareConnectedStep({ onContinue }: SquareConnectedStepProps) {
   return (
     <div className="flex flex-col items-center gap-10 ob-animate-in">
       <div className="flex flex-col items-center gap-5">
-        <Typography
-          variant="h1"
-          className="font-fraunces font-black text-center max-w-[440px] xl:text-5xl"
-        >
+        <Typography variant="h1" className="font-fraunces font-black text-center">
           Square connected!
         </Typography>
         <Typography variant="h5" color="muted" className="text-center lg:text-xl">
