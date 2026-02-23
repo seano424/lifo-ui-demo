@@ -26,9 +26,9 @@ function getProgressPercentage(
 
 export function SetupStepsProgress() {
   const { currentStep, batchTrackingSubStep } = useSetupFlowStore()
-  const { hasStore } = useSetupProgress()
+  const { hasSquareConnection } = useSetupProgress()
 
-  const percentage = getProgressPercentage(currentStep, batchTrackingSubStep, hasStore)
+  const percentage = getProgressPercentage(currentStep, batchTrackingSubStep, hasSquareConnection)
 
   return (
     <div className="h-1.5 bg-muted rounded-full w-1/4 mx-auto">
