@@ -38,11 +38,12 @@ export function StepIntro({
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-2 p-4 text-center">
         <Typography variant="h2" className="font-extrabold">
-          Lets get started
+          Let&apos;s get started
         </Typography>
 
         <Typography variant="p" color="muted" className="max-w-lg mx-auto">
-          Choose what to track and decide if it should be tracked automatically or manually.
+          In the next few steps, you&apos;ll pick which products to track and how expiry dates get
+          added.
         </Typography>
 
         <button
@@ -115,7 +116,7 @@ export function StepIntro({
       </div>
 
       {/* Actions */}
-      <div className="flex items-center justify-between gap-3 pt-2">
+      <div className="flex items-center justify-end gap-3 pt-2">
         {onBack && (
           <Button variant="outline" onClick={onBack} disabled={isSkipping}>
             Back

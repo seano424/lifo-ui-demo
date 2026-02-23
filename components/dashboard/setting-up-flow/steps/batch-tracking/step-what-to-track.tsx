@@ -63,8 +63,8 @@ export function StepWhatToTrack({
   }
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-2 p-4 text-center">
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 p-4 text-center">
         <Typography variant="h2" className="font-extrabold">
           {t('title')}
         </Typography>
@@ -94,8 +94,8 @@ export function StepWhatToTrack({
 
       {/* Category List — only shown in manual mode */}
       {selectionMode === 'manual' && (
-        <div className="flex flex-col gap-3 px-4">
-          <Card className="flex flex-col gap-3">
+        <div className="flex flex-col px-4">
+          <Card className="flex flex-col gap-3 overflow-hidden max-h-[350px] overflow-y-auto scrollbar-none border-b border-border rounded-b-none p-2">
             {categories.length === 0 ? (
               <div className="py-8 text-center">
                 <Package className="h-12 w-12 mx-auto mb-3 text-muted-foreground/50" />

@@ -596,7 +596,7 @@
   "setupFlow": {
     "welcome": {
       "title": "Welcome to lifo AI, {name}!",
-      "subtitle": "Track Product by Expiry Dates. Create batches, review expiring items, and receive notifications on expiring batches."
+      "subtitle": "We'll pull in your products and inventory from Square, so you can start tracking what's expiring and when. Takes about 10 seconds."
     },
     "batchTracking": {
       "title": "Set up expiry date tracking (recommended)",
@@ -623,7 +623,7 @@
         },
         "whatToTrack": {
           "title": "What would you like to track?",
-          "description": "Choose which products should appear in your expiry dashboard.",
+          "description": "Choose which products you want to track.",
           "sections": {
             "categories": "Product categories",
             "food": "Food Categories",
@@ -681,7 +681,7 @@
             },
             "chooseManually": {
               "label": "Choose categories manually",
-              "description": "Select which categories to track"
+              "description": "Skip non-perishables like cleaning supplies"
             }
           },
           "backButton": "Back",
@@ -773,13 +773,13 @@
       "addStore": {
         "title": "Connect your Square account",
         "titleConnected": "Square Account Connected!",
-        "description": "Track Product by Expiry Dates. Create batches, review expiring items, and receive notifications on expiring batches.",
+        "description": "We'll pull in your products and inventory from Square, so you can start tracking what's expiring and when. Takes about 10 seconds.",
         "descriptionConnected": "Track product by expiry dates. Review expiring items, and receive notifications on expiring products.",
         "realTime": "Real time",
         "integration": "Integration",
         "manual": "Manual",
         "recommended": "Recommended",
-        "squareDescription": "Connect your square account to set up real time product tracking by expiration dates",
+        "squareDescription": "We'll sync your products and inventory automatically.",
         "connect": "Connect",
         "oneTime": "One time",
         "csvDescription": "Real-time data integrations are most powerful, but one-time imports are helpful to backfill historical data or augment your existing data. Learn more about importing People via CSV.",

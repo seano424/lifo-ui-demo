@@ -597,7 +597,7 @@
   "setupFlow": {
     "welcome": {
       "title": "Welkom bij lifo AI, {name}!",
-      "subtitle": "Volg producten op vervaldatum. Maak batches aan, controleer verlopende artikelen en ontvang meldingen over verlopende batches."
+      "subtitle": "We halen uw producten en voorraad uit Square — zodat u kunt beginnen met het volgen van wat verloopt en wanneer. Dit duurt ongeveer 10 seconden."
     },
     "batchTracking": {
       "title": "Vervaldatum tracking instellen (aanbevolen)",
@@ -624,7 +624,7 @@
         },
         "whatToTrack": {
           "title": "Wat wilt u volgen?",
-          "description": "Kies welke producten in uw vervaldashboard moeten verschijnen.",
+          "description": "Kies welke producten u wilt volgen.",
           "sections": {
             "categories": "Productcategorieën",
             "food": "Voedselcategorieën",
@@ -682,7 +682,7 @@
             },
             "chooseManually": {
               "label": "Categorieën handmatig kiezen",
-              "description": "Selecteer welke categorieën u wilt bijhouden"
+              "description": "Sla niet-bederfelijke producten over, zoals schoonmaakmiddelen"
             }
           },
           "backButton": "Terug",
@@ -774,13 +774,13 @@
       "addStore": {
         "title": "Verbind uw Square account",
         "titleConnected": "Square account verbonden!",
-        "description": "Volg producten op vervaldatum. Maak batches aan, controleer verlopende artikelen en ontvang meldingen over verlopende batches.",
+        "description": "We halen uw producten en voorraad uit Square, zodat u kunt beginnen met het volgen van wat verloopt en wanneer. Dit duurt ongeveer 10 seconden.",
         "descriptionConnected": "Volg producten op vervaldatum. Controleer verlopende artikelen en ontvang meldingen over verlopende producten.",
         "realTime": "Real-time",
         "integration": "Integratie",
         "manual": "Handmatig",
         "recommended": "Aanbevolen",
-        "squareDescription": "Verbind uw Square-account om real-time product tracking op vervaldatum in te stellen",
+        "squareDescription": "We synchroniseren uw producten en voorraad automatisch.",
         "connect": "Verbinden",
         "oneTime": "Eenmalig",
         "csvDescription": "Real-time data integraties zijn het krachtigst, maar eenmalige imports zijn nuttig om historische gegevens aan te vullen of uw bestaande gegevens te verrijken. Lees meer over het importeren van personen via CSV.",

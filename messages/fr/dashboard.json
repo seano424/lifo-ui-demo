@@ -596,7 +596,7 @@
   "setupFlow": {
     "welcome": {
       "title": "Bienvenue sur lifo AI, {name} !",
-      "subtitle": "Suivez les produits par dates d'expiration. Créez des lots, consultez les articles qui expirent et recevez des notifications sur les lots qui expirent."
+      "subtitle": "Nous récupérerons vos produits et inventaire depuis Square — vous pourrez commencer à suivre ce qui expire et quand. Prend environ 10 secondes."
     },
     "batchTracking": {
       "title": "Configurer le suivi des dates d'expiration (recommandé)",
@@ -623,7 +623,7 @@
         },
         "whatToTrack": {
           "title": "Qu'aimeriez-vous suivre ?",
-          "description": "Choisissez quels produits doivent apparaître dans votre tableau de bord des dates d'expiration.",
+          "description": "Choisissez les produits que vous souhaitez suivre.",
           "sections": {
             "categories": "Catégories de produits",
             "food": "Catégories alimentaires",
@@ -681,7 +681,7 @@
             },
             "chooseManually": {
               "label": "Choisir les catégories manuellement",
-              "description": "Sélectionnez les catégories à suivre"
+              "description": "Ignorez les non-périssables comme les produits d'entretien"
             }
           },
           "backButton": "Retour",
@@ -773,13 +773,13 @@
       "addStore": {
         "title": "Connectez votre compte Square",
         "titleConnected": "Compte Square connecté !",
-        "description": "Suivez les produits par dates d'expiration. Créez des lots, consultez les articles qui expirent et recevez des notifications sur les lots qui expirent.",
+        "description": "Nous récupérerons vos produits et inventaire depuis Square, vous pourrez commencer à suivre ce qui expire et quand. Prend environ 10 secondes.",
         "descriptionConnected": "Suivez les produits par dates d'expiration. Consultez les articles qui expirent et recevez des notifications sur les produits qui expirent.",
         "realTime": "Temps réel",
         "integration": "Integration",
         "manual": "Manuel",
         "recommended": "Recommandé",
-        "squareDescription": "Connectez votre compte Square pour configurer le suivi en temps réel des produits par dates d'expiration",
+        "squareDescription": "Nous synchroniserons automatiquement vos produits et inventaire.",
         "connect": "Connecter",
         "oneTime": "Ponctuel",
         "csvDescription": "Les intégrations de données en temps réel sont les plus puissantes, mais les importations ponctuelles sont utiles pour compléter les données historiques ou enrichir vos données existantes. En savoir plus sur l'importation de personnes via CSV.",

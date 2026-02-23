@@ -65,7 +65,7 @@ export function BatchTrackingStep() {
   const storeId = useActiveStoreId()
 
   // Setup flow navigation (for going back to Add Store step)
-  const { goToPrevStep, setBatchTrackingSubStep } = useSetupFlowStore()
+  const { setBatchTrackingSubStep } = useSetupFlowStore()
 
   // Internal sub-step navigation
   const [subStep, setSubStep] = useState<WizardSubStep>('intro')
@@ -377,7 +377,6 @@ export function BatchTrackingStep() {
           isSkipping={isSkipping}
           onSetup={() => setSubStep('what-to-track')}
           onSkip={handleSkip}
-          onBack={goToPrevStep}
         />
       )}
 

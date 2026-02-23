@@ -59,57 +59,25 @@ export function StepHowToTrack({
   return (
     <div className="flex flex-col gap-4">
       {/* Header */}
-      <div className="flex flex-col gap-2 text-center">
+      <div className="flex flex-col gap-4 text-center">
         <Typography variant="h2" className="font-extrabold max-w-lg mx-auto">
           How do you want to track expiry dates?
         </Typography>
-        <Typography variant="p" className="max-w-lg mx-auto">
-          Configure how Lifo monitors and manages product batches.
+        <Typography variant="h5" className="max-w-3xl mx-auto">
+          We&apos;ve suggested a shelf life for each category. Adjust any that don&apos;t match your
+          store. You can fine-tune individual products later.
         </Typography>
-        <div className="flex flex-col gap-1">
-          {/* <Typography variant="small" color="muted" className="max-w-lg mx-auto italic">
-            Manual entry = you add dates
-          </Typography>
-          <Typography variant="small" color="muted" className="max-w-lg mx-auto italic">
-            Auto-track = we calculate dates from delivery date + shelf life
-          </Typography> */}
-          {/* <Typography variant="small" color="muted" className="max-w-lg mx-auto">
-            (You can always change these settings later)
-          </Typography> */}
-        </div>
-
-        {/* Bulk actions */}
-        <div className="flex items-center gap-3 px-4 py-5 mt-2 border-t border-muted justify-center font-mono tracking-tighter">
-          <Typography variant="small" color="muted" className="font-mono tracking-tighter">
-            Set all to:
-          </Typography>
-          <button
-            type="button"
-            onClick={handleSetAllAuto}
-            className="inline-flex items-center gap-1.5 text-sm text-secondary-700 hover:underline"
-          >
-            <Zap className="w-3 h-3" /> Auto-track
-          </button>
-          <span className="text-muted-foreground text-sm">·</span>
-          <button
-            type="button"
-            onClick={handleSetAllManual}
-            className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:underline"
-          >
-            <Type className="w-3 h-3" /> Manual entry
-          </button>
-        </div>
       </div>
 
       {/* Categories table */}
-      <Card className="overflow-hidden max-h-[400px] overflow-y-auto scrollbar-none">
+      <Card className="overflow-hidden max-h-[400px] overflow-y-auto scrollbar-none py-4">
         {/* Column headers */}
-        <div className="grid grid-cols-[1fr_160px_80px] gap-4 px-4 py-3">
+        {/* <div className="grid grid-cols-[1fr_160px_80px] gap-4 px-4 py-3">
           <Typography variant="small" color="muted" className="font-mono tracking-tighter">
             Category
           </Typography>
           <Typography variant="small" color="muted" className="font-mono tracking-tighter">
-            Expiry Handling
+            Method
           </Typography>
           <Typography
             variant="small"
@@ -118,7 +86,7 @@ export function StepHowToTrack({
           >
             Shelf Life
           </Typography>
-        </div>
+        </div> */}
 
         <div className="divide-y divide-muted">
           {categories.map(category => (
@@ -133,6 +101,28 @@ export function StepHowToTrack({
           ))}
         </div>
       </Card>
+
+      {/* Bulk actions */}
+      <div className="flex items-center gap-3 p-2 justify-center font-mono tracking-tighter">
+        <Typography variant="small" color="muted" className="font-mono tracking-tighter">
+          Set all to:
+        </Typography>
+        <button
+          type="button"
+          onClick={handleSetAllAuto}
+          className="inline-flex items-center gap-1.5 text-sm text-secondary-700 hover:underline"
+        >
+          <Zap className="w-3 h-3" /> Auto-track
+        </button>
+        <span className="text-muted-foreground text-sm">·</span>
+        <button
+          type="button"
+          onClick={handleSetAllManual}
+          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:underline"
+        >
+          <Type className="w-3 h-3" /> Manual entry
+        </button>
+      </div>
 
       {/* Navigation */}
       <div className="flex justify-between">
@@ -309,7 +299,7 @@ function CategoryEditSheet({
                     draftMode === 'auto' ? 'text-white' : 'text-secondary-700',
                   )}
                 >
-                  Auto-track with shelf life
+                  Auto-track
                 </Typography>
                 <Typography
                   variant="small"
@@ -361,7 +351,8 @@ function CategoryEditSheet({
                     draftMode === 'manual' ? 'text-white' : 'text-secondary-700',
                   )}
                 >
-                  Enter expiry dates from product packaging
+                  When you log a delivery, we&apos;ll ask for the expiry date printed on the
+                  packaging.
                 </Typography>
               </div>
             </button>

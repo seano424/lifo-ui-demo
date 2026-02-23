@@ -62,7 +62,7 @@ export const SquareSuccessModal = () => {
         </Typography>
 
         <Button size="xl" className="w-full mt-4" onClick={() => setShowSquareSuccessModal(false)}>
-          Lets get started 🎉
+          Let&apos;s get started 🎉
         </Button>
       </DialogContent>
     </Dialog>
