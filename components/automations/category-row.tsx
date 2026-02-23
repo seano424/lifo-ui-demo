@@ -68,10 +68,7 @@ export function CategoryRow({ category, state, onEdit }: CategoryRowProps) {
           {effectiveDays} days
         </span>
       ) : (
-        <span
-          className="text-[13px] text-right min-w-[60px] shrink-0"
-          style={{ color: 'var(--ob-text-muted)' }}
-        >
+        <span className="text-[13px] text-right min-w-[60px] shrink-0 text-muted-foreground">
           —
         </span>
       )}

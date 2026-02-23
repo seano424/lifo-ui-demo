@@ -5,7 +5,7 @@ import { DashboardContent } from '@/components/dashboard/dashboard-content'
 export default async function DashboardPage() {
   const supabase = await createClient()
 
-  const { data } = await supabase
+  const { data, error } = await supabase
     .schema('integrations')
     .from('square_connections')
     .select('connection_id')
@@ -13,7 +13,10 @@ export default async function DashboardPage() {
     .limit(1)
     .maybeSingle()
 
-  if (!data) {
+  if (error) {
+    // Don't gate on a failed query — fall through to dashboard
+    console.error('Failed to check Square connection:', error)
+  } else if (!data) {
     redirect('/onboarding/setup')
   }
 

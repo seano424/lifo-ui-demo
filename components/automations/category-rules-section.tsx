@@ -157,10 +157,7 @@ export const CategoryRulesSection = forwardRef<CategoryRulesSectionHandle>(
 
         {/* Bulk actions */}
         {!isLoading && (categories?.length ?? 0) > 0 && (
-          <div
-            className="flex items-center gap-2 text-[13px]"
-            style={{ color: 'var(--ob-text-secondary)' }}
-          >
+          <div className="flex items-center gap-2 text-[13px] text-muted-foreground">
             <span>Set all to:</span>
             <button
               type="button"
@@ -169,7 +166,7 @@ export const CategoryRulesSection = forwardRef<CategoryRulesSectionHandle>(
                 'px-[14px] py-[5px] rounded-full border text-[12px] font-medium cursor-pointer transition-all duration-200',
                 bulkActive === 'auto'
                   ? 'bg-secondary border-secondary text-white'
-                  : 'bg-white border-border hover:border-secondary hover:text-secondary',
+                  : 'bg-background border-border hover:border-secondary hover:text-secondary',
               )}
             >
               ⚡ Auto-track
@@ -181,7 +178,7 @@ export const CategoryRulesSection = forwardRef<CategoryRulesSectionHandle>(
                 'px-[14px] py-[5px] rounded-full border text-[12px] font-medium cursor-pointer transition-all duration-200',
                 bulkActive === 'manual'
                   ? 'bg-secondary border-secondary text-white'
-                  : 'bg-white border-border hover:border-secondary hover:text-secondary',
+                  : 'bg-background border-border hover:border-secondary hover:text-secondary',
               )}
             >
               ✏️ Manual

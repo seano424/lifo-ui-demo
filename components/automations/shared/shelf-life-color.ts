@@ -1,6 +1,6 @@
 export function getShelfLifeColor(days: number): string {
-  if (days <= 5) return 'var(--ob-red)'
-  if (days <= 14) return 'var(--ob-amber)'
-  if (days <= 30) return 'var(--ob-green)'
-  return 'var(--ob-text-muted)'
+  if (days <= 5) return '#ef4444'
+  if (days <= 14) return '#f59e0b'
+  if (days <= 30) return 'hsl(252 100% 57%)'
+  return 'var(--muted-foreground)'
 }

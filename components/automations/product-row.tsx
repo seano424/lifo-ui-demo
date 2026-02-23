@@ -32,13 +32,8 @@ export function ProductRow({ product, override, onEdit }: ProductRowProps) {
     >
       {/* Product info */}
       <div className="flex flex-col gap-0.5 min-w-0">
-        <span
-          className="font-medium text-[14px] truncate"
-          style={{ color: 'var(--ob-text-primary)' }}
-        >
-          {product.name}
-        </span>
-        <span className="text-[12px]" style={{ color: 'var(--ob-text-muted)' }}>
+        <span className="font-medium text-[14px] truncate text-foreground">{product.name}</span>
+        <span className="text-[12px] text-muted-foreground">
           {product.category_name ?? 'Uncategorized'}
           {hasOverride && (
             <span className="ml-2 text-secondary-700 font-medium">· Custom override</span>
@@ -53,7 +48,7 @@ export function ProductRow({ product, override, onEdit }: ProductRowProps) {
           ⚡ Auto
         </span>
       ) : (
-        <span className="inline-flex items-center gap-[5px] px-3 py-[5px] rounded-full text-[12px] font-medium bg-[#dbeafe] text-[#2563eb] shrink-0">
+        <span className="inline-flex items-center gap-[5px] px-3 py-[5px] rounded-full text-[12px] font-medium bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 shrink-0">
           ✏️ Manual
         </span>
       )}
@@ -67,10 +62,7 @@ export function ProductRow({ product, override, onEdit }: ProductRowProps) {
           {effectiveDays} days
         </span>
       ) : (
-        <span
-          className="text-[13px] text-right min-w-[60px] shrink-0"
-          style={{ color: 'var(--ob-text-muted)' }}
-        >
+        <span className="text-[13px] text-right min-w-[60px] shrink-0 text-muted-foreground">
           —
         </span>
       )}
