@@ -35,9 +35,16 @@ export function UntrackedAlert({
     return null
   }
 
+  const today = new Date().toISOString().split('T')[0]
+
   const handleAdd = async () => {
     if (!date) {
       toast.error('Please select an expiry date')
+      return
+    }
+
+    if (date < today) {
+      toast.error('Expiry date must be today or in the future')
       return
     }
 
@@ -106,6 +113,7 @@ export function UntrackedAlert({
                 ref={inputRef}
                 type="date"
                 value={date}
+                min={today}
                 onChange={e => setDate(e.target.value)}
                 className="w-full"
               />
