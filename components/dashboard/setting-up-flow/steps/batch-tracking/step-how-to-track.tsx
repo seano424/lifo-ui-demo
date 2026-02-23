@@ -60,10 +60,10 @@ export function StepHowToTrack({
     <div className="flex flex-col gap-4">
       {/* Header */}
       <div className="flex flex-col gap-4 text-center">
-        <Typography variant="h2" className="font-extrabold max-w-lg mx-auto">
+        <Typography variant="h2" className="font-extrabold font-fraunces max-w-lg mx-auto">
           How do you want to track expiry dates?
         </Typography>
-        <Typography variant="h5" className="max-w-3xl mx-auto">
+        <Typography variant="h5" color="muted" className="max-w-3xl mx-auto">
           We&apos;ve suggested a shelf life for each category. Adjust any that don&apos;t match your
           store. You can fine-tune individual products later.
         </Typography>

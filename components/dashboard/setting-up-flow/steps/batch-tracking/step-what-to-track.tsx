@@ -65,11 +65,14 @@ export function StepWhatToTrack({
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-4 p-4 text-center">
-        <Typography variant="h2" className="font-extrabold">
+        <Typography
+          variant="h2"
+          className="font-extrabold font-fraunces max-w-lg lg:max-w-xl mx-auto"
+        >
           {t('title')}
         </Typography>
 
-        <Typography variant="p" color="muted" className="max-w-lg mx-auto">
+        <Typography variant="h5" color="muted" className="max-w-3xl mx-auto">
           {t('description')}
         </Typography>
       </div>

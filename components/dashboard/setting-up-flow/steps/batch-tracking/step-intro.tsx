@@ -36,12 +36,12 @@ export function StepIntro({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-2 p-4 text-center">
-        <Typography variant="h2" className="font-extrabold">
+      <div className="flex flex-col gap-4 p-4 text-center">
+        <Typography variant="h2" className="font-extrabold font-fraunces">
           Let&apos;s get started
         </Typography>
 
-        <Typography variant="p" color="muted" className="max-w-lg mx-auto">
+        <Typography variant="h5" color="muted" className="max-w-lg mx-auto">
           In the next few steps, you&apos;ll pick which products to track and how expiry dates get
           added.
         </Typography>

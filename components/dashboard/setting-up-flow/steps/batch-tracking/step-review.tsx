@@ -36,11 +36,14 @@ export function StepReview({
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-2 p-4 text-center">
-        <Typography variant="h2" className="font-extrabold">
+        <Typography
+          variant="h2"
+          className="font-extrabold font-fraunces max-w-md lg:max-w-xl mx-auto"
+        >
           Review &amp; Complete Setup
         </Typography>
 
-        <Typography variant="p" color="muted" className="max-w-lg mx-auto">
+        <Typography variant="h5" color="muted" className="max-w-3xl mx-auto">
           Review your expiry date settings before turning on. You can change these any time in
           Settings.
         </Typography>

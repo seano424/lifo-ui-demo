@@ -259,6 +259,7 @@ export function BatchTrackingStep() {
         config: {
           enabled: false,
           setup_completed: false,
+          setup_completed_at: new Date().toISOString(),
           product_selection_mode: 'by_category',
           selected_category_ids: processedCategories.map(c => c.id),
           selected_product_ids: [],
