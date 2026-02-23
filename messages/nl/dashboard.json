@@ -1,5 +1,6 @@
 {
   "dashboard": {
+    "automations": "Automatiseringen",
     "newDeliveries": {
       "title": "Nieuwe Leveringen",
       "description": "Voeg nieuwe items toe aan uw voorraad",
@@ -416,6 +417,7 @@
     }
   },
   "navigation": {
+    "automations": "Automatiseringen",
     "dashboard-title": "Winkel",
     "dashboard": "Dashboard",
     "overview": "Overzicht",

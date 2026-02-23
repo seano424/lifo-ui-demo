@@ -7,7 +7,7 @@ import { ReactQueryProvider } from '@/lib/react-query/provider'
 import type { Metadata } from 'next'
 import { getLocale, getMessages } from 'next-intl/server'
 import { ThemeProvider } from 'next-themes'
-import { Inter, Raleway, Roboto_Mono } from 'next/font/google'
+import { DM_Sans, Fraunces, Inter, Raleway, Roboto_Mono } from 'next/font/google'
 import './globals.css'
 
 const defaultUrl = process.env.VERCEL_URL
@@ -71,6 +71,24 @@ const inter = Inter({
   preload: true,
 })
 
+// Fraunces serif — used for onboarding headings
+const fraunces = Fraunces({
+  variable: '--font-fraunces',
+  display: 'swap',
+  subsets: ['latin'],
+  axes: ['opsz'],
+  preload: false,
+})
+
+// DM Sans — used for onboarding body text
+const dmSans = DM_Sans({
+  variable: '--font-dm-sans',
+  display: 'swap',
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  preload: false,
+})
+
 const robotoMono = Roboto_Mono({
   variable: '--font-roboto-mono',
   display: 'swap',
@@ -94,7 +112,7 @@ export default async function RootLayout({
       lang={locale}
       suppressHydrationWarning
       data-scroll-behavior="smooth"
-      className={`${raleway.variable} ${inter.variable} ${robotoMono.variable} ${debugScreens}`}
+      className={`${raleway.variable} ${inter.variable} ${robotoMono.variable} ${fraunces.variable} ${dmSans.variable} ${debugScreens}`}
     >
       <body className={`font-sans antialiased`} suppressHydrationWarning>
         <PostHogProvider>

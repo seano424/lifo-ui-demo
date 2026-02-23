@@ -1,52 +1,28 @@
 import { useStoreState } from '@/lib/stores/store-context'
-import { useBatchTrackingSetup } from '@/lib/queries/batch-tracking-onboarding'
-import type { SetupStep } from '@/lib/stores/setup-flow-store'
+import { useCurrentUser } from '@/hooks/use-users'
+import { useSquareStatus } from '@/hooks/use-square-integration'
 
 export interface SetupProgress {
-  hasStore: boolean
-  hasBatchTrackingSetup: boolean
+  hasSquareConnection: boolean
   isLoading: boolean
 }
 
 /**
- * Hook to derive setup progress from database state
- * This replaces localStorage-based completion tracking with actual data
+ * Checks if the user has an active Square connection.
+ *
+ * Uses useSquareStatus (backend API) instead of querying
+ * integrations.square_connections directly, because the client-side
+ * anon key lacks RLS read access to that table.
+ *
+ * The setup modal shows when hasSquareConnection is false.
  */
 export function useSetupProgress(): SetupProgress {
-  const { activeStore, isLoadingStores } = useStoreState()
-
-  // Check if batch tracking setup is completed
-  const { data: batchTrackingSetup, isLoading } = useBatchTrackingSetup(activeStore?.store_id || '')
+  const { isLoading: isLoadingUser } = useCurrentUser()
+  const { isLoadingStores } = useStoreState()
+  const { data: squareStatus, isLoading: isLoadingSquare } = useSquareStatus()
 
   return {
-    hasStore: !!activeStore,
-    hasBatchTrackingSetup: batchTrackingSetup?.config?.setup_completed ?? false,
-    isLoading: isLoading || isLoadingStores,
+    hasSquareConnection: squareStatus?.is_connected ?? false,
+    isLoading: isLoadingUser || isLoadingStores || isLoadingSquare,
   }
-}
-
-/**
- * Helper to check if a specific step is completed based on database state
- */
-export function isStepCompleted(step: SetupStep, progress: SetupProgress): boolean {
-  switch (step) {
-    case 'add-store':
-      // Completed when they have a store (either via Square or manual)
-      return progress.hasStore
-    case 'batch-tracking-setup':
-      // Completed when batch tracking setup is finished
-      return progress.hasBatchTrackingSetup
-    default:
-      return false
-  }
-}
-
-/**
- * Calculate overall progress percentage
- */
-export function getProgressPercentage(progress: SetupProgress): number {
-  const steps: SetupStep[] = ['add-store', 'batch-tracking-setup']
-
-  const completedCount = steps.filter(step => isStepCompleted(step, progress)).length
-  return Math.round((completedCount / steps.length) * 100)
 }

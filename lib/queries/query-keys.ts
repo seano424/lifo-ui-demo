@@ -58,9 +58,6 @@ export const queryKeys = {
 
     overview: (storeId: string) => [...queryKeys.todos.all, 'overview', storeId] as const,
 
-    // Ultra-fast urgent count for sidebar badge (uses materialized view)
-    urgentCount: (storeId: string) => [...queryKeys.todos.all, 'urgent-count', storeId] as const,
-
     // Ultra-fast expiry count for notification bell (uses store's expiry_alert_days setting)
     expiryCount: (storeId: string) => [...queryKeys.todos.all, 'expiry-count', storeId] as const,
 

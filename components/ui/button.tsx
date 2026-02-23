@@ -42,7 +42,7 @@ const buttonVariants = cva(
         black: 'bg-black hover:bg-black/90 text-white',
         gray: 'bg-gray-50 hover:bg-gray-50/90 dark:bg-secondary-100/10 dark:hover:bg-opacity-20',
         subtleGray:
-          'bg-gray-100 text-foreground hover:bg-gray-200 dark:bg-secondary-900/10 dark:hover:bg-secondary-900/20',
+          'bg-gray-100 text-foreground hover:bg-gray-100/90 dark:bg-secondary-900/10 dark:hover:bg-secondary-900/20',
         white:
           'bg-white text-primary-800 hover:bg-white/90 dark:bg-primary-900 dark:text-primary-100 dark:hover:bg-primary-900/90',
       },

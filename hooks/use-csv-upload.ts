@@ -814,13 +814,6 @@ export function useCSVUpload() {
       // New batches affect todos urgency, completion status, counts
       queryClient.invalidateQueries({ queryKey: queryKeys.todos.all })
 
-      // ✅ CRITICAL: Explicitly invalidate urgent count (sidebar badge)
-      // This query has refetchOnMount:false, so needs explicit invalidation + refetch
-      await queryClient.invalidateQueries({
-        queryKey: queryKeys.todos.urgentCount(storeId),
-        refetchType: 'active', // Force refetch if query is currently mounted
-      })
-
       // ✅ Invalidate dashboard KPIs (inventory stats, sales, donations, waste)
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboardKPIs.byStore(storeId) })
 

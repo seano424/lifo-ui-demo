@@ -88,6 +88,11 @@ function useNavigationData() {
               url: '/dashboard/settings',
               icon: SettingsIcon,
             },
+            {
+              title: t('automations'),
+              url: '/dashboard/settings/automations',
+              icon: Zap,
+            },
             // {
             //   title: t('support'),
             //   url: '/dashboard/support',

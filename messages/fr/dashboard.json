@@ -416,6 +416,7 @@
     }
   },
   "navigation": {
+    "automations": "Automatisations",
     "dashboard-title": "Magasin",
     "dashboard": "Tableau de bord",
     "overview": "Aperçu",

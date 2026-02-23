@@ -264,6 +264,14 @@
   --font-mono:
     var(--font-roboto-mono), ui-monospace, SFMono-Regular, Menlo, Monaco,
     Consolas, 'Liberation Mono', 'Courier New', monospace;
+  --font-fraunces:
+    var(--font-fraunces), ui-sans-serif, system-ui, -apple-system,
+    BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+    'Noto Sans', sans-serif;
+  --font-dm-sans:
+    var(--font-dm-sans), ui-sans-serif, system-ui, -apple-system,
+    BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+    'Noto Sans', sans-serif;
 
   /* Breakpoints */
   --breakpoint-sm: 640px;
@@ -340,11 +348,9 @@
     --popover: 0 0% 100%;
     --popover-foreground: 225 42% 8%;
 
-    /* Updated primary to use the new vibrant purple */
     --primary: 252 100% 57%;
     --primary-foreground: 0 0% 100%;
 
-    /* Updated secondary to use the new vibrant blue */
     --secondary: 227 100% 63%;
     --secondary-foreground: 0 0% 100%;
 
@@ -486,6 +492,115 @@
   .animate-float-slow,
   .animate-float-slower,
   .animate-float-slowest {
+    animation: none;
+  }
+}
+
+/* ===== ONBOARDING FLOW ===== */
+/*
+ * All tokens and utility classes here are scoped to .onboarding-flow so they
+ * cannot affect the rest of the app. Later tasks will apply the
+ * .onboarding-flow class to the setting-up-flow root element.
+ */
+
+.onboarding-flow {
+  background: #ffffff;
+
+  /* Primary/secondary palette (purple + blue) */
+  --ob-green: hsl(252, 100%, 57%);
+  --ob-green-light: hsl(252, 100%, 96%);
+  --ob-green-dark: hsl(252, 100%, 44%);
+  --ob-emerald: hsl(227, 100%, 63%);
+
+  /* Surface / background tokens */
+  --ob-surface: #fafbfc;
+  --ob-surface-warm: #f8f7f4;
+  --ob-white: #ffffff;
+
+  /* Text tokens */
+  --ob-text-primary: #1a1d23;
+  --ob-text-secondary: #6b7280;
+  --ob-text-muted: #9ca3af;
+
+  /* Border tokens */
+  --ob-border: #e5e7eb;
+  --ob-border-light: #f0f1f3;
+
+  /* Semantic accent colors (used for shelf-life urgency + badges) */
+  --ob-amber: #f59e0b;
+  --ob-amber-light: #fef3c7;
+  --ob-red: #ef4444;
+  --ob-red-light: #fee2e2;
+  --ob-blue: #3b82f6;
+  --ob-blue-light: #dbeafe;
+
+  /* Shadow scale */
+  --ob-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --ob-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06);
+  --ob-shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.08);
+}
+
+/* Onboarding headings — Fraunces serif, large */
+.ob-heading {
+  font-family: var(--font-fraunces), Georgia, 'Times New Roman', serif;
+  font-size: clamp(32px, 5vw, 42px);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.04em;
+  color: var(--ob-text-primary);
+  text-align: center;
+}
+
+/* Onboarding subheadings — DM Sans, regular weight */
+.ob-subheading {
+  font-family: var(--font-dm-sans), var(--font-inter), system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--ob-text-secondary);
+  text-align: center;
+  max-width: 440px;
+}
+
+/* Step entry animation */
+@keyframes ob-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ob-animate-in {
+  animation: ob-fade-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Success badge pop animation (Step 2: connected) */
+@keyframes ob-success-pop {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.ob-success-pop {
+  animation: ob-success-pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+}
+
+/* Reduced motion overrides */
+@media (prefers-reduced-motion: reduce) {
+  .ob-animate-in,
+  .ob-success-pop {
     animation: none;
   }
 }

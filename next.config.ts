@@ -43,7 +43,7 @@ const nextConfig: NextConfig = {
             // Allows PostHog EU endpoint, barcode scanner WASM, FastAPI backend, ngrok tunnels, and other necessary domains
             key: 'Content-Security-Policy',
             value:
-              "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://app.posthog.com https://*.posthog.com https://eu.i.posthog.com; connect-src 'self' http://127.0.0.1:54321 http://localhost:54321 http://127.0.0.1:8000 http://localhost:8000 https://*.ngrok-free.dev https://*.ngrok.io https://jrgmetdsohowtxickqij.supabase.co https://world.openfoodfacts.org https://*.ondigitalocean.app https://fonts.googleapis.com https://fonts.gstatic.com https://app.posthog.com https://*.posthog.com https://eu.i.posthog.com https://*.jsdelivr.net; font-src 'self' https://fonts.gstatic.com data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:;",
+              "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://app.posthog.com https://*.posthog.com https://eu.i.posthog.com; worker-src blob:; connect-src 'self' http://127.0.0.1:54321 http://localhost:54321 http://127.0.0.1:8000 http://localhost:8000 https://*.ngrok-free.dev https://*.ngrok.io https://jrgmetdsohowtxickqij.supabase.co https://world.openfoodfacts.org https://*.ondigitalocean.app https://fonts.googleapis.com https://fonts.gstatic.com https://app.posthog.com https://*.posthog.com https://eu.i.posthog.com https://*.jsdelivr.net; font-src 'self' https://fonts.gstatic.com data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:;",
           },
         ],
       },

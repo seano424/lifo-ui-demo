@@ -416,6 +416,7 @@
     }
   },
   "navigation": {
+    "automations": "Automations",
     "dashboard-title": "Store",
     "dashboard": "Dashboard",
     "overview": "Overview",

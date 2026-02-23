@@ -73,7 +73,8 @@
       "expiring": "Verlopend",
       "expiringSoon": "Verloopt binnenkort",
       "new": "Nieuw",
-      "ignored": "Genegeerd"
+      "ignored": "Genegeerd",
+      "automations": "Automatiseringen"
     },
     "navUser": {
       "upgradeToPro": "Upgrade naar Pro",

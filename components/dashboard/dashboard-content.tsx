@@ -6,6 +6,8 @@ import { StatCards } from './stat-cards/stat-cards'
 import { BatchesFilteredList } from '@/components/batches/batches-filtered-list'
 import { CoverageBar } from './coverage-bar'
 import { AutomationCard } from './automation-card'
+import { AutoTrackingBanner } from './auto-tracking-banner'
+import { SquareSetupBanner } from './square-setup-banner'
 import { Typography } from '../ui/typography'
 import { Button } from '../ui/button'
 import { ChevronRight } from 'lucide-react'
@@ -16,7 +18,9 @@ export function DashboardContent() {
   const daysFilter = timeRange === '7d' ? 7 : timeRange === '30d' ? 30 : 90
 
   return (
-    <div className="flex flex-col gap-10 pb-80 animate-in fade-in-0 duration-1000 transition-all duration-300 ease-in-out min-h-screen">
+    <div className="flex flex-col gap-10 pb-80 animate-in fade-in-0 transition-all duration-300 ease-in-out min-h-screen">
+      <SquareSetupBanner />
+      <AutoTrackingBanner />
       <DashboardHeader timeRange={timeRange} onTimeRangeChange={setTimeRange} />
 
       <StatCards daysFilter={daysFilter} />
