@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useMemo, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import {
   useCategoriesWithTrackingSettings,
   useSaveBatchTrackingSetup,
@@ -61,6 +62,7 @@ export interface ProductOverride {
  */
 export function BatchTrackingStep() {
   const context = 'BatchTrackingStep'
+  const router = useRouter()
   // Get active store from Zustand store context
   const storeId = useActiveStoreId()
 
@@ -255,9 +257,8 @@ export function BatchTrackingStep() {
       await saveMutation.mutateAsync({
         storeId,
         config: {
-          enabled: true,
-          setup_completed: true,
-          setup_completed_at: new Date().toISOString(),
+          enabled: false,
+          setup_completed: false,
           product_selection_mode: 'by_category',
           selected_category_ids: processedCategories.map(c => c.id),
           selected_product_ids: [],
@@ -266,8 +267,8 @@ export function BatchTrackingStep() {
         productOverrides: [],
       })
 
-      logger.log(context, 'Skip save complete — setup flow will exit to dashboard', { storeId })
-      // React Query invalidation from saveMutation.onSuccess handles navigation
+      logger.log(context, 'Skip save complete — navigating to dashboard', { storeId })
+      router.replace('/dashboard')
     } catch (error) {
       logger.error(context, 'Failed to skip batch tracking setup', { error, storeId })
       setIsSkipping(false)
