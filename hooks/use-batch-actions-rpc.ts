@@ -366,8 +366,7 @@ export function useBatchActionRPC(providedStoreId?: string) {
               queryType === 'filtered' ||
               queryType === 'with-counts' ||
               queryType === 'counts' ||
-              queryType === 'dashboardSummary' ||
-              queryType === 'urgentCount'
+              queryType === 'dashboardSummary'
             )
           },
         }),

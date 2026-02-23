@@ -1,15 +1,16 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Card } from '@/components/ui/card'
 import { Typography } from '@/components/ui/typography'
 import { Button } from '@/components/ui/button'
-import { ShelfLifeChip } from './shelf-life-chip'
-// import { CategoryProductExpand } from './category-product-expand' // Hidden for now
+import { BottomSheet } from '@/components/ui/bottom-sheet'
+import { cn } from '@/lib/utils'
 import { useTranslations } from 'next-intl'
-import { Zap, Type, Eye, ChevronDown, RotateCcw } from 'lucide-react'
+import { Zap, Type, Lightbulb } from 'lucide-react'
 import type { ProcessedCategory, ProductOverride } from '../batch-tracking-step'
-import { Badge } from '@/components/ui/badge'
+
+const DEFAULT_SHELF_LIFE = 14
 
 interface StepHowToTrackProps {
   categories: ProcessedCategory[]
@@ -30,216 +31,120 @@ interface StepHowToTrackProps {
  * Step 2: How to Track
  *
  * Configure shelf life and tracking mode for each category.
- * - Auto mode: System calculates expiry dates
- * - Manual mode: User enters expiry dates manually
- * - Optional per-product overrides within categories
+ * Rows are read-only; clicking a row opens a BottomSheet editor.
  */
 export function StepHowToTrack({
   categories,
   categoryModes,
   shelfLifeDays,
-  productOverrides,
-  storeId,
   onUpdateMode,
   onUpdateShelfLife,
-  onUpdateProductOverride,
-  onClearProductOverride,
-  onResetToDefaults,
   onActivate,
   onBack,
 }: StepHowToTrackProps) {
   const t = useTranslations('setupFlow.batchTracking.steps.howToTrack')
-  const [previewOpen, setPreviewOpen] = useState(false)
 
-  const autoCount = categories.filter(c => categoryModes[c.id] === 'auto').length
-  const manualCount = categories.filter(c => categoryModes[c.id] === 'manual').length
-  const trackedProducts = categories.reduce((sum, cat) => sum + cat.productCount, 0)
+  const handleSetAllAuto = () => {
+    for (const cat of categories) {
+      onUpdateMode(cat.id, 'auto')
+    }
+  }
 
-  // Generate preview batches based on actual enabled categories
-  const previewBatches = categories
-    .filter(c => categoryModes[c.id] === 'auto')
-    .slice(0, 4)
-    .map(c => ({
-      product: `${c.name} Sample Product`,
-      category: c.name,
-      daysLeft: shelfLifeDays[c.id] || 14,
-      qty: Math.floor(Math.random() * 30) + 8,
-      confidence: c.matched ? 'high' : 'low',
-    }))
-
-  // Add a manual example if any categories are manual
-  if (manualCount > 0) {
-    const manualCategory = categories.find(c => categoryModes[c.id] === 'manual')
-    if (manualCategory) {
-      previewBatches.push({
-        product: `${manualCategory.name} Sample Product`,
-        category: manualCategory.name,
-        daysLeft: 14,
-        qty: 15,
-        confidence: 'manual',
-      })
+  const handleSetAllManual = () => {
+    for (const cat of categories) {
+      onUpdateMode(cat.id, 'manual')
     }
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-4">
       {/* Header */}
-      <div>
-        <Typography variant="h3" className="mb-2">
-          How should we track expiration dates?
+      <div className="flex flex-col gap-4 text-center">
+        <Typography variant="h2" className="font-extrabold font-fraunces max-w-lg mx-auto">
+          How do you want to track expiry dates?
         </Typography>
-        <Typography variant="p" color="muted">
-          Set a default shelf life for each category. When deliveries arrive, we'll calculate the
-          expiry automatically. Choose "Manual entry" for categories where you'd rather enter dates
-          yourself.
+        <Typography variant="h5" color="muted" className="max-w-3xl mx-auto">
+          We&apos;ve suggested a shelf life for each category. Adjust any that don&apos;t match your
+          store. You can fine-tune individual products later.
         </Typography>
       </div>
 
-      {/* Categories */}
-      <div className="flex flex-col gap-3">
-        {/* <div className="flex items-center justify-between border-b border-secondary-100 pb-4">
-          <Typography variant="h4">
-            {t('sections.categories')}
+      {/* Categories table */}
+      <Card className="overflow-hidden max-h-[400px] overflow-y-auto scrollbar-none py-4">
+        {/* Column headers */}
+        {/* <div className="grid grid-cols-[1fr_160px_80px] gap-4 px-4 py-3">
+          <Typography variant="small" color="muted" className="font-mono tracking-tighter">
+            Category
           </Typography>
-          <Typography variant="h4">
-            {t('sections.defaultShelfLife')}
+          <Typography variant="small" color="muted" className="font-mono tracking-tighter">
+            Method
+          </Typography>
+          <Typography
+            variant="small"
+            color="muted"
+            className="text-right font-mono tracking-tighter"
+          >
+            Shelf Life
           </Typography>
         </div> */}
-        <Card className="flex flex-col gap-3">
+
+        <div className="divide-y divide-muted">
           {categories.map(category => (
             <CategoryConfigRow
               key={category.id}
               category={category}
               mode={categoryModes[category.id] || 'auto'}
               days={shelfLifeDays[category.id]}
-              productOverrides={productOverrides}
-              storeId={storeId}
               onUpdateMode={onUpdateMode}
               onUpdateShelfLife={onUpdateShelfLife}
-              onUpdateProductOverride={onUpdateProductOverride}
-              onClearProductOverride={onClearProductOverride}
-              t={t}
             />
           ))}
-        </Card>
-
-        {/* Legend */}
-        <div className="flex items-center gap-4 text-xs text-muted-foreground justify-center select-none">
-          <div className="flex items-center gap-1.5">
-            <Zap className="w-3 h-3" /> = auto-calculate from delivery date
-          </div>
-          <div className="flex items-center gap-1.5">
-            <Type className="w-3 h-3" /> = you'll enter dates per delivery
-          </div>
         </div>
-      </div>
+      </Card>
 
-      {/* Batch preview — collapsible */}
-      <Card className="overflow-hidden">
+      {/* Bulk actions */}
+      <div className="flex items-center gap-3 p-2 justify-center font-mono tracking-tighter">
+        <Typography variant="small" color="muted" className="font-mono tracking-tighter">
+          Set all to:
+        </Typography>
         <button
           type="button"
-          onClick={() => setPreviewOpen(!previewOpen)}
-          className="w-full flex items-center justify-between group"
+          onClick={handleSetAllAuto}
+          className="inline-flex items-center gap-1.5 text-sm text-secondary-700 hover:underline"
         >
-          <div className="flex items-center gap-2.5">
-            <Eye className="w-5 h-5 text-primary-900" />
-
-            <Typography variant="p">Preview your dashboard</Typography>
-          </div>
-          <ChevronDown
-            className={`w-4 h-4 transition-transform duration-200 ${previewOpen ? 'rotate-180' : ''}`}
-          />
+          <Zap className="w-3 h-3" /> Auto-track
         </button>
-        {previewOpen && (
-          <div className="py-4">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="text-left text-xs uppercase tracking-wider">
-                    <th className="py-2">Product</th>
-                    <th className="py-2">Est. Expiry</th>
-                    <th className="py-2 text-right">Qty</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-secondary-100">
-                  {previewBatches.map(batch => (
-                    <tr key={`${batch.product}-${batch.category}`}>
-                      <td className="py-2.5 flex flex-col gap-1">
-                        <Typography variant="small" color="primary">
-                          {batch.product}
-                        </Typography>
-                        <Typography variant="extraSmall">{batch.category}</Typography>
-                      </td>
-                      <td className="py-2.5">
-                        {batch.confidence === 'manual' ? (
-                          <Badge size="sm">
-                            <Type className="w-3 h-3" /> Set on delivery
-                          </Badge>
-                        ) : (
-                          <Badge size="sm" variant={batch.daysLeft <= 3 ? 'danger' : 'primary'}>
-                            {batch.daysLeft}d from delivery
-                            {batch.confidence !== 'high' && '~'}
-                          </Badge>
-                        )}
-                      </td>
-                      <td className="px-2 py-2.5  text-right tabular-nums">{batch.qty}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <div className="px-2 pt-4 border-t border-secondary-100">
-              <span className="text-xs">
-                Sample of {trackedProducts} tracked products · Tilde (~) = estimated from default
-                shelf life
-              </span>
-            </div>
-          </div>
-        )}
-      </Card>
-
-      {/* Info box */}
-      <div className="flex items-start gap-3 p-4 border border-muted rounded-lg shadow-sm">
-        <Typography variant="small">
-          These are starting defaults. Your team can adjust any date when processing a delivery. You
-          can change all of this later in settings.
-        </Typography>
+        <span className="text-muted-foreground text-sm">·</span>
+        <button
+          type="button"
+          onClick={handleSetAllManual}
+          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:underline"
+        >
+          <Type className="w-3 h-3" /> Manual entry
+        </button>
       </div>
-
-      {/* Summary */}
-      <Card className="p-4 border border-muted rounded-lg shadow-sm">
-        <div className="flex items-center justify-between mb-2">
-          <Typography variant="p">{trackedProducts} products ready</Typography>
-        </div>
-        <div className="flex items-center gap-6 ">
-          <div className="flex items-center gap-2">
-            <Typography variant="small">Auto-dated categories:</Typography>
-            <Typography variant="small">{autoCount}</Typography>
-          </div>
-          <div className="flex items-center gap-2">
-            <Typography variant="small">Manual categories:</Typography>
-            <Typography variant="small">{manualCount}</Typography>
-          </div>
-        </div>
-      </Card>
 
       {/* Navigation */}
       <div className="flex justify-between">
         <Button variant="outline" onClick={onBack}>
           {t('backButton')}
         </Button>
-        <div className="flex gap-3">
-          <Button variant="outline" onClick={onResetToDefaults}>
-            <RotateCcw className="w-3 h-3 mr-1.5" />
-            {t('resetButton')}
-          </Button>
-          <Button onClick={onActivate}>
-            <Zap className="w-3.5 h-3.5 mr-2" />
-            {t('activateButton')}
-          </Button>
-        </div>
+        <Button onClick={onActivate}>Continue</Button>
       </div>
     </div>
+  )
+}
+
+// =============================================================================
+// MODE BADGE
+// =============================================================================
+
+function ModeBadge({ mode }: { mode: 'auto' | 'manual' }) {
+  return (
+    <span className="inline-flex justify-center items-center gap-1.5 p-2 text-sm font-medium rounded-lg border border-muted bg-secondary-50 text-secondary-700">
+      {mode === 'auto' ? <Zap className="w-3 h-3" /> : <Type className="w-3 h-3" />}
+      {mode === 'auto' ? 'Auto-track' : 'Manual entry'}
+    </span>
   )
 }
 
@@ -253,12 +158,6 @@ interface CategoryConfigRowProps {
   days: number | null
   onUpdateMode: (categoryId: string, mode: 'auto' | 'manual') => void
   onUpdateShelfLife: (categoryId: string, days: number | null) => void
-  // Kept in interface but unused - for future product overrides feature
-  productOverrides?: Record<string, ProductOverride>
-  storeId?: string | null
-  onUpdateProductOverride?: (productId: string, override: ProductOverride) => void
-  onClearProductOverride?: (productId: string) => void
-  t?: (key: string) => string
 }
 
 function CategoryConfigRow({
@@ -268,49 +167,255 @@ function CategoryConfigRow({
   onUpdateMode,
   onUpdateShelfLife,
 }: CategoryConfigRowProps) {
-  return (
-    <div className="flex items-center justify-between py-2">
-      <div className="flex-1">
-        <Typography variant="p" className="font-medium">
-          {category.name}
-        </Typography>
-        <Typography variant="small" className="text-muted-foreground">
-          {category.productCount} {category.productCount === 1 ? 'product' : 'products'}
-        </Typography>
-      </div>
-      <div className="flex items-center gap-2 shrink-0">
-        <ShelfLifeChip
-          mode={mode}
-          days={days}
-          onModeChange={newMode => onUpdateMode(category.id, newMode)}
-          onDaysChange={newDays => onUpdateShelfLife(category.id, newDays)}
-        />
-        {/* Mode toggle button */}
-        <button
-          type="button"
-          onClick={() => {
-            const newMode = mode === 'auto' ? 'manual' : 'auto'
-            onUpdateMode(category.id, newMode)
-          }}
-          className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-          title={mode === 'auto' ? 'Switch to manual entry' : 'Switch to automatic'}
-        >
-          {mode === 'auto' ? <Zap className="w-3.5 h-3.5" /> : <Type className="w-3.5 h-3.5" />}
-        </button>
-      </div>
+  const [editOpen, setEditOpen] = useState(false)
 
-      {/* Optional Product Overrides - Hidden for now as requested */}
-      {/* {category.id !== 'uncategorized' && (
-        <CategoryProductExpand
-          categoryId={category.id}
-          storeId={storeId}
-          categoryMode={mode}
-          categoryDays={days}
-          productOverrides={productOverrides}
-          onUpdateProductOverride={onUpdateProductOverride}
-          onClearProductOverride={onClearProductOverride}
-        />
-      )} */}
-    </div>
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => setEditOpen(true)}
+        className="grid grid-cols-[1fr_160px_80px] items-center gap-4 px-4 py-2 w-full text-left hover:bg-muted transition-all duration-100 ease-in-out hover:cursor-pointer"
+      >
+        <Typography variant="small">{category.name}</Typography>
+        <ModeBadge mode={mode} />
+        <div className="text-right">
+          {mode === 'auto' ? (
+            <Typography variant="small">{days ?? DEFAULT_SHELF_LIFE} days</Typography>
+          ) : (
+            <Typography variant="small" color="muted">
+              —
+            </Typography>
+          )}
+        </div>
+      </button>
+
+      <CategoryEditSheet
+        category={category}
+        mode={mode}
+        days={days}
+        isOpen={editOpen}
+        onClose={() => setEditOpen(false)}
+        onUpdateMode={onUpdateMode}
+        onUpdateShelfLife={onUpdateShelfLife}
+      />
+    </>
+  )
+}
+
+// =============================================================================
+// CATEGORY EDIT SHEET
+// =============================================================================
+
+interface CategoryEditSheetProps {
+  category: ProcessedCategory
+  mode: 'auto' | 'manual'
+  days: number | null
+  isOpen: boolean
+  onClose: () => void
+  onUpdateMode: (categoryId: string, mode: 'auto' | 'manual') => void
+  onUpdateShelfLife: (categoryId: string, days: number | null) => void
+}
+
+function CategoryEditSheet({
+  category,
+  mode,
+  days,
+  isOpen,
+  onClose,
+  onUpdateMode,
+  onUpdateShelfLife,
+}: CategoryEditSheetProps) {
+  const [draftMode, setDraftMode] = useState<'auto' | 'manual'>(mode)
+  const [draftDays, setDraftDays] = useState(days ?? DEFAULT_SHELF_LIFE)
+
+  // Reset draft state whenever the sheet opens
+  useEffect(() => {
+    if (isOpen) {
+      setDraftMode(mode)
+      setDraftDays(days ?? DEFAULT_SHELF_LIFE)
+    }
+  }, [isOpen, mode, days])
+
+  const handleSave = () => {
+    onUpdateMode(category.id, draftMode)
+    onUpdateShelfLife(category.id, draftMode === 'auto' ? draftDays : null)
+    onClose()
+  }
+
+  // Example expiry date calculation
+  const expiryDate = new Date()
+  expiryDate.setDate(expiryDate.getDate() + draftDays)
+  const formattedDate = new Intl.DateTimeFormat('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  }).format(expiryDate)
+
+  return (
+    <BottomSheet
+      isOpen={isOpen}
+      onClose={onClose}
+      titleElement={
+        <Typography variant="h3" className="font-bold">
+          Edit: {category.name}
+        </Typography>
+      }
+    >
+      <div className="px-6 flex flex-col gap-6">
+        <Typography variant="p" color="muted">
+          Configure how expiry dates are handled for this category.
+        </Typography>
+
+        {/* Expiry Date Handling */}
+        <div className="flex flex-col gap-3">
+          <Typography variant="p" className="font-semibold">
+            Expiry Date Handling
+          </Typography>
+          <div className="border border-border rounded-xl overflow-hidden divide-y divide-border">
+            {/* Auto-track */}
+            <button
+              type="button"
+              onClick={() => setDraftMode('auto')}
+              className={cn(
+                'w-full flex items-start gap-3 p-4 text-left transition-all duration-100 ease-in-out',
+                draftMode === 'auto'
+                  ? 'bg-secondary-900 text-white'
+                  : 'bg-background hover:bg-muted/30',
+              )}
+            >
+              <div
+                className={cn(
+                  'mt-0.5 w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0',
+                  draftMode === 'auto' ? 'border-white' : 'border-muted-foreground/40',
+                )}
+              >
+                {draftMode === 'auto' && <div className="w-2 h-2 rounded-full bg-white" />}
+              </div>
+              <div className="flex flex-col gap-0.5">
+                <Typography
+                  variant="p"
+                  className={cn(
+                    'font-semibold transition-all duration-100 ease-in-out',
+                    draftMode === 'auto' ? 'text-white' : 'text-secondary-700',
+                  )}
+                >
+                  Auto-track
+                </Typography>
+                <Typography
+                  variant="small"
+                  color="muted"
+                  className={cn(
+                    'transition-all duration-100 ease-in-out',
+                    draftMode === 'auto' ? 'text-white' : 'text-secondary-700',
+                  )}
+                >
+                  Expiry dates calculated from delivery date + shelf life
+                </Typography>
+              </div>
+            </button>
+
+            {/* Manual entry */}
+            <button
+              type="button"
+              onClick={() => setDraftMode('manual')}
+              className={cn(
+                'w-full flex items-start gap-3 p-4 text-left transition-all duration-100 ease-in-out',
+                draftMode === 'manual'
+                  ? 'bg-secondary-900 text-white'
+                  : 'bg-background hover:bg-muted/30',
+              )}
+            >
+              <div
+                className={cn(
+                  'mt-0.5 w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0',
+                  draftMode === 'manual' ? 'border-white' : 'border-muted-foreground/40',
+                )}
+              >
+                {draftMode === 'manual' && <div className="w-2 h-2 rounded-full bg-white" />}
+              </div>
+              <div className="flex flex-col gap-0.5">
+                <Typography
+                  variant="p"
+                  className={cn(
+                    'font-semibold transition-all duration-100 ease-in-out',
+                    draftMode === 'manual' ? 'text-white' : 'text-secondary-700',
+                  )}
+                >
+                  Manual entry
+                </Typography>
+                <Typography
+                  variant="small"
+                  color="muted"
+                  className={cn(
+                    'transition-all duration-100 ease-in-out',
+                    draftMode === 'manual' ? 'text-white' : 'text-secondary-700',
+                  )}
+                >
+                  When you log a delivery, we&apos;ll ask for the expiry date printed on the
+                  packaging.
+                </Typography>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        {/* Shelf Life (days) — only shown for auto mode */}
+        {draftMode === 'auto' && (
+          <div className={cn('flex flex-col gap-3 p-4 border border-border rounded-xl')}>
+            <Typography
+              variant="p"
+              className={cn('font-semibold transition-all duration-100 ease-in-out')}
+            >
+              Shelf Life (days)
+            </Typography>
+            <input
+              type="number"
+              min="1"
+              value={draftDays}
+              onChange={e =>
+                setDraftDays(Number.parseInt(e.target.value, 10) || DEFAULT_SHELF_LIFE)
+              }
+              className={cn(
+                'w-24 px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500',
+              )}
+            />
+            <div className="flex flex-col gap-1">
+              <Typography
+                variant="small"
+                className={cn('font-medium transition-all duration-100 ease-in-out')}
+              >
+                Example:
+              </Typography>
+              <Typography
+                variant="small"
+                color="muted"
+                className={cn('transition-all duration-100 ease-in-out')}
+              >
+                {category.name} delivered today → Expires {formattedDate} ({draftDays} days)
+              </Typography>
+            </div>
+          </div>
+        )}
+
+        {/* Hint */}
+        <div className="flex items-start gap-2">
+          <Lightbulb className="w-4 h-4 text-muted-foreground shrink-0 mt-0.5" />
+          <Typography variant="small" color="muted">
+            You can override shelf life for individual products later (e.g., artisan bread lasts 2
+            days vs. regular bread 3 days)
+          </Typography>
+        </div>
+
+        {/* Actions */}
+        <div className="flex gap-3 justify-end">
+          <Button variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button variant="secondary" onClick={handleSave}>
+            Save Changes
+          </Button>
+        </div>
+      </div>
+    </BottomSheet>
   )
 }

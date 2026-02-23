@@ -1,8 +1,3 @@
-/**
- * Integrations Hub Page
- * Displays available third-party integrations and their connection status
- */
-
 'use client'
 
 import { useState } from 'react'
@@ -86,47 +81,9 @@ export default function IntegrationsPage() {
       <DashboardInsetHeader page="integrations" />
 
       {/* Active Section */}
-      <div className="flex flex-col border border-muted rounded-xl overflow-hidden">
-        <div className="p-4 flex flex-col gap-4">
-          <Typography variant="h5">Active</Typography>
-          {/* Tabs */}
-          {/* <div className="flex gap-6">
-            <Button
-              onClick={() => setActiveTab('integrations')}
-              className={`pb-3 px-0 rounded-none hover:bg-transparent hover:text-gray-900 transition-colors relative ${activeTab === 'integrations'
-                ? 'text-gray-900 dark:text-gray-100'
-                : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
-                }`}
-              variant="ghost"
-            >
-              Integrations
-              {activeTab === 'integrations' && (
-                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary-900/30" />
-              )}
-            </Button>
-            <Button
-              variant="ghost"
-              onClick={() => setActiveTab('connections')}
-              className={`pb-3 rounded-none transition-colors relative flex items-center hover:bg-transparent hover:text-gray-900 gap-2 ${activeTab === 'connections'
-                ? 'text-gray-900 dark:text-gray-100'
-                : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
-                }`}
-            >
-              Third party connections
-              {activeTab === 'connections' && (
-                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-900" />
-              )}
-            </Button>
-          </div> */}
-
-          <Typography variant="p">
-            Integrations connect your external applications to unlock more ways to manage your
-            inventory
-          </Typography>
-        </div>
-
+      <div className="flex flex-col border border-primary-100 rounded-xl overflow-hidden">
         {/* Integrations */}
-        <div className="divide-y divide-border border-t border-muted">
+        <div className="divide-y divide-border">
           {/* Not Loading State */}
           {isLoadingSquare && (
             <div className="overflow-x-auto scrollbar-none">
@@ -238,7 +195,7 @@ export default function IntegrationsPage() {
                         <div key={store.store_id} className="flex items-center justify-between p-2">
                           <div>
                             <Typography variant="p">{store.store_name}</Typography>
-                            <Typography variant="muted">
+                            <Typography variant="small">
                               Location ID: {store.location_id}
                             </Typography>
                           </div>

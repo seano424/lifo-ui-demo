@@ -73,7 +73,8 @@
       "expiring": "Expiring",
       "expiringSoon": "Expiring Soon",
       "new": "New",
-      "ignored": "Ignored"
+      "ignored": "Ignored",
+      "automations": "Automations"
     },
     "navUser": {
       "upgradeToPro": "Upgrade to Pro",

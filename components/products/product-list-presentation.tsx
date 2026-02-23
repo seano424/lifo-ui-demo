@@ -261,7 +261,7 @@ export function ProductsListPresentation({
                       <span>{product.brand || 'N/A'}</span>
                     </TableCell>
                     <TableCell>
-                      <Typography variant="muted">
+                      <Typography variant="small">
                         <span>{product.store_quantity ?? product.batch_quantity ?? 0}</span>
                         <span>{product.unit_type || t('table.units')}</span>
                       </Typography>

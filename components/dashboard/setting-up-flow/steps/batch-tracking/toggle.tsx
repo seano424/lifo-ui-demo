@@ -27,8 +27,8 @@ export function Toggle({ checked, onCheckedChange, disabled = false, className }
       disabled={disabled}
       onClick={() => onCheckedChange(!checked)}
       className={cn(
-        'relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-900 dark:focus-visible:ring-gray-100',
-        checked ? 'bg-gray-900 dark:bg-gray-100' : 'bg-gray-200 dark:bg-gray-700',
+        'relative inline-flex h-5 w-10 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-900 dark:focus-visible:ring-gray-100',
+        checked ? 'bg-secondary-900 dark:bg-secondary-100' : 'bg-gray-200 dark:bg-gray-700',
         disabled && 'opacity-50 cursor-not-allowed',
         className,
       )}
@@ -37,7 +37,7 @@ export function Toggle({ checked, onCheckedChange, disabled = false, className }
       <span
         aria-hidden="true"
         className={cn(
-          'pointer-events-none inline-block h-5 w-5 transform rounded-full shadow-lg ring-0 transition duration-200 ease-in-out',
+          'pointer-events-none inline-block size-4 transform rounded-full shadow-lg ring-0 transition duration-200 ease-in-out',
           checked
             ? 'translate-x-5 bg-white dark:bg-gray-900'
             : 'translate-x-0 bg-white dark:bg-gray-100',

@@ -8,7 +8,7 @@ import { RevealAnimation } from '@/components/ui/reveal-animation'
 type PlanFeatures = Record<string, string>
 
 export const metadata: Metadata = {
-  title: 'Pricing - LIFO.AI',
+  title: 'Pricing -Lifo.AI',
   description:
     'Choose the perfect plan for your food waste management needs. From free trial to enterprise solutions.',
 }

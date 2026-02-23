@@ -17,13 +17,26 @@ export default async function proxy(request: NextRequest) {
   // wait for the setAll Promise to resolve before returning the response.
   //
   // SECURITY: This also ensures redirect path validation happens before any response is sent.
+  // Square OAuth redirects back to /auth/login?success=true after the backend
+  // processes the callback. Bounce authenticated users straight to the dashboard.
+  if (
+    pathname === '/dashboard/integrations/square/callback' &&
+    searchParams.get('success') === 'true'
+  ) {
+    return NextResponse.redirect(new URL('/onboarding/setup?square_connected=true', request.url))
+  }
+
   if (code && pathname === '/auth/callback') {
     const type = searchParams.get('type')
     const next = searchParams.get('next')
 
     // Determine redirect destination
     const redirectPath =
-      type === 'recovery' ? '/auth/update-password' : next?.startsWith('/') ? next : '/dashboard'
+      type === 'recovery'
+        ? '/auth/update-password'
+        : next?.startsWith('/')
+          ? next
+          : '/onboarding/setup'
 
     // Create response (will have cookies set on it by setAll)
     const response = NextResponse.redirect(new URL(redirectPath, request.url))

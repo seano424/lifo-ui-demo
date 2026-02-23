@@ -176,7 +176,7 @@ export function RecipientSelector({
       {/* DB Recipients */}
       {dbRecipients.length > 0 && (
         <div className="flex flex-col gap-2">
-          <Typography variant="muted">{t('savedRecipients') || 'Saved Recipients'}</Typography>
+          <Typography variant="small">{t('savedRecipients') || 'Saved Recipients'}</Typography>
           <div className="grid grid-cols-1 gap-2">
             {dbRecipients.map(recipient => (
               <button
@@ -204,7 +204,7 @@ export function RecipientSelector({
 
       {/* Quick Presets */}
       <div className={`flex flex-col gap-2 ${dbRecipients.length > 0 ? 'mt-4' : ''}`}>
-        <Typography variant="muted">{t('quickOptions') || 'Quick Options'}</Typography>
+        <Typography variant="small">{t('quickOptions') || 'Quick Options'}</Typography>
         <div className="grid grid-cols-2 gap-2">
           {ADHOC_PRESETS.map(preset => {
             const isSelected =
@@ -357,7 +357,7 @@ export function RecipientSelector({
       {/* {adhocRecipientsList.length > 0 && (
         <div className="flex flex-col gap-2 mt-4">
           <Typography
-            variant="muted"
+            variant="small"
             className="text-sm"
           >
             {t('recentQuickOptions') || 'Recent Quick Options'}

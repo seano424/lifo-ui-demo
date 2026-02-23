@@ -1,52 +1,41 @@
-import { useStoreState } from '@/lib/stores/store-context'
+import { useStoreState, useActiveStoreId } from '@/lib/stores/store-context'
+import { useCurrentUser } from '@/hooks/use-users'
+import { useSquareStatus } from '@/hooks/use-square-integration'
 import { useBatchTrackingSetup } from '@/lib/queries/batch-tracking-onboarding'
-import type { SetupStep } from '@/lib/stores/setup-flow-store'
 
 export interface SetupProgress {
-  hasStore: boolean
-  hasBatchTrackingSetup: boolean
+  hasSquareConnection: boolean
+  hasAutomation: boolean
   isLoading: boolean
 }
 
 /**
- * Hook to derive setup progress from database state
- * This replaces localStorage-based completion tracking with actual data
+ * Checks setup progress across both onboarding steps.
+ *
+ * Uses useSquareStatus (backend API) instead of querying
+ * integrations.square_connections directly, because the client-side
+ * anon key lacks RLS read access to that table.
+ *
+ * hasAutomation reflects whether batch tracking setup_completed is true
+ * for the active store. Only checked once Square is connected.
  */
 export function useSetupProgress(): SetupProgress {
-  const { activeStore, isLoadingStores } = useStoreState()
+  const { isLoading: isLoadingUser } = useCurrentUser()
+  const { isLoadingStores } = useStoreState()
+  const { data: squareStatus, isLoading: isLoadingSquare } = useSquareStatus()
+  const storeId = useActiveStoreId()
 
-  // Check if batch tracking setup is completed
-  const { data: batchTrackingSetup, isLoading } = useBatchTrackingSetup(activeStore?.store_id || '')
+  const hasSquareConnection = squareStatus?.is_connected ?? false
+
+  const { data: batchSetup, isLoading: isLoadingBatch } = useBatchTrackingSetup(storeId ?? '')
 
   return {
-    hasStore: !!activeStore,
-    hasBatchTrackingSetup: batchTrackingSetup?.config?.setup_completed ?? false,
-    isLoading: isLoading || isLoadingStores,
+    hasSquareConnection,
+    hasAutomation: batchSetup?.config?.setup_completed ?? false,
+    isLoading:
+      isLoadingUser ||
+      isLoadingStores ||
+      isLoadingSquare ||
+      (hasSquareConnection && !!storeId && isLoadingBatch),
   }
-}
-
-/**
- * Helper to check if a specific step is completed based on database state
- */
-export function isStepCompleted(step: SetupStep, progress: SetupProgress): boolean {
-  switch (step) {
-    case 'add-store':
-      // Completed when they have a store (either via Square or manual)
-      return progress.hasStore
-    case 'batch-tracking-setup':
-      // Completed when batch tracking setup is finished
-      return progress.hasBatchTrackingSetup
-    default:
-      return false
-  }
-}
-
-/**
- * Calculate overall progress percentage
- */
-export function getProgressPercentage(progress: SetupProgress): number {
-  const steps: SetupStep[] = ['add-store', 'batch-tracking-setup']
-
-  const completedCount = steps.filter(step => isStepCompleted(step, progress)).length
-  return Math.round((completedCount / steps.length) * 100)
 }

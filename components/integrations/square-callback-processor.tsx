@@ -61,19 +61,19 @@ export function SquareCallbackProcessor() {
           // Sync completed successfully
           setStatus('success')
           setTimeout(() => {
-            router.push('/dashboard/integrations/square')
+            router.push('/dashboard?square_connected=true')
           }, 2000)
         } else if (syncStatus === 'failed') {
           // Sync failed but connection is active — user can retry from dashboard
           setStatus('sync_failed')
           setTimeout(() => {
-            router.push('/dashboard/integrations/square')
+            router.push('/dashboard')
           }, 3000)
         } else {
           // No sync status yet (legacy or sync hasn't started) — treat as success
           setStatus('success')
           setTimeout(() => {
-            router.push('/dashboard/integrations/square')
+            router.push('/dashboard?square_connected=true')
           }, 2000)
         }
       } else {

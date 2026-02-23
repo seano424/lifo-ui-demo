@@ -35,9 +35,16 @@ export function UntrackedAlert({
     return null
   }
 
+  const today = new Date().toISOString().split('T')[0]
+
   const handleAdd = async () => {
     if (!date) {
       toast.error('Please select an expiry date')
+      return
+    }
+
+    if (date < today) {
+      toast.error('Expiry date must be today or in the future')
       return
     }
 
@@ -89,9 +96,7 @@ export function UntrackedAlert({
             <Typography variant="p" className="font-medium">
               {count} units have no expiry date
             </Typography>
-            <Typography variant="p" className="text-muted-foreground">
-              {expanded ? '▾ Collapse' : '▸ Add Dates'}
-            </Typography>
+            <Typography variant="p">{expanded ? '▾ Collapse' : '▸ Add Dates'}</Typography>
           </div>
         </div>
       </button>
@@ -108,6 +113,7 @@ export function UntrackedAlert({
                 ref={inputRef}
                 type="date"
                 value={date}
+                min={today}
                 onChange={e => setDate(e.target.value)}
                 className="w-full"
               />

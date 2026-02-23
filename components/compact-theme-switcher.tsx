@@ -55,13 +55,13 @@ const CompactThemeSwitcher = () => {
       <DropdownMenuContent className="w-content" align="start">
         <DropdownMenuRadioGroup value={theme} onValueChange={e => setTheme(e)}>
           <DropdownMenuRadioItem className="flex gap-2" value="light">
-            <Sun size={ICON_SIZE} className="text-muted-foreground" /> <span>{t('light')}</span>
+            <Sun size={ICON_SIZE} /> <span>{t('light')}</span>
           </DropdownMenuRadioItem>
           <DropdownMenuRadioItem className="flex gap-2" value="dark">
-            <Moon size={ICON_SIZE} className="text-muted-foreground" /> <span>{t('dark')}</span>
+            <Moon size={ICON_SIZE} /> <span>{t('dark')}</span>
           </DropdownMenuRadioItem>
           <DropdownMenuRadioItem className="flex gap-2" value="system">
-            <Laptop size={ICON_SIZE} className="text-muted-foreground" /> <span>{t('system')}</span>
+            <Laptop size={ICON_SIZE} /> <span>{t('system')}</span>
           </DropdownMenuRadioItem>
         </DropdownMenuRadioGroup>
       </DropdownMenuContent>

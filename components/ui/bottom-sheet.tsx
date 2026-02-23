@@ -129,7 +129,11 @@ const BottomSheet = React.forwardRef<HTMLDivElement, BottomSheetProps>(
                 onTouchMove={handleTouchMove}
                 onTouchEnd={handleTouchEnd}
               >
-                <DialogPrimitive.Title>{titleElement || title}</DialogPrimitive.Title>
+                {titleElement ? (
+                  <DialogPrimitive.Title asChild>{titleElement}</DialogPrimitive.Title>
+                ) : (
+                  <DialogPrimitive.Title>{title}</DialogPrimitive.Title>
+                )}
                 <DialogPrimitive.Close
                   className={cn(
                     'rounded-full p-2 bg-background',

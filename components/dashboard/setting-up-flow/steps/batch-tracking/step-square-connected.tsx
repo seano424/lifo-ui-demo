@@ -35,9 +35,7 @@ export function StepSquareConnected({
         <Typography variant="h3" className="mb-2">
           {t('title')}
         </Typography>
-        <Typography variant="p" className="text-muted-foreground">
-          {t('description')}
-        </Typography>
+        <Typography variant="p">{t('description')}</Typography>
       </div>
 
       {isSyncing ? (
@@ -62,9 +60,7 @@ export function StepSquareConnected({
               </div>
               <div>
                 <Typography variant="h4">{storeName}</Typography>
-                <Typography variant="small" className="text-muted-foreground">
-                  {t('connectionActive')}
-                </Typography>
+                <Typography variant="small">{t('connectionActive')}</Typography>
               </div>
             </div>
 
@@ -73,24 +69,18 @@ export function StepSquareConnected({
                 <Typography variant="h4" className="font-semibold">
                   {productCount.toLocaleString()}
                 </Typography>
-                <Typography variant="small" className="text-muted-foreground">
-                  {t('productsImported')}
-                </Typography>
+                <Typography variant="small">{t('productsImported')}</Typography>
               </div>
               <div className="p-4 bg-muted/50 rounded-xl">
                 <Typography variant="h4" className="font-semibold">
                   {categoryCount.toLocaleString()}
                 </Typography>
-                <Typography variant="small" className="text-muted-foreground">
-                  {t('categoriesFound')}
-                </Typography>
+                <Typography variant="small">{t('categoriesFound')}</Typography>
               </div>
             </div>
 
             <div className="pt-2">
-              <Typography variant="small" className="text-muted-foreground">
-                {t('nextSteps')}
-              </Typography>
+              <Typography variant="small">{t('nextSteps')}</Typography>
             </div>
           </Card>
 

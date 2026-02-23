@@ -19,7 +19,7 @@ import { useStoreActions, useUserStores } from '@/hooks/use-stores'
 import type { Store } from '@/lib/queries/stores'
 import { useStoreState } from '@/lib/stores/store-context'
 import { cn } from '@/lib/utils'
-import { Settings, Store as StoreIcon } from 'lucide-react'
+import { Store as StoreIcon } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { Button } from './ui/button'
 import { Skeleton } from './ui/skeleton'
@@ -74,7 +74,7 @@ export function TeamSwitcher({ compact = false }: TeamSwitcherProps) {
             >
               <StoreIcon className="w-4 h-4 text-muted-foreground" />
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="text-muted-foreground">{t('noStoresAvailable')}</span>
+                <span>{t('noStoresAvailable')}</span>
               </div>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -110,8 +110,6 @@ export function TeamSwitcher({ compact = false }: TeamSwitcherProps) {
             </DropdownMenuTrigger>
             <DropdownMenuContent
               className="w-[--radix-dropdown-menu-trigger-width] sm:min-w-56 rounded-2xl mr-2 mt-4 border-4 border-muted"
-              align="start"
-              // side={isMobile ? 'bottom' : 'right'}
               sideOffset={4}
             >
               <DropdownMenuLabel className="text-xs text-muted-foreground">
@@ -127,16 +125,17 @@ export function TeamSwitcher({ compact = false }: TeamSwitcherProps) {
                     key={store.store_id}
                     onClick={() => handleStoreSwitch(store)}
                     className={cn(
-                      'gap-2 p-2 border-b border-b-border rounded-none',
-                      // index === userStores.length - 1 && 'border-b-0',
+                      'border-b border-b-border rounded-none group',
                       index === 0 && 'border-t border-t-border/50',
+                      index === userStores.length - 1 && 'border-b-0',
                     )}
                     disabled={isChangingStore}
                   >
-                    <div className="flex items-center gap-5 justify-between w-full">
+                    <div className="flex items-center gap-5 justify-between w-full b">
                       <div className="flex flex-1 flex-col gap-1 justify-between">
                         <Typography
                           variant="small"
+                          className="group-hover:text-primary!"
                           color={activeStore?.store_id === store.store_id ? 'primary' : 'muted'}
                         >
                           {store.store_name}
@@ -169,7 +168,7 @@ export function TeamSwitcher({ compact = false }: TeamSwitcherProps) {
               <DropdownMenuSeparator />
 
               {/* Set as Primary Store Option */}
-              {activeStore && (
+              {/* {activeStore && (
                 <DropdownMenuItem
                   onClick={() => handleStoreSwitch(activeStore, true)}
                   className="gap-2 p-2"
@@ -180,7 +179,7 @@ export function TeamSwitcher({ compact = false }: TeamSwitcherProps) {
                   </div>
                   <div className=" text-muted-foreground">{t('setAsPrimaryStore')}</div>
                 </DropdownMenuItem>
-              )}
+              )} */}
             </DropdownMenuContent>
           </DropdownMenu>
         </SidebarMenuItem>

@@ -264,6 +264,14 @@
   --font-mono:
     var(--font-roboto-mono), ui-monospace, SFMono-Regular, Menlo, Monaco,
     Consolas, 'Liberation Mono', 'Courier New', monospace;
+  --font-fraunces:
+    var(--font-fraunces), ui-sans-serif, system-ui, -apple-system,
+    BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+    'Noto Sans', sans-serif;
+  --font-dm-sans:
+    var(--font-dm-sans), ui-sans-serif, system-ui, -apple-system,
+    BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+    'Noto Sans', sans-serif;
 
   /* Breakpoints */
   --breakpoint-sm: 640px;
@@ -340,11 +348,9 @@
     --popover: 0 0% 100%;
     --popover-foreground: 225 42% 8%;
 
-    /* Updated primary to use the new vibrant purple */
     --primary: 252 100% 57%;
     --primary-foreground: 0 0% 100%;
 
-    /* Updated secondary to use the new vibrant blue */
     --secondary: 227 100% 63%;
     --secondary-foreground: 0 0% 100%;
 
@@ -489,3 +495,4 @@
     animation: none;
   }
 }
+

@@ -391,9 +391,7 @@ export default function StoreInformation({
                 <Typography variant="p">
                   {storeData?.store_name || t('storeInformation.messages.notSet')}
                 </Typography>
-                <Typography variant="small" className="text-muted-foreground">
-                  From Square location
-                </Typography>
+                <Typography variant="small">From Square location</Typography>
               </div>
 
               {/* Business Name - from Square merchant */}
@@ -402,9 +400,7 @@ export default function StoreInformation({
                 <Typography variant="p">
                   {storeData?.business_name || t('storeInformation.messages.notSet')}
                 </Typography>
-                <Typography variant="small" className="text-muted-foreground">
-                  From Square merchant
-                </Typography>
+                <Typography variant="small">From Square merchant</Typography>
               </div>
 
               {/* Store Code - read-only, generated from Square */}
@@ -413,9 +409,7 @@ export default function StoreInformation({
                 <Typography variant="p" className="font-mono">
                   {storeData?.store_code || t('storeInformation.messages.notSet')}
                 </Typography>
-                <Typography variant="small" className="text-muted-foreground">
-                  Auto-generated from Square location ID
-                </Typography>
+                <Typography variant="small">Auto-generated from Square location ID</Typography>
               </div>
 
               {/* Store Type - defaults to convenience */}
@@ -425,9 +419,7 @@ export default function StoreInformation({
                   {STORE_TYPES.find(type => type.value === storeData?.store_type)?.label ||
                     'Convenience'}
                 </Typography>
-                <Typography variant="small" className="text-muted-foreground">
-                  Default type for Square stores
-                </Typography>
+                <Typography variant="small">Default type for Square stores</Typography>
               </div>
             </div>
           </div>
@@ -445,9 +437,7 @@ export default function StoreInformation({
                 <Typography variant="p">
                   {storeData?.city || t('storeInformation.messages.notSet')}
                 </Typography>
-                <Typography variant="small" className="text-muted-foreground">
-                  From Square location
-                </Typography>
+                <Typography variant="small">From Square location</Typography>
               </div>
 
               {/* Country - from Square merchant */}
@@ -456,9 +446,7 @@ export default function StoreInformation({
                 <Typography variant="p">
                   {storeData?.country || t('storeInformation.messages.notSet')}
                 </Typography>
-                <Typography variant="small" className="text-muted-foreground">
-                  From Square merchant
-                </Typography>
+                <Typography variant="small">From Square merchant</Typography>
               </div>
             </div>
           </div>

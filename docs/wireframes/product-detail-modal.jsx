@@ -596,7 +596,7 @@ export default function ProductDetailModalDemo() {
             Product Detail Modal
           </h1>
           <p className="text-sm text-gray-500 mt-1">
-            LIFO wireframe — 3 entry points
+           Lifo wireframe — 3 entry points
           </p>
         </div>
 
