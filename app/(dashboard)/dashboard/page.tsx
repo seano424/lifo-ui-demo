@@ -1,21 +1,21 @@
-'use client'
-
-import { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { redirect } from 'next/navigation'
+import { createClient } from '@/lib/supabase/server'
 import { DashboardContent } from '@/components/dashboard/dashboard-content'
-import { useSetupProgress } from '@/lib/hooks/use-setup-progress'
 
-export default function DashboardPage() {
-  const router = useRouter()
-  const { hasSquareConnection, isLoading } = useSetupProgress()
+export default async function DashboardPage() {
+  const supabase = await createClient()
 
-  useEffect(() => {
-    if (!isLoading && !hasSquareConnection) {
-      router.replace('/onboarding/setup')
-    }
-  }, [isLoading, hasSquareConnection, router])
+  const { data } = await supabase
+    .schema('integrations')
+    .from('square_connections')
+    .select('connection_id')
+    .eq('is_active', true)
+    .limit(1)
+    .maybeSingle()
 
-  if (isLoading || !hasSquareConnection) return null
+  if (!data) {
+    redirect('/onboarding/setup')
+  }
 
   return (
     <div className="container py-6 lg:py-8">
