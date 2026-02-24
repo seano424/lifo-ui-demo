@@ -62,6 +62,14 @@ export function NavMain({
     setIsHydrated(true)
   }, [])
 
+  // Collect all nav item paths to detect more-specific matches
+  const allNavPaths = sections.flatMap(section =>
+    section.items.flatMap(item => [
+      item.url.split('?')[0],
+      ...(item.items?.map(sub => sub.url.split('?')[0]) ?? []),
+    ]),
+  )
+
   // Helper function to check if path is active (only after hydration)
   const isPathActive = (itemUrl: string) => {
     if (!isHydrated) return false // Prevent hydration mismatch
@@ -79,15 +87,18 @@ export function NavMain({
       return pathname === '/dashboard'
     }
 
-    // Special handling for settings: treat /settings/store as active for /settings
-    if (itemPath.includes('/settings')) {
-      return pathname.startsWith(itemPath)
-    }
-
     // Check if current path starts with the item URL (for nested routes)
     // This handles cases like /dashboard/todos/123 matching /dashboard/todos
+    // Skip if another nav item is a more specific match (e.g. /dashboard/settings/automations
+    // should not cause /dashboard/settings to also be active)
     if (pathname.startsWith(`${itemPath}/`)) {
-      return true
+      const hasMoreSpecificNavItem = allNavPaths.some(
+        navPath =>
+          navPath !== itemPath &&
+          navPath.startsWith(`${itemPath}/`) &&
+          pathname.startsWith(navPath),
+      )
+      return !hasMoreSpecificNavItem
     }
 
     return false

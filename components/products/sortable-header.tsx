@@ -1,6 +1,6 @@
-import { ArrowDown, ArrowUp } from 'lucide-react'
+import { ArrowUpDown } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import type { ProductSort, SortField } from '@/lib/queries/products'
+import type { SortField, ProductSort } from '@/lib/queries/products'
 import { cn } from '@/lib/utils'
 
 interface SortableHeaderProps {
@@ -14,29 +14,21 @@ interface SortableHeaderProps {
 export function SortableHeader({
   field,
   children,
-  currentSort,
+  // currentSort,
   updateSort,
   className,
 }: SortableHeaderProps) {
-  const isActive = currentSort.field === field
+  // const isActive = currentSort.field === field
 
   return (
     <div className={cn('flex items-center gap-1 group', className)}>
       <Button
         variant="ghost"
         onClick={() => updateSort(field)}
-        className="h-auto p-0 hover:bg-transparent hover:text-foreground"
+        className="h-auto p-0 hover:bg-transparent hover:text-foreground flex items-center gap-1 font-medium"
       >
-        <div className="flex items-center gap-1">
-          <span className="text-sm text-foreground">{children}</span>
-          {isActive ? (
-            currentSort.direction === 'asc' ? (
-              <ArrowUp className="h-3.5 w-3.5" />
-            ) : (
-              <ArrowDown className="h-3.5 w-3.5" />
-            )
-          ) : null}
-        </div>
+        {children}
+        <ArrowUpDown className="h-3.5 w-3.5" />
       </Button>
     </div>
   )

@@ -164,11 +164,11 @@ export function BatchTable({
                 <TableHead
                   key={header.id}
                   className="sticky top-0 z-10 py-3 px-2 sm:px-4 border-b border-muted"
-                  style={
-                    header.column.columnDef.size
-                      ? { width: header.column.columnDef.size }
-                      : undefined
-                  }
+                  // style={
+                  //   header.column.columnDef.size
+                  //     ? { width: header.column.columnDef.size }
+                  //     : undefined
+                  // }
                 >
                   {header.isPlaceholder
                     ? null

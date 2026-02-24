@@ -38,7 +38,7 @@ export function BatchListFilters({ filters, onFiltersChange, isLoading }: BatchL
         }
         disabled={isLoading}
       >
-        <SelectTrigger className="w-[140px]">
+        <SelectTrigger className="w-fit sm:w-[140px]">
           <div className="flex items-center gap-2">
             <Typography variant="small">{t('date')}:</Typography>
             <SelectValue />
@@ -77,9 +77,11 @@ export function BatchListFilters({ filters, onFiltersChange, isLoading }: BatchL
         }
         disabled={isLoading}
       >
-        <SelectTrigger className="w-[180px]" showChevron>
+        <SelectTrigger className="w-fit sm:w-[180px]" showChevron>
           <div className="flex items-center gap-2">
-            <Typography variant="small">{t('status')}:</Typography>
+            <Typography variant="small" className="hidden sm:block">
+              {t('status')}:
+            </Typography>
             <SelectValue />
           </div>
         </SelectTrigger>

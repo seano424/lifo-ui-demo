@@ -1,7 +1,6 @@
 'use client'
 
 import type { ColumnDef } from '@tanstack/react-table'
-import { Building2, Tag } from 'lucide-react'
 import type { useTranslations } from 'next-intl'
 
 import { SortableHeader } from '@/components/products/sortable-header'
@@ -90,10 +89,8 @@ export function createProductTableColumns({
         </SortableHeader>
       ),
       cell: ({ row }) => (
-        <div>
-          <div className="truncate" title={row.original.name}>
-            {row.original.name || t('unnamedProduct')}
-          </div>
+        <div className="truncate font-medium" title={row.original.name}>
+          {row.original.name}
         </div>
       ),
       size: 200,
@@ -110,7 +107,11 @@ export function createProductTableColumns({
           {t('totalStock')}
         </SortableHeader>
       ),
-      cell: ({ row }) => <div className="text-right">{row.original.store_quantity ?? 0}</div>,
+      cell: ({ row }) => (
+        <Typography variant="small" color="muted" className="text-right">
+          {row.original.store_quantity ?? 0}
+        </Typography>
+      ),
       size: 180,
     },
     {
@@ -126,7 +127,11 @@ export function createProductTableColumns({
           {t('totalUnitsWithExpiryDates')}
         </SortableHeader>
       ),
-      cell: ({ row }) => <div className="text-right">{row.original.batch_quantity ?? 0}</div>,
+      cell: ({ row }) => (
+        <Typography variant="small" color="muted" className="text-right">
+          {row.original.batch_quantity ?? 0}
+        </Typography>
+      ),
       size: 300,
     },
     {
@@ -145,35 +150,36 @@ export function createProductTableColumns({
         const storeQty = row.original.store_quantity ?? 0
         const batchQty = row.original.batch_quantity ?? 0
         const needsExpiry = Math.max(0, storeQty - batchQty)
-        return <div className="text-right">{needsExpiry}</div>
+        return (
+          <Typography variant="small" color="muted" className="text-right">
+            {needsExpiry}
+          </Typography>
+        )
       },
       size: 180,
     },
-    {
-      id: 'created_at',
-      accessorKey: 'created_at',
-      header: () => (
-        <SortableHeader
-          field="created_at"
-          currentSort={currentSort}
-          updateSort={updateSort}
-          className="justify-end"
-        >
-          {t('dateAdded')}
-        </SortableHeader>
-      ),
-      cell: ({ row }) => (
-        <Typography
-          variant="small"
-          className="text-muted-foreground text-right flex items-center justify-end"
-        >
-          {row.original.created_at
-            ? new Date(row.original.created_at).toLocaleDateString()
-            : t('notAvailable')}
-        </Typography>
-      ),
-      size: 150,
-    },
+    // {
+    //   id: 'created_at',
+    //   accessorKey: 'created_at',
+    //   header: () => (
+    //     <SortableHeader
+    //       field="created_at"
+    //       currentSort={currentSort}
+    //       updateSort={updateSort}
+    //       className="justify-end"
+    //     >
+    //       {t('dateAdded')}
+    //     </SortableHeader>
+    //   ),
+    //   cell: ({ row }) => (
+    //     <Typography variant="small" color="muted" className="text-right">
+    //       {row.original.created_at
+    //         ? new Date(row.original.created_at).toLocaleDateString()
+    //         : t('notAvailable')}
+    //     </Typography>
+    //   ),
+    //   size: 150,
+    // },
     {
       id: 'category',
       accessorKey: 'category',
@@ -189,33 +195,13 @@ export function createProductTableColumns({
       ),
       cell: ({ row }) => (
         <div className="flex items-center justify-end text-right">
-          <Badge variant="elevated">
-            <Tag className="h-3.5 w-3.5" />
+          <Badge
+            variant="successRounded"
+            size="sm"
+            className="font-light rounded-lg! border border-lime-200"
+          >
             {row.original.category_code ? getCategoryName(row.original) : t('uncategorized')}
           </Badge>
-        </div>
-      ),
-      size: 240,
-    },
-    {
-      id: 'brand',
-      accessorKey: 'brand',
-      header: () => (
-        <SortableHeader
-          field="brand"
-          currentSort={currentSort}
-          updateSort={updateSort}
-          className="justify-end"
-        >
-          {t('brand')}
-        </SortableHeader>
-      ),
-      cell: ({ row }) => (
-        <div className="flex items-center gap-2 justify-end text-right">
-          <Building2 className="h-4 w-4 text-muted-foreground shrink-0" />
-          <span className="truncate" title={row.original.brand || t('notAvailable')}>
-            {row.original.brand || t('notAvailable')}
-          </span>
         </div>
       ),
       size: 240,

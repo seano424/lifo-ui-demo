@@ -31,7 +31,7 @@ const badgeVariants = cva(
         mutedRounded: 'bg-muted text-foreground rounded-full',
         secondaryRounded:
           'bg-secondary-400/15 text-secondary-700 dark:bg-secondary-400/10 dark:text-secondary-300 rounded-full',
-        successRounded: 'bg-lime-100 rounded-full',
+        successRounded: 'bg-lime-100 rounded-full dark:text-black',
         dangerRounded: 'bg-red-100 rounded-full',
         destructiveRounded:
           'bg-red-400/15 text-red-700 dark:bg-red-400/10 dark:text-red-300 rounded-full',
