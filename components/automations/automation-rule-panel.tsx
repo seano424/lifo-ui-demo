@@ -1,9 +1,20 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { Button } from '@/components/ui/button'
+import { Button, buttonVariants } from '@/components/ui/button'
 import { Typography } from '@/components/ui/typography'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
 import { cn } from '@/lib/utils'
 import type { AutomationRule } from '@/lib/queries/dashboard'
 
@@ -182,13 +193,34 @@ export function AutomationRulePanel({
 
         {/* Footer */}
         <div className="px-6 py-4 border-t border-border flex items-center justify-between">
-          <Button
-            variant="ghost"
-            className="text-destructive hover:text-destructive hover:bg-destructive/10"
-            onClick={() => rule && onDelete(rule)}
-          >
-            Delete rule
-          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button
+                variant="ghost"
+                className="text-destructive hover:text-destructive hover:bg-destructive/10"
+              >
+                Delete rule
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Delete rule?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  &ldquo;{rule?.name}&rdquo; will be removed. Products in this {rule?.type} will no
+                  longer have shelf life automatically assigned.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  className={buttonVariants({ variant: 'destructive' })}
+                  onClick={() => rule && onDelete(rule)}
+                >
+                  Delete rule
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
           <div className="flex gap-2">
             <Button variant="outline" onClick={onClose}>
               Cancel

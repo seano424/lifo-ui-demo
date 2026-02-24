@@ -8,6 +8,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Typography } from '@/components/ui/typography'
 import { AutomationRuleRow } from './automation-rule-row'
 import { AutomationRulePanel } from './automation-rule-panel'
+import { AddAutomationRulePanel } from './add-automation-rule-panel'
 import type { AutomationRule } from '@/lib/queries/dashboard'
 
 interface AutomationRulesTableProps {
@@ -59,6 +60,7 @@ export function AutomationRulesTable({ rules, isLoading }: AutomationRulesTableP
   const [localRules, setLocalRules] = useState<AutomationRule[] | null>(null)
   const [editingRule, setEditingRule] = useState<AutomationRule | null>(null)
   const [isPanelOpen, setIsPanelOpen] = useState(false)
+  const [isAddPanelOpen, setIsAddPanelOpen] = useState(false)
 
   // Use local overrides if the user has made edits, otherwise show server data
   const displayRules = localRules ?? rules
@@ -91,6 +93,17 @@ export function AutomationRulesTable({ rules, isLoading }: AutomationRulesTableP
     toast.success(`${rule.name} rule deleted`)
   }
 
+  const handleCreate = (draft: Omit<AutomationRule, 'rule_id' | 'created_at'>) => {
+    const newRule: AutomationRule = {
+      ...draft,
+      rule_id: crypto.randomUUID(),
+      created_at: new Date().toISOString(),
+    }
+    setLocalRules([...(localRules ?? rules), newRule])
+    setIsAddPanelOpen(false)
+    toast.success(`${newRule.name} rule created`)
+  }
+
   if (isLoading) {
     return <TableSkeleton />
   }
@@ -116,7 +129,7 @@ export function AutomationRulesTable({ rules, isLoading }: AutomationRulesTableP
           </Typography>
         </div>
         <div className="ml-auto">
-          <Button variant="default" size="sm" onClick={() => toast.info('Add rule — coming soon')}>
+          <Button variant="default" size="sm" onClick={() => setIsAddPanelOpen(true)}>
             <Plus className="w-4 h-4" />
             Add rule
           </Button>
@@ -169,6 +182,12 @@ export function AutomationRulesTable({ rules, isLoading }: AutomationRulesTableP
         onClose={handlePanelClose}
         onSave={handleSave}
         onDelete={handleDelete}
+      />
+
+      <AddAutomationRulePanel
+        isOpen={isAddPanelOpen}
+        onClose={() => setIsAddPanelOpen(false)}
+        onCreate={handleCreate}
       />
     </>
   )

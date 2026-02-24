@@ -1,6 +1,19 @@
+import { useState } from 'react'
 import { Pencil, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Typography } from '@/components/ui/typography'
+import { buttonVariants } from '@/components/ui/button'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
 import type { AutomationRule } from '@/lib/queries/dashboard'
 
 interface AutomationRuleRowProps {
@@ -18,10 +31,12 @@ function formatCreatedAt(iso: string): string {
 }
 
 export function AutomationRuleRow({ rule, onEdit, onDelete }: AutomationRuleRowProps) {
+  const [deleteOpen, setDeleteOpen] = useState(false)
+
   return (
     <tr
       className="group hover:bg-muted/30 cursor-pointer transition-colors"
-      onClick={() => onEdit(rule)}
+      onClick={() => !deleteOpen && onEdit(rule)}
     >
       {/* Rule name + type */}
       <td className="px-6 py-4">
@@ -72,17 +87,35 @@ export function AutomationRuleRow({ rule, onEdit, onDelete }: AutomationRuleRowP
           >
             <Pencil className="w-3.5 h-3.5" />
           </button>
-          <button
-            type="button"
-            aria-label={`Delete ${rule.name}`}
-            onClick={e => {
-              e.stopPropagation()
-              onDelete(rule)
-            }}
-            className="p-1.5 rounded hover:bg-muted text-muted-foreground hover:text-destructive transition-colors"
-          >
-            <Trash2 className="w-3.5 h-3.5" />
-          </button>
+          <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+            <AlertDialogTrigger asChild onClick={e => e.stopPropagation()}>
+              <button
+                type="button"
+                aria-label={`Delete ${rule.name}`}
+                className="p-1.5 rounded hover:bg-muted text-muted-foreground hover:text-destructive transition-colors"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+              </button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Delete rule?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  &ldquo;{rule.name}&rdquo; will be removed. Products in this {rule.type} will no
+                  longer have shelf life automatically assigned.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  className={buttonVariants({ variant: 'destructive' })}
+                  onClick={() => onDelete(rule)}
+                >
+                  Delete rule
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       </td>
     </tr>
