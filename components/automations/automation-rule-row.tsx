@@ -1,0 +1,90 @@
+import { Pencil, Trash2 } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { Typography } from '@/components/ui/typography'
+import type { AutomationRule } from '@/lib/queries/dashboard'
+
+interface AutomationRuleRowProps {
+  rule: AutomationRule
+  onEdit: (rule: AutomationRule) => void
+  onDelete: (rule: AutomationRule) => void
+}
+
+function formatCreatedAt(iso: string): string {
+  return new Intl.DateTimeFormat('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  }).format(new Date(iso))
+}
+
+export function AutomationRuleRow({ rule, onEdit, onDelete }: AutomationRuleRowProps) {
+  return (
+    <tr
+      className="group hover:bg-muted/30 cursor-pointer transition-colors"
+      onClick={() => onEdit(rule)}
+    >
+      {/* Rule name + type */}
+      <td className="px-6 py-4">
+        <div className="flex items-center gap-3">
+          <div
+            className={cn(
+              'w-2 h-2 rounded-full shrink-0',
+              rule.type === 'product' ? 'bg-green-500' : 'bg-primary',
+            )}
+          />
+          <div>
+            <Typography variant="p" className="font-medium text-foreground leading-none mb-0.5">
+              {rule.name}
+            </Typography>
+            <Typography variant="small" color="muted">
+              {rule.type === 'product' ? 'Product' : 'Category'} · {rule.products_count}{' '}
+              {rule.products_count === 1 ? 'item' : 'items'}
+            </Typography>
+          </div>
+        </div>
+      </td>
+
+      {/* Shelf life */}
+      <td className="px-6 py-4">
+        <Typography variant="p" className="text-foreground">
+          {rule.shelf_life_days} days
+        </Typography>
+      </td>
+
+      {/* Created */}
+      <td className="px-6 py-4">
+        <Typography variant="p" color="muted">
+          {formatCreatedAt(rule.created_at)}
+        </Typography>
+      </td>
+
+      {/* Row actions — visible on hover */}
+      <td className="px-6 py-4">
+        <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          <button
+            type="button"
+            aria-label={`Edit ${rule.name}`}
+            onClick={e => {
+              e.stopPropagation()
+              onEdit(rule)
+            }}
+            className="p-1.5 rounded hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <Pencil className="w-3.5 h-3.5" />
+          </button>
+          <button
+            type="button"
+            aria-label={`Delete ${rule.name}`}
+            onClick={e => {
+              e.stopPropagation()
+              onDelete(rule)
+            }}
+            className="p-1.5 rounded hover:bg-muted text-muted-foreground hover:text-destructive transition-colors"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      </td>
+    </tr>
+  )
+}

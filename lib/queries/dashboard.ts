@@ -51,6 +51,8 @@ export interface AutomationRule {
   type: 'category' | 'product'
   products_count: number
   status: 'active' | 'paused'
+  shelf_life_days: number
+  created_at: string
 }
 
 const MOCK_EXPIRING_BATCHES: BatchForTable[] = [
@@ -108,6 +110,8 @@ const MOCK_AUTOMATION_RULES: AutomationRule[] = [
     type: 'category',
     products_count: 12,
     status: 'active',
+    shelf_life_days: 14,
+    created_at: '2026-02-20T10:00:00Z',
   },
   {
     rule_id: 'rule-002',
@@ -115,6 +119,8 @@ const MOCK_AUTOMATION_RULES: AutomationRule[] = [
     type: 'category',
     products_count: 8,
     status: 'active',
+    shelf_life_days: 730,
+    created_at: '2026-02-20T10:00:00Z',
   },
   {
     rule_id: 'rule-003',
@@ -122,6 +128,8 @@ const MOCK_AUTOMATION_RULES: AutomationRule[] = [
     type: 'product',
     products_count: 1,
     status: 'active',
+    shelf_life_days: 3,
+    created_at: '2026-02-24T09:15:00Z',
   },
   {
     rule_id: 'rule-004',
@@ -129,6 +137,8 @@ const MOCK_AUTOMATION_RULES: AutomationRule[] = [
     type: 'category',
     products_count: 15,
     status: 'paused',
+    shelf_life_days: 90,
+    created_at: '2026-02-20T10:00:00Z',
   },
 ]
 

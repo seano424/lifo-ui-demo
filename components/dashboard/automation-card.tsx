@@ -119,7 +119,8 @@ export function AutomationCard() {
                   {rule.name}
                 </Typography>
                 <Typography variant="small" color="muted">
-                  {t(`ruleTypes.${rule.type}`)} · {rule.products_count} items
+                  {t(`ruleTypes.${rule.type}`)} · {rule.products_count} items ·{' '}
+                  {rule.shelf_life_days}d
                 </Typography>
               </div>
             </div>

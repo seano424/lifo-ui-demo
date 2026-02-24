@@ -1,0 +1,548 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+    <title>Add Automation Rule</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+          'Helvetica Neue', Arial, sans-serif;
+      }
+      .slide-panel {
+        transform: translateX(100%);
+        transition: transform 0.3s ease-in-out;
+      }
+      .slide-panel.open {
+        transform: translateX(0);
+      }
+      .overlay {
+        opacity: 0;
+        transition: opacity 0.3s ease-in-out;
+        pointer-events: none;
+      }
+      .overlay.open {
+        opacity: 1;
+        pointer-events: auto;
+      }
+      .number-input::-webkit-inner-spin-button,
+      .number-input::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+      .number-input {
+        -moz-appearance: textfield;
+      }
+      select {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+        background-position: right 0.5rem center;
+        background-repeat: no-repeat;
+        background-size: 1.5em 1.5em;
+        padding-right: 2.5rem;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50 p-8">
+    <!-- Demo Button -->
+    <div class="max-w-4xl mx-auto">
+      <button
+        onclick="openAddPanel()"
+        class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+      >
+        Open Add Rule Panel
+      </button>
+
+      <!-- Mock Table for Context -->
+      <div class="mt-8 bg-white rounded-lg border border-gray-200 p-6">
+        <h3 class="font-medium text-gray-900 mb-4">Existing Rules</h3>
+        <div class="space-y-2 text-sm text-gray-600">
+          <div class="flex items-center gap-2">
+            <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+            <span>Dairy (Category) - 14 days</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+            <span>Canned Goods (Category) - 730 days</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+            <span>Fresh Bread 400g (Product) - 3 days</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Overlay -->
+    <div
+      id="overlay"
+      class="overlay fixed inset-0 bg-black bg-opacity-20 z-40"
+      onclick="closePanel()"
+    ></div>
+
+    <!-- Add Rule Panel -->
+    <div
+      id="addPanel"
+      class="slide-panel fixed top-0 right-0 h-full w-[500px] bg-white shadow-2xl z-50 overflow-y-auto"
+    >
+      <div class="flex flex-col h-full">
+        <!-- Panel Header -->
+        <div
+          class="flex items-center justify-between px-6 py-4 border-b border-gray-200"
+        >
+          <h2 class="text-xl font-semibold text-gray-900">
+            Create automation rule
+          </h2>
+          <button
+            onclick="closePanel()"
+            class="p-2 hover:bg-gray-100 rounded-full text-gray-500 transition-colors"
+          >
+            <svg
+              class="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              ></path>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Panel Content -->
+        <div class="flex-1 px-6 py-6 overflow-y-auto">
+          <!-- Rule Type -->
+          <div class="mb-6">
+            <label class="block text-base font-semibold text-gray-900 mb-3"
+              >Rule Type</label
+            >
+            <div class="flex gap-3">
+              <button
+                id="typeCategory"
+                onclick="selectType('category')"
+                class="flex-1 px-4 py-3 border-2 border-blue-500 bg-blue-50 rounded-lg text-left transition-all"
+              >
+                <div class="flex items-center gap-2">
+                  <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+                  <span class="font-medium text-gray-900">Category</span>
+                </div>
+                <p class="text-xs text-gray-600 mt-1">
+                  Apply to all products in a category
+                </p>
+              </button>
+              <button
+                id="typeProduct"
+                onclick="selectType('product')"
+                class="flex-1 px-4 py-3 border-2 border-gray-300 bg-white rounded-lg text-left transition-all hover:border-gray-400"
+              >
+                <div class="flex items-center gap-2">
+                  <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                  <span class="font-medium text-gray-900">Product</span>
+                </div>
+                <p class="text-xs text-gray-600 mt-1">
+                  Override for a specific product
+                </p>
+              </button>
+            </div>
+          </div>
+
+          <!-- Category/Product Selection -->
+          <div class="mb-6">
+            <label
+              class="block text-base font-semibold text-gray-900 mb-3"
+              id="selectionLabel"
+              >Category</label
+            >
+
+            <!-- Category Select -->
+            <div id="categorySelect">
+              <select
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                onchange="updateCategorySelection(this)"
+              >
+                <option value="">Select a category...</option>
+                <optgroup label="Available">
+                  <option value="beverages">Beverages (1 product)</option>
+                  <option value="butter">Butter & Spreads (0 products)</option>
+                  <option value="cheese">Cheese (0 products)</option>
+                  <option value="chilled">Chilled Packaged (0 products)</option>
+                  <option value="deli">
+                    Deli & Prepared Foods (15 products)
+                  </option>
+                </optgroup>
+                <optgroup label="Already have rules">
+                  <option
+                    value="dairy"
+                    disabled
+                  >
+                    Dairy (12 products) ✓
+                  </option>
+                  <option
+                    value="canned"
+                    disabled
+                  >
+                    Canned Goods (8 products) ✓
+                  </option>
+                </optgroup>
+              </select>
+              <p class="mt-2 text-xs text-gray-500">
+                Categories with ✓ already have automation rules
+              </p>
+            </div>
+
+            <!-- Product Select (hidden by default) -->
+            <div
+              id="productSelect"
+              class="hidden"
+            >
+              <select
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                onchange="updateProductSelection(this)"
+              >
+                <option value="">Select a product...</option>
+                <optgroup label="Available">
+                  <option value="whole-milk">Whole Milk 1L (Dairy)</option>
+                  <option value="greek-yogurt">
+                    Greek Yogurt 500g (Dairy)
+                  </option>
+                  <option value="orange-juice">
+                    Orange Juice 1L (Beverages)
+                  </option>
+                  <option value="tomato-soup">
+                    Tomato Soup 400g (Canned Goods)
+                  </option>
+                </optgroup>
+                <optgroup label="Already have rules">
+                  <option
+                    value="bread"
+                    disabled
+                  >
+                    Fresh Bread 400g ✓
+                  </option>
+                </optgroup>
+              </select>
+              <p class="mt-2 text-xs text-gray-500">
+                Products with ✓ already have automation rules
+              </p>
+            </div>
+
+            <div
+              id="selectedInfo"
+              class="mt-3 hidden"
+            >
+              <div class="flex items-center gap-2">
+                <div
+                  class="w-2 h-2 bg-blue-500 rounded-full"
+                  id="selectedDot"
+                ></div>
+                <span
+                  class="text-sm text-gray-700"
+                  id="selectedName"
+                ></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Shelf Life -->
+          <div class="mb-6">
+            <label class="block text-base font-semibold text-gray-900 mb-3"
+              >Shelf life (days)</label
+            >
+            <input
+              type="number"
+              id="shelfLife"
+              value="14"
+              min="1"
+              class="number-input w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+              oninput="updateExample()"
+            />
+            <p
+              class="mt-2 text-sm text-gray-600"
+              id="exampleDate"
+            >
+              Example: Delivered today → Expires Mar 10, 2026
+            </p>
+          </div>
+
+          <!-- Products Covered Preview -->
+          <div
+            class="mb-6"
+            id="productsCoveredSection"
+          >
+            <label class="block text-base font-semibold text-gray-900 mb-3"
+              >Products covered</label
+            >
+            <div class="flex items-center gap-2 mb-3">
+              <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+              <span
+                class="text-sm text-gray-700"
+                id="productsCount"
+                >Select a category to see products</span
+              >
+            </div>
+            <div
+              class="space-y-2"
+              id="productsList"
+            >
+              <!-- Will be populated when category is selected -->
+            </div>
+          </div>
+
+          <!-- Info Box -->
+          <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg">
+            <p class="text-sm font-medium text-gray-900 mb-1">
+              These rules automatically add expiry dates to products.
+            </p>
+            <p class="text-sm text-gray-600">
+              When deliveries are logged, expiry dates will be calculated using
+              this shelf life instead of manual entry.
+            </p>
+          </div>
+        </div>
+
+        <!-- Panel Footer -->
+        <div
+          class="px-6 py-4 border-t border-gray-200 flex items-center justify-end gap-3"
+        >
+          <button
+            onclick="closePanel()"
+            class="px-4 py-2 border border-gray-300 text-sm text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            id="createBtn"
+            onclick="createRule()"
+            disabled
+            class="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Create rule
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let selectedType = 'category'
+      let selectedValue = null
+
+      const categoryData = {
+        beverages: {
+          name: 'Beverages',
+          count: 1,
+          products: ['Orange Juice 1L'],
+        },
+        butter: { name: 'Butter & Spreads', count: 0, products: [] },
+        cheese: { name: 'Cheese', count: 0, products: [] },
+        chilled: { name: 'Chilled Packaged', count: 0, products: [] },
+        deli: {
+          name: 'Deli & Prepared Foods',
+          count: 15,
+          products: [
+            'Roast Chicken',
+            'Pasta Salad 500g',
+            'Ham Slices 200g',
+            'Potato Salad 400g',
+          ],
+        },
+        dairy: {
+          name: 'Dairy',
+          count: 12,
+          products: [
+            'Whole Milk 1L',
+            'Greek Yogurt 500g',
+            'Cheddar Cheese 200g',
+            'Butter Unsalted 250g',
+          ],
+        },
+      }
+
+      const productData = {
+        'whole-milk': { name: 'Whole Milk 1L', category: 'Dairy' },
+        'greek-yogurt': { name: 'Greek Yogurt 500g', category: 'Dairy' },
+        'orange-juice': { name: 'Orange Juice 1L', category: 'Beverages' },
+        'tomato-soup': { name: 'Tomato Soup 400g', category: 'Canned Goods' },
+      }
+
+      function openAddPanel() {
+        document.getElementById('addPanel').classList.add('open')
+        document.getElementById('overlay').classList.add('open')
+        updateExample()
+      }
+
+      function closePanel() {
+        document.getElementById('addPanel').classList.remove('open')
+        document.getElementById('overlay').classList.remove('open')
+        resetForm()
+      }
+
+      function selectType(type) {
+        selectedType = type
+        selectedValue = null
+
+        // Update button styles
+        const categoryBtn = document.getElementById('typeCategory')
+        const productBtn = document.getElementById('typeProduct')
+
+        if (type === 'category') {
+          categoryBtn.className =
+            'flex-1 px-4 py-3 border-2 border-blue-500 bg-blue-50 rounded-lg text-left transition-all'
+          productBtn.className =
+            'flex-1 px-4 py-3 border-2 border-gray-300 bg-white rounded-lg text-left transition-all hover:border-gray-400'
+
+          document.getElementById('selectionLabel').textContent = 'Category'
+          document.getElementById('categorySelect').classList.remove('hidden')
+          document.getElementById('productSelect').classList.add('hidden')
+        } else {
+          productBtn.className =
+            'flex-1 px-4 py-3 border-2 border-green-500 bg-green-50 rounded-lg text-left transition-all'
+          categoryBtn.className =
+            'flex-1 px-4 py-3 border-2 border-gray-300 bg-white rounded-lg text-left transition-all hover:border-gray-400'
+
+          document.getElementById('selectionLabel').textContent = 'Product'
+          document.getElementById('productSelect').classList.remove('hidden')
+          document.getElementById('categorySelect').classList.add('hidden')
+        }
+
+        document.getElementById('selectedInfo').classList.add('hidden')
+        document
+          .getElementById('productsCoveredSection')
+          .classList.add('hidden')
+        document.getElementById('createBtn').disabled = true
+      }
+
+      function updateCategorySelection(select) {
+        const value = select.value
+        if (!value) {
+          selectedValue = null
+          document.getElementById('selectedInfo').classList.add('hidden')
+          document
+            .getElementById('productsCoveredSection')
+            .classList.add('hidden')
+          document.getElementById('createBtn').disabled = true
+          return
+        }
+
+        selectedValue = value
+        const data = categoryData[value]
+
+        // Show selected info
+        document.getElementById('selectedName').textContent = data.name
+        document.getElementById('selectedDot').className =
+          'w-2 h-2 bg-blue-500 rounded-full'
+        document.getElementById('selectedInfo').classList.remove('hidden')
+
+        // Update products covered
+        document.getElementById('productsCount').textContent =
+          `${data.count} ${data.count === 1 ? 'product' : 'products'}`
+
+        const productsList = document.getElementById('productsList')
+        if (data.count > 0) {
+          const displayProducts = data.products.slice(0, 4)
+          const remaining = data.count - displayProducts.length
+
+          productsList.innerHTML = displayProducts
+            .map(
+              (p) =>
+                `<div class="text-xs text-gray-600 py-2 px-3 bg-gray-50 rounded">${p}</div>`,
+            )
+            .join('')
+
+          if (remaining > 0) {
+            productsList.innerHTML += `<div class="text-xs text-gray-500 text-center py-1">+ ${remaining} more</div>`
+          }
+        } else {
+          productsList.innerHTML =
+            '<div class="text-xs text-gray-500 py-2 px-3 bg-gray-50 rounded">No products in this category yet</div>'
+        }
+
+        document
+          .getElementById('productsCoveredSection')
+          .classList.remove('hidden')
+        document.getElementById('createBtn').disabled = false
+      }
+
+      function updateProductSelection(select) {
+        const value = select.value
+        if (!value) {
+          selectedValue = null
+          document.getElementById('selectedInfo').classList.add('hidden')
+          document
+            .getElementById('productsCoveredSection')
+            .classList.add('hidden')
+          document.getElementById('createBtn').disabled = true
+          return
+        }
+
+        selectedValue = value
+        const data = productData[value]
+
+        // Show selected info
+        document.getElementById('selectedName').textContent =
+          `${data.name} (${data.category})`
+        document.getElementById('selectedDot').className =
+          'w-2 h-2 bg-green-500 rounded-full'
+        document.getElementById('selectedInfo').classList.remove('hidden')
+
+        // Update products covered
+        document.getElementById('productsCount').textContent = '1 product'
+
+        const productsList = document.getElementById('productsList')
+        productsList.innerHTML = `<div class="text-xs text-gray-600 py-2 px-3 bg-gray-50 rounded">${data.name}</div>`
+
+        document
+          .getElementById('productsCoveredSection')
+          .classList.remove('hidden')
+        document.getElementById('createBtn').disabled = false
+      }
+
+      function updateExample() {
+        const days = parseInt(document.getElementById('shelfLife').value) || 0
+        const date = new Date()
+        date.setDate(date.getDate() + days)
+        const formatted = date.toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric',
+        })
+        document.getElementById('exampleDate').textContent =
+          `Example: Delivered today → Expires ${formatted}`
+      }
+
+      function createRule() {
+        const shelfLife = document.getElementById('shelfLife').value
+        if (!selectedValue) {
+          alert('Please select a category or product')
+          return
+        }
+
+        const ruleName =
+          selectedType === 'category'
+            ? categoryData[selectedValue].name
+            : productData[selectedValue].name
+
+        alert(
+          `Creating ${selectedType} rule for "${ruleName}" with ${shelfLife} days shelf life`,
+        )
+        closePanel()
+      }
+
+      function resetForm() {
+        selectedType = 'category'
+        selectedValue = null
+        document.getElementById('shelfLife').value = '14'
+        document.querySelectorAll('select').forEach((s) => (s.value = ''))
+        selectType('category')
+      }
+    </script>
+  </body>
+</html>
