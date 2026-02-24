@@ -9,7 +9,7 @@ import {
   type UserStore,
 } from '@/lib/queries/stores'
 import { fetchUserPreferencesRPC } from '@/lib/queries/stores-rpc'
-import { fetchCurrentUser } from '@/lib/queries/users'
+import { fetchCurrentUser, transformAuthUserToUser } from '@/lib/queries/users'
 import { createClient as createServerClient } from '@/lib/supabase/server'
 import { logger } from '@/lib/utils/logger'
 import { createQueryClient } from './client'
@@ -82,28 +82,33 @@ export async function prefetchDashboardData() {
 
     const user = { id: data.claims.sub as string }
 
+    // Seed currentUser from JWT claims — synchronous, no network call.
+    // claims contains email, phone, and user_metadata (full_name, avatar_url, etc.).
+    // created_at/updated_at are absent from claims and will be '' until useCurrentUser
+    // refetches (~30s staleTime on the client hook), which is acceptable.
+    const currentUserFromClaims = transformAuthUserToUser({
+      id: data.claims.sub,
+      email: data.claims.email ?? '',
+      phone: (data.claims.phone as string | undefined) ?? null,
+      user_metadata: (data.claims.user_metadata as Record<string, unknown>) ?? {},
+    })
+    queryClient.setQueryData(queryKeys.auth.currentUser(), currentUserFromClaims)
+    logger.query('prefetchDashboardData', '  ✓ currentUser (from claims) — 0ms')
+
     // Kick off cookie read early — it doesn't depend on any DB call
     const activeStoreCookiePromise = getActiveStoreCookie()
 
-    // Prefetch all critical data in parallel with Promise.allSettled for resilience.
-    // userStores and userPreferences only need user.id (already resolved above),
-    // so they can run alongside currentUser — no need to serialize.
+    // Prefetch DB-dependent data in parallel. currentUser is already seeded above,
+    // so we only wait on the two DB queries.
     const prefetchStart = performance.now()
     const results = await Promise.allSettled([
-      timed('currentUser', () =>
-        queryClient.prefetchQuery({
-          queryKey: ['currentUser'],
-          queryFn: () => fetchCurrentUser(supabase),
-          staleTime: 5 * 60 * 1000,
-        }),
-      ),
       timed('userStores', () => fetchUserStores(user.id, supabase)),
       timed('userPreferences', () => fetchUserPreferencesRPC(supabase)),
     ])
     const prefetchDuration = performance.now() - prefetchStart
 
     // Log any failed prefetches
-    const queryNames = ['currentUser', 'userStores', 'userPreferences']
+    const queryNames = ['userStores', 'userPreferences']
     results.forEach((result, index) => {
       if (result.status === 'rejected') {
         logger.queryWarn('prefetchDashboardData', `Failed to prefetch ${queryNames[index]}`, {
@@ -116,7 +121,7 @@ export async function prefetchDashboardData() {
     let userStores: UserStore[] = []
     let userPreferences: UserPreferences | null = null
 
-    const userStoresResult = results[1]
+    const userStoresResult = results[0]
     if (userStoresResult.status === 'fulfilled') {
       userStores = userStoresResult.value as UserStore[]
       await queryClient.prefetchQuery({
@@ -126,7 +131,7 @@ export async function prefetchDashboardData() {
       })
     }
 
-    const userPreferencesResult = results[2]
+    const userPreferencesResult = results[1]
     if (userPreferencesResult.status === 'fulfilled') {
       userPreferences = userPreferencesResult.value as UserPreferences | null
       await queryClient.prefetchQuery({
