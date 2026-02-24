@@ -157,7 +157,7 @@ export function ProductsFilteredList({
   return (
     <div className="flex flex-col gap-6">
       {/* Control bar - Search, Filters, and Sort on same level */}
-      <div className="flex flex-row flex-wrap lg:items-center lg:gap-2 gap-3">
+      <div className="flex flex-col lg:flex-row lg:items-center lg:gap-2 gap-3">
         {/* Search Bar */}
         <div className="flex-1">
           <TodoSearchBar
@@ -169,29 +169,31 @@ export function ProductsFilteredList({
           />
         </div>
 
-        {/* Filters */}
-        <ProductListFilters
-          filters={{
-            category: filters.category || undefined,
-          }}
-          onFiltersChange={handleFiltersChange}
-          isLoading={isLoading}
-        />
+        <div className="flex items-center gap-2 justify-start w-full">
+          {/* Filters */}
+          <ProductListFilters
+            filters={{
+              category: filters.category || undefined,
+            }}
+            onFiltersChange={handleFiltersChange}
+            isLoading={isLoading}
+          />
 
-        {/* Sort Controls */}
-        <ProductListSortControls
-          currentSort={filters.sort || { field: 'created_at', direction: 'desc' }}
-          updateSort={field => {
-            const currentSort = filters.sort || {
-              field: 'created_at',
-              direction: 'desc',
-            }
-            const newDirection =
-              currentSort.field === field && currentSort.direction === 'asc' ? 'desc' : 'asc'
-            handleSortChange({ field, direction: newDirection })
-          }}
-          isLoading={isLoading}
-        />
+          {/* Sort Controls */}
+          <ProductListSortControls
+            currentSort={filters.sort || { field: 'created_at', direction: 'desc' }}
+            updateSort={field => {
+              const currentSort = filters.sort || {
+                field: 'created_at',
+                direction: 'desc',
+              }
+              const newDirection =
+                currentSort.field === field && currentSort.direction === 'asc' ? 'desc' : 'asc'
+              handleSortChange({ field, direction: newDirection })
+            }}
+            isLoading={isLoading}
+          />
+        </div>
 
         {/* Add Product Button */}
         {/* <Link href="/dashboard/deliveries">

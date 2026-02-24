@@ -25,16 +25,16 @@ export function BatchListSortControls({
   const t = useTranslations('batchSort')
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-2 flex-1">
       <Select
         value={currentSort.field}
         onValueChange={(field: BatchSortField) => updateSort(field)}
         disabled={isLoading}
       >
-        <SelectTrigger className="w-max" showChevron={false}>
+        <SelectTrigger className="w-full sm:w-max" showChevron={false}>
           <div className="flex items-center gap-1">
             <SelectValue className="whitespace-nowrap" />
-            <ArrowUpDownIcon className="h-4 w-4 text-foreground" />
+            <ArrowUpDownIcon className="h-4 w-4 text-muted-foreground" />
           </div>
         </SelectTrigger>
         <SelectContent>

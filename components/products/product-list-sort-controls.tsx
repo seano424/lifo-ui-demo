@@ -32,7 +32,7 @@ export function ProductListSortControls({
         <SelectTrigger className="w-max" showChevron={false}>
           <div className="flex items-center gap-2">
             <SelectValue className="whitespace-nowrap" />
-            <ArrowUpDownIcon className="h-4 w-4" />
+            <ArrowUpDownIcon className="h-4 w-4 text-muted-foreground" />
           </div>
         </SelectTrigger>
         <SelectContent>

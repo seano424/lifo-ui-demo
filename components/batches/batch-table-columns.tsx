@@ -5,6 +5,7 @@ import { SortableHeader } from '@/components/batches/sortable-header'
 import type { BatchSort, BatchSortField, BatchWithProduct } from '@/lib/queries/batches'
 import { parseISODateAsLocal } from '@/lib/utils/date-conversion'
 import { Badge } from '../ui/badge'
+import { Typography } from '../ui/typography'
 
 // Export column metadata for use in skeleton
 export const BATCH_TABLE_COLUMN_CONFIG = [
@@ -160,15 +161,15 @@ export function createBatchTableColumns({
       ),
       cell: ({ row }) => (
         <div className={alignments.product_name.cellClass}>
-          <div className="truncate " title={row.original.products?.name}>
+          <div className="truncate font-medium" title={row.original.products?.name}>
             {row.original.products?.name}
           </div>
-          <div
+          {/* <div
             className="text-sm text-muted-foreground truncate"
             title={row.original.products?.sku}
           >
             {row.original.products?.sku}
-          </div>
+          </div> */}
         </div>
       ),
       size: BATCH_TABLE_COLUMN_CONFIG[0].width,
@@ -201,7 +202,9 @@ export function createBatchTableColumns({
 
         return (
           <div className={alignments.days_left.cellClass}>
-            <Badge variant={daysLeft <= 3 ? 'danger' : 'primary'}>{label}</Badge>
+            <Badge size="sm" variant={daysLeft <= 3 ? 'danger' : 'primary'}>
+              {label}
+            </Badge>
           </div>
         )
       },
@@ -221,9 +224,13 @@ export function createBatchTableColumns({
         </SortableHeader>
       ),
       cell: ({ row }) => (
-        <div className={`${alignments.current_quantity.cellClass} tabular-nums`}>
+        <Typography
+          variant="small"
+          color="muted"
+          className={`${alignments.current_quantity.cellClass} tabular-nums`}
+        >
           {Math.round(Number(row.original.current_quantity)).toLocaleString()}
-        </div>
+        </Typography>
       ),
       size: BATCH_TABLE_COLUMN_CONFIG[4].width,
     },
@@ -252,9 +259,9 @@ export function createBatchTableColumns({
         }
 
         return (
-          <div className={alignments.expiry_date.cellClass}>
+          <Typography variant="small" color="muted" className={alignments.expiry_date.cellClass}>
             {expiryDate ? expiryDate.toLocaleDateString() : tExpiry('noExpiryDate')}
-          </div>
+          </Typography>
         )
       },
       size: BATCH_TABLE_COLUMN_CONFIG[2].width,
@@ -275,10 +282,10 @@ export function createBatchTableColumns({
       cell: ({ row }) => {
         const status = row.original.status || 'active'
         return (
-          <div className={alignments.status.cellClass}>
+          <Typography variant="small" color="muted" className={alignments.status.cellClass}>
             {/* <Badge variant={getStatusVariant(status)}>{tStatus(status)}</Badge> */}
             {tStatus(status)}
-          </div>
+          </Typography>
         )
       },
       size: BATCH_TABLE_COLUMN_CONFIG[1].width,
