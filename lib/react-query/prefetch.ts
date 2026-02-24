@@ -1,7 +1,6 @@
 import { dehydrate } from '@tanstack/react-query'
 import { getActiveStoreCookie } from '@/lib/actions/store-actions'
 import { queryKeys } from '@/lib/queries/query-keys'
-import { fetchCategories } from '@/lib/queries/products'
 import {
   fetchUserStores,
   selectDefaultStore,
@@ -11,10 +10,6 @@ import {
 } from '@/lib/queries/stores'
 import { fetchUserPreferencesRPC } from '@/lib/queries/stores-rpc'
 import { fetchCurrentUser } from '@/lib/queries/users'
-import {
-  BatchTrackingSetupResponseSchema,
-  type BatchTrackingSetupResponse,
-} from '@/lib/validation/rpc-schemas'
 import { createClient as createServerClient } from '@/lib/supabase/server'
 import { logger } from '@/lib/utils/logger'
 import { createQueryClient } from './client'
@@ -74,57 +69,25 @@ export async function prefetchDashboardData() {
   }
 
   try {
-    // Get the current authenticated user
-    let user = null
-    try {
-      const { data, error: authError } = await timed('auth.getUser', () => supabase.auth.getUser())
+    // getClaims() validates the JWT locally using the project's public key (ES256/asymmetric).
+    // No network call — ~1ms. Safe here because middleware (proxy.ts) gates all dashboard
+    // routes and also uses getClaims(). RLS enforces row-level access at the DB layer.
+    const { data, error: authError } = await timed('auth.getClaims', () =>
+      supabase.auth.getClaims(),
+    )
 
-      if (authError) {
-        // Check if it's a transient fetch error vs actual auth error
-        if (authError.message?.includes('fetch failed')) {
-          logger.queryWarn(
-            'prefetchDashboardData',
-            'Auth fetch failed (likely transient), returning empty state',
-          )
-          // Return empty state - client will handle auth check
-          return {
-            queryClient,
-            dehydratedState: dehydrate(queryClient),
-            error: new Error('Auth check temporarily unavailable'),
-          }
-        }
-        throw new Error('Authentication required')
-      }
-
-      user = data?.user
-    } catch (authFetchError) {
-      // Handle fetch errors gracefully
-      const errorMessage =
-        authFetchError instanceof Error ? authFetchError.message : String(authFetchError)
-      if (errorMessage.includes('fetch failed')) {
-        logger.queryWarn(
-          'prefetchDashboardData',
-          'Auth check failed due to network issue, returning empty state',
-        )
-        return {
-          queryClient,
-          dehydratedState: dehydrate(queryClient),
-          error: new Error('Auth check temporarily unavailable'),
-        }
-      }
-      throw authFetchError
-    }
-
-    if (!user) {
+    if (authError || !data?.claims) {
       throw new Error('Authentication required')
     }
+
+    const user = { id: data.claims.sub as string }
 
     // Kick off cookie read early — it doesn't depend on any DB call
     const activeStoreCookiePromise = getActiveStoreCookie()
 
     // Prefetch all critical data in parallel with Promise.allSettled for resilience.
     // userStores and userPreferences only need user.id (already resolved above),
-    // so they can run alongside currentUser and categories — no need to serialize.
+    // so they can run alongside currentUser — no need to serialize.
     const prefetchStart = performance.now()
     const results = await Promise.allSettled([
       timed('currentUser', () =>
@@ -134,21 +97,13 @@ export async function prefetchDashboardData() {
           staleTime: 5 * 60 * 1000,
         }),
       ),
-      timed('categories', () =>
-        queryClient.prefetchQuery({
-          queryKey: queryKeys.categories.list,
-          queryFn: () => fetchCategories(supabase),
-          staleTime: 10 * 60 * 1000,
-          gcTime: 30 * 60 * 1000,
-        }),
-      ),
       timed('userStores', () => fetchUserStores(user.id, supabase)),
       timed('userPreferences', () => fetchUserPreferencesRPC(supabase)),
     ])
     const prefetchDuration = performance.now() - prefetchStart
 
     // Log any failed prefetches
-    const queryNames = ['currentUser', 'categories', 'userStores', 'userPreferences']
+    const queryNames = ['currentUser', 'userStores', 'userPreferences']
     results.forEach((result, index) => {
       if (result.status === 'rejected') {
         logger.queryWarn('prefetchDashboardData', `Failed to prefetch ${queryNames[index]}`, {
@@ -161,7 +116,7 @@ export async function prefetchDashboardData() {
     let userStores: UserStore[] = []
     let userPreferences: UserPreferences | null = null
 
-    const userStoresResult = results[2]
+    const userStoresResult = results[1]
     if (userStoresResult.status === 'fulfilled') {
       userStores = userStoresResult.value as UserStore[]
       await queryClient.prefetchQuery({
@@ -171,7 +126,7 @@ export async function prefetchDashboardData() {
       })
     }
 
-    const userPreferencesResult = results[3]
+    const userPreferencesResult = results[2]
     if (userPreferencesResult.status === 'fulfilled') {
       userPreferences = userPreferencesResult.value as UserPreferences | null
       await queryClient.prefetchQuery({
@@ -196,40 +151,13 @@ export async function prefetchDashboardData() {
       )
 
       if (targetStore) {
-        const storeId = targetStore.store_id
-        // Prefetch active store, urgent todos count, and batch tracking setup in parallel
-        await Promise.all([
-          timed('activeStore (cache write)', () =>
-            queryClient.prefetchQuery({
-              queryKey: ['activeStore'],
-              queryFn: async () => targetStore,
-              staleTime: 2 * 60 * 1000,
-            }),
-          ),
-          timed('batchTrackingSetup', () =>
-            queryClient.prefetchQuery({
-              queryKey: queryKeys.batchTrackingOnboarding.config(storeId),
-              queryFn: async () => {
-                const { data, error } = await supabase.rpc('get_batch_tracking_setup', {
-                  p_store_id: storeId,
-                })
-                if (error) {
-                  logger.queryWarn(
-                    'prefetchDashboardData',
-                    'Failed to prefetch batch tracking setup',
-                    {
-                      error: error.message,
-                      storeId,
-                    },
-                  )
-                  return null
-                }
-                return data ? BatchTrackingSetupResponseSchema.parse(data) : null
-              },
-              staleTime: 2 * 60 * 1000,
-            }),
-          ),
-        ])
+        await timed('activeStore (cache write)', () =>
+          queryClient.prefetchQuery({
+            queryKey: ['activeStore'],
+            queryFn: async () => targetStore,
+            staleTime: 2 * 60 * 1000,
+          }),
+        )
       }
     }
 
@@ -239,21 +167,12 @@ export async function prefetchDashboardData() {
       `Dashboard prefetch completed in ${totalDuration.toFixed(0)}ms (prefetch: ${prefetchDuration.toFixed(0)}ms)`,
     )
 
-    // Read batch tracking setup status from the cache (populated by the prefetch above)
-    const batchSetupCached = targetStore
-      ? queryClient.getQueryData<BatchTrackingSetupResponse | null>(
-          queryKeys.batchTrackingOnboarding.config(targetStore.store_id),
-        )
-      : null
-    const setupCompleted = batchSetupCached?.config?.setup_completed ?? false
-
     return {
       queryClient,
       dehydratedState: dehydrate(queryClient),
       user,
       userStores: userStores || [],
       activeStore: targetStore,
-      setupCompleted,
     }
   } catch (error) {
     // Log connection errors more gracefully

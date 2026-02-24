@@ -1,5 +1,10 @@
+import { Suspense } from 'react'
 import { SetupPageClient } from './setup-client'
 
 export default function SetupPage() {
-  return <SetupPageClient />
+  return (
+    <Suspense>
+      <SetupPageClient />
+    </Suspense>
+  )
 }
