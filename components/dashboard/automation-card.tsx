@@ -197,10 +197,10 @@ export function AutomationCard() {
     <>
       <Card className="overflow-hidden flex flex-col gap-0 bg-card">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-muted px-6 py-4">
-          <div>
+        <div className="flex items-start justify-between border-b border-muted px-6 py-4">
+          <div className="flex flex-col gap-2">
             <Typography variant="h4">{t('title')}</Typography>
-            <Typography variant="p" color="muted">
+            <Typography variant="p" color="muted" className="max-w-md">
               {t('subtitle')}
             </Typography>
           </div>

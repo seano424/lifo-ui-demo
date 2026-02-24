@@ -224,10 +224,10 @@
         "remaining": "{count, plural, =1 {1 product} other {# products}} remaining"
       },
       "automation": {
-        "title": "Automation",
-        "subtitle": "Auto-batch creation rules",
+        "title": "Expiry Automations",
+        "subtitle": "We calculate expiry dates from the delivery date + shelf life you set. Nothing to enter on delivery.",
         "emptyState": {
-          "title": "No automation rules configured",
+          "title": "No expiry automations configured",
           "description": "Set up rules to automatically create batches from deliveries"
         },
         "addRule": "Add rule",
