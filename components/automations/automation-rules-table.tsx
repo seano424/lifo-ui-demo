@@ -2,15 +2,10 @@
 
 import { useState } from 'react'
 import { Plus } from 'lucide-react'
-import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Typography } from '@/components/ui/typography'
-import {
-  useBatchTrackingSetup,
-  useSaveBatchTrackingSetup,
-} from '@/lib/queries/batch-tracking-onboarding'
-import { useActiveStoreId } from '@/lib/stores/store-context'
+import { useAutomationRuleMutations } from '@/hooks/use-automation-rule-mutations'
 import { AutomationRuleRow } from './automation-rule-row'
 import { AutomationRulePanel } from './automation-rule-panel'
 import { AddAutomationRulePanel } from './add-automation-rule-panel'
@@ -59,29 +54,13 @@ function TableSkeleton() {
 }
 
 export function AutomationRulesTable({ rules, isLoading }: AutomationRulesTableProps) {
-  const storeId = useActiveStoreId() || ''
-  const { data: batchSetup } = useBatchTrackingSetup(storeId)
-  const saveMutation = useSaveBatchTrackingSetup()
+  const { saveRule, deleteRule, createRule, isPending } = useAutomationRuleMutations()
 
   const [editingRule, setEditingRule] = useState<AutomationRule | null>(null)
   const [isPanelOpen, setIsPanelOpen] = useState(false)
   const [isAddPanelOpen, setIsAddPanelOpen] = useState(false)
 
   const totalProducts = rules.reduce((sum, r) => sum + r.products_count, 0)
-
-  // Build the config payload needed by save_batch_tracking_setup RPC.
-  // We preserve the existing setup state rather than overwriting it.
-  const buildConfig = () => {
-    const c = batchSetup?.config
-    return {
-      enabled: c?.enabled ?? true,
-      setup_completed: c?.setup_completed ?? true,
-      setup_completed_at: c?.setup_completed_at ?? new Date().toISOString(),
-      product_selection_mode: c?.product_selection_mode ?? ('by_category' as const),
-      selected_category_ids: c?.selected_category_ids ?? [],
-      selected_product_ids: c?.selected_product_ids ?? [],
-    }
-  }
 
   const handleEdit = (rule: AutomationRule) => {
     setEditingRule(rule)
@@ -94,112 +73,28 @@ export function AutomationRulesTable({ rules, isLoading }: AutomationRulesTableP
 
   const handleSave = async (rule: AutomationRule, shelfLifeDays: number) => {
     try {
-      if (rule.type === 'product') {
-        await saveMutation.mutateAsync({
-          storeId,
-          config: buildConfig(),
-          categorySettings: [],
-          productOverrides: [
-            {
-              product_id: rule.rule_id,
-              shelf_life_override_days: shelfLifeDays,
-              auto_create_batches: true,
-            },
-          ],
-        })
-      } else {
-        await saveMutation.mutateAsync({
-          storeId,
-          config: buildConfig(),
-          categorySettings: [
-            {
-              category_id: rule.rule_id,
-              is_tracked: true,
-              auto_create_batches: true,
-              default_shelf_life_days: shelfLifeDays,
-            },
-          ],
-          productOverrides: [],
-        })
-      }
+      await saveRule(rule, shelfLifeDays)
       setIsPanelOpen(false)
-      toast.success('Rule saved')
     } catch {
-      toast.error('Failed to save rule')
+      // error toast shown inside hook
     }
   }
 
   const handleDelete = async (rule: AutomationRule) => {
     try {
-      if (rule.type === 'product') {
-        await saveMutation.mutateAsync({
-          storeId,
-          config: buildConfig(),
-          categorySettings: [],
-          productOverrides: [
-            {
-              product_id: rule.rule_id,
-              shelf_life_override_days: null,
-              auto_create_batches: null,
-            },
-          ],
-        })
-      } else {
-        await saveMutation.mutateAsync({
-          storeId,
-          config: buildConfig(),
-          categorySettings: [
-            {
-              category_id: rule.rule_id,
-              is_tracked: true,
-              auto_create_batches: false,
-              default_shelf_life_days: rule.shelf_life_days,
-            },
-          ],
-          productOverrides: [],
-        })
-      }
+      await deleteRule(rule)
       setIsPanelOpen(false)
-      toast.success(`${rule.name} rule deleted`)
     } catch {
-      toast.error('Failed to delete rule')
+      // error toast shown inside hook
     }
   }
 
   const handleCreate = async (rule: AutomationRule) => {
     try {
-      if (rule.type === 'product') {
-        await saveMutation.mutateAsync({
-          storeId,
-          config: buildConfig(),
-          categorySettings: [],
-          productOverrides: [
-            {
-              product_id: rule.rule_id,
-              shelf_life_override_days: rule.shelf_life_days,
-              auto_create_batches: true,
-            },
-          ],
-        })
-      } else {
-        await saveMutation.mutateAsync({
-          storeId,
-          config: buildConfig(),
-          categorySettings: [
-            {
-              category_id: rule.rule_id,
-              is_tracked: true,
-              auto_create_batches: true,
-              default_shelf_life_days: rule.shelf_life_days,
-            },
-          ],
-          productOverrides: [],
-        })
-      }
+      await createRule(rule)
       setIsAddPanelOpen(false)
-      toast.success(`${rule.name} rule created`)
     } catch {
-      toast.error('Failed to create rule')
+      // error toast shown inside hook
     }
   }
 
@@ -275,7 +170,7 @@ export function AutomationRulesTable({ rules, isLoading }: AutomationRulesTableP
       <AutomationRulePanel
         rule={editingRule}
         isOpen={isPanelOpen}
-        isSaving={saveMutation.isPending}
+        isSaving={isPending}
         onClose={handlePanelClose}
         onSave={handleSave}
         onDelete={handleDelete}
@@ -283,7 +178,7 @@ export function AutomationRulesTable({ rules, isLoading }: AutomationRulesTableP
 
       <AddAutomationRulePanel
         isOpen={isAddPanelOpen}
-        isSaving={saveMutation.isPending}
+        isSaving={isPending}
         onClose={() => setIsAddPanelOpen(false)}
         onCreate={handleCreate}
       />
