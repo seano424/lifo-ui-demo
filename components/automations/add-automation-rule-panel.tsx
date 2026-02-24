@@ -5,12 +5,13 @@ import { ChevronDown } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Typography } from '@/components/ui/typography'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
-import { useCategoriesWithTrackingSettings } from '@/lib/queries/batch-tracking-onboarding'
+import {
+  useCategoriesWithTrackingSettings,
+  useProductsForTrackingSetup,
+} from '@/lib/queries/batch-tracking-onboarding'
 import { useActiveStoreId } from '@/lib/stores/store-context'
+import { cn } from '@/lib/utils'
 import type { AutomationRule } from '@/lib/queries/dashboard'
-
-// Product-type rule creation is not yet wired to real data — coming in a future task.
-// Category rules are fully wired.
 
 interface AddAutomationRulePanelProps {
   isOpen: boolean
@@ -28,19 +29,45 @@ export function AddAutomationRulePanel({
   const activeStoreId = useActiveStoreId() || ''
   const { data: categories = [] } = useCategoriesWithTrackingSettings(activeStoreId)
 
+  const [ruleType, setRuleType] = useState<'category' | 'product'>('category')
   const [selectedKey, setSelectedKey] = useState('')
   const [draftDays, setDraftDays] = useState(14)
+  const [productSearch, setProductSearch] = useState('')
+  const [debouncedProductSearch, setDebouncedProductSearch] = useState('')
 
-  // Categories that don't yet have auto_create_batches enabled
+  // Debounce product search input
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedProductSearch(productSearch), 400)
+    return () => clearTimeout(timer)
+  }, [productSearch])
+
+  const { data: products = [] } = useProductsForTrackingSetup(activeStoreId, {
+    searchTerm: debouncedProductSearch || null,
+    pageSize: 50,
+  })
+
+  // Categories that don't yet have auto_create_batches enabled (and have products)
   const availableCategories = useMemo(
-    () => categories.filter(c => !c.auto_create_batches),
+    () => categories.filter(c => !c.auto_create_batches && c.product_count > 0),
     [categories],
   )
 
-  // Categories that already have a rule
+  // Categories that already have a rule (and have products)
   const categoriesWithRules = useMemo(
-    () => categories.filter(c => c.auto_create_batches),
+    () => categories.filter(c => c.auto_create_batches && c.product_count > 0),
     [categories],
+  )
+
+  // Products without a shelf life override (available for new rules)
+  const availableProducts = useMemo(
+    () => products.filter(p => p.shelf_life_override_days === null),
+    [products],
+  )
+
+  // Products that already have a shelf life override (already have rules)
+  const productsWithRules = useMemo(
+    () => products.filter(p => p.shelf_life_override_days !== null),
+    [products],
   )
 
   const selectedCategory = useMemo(
@@ -48,7 +75,15 @@ export function AddAutomationRulePanel({
     [categories, selectedKey],
   )
 
-  const isAvailable = availableCategories.some(c => c.category_id === selectedKey)
+  const selectedProduct = useMemo(
+    () => products.find(p => p.product_id === selectedKey) ?? null,
+    [products, selectedKey],
+  )
+
+  const isAvailable =
+    ruleType === 'category'
+      ? availableCategories.some(c => c.category_id === selectedKey)
+      : availableProducts.some(p => p.product_id === selectedKey)
 
   const expiryExample = useMemo(() => {
     const d = new Date()
@@ -62,22 +97,40 @@ export function AddAutomationRulePanel({
 
   useEffect(() => {
     if (!isOpen) {
+      setRuleType('category')
       setSelectedKey('')
       setDraftDays(14)
+      setProductSearch('')
+      setDebouncedProductSearch('')
     }
   }, [isOpen])
+
+  const handleTypeChange = (type: 'category' | 'product') => {
+    setRuleType(type)
+    setSelectedKey('')
+  }
 
   const canCreate = selectedKey !== '' && isAvailable
 
   const handleCreate = () => {
-    if (!canCreate || !selectedCategory) return
-    onCreate({
-      rule_id: selectedCategory.category_id,
-      name: selectedCategory.display_name_en,
-      type: 'category',
-      products_count: selectedCategory.product_count,
-      shelf_life_days: draftDays,
-    })
+    if (!canCreate) return
+    if (ruleType === 'category' && selectedCategory) {
+      onCreate({
+        rule_id: selectedCategory.category_id,
+        name: selectedCategory.display_name_en,
+        type: 'category',
+        products_count: selectedCategory.product_count,
+        shelf_life_days: draftDays,
+      })
+    } else if (ruleType === 'product' && selectedProduct) {
+      onCreate({
+        rule_id: selectedProduct.product_id,
+        name: selectedProduct.name,
+        type: 'product',
+        products_count: 1,
+        shelf_life_days: draftDays,
+      })
+    }
   }
 
   return (
@@ -89,44 +142,127 @@ export function AddAutomationRulePanel({
 
         {/* Scrollable content */}
         <div className="flex-1 overflow-y-auto px-6 py-6 flex flex-col gap-6">
-          {/* Category selection */}
+          {/* Rule type toggle */}
           <div className="flex flex-col gap-2">
             <Typography variant="h5" className="font-semibold">
-              Category
+              Rule type
             </Typography>
-            <div className="relative">
-              <select
-                value={selectedKey}
-                onChange={e => setSelectedKey(e.target.value)}
-                className="w-full appearance-none px-3 py-2 pr-8 border border-border rounded-lg text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+            <div className="flex rounded-lg border border-border overflow-hidden">
+              <button
+                type="button"
+                onClick={() => handleTypeChange('category')}
+                className={cn(
+                  'flex-1 px-4 py-2 text-sm font-medium transition-colors',
+                  ruleType === 'category'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-background text-foreground hover:bg-muted',
+                )}
               >
-                <option value="">Select a category...</option>
-                {availableCategories.length > 0 && (
-                  <optgroup label="Available">
-                    {availableCategories.map(c => (
-                      <option key={c.category_id} value={c.category_id}>
-                        {c.display_name_en} ({c.product_count}{' '}
-                        {c.product_count === 1 ? 'product' : 'products'})
-                      </option>
-                    ))}
-                  </optgroup>
+                Category
+              </button>
+              <button
+                type="button"
+                onClick={() => handleTypeChange('product')}
+                className={cn(
+                  'flex-1 px-4 py-2 text-sm font-medium transition-colors border-l border-border',
+                  ruleType === 'product'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-background text-foreground hover:bg-muted',
                 )}
-                {categoriesWithRules.length > 0 && (
-                  <optgroup label="Already have rules">
-                    {categoriesWithRules.map(c => (
-                      <option key={c.category_id} value={c.category_id} disabled>
-                        {c.display_name_en} ✓
-                      </option>
-                    ))}
-                  </optgroup>
-                )}
-              </select>
-              <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+              >
+                Product
+              </button>
             </div>
-            <Typography variant="small" color="muted">
-              Categories marked ✓ already have automation rules
-            </Typography>
           </div>
+
+          {/* Category selection */}
+          {ruleType === 'category' && (
+            <div className="flex flex-col gap-2">
+              <Typography variant="h5" className="font-semibold">
+                Category
+              </Typography>
+              <div className="relative">
+                <select
+                  value={selectedKey}
+                  onChange={e => setSelectedKey(e.target.value)}
+                  className="w-full appearance-none px-3 py-2 pr-8 border border-border rounded-lg text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                >
+                  <option value="">Select a category...</option>
+                  {availableCategories.length > 0 && (
+                    <optgroup label="Available">
+                      {availableCategories.map(c => (
+                        <option key={c.category_id} value={c.category_id}>
+                          {c.display_name_en} ({c.product_count}{' '}
+                          {c.product_count === 1 ? 'product' : 'products'})
+                        </option>
+                      ))}
+                    </optgroup>
+                  )}
+                  {categoriesWithRules.length > 0 && (
+                    <optgroup label="Already have rules">
+                      {categoriesWithRules.map(c => (
+                        <option key={c.category_id} value={c.category_id} disabled>
+                          {c.display_name_en} ✓
+                        </option>
+                      ))}
+                    </optgroup>
+                  )}
+                </select>
+                <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+              </div>
+              <Typography variant="small" color="muted">
+                Categories marked ✓ already have automation rules
+              </Typography>
+            </div>
+          )}
+
+          {/* Product selection */}
+          {ruleType === 'product' && (
+            <div className="flex flex-col gap-2">
+              <Typography variant="h5" className="font-semibold">
+                Product
+              </Typography>
+              <input
+                type="text"
+                placeholder="Search products..."
+                value={productSearch}
+                onChange={e => setProductSearch(e.target.value)}
+                className="w-full px-3 py-2 border border-border rounded-lg text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+              />
+              <div className="relative">
+                <select
+                  value={selectedKey}
+                  onChange={e => setSelectedKey(e.target.value)}
+                  className="w-full appearance-none px-3 py-2 pr-8 border border-border rounded-lg text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                >
+                  <option value="">Select a product...</option>
+                  {availableProducts.length > 0 && (
+                    <optgroup label="Available">
+                      {availableProducts.map(p => (
+                        <option key={p.product_id} value={p.product_id}>
+                          {p.name}
+                          {p.category_name ? ` — ${p.category_name}` : ''}
+                        </option>
+                      ))}
+                    </optgroup>
+                  )}
+                  {productsWithRules.length > 0 && (
+                    <optgroup label="Already have rules">
+                      {productsWithRules.map(p => (
+                        <option key={p.product_id} value={p.product_id} disabled>
+                          {p.name} ✓
+                        </option>
+                      ))}
+                    </optgroup>
+                  )}
+                </select>
+                <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+              </div>
+              <Typography variant="small" color="muted">
+                Products marked ✓ already have automation rules
+              </Typography>
+            </div>
+          )}
 
           {/* Shelf life */}
           <div className="flex flex-col gap-2">
@@ -147,8 +283,8 @@ export function AddAutomationRulePanel({
             </Typography>
           </div>
 
-          {/* Products covered — shown only once a category is selected */}
-          {selectedCategory && (
+          {/* Products covered — shown only for category rules once a category is selected */}
+          {ruleType === 'category' && selectedCategory && (
             <div className="flex flex-col gap-2">
               <Typography variant="h5" className="font-semibold">
                 Products covered

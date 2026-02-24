@@ -42,7 +42,7 @@ export function AutomationCard() {
             {t('emptyState.description')}
           </Typography>
           <Link
-            href="/dashboard/settings/automation"
+            href="/dashboard/settings/automations"
             className="transition-colors hover:text-gray-900"
           >
             {t('addRule')}
@@ -63,7 +63,7 @@ export function AutomationCard() {
             {t('subtitle')}
           </Typography>
         </div>
-        <Link href="/dashboard/settings/automation">
+        <Link href="/dashboard/settings/automations">
           <Typography
             variant="p"
             color="muted"
@@ -126,7 +126,7 @@ export function AutomationCard() {
 
       <Typography variant="p">
         <Link
-          href="/dashboard/settings/automation"
+          href="/dashboard/settings/automations"
           className="flex items-center gap-2 hover:bg-gray-50 hover:text-gray-900 dark:hover:bg-secondary-900/10 dark:hover:text-secondary-100 px-6 py-5 border-t border-muted"
         >
           <Plus className="h-3.5 w-3.5" aria-hidden="true" />

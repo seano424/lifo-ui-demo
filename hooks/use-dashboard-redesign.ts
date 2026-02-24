@@ -3,7 +3,10 @@
 import { useMemo } from 'react'
 import { useQuery, keepPreviousData } from '@tanstack/react-query'
 import { fetchDashboardRedesignSummary, fetchTopExpiringBatches } from '@/lib/queries/dashboard'
-import { useCategoriesWithTrackingSettings } from '@/lib/queries/batch-tracking-onboarding'
+import {
+  useCategoriesWithTrackingSettings,
+  useProductsForTrackingSetup,
+} from '@/lib/queries/batch-tracking-onboarding'
 import { queryKeys } from '@/lib/queries/query-keys'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 import type { AutomationRule } from '@/lib/queries/dashboard'
@@ -85,23 +88,42 @@ export function useTopExpiringBatches(limit: number = 5) {
 export function useAutomationRules() {
   const activeStoreId = useActiveStoreId()
   const categoriesQuery = useCategoriesWithTrackingSettings(activeStoreId || '')
+  const productsQuery = useProductsForTrackingSetup(activeStoreId || '', {
+    onlyTracked: true,
+    pageSize: 100,
+  })
 
   const rules = useMemo((): AutomationRule[] => {
-    if (!categoriesQuery.data) return []
-    return categoriesQuery.data
-      .filter(cat => cat.auto_create_batches)
-      .map(cat => ({
-        rule_id: cat.category_id,
-        name: cat.display_name_en,
-        type: 'category' as const,
-        products_count: cat.product_count,
-        shelf_life_days: cat.default_shelf_life_days,
-      }))
-  }, [categoriesQuery.data])
+    const categoryRules: AutomationRule[] = categoriesQuery.data
+      ? categoriesQuery.data
+          .filter(cat => cat.auto_create_batches)
+          .map(cat => ({
+            rule_id: cat.category_id,
+            name: cat.display_name_en,
+            type: 'category' as const,
+            products_count: cat.product_count,
+            shelf_life_days: cat.default_shelf_life_days,
+          }))
+      : []
+
+    const productRules: AutomationRule[] = productsQuery.data
+      ? productsQuery.data
+          .filter(p => p.shelf_life_override_days !== null)
+          .map(p => ({
+            rule_id: p.product_id,
+            name: p.name,
+            type: 'product' as const,
+            products_count: 1,
+            shelf_life_days: p.shelf_life_override_days,
+          }))
+      : []
+
+    return [...categoryRules, ...productRules]
+  }, [categoriesQuery.data, productsQuery.data])
 
   return {
     data: rules,
-    isLoading: categoriesQuery.isLoading,
-    error: categoriesQuery.error,
+    isLoading: categoriesQuery.isLoading || productsQuery.isLoading,
+    error: categoriesQuery.error ?? productsQuery.error,
   }
 }

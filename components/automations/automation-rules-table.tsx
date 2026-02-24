@@ -94,19 +94,34 @@ export function AutomationRulesTable({ rules, isLoading }: AutomationRulesTableP
 
   const handleSave = async (rule: AutomationRule, shelfLifeDays: number) => {
     try {
-      await saveMutation.mutateAsync({
-        storeId,
-        config: buildConfig(),
-        categorySettings: [
-          {
-            category_id: rule.rule_id,
-            is_tracked: true,
-            auto_create_batches: true,
-            default_shelf_life_days: shelfLifeDays,
-          },
-        ],
-        productOverrides: [],
-      })
+      if (rule.type === 'product') {
+        await saveMutation.mutateAsync({
+          storeId,
+          config: buildConfig(),
+          categorySettings: [],
+          productOverrides: [
+            {
+              product_id: rule.rule_id,
+              shelf_life_override_days: shelfLifeDays,
+              auto_create_batches: true,
+            },
+          ],
+        })
+      } else {
+        await saveMutation.mutateAsync({
+          storeId,
+          config: buildConfig(),
+          categorySettings: [
+            {
+              category_id: rule.rule_id,
+              is_tracked: true,
+              auto_create_batches: true,
+              default_shelf_life_days: shelfLifeDays,
+            },
+          ],
+          productOverrides: [],
+        })
+      }
       setIsPanelOpen(false)
       toast.success('Rule saved')
     } catch {
@@ -116,19 +131,34 @@ export function AutomationRulesTable({ rules, isLoading }: AutomationRulesTableP
 
   const handleDelete = async (rule: AutomationRule) => {
     try {
-      await saveMutation.mutateAsync({
-        storeId,
-        config: buildConfig(),
-        categorySettings: [
-          {
-            category_id: rule.rule_id,
-            is_tracked: true,
-            auto_create_batches: false,
-            default_shelf_life_days: rule.shelf_life_days,
-          },
-        ],
-        productOverrides: [],
-      })
+      if (rule.type === 'product') {
+        await saveMutation.mutateAsync({
+          storeId,
+          config: buildConfig(),
+          categorySettings: [],
+          productOverrides: [
+            {
+              product_id: rule.rule_id,
+              shelf_life_override_days: null,
+              auto_create_batches: null,
+            },
+          ],
+        })
+      } else {
+        await saveMutation.mutateAsync({
+          storeId,
+          config: buildConfig(),
+          categorySettings: [
+            {
+              category_id: rule.rule_id,
+              is_tracked: true,
+              auto_create_batches: false,
+              default_shelf_life_days: rule.shelf_life_days,
+            },
+          ],
+          productOverrides: [],
+        })
+      }
       setIsPanelOpen(false)
       toast.success(`${rule.name} rule deleted`)
     } catch {
@@ -138,19 +168,34 @@ export function AutomationRulesTable({ rules, isLoading }: AutomationRulesTableP
 
   const handleCreate = async (rule: AutomationRule) => {
     try {
-      await saveMutation.mutateAsync({
-        storeId,
-        config: buildConfig(),
-        categorySettings: [
-          {
-            category_id: rule.rule_id,
-            is_tracked: true,
-            auto_create_batches: true,
-            default_shelf_life_days: rule.shelf_life_days,
-          },
-        ],
-        productOverrides: [],
-      })
+      if (rule.type === 'product') {
+        await saveMutation.mutateAsync({
+          storeId,
+          config: buildConfig(),
+          categorySettings: [],
+          productOverrides: [
+            {
+              product_id: rule.rule_id,
+              shelf_life_override_days: rule.shelf_life_days,
+              auto_create_batches: true,
+            },
+          ],
+        })
+      } else {
+        await saveMutation.mutateAsync({
+          storeId,
+          config: buildConfig(),
+          categorySettings: [
+            {
+              category_id: rule.rule_id,
+              is_tracked: true,
+              auto_create_batches: true,
+              default_shelf_life_days: rule.shelf_life_days,
+            },
+          ],
+          productOverrides: [],
+        })
+      }
       setIsAddPanelOpen(false)
       toast.success(`${rule.name} rule created`)
     } catch {
