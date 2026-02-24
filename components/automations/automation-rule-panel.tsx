@@ -15,6 +15,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
+import { useProductsForTrackingSetup } from '@/lib/queries/batch-tracking-onboarding'
+import { useActiveStoreId } from '@/lib/stores/store-context'
 import { cn } from '@/lib/utils'
 import type { AutomationRule } from '@/lib/queries/dashboard'
 
@@ -35,6 +37,14 @@ export function AutomationRulePanel({
   onSave,
   onDelete,
 }: AutomationRulePanelProps) {
+  const storeId = useActiveStoreId() || ''
+
+  // Fetch products for category rules; passing empty storeId skips the query for product rules
+  const { data: categoryProducts = [] } = useProductsForTrackingSetup(
+    rule?.type === 'category' && rule.rule_id ? storeId : '',
+    { categoryId: rule?.rule_id ?? null, pageSize: 100 },
+  )
+
   const [draftDays, setDraftDays] = useState(rule?.shelf_life_days ?? 14)
 
   useEffect(() => {
@@ -130,17 +140,37 @@ export function AutomationRulePanel({
             <Typography variant="h5" className="font-semibold">
               Products covered
             </Typography>
-            <div className="flex items-center gap-2">
-              <div
-                className={cn(
-                  'w-2 h-2 rounded-full shrink-0',
-                  rule?.type === 'product' ? 'bg-green-500' : 'bg-primary',
-                )}
-              />
-              <Typography variant="p" color="muted">
-                {rule?.products_count ?? 0}{' '}
-                {(rule?.products_count ?? 0) === 1 ? 'product' : 'products'}
-              </Typography>
+            <div className="flex flex-col gap-1">
+              <div className="flex items-center gap-2">
+                <div
+                  className={cn(
+                    'w-2 h-2 rounded-full shrink-0',
+                    rule?.type === 'product' ? 'bg-green-500' : 'bg-primary',
+                  )}
+                />
+                <Typography variant="p" color="muted">
+                  {rule?.products_count ?? 0}{' '}
+                  {(rule?.products_count ?? 0) === 1 ? 'product' : 'products'}
+                </Typography>
+              </div>
+              {rule?.type === 'product' ? (
+                <Typography variant="small" color="muted" className="pl-4">
+                  · {rule.name}
+                </Typography>
+              ) : (
+                <>
+                  {categoryProducts.slice(0, 10).map(p => (
+                    <Typography key={p.product_id} variant="small" color="muted" className="pl-4">
+                      · {p.name}
+                    </Typography>
+                  ))}
+                  {categoryProducts.length > 10 && (
+                    <Typography variant="small" color="muted" className="pl-4">
+                      and {categoryProducts.length - 10} more
+                    </Typography>
+                  )}
+                </>
+              )}
             </div>
           </div>
 

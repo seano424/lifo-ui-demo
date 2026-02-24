@@ -46,6 +46,12 @@ export function AddAutomationRulePanel({
     pageSize: 50,
   })
 
+  // Fetch products for the selected category to show names under "Products covered"
+  const { data: categoryProducts = [] } = useProductsForTrackingSetup(
+    ruleType === 'category' && selectedKey ? activeStoreId : '',
+    { categoryId: selectedKey || null, pageSize: 100 },
+  )
+
   // Categories that don't yet have auto_create_batches enabled (and have products)
   const availableCategories = useMemo(
     () => categories.filter(c => !c.auto_create_batches && c.product_count > 0),
@@ -289,12 +295,24 @@ export function AddAutomationRulePanel({
               <Typography variant="h5" className="font-semibold">
                 Products covered
               </Typography>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full shrink-0 bg-primary" />
-                <Typography variant="p" color="muted">
-                  {selectedCategory.product_count}{' '}
-                  {selectedCategory.product_count === 1 ? 'product' : 'products'}
-                </Typography>
+              <div className="flex flex-col gap-1">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full shrink-0 bg-primary" />
+                  <Typography variant="p" color="muted">
+                    {selectedCategory.product_count}{' '}
+                    {selectedCategory.product_count === 1 ? 'product' : 'products'}
+                  </Typography>
+                </div>
+                {categoryProducts.slice(0, 10).map(p => (
+                  <Typography key={p.product_id} variant="small" color="muted" className="pl-4">
+                    · {p.name}
+                  </Typography>
+                ))}
+                {categoryProducts.length > 10 && (
+                  <Typography variant="small" color="muted" className="pl-4">
+                    and {categoryProducts.length - 10} more
+                  </Typography>
+                )}
               </div>
             </div>
           )}
