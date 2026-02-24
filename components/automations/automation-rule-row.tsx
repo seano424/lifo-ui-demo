@@ -22,14 +22,6 @@ interface AutomationRuleRowProps {
   onDelete: (rule: AutomationRule) => void
 }
 
-function formatCreatedAt(iso: string): string {
-  return new Intl.DateTimeFormat('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  }).format(new Date(iso))
-}
-
 export function AutomationRuleRow({ rule, onEdit, onDelete }: AutomationRuleRowProps) {
   const [deleteOpen, setDeleteOpen] = useState(false)
 
@@ -62,14 +54,7 @@ export function AutomationRuleRow({ rule, onEdit, onDelete }: AutomationRuleRowP
       {/* Shelf life */}
       <td className="px-6 py-4">
         <Typography variant="p" className="text-foreground">
-          {rule.shelf_life_days} days
-        </Typography>
-      </td>
-
-      {/* Created */}
-      <td className="px-6 py-4">
-        <Typography variant="p" color="muted">
-          {formatCreatedAt(rule.created_at)}
+          {rule.shelf_life_days != null ? `${rule.shelf_life_days} days` : '—'}
         </Typography>
       </td>
 

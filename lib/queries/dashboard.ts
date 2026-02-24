@@ -44,15 +44,15 @@ export interface BatchForTable {
 
 /**
  * Automation rule configuration
+ * Derived from batch tracking category settings (auto_create_batches === true).
+ * rule_id is the category_id (for category rules) or product_id (for product rules).
  */
 export interface AutomationRule {
   rule_id: string
   name: string
   type: 'category' | 'product'
   products_count: number
-  status: 'active' | 'paused'
-  shelf_life_days: number
-  created_at: string
+  shelf_life_days: number | null
 }
 
 const MOCK_EXPIRING_BATCHES: BatchForTable[] = [
@@ -100,45 +100,6 @@ const MOCK_EXPIRING_BATCHES: BatchForTable[] = [
     days_left: 39,
     current_quantity: 45,
     value: 89.55,
-  },
-]
-
-const MOCK_AUTOMATION_RULES: AutomationRule[] = [
-  {
-    rule_id: 'rule-001',
-    name: 'Dairy',
-    type: 'category',
-    products_count: 12,
-    status: 'active',
-    shelf_life_days: 14,
-    created_at: '2026-02-20T10:00:00Z',
-  },
-  {
-    rule_id: 'rule-002',
-    name: 'Canned Goods',
-    type: 'category',
-    products_count: 8,
-    status: 'active',
-    shelf_life_days: 730,
-    created_at: '2026-02-20T10:00:00Z',
-  },
-  {
-    rule_id: 'rule-003',
-    name: 'Fresh Bread 400g',
-    type: 'product',
-    products_count: 1,
-    status: 'active',
-    shelf_life_days: 3,
-    created_at: '2026-02-24T09:15:00Z',
-  },
-  {
-    rule_id: 'rule-004',
-    name: 'Snacks',
-    type: 'category',
-    products_count: 15,
-    status: 'paused',
-    shelf_life_days: 90,
-    created_at: '2026-02-20T10:00:00Z',
   },
 ]
 
@@ -291,18 +252,4 @@ export async function fetchTopExpiringBatches(
 
   // Return mock data limited to requested count
   return MOCK_EXPIRING_BATCHES.slice(0, limit)
-}
-
-/**
- * Fetch automation rules
- * Mock version with simulated network delay
- * Returns empty array until automation table exists
- */
-export async function fetchAutomationRules(_storeId: string): Promise<AutomationRule[]> {
-  // Simulate network delay (300ms)
-  await new Promise(resolve => setTimeout(resolve, 300))
-
-  // Return mock automation rules for demo purposes
-  // In production, this will return [] until automation_rules table is created
-  return MOCK_AUTOMATION_RULES
 }

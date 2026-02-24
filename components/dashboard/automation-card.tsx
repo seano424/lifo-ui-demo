@@ -6,7 +6,6 @@ import { useTranslations } from 'next-intl'
 import { useAutomationRules } from '@/hooks/use-dashboard-redesign'
 import { Card } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
-import { cn } from '@/lib/utils'
 import { Typography } from '../ui/typography'
 import { Badge } from '../ui/badge'
 
@@ -29,7 +28,6 @@ export function AutomationCard() {
     )
   }
 
-  const activeRules = rules?.filter(r => r.status === 'active') || []
   const totalProducts = rules?.reduce((sum, r) => sum + r.products_count, 0) || 0
   const hasRules = rules && rules.length > 0
 
@@ -84,7 +82,7 @@ export function AutomationCard() {
             className="border aspect-square min-h-10 min-w-10 p-2 flex items-center justify-center rounded-full dark:border-secondary-100"
             variant="p"
           >
-            {activeRules.length}
+            {rules?.length ?? 0}
           </Typography>
           <Typography variant="p">{t('activeRules')}</Typography>
         </div>
@@ -108,25 +106,18 @@ export function AutomationCard() {
             className="flex sm:items-center justify-between px-6 py-3 transition-colors hover:bg-gray-50 hover:text-gray-900 dark:hover:bg-secondary-900/10 dark:hover:text-secondary-100"
           >
             <div className="flex items-center gap-3">
-              <div
-                className={cn(
-                  'h-2 w-2 rounded-full hidden sm:block',
-                  rule.status === 'active' ? 'bg-primary' : 'bg-gray-200',
-                )}
-              />
+              <div className="h-2 w-2 rounded-full hidden sm:block bg-primary" />
               <div className="flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between sm:divide-x sm:divide-muted">
                 <Typography variant="p" color="default" className="sm:pr-2">
                   {rule.name}
                 </Typography>
                 <Typography variant="small" color="muted">
                   {t(`ruleTypes.${rule.type}`)} · {rule.products_count} items ·{' '}
-                  {rule.shelf_life_days}d
+                  {rule.shelf_life_days != null ? `${rule.shelf_life_days}d` : '—'}
                 </Typography>
               </div>
             </div>
-            <Badge variant={rule.status === 'active' ? 'primary' : 'danger'}>
-              {t(`ruleStatus.${rule.status}`)}
-            </Badge>
+            <Badge variant="primary">{t('ruleStatus.active')}</Badge>
           </div>
         ))}
       </div>

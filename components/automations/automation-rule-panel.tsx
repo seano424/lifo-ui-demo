@@ -21,21 +21,16 @@ import type { AutomationRule } from '@/lib/queries/dashboard'
 interface AutomationRulePanelProps {
   rule: AutomationRule | null
   isOpen: boolean
+  isSaving?: boolean
   onClose: () => void
   onSave: (rule: AutomationRule, shelfLifeDays: number) => void
   onDelete: (rule: AutomationRule) => void
 }
 
-const MOCK_PRODUCTS: Record<string, string[]> = {
-  'rule-001': ['Whole Milk 1L', 'Greek Yogurt 500g', 'Cheddar Cheese 200g', 'Butter Unsalted 250g'],
-  'rule-002': ['Tomato Soup 400g', 'Black Beans 400g', 'Tuna 185g', 'Corn Kernels 340g'],
-  'rule-003': ['Fresh Bread 400g'],
-  'rule-004': ['Mixed Nuts 250g', 'Potato Chips 150g', 'Granola Bar 40g', 'Popcorn 100g'],
-}
-
 export function AutomationRulePanel({
   rule,
   isOpen,
+  isSaving = false,
   onClose,
   onSave,
   onDelete,
@@ -44,7 +39,7 @@ export function AutomationRulePanel({
 
   useEffect(() => {
     if (isOpen && rule) {
-      setDraftDays(rule.shelf_life_days)
+      setDraftDays(rule.shelf_life_days ?? 14)
     }
   }, [isOpen, rule])
 
@@ -57,10 +52,6 @@ export function AutomationRulePanel({
       year: 'numeric',
     }).format(d)
   }, [draftDays])
-
-  const productsList = rule ? (MOCK_PRODUCTS[rule.rule_id] ?? []) : []
-  const displayProducts = productsList.slice(0, 4)
-  const remaining = (rule?.products_count ?? 0) - displayProducts.length
 
   return (
     <Sheet open={isOpen} onOpenChange={open => !open && onClose()}>
@@ -151,31 +142,6 @@ export function AutomationRulePanel({
                 {(rule?.products_count ?? 0) === 1 ? 'product' : 'products'}
               </Typography>
             </div>
-            {displayProducts.length > 0 && (
-              <div className="flex flex-col gap-1.5 mt-1">
-                <div className="flex flex-col gap-1.5">
-                  {displayProducts.map(name => (
-                    <div
-                      key={name}
-                      className="text-sm text-gray-600 px-3 py-2 bg-gray-100 rounded-lg"
-                    >
-                      {name}
-                    </div>
-                  ))}
-                </div>
-                {remaining > 0 && (
-                  <button
-                    type="button"
-                    className="text-center py-1 text-gray-500 hover:text-gray-900 transition-all cursor-pointer duration-100 ease-in-out text-sm"
-                    onClick={() => {
-                      console.log('show more products')
-                    }}
-                  >
-                    + {remaining} more
-                  </button>
-                )}
-              </div>
-            )}
           </div>
 
           {/* Info box */}
@@ -197,6 +163,7 @@ export function AutomationRulePanel({
             <AlertDialogTrigger asChild>
               <Button
                 variant="ghost"
+                disabled={isSaving}
                 className="text-destructive hover:text-destructive hover:bg-destructive/10"
               >
                 Delete rule
@@ -222,10 +189,12 @@ export function AutomationRulePanel({
             </AlertDialogContent>
           </AlertDialog>
           <div className="flex gap-2">
-            <Button variant="outline" onClick={onClose}>
+            <Button variant="outline" onClick={onClose} disabled={isSaving}>
               Cancel
             </Button>
-            <Button onClick={() => rule && onSave(rule, draftDays)}>Save changes</Button>
+            <Button disabled={isSaving} onClick={() => rule && onSave(rule, draftDays)}>
+              {isSaving ? 'Saving…' : 'Save changes'}
+            </Button>
           </div>
         </div>
       </SheetContent>
