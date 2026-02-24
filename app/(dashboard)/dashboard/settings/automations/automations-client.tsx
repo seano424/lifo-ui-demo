@@ -11,7 +11,7 @@ export default function AutomationsClient() {
 
   return (
     <div className="flex flex-col gap-6 pb-12 container py-8">
-      <DashboardInsetHeader title="Automation" description="Auto-batch creation rules" />
+      <DashboardInsetHeader title="Automations" description="Auto-batch creation rules" />
 
       <AutomationRulesTable rules={rules} isLoading={isLoading || !storeId} />
     </div>
