@@ -1,7 +1,7 @@
 'use client'
 
 import { createProductTableColumns } from '@/components/products/product-table-columns'
-import { ProductDetailModal } from '@/components/products/product-detail-modal'
+import { ProductDetailPanel } from '@/components/products/product-detail-panel'
 import { CardDescription, CardTitle } from '@/components/ui/card'
 import {
   Table,
@@ -182,7 +182,7 @@ export function ProductsTable({
       </Table>
 
       {selectedProductId && (
-        <ProductDetailModal
+        <ProductDetailPanel
           isOpen={isModalOpen}
           onClose={() => {
             setIsModalOpen(false)

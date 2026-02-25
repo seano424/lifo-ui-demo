@@ -455,16 +455,14 @@ export function useBatchActions() {
   })
 
   const deleteMutation = useMutation({
-    mutationFn: (batchId: string) => deleteBatch(batchId),
+    mutationFn: ({ batchId }: { batchId: string; productId: string }) => deleteBatch(batchId),
 
-    onMutate: async batchId => {
+    onMutate: async ({ batchId, productId }) => {
       await queryClient.cancelQueries({
         queryKey: queryKeys.batches.detail(batchId),
       })
 
-      const previousBatch = queryClient.getQueryData(queryKeys.batches.detail(batchId)) as
-        | BatchWithProduct
-        | undefined
+      const previousBatch = queryClient.getQueryData(queryKeys.batches.detail(batchId))
 
       queryClient.removeQueries({ queryKey: queryKeys.batches.detail(batchId) })
 
@@ -490,33 +488,30 @@ export function useBatchActions() {
         )
       }
 
-      return { previousBatch, batchId }
+      return { previousBatch, batchId, productId }
     },
 
-    onError: (err, _batchId, context) => {
+    onError: (err, _vars, context) => {
       if (context?.previousBatch) {
         queryClient.setQueryData(queryKeys.batches.detail(context.batchId), context.previousBatch)
+      }
+      if (activeStoreId) {
+        queryClient.invalidateQueries({ queryKey: queryKeys.batches.byStore(activeStoreId) })
       }
       console.error('Failed to delete batch:', err)
       toast.error('Failed to delete batch')
     },
 
-    onSettled: (_data, _error, _batchId, context) => {
+    onSettled: (_data, _error, { productId }) => {
       if (activeStoreId) {
         queryClient.invalidateQueries({
           queryKey: queryKeys.batches.byStore(activeStoreId),
         })
-      }
-
-      if (context?.previousBatch) {
         queryClient.invalidateQueries({
-          queryKey: queryKeys.batches.byProduct(
-            activeStoreId || '',
-            context.previousBatch.product_id,
-          ),
+          queryKey: queryKeys.batches.byProduct(activeStoreId, productId),
         })
         queryClient.invalidateQueries({
-          queryKey: queryKeys.products.detail(context.previousBatch.product_id),
+          queryKey: queryKeys.products.detail(productId),
         })
       }
     },

@@ -17,12 +17,14 @@ export interface BatchRowProps {
   onStartEdit: () => void
   onSave: (updates: { expiry_date?: string; current_quantity?: number }) => void
   onCancel: () => void
-  currencySymbol: string
+  currencySymbol?: string
+  onDelete: (batchId: string) => void
 }
 
 export interface UntrackedAlertProps {
   count: number
   productId: string
+  storeQuantity: number
   autoExpand?: boolean
   costPrice?: number | null
   sellingPrice?: number | null

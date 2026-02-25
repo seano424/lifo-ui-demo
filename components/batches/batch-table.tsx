@@ -1,7 +1,7 @@
 'use client'
 
 import { createBatchTableColumns } from '@/components/batches/batch-table-columns'
-import { ProductDetailModal } from '@/components/products/product-detail-modal'
+import { ProductDetailPanel } from '@/components/products/product-detail-panel'
 import { CardDescription, CardTitle } from '@/components/ui/card'
 import {
   Table,
@@ -206,7 +206,7 @@ export function BatchTable({
       </Table>
 
       {selectedProductId && (
-        <ProductDetailModal
+        <ProductDetailPanel
           isOpen={isBottomSheetOpen}
           onClose={() => {
             setIsBottomSheetOpen(false)

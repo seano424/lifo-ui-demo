@@ -202,7 +202,7 @@ export function createBatchTableColumns({
 
         return (
           <div className={alignments.days_left.cellClass}>
-            <Badge size="sm" variant={daysLeft <= 3 ? 'danger' : 'primary'}>
+            <Badge size="sm" variant={daysLeft <= 3 ? 'danger' : 'success'}>
               {label}
             </Badge>
           </div>

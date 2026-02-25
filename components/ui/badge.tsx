@@ -12,7 +12,7 @@ const badgeVariants = cva(
         primary: 'bg-primary-400/15 text-primary-700 dark:bg-primary-400/10 dark:text-primary-300',
         secondary:
           'bg-secondary-400/15 text-secondary-700 dark:bg-secondary-400/10 dark:text-secondary-300',
-        success: 'bg-lime-400/20 text-lime-700 dark:bg-lime-400/10 dark:text-lime-300',
+        success: 'bg-lime-400/20 text-lime-900 dark:bg-lime-400/10 dark:text-lime-300',
         danger: 'bg-red-200/15 text-red-400 dark:bg-red-400/10 dark:text-red-400',
         destructive: 'bg-red-400/15 text-red-700 dark:bg-red-400/10 dark:text-red-300',
         outline:
