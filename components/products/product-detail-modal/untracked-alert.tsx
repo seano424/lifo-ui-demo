@@ -28,7 +28,7 @@ export function UntrackedAlert({
   const [showForm, setShowForm] = useState(autoExpand)
   const [rows, setRows] = useState<BatchRow[]>([{ id: 1, date: '', qty: '' }])
   const firstInputRef = useRef<HTMLInputElement>(null)
-  const { createBatch, isCreating } = useBatchActions()
+  const { createBatch } = useBatchActions()
 
   useEffect(() => {
     if (showForm && firstInputRef.current) {
