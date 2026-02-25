@@ -47,8 +47,8 @@ export function BatchList({
         onClick={() => setIsOpen(!isOpen)}
         className="w-full flex items-center justify-between px-0"
       >
-        <Typography variant="p" className="flex items-center gap-2">
-          Batches ({totalBatchQty} of {storeQuantity ?? '?'} units)
+        <Typography variant="h5" className="flex items-center gap-2 font-semibold">
+          Stock with expiry dates ({totalBatchQty} of {storeQuantity ?? '?'})
         </Typography>
         <ChevronDown className={cn('size-3 transition-transform', isOpen && 'rotate-180')} />
       </Button>

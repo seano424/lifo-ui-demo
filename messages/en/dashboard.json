@@ -537,7 +537,7 @@
     "brand": "Brand",
     "totalStock": "Total Stock",
     "batchesTracked": "Batches Tracked",
-    "totalUnitsWithExpiryDates": "Total units with expiry dates",
+    "totalUnitsWithExpiryDates": "Total stock with expiry dates",
     "datesMissing": "Dates Missing",
     "activeBatches": "Active Batches",
     "dateAdded": "Date Added",

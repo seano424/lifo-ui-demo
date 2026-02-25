@@ -133,7 +133,7 @@ export function TrackingSettings({
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="bg-muted rounded-3xl p-4 flex flex-col gap-4">
       <Button
         variant="ghost"
         onClick={() => setIsOpen(!isOpen)}

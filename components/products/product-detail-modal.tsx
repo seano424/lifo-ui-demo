@@ -145,13 +145,13 @@ export function ProductDetailModal({
               {/* Section header */}
               <div className="flex flex-col gap-4 px-4 bg-muted rounded-3xl p-4">
                 <div className="flex items-center gap-2 justify-between">
-                  <Typography variant="p">Total units</Typography>
+                  <Typography variant="p">Total stock</Typography>
 
                   <Typography>{product?.store_quantity ?? product?.batch_quantity ?? 0}</Typography>
                 </div>
 
                 <div className="flex items-center gap-2 justify-between">
-                  <Typography variant="p">Total units with expiry dates</Typography>
+                  <Typography variant="p">Total stock with expiry dates</Typography>
                   <Typography>
                     {totalTrackedQty} of {product?.store_quantity ?? product?.batch_quantity ?? 0}{' '}
                     units

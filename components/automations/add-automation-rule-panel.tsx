@@ -18,6 +18,8 @@ interface AddAutomationRulePanelProps {
   isSaving?: boolean
   onClose: () => void
   onCreate: (rule: AutomationRule) => void
+  initialRuleType?: 'category' | 'product'
+  initialSelectedKey?: string
 }
 
 export function AddAutomationRulePanel({
@@ -25,6 +27,8 @@ export function AddAutomationRulePanel({
   isSaving = false,
   onClose,
   onCreate,
+  initialRuleType,
+  initialSelectedKey,
 }: AddAutomationRulePanelProps) {
   const activeStoreId = useActiveStoreId() || ''
   const { data: categories = [] } = useCategoriesWithTrackingSettings(activeStoreId)
@@ -102,14 +106,17 @@ export function AddAutomationRulePanel({
   }, [draftDays])
 
   useEffect(() => {
-    if (!isOpen) {
+    if (isOpen) {
+      if (initialRuleType) setRuleType(initialRuleType)
+      if (initialSelectedKey) setSelectedKey(initialSelectedKey)
+    } else {
       setRuleType('category')
       setSelectedKey('')
       setDraftDays(14)
       setProductSearch('')
       setDebouncedProductSearch('')
     }
-  }, [isOpen])
+  }, [isOpen, initialRuleType, initialSelectedKey])
 
   const handleTypeChange = (type: 'category' | 'product') => {
     setRuleType(type)

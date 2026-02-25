@@ -485,7 +485,7 @@ function ProductDetailModal({
           <span className="text-sm font-semibold text-gray-900">
             {PRODUCT.totalStock}
           </span>
-          <span className="text-xs text-gray-400">total units</span>
+          <span className="text-xs text-gray-400">Total stock</span>
         </div>
       </div>
 
