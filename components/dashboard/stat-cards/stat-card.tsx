@@ -24,9 +24,7 @@ interface StatCardProps {
 export function StatCard({ label, value, subtitle, trend, href, hrefLabel }: StatCardProps) {
   return (
     <Card className="relative cursor-default p-5 transition-all duration-200 flex flex-col gap-3 flex-1 bg-card">
-      <Typography variant="p" color="primary">
-        {label}
-      </Typography>
+      <Typography variant="p">{label}</Typography>
       <div className="flex flex-col gap-1 min-h-24">
         <Typography variant="h4">{value}</Typography>
         <Typography variant="h5" color="muted">
@@ -35,7 +33,7 @@ export function StatCard({ label, value, subtitle, trend, href, hrefLabel }: Sta
       </div>
       {trend && <TrendBadge {...trend} />}
       {href && !trend && (
-        <Link href={href} className={cn(badgeVariants({ variant: 'secondary' }), 'w-full')}>
+        <Link href={href} className={cn(badgeVariants({ variant: 'primary' }), 'w-full')}>
           {hrefLabel}
           <ArrowRight className="h-3 w-3" aria-hidden="true" />
         </Link>

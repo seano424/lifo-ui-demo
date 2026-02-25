@@ -46,22 +46,11 @@ function useNavigationData() {
               icon: Layers,
             },
             {
-              title: t('expiring'),
+              title: t('expiringSoon'),
               url: '/dashboard/expiring',
               icon: CalendarFold,
               badge: expiryTodosCount > 0 ? expiryTodosCount : undefined,
             },
-            // {
-            //   title: t('ignored'),
-            //   url: '/dashboard/inventory/ignored',
-            //   icon: XCircle,
-            // },
-            // {
-            //   title: t('catalog'),
-            //   url: '/dashboard/inventory/products?sort=active_batches_count&direction=desc',
-            //   icon: Package,
-            //   isActive: true,
-            // },
           ],
         },
         {
@@ -93,11 +82,6 @@ function useNavigationData() {
               url: '/dashboard/settings/automations',
               icon: Zap,
             },
-            // {
-            //   title: t('support'),
-            //   url: '/dashboard/support',
-            //   icon: HelpCircle,
-            // },
           ],
         },
       ],

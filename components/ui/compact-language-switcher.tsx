@@ -32,7 +32,7 @@ export function CompactLanguageSwitcher() {
           variant="outline"
           size="icon"
           disabled={isLoading}
-          className="rounded-full border"
+          className="rounded-full border size-10"
           aria-label={t('selectLanguage')}
         >
           <Globe className="h-4 w-4" />

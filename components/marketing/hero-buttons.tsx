@@ -18,13 +18,7 @@ export const HeroButtons = memo(function HeroButtons() {
   return (
     <>
       {currentUser && (
-        <Button
-          size="lg"
-          variant="secondary"
-          asLink
-          href="/dashboard"
-          className="group rounded-3xl"
-        >
+        <Button size="lg" variant="secondary" asLink href="/dashboard" className="group">
           {t('dashboard')}
           <ChevronRightIcon className="w-5 h-5 -rotate-45 transition-transform duration-300 ease-in-out group-hover:translate-x-px group-hover:-translate-y-px" />
         </Button>
@@ -35,7 +29,7 @@ export const HeroButtons = memo(function HeroButtons() {
             asLink
             href="/auth/sign-up"
             size="lg"
-            className="flex items-center gap-1 group rounded-3xl"
+            className="flex items-center gap-1 group"
             variant="black"
             hasArrowUpIcon
           >
@@ -48,7 +42,7 @@ export const HeroButtons = memo(function HeroButtons() {
             rel="noopener noreferrer"
             href="https://calendar.app.google/on8fX3nrWppW7qow7"
             size="lg"
-            className="group flex items-center gap-1 rounded-3xl"
+            className="group flex items-center gap-1"
             hasArrowUpIcon
           >
             {t('bookDemo')}

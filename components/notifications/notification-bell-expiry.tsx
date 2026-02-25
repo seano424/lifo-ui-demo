@@ -1,6 +1,5 @@
 'use client'
 
-import { NotificationCount } from '@/components/notifications/notification-count'
 import { useExpiryTodosCount } from '@/hooks/use-expiry-todos-count'
 import { BellIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -11,19 +10,18 @@ export function NotificationBellExpiry() {
   return (
     <div className="relative">
       <Button
-        size="sm"
+        variant="outline"
+        size="icon"
         asLink
-        variant="secondary"
+        className="rounded-full border size-10"
         href={'/dashboard/expiring'}
-        className="rounded-full aspect-square p-2.5 flex items-center justify-center bg-linear-to-br from-secondary-900 via-primary-900 to-transparent"
       >
-        <BellIcon size={16} className="text-white" />
+        <BellIcon size={16} className="text-gray-700 dark:text-white" />
       </Button>
-      <NotificationCount
-        count={expiryTodosCount}
-        variant="navbar"
-        className="absolute -top-1.5 -right-2 z-20 pointer-events-none"
-      />
+
+      {expiryTodosCount > 0 && (
+        <div className="absolute top-0 right-0 z-20 pointer-events-none size-3 bg-red-400 rounded-full aspect-square" />
+      )}
     </div>
   )
 }

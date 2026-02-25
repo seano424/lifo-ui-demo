@@ -1189,7 +1189,7 @@ function NotificationRulesSection({ rules, setRules, showAddForm, setShowAddForm
                       </span>
                     </div>
                     <div className="text-xs text-gray-400 mt-0.5">
-                      When ≤ {rule.threshold} days left → suggest {rule.action}
+                      When ≤ {rule.threshold} days remaining → suggest {rule.action}
                       {rule.type === 'category' && ` · ${rule.products} products`}
                     </div>
                   </div>

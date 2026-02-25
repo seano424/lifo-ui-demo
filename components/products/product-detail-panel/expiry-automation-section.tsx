@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Typography } from '@/components/ui/typography'
 import { AddAutomationRulePanel } from '@/components/automations/add-automation-rule-panel'
@@ -150,31 +149,37 @@ function RuleRow({
   actionLabel,
 }: RuleRowProps) {
   return (
-    <div className={cn('flex items-center gap-3', dimmed && 'opacity-50')}>
-      <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center shrink-0">
-        {icon}
-      </div>
-
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2">
-          <Typography variant="p" className="font-semibold">
-            {shelfLifeDays !== null ? `${shelfLifeDays}-day shelf life` : 'Not set'}
-          </Typography>
-          {badge}
+    <button
+      type="button"
+      className={cn('flex items-center justify-between group gap-3 py-2')}
+      onClick={onAction}
+    >
+      <div className="flex items-center gap-3">
+        <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center shrink-0 transition-all duration-300 ease-in">
+          {icon}
         </div>
-        <Typography variant="small" color="muted">
-          {label} · {sublabel}
-        </Typography>
+
+        <div className={cn('text-left', (shelfLifeDays === null || dimmed) && 'opacity-50')}>
+          <div className="flex items-center gap-2">
+            <Typography variant="p">
+              {shelfLifeDays !== null ? `${shelfLifeDays}-day shelf life` : 'N/A'}
+            </Typography>
+            {badge}
+          </div>
+
+          <Typography variant="small" color="muted">
+            {label} · {sublabel}
+          </Typography>
+        </div>
       </div>
 
-      <Button
-        variant="ghost"
-        size="sm"
-        className="text-muted-foreground hover:text-foreground shrink-0 h-auto py-0 px-1"
+      <Typography
+        variant="small"
+        className="text-muted-foreground/0 group-hover:text-foreground shrink-0 h-auto py-0 px-1 transition-all duration-100 ease-in-out"
         onClick={onAction}
       >
         {actionLabel}
-      </Button>
-    </div>
+      </Typography>
+    </button>
   )
 }

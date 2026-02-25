@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { useMemo, useState } from 'react'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -86,34 +87,38 @@ export function ProductDetailPanel({
   return (
     <Sheet open={isOpen} onOpenChange={open => !open && handleClose()}>
       <SheetContent side="right" className="flex flex-col gap-0 p-0 w-full sm:max-w-[500px]">
-        <SheetHeader className="px-6 py-4 border-b border-border">
+        <SheetHeader className="px-6 py-4 border-b border-border/20">
           <div className="flex items-center gap-3">
-            <ProductMonogram name={productName} />
+            <ProductMonogram name={productName} imageUrl={product?.image_url} />
             <div className="flex-1 min-w-0">
-              <SheetTitle className="text-lg font-semibold text-left">{productName}</SheetTitle>
-              {(product?.brand || product?.category_display_name) && (
-                <div className="flex items-center gap-1.5">
-                  {product?.brand && (
-                    <Typography variant="small" color="muted">
-                      {product.brand}
-                    </Typography>
-                  )}
-                  {product?.brand && product?.category_display_name && (
-                    <span className="text-xs text-muted-foreground">·</span>
-                  )}
-                  {product?.category_display_name && (
-                    <Typography variant="small" color="muted">
-                      {product.category_display_name}
-                    </Typography>
+              <SheetTitle className="text-lg font-semibold text-left">
+                <div className="flex flex-col">
+                  <span>{productName}</span>
+                  {(product?.brand || product?.category_display_name) && (
+                    <div className="flex items-center gap-1.5">
+                      {product?.brand && (
+                        <Typography variant="small" color="muted">
+                          {product.brand}
+                        </Typography>
+                      )}
+                      {product?.brand && product?.category_display_name && (
+                        <span className="text-xs text-muted-foreground">·</span>
+                      )}
+                      {product?.category_display_name && (
+                        <Typography variant="small" color="muted">
+                          {product.category_display_name}
+                        </Typography>
+                      )}
+                    </div>
                   )}
                 </div>
-              )}
+              </SheetTitle>
             </div>
           </div>
         </SheetHeader>
 
         {/* Scrollable content */}
-        <div className="flex-1 overflow-y-auto flex flex-col divide-y divide-border">
+        <div className="flex-1 overflow-y-auto flex flex-col divide-y divide-border/20 pb-[50vh] scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent">
           {!isReady ? (
             <div className="px-6 py-6 flex flex-col gap-4">
               <Skeleton className="h-24 w-full rounded-3xl" />
@@ -124,7 +129,7 @@ export function ProductDetailPanel({
             <>
               {/* Batches section */}
               {sortedBatches.length > 0 && (
-                <div className="px-6 py-5">
+                <div className="">
                   <div className="select-none">
                     <BatchList
                       batches={sortedBatches}
@@ -143,7 +148,7 @@ export function ProductDetailPanel({
                   <Typography
                     variant="extraSmall"
                     color="muted"
-                    className="uppercase tracking-wider font-semibold mb-4"
+                    className="uppercase italic tracking-wider mb-4"
                   >
                     Coverage
                   </Typography>
@@ -163,10 +168,11 @@ export function ProductDetailPanel({
                 <Typography
                   variant="extraSmall"
                   color="muted"
-                  className="uppercase tracking-wider font-semibold mb-4"
+                  className="uppercase italic tracking-wider mb-4"
                 >
                   Automation
                 </Typography>
+
                 <ExpiryAutomationSection
                   productId={productId}
                   productName={productName}
@@ -189,7 +195,21 @@ function getInitials(name: string): string {
   return (words[0][0] + words[1][0]).toUpperCase()
 }
 
-function ProductMonogram({ name }: { name: string }) {
+function ProductMonogram({ name, imageUrl }: { name: string; imageUrl?: string | null }) {
+  if (imageUrl) {
+    return (
+      <div className="size-9 rounded-lg overflow-hidden shrink-0 bg-primary/10">
+        <Image
+          src={imageUrl}
+          alt={name}
+          width={36}
+          height={36}
+          className="object-cover w-full h-full"
+        />
+      </div>
+    )
+  }
+
   const initials = getInitials(name)
   return (
     <Typography

@@ -44,8 +44,8 @@ export function AutoTrackingBanner() {
     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 rounded-xl border border-border bg-card p-5 shadow-sm relative">
       <div className="flex items-center gap-4">
         {/* Icon */}
-        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10">
-          <Zap className="h-6 w-6 text-yellow-500" />
+        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-lime-300/10">
+          <Zap className="h-6 w-6 text-lime-500" />
         </div>
         <div className="flex-1 min-w-0">
           <Typography variant="h4" className="mb-0.5">
@@ -59,7 +59,12 @@ export function AutoTrackingBanner() {
       </div>
 
       <div className="flex shrink-0 items-center gap-2">
-        <Button className="w-full md:w-auto" asLink href="/dashboard/settings/automations">
+        <Button
+          className="w-full md:w-auto "
+          variant="lime"
+          asLink
+          href="/dashboard/settings/automations"
+        >
           Set up now
         </Button>
         <Button

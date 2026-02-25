@@ -76,10 +76,11 @@ export function BatchList({
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="divide-y divide-border/20">
       {soonBatches.length > 0 && (
         <BatchGroup
-          label="expiring soon batches (within 3 days)"
+          color="destructive"
+          label="expiring soon (3 days or less)"
           batches={soonBatches}
           batchRowProps={batchRowProps}
         />
@@ -87,7 +88,8 @@ export function BatchList({
 
       {upcomingBatches.length > 0 && (
         <BatchGroup
-          label="fresh batches (+3 days from today)"
+          color="lime"
+          label="expiring later"
           batches={upcomingBatches}
           batchRowProps={batchRowProps}
         />
@@ -95,7 +97,8 @@ export function BatchList({
 
       {expiredBatches.length > 0 && (
         <BatchGroup
-          label="expired batches"
+          color="muted"
+          label="expired"
           batches={expiredBatches}
           batchRowProps={batchRowProps}
         />
@@ -106,22 +109,33 @@ export function BatchList({
 
 interface BatchGroupProps {
   label: string
+  color?: 'destructive' | 'lime' | 'muted'
   batches: BatchWithProduct[]
   batchRowProps: (batch: BatchWithProduct) => Omit<React.ComponentProps<typeof BatchRow>, never>
 }
+// const colorMap: Record<'destructive' | 'lime' | 'muted', { text: string; bg: string }> = {
+//   destructive: {
+//     text: 'text-destructive',
+//     bg: 'bg-destructive/10',
+//   },
+//   lime: {
+//     text: 'text-foreground',
+//     bg: 'bg-lime-500/10',
+//   },
+//   muted: {
+//     text: 'text-muted-foreground',
+//     bg: 'bg-muted-foreground/10',
+//   },
+// }
 
 function BatchGroup({ label, batches, batchRowProps }: BatchGroupProps) {
   return (
-    <div className="flex flex-col gap-2">
-      <Typography
-        variant="extraSmall"
-        color="muted"
-        className="uppercase tracking-wider font-semibold"
-      >
+    <div className="flex flex-col gap-4 px-6 py-5">
+      <Typography variant="extraSmall" color="muted" className="uppercase italic tracking-wider">
         {label}
       </Typography>
 
-      <div className="flex flex-col">
+      <div className="flex flex-col gap-4">
         {batches.map(batch => (
           <BatchRow key={batch.batch_id} {...batchRowProps(batch)} />
         ))}

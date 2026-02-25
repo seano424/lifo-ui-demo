@@ -1,6 +1,7 @@
 'use client'
 
 import type { ColumnDef } from '@tanstack/react-table'
+import Image from 'next/image'
 import type { useTranslations } from 'next-intl'
 
 import { SortableHeader } from '@/components/products/sortable-header'
@@ -89,8 +90,21 @@ export function createProductTableColumns({
         </SortableHeader>
       ),
       cell: ({ row }) => (
-        <div className="truncate font-medium" title={row.original.name}>
-          {row.original.name}
+        <div className="flex items-center gap-2">
+          {row.original.image_url && (
+            <div className="size-9 rounded-lg overflow-hidden shrink-0">
+              <Image
+                src={row.original.image_url}
+                alt={row.original.name}
+                width={36}
+                height={36}
+                className="object-cover w-full h-full"
+              />
+            </div>
+          )}
+          <div className="truncate font-medium" title={row.original.name}>
+            {row.original.name}
+          </div>
         </div>
       ),
       size: 200,

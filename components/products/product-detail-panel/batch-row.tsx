@@ -82,33 +82,41 @@ export function BatchRow({
     onCancel()
   }
 
-  const isExpired = daysToExpiry != null && daysToExpiry <= 0
+  const isExpired = daysToExpiry != null && daysToExpiry < 0
 
   return (
     <>
-      <div className="group">
+      <div
+        onClick={isEditing ? onCancel : isExpired ? undefined : onStartEdit}
+        onKeyDown={e => e.key === 'Enter' && onStartEdit()}
+        className={cn(
+          'flex items-center gap-3 group',
+          // 'bg-muted rounded-lg py-2 px-3',
+          !isExpired && 'cursor-pointer',
+        )}
+      >
+        {/* Batch info */}
         <div
-          onClick={isEditing ? onCancel : isExpired ? undefined : onStartEdit}
-          onKeyDown={e => e.key === 'Enter' && onStartEdit()}
-          className={cn('flex items-center gap-3 py-3', !isExpired && 'cursor-pointer')}
+          className={cn(
+            'flex-1 min-w-0 flex flex-col items-baseline gap-1',
+            isExpired && 'opacity-50',
+          )}
         >
-          {/* Batch info */}
-          <div
-            className={cn(
-              'flex-1 min-w-0 flex-col items-baseline gap-2',
-              isExpired && 'opacity-50',
-            )}
-          >
-            <Typography variant="p">{batch.current_quantity || 0} units of stock</Typography>
-            <Typography variant="small" color="muted">
-              {formatDate(batch.expiry_date)}
-            </Typography>
-          </div>
+          <Typography variant="p">
+            {batch.current_quantity || 0} {daysToExpiry !== null && daysToExpiry < 0 && 'expired'}{' '}
+            {daysToExpiry !== null && daysToExpiry === 0 && 'expiring today'}{' '}
+            {daysToExpiry !== null && daysToExpiry === 1 && 'expiring tomorrow'}{' '}
+            {daysToExpiry !== null && daysToExpiry <= 3 && daysToExpiry > 1 && 'expiring soon'}{' '}
+            {daysToExpiry !== null && daysToExpiry > 3 && 'expiring later'}{' '}
+          </Typography>
+          <Typography variant="small" color="muted">
+            {formatDate(batch.expiry_date)}
+          </Typography>
+        </div>
 
-          {/* Status badge */}
-          <div className="flex items-center gap-2 shrink-0">
-            <DaysLeftLabel days={daysToExpiry} />
-          </div>
+        {/* Status badge */}
+        <div className="flex items-center gap-2 shrink-0">
+          <DaysLeftLabel days={daysToExpiry} />
         </div>
       </div>
 

@@ -18,9 +18,9 @@ export function NotificationCount({
   const baseClasses = 'flex items-center justify-center rounded text-xs text-white aspect-square'
 
   const variantClasses = {
-    sidebar: 'min-w-6 bg-secondary-900/10 text-foreground',
-    navbar: 'min-w-7 bg-secondary-900 dark:text-white px-1 shadow-lg rounded-full',
-    default: 'min-w-6 bg-secondary-900/10 text-foreground',
+    sidebar: 'min-w-6 bg-red-400 font-normal text-white rounded-full font-medium',
+    navbar: 'min-w-8 bg-red-400 font-normal text-white rounded-full font-medium text-sm',
+    default: 'min-w-6 bg-red-400 font-normal text-white rounded-full font-medium',
   }
 
   return (
