@@ -2,9 +2,20 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { ChevronDown } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { Button, buttonVariants } from '@/components/ui/button'
 import { Typography } from '@/components/ui/typography'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
 import {
   useCategoriesWithTrackingSettings,
   useProductsForTrackingSetup,
@@ -17,7 +28,17 @@ interface AddAutomationRulePanelProps {
   isOpen: boolean
   isSaving?: boolean
   onClose: () => void
-  onCreate: (rule: AutomationRule) => void
+  // Create callback (used when no rule exists for the current tab)
+  onCreate?: (rule: AutomationRule) => void
+  // Edit callbacks (used when a rule already exists for the current tab)
+  onSave?: (rule: AutomationRule, shelfLifeDays: number) => void
+  onDelete?: (rule: AutomationRule) => void
+  // Pass existing rules to enable contextual (product detail) mode.
+  // When provided (even as null), the type toggle is always enabled and the
+  // selector is locked — the panel handles create vs edit per tab automatically.
+  productRule?: AutomationRule | null
+  categoryRule?: AutomationRule | null
+  // Pre-fill helpers
   initialRuleType?: 'category' | 'product'
   initialSelectedKey?: string
   initialProductName?: string
@@ -29,6 +50,10 @@ export function AddAutomationRulePanel({
   isSaving = false,
   onClose,
   onCreate,
+  onSave,
+  onDelete,
+  productRule,
+  categoryRule,
   initialRuleType,
   initialSelectedKey,
   initialProductName,
@@ -42,6 +67,14 @@ export function AddAutomationRulePanel({
   const [draftDays, setDraftDays] = useState(14)
   const [productSearch, setProductSearch] = useState('')
   const [debouncedProductSearch, setDebouncedProductSearch] = useState('')
+
+  // When either productRule or categoryRule is explicitly provided (even as null),
+  // we're in contextual mode: type toggle is always enabled, selectors are locked.
+  const contextualMode = productRule !== undefined || categoryRule !== undefined
+
+  // The rule for the currently visible tab (null = no rule yet for this tab)
+  const currentTabRule = ruleType === 'product' ? (productRule ?? null) : (categoryRule ?? null)
+  const isCurrentTabEditing = contextualMode && !!currentTabRule
 
   // Debounce product search input
   useEffect(() => {
@@ -111,12 +144,24 @@ export function AddAutomationRulePanel({
 
   useEffect(() => {
     if (isOpen) {
-      if (initialRuleType) setRuleType(initialRuleType)
-      if (initialSelectedKey) setSelectedKey(initialSelectedKey)
+      const startType = initialRuleType ?? 'category'
+      setRuleType(startType)
+
+      // Lock selectedKey to the appropriate context ID for each tab
+      const startKey =
+        startType === 'category'
+          ? (initialCategoryKey ?? initialSelectedKey ?? '')
+          : (initialSelectedKey ?? '')
+      setSelectedKey(startKey)
+
       if (initialProductName) {
         setProductSearch(initialProductName)
         setDebouncedProductSearch(initialProductName)
       }
+
+      // Seed shelf life from the rule for the starting tab (if it exists)
+      const startRule = startType === 'product' ? productRule : categoryRule
+      setDraftDays(startRule?.shelf_life_days ?? 14)
     } else {
       setRuleType('category')
       setSelectedKey('')
@@ -124,10 +169,20 @@ export function AddAutomationRulePanel({
       setProductSearch('')
       setDebouncedProductSearch('')
     }
-  }, [isOpen, initialRuleType, initialSelectedKey, initialProductName])
+  }, [
+    isOpen,
+    initialRuleType,
+    initialSelectedKey,
+    initialProductName,
+    initialCategoryKey,
+    productRule,
+    categoryRule,
+  ])
 
   const handleTypeChange = (type: 'category' | 'product') => {
     setRuleType(type)
+
+    // Restore the appropriate context key for the new tab
     if (type === 'category' && initialCategoryKey) {
       setSelectedKey(initialCategoryKey)
     } else if (type === 'product' && initialSelectedKey) {
@@ -135,11 +190,38 @@ export function AddAutomationRulePanel({
     } else {
       setSelectedKey('')
     }
+
+    // Update shelf life to match the new tab's existing rule (or reset to default)
+    const tabRule = type === 'product' ? productRule : categoryRule
+    setDraftDays(tabRule?.shelf_life_days ?? 14)
   }
 
   const canCreate = selectedKey !== '' && isAvailable
 
   const handleCreate = () => {
+    if (!onCreate) return
+    if (contextualMode) {
+      // In contextual mode the rule identity comes from the locked selection
+      if (ruleType === 'category' && selectedCategory) {
+        onCreate({
+          rule_id: selectedCategory.category_id,
+          name: selectedCategory.display_name_en,
+          type: 'category',
+          products_count: selectedCategory.product_count,
+          shelf_life_days: draftDays,
+        })
+      } else if (ruleType === 'product' && selectedProduct) {
+        onCreate({
+          rule_id: selectedProduct.product_id,
+          name: selectedProduct.name,
+          type: 'product',
+          products_count: 1,
+          shelf_life_days: draftDays,
+        })
+      }
+      return
+    }
+    // Standard create mode (automations page)
     if (!canCreate) return
     if (ruleType === 'category' && selectedCategory) {
       onCreate({
@@ -160,11 +242,22 @@ export function AddAutomationRulePanel({
     }
   }
 
+  const handleSave = () => {
+    if (!currentTabRule || !onSave) return
+    onSave(currentTabRule, draftDays)
+  }
+
+  // In contextual mode the selector is always locked — the product/category is
+  // determined by context. In standard mode it's only locked when editing.
+  const selectorDisabled = contextualMode
+
   return (
     <Sheet open={isOpen} onOpenChange={open => !open && onClose()}>
       <SheetContent side="right" className="flex flex-col gap-0 p-0 w-full sm:max-w-[500px]">
         <SheetHeader className="px-6 py-4 border-b border-border">
-          <SheetTitle className="text-xl font-bold">Create automation rule</SheetTitle>
+          <SheetTitle className="text-xl font-bold">
+            {isCurrentTabEditing ? 'Edit automation rule' : 'Create automation rule'}
+          </SheetTitle>
         </SheetHeader>
 
         {/* Scrollable content */}
@@ -208,11 +301,12 @@ export function AddAutomationRulePanel({
               <Typography variant="h5" className="font-semibold">
                 Category
               </Typography>
-              <div className="relative">
+              <div className={cn('relative', selectorDisabled && 'opacity-50')}>
                 <select
                   value={selectedKey}
                   onChange={e => setSelectedKey(e.target.value)}
-                  className="w-full appearance-none px-3 py-2 pr-8 border border-border rounded-lg text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  disabled={selectorDisabled}
+                  className="w-full appearance-none px-3 py-2 pr-8 border border-border rounded-lg text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 disabled:cursor-default"
                 >
                   <option value="">Select a category...</option>
                   {availableCategories.length > 0 && (
@@ -228,7 +322,11 @@ export function AddAutomationRulePanel({
                   {categoriesWithRules.length > 0 && (
                     <optgroup label="Already have rules">
                       {categoriesWithRules.map(c => (
-                        <option key={c.category_id} value={c.category_id} disabled>
+                        <option
+                          key={c.category_id}
+                          value={c.category_id}
+                          disabled={!selectorDisabled}
+                        >
                           {c.display_name_en} ✓
                         </option>
                       ))}
@@ -237,9 +335,11 @@ export function AddAutomationRulePanel({
                 </select>
                 <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
               </div>
-              <Typography variant="small" color="muted">
-                Categories marked ✓ already have automation rules
-              </Typography>
+              {!selectorDisabled && (
+                <Typography variant="small" color="muted">
+                  Categories marked ✓ already have automation rules
+                </Typography>
+              )}
             </div>
           )}
 
@@ -249,18 +349,21 @@ export function AddAutomationRulePanel({
               <Typography variant="h5" className="font-semibold">
                 Product
               </Typography>
-              <input
-                type="text"
-                placeholder="Search products..."
-                value={productSearch}
-                onChange={e => setProductSearch(e.target.value)}
-                className="w-full px-3 py-2 border border-border rounded-lg text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
-              />
-              <div className="relative">
+              {!selectorDisabled && (
+                <input
+                  type="text"
+                  placeholder="Search products..."
+                  value={productSearch}
+                  onChange={e => setProductSearch(e.target.value)}
+                  className="w-full px-3 py-2 border border-border rounded-lg text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                />
+              )}
+              <div className={cn('relative', selectorDisabled && 'opacity-50')}>
                 <select
                   value={selectedKey}
                   onChange={e => setSelectedKey(e.target.value)}
-                  className="w-full appearance-none px-3 py-2 pr-8 border border-border rounded-lg text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  disabled={selectorDisabled}
+                  className="w-full appearance-none px-3 py-2 pr-8 border border-border rounded-lg text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 disabled:cursor-default"
                 >
                   <option value="">Select a product...</option>
                   {availableProducts.length > 0 && (
@@ -276,7 +379,11 @@ export function AddAutomationRulePanel({
                   {productsWithRules.length > 0 && (
                     <optgroup label="Already have rules">
                       {productsWithRules.map(p => (
-                        <option key={p.product_id} value={p.product_id} disabled>
+                        <option
+                          key={p.product_id}
+                          value={p.product_id}
+                          disabled={!selectorDisabled}
+                        >
                           {p.name} ✓
                         </option>
                       ))}
@@ -285,9 +392,11 @@ export function AddAutomationRulePanel({
                 </select>
                 <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
               </div>
-              <Typography variant="small" color="muted">
-                Products marked ✓ already have automation rules
-              </Typography>
+              {!selectorDisabled && (
+                <Typography variant="small" color="muted">
+                  Products marked ✓ already have automation rules
+                </Typography>
+              )}
             </div>
           )}
 
@@ -310,7 +419,7 @@ export function AddAutomationRulePanel({
             </Typography>
           </div>
 
-          {/* Products covered — shown only for category rules once a category is selected */}
+          {/* Products covered — shown for category rules once a category is selected */}
           {ruleType === 'category' && selectedCategory && (
             <div className="flex flex-col gap-2">
               <Typography variant="h5" className="font-semibold">
@@ -350,15 +459,57 @@ export function AddAutomationRulePanel({
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="px-6 py-4 border-t border-border flex items-center justify-end gap-2">
-          <Button variant="outline" onClick={onClose} disabled={isSaving}>
-            Cancel
-          </Button>
-          <Button disabled={!canCreate || isSaving} onClick={handleCreate}>
-            {isSaving ? 'Creating…' : 'Create rule'}
-          </Button>
-        </div>
+        {/* Footer — edit mode when the current tab has an existing rule */}
+        {isCurrentTabEditing ? (
+          <div className="px-6 py-4 border-t border-border flex items-center justify-between">
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  variant="ghost"
+                  disabled={isSaving}
+                  className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                >
+                  Delete rule
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Delete rule?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    &ldquo;{currentTabRule?.name}&rdquo; will be removed. Products in this{' '}
+                    {currentTabRule?.type} will no longer have shelf life automatically assigned.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    className={buttonVariants({ variant: 'destructive' })}
+                    onClick={() => currentTabRule && onDelete?.(currentTabRule)}
+                  >
+                    Delete rule
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={onClose} disabled={isSaving}>
+                Cancel
+              </Button>
+              <Button disabled={isSaving} onClick={handleSave}>
+                {isSaving ? 'Saving…' : 'Save changes'}
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <div className="px-6 py-4 border-t border-border flex items-center justify-end gap-2">
+            <Button variant="outline" onClick={onClose} disabled={isSaving}>
+              Cancel
+            </Button>
+            <Button disabled={(!contextualMode && !canCreate) || isSaving} onClick={handleCreate}>
+              {isSaving ? 'Creating…' : 'Create rule'}
+            </Button>
+          </div>
+        )}
       </SheetContent>
     </Sheet>
   )

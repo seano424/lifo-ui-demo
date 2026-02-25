@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Typography } from '@/components/ui/typography'
-import { AutomationRulePanel } from '@/components/automations/automation-rule-panel'
 import { AddAutomationRulePanel } from '@/components/automations/add-automation-rule-panel'
 import { useAutomationRules } from '@/hooks/use-dashboard-redesign'
 import { useAutomationRuleMutations } from '@/hooks/use-automation-rule-mutations'
@@ -26,34 +25,27 @@ export function ExpiryAutomationSection({
   const { data: allRules = [] } = useAutomationRules()
   const { saveRule, deleteRule, createRule, isPending } = useAutomationRuleMutations()
 
-  const [editingRule, setEditingRule] = useState<AutomationRule | null>(null)
-  const [addingRuleType, setAddingRuleType] = useState<'product' | 'category' | null>(null)
+  const [panelOpen, setPanelOpen] = useState(false)
 
   const productRule = allRules.find(r => r.rule_id === productId && r.type === 'product') ?? null
   const categoryRule = allRules.find(r => r.rule_id === categoryId && r.type === 'category') ?? null
   const effectiveRule = productRule ?? categoryRule
 
+  const handleClose = () => setPanelOpen(false)
+
   const handleSave = async (rule: AutomationRule, shelfLifeDays: number) => {
     await saveRule(rule, shelfLifeDays)
-    setEditingRule(null)
+    handleClose()
   }
 
   const handleDelete = async (rule: AutomationRule) => {
     await deleteRule(rule)
-    setEditingRule(null)
+    handleClose()
   }
 
   const handleCreate = async (rule: AutomationRule) => {
     await createRule(rule)
-    setAddingRuleType(null)
-  }
-
-  const handleEdit = () => {
-    if (effectiveRule) {
-      setEditingRule(effectiveRule)
-    } else {
-      setAddingRuleType('product')
-    }
+    handleClose()
   }
 
   return (
@@ -78,29 +70,26 @@ export function ExpiryAutomationSection({
           variant="ghost"
           size="sm"
           className="text-muted-foreground hover:text-foreground shrink-0 h-auto py-0 px-1"
-          onClick={handleEdit}
+          onClick={() => setPanelOpen(true)}
         >
           {effectiveRule ? 'Edit' : '+ Add'}
         </Button>
       </div>
 
-      <AutomationRulePanel
-        rule={editingRule}
-        isOpen={editingRule !== null}
+      <AddAutomationRulePanel
+        isOpen={panelOpen}
         isSaving={isPending}
-        onClose={() => setEditingRule(null)}
+        onClose={handleClose}
+        onCreate={handleCreate}
         onSave={handleSave}
         onDelete={handleDelete}
-      />
-
-      <AddAutomationRulePanel
-        isOpen={addingRuleType !== null}
-        isSaving={isPending}
-        onClose={() => setAddingRuleType(null)}
-        onCreate={handleCreate}
-        initialRuleType={addingRuleType ?? 'category'}
-        initialSelectedKey={addingRuleType === 'product' ? productId : categoryId}
-        initialProductName={addingRuleType === 'product' ? productName : undefined}
+        // Pass both rules so the panel manages per-tab create/edit state
+        productRule={productRule}
+        categoryRule={categoryRule}
+        // Open on the effective rule's tab, falling back to product
+        initialRuleType={effectiveRule?.type ?? 'product'}
+        initialSelectedKey={productId}
+        initialProductName={productName}
         initialCategoryKey={categoryId}
       />
     </>
