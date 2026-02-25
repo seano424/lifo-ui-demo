@@ -39,7 +39,7 @@ const CompactThemeSwitcher = () => {
       <DropdownMenuTrigger asChild>
         <Button
           variant="outline"
-          className="rounded-full border aspect-square p-2.5 flex items-center justify-center"
+          className="rounded-full border size-10"
           size={'sm'}
           aria-label={t('title')}
         >

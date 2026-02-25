@@ -246,7 +246,7 @@
       "expiringTable": {
         "daysLeft": {
           "singular": "day left",
-          "plural": "days left"
+          "plural": "Days remaining"
         }
       }
     }

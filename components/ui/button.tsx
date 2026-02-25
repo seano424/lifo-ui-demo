@@ -19,6 +19,7 @@ const buttonVariants = cva(
         subtleDestructive: 'text-destructive hover:bg-destructive-100',
         outline: 'border border-input bg-background shadow-xs hover:border-muted',
         secondary: 'bg-secondary-900 shadow-xs hover:bg-secondary-800 text-white',
+        lime: 'bg-lime-200 hover:bg-lime-200/80 text-black dark:bg-lime-300 dark:hover:bg-lime-300/80',
         ghost:
           'hover:text-primary-800 dark:hover:bg-primary-900/0 dark:text-foreground font-normal w-fit',
         subtleTertiary:

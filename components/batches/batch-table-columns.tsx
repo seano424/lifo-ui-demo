@@ -86,7 +86,7 @@ function getDaysLeft(expiryDate: Date): number {
   return Math.ceil((expiry.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
 }
 
-// Helper function to get urgency styling for days left
+// Helper function to get urgency styling for Days remaining
 function getDaysLeftStyling(daysLeft: number): {
   textClass: string
   label: string

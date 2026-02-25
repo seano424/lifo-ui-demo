@@ -131,7 +131,7 @@
       "urgency": "Urgency"
     },
     "daysLeft": "{days, plural, =1 {1 day} other {# days}}",
-    "daysRemaining": "{days, plural, =1 {1 day remaining} other {# days remaining}}",
+    "daysRemaining": "{days, plural, =1 {1 day remaining} other {# Days remaining}}",
     "actionHistory": "Action History",
     "totalActions": "Total Actions",
     "actions": {

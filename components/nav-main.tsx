@@ -146,9 +146,9 @@ export function NavMain({
                         {item.items.map(subItem => (
                           <SidebarMenuSubItem
                             className={cn(
-                              'hover:bg-secondary-100/30 dark:hover:bg-primary-900 dark:active:bg-primary-900 rounded-2xl  pl-6 py-1',
+                              'pl-6 py-1 hover:text-primary-900',
                               isPathActive(subItem.url) &&
-                                'bg-secondary-100/30 hover:bg-secondary-100/30 dark:hover:bg-primary-900 dark:bg-background dark:active:bg-primary-900 text-secondary-900 ',
+                                'text-primary-900 hover:text-primary-900',
                               'group-data-[collapsible=icon]:pl-0 group-data-[collapsible=icon]:py-0',
                             )}
                             key={subItem.title}
@@ -156,7 +156,7 @@ export function NavMain({
                             <SidebarMenuSubButton asChild tooltip={subItem.title}>
                               <Link href={subItem.url} onClick={handleLinkClick}>
                                 {subItem.icon && (
-                                  <subItem.icon className="text-secondary-900 dark:text-primary-50" />
+                                  <subItem.icon className="text-primary-900 dark:text-primary-50" />
                                 )}
                                 <span>{subItem.title}</span>
                                 {subItem.badge && <NavBadge count={subItem.badge} />}
@@ -172,9 +172,8 @@ export function NavMain({
                 <SidebarMenuItem className="flex flex-col items-center gap-2" key={item.title}>
                   <SidebarMenuButton
                     className={cn(
-                      'hover:bg-secondary-100/30 rounded-lg dark:hover:bg-secondary-900/5 dark:data-[active=true]:bg-primary-900/10 py-2 px-2 relative opacity-90',
-                      isPathActive(item.url) &&
-                        'bg-secondary-100/30 hover:bg-secondary-100/30 dark:hover:bg-secondary-900/5 dark:text-brand-white dark:bg-secondary-900/5 font-medium opacity-100',
+                      'py-2 px-2 relative hover:text-primary-900',
+                      isPathActive(item.url) && 'text-primary-900 hover:text-primary-900',
                     )}
                     asChild
                     tooltip={item.title}
@@ -185,7 +184,7 @@ export function NavMain({
                       onClick={handleLinkClick}
                     >
                       {item.icon && (
-                        <item.icon className="text-secondary-900 dark:text-primary-50" />
+                        <item.icon className={cn(isPathActive(item.url) && 'text-primary-900')} />
                       )}
                       <span>{item.title}</span>
                       {item.badge && <NavBadge count={item.badge} />}

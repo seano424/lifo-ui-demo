@@ -137,7 +137,7 @@
         "product": "Product",
         "supplier": "Supplier",
         "expiryDate": "Expiry Date",
-        "daysLeft": "Days Left",
+        "daysLeft": "Days remaining",
         "quantity": "Quantity",
         "stock": "Stock",
         "costPrice": "Cost Price",
