@@ -1,6 +1,5 @@
 {
   "dashboard": {
-    "automations": "Automatiseringen",
     "newDeliveries": {
       "title": "Nieuwe Leveringen",
       "description": "Voeg nieuwe items toe aan uw voorraad",
@@ -686,7 +685,13 @@
             }
           },
           "backButton": "Terug",
-          "nextButton": "Volgende"
+          "nextButton": "Volgende",
+          "tooltip": {
+            "autoTrackTitle": "⚡ Automatisch bijhouden",
+            "autoTrackDescription": "We berekenen vervaldatums op basis van de leveringsdatum + houdbaarheid. Niets in te voeren bij levering.",
+            "manualEntryTitle": "✋ Handmatige invoer",
+            "manualEntryDescription": "U scant of voert de vervaldatum in wanneer de levering arriveert."
+          }
         },
         "howToTrack": {
           "title": "Hoe moeten we vervaldatums bijhouden?",

@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { useMemo, useState } from 'react'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -88,7 +89,7 @@ export function ProductDetailPanel({
       <SheetContent side="right" className="flex flex-col gap-0 p-0 w-full sm:max-w-[500px]">
         <SheetHeader className="px-6 py-4 border-b border-border">
           <div className="flex items-center gap-3">
-            <ProductMonogram name={productName} />
+            <ProductMonogram name={productName} imageUrl={product?.image_url} />
             <div className="flex-1 min-w-0">
               <SheetTitle className="text-lg font-semibold text-left">{productName}</SheetTitle>
               {(product?.brand || product?.category_display_name) && (
@@ -189,7 +190,21 @@ function getInitials(name: string): string {
   return (words[0][0] + words[1][0]).toUpperCase()
 }
 
-function ProductMonogram({ name }: { name: string }) {
+function ProductMonogram({ name, imageUrl }: { name: string; imageUrl?: string | null }) {
+  if (imageUrl) {
+    return (
+      <div className="size-9 rounded-lg overflow-hidden shrink-0 bg-primary/10">
+        <Image
+          src={imageUrl}
+          alt={name}
+          width={36}
+          height={36}
+          className="object-cover w-full h-full"
+        />
+      </div>
+    )
+  }
+
   const initials = getInitials(name)
   return (
     <Typography

@@ -1,6 +1,7 @@
 'use client'
 
 import type { ColumnDef } from '@tanstack/react-table'
+import Image from 'next/image'
 import { SortableHeader } from '@/components/batches/sortable-header'
 import type { BatchSort, BatchSortField, BatchWithProduct } from '@/lib/queries/batches'
 import { parseISODateAsLocal } from '@/lib/utils/date-conversion'
@@ -160,16 +161,21 @@ export function createBatchTableColumns({
         </SortableHeader>
       ),
       cell: ({ row }) => (
-        <div className={alignments.product_name.cellClass}>
+        <div className={`flex items-center gap-2 ${alignments.product_name.cellClass}`}>
+          {row.original.products?.image_url && (
+            <div className="size-9 rounded-lg overflow-hidden shrink-0">
+              <Image
+                src={row.original.products.image_url}
+                alt={row.original.products?.name ?? ''}
+                width={36}
+                height={36}
+                className="object-cover w-full h-full"
+              />
+            </div>
+          )}
           <div className="truncate font-medium" title={row.original.products?.name}>
             {row.original.products?.name}
           </div>
-          {/* <div
-            className="text-sm text-muted-foreground truncate"
-            title={row.original.products?.sku}
-          >
-            {row.original.products?.sku}
-          </div> */}
         </div>
       ),
       size: BATCH_TABLE_COLUMN_CONFIG[0].width,

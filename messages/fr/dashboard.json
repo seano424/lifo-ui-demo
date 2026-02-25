@@ -685,7 +685,13 @@
             }
           },
           "backButton": "Retour",
-          "nextButton": "Suivant"
+          "nextButton": "Suivant",
+          "tooltip": {
+            "autoTrackTitle": "⚡ Suivi automatique",
+            "autoTrackDescription": "Nous calculons les dates d'expiration en fonction de la date de livraison + la durée de conservation. Rien à saisir à la livraison.",
+            "manualEntryTitle": "✋ Saisie manuelle",
+            "manualEntryDescription": "Vous scannerez ou saisirez la date d'expiration à la livraison."
+          }
         },
         "howToTrack": {
           "title": "Comment devons-nous suivre les dates d'expiration ?",

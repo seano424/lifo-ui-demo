@@ -20,7 +20,7 @@ export function NotificationBellExpiry() {
       </Button>
 
       {expiryTodosCount > 0 && (
-        <div className="absolute top-0.5 right-0.5 z-20 pointer-events-none size-2 bg-red-400 rounded-full aspect-square" />
+        <div className="absolute top-0 right-0 z-20 pointer-events-none size-3 bg-red-400 rounded-full aspect-square" />
       )}
     </div>
   )

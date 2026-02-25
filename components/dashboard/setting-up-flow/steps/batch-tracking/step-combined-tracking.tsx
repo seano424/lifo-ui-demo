@@ -129,13 +129,10 @@ export function StepCombinedTracking({
               </button>
             </TooltipTrigger>
             <TooltipContent className="max-w-xs">
-              <p className="font-semibold mb-1">⚡ Auto-track</p>
-              <p className="mb-2">
-                We calculate expiry dates based on delivery date + shelf life. Nothing to enter on
-                delivery.
-              </p>
-              <p className="font-semibold mb-1">✋ Manual entry</p>
-              <p>You'll scan or enter the expiry date when the delivery arrives.</p>
+              <p className="font-semibold mb-1">{t('whatToTrack.tooltip.autoTrackTitle')}</p>
+              <p className="mb-2">{t('whatToTrack.tooltip.autoTrackDescription')}</p>
+              <p className="font-semibold mb-1">{t('whatToTrack.tooltip.manualEntryTitle')}</p>
+              <p>{t('whatToTrack.tooltip.manualEntryDescription')}</p>
             </TooltipContent>
           </Tooltip>
         </div>

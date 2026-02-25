@@ -685,7 +685,13 @@
             }
           },
           "backButton": "Back",
-          "nextButton": "Next"
+          "nextButton": "Next",
+          "tooltip": {
+            "autoTrackTitle": "⚡ Auto-track",
+            "autoTrackDescription": "We calculate expiry dates based on delivery date + shelf life. Nothing to enter on delivery.",
+            "manualEntryTitle": "✋ Manual entry",
+            "manualEntryDescription": "You'll scan or enter the expiry date when the delivery arrives."
+          }
         },
         "howToTrack": {
           "title": "How should we track expiration dates?",
