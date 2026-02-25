@@ -172,8 +172,9 @@ export function NavMain({
                 <SidebarMenuItem className="flex flex-col items-center gap-2" key={item.title}>
                   <SidebarMenuButton
                     className={cn(
-                      'py-2 px-2 relative hover:text-primary-900',
-                      isPathActive(item.url) && 'text-primary-900 hover:text-primary-900',
+                      'py-2 px-2 relative hover:text-primary-900 hover:bg-muted',
+                      isPathActive(item.url) &&
+                        'text-primary-900 hover:text-primary-900 hover:bg-primary-200/10',
                     )}
                     asChild
                     tooltip={item.title}

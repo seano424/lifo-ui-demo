@@ -110,13 +110,11 @@ export function UntrackedAlert({
   }
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-3 px-1">
       {/* Main row: headline + Add dates button */}
       <div className="flex items-start justify-between gap-3">
         <div className="flex flex-col gap-0.5">
-          <Typography variant="p" className="font-semibold">
-            {count} units missing expiry dates
-          </Typography>
+          <Typography variant="p">{count} units missing expiry dates</Typography>
           <Typography variant="small" color="muted">
             Cannot be tracked until dates are added
           </Typography>
