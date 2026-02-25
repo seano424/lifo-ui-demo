@@ -23,10 +23,6 @@ export function getUrgencyTier(batch: BatchWithProduct): UrgencyTier {
   return 'upcoming'
 }
 
-function groupQty(batches: BatchWithProduct[]) {
-  return batches.reduce((sum, b) => sum + (b.current_quantity || 0), 0)
-}
-
 export function BatchList({
   batches,
   storeQuantity,
@@ -58,9 +54,10 @@ export function BatchList({
 
   const soonBatches = batches.filter(b => getUrgencyTier(b) === 'soon')
   const expiredBatches = batches.filter(b => getUrgencyTier(b) === 'expired')
-  const upcomingBatches = batches.filter(
-    b => getUrgencyTier(b) === 'upcoming' || getUrgencyTier(b) === 'no-date',
-  )
+  const upcomingBatches = batches.filter(b => {
+    const tier = getUrgencyTier(b)
+    return tier === 'upcoming' || tier === 'no-date'
+  })
 
   const batchRowProps = (batch: BatchWithProduct) => {
     const maxQuantity =
@@ -83,8 +80,6 @@ export function BatchList({
       {soonBatches.length > 0 && (
         <BatchGroup
           label="expiring soon batches (within 3 days)"
-          descriptor="within 3 days"
-          totalQty={groupQty(soonBatches)}
           batches={soonBatches}
           batchRowProps={batchRowProps}
         />
@@ -93,8 +88,6 @@ export function BatchList({
       {upcomingBatches.length > 0 && (
         <BatchGroup
           label="fresh batches (+3 days from today)"
-          descriptor={`${upcomingBatches.length} batch${upcomingBatches.length !== 1 ? 'es' : ''}`}
-          totalQty={groupQty(upcomingBatches)}
           batches={upcomingBatches}
           batchRowProps={batchRowProps}
         />
@@ -103,8 +96,6 @@ export function BatchList({
       {expiredBatches.length > 0 && (
         <BatchGroup
           label="expired batches"
-          descriptor={`${expiredBatches.length} batch${expiredBatches.length !== 1 ? 'es' : ''}`}
-          totalQty={groupQty(expiredBatches)}
           batches={expiredBatches}
           batchRowProps={batchRowProps}
         />
@@ -115,8 +106,6 @@ export function BatchList({
 
 interface BatchGroupProps {
   label: string
-  descriptor: string
-  totalQty: number
   batches: BatchWithProduct[]
   batchRowProps: (batch: BatchWithProduct) => Omit<React.ComponentProps<typeof BatchRow>, never>
 }
@@ -124,9 +113,6 @@ interface BatchGroupProps {
 function BatchGroup({ label, batches, batchRowProps }: BatchGroupProps) {
   return (
     <div className="flex flex-col gap-2">
-      {/* <Typography variant="h5" className="capitalize">
-        {label}
-      </Typography> */}
       <Typography
         variant="extraSmall"
         color="muted"

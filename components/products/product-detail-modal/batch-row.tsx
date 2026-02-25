@@ -19,7 +19,6 @@ export function BatchRow({
   onStartEdit,
   onSave,
   onCancel,
-  // currencySymbol,
   onDelete,
 }: BatchRowProps) {
   const [editedDate, setEditedDate] = useState(batch.expiry_date || '')
@@ -47,8 +46,6 @@ export function BatchRow({
       year: 'numeric',
     })
   }
-
-  // const formatCurrency = (value: number) => `${currencySymbol}${value.toFixed(2)}`
 
   const handleSave = () => {
     const updates: { expiry_date?: string; current_quantity?: number } = {}
@@ -91,7 +88,7 @@ export function BatchRow({
     <>
       <div className="group">
         <div
-          onClick={isEditing ? onCancel : onStartEdit}
+          onClick={isEditing ? onCancel : isExpired ? undefined : onStartEdit}
           onKeyDown={e => e.key === 'Enter' && onStartEdit()}
           className={cn('flex items-center gap-3 py-3', !isExpired && 'cursor-pointer')}
         >
@@ -108,14 +105,9 @@ export function BatchRow({
             </Typography>
           </div>
 
-          {/* Status + hover-only edit hint */}
+          {/* Status badge */}
           <div className="flex items-center gap-2 shrink-0">
             <DaysLeftLabel days={daysToExpiry} />
-            {/* {daysToExpiry != null && daysToExpiry > 0 && (
-              <span className="opacity-0 group-hover:opacity-100 text-xs text-muted-foreground transition-opacity">
-                Edit
-              </span>
-            )} */}
           </div>
         </div>
       </div>
@@ -219,7 +211,7 @@ function DaysLeftLabel({ days }: { days: number | null }) {
 
   if (days === 0) {
     return (
-      <Badge size="sm" variant={'muted'}>
+      <Badge size="sm" variant={'danger'}>
         Today
       </Badge>
     )

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { ChevronDown } from 'lucide-react'
 import { Button, buttonVariants } from '@/components/ui/button'
 import { Typography } from '@/components/ui/typography'
@@ -67,6 +67,7 @@ export function AddAutomationRulePanel({
   const [draftDays, setDraftDays] = useState(14)
   const [productSearch, setProductSearch] = useState('')
   const [debouncedProductSearch, setDebouncedProductSearch] = useState('')
+  const initDoneRef = useRef(false)
 
   // When either productRule or categoryRule is explicitly provided (even as null),
   // we're in contextual mode: type toggle is always enabled, selectors are locked.
@@ -143,7 +144,9 @@ export function AddAutomationRulePanel({
   }, [draftDays])
 
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && !initDoneRef.current) {
+      initDoneRef.current = true
+
       const startType = initialRuleType ?? 'category'
       setRuleType(startType)
 
@@ -162,7 +165,10 @@ export function AddAutomationRulePanel({
       // Seed shelf life from the rule for the starting tab (if it exists)
       const startRule = startType === 'product' ? productRule : categoryRule
       setDraftDays(startRule?.shelf_life_days ?? 14)
-    } else {
+    }
+
+    if (!isOpen) {
+      initDoneRef.current = false
       setRuleType('category')
       setSelectedKey('')
       setDraftDays(14)

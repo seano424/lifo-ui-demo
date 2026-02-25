@@ -1,11 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Typography } from '@/components/ui/typography'
 import { useProductWithBatches } from '@/hooks/use-products'
-import { BatchList, getUrgencyTier } from './product-detail-modal/batch-list'
+import { BatchList } from './product-detail-modal/batch-list'
+import { parseISODateAsLocal } from '@/lib/utils/date-conversion'
 import { UntrackedAlert } from './product-detail-modal/untracked-alert'
 import { ExpiryAutomationSection } from './product-detail-modal/expiry-automation-section'
 
@@ -42,48 +43,43 @@ export function ProductDetailPanel({
   const storeQuantity = product?.store_quantity ?? 0
   const untrackedQty = Math.max(0, storeQuantity - totalTrackedQty)
 
-  const sortedBatches = [...(batches || [])].sort((a, b) => {
+  const sortedBatches = useMemo(() => {
     const today = new Date()
     today.setHours(0, 0, 0, 0)
 
-    const aNoDate = !a.expiry_date || a.status === 'draft'
-    const bNoDate = !b.expiry_date || b.status === 'draft'
+    return [...(batches || [])].sort((a, b) => {
+      const aNoDate = !a.expiry_date || a.status === 'draft'
+      const bNoDate = !b.expiry_date || b.status === 'draft'
 
-    if (aNoDate && bNoDate) return 0
+      if (aNoDate && bNoDate) return 0
 
-    if (aNoDate || bNoDate) {
-      const dateToCheck = aNoDate ? b.expiry_date : a.expiry_date
-      if (dateToCheck) {
-        const expiry = new Date(dateToCheck)
-        expiry.setHours(0, 0, 0, 0)
-        const isExpired = expiry < today
-        if (isExpired) return aNoDate ? -1 : 1
-        return aNoDate ? 1 : -1
+      if (aNoDate || bNoDate) {
+        const dateToCheck = aNoDate ? b.expiry_date : a.expiry_date
+        if (dateToCheck) {
+          const expiry = parseISODateAsLocal(dateToCheck)
+          expiry.setHours(0, 0, 0, 0)
+          const isExpired = expiry < today
+          if (isExpired) return aNoDate ? -1 : 1
+          return aNoDate ? 1 : -1
+        }
+        return 0
       }
-      return 0
-    }
 
-    const aExpiry = new Date(a.expiry_date || '')
-    const bExpiry = new Date(b.expiry_date || '')
-    aExpiry.setHours(0, 0, 0, 0)
-    bExpiry.setHours(0, 0, 0, 0)
+      const aExpiry = parseISODateAsLocal(a.expiry_date || '')
+      const bExpiry = parseISODateAsLocal(b.expiry_date || '')
+      aExpiry.setHours(0, 0, 0, 0)
+      bExpiry.setHours(0, 0, 0, 0)
 
-    const aExpired = aExpiry < today
-    const bExpired = bExpiry < today
+      const aExpired = aExpiry < today
+      const bExpired = bExpiry < today
 
-    if (aExpired && !bExpired) return 1
-    if (!aExpired && bExpired) return -1
+      if (aExpired && !bExpired) return 1
+      if (!aExpired && bExpired) return -1
 
-    if (aExpired && bExpired) return bExpiry.getTime() - aExpiry.getTime()
-    return aExpiry.getTime() - bExpiry.getTime()
-  })
-
-  const hasUrgentBatches =
-    isReady &&
-    sortedBatches.some(b => {
-      const tier = getUrgencyTier(b)
-      return tier === 'expired' || tier === 'soon'
+      if (aExpired && bExpired) return bExpiry.getTime() - aExpiry.getTime()
+      return aExpiry.getTime() - bExpiry.getTime()
     })
+  }, [batches])
 
   const productName = product?.name || 'Product Details'
 
@@ -126,27 +122,9 @@ export function ProductDetailPanel({
             </div>
           ) : (
             <>
-              {/* ACTION REQUIRED section */}
-              {(hasUrgentBatches || (!hasUrgentBatches && sortedBatches.length > 0)) && (
+              {/* Batches section */}
+              {sortedBatches.length > 0 && (
                 <div className="px-6 py-5">
-                  {/* <div className="flex items-center justify-between mb-4">
-                    <Typography
-                      variant="extraSmall"
-                      color="muted"
-                      className="uppercase tracking-wider font-semibold"
-                    >
-                      {hasUrgentBatches ? 'Action Required' : 'Batches'}
-                    </Typography>
-                    {hasUpcomingBatches && (
-                      <button
-                        type="button"
-                        onClick={() => setShowAllBatches(v => !v)}
-                        className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                      >
-                        {showAllBatches ? 'Show less' : 'View all'}
-                      </button>
-                    )}
-                  </div> */}
                   <div className="select-none">
                     <BatchList
                       batches={sortedBatches}

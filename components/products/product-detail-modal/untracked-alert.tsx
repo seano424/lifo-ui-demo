@@ -28,7 +28,7 @@ export function UntrackedAlert({
   const [showForm, setShowForm] = useState(autoExpand)
   const [rows, setRows] = useState<BatchRow[]>([{ id: 1, date: '', qty: '' }])
   const firstInputRef = useRef<HTMLInputElement>(null)
-  const { createBatch } = useBatchActions()
+  const { isCreating, createMutation } = useBatchActions()
 
   useEffect(() => {
     if (showForm && firstInputRef.current) {
@@ -68,29 +68,35 @@ export function UntrackedAlert({
         toast.error('Expiry date must be today or in the future')
         return
       }
-      if (quantity <= 0 || quantity > count) {
-        toast.error(`Quantity must be between 1 and ${count}`)
+      if (quantity <= 0) {
+        toast.error('Quantity must be at least 1')
         return
       }
     }
 
-    try {
-      for (const { date, quantity } of rowsToCreate) {
-        const batchNumber = `BATCH-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`
-        createBatch({
-          product_id: productId,
-          batch_number: batchNumber,
-          expiry_date: date,
-          initial_quantity: quantity,
-          current_quantity: quantity,
-          cost_price: costPrice ?? sellingPrice ?? undefined,
-          selling_price: sellingPrice ?? costPrice ?? undefined,
-          status: 'active',
-          store_id: '',
-        } as Parameters<typeof createBatch>[0])
-      }
+    const totalQty = rowsToCreate.reduce((s, r) => s + r.quantity, 0)
+    if (totalQty > count) {
+      toast.error(`Total quantity (${totalQty}) exceeds untracked units (${count})`)
+      return
+    }
 
-      const totalQty = rowsToCreate.reduce((s, r) => s + r.quantity, 0)
+    try {
+      await Promise.all(
+        rowsToCreate.map(({ date, quantity }) =>
+          createMutation.mutateAsync({
+            product_id: productId,
+            batch_number: `BATCH-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
+            expiry_date: date,
+            initial_quantity: quantity,
+            current_quantity: quantity,
+            cost_price: (costPrice ?? sellingPrice) as number,
+            selling_price: (sellingPrice ?? costPrice) as number,
+            status: 'active',
+            store_id: '',
+          }),
+        ),
+      )
+
       toast.success(
         rowsToCreate.length === 1
           ? `Batch created with ${totalQty} units`
@@ -211,7 +217,7 @@ export function UntrackedAlert({
                 variant="subtleTertiary"
                 className="rounded-lg"
                 onClick={handleSubmit}
-                // disabled={!hasAnyDate || isCreating}
+                disabled={!hasAnyDate || isCreating}
                 size="xs"
               >
                 Add batch

@@ -457,10 +457,12 @@ export function useBatchActions() {
   const deleteMutation = useMutation({
     mutationFn: ({ batchId }: { batchId: string; productId: string }) => deleteBatch(batchId),
 
-    onMutate: async ({ batchId }) => {
+    onMutate: async ({ batchId, productId }) => {
       await queryClient.cancelQueries({
         queryKey: queryKeys.batches.detail(batchId),
       })
+
+      const previousBatch = queryClient.getQueryData(queryKeys.batches.detail(batchId))
 
       queryClient.removeQueries({ queryKey: queryKeys.batches.detail(batchId) })
 
@@ -485,9 +487,17 @@ export function useBatchActions() {
           },
         )
       }
+
+      return { previousBatch, batchId, productId }
     },
 
-    onError: err => {
+    onError: (err, _vars, context) => {
+      if (context?.previousBatch) {
+        queryClient.setQueryData(queryKeys.batches.detail(context.batchId), context.previousBatch)
+      }
+      if (activeStoreId) {
+        queryClient.invalidateQueries({ queryKey: queryKeys.batches.byStore(activeStoreId) })
+      }
       console.error('Failed to delete batch:', err)
       toast.error('Failed to delete batch')
     },
