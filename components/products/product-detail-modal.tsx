@@ -136,6 +136,7 @@ export function ProductDetailModal({
                 <UntrackedAlert
                   count={untrackedQty}
                   productId={productId}
+                  storeQuantity={product?.store_quantity ?? 0}
                   autoExpand={focusAddDate}
                   costPrice={product?.store_cost_price}
                   sellingPrice={product?.store_selling_price}

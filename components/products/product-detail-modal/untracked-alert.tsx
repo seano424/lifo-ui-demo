@@ -6,7 +6,8 @@ import { Input } from '@/components/ui/input'
 import type { UntrackedAlertProps } from './types'
 import { useBatchActions } from '@/hooks/use-batches'
 import { useState, useEffect, useRef } from 'react'
-import { AlertCircle, ChevronRight, Plus, Minus, Check, AlertTriangle } from 'lucide-react'
+import { AlertTriangle } from 'lucide-react'
+import { Label } from '@/components/ui/label'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 
@@ -19,40 +20,36 @@ interface BatchRow {
 export function UntrackedAlert({
   count,
   productId,
+  storeQuantity,
   autoExpand = false,
   costPrice,
   sellingPrice,
 }: UntrackedAlertProps) {
-  const [expanded, setExpanded] = useState(autoExpand)
+  const [showForm, setShowForm] = useState(autoExpand)
   const [rows, setRows] = useState<BatchRow[]>([{ id: 1, date: '', qty: '' }])
   const firstInputRef = useRef<HTMLInputElement>(null)
   const { createBatch, isCreating } = useBatchActions()
 
   useEffect(() => {
-    if (expanded && firstInputRef.current) {
+    if (showForm && firstInputRef.current) {
       firstInputRef.current.focus()
     }
-  }, [expanded])
+  }, [showForm])
 
   if (count <= 0) return null
 
   const today = new Date().toISOString().split('T')[0]
 
-  const totalAssigned = rows.reduce((sum, r) => sum + (parseInt(r.qty) || 0), 0)
+  const trackedQty = storeQuantity - count
+  const progressPct = storeQuantity > 0 ? Math.round((trackedQty / storeQuantity) * 100) : 0
+
+  const totalAssigned = rows.reduce((sum, r) => sum + (parseInt(r.qty, 10) || 0), 0)
   const remaining = count - totalAssigned
   const hasAnyDate = rows.some(r => r.date)
   const datedRows = rows.filter(r => r.date)
 
-  const addRow = () => {
-    setRows(prev => [...prev, { id: Date.now(), date: '', qty: '' }])
-  }
-
   const updateRow = (id: number, field: 'date' | 'qty', value: string) => {
     setRows(prev => prev.map(r => (r.id === id ? { ...r, [field]: value } : r)))
-  }
-
-  const removeRow = (id: number) => {
-    if (rows.length > 1) setRows(prev => prev.filter(r => r.id !== id))
   }
 
   const handleSubmit = async () => {
@@ -79,7 +76,7 @@ export function UntrackedAlert({
 
     try {
       for (const { date, quantity } of rowsToCreate) {
-        const batchNumber = `BATCH-${Date.now()}-${Math.random().toString(36).substring(7).t()}`
+        const batchNumber = `BATCH-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`
         createBatch({
           product_id: productId,
           batch_number: batchNumber,
@@ -100,187 +97,131 @@ export function UntrackedAlert({
           : `${rowsToCreate.length} batches created (${totalQty} units)`,
       )
       setRows([{ id: 1, date: '', qty: '' }])
+      setShowForm(false)
     } catch {
       toast.error('Failed to create batch')
     }
   }
 
   return (
-    <div className="space-y-3">
-      {/* Collapsed pill banner */}
-      {!expanded && (
-        <button type="button" onClick={() => setExpanded(true)} className="w-full group">
-          <div className="flex items-center gap-3.5 px-4 py-3.5 rounded-3xl bg-background border border-primary-300 hover:border-primary-200 hover:shadow-sm transition-all duration-200">
-            {/* Text */}
-            <div className="flex-1 text-left">
-              <div className="flex items-center gap-2">
-                {/* <div className="size-9 rounded-full bg-primary flex items-center justify-center shrink-0">
-                  <Typography variant="extraSmall" color="white" className="font-bold"></Typography>
-                </div> */}
-                <Typography variant="h5" className="font-semibold">
-                  {count} units need expiry dates
-                </Typography>
-              </div>
-            </div>
+    <div className="flex flex-col gap-3">
+      {/* Main row: headline + Add dates button */}
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex flex-col gap-0.5">
+          <Typography variant="p" className="font-semibold">
+            {count} units missing expiry dates
+          </Typography>
+          <Typography variant="small" color="muted">
+            Cannot be tracked until dates are added
+          </Typography>
+        </div>
+        <Button
+          variant="subtleGray"
+          size="xs"
+          className="shrink-0 rounded-lg"
+          onClick={() => setShowForm(v => !v)}
+        >
+          {showForm ? 'Close' : 'Add dates'}
+        </Button>
+      </div>
 
-            {/* Icon bubble */}
-            <div className="size-9 rounded-full bg-primary-500 flex items-center justify-center shrink-0">
-              <Plus className="size-5 text-white" />
-            </div>
-          </div>
-        </button>
-      )}
+      {/* Progress bar */}
+      <div className="flex flex-col gap-1.5">
+        <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+          <div
+            className="h-full rounded-full bg-lime-400/20 transition-all"
+            style={{ width: `${progressPct}%` }}
+          />
+        </div>
+        <div className="flex items-center justify-between">
+          <Typography variant="extraSmall" color="muted">
+            {trackedQty} of {storeQuantity} units tracked
+          </Typography>
+          <Typography variant="extraSmall" className="font-medium">
+            {progressPct}%
+          </Typography>
+        </div>
+      </div>
 
-      {/* Expanded card */}
-      {expanded && (
-        <div className="rounded-3xl bg-background border border-primary-300 overflow-hidden">
-          {/* Header — click to collapse */}
-          <button
-            type="button"
-            onClick={() => setExpanded(false)}
-            className="w-full flex items-center gap-3.5 px-4 py-3.5 transition-colors"
-          >
-            {/* Text */}
-            <div className="flex-1 text-left">
-              <div className="flex items-center gap-2">
-                {/* <div className="size-9 rounded-full bg-primary flex items-center justify-center shrink-0">
-                  <Typography variant="extraSmall" color="white" className="font-bold"></Typography>
-                </div> */}
-                <Typography variant="h5" className="font-semibold">
-                  {count} units need expiry dates
-                </Typography>
-              </div>
-            </div>
-
-            {/* Icon bubble */}
-            <div className="size-9 rounded-full bg-primary-500 flex items-center justify-center shrink-0">
-              <Plus className="size-5 text-white" />
-            </div>
-          </button>
-
-          {/* Form area */}
-          <div className="p-4 border-t border-primary-300">
-            {/* Column headers */}
-            <div className="flex items-center gap-3 mb-2 px-1">
-              <Typography variant="extraSmall" color="muted" className="flex-1">
-                Expiry date
-              </Typography>
-              <Typography variant="extraSmall" color="muted">
-                Quantity
-              </Typography>
-            </div>
-
-            {/* Batch rows */}
-            <div className="space-y-2">
-              {rows.map((row, idx) => (
-                <div
-                  key={row.id}
-                  className="flex items-center justify-between w-full rounded-lg gap-3"
-                >
-                  {/* Date input */}
+      {/* Expandable form */}
+      {showForm && (
+        <div className="flex flex-col gap-3 pt-2 border-t border-border">
+          {/* Batch rows */}
+          <div className="space-y-2">
+            {rows.map((row, idx) => (
+              <div key={row.id} className="grid grid-cols-2 gap-2">
+                <div className="flex flex-col gap-1">
+                  <Label className="text-sm text-foreground">Expiry date</Label>
                   <Input
                     ref={idx === 0 ? firstInputRef : undefined}
                     type="date"
                     value={row.date}
                     min={today}
-                    size="sm"
                     onChange={e => updateRow(row.id, 'date', e.target.value)}
-                    className="flex-1 rounded-lg select-none border border-primary-100/60"
+                    className="w-full"
                   />
-                  <div>
-                    {/* Quantity input */}
-                    <Input
-                      type="number"
-                      value={row.qty}
-                      onChange={e => updateRow(row.id, 'qty', e.target.value)}
-                      placeholder={rows.length === 1 ? String(count) : '0'}
-                      min="1"
-                      max={count}
-                      size="sm"
-                      className="w-20 text-center rounded-lg border border-primary-100/60 select-none"
-                    />
-                  </div>
-
-                  {/* Remove row */}
-                  {/* {rows.length > 1 ? (
-                    <button
-                      type="button"
-                      onClick={() => removeRow(row.id)}
-                      className="w-8 h-8 rounded-full bg-destructive/10 text-destructive hover:bg-destructive/20 flex items-center justify-center transition-colors shrink-0"
-                    >
-                      <Minus className="w-3.5 h-3.5" />
-                    </button>
-                  ) : (
-                    <span className="w-8" />
-                  )} */}
                 </div>
-              ))}
+                <div className="flex flex-col gap-1">
+                  <Label className="text-sm text-foreground">Quantity</Label>
+                  <Input
+                    type="number"
+                    value={row.qty}
+                    onChange={e => updateRow(row.id, 'qty', e.target.value)}
+                    placeholder={rows.length === 1 ? String(count) : '0'}
+                    min="1"
+                    max={count}
+                    className="w-full"
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Remaining count + submit */}
+          <div className="flex items-center justify-between gap-2 flex-wrap">
+            <div className={cn('inline-flex items-center gap-1.5 px-3 py-1.5 border-border')}>
+              {remaining === 0 ? (
+                <Typography variant="small" color="muted">
+                  All units assigned
+                </Typography>
+              ) : remaining < 0 ? (
+                <>
+                  <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+                  <Typography className="font-medium text-sm" as="span">
+                    {Math.abs(remaining)} over
+                  </Typography>
+                </>
+              ) : (
+                <Typography variant="small" color="muted">
+                  {remaining} unassigned
+                </Typography>
+              )}
             </div>
 
-            {/* Add another row */}
-            {/* <button
-              type="button"
-              onClick={addRow}
-              className="mt-2.5 flex items-center gap-2 px-1 py-1 hover:opacity-80 transition-opacity"
-            >
-              <div className="w-5 h-5 rounded-full bg-primary-100 flex items-center justify-center shrink-0">
-                <Plus className="w-3 h-3 text-primary" />
-              </div>
-              <Typography variant="small" color="primary" className="font-medium">
-                Add another batch
-              </Typography>
-            </button> */}
-
-            {/* Remaining count + submit */}
-            <div className="mt-4 py-2 flex items-center justify-between gap-3">
-              {/* Remaining pill */}
-              <div
-                className={cn(
-                  'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-primary-300',
-                  // remaining === 0
-                  //   ? 'bg-secondary-50 text-secondary border-secondary-100'
-                  //   : remaining < 0
-                  //     ? 'bg-primary-50 text-primary border-primary-100'
-                  //     : 'bg-muted text-muted-foreground border-border',
-                )}
-              >
-                {remaining === 0 ? (
-                  <Typography className="font-medium text-sm" as="span">
-                    All units assigned
-                  </Typography>
-                ) : remaining < 0 ? (
-                  <>
-                    <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
-                    <Typography className="font-medium text-sm" as="span">
-                      {Math.abs(remaining)} over
-                    </Typography>
-                  </>
-                ) : (
-                  <>
-                    <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/50 shrink-0" />
-                    <Typography className="font-medium text-sm" as="span">
-                      {remaining} unassigned
-                    </Typography>
-                  </>
-                )}
-              </div>
-
-              {/* Submit button */}
+            <div className="flex items-center gap-1">
               <Button
-                variant="secondary"
+                className="rounded-lg"
+                variant="subtleGray"
+                size="xs"
+                onClick={() => setShowForm(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="subtleTertiary"
+                className="rounded-lg"
                 onClick={handleSubmit}
-                disabled={!hasAnyDate || isCreating}
-                size="sm"
+                // disabled={!hasAnyDate || isCreating}
+                size="xs"
               >
                 Add batch
               </Button>
             </div>
-
-            {/* Helper text */}
-            <Typography variant="extraSmall" color="muted" className="mt-3 text-center block">
-              Quantity defaults to all {count} untracked units if left blank.
-            </Typography>
           </div>
+
+          <Typography variant="extraSmall" color="muted" className="text-center">
+            Quantity defaults to all {count} untracked units if left blank.
+          </Typography>
         </div>
       )}
     </div>

@@ -20,6 +20,8 @@ interface AddAutomationRulePanelProps {
   onCreate: (rule: AutomationRule) => void
   initialRuleType?: 'category' | 'product'
   initialSelectedKey?: string
+  initialProductName?: string
+  initialCategoryKey?: string
 }
 
 export function AddAutomationRulePanel({
@@ -29,6 +31,8 @@ export function AddAutomationRulePanel({
   onCreate,
   initialRuleType,
   initialSelectedKey,
+  initialProductName,
+  initialCategoryKey,
 }: AddAutomationRulePanelProps) {
   const activeStoreId = useActiveStoreId() || ''
   const { data: categories = [] } = useCategoriesWithTrackingSettings(activeStoreId)
@@ -109,6 +113,10 @@ export function AddAutomationRulePanel({
     if (isOpen) {
       if (initialRuleType) setRuleType(initialRuleType)
       if (initialSelectedKey) setSelectedKey(initialSelectedKey)
+      if (initialProductName) {
+        setProductSearch(initialProductName)
+        setDebouncedProductSearch(initialProductName)
+      }
     } else {
       setRuleType('category')
       setSelectedKey('')
@@ -116,11 +124,17 @@ export function AddAutomationRulePanel({
       setProductSearch('')
       setDebouncedProductSearch('')
     }
-  }, [isOpen, initialRuleType, initialSelectedKey])
+  }, [isOpen, initialRuleType, initialSelectedKey, initialProductName])
 
   const handleTypeChange = (type: 'category' | 'product') => {
     setRuleType(type)
-    setSelectedKey('')
+    if (type === 'category' && initialCategoryKey) {
+      setSelectedKey(initialCategoryKey)
+    } else if (type === 'product' && initialSelectedKey) {
+      setSelectedKey(initialSelectedKey)
+    } else {
+      setSelectedKey('')
+    }
   }
 
   const canCreate = selectedKey !== '' && isAvailable

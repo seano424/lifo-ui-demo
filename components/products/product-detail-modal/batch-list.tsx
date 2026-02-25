@@ -5,11 +5,27 @@ import { BatchRow } from './batch-row'
 import type { BatchListProps } from './types'
 import { useCurrency } from '@/hooks/use-currency'
 import { useBatchActions } from '@/hooks/use-batches'
-import { ChevronDown, Package } from 'lucide-react'
+import { Package } from 'lucide-react'
 import type { Database } from '@/types/supabase-extended'
-import { Button } from '@/components/ui/button'
-import { cn } from '@/lib/utils'
-import { useState } from 'react'
+import type { BatchWithProduct } from '@/lib/queries/batches'
+import { parseISODateAsLocal } from '@/lib/utils/date-conversion'
+
+type UrgencyTier = 'expired' | 'soon' | 'upcoming' | 'no-date'
+
+export function getUrgencyTier(batch: BatchWithProduct): UrgencyTier {
+  if (!batch.expiry_date) return 'no-date'
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const expiry = parseISODateAsLocal(batch.expiry_date)
+  const days = Math.ceil((expiry.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+  if (days < 0) return 'expired'
+  if (days <= 3) return 'soon'
+  return 'upcoming'
+}
+
+function groupQty(batches: BatchWithProduct[]) {
+  return batches.reduce((sum, b) => sum + (b.current_quantity || 0), 0)
+}
 
 export function BatchList({
   batches,
@@ -19,12 +35,12 @@ export function BatchList({
   onCancelEdit,
 }: BatchListProps) {
   const currencySymbol = useCurrency()
-  const { updateBatch } = useBatchActions()
-  const [isOpen, setIsOpen] = useState(true)
+  const { updateBatch, deleteBatch } = useBatchActions()
 
   const totalBatchQty = batches
     .filter(b => b.status === 'active')
     .reduce((sum, b) => sum + (b.current_quantity || 0), 0)
+
   const handleSave = (
     batchId: string,
     updates: { expiry_date?: string; current_quantity?: number },
@@ -40,47 +56,94 @@ export function BatchList({
     return <EmptyBatchesState />
   }
 
+  const soonBatches = batches.filter(b => getUrgencyTier(b) === 'soon')
+  const expiredBatches = batches.filter(b => getUrgencyTier(b) === 'expired')
+  const upcomingBatches = batches.filter(
+    b => getUrgencyTier(b) === 'upcoming' || getUrgencyTier(b) === 'no-date',
+  )
+
+  const batchRowProps = (batch: BatchWithProduct) => {
+    const maxQuantity =
+      storeQuantity != null ? storeQuantity - totalBatchQty + (batch.current_quantity || 0) : null
+    return {
+      batch,
+      isEditing: batch.batch_id === editingBatchId,
+      maxQuantity,
+      onStartEdit: () => onStartEdit(batch.batch_id),
+      onSave: (updates: { expiry_date?: string; current_quantity?: number }) =>
+        handleSave(batch.batch_id, updates),
+      onCancel: onCancelEdit,
+      onDelete: (batchId: string) => deleteBatch({ batchId, productId: batch.product_id }),
+      currencySymbol,
+    }
+  }
+
   return (
-    <div className="flex flex-col gap-4">
-      <Button
-        variant="ghost"
-        onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between px-0"
-      >
-        <Typography variant="h5" className="flex items-center gap-2 font-semibold">
-          Stock with expiry dates ({totalBatchQty} of {storeQuantity ?? '?'})
-        </Typography>
-        <ChevronDown className={cn('size-3 transition-transform', isOpen && 'rotate-180')} />
-      </Button>
-      {isOpen && (
-        <div className="flex flex-col gap-4">
-          {batches.map(batch => {
-            // store_quantity is POS-synced and can change externally, so this is a UX
-            // guardrail only — not a DB-level constraint. See untracked_qty in the RPC.
-            const maxQuantity =
-              storeQuantity != null
-                ? storeQuantity - totalBatchQty + (batch.current_quantity || 0)
-                : null
-            return (
-              <BatchRow
-                key={batch.batch_id}
-                batch={batch}
-                isEditing={batch.batch_id === editingBatchId}
-                maxQuantity={maxQuantity}
-                onStartEdit={() => onStartEdit(batch.batch_id)}
-                onSave={updates => handleSave(batch.batch_id, updates)}
-                onCancel={onCancelEdit}
-                currencySymbol={currencySymbol}
-              />
-            )
-          })}
-        </div>
+    <div className="flex flex-col gap-6">
+      {soonBatches.length > 0 && (
+        <BatchGroup
+          label="expiring soon batches (within 3 days)"
+          descriptor="within 3 days"
+          totalQty={groupQty(soonBatches)}
+          batches={soonBatches}
+          batchRowProps={batchRowProps}
+        />
+      )}
+
+      {upcomingBatches.length > 0 && (
+        <BatchGroup
+          label="fresh batches (+3 days from today)"
+          descriptor={`${upcomingBatches.length} batch${upcomingBatches.length !== 1 ? 'es' : ''}`}
+          totalQty={groupQty(upcomingBatches)}
+          batches={upcomingBatches}
+          batchRowProps={batchRowProps}
+        />
+      )}
+
+      {expiredBatches.length > 0 && (
+        <BatchGroup
+          label="expired batches"
+          descriptor={`${expiredBatches.length} batch${expiredBatches.length !== 1 ? 'es' : ''}`}
+          totalQty={groupQty(expiredBatches)}
+          batches={expiredBatches}
+          batchRowProps={batchRowProps}
+        />
       )}
     </div>
   )
 }
 
-// Empty state when no batches exist
+interface BatchGroupProps {
+  label: string
+  descriptor: string
+  totalQty: number
+  batches: BatchWithProduct[]
+  batchRowProps: (batch: BatchWithProduct) => Omit<React.ComponentProps<typeof BatchRow>, never>
+}
+
+function BatchGroup({ label, batches, batchRowProps }: BatchGroupProps) {
+  return (
+    <div className="flex flex-col gap-2">
+      {/* <Typography variant="h5" className="capitalize">
+        {label}
+      </Typography> */}
+      <Typography
+        variant="extraSmall"
+        color="muted"
+        className="uppercase tracking-wider font-semibold"
+      >
+        {label}
+      </Typography>
+
+      <div className="flex flex-col">
+        {batches.map(batch => (
+          <BatchRow key={batch.batch_id} {...batchRowProps(batch)} />
+        ))}
+      </div>
+    </div>
+  )
+}
+
 function EmptyBatchesState() {
   return (
     <div className="px-5 py-10 text-center">
