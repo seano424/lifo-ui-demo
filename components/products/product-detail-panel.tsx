@@ -5,10 +5,10 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sh
 import { Skeleton } from '@/components/ui/skeleton'
 import { Typography } from '@/components/ui/typography'
 import { useProductWithBatches } from '@/hooks/use-products'
-import { BatchList } from './product-detail-modal/batch-list'
+import { BatchList } from './product-detail-panel/batch-list'
 import { parseISODateAsLocal } from '@/lib/utils/date-conversion'
-import { UntrackedAlert } from './product-detail-modal/untracked-alert'
-import { ExpiryAutomationSection } from './product-detail-modal/expiry-automation-section'
+import { UntrackedAlert } from './product-detail-panel/untracked-alert'
+import { ExpiryAutomationSection } from './product-detail-panel/expiry-automation-section'
 
 interface ProductDetailPanelProps {
   isOpen: boolean
