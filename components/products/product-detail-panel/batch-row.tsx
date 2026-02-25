@@ -104,7 +104,9 @@ export function BatchRow({
         >
           <Typography variant="p">
             {batch.current_quantity || 0} {daysToExpiry !== null && daysToExpiry < 0 && 'expired'}{' '}
-            {daysToExpiry !== null && daysToExpiry <= 3 && daysToExpiry >= 0 && 'expiring soon'}{' '}
+            {daysToExpiry !== null && daysToExpiry === 0 && 'expiring today'}{' '}
+            {daysToExpiry !== null && daysToExpiry === 1 && 'expiring tomorrow'}{' '}
+            {daysToExpiry !== null && daysToExpiry <= 3 && daysToExpiry > 1 && 'expiring soon'}{' '}
             {daysToExpiry !== null && daysToExpiry > 3 && 'expiring later'}{' '}
           </Typography>
           <Typography variant="small" color="muted">
