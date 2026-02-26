@@ -66,7 +66,7 @@ export function ProductListFilters({
         }
         disabled={isLoading || categoriesLoading}
       >
-        <SelectTrigger className="w-fit sm:w-[180px] flex gap-1 px-4">
+        <SelectTrigger className="w-fit sm:w-[180px] flex gap-1 px-4" showChevron={false}>
           <SelectValue placeholder={t('categoryFilter')} />
         </SelectTrigger>
         <SelectContent>

@@ -29,10 +29,10 @@ export function ProductListSortControls({
         onValueChange={(field: SortField) => updateSort(field)}
         disabled={isLoading}
       >
-        <SelectTrigger className="w-max" showChevron={false}>
+        <SelectTrigger className="w-max px-4" showChevron={false}>
           <div className="flex items-center gap-2">
             <SelectValue className="whitespace-nowrap" />
-            <ArrowUpDownIcon className="h-4 w-4 text-muted-foreground" />
+            <ArrowUpDownIcon className="h-4 w-4 text-muted-foreground hidden sm:block" />
           </div>
         </SelectTrigger>
         <SelectContent>
