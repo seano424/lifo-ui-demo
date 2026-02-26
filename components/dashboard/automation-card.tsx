@@ -13,6 +13,7 @@ import { Badge } from '../ui/badge'
 import { AutomationRulePanel } from '@/components/automations/automation-rule-panel'
 import { AddAutomationRulePanel } from '@/components/automations/add-automation-rule-panel'
 import type { AutomationRule } from '@/lib/queries/dashboard'
+import { cn } from '@/lib/utils'
 
 export function AutomationCard({ showLinks = true }: { showLinks?: boolean }) {
   const t = useTranslations('dashboard.redesign.automation')
@@ -154,7 +155,12 @@ export function AutomationCard({ showLinks = true }: { showLinks?: boolean }) {
               className="flex sm:items-center justify-between py-3 transition-colors hover:bg-gray-50 hover:text-gray-900 dark:hover:bg-secondary-900/10 dark:hover:text-secondary-100 cursor-pointer w-full text-left"
             >
               <div className="flex items-center gap-3">
-                <div className="h-2 w-2 rounded-full hidden sm:block bg-primary" />
+                <div
+                  className={cn(
+                    'h-2 w-2 rounded-full hidden sm:block',
+                    rule.type === 'product' ? 'bg-green-500' : 'bg-primary',
+                  )}
+                />
                 <div className="flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between sm:divide-x sm:divide-muted">
                   <Typography variant="p" color="default" className="sm:pr-2">
                     {rule.name}
@@ -165,7 +171,7 @@ export function AutomationCard({ showLinks = true }: { showLinks?: boolean }) {
                   </Typography>
                 </div>
               </div>
-              <Badge variant="primary">
+              <Badge variant="primary" className="size-9 sm:size-auto rounded text-xs sm:text-sm">
                 {rule.shelf_life_days != null ? `${rule.shelf_life_days}d` : '—'}
               </Badge>
             </button>
