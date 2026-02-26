@@ -83,9 +83,10 @@ export async function prefetchDashboardData() {
     const user = { id: data.claims.sub as string }
 
     // Seed currentUser from JWT claims — synchronous, no network call.
-    // claims contains email, phone, and user_metadata (full_name, avatar_url, etc.).
-    // created_at/updated_at are absent from claims and will be '' until useCurrentUser
-    // refetches (~30s staleTime on the client hook), which is acceptable.
+    // This provides an immediate placeholder; the real user data (with avatar_url,
+    // created_at, etc.) is fetched via getUser() in the parallel block below and
+    // overwrites this seed. JWT user_metadata for PIN-based sessions may be stale
+    // and not include avatar_url, which is why we don't rely on the claims alone.
     const currentUserFromClaims = transformAuthUserToUser({
       id: data.claims.sub,
       email: data.claims.email ?? '',
@@ -98,17 +99,19 @@ export async function prefetchDashboardData() {
     // Kick off cookie read early — it doesn't depend on any DB call
     const activeStoreCookiePromise = getActiveStoreCookie()
 
-    // Prefetch DB-dependent data in parallel. currentUser is already seeded above,
-    // so we only wait on the two DB queries.
+    // Prefetch data in parallel. currentUser is seeded above as a fast placeholder;
+    // fetchCurrentUser (getUser) runs here to get the real user with avatar_url —
+    // it's ~50-150ms server-side and doesn't increase total time since DB queries dominate.
     const prefetchStart = performance.now()
     const results = await Promise.allSettled([
       timed('userStores', () => fetchUserStores(user.id, supabase)),
       timed('userPreferences', () => fetchUserPreferencesRPC(supabase)),
+      timed('currentUser (getUser)', () => fetchCurrentUser(supabase)),
     ])
     const prefetchDuration = performance.now() - prefetchStart
 
     // Log any failed prefetches
-    const queryNames = ['userStores', 'userPreferences']
+    const queryNames = ['userStores', 'userPreferences', 'currentUser']
     results.forEach((result, index) => {
       if (result.status === 'rejected') {
         logger.queryWarn('prefetchDashboardData', `Failed to prefetch ${queryNames[index]}`, {
@@ -116,6 +119,13 @@ export async function prefetchDashboardData() {
         })
       }
     })
+
+    // Overwrite the claims-based seed with real user data if getUser() succeeded.
+    // This ensures avatar_url, created_at, etc. are always correct on first render.
+    const currentUserResult = results[2]
+    if (currentUserResult.status === 'fulfilled' && currentUserResult.value) {
+      queryClient.setQueryData(queryKeys.auth.currentUser(), currentUserResult.value)
+    }
 
     // Extract userStores and userPreferences from allSettled results
     let userStores: UserStore[] = []

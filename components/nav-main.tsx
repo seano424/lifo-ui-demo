@@ -13,7 +13,7 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar'
 import { cn } from '@/lib/utils'
-import { ChevronRight, type LucideIcon } from 'lucide-react'
+import { ChevronRight, StoreIcon, type LucideIcon } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -111,6 +111,26 @@ export function NavMain({
 
   return (
     <div className="flex flex-col gap-6">
+      <SidebarGroup className="px-4">
+        <SidebarGroupLabel className="mb-1">
+          <Typography variant="extraSmall" color="muted" className=" uppercase text-slate-400/90">
+            Locations
+          </Typography>
+        </SidebarGroupLabel>
+        <SidebarMenu>
+          <SidebarMenuItem className="flex flex-col items-center gap-2">
+            <SidebarMenuButton
+              className={cn('py-2 px-2 relative hover:text-primary-900 hover:bg-muted')}
+              asChild
+            >
+              <div className="flex items-center w-full">
+                <StoreIcon />
+                <span>Stores</span>
+              </div>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarGroup>
       {sections.map(section => (
         <SidebarGroup className="px-4" key={section.title}>
           <SidebarGroupLabel className="mb-1">
