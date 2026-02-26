@@ -35,11 +35,6 @@ function useNavigationData() {
               icon: ChartNoAxesCombined,
               isActive: true,
             },
-          ],
-        },
-        {
-          title: t('batches'),
-          items: [
             {
               title: t('all'),
               url: '/dashboard/inventory/batches',
@@ -51,11 +46,6 @@ function useNavigationData() {
               icon: CalendarFold,
               badge: expiryTodosCount > 0 ? expiryTodosCount : undefined,
             },
-          ],
-        },
-        {
-          title: t('catalog'),
-          items: [
             {
               title: t('products'),
               url: '/dashboard/inventory/products?sort=active_batches_count&direction=desc',

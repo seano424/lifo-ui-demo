@@ -13,13 +13,14 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar'
 import { cn } from '@/lib/utils'
-import { ChevronRight, StoreIcon, type LucideIcon } from 'lucide-react'
+import { ChevronRight, type LucideIcon } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { Typography } from './ui/typography'
 
 import { NotificationCount } from '@/components/notifications/notification-count'
+import { NavLocations } from '@/components/nav-locations'
 
 // Badge component for navigation items
 function NavBadge({ count, className }: { count: number; className?: string }) {
@@ -111,26 +112,7 @@ export function NavMain({
 
   return (
     <div className="flex flex-col gap-6">
-      <SidebarGroup className="px-4">
-        <SidebarGroupLabel className="mb-1">
-          <Typography variant="extraSmall" color="muted" className=" uppercase text-slate-400/90">
-            Locations
-          </Typography>
-        </SidebarGroupLabel>
-        <SidebarMenu>
-          <SidebarMenuItem className="flex flex-col items-center gap-2">
-            <SidebarMenuButton
-              className={cn('py-2 px-2 relative hover:text-primary-900 hover:bg-muted')}
-              asChild
-            >
-              <div className="flex items-center w-full">
-                <StoreIcon />
-                <span>Stores</span>
-              </div>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarGroup>
+      <NavLocations />
       {sections.map(section => (
         <SidebarGroup className="px-4" key={section.title}>
           <SidebarGroupLabel className="mb-1">
@@ -152,7 +134,7 @@ export function NavMain({
                   <SidebarMenuItem>
                     <CollapsibleTrigger asChild>
                       <SidebarMenuButton
-                        className="p-4  group-data-[collapsible=icon]:hidden"
+                        className="p-4 group-data-[collapsible=icon]:hidden"
                         tooltip={item.title}
                       >
                         {item.icon && <item.icon />}
@@ -192,7 +174,7 @@ export function NavMain({
                 <SidebarMenuItem className="flex flex-col items-center gap-2" key={item.title}>
                   <SidebarMenuButton
                     className={cn(
-                      'py-2 px-2 relative hover:text-primary-900 hover:bg-muted',
+                      'py-2 relative hover:text-primary-900 hover:bg-muted',
                       isPathActive(item.url) &&
                         'text-primary-900 hover:text-primary-900 hover:bg-primary-200/10',
                     )}
