@@ -230,7 +230,7 @@
     },
     "daysAgo": "{days, plural, =1 {1 day ago} other {# days ago}}",
     "daysLeft": "{days, plural, =1 {1 day} other {# days}}",
-    "daysRemaining": "{days, plural, =1 {1 day remaining} other {# Days remaining}}",
+    "daysRemaining": "{days, plural, =1 {1 day remaining} other {# days remaining}}",
     "inventoryPricing": "Inventory & Pricing",
     "percentOff": "% off",
     "actionHistory": "Action History",

@@ -79,7 +79,6 @@ export function BatchList({
     <div className="divide-y divide-border/20">
       {soonBatches.length > 0 && (
         <BatchGroup
-          color="destructive"
           label="expiring soon (3 days or less)"
           batches={soonBatches}
           batchRowProps={batchRowProps}
@@ -88,7 +87,6 @@ export function BatchList({
 
       {upcomingBatches.length > 0 && (
         <BatchGroup
-          color="lime"
           label="expiring later"
           batches={upcomingBatches}
           batchRowProps={batchRowProps}
@@ -96,12 +94,7 @@ export function BatchList({
       )}
 
       {expiredBatches.length > 0 && (
-        <BatchGroup
-          color="muted"
-          label="expired"
-          batches={expiredBatches}
-          batchRowProps={batchRowProps}
-        />
+        <BatchGroup label="expired" batches={expiredBatches} batchRowProps={batchRowProps} />
       )}
     </div>
   )
@@ -109,24 +102,9 @@ export function BatchList({
 
 interface BatchGroupProps {
   label: string
-  color?: 'destructive' | 'lime' | 'muted'
   batches: BatchWithProduct[]
-  batchRowProps: (batch: BatchWithProduct) => Omit<React.ComponentProps<typeof BatchRow>, never>
+  batchRowProps: (batch: BatchWithProduct) => React.ComponentProps<typeof BatchRow>
 }
-// const colorMap: Record<'destructive' | 'lime' | 'muted', { text: string; bg: string }> = {
-//   destructive: {
-//     text: 'text-destructive',
-//     bg: 'bg-destructive/10',
-//   },
-//   lime: {
-//     text: 'text-foreground',
-//     bg: 'bg-lime-500/10',
-//   },
-//   muted: {
-//     text: 'text-muted-foreground',
-//     bg: 'bg-muted-foreground/10',
-//   },
-// }
 
 function BatchGroup({ label, batches, batchRowProps }: BatchGroupProps) {
   return (

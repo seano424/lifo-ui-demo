@@ -13,10 +13,21 @@ const nextConfig: NextConfig = {
         hostname: 'placehold.co',
         pathname: '/**',
       },
+      // Square Catalog API image buckets (current production, legacy, sandbox)
       {
         protocol: 'https',
-        hostname: '**.amazonaws.com',
-        pathname: '/**',
+        hostname: 'items-images-production.s3.us-west-2.amazonaws.com',
+        pathname: '/files/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'square-production.s3.amazonaws.com',
+        pathname: '/files/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'square-catalog-sandbox.s3.amazonaws.com',
+        pathname: '/files/**',
       },
     ],
   },
