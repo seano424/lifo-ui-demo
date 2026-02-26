@@ -9,6 +9,7 @@ import { Typography } from '@/components/ui/typography'
 import { useProductWithBatches } from '@/hooks/use-products'
 import { BatchList } from './product-detail-panel/batch-list'
 import { parseISODateAsLocal } from '@/lib/utils/date-conversion'
+import { formatProductName } from '@/lib/utils/product-name'
 import { UntrackedAlert } from './product-detail-panel/untracked-alert'
 import { ExpiryAutomationSection } from './product-detail-panel/expiry-automation-section'
 
@@ -83,7 +84,7 @@ export function ProductDetailPanel({
     })
   }, [batches])
 
-  const productName = (product?.name || 'Product Details').replace(/ - /g, ' ')
+  const productName = formatProductName(product?.name) || 'Product Details'
   const rawProductName = product?.name || ''
 
   return (

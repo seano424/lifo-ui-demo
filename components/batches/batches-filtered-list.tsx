@@ -259,7 +259,7 @@ export function BatchesFilteredList({
               size="large"
             />
           </div>
-          <div className="flex items-center gap-1 sm:justify-start justify-between w-full">
+          <div className="flex items-center gap-1 justify-between w-full">
             <BatchListFilters
               filters={{
                 expiringInDays: filters.expiringInDays,

@@ -170,6 +170,8 @@
     },
     "expiry": {
       "expired": "Verlopen",
+      "today": "Vandaag",
+      "days": "{count, plural, =1 {1 dag} other {# dagen}}",
       "daysLeft": "{days}d over",
       "noExpiryDate": "Geen vervaldatum"
     }

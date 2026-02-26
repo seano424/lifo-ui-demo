@@ -2,6 +2,12 @@
   "settings": {
     "title": "Instellingen",
     "description": "Beheer uw voorkeuren en accountinstellingen",
+    "automations": {
+      "page": {
+        "title": "Automatiseringen",
+        "description": "We berekenen vervaldatums op basis van de leveringsdatum + de houdbaarheidsduur die u instelt. Niets invoeren bij levering."
+      }
+    },
     "language": {
       "title": "Taal",
       "description": "Kies uw voorkeurstaal voor de interface",

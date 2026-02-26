@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { DashboardHeader } from './dashboard-header'
 import { StatCards } from './stat-cards/stat-cards'
 import { BatchesFilteredList } from '@/components/batches/batches-filtered-list'
@@ -12,6 +13,8 @@ import { Button } from '../ui/button'
 import { ChevronRight } from 'lucide-react'
 
 export function DashboardContent() {
+  const tNav = useTranslations('navigation')
+  const tTable = useTranslations('dashboard.redesign.expiringTable')
   const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d'>('30d')
 
   const daysFilter = timeRange === '7d' ? 7 : timeRange === '30d' ? 30 : 90
@@ -25,9 +28,9 @@ export function DashboardContent() {
 
       <div className="flex items-center justify-between border-b border-muted">
         <div className="flex flex-col gap-1">
-          <Typography variant="h4">Expiring Soon</Typography>
+          <Typography variant="h4">{tNav('expiringSoon')}</Typography>
           <Typography variant="p" color="muted" className="hidden sm:block">
-            Batches closest to their expiry date
+            {tTable('description')}
           </Typography>
         </div>
         <Button
@@ -36,7 +39,7 @@ export function DashboardContent() {
           href="/dashboard/inventory/batches"
           className="gap-2 flex items-center hover:text-secondary dark:hover:text-secondary px-0"
         >
-          View all
+          {tTable('viewAll')}
           <ChevronRight className="h-4 w-4" />
         </Button>
       </div>

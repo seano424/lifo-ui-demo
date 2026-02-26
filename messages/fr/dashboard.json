@@ -223,6 +223,19 @@
         "tracked": "{count, plural, =1 {1 produit} other {# produits}} suivi",
         "remaining": "{count, plural, =1 {1 produit} other {# produits}} restant"
       },
+      "autoTrackingBanner": {
+        "title": "Gagnez du temps avec le suivi automatique",
+        "description": "Dites à Lifo combien de temps durent les articles, et il calculera automatiquement les dates d'expiration pour les nouvelles livraisons.",
+        "cta": "Configurer maintenant",
+        "dismiss": "Ignorer"
+      },
+      "content": {
+        "expiringSoon": {
+          "title": "Expire bientôt",
+          "subtitle": "Lots les plus proches de leur date d'expiration",
+          "viewAll": "Voir tout"
+        }
+      },
       "automation": {
         "title": "Automatisation",
         "subtitle": "Règles de création automatique de lots",
@@ -243,11 +256,73 @@
           "product": "Produit"
         }
       },
+      "automations": {
+        "table": {
+          "activeRules": "Règles actives",
+          "productsCovered": "Produits couverts",
+          "addRule": "Ajouter une règle",
+          "empty": "Aucune règle d'automatisation. Ajoutez une règle pour commencer.",
+          "headers": {
+            "rule": "Règle",
+            "shelfLife": "Durée de vie",
+            "actions": "Actions"
+          }
+        },
+        "row": {
+          "typeProduct": "Produit",
+          "typeCategory": "Catégorie",
+          "items": "{count, plural, =1 {1 article} other {# articles}}",
+          "shelfLifeDays": "{count} jours",
+          "editLabel": "Modifier {name}",
+          "deleteLabel": "Supprimer {name}"
+        },
+        "panel": {
+          "editTitle": "Modifier la règle d'automatisation",
+          "editTypeTitle": "Modifier la règle {type}",
+          "createTitle": "Créer une règle d'automatisation",
+          "ruleTypeHeading": "Type de règle",
+          "typeCategory": "Catégorie",
+          "typeProduct": "Produit",
+          "categoryHeading": "Catégorie",
+          "selectCategory": "Sélectionner une catégorie...",
+          "availableGroup": "Disponibles",
+          "alreadyHaveRulesGroup": "Ont déjà des règles",
+          "productCount": "{count, plural, =1 {1 produit} other {# produits}}",
+          "categoriesWithRulesNote": "Les catégories marquées ✓ ont déjà des règles d'automatisation",
+          "productHeading": "Produit",
+          "searchProducts": "Rechercher des produits...",
+          "selectProduct": "Sélectionner un produit...",
+          "productsWithRulesNote": "Les produits marqués ✓ ont déjà des règles d'automatisation",
+          "shelfLifeHeading": "Durée de vie (jours)",
+          "shelfLifeExample": "Exemple : Livré aujourd'hui → Expire le {date}",
+          "productsCoveredHeading": "Produits couverts",
+          "andMore": "et {count} de plus",
+          "infoTitle": "Ces règles ajoutent automatiquement des dates d'expiration aux produits.",
+          "infoDescription": "Lors de l'enregistrement des livraisons, les dates d'expiration seront calculées en utilisant cette durée de vie au lieu d'une saisie manuelle.",
+          "ruleTypeDisplayHeading": "Type de règle"
+        },
+        "deleteDialog": {
+          "title": "Supprimer la règle ?",
+          "description": "« {name} » sera supprimé. Les produits de cette {type} n'auront plus de durée de vie assignée automatiquement.",
+          "cancel": "Annuler",
+          "confirm": "Supprimer la règle"
+        },
+        "actions": {
+          "deleteRule": "Supprimer la règle",
+          "cancel": "Annuler",
+          "saveChanges": "Enregistrer les modifications",
+          "saving": "Enregistrement\u2026",
+          "createRule": "Créer la règle",
+          "creating": "Création\u2026"
+        }
+      },
       "expiringTable": {
         "daysLeft": {
           "singular": "jour restant",
           "plural": "jours restants"
-        }
+        },
+        "description": "Lots les plus proches de leur date d'expiration",
+        "viewAll": "Tout afficher"
       }
     }
   },
@@ -417,6 +492,7 @@
   },
   "navigation": {
     "automations": "Automatisations",
+    "locations": "Emplacements",
     "dashboard-title": "Magasin",
     "dashboard": "Tableau de bord",
     "overview": "Aperçu",

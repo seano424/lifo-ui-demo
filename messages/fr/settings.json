@@ -2,6 +2,12 @@
   "settings": {
     "title": "Paramètres",
     "description": "Gérez vos préférences et paramètres de compte",
+    "automations": {
+      "page": {
+        "title": "Automatisations",
+        "description": "Nous calculons les dates d'expiration à partir de la date de livraison + la durée de conservation que vous définissez. Rien à saisir à la livraison."
+      }
+    },
     "language": {
       "title": "Langue",
       "description": "Choisissez votre langue préférée pour l'interface",

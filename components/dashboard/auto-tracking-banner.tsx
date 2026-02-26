@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Zap, XIcon } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Typography } from '@/components/ui/typography'
 import { useActiveStoreId } from '@/lib/stores/store-context'
@@ -22,6 +23,7 @@ function setDismissedCookie() {
 }
 
 export function AutoTrackingBanner() {
+  const t = useTranslations('dashboard.redesign.autoTrackingBanner')
   const activeStoreId = useActiveStoreId()
   const { data: batchTrackingSetup, isLoading } = useBatchTrackingSetup(activeStoreId || '')
   const [dismissed, setDismissed] = useState(true)
@@ -59,11 +61,10 @@ export function AutoTrackingBanner() {
         </div>
         <div className="flex-1 min-w-0">
           <Typography variant="h4" className="mb-0.5">
-            Save time with auto-tracking
+            {t('title')}
           </Typography>
           <Typography variant="p" color="muted">
-            Tell Lifo how long items last, and it will automatically set expiry dates for new
-            deliveries.
+            {t('description')}
           </Typography>
         </div>
       </div>
@@ -75,14 +76,14 @@ export function AutoTrackingBanner() {
           asLink
           href="/dashboard/settings/automations"
         >
-          Set up now
+          {t('cta')}
         </Button>
         <Button
           variant="subtleGray"
           onClick={handleDismiss}
           className="w-full md:w-auto hidden md:flex"
         >
-          Dismiss
+          {t('dismiss')}
           <XIcon className="w-4 h-4" />
         </Button>
       </div>

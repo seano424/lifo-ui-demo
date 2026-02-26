@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { Button, buttonVariants } from '@/components/ui/button'
 import { Typography } from '@/components/ui/typography'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
@@ -37,6 +38,7 @@ export function AutomationRulePanel({
   onSave,
   onDelete,
 }: AutomationRulePanelProps) {
+  const t = useTranslations('dashboard.redesign.automations')
   const storeId = useActiveStoreId() || ''
 
   // Fetch products for category rules; passing empty storeId skips the query for product rules
@@ -68,7 +70,9 @@ export function AutomationRulePanel({
       <SheetContent side="right" className="flex flex-col gap-0 p-0 w-full sm:max-w-[500px]">
         <SheetHeader className="px-6 py-4 border-b border-border">
           <SheetTitle className="text-xl font-bold">
-            Edit {rule?.type === 'product' ? 'product' : 'category'} rule
+            {t('panel.editTypeTitle', {
+              type: rule?.type === 'product' ? t('panel.typeProduct') : t('panel.typeCategory'),
+            })}
           </SheetTitle>
         </SheetHeader>
 
@@ -83,7 +87,7 @@ export function AutomationRulePanel({
           {/* Type */}
           <div className="flex flex-col gap-1.5">
             <Typography variant="h5" className="font-semibold">
-              Rule Type
+              {t('panel.ruleTypeDisplayHeading')}
             </Typography>
             <div className="flex items-center gap-2">
               <div
@@ -93,7 +97,7 @@ export function AutomationRulePanel({
                 )}
               />
               <Typography variant="p" color="muted">
-                {rule?.type === 'product' ? 'Product' : 'Category'}
+                {rule?.type === 'product' ? t('panel.typeProduct') : t('panel.typeCategory')}
               </Typography>
             </div>
           </div>
@@ -101,7 +105,7 @@ export function AutomationRulePanel({
           {/* Product or Category Name */}
           <div className="flex flex-col gap-1.5">
             <Typography variant="h5" className="font-semibold">
-              {rule?.type === 'product' ? 'Product' : 'Category'}
+              {rule?.type === 'product' ? t('panel.typeProduct') : t('panel.typeCategory')}
             </Typography>
             <div className="flex items-center gap-2">
               <div
@@ -120,7 +124,7 @@ export function AutomationRulePanel({
           <div className="flex flex-col gap-4">
             <div className="flex items-center justify-between">
               <Typography variant="h5" className="font-semibold">
-                Shelf life (days)
+                {t('panel.shelfLifeHeading')}
               </Typography>
               <div className="flex items-center gap-2">
                 <input
@@ -135,14 +139,14 @@ export function AutomationRulePanel({
               </div>
             </div>
             <Typography variant="small" color="muted">
-              Example: Delivered today → Expires {expiryExample}
+              {t('panel.shelfLifeExample', { date: expiryExample })}
             </Typography>
           </div>
 
           {/* Products covered */}
           <div className="flex flex-col gap-2">
             <Typography variant="h5" className="font-semibold">
-              Products covered
+              {t('panel.productsCoveredHeading')}
             </Typography>
             <div className="flex flex-col gap-1">
               <div className="flex items-center gap-2">
@@ -153,8 +157,7 @@ export function AutomationRulePanel({
                   )}
                 />
                 <Typography variant="p" color="muted">
-                  {rule?.products_count ?? 0}{' '}
-                  {(rule?.products_count ?? 0) === 1 ? 'product' : 'products'}
+                  {t('panel.productCount', { count: rule?.products_count ?? 0 })}
                 </Typography>
               </div>
               {rule?.type === 'product' ? (
@@ -170,7 +173,7 @@ export function AutomationRulePanel({
                   ))}
                   {categoryProducts.length > 10 && (
                     <Typography variant="small" color="muted" className="pl-4">
-                      and {categoryProducts.length - 10} more
+                      {t('panel.andMore', { count: categoryProducts.length - 10 })}
                     </Typography>
                   )}
                 </>
@@ -182,11 +185,10 @@ export function AutomationRulePanel({
 
           <div className="flex flex-col gap-1">
             <Typography variant="p" className="font-semibold">
-              These rules automatically add expiry dates to products.
+              {t('panel.infoTitle')}
             </Typography>
             <Typography variant="p" color="muted">
-              When deliveries are logged, expiry dates will be calculated using this shelf life
-              instead of manual entry.
+              {t('panel.infoDescription')}
             </Typography>
           </div>
         </div>
@@ -200,34 +202,36 @@ export function AutomationRulePanel({
                 disabled={isSaving}
                 className="text-destructive hover:text-destructive hover:bg-destructive/10"
               >
-                Delete rule
+                {t('actions.deleteRule')}
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>Delete rule?</AlertDialogTitle>
+                <AlertDialogTitle>{t('deleteDialog.title')}</AlertDialogTitle>
                 <AlertDialogDescription>
-                  &ldquo;{rule?.name}&rdquo; will be removed. Products in this {rule?.type} will no
-                  longer have shelf life automatically assigned.
+                  {t('deleteDialog.description', {
+                    name: rule?.name ?? '',
+                    type: rule?.type ?? '',
+                  })}
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogCancel>{t('deleteDialog.cancel')}</AlertDialogCancel>
                 <AlertDialogAction
                   className={buttonVariants({ variant: 'destructive' })}
                   onClick={() => rule && onDelete(rule)}
                 >
-                  Delete rule
+                  {t('deleteDialog.confirm')}
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
           <div className="flex gap-2">
             <Button variant="outline" onClick={onClose} disabled={isSaving}>
-              Cancel
+              {t('actions.cancel')}
             </Button>
             <Button disabled={isSaving} onClick={() => rule && onSave(rule, draftDays)}>
-              {isSaving ? 'Saving…' : 'Save changes'}
+              {isSaving ? t('actions.saving') : t('actions.saveChanges')}
             </Button>
           </div>
         </div>

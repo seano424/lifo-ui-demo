@@ -22,6 +22,43 @@ import { BadgeCheck, Bell, ChevronsUpDown, CreditCard, Sparkles } from 'lucide-r
 import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import Image from 'next/image'
+import { useState } from 'react'
+
+function UserAvatar({
+  avatarUrl,
+  fullName,
+  className,
+}: {
+  avatarUrl: string | null | undefined
+  fullName: string | null | undefined
+  className?: string
+}) {
+  const [imgError, setImgError] = useState(false)
+  const initials =
+    fullName
+      ?.split(' ')
+      .map(n => n.charAt(0))
+      .join('') || 'CN'
+
+  if (avatarUrl && !imgError) {
+    return (
+      <Image
+        src={avatarUrl}
+        alt={fullName || ''}
+        width={32}
+        height={32}
+        className={className ?? 'rounded-2xl'}
+        onError={() => setImgError(true)}
+      />
+    )
+  }
+
+  return (
+    <div className="h-8 w-8 rounded-2xl bg-muted flex items-center justify-center text-xs font-medium shrink-0">
+      {initials}
+    </div>
+  )
+}
 
 export function NavUser({ user }: { user: User }) {
   const { isMobile } = useSidebar()
@@ -33,22 +70,7 @@ export function NavUser({ user }: { user: User }) {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
-              {user.avatar_url ? (
-                <Image
-                  src={user.avatar_url}
-                  alt={user.full_name || ''}
-                  width={32}
-                  height={32}
-                  className="rounded-2xl"
-                />
-              ) : (
-                <div className="h-8 w-8 rounded-2xl bg-muted flex items-center justify-center text-xs font-medium shrink-0">
-                  {user.full_name
-                    ?.split(' ')
-                    .map(n => n.charAt(0))
-                    .join('') || 'CN'}
-                </div>
-              )}
+              <UserAvatar avatarUrl={user.avatar_url} fullName={user.full_name} />
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate ">{user.full_name}</span>
                 <span className="truncate text-xs">{user.email}</span>
@@ -64,22 +86,11 @@ export function NavUser({ user }: { user: User }) {
           >
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                {user.avatar_url ? (
-                  <Image
-                    src={user.avatar_url}
-                    alt={user.full_name || ''}
-                    width={32}
-                    height={32}
-                    className="rounded-2xl shrink-0"
-                  />
-                ) : (
-                  <div className="h-8 w-8 rounded-2xl bg-muted flex items-center justify-center text-xs font-medium shrink-0">
-                    {user.full_name
-                      ?.split(' ')
-                      .map(n => n.charAt(0))
-                      .join('') || 'CN'}
-                  </div>
-                )}
+                <UserAvatar
+                  avatarUrl={user.avatar_url}
+                  fullName={user.full_name}
+                  className="rounded-2xl shrink-0"
+                />
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate ">{user.full_name}</span>
                   <span className="truncate text-xs">{user.email}</span>

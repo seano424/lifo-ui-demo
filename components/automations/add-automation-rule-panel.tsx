@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { ChevronDown } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { Button, buttonVariants } from '@/components/ui/button'
 import { Typography } from '@/components/ui/typography'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
@@ -59,6 +60,7 @@ export function AddAutomationRulePanel({
   initialProductName,
   initialCategoryKey,
 }: AddAutomationRulePanelProps) {
+  const t = useTranslations('dashboard.redesign.automations')
   const activeStoreId = useActiveStoreId() || ''
   const { data: categories = [] } = useCategoriesWithTrackingSettings(activeStoreId)
 
@@ -262,7 +264,7 @@ export function AddAutomationRulePanel({
       <SheetContent side="right" className="flex flex-col gap-0 p-0 w-full sm:max-w-[500px]">
         <SheetHeader className="px-6 py-4 border-b border-border">
           <SheetTitle className="text-xl font-bold">
-            {isCurrentTabEditing ? 'Edit automation rule' : 'Create automation rule'}
+            {isCurrentTabEditing ? t('panel.editTitle') : t('panel.createTitle')}
           </SheetTitle>
         </SheetHeader>
 
@@ -271,7 +273,7 @@ export function AddAutomationRulePanel({
           {/* Rule type toggle */}
           <div className="flex flex-col gap-2">
             <Typography variant="h5" className="font-semibold">
-              Rule type
+              {t('panel.ruleTypeHeading')}
             </Typography>
             <div className="flex rounded-lg border border-border overflow-hidden">
               <button
@@ -284,7 +286,7 @@ export function AddAutomationRulePanel({
                     : 'bg-background text-foreground hover:bg-muted',
                 )}
               >
-                Category
+                {t('panel.typeCategory')}
               </button>
               <button
                 type="button"
@@ -296,7 +298,7 @@ export function AddAutomationRulePanel({
                     : 'bg-background text-foreground hover:bg-muted',
                 )}
               >
-                Product
+                {t('panel.typeProduct')}
               </button>
             </div>
           </div>
@@ -305,7 +307,7 @@ export function AddAutomationRulePanel({
           {ruleType === 'category' && (
             <div className="flex flex-col gap-2">
               <Typography variant="h5" className="font-semibold">
-                Category
+                {t('panel.categoryHeading')}
               </Typography>
               <div className={cn('relative', selectorDisabled && 'opacity-50')}>
                 <select
@@ -314,19 +316,19 @@ export function AddAutomationRulePanel({
                   disabled={selectorDisabled}
                   className="w-full appearance-none px-3 py-2 pr-8 border border-border rounded-lg text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 disabled:cursor-default"
                 >
-                  <option value="">Select a category...</option>
+                  <option value="">{t('panel.selectCategory')}</option>
                   {availableCategories.length > 0 && (
-                    <optgroup label="Available">
+                    <optgroup label={t('panel.availableGroup')}>
                       {availableCategories.map(c => (
                         <option key={c.category_id} value={c.category_id}>
-                          {c.display_name_en} ({c.product_count}{' '}
-                          {c.product_count === 1 ? 'product' : 'products'})
+                          {c.display_name_en} ({t('panel.productCount', { count: c.product_count })}
+                          )
                         </option>
                       ))}
                     </optgroup>
                   )}
                   {categoriesWithRules.length > 0 && (
-                    <optgroup label="Already have rules">
+                    <optgroup label={t('panel.alreadyHaveRulesGroup')}>
                       {categoriesWithRules.map(c => (
                         <option
                           key={c.category_id}
@@ -343,7 +345,7 @@ export function AddAutomationRulePanel({
               </div>
               {!selectorDisabled && (
                 <Typography variant="small" color="muted">
-                  Categories marked ✓ already have automation rules
+                  {t('panel.categoriesWithRulesNote')}
                 </Typography>
               )}
             </div>
@@ -353,12 +355,12 @@ export function AddAutomationRulePanel({
           {ruleType === 'product' && (
             <div className="flex flex-col gap-2">
               <Typography variant="h5" className="font-semibold">
-                Product
+                {t('panel.productHeading')}
               </Typography>
               {!selectorDisabled && (
                 <input
                   type="text"
-                  placeholder="Search products..."
+                  placeholder={t('panel.searchProducts')}
                   value={productSearch}
                   onChange={e => setProductSearch(e.target.value)}
                   className="w-full px-3 py-2 border border-border rounded-lg text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
@@ -371,9 +373,9 @@ export function AddAutomationRulePanel({
                   disabled={selectorDisabled}
                   className="w-full appearance-none px-3 py-2 pr-8 border border-border rounded-lg text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 disabled:cursor-default"
                 >
-                  <option value="">Select a product...</option>
+                  <option value="">{t('panel.selectProduct')}</option>
                   {availableProducts.length > 0 && (
-                    <optgroup label="Available">
+                    <optgroup label={t('panel.availableGroup')}>
                       {availableProducts.map(p => (
                         <option key={p.product_id} value={p.product_id}>
                           {p.name}
@@ -383,7 +385,7 @@ export function AddAutomationRulePanel({
                     </optgroup>
                   )}
                   {productsWithRules.length > 0 && (
-                    <optgroup label="Already have rules">
+                    <optgroup label={t('panel.alreadyHaveRulesGroup')}>
                       {productsWithRules.map(p => (
                         <option
                           key={p.product_id}
@@ -400,7 +402,7 @@ export function AddAutomationRulePanel({
               </div>
               {!selectorDisabled && (
                 <Typography variant="small" color="muted">
-                  Products marked ✓ already have automation rules
+                  {t('panel.productsWithRulesNote')}
                 </Typography>
               )}
             </div>
@@ -410,7 +412,7 @@ export function AddAutomationRulePanel({
           <div className="flex flex-col gap-4">
             <div className="flex items-center justify-between">
               <Typography variant="h5" className="font-semibold">
-                Shelf life (days)
+                {t('panel.shelfLifeHeading')}
               </Typography>
               <div className="flex items-center gap-2">
                 <input
@@ -425,7 +427,7 @@ export function AddAutomationRulePanel({
               </div>
             </div>
             <Typography variant="small" color="muted">
-              Example: Delivered today → Expires {expiryExample}
+              {t('panel.shelfLifeExample', { date: expiryExample })}
             </Typography>
           </div>
 
@@ -433,14 +435,13 @@ export function AddAutomationRulePanel({
           {ruleType === 'category' && selectedCategory && (
             <div className="flex flex-col gap-2">
               <Typography variant="h5" className="font-semibold">
-                Products covered
+                {t('panel.productsCoveredHeading')}
               </Typography>
               <div className="flex flex-col gap-1">
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full shrink-0 bg-primary" />
                   <Typography variant="p" color="muted">
-                    {selectedCategory.product_count}{' '}
-                    {selectedCategory.product_count === 1 ? 'product' : 'products'}
+                    {t('panel.productCount', { count: selectedCategory.product_count })}
                   </Typography>
                 </div>
                 {categoryProducts.slice(0, 10).map(p => (
@@ -450,7 +451,7 @@ export function AddAutomationRulePanel({
                 ))}
                 {categoryProducts.length > 10 && (
                   <Typography variant="small" color="muted" className="pl-4">
-                    and {categoryProducts.length - 10} more
+                    {t('panel.andMore', { count: categoryProducts.length - 10 })}
                   </Typography>
                 )}
               </div>
@@ -460,11 +461,10 @@ export function AddAutomationRulePanel({
           {/* Info box */}
           <div className="flex flex-col gap-1">
             <Typography variant="p" className="font-semibold">
-              These rules automatically add expiry dates to products.
+              {t('panel.infoTitle')}
             </Typography>
             <Typography variant="p" color="muted">
-              When deliveries are logged, expiry dates will be calculated using this shelf life
-              instead of manual entry.
+              {t('panel.infoDescription')}
             </Typography>
           </div>
         </div>
@@ -479,44 +479,46 @@ export function AddAutomationRulePanel({
                   disabled={isSaving}
                   className="text-destructive hover:text-destructive hover:bg-destructive/10"
                 >
-                  Delete rule
+                  {t('actions.deleteRule')}
                 </Button>
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Delete rule?</AlertDialogTitle>
+                  <AlertDialogTitle>{t('deleteDialog.title')}</AlertDialogTitle>
                   <AlertDialogDescription>
-                    &ldquo;{currentTabRule?.name}&rdquo; will be removed. Products in this{' '}
-                    {currentTabRule?.type} will no longer have shelf life automatically assigned.
+                    {t('deleteDialog.description', {
+                      name: currentTabRule?.name ?? '',
+                      type: currentTabRule?.type ?? '',
+                    })}
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogCancel>{t('deleteDialog.cancel')}</AlertDialogCancel>
                   <AlertDialogAction
                     className={buttonVariants({ variant: 'destructive' })}
                     onClick={() => currentTabRule && onDelete?.(currentTabRule)}
                   >
-                    Delete rule
+                    {t('deleteDialog.confirm')}
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
             <div className="flex gap-2">
               <Button variant="outline" onClick={onClose} disabled={isSaving}>
-                Cancel
+                {t('actions.cancel')}
               </Button>
               <Button disabled={isSaving} onClick={handleSave}>
-                {isSaving ? 'Saving…' : 'Save changes'}
+                {isSaving ? t('actions.saving') : t('actions.saveChanges')}
               </Button>
             </div>
           </div>
         ) : (
           <div className="px-6 py-4 border-t border-border flex items-center justify-end gap-2">
             <Button variant="outline" onClick={onClose} disabled={isSaving}>
-              Cancel
+              {t('actions.cancel')}
             </Button>
             <Button disabled={(!contextualMode && !canCreate) || isSaving} onClick={handleCreate}>
-              {isSaving ? 'Creating…' : 'Create rule'}
+              {isSaving ? t('actions.creating') : t('actions.createRule')}
             </Button>
           </div>
         )}

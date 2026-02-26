@@ -110,19 +110,27 @@ export async function prefetchDashboardData() {
     ])
     const prefetchDuration = performance.now() - prefetchStart
 
+    const [userStoresResult, userPreferencesResult, currentUserResult] = results
+
     // Log any failed prefetches
-    const queryNames = ['userStores', 'userPreferences', 'currentUser']
-    results.forEach((result, index) => {
-      if (result.status === 'rejected') {
-        logger.queryWarn('prefetchDashboardData', `Failed to prefetch ${queryNames[index]}`, {
-          error: result.reason,
-        })
-      }
-    })
+    if (userStoresResult.status === 'rejected') {
+      logger.queryWarn('prefetchDashboardData', 'Failed to prefetch userStores', {
+        error: userStoresResult.reason,
+      })
+    }
+    if (userPreferencesResult.status === 'rejected') {
+      logger.queryWarn('prefetchDashboardData', 'Failed to prefetch userPreferences', {
+        error: userPreferencesResult.reason,
+      })
+    }
+    if (currentUserResult.status === 'rejected') {
+      logger.queryWarn('prefetchDashboardData', 'Failed to prefetch currentUser', {
+        error: currentUserResult.reason,
+      })
+    }
 
     // Overwrite the claims-based seed with real user data if getUser() succeeded.
     // This ensures avatar_url, created_at, etc. are always correct on first render.
-    const currentUserResult = results[2]
     if (currentUserResult.status === 'fulfilled' && currentUserResult.value) {
       queryClient.setQueryData(queryKeys.auth.currentUser(), currentUserResult.value)
     }
@@ -131,7 +139,6 @@ export async function prefetchDashboardData() {
     let userStores: UserStore[] = []
     let userPreferences: UserPreferences | null = null
 
-    const userStoresResult = results[0]
     if (userStoresResult.status === 'fulfilled') {
       userStores = userStoresResult.value as UserStore[]
       await queryClient.prefetchQuery({
@@ -141,7 +148,6 @@ export async function prefetchDashboardData() {
       })
     }
 
-    const userPreferencesResult = results[1]
     if (userPreferencesResult.status === 'fulfilled') {
       userPreferences = userPreferencesResult.value as UserPreferences | null
       await queryClient.prefetchQuery({

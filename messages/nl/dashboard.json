@@ -223,6 +223,19 @@
         "tracked": "{count, plural, =1 {1 product} other {# producten}} gevolgd",
         "remaining": "{count, plural, =1 {1 product} other {# producten}} resterend"
       },
+      "autoTrackingBanner": {
+        "title": "Bespaar tijd met automatisch bijhouden",
+        "description": "Vertel Lifo hoe lang artikelen meegaan, en het berekent automatisch vervaldatums voor nieuwe leveringen.",
+        "cta": "Nu instellen",
+        "dismiss": "Sluiten"
+      },
+      "content": {
+        "expiringSoon": {
+          "title": "Verloopt binnenkort",
+          "subtitle": "Batches dichtstbij hun vervaldatum",
+          "viewAll": "Alles bekijken"
+        }
+      },
       "automation": {
         "title": "Automatisering",
         "subtitle": "Automatische batch-aanmaakregels",
@@ -243,11 +256,73 @@
           "product": "Product"
         }
       },
+      "automations": {
+        "table": {
+          "activeRules": "Actieve regels",
+          "productsCovered": "Gedekte producten",
+          "addRule": "Regel toevoegen",
+          "empty": "Nog geen automatiseringsregels. Voeg een regel toe om te beginnen.",
+          "headers": {
+            "rule": "Regel",
+            "shelfLife": "Houdbaarheid",
+            "actions": "Acties"
+          }
+        },
+        "row": {
+          "typeProduct": "Product",
+          "typeCategory": "Categorie",
+          "items": "{count, plural, =1 {1 artikel} other {# artikelen}}",
+          "shelfLifeDays": "{count} dagen",
+          "editLabel": "Bewerken {name}",
+          "deleteLabel": "Verwijderen {name}"
+        },
+        "panel": {
+          "editTitle": "Automatiseringsregel bewerken",
+          "editTypeTitle": "Bewerk {type} regel",
+          "createTitle": "Automatiseringsregel aanmaken",
+          "ruleTypeHeading": "Regeltype",
+          "typeCategory": "Categorie",
+          "typeProduct": "Product",
+          "categoryHeading": "Categorie",
+          "selectCategory": "Selecteer een categorie...",
+          "availableGroup": "Beschikbaar",
+          "alreadyHaveRulesGroup": "Hebben al regels",
+          "productCount": "{count, plural, =1 {1 product} other {# producten}}",
+          "categoriesWithRulesNote": "Categorieën met ✓ hebben al automatiseringsregels",
+          "productHeading": "Product",
+          "searchProducts": "Producten zoeken...",
+          "selectProduct": "Selecteer een product...",
+          "productsWithRulesNote": "Producten met ✓ hebben al automatiseringsregels",
+          "shelfLifeHeading": "Houdbaarheid (dagen)",
+          "shelfLifeExample": "Voorbeeld: Vandaag geleverd → Verloopt op {date}",
+          "productsCoveredHeading": "Gedekte producten",
+          "andMore": "en {count} meer",
+          "infoTitle": "Deze regels voegen automatisch vervaldatums toe aan producten.",
+          "infoDescription": "Wanneer leveringen worden geregistreerd, worden vervaldatums berekend op basis van deze houdbaarheid in plaats van handmatige invoer.",
+          "ruleTypeDisplayHeading": "Regeltype"
+        },
+        "deleteDialog": {
+          "title": "Regel verwijderen?",
+          "description": "'{name}' wordt verwijderd. Producten in deze {type} krijgen niet langer automatisch een houdbaarheid toegewezen.",
+          "cancel": "Annuleren",
+          "confirm": "Regel verwijderen"
+        },
+        "actions": {
+          "deleteRule": "Regel verwijderen",
+          "cancel": "Annuleren",
+          "saveChanges": "Wijzigingen opslaan",
+          "saving": "Opslaan\u2026",
+          "createRule": "Regel aanmaken",
+          "creating": "Aanmaken\u2026"
+        }
+      },
       "expiringTable": {
         "daysLeft": {
           "singular": "dag over",
           "plural": "dagen over"
-        }
+        },
+        "description": "Batches dichtst bij hun vervaldatum",
+        "viewAll": "Alles bekijken"
       }
     }
   },
@@ -417,6 +492,7 @@
   },
   "navigation": {
     "automations": "Automatiseringen",
+    "locations": "Locaties",
     "dashboard-title": "Winkel",
     "dashboard": "Dashboard",
     "overview": "Overzicht",

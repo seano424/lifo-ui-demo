@@ -22,6 +22,7 @@ import type { BatchSort, BatchSortField, BatchWithProduct } from '@/lib/queries/
 import { fetchProductWithBatches } from '@/lib/queries/products'
 import { queryKeys } from '@/lib/queries/query-keys'
 import { parseISODateAsLocal } from '@/lib/utils/date-conversion'
+import { formatProductName } from '@/lib/utils/product-name'
 import {
   flexRender,
   getCoreRowModel,
@@ -198,7 +199,9 @@ export function BatchTable({
                 onMouseEnter={() => handleBatchHover(row.original.product_id)}
                 className={cn(
                   'cursor-pointer transition-all duration-100 ease-in-out',
-                  isExpiringSoon(row.original) ? 'hover:bg-muted/30' : 'hover:bg-muted/30',
+                  isExpiringSoon(row.original)
+                    ? 'bg-red-50/20 hover:bg-red-50/40 dark:bg-red-900/10 dark:hover:bg-red-900/20'
+                    : 'hover:bg-muted/30',
                 )}
               >
                 {row.getVisibleCells().map(cell => (
@@ -224,15 +227,16 @@ export function BatchTable({
           const expiryDate = batch.expiry_date ? parseISODateAsLocal(batch.expiry_date) : null
           const daysLeft = expiryDate ? getDaysLeft(expiryDate) : null
           const { label: daysLabel } =
-            daysLeft !== null ? getDaysLeftStyling(daysLeft) : { label: '-' }
+            daysLeft !== null ? getDaysLeftStyling(daysLeft, tExpiry) : { label: '-' }
           const badgeVariant = daysLeft !== null && daysLeft <= 3 ? 'danger' : 'success'
 
           return (
-            <div
+            <button
               key={batch.batch_id}
+              type="button"
               onClick={() => handleBatchClick(batch)}
               className={cn(
-                'px-4 py-4 cursor-pointer transition-colors active:bg-muted/20 border border-b-muted-foreground/10 border-t-transparent border-x-transparent',
+                'w-full text-left px-4 py-4 cursor-pointer transition-colors active:bg-muted/20 border border-b-muted-foreground/10 border-t-transparent border-x-transparent',
                 isExpiringSoon(batch) && 'border border-red-100/90',
               )}
             >
@@ -251,7 +255,7 @@ export function BatchTable({
                     </div>
                   )}
                   <span className="font-semibold truncate">
-                    {batch.products?.name?.replace(/ - /g, ' ')}
+                    {formatProductName(batch.products?.name)}
                   </span>
                 </div>
                 {expiryDate && (
@@ -286,7 +290,7 @@ export function BatchTable({
                   <Typography variant="small">{tStatus(batch.status || 'active')}</Typography>
                 </div>
               </div>
-            </div>
+            </button>
           )
         })}
       </div>

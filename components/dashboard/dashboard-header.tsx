@@ -1,6 +1,6 @@
 'use client'
 
-import { useTranslations } from 'next-intl'
+import { useTranslations, useLocale } from 'next-intl'
 import { useStoreState } from '@/lib/stores/store-context'
 import { useCurrentUser } from '@/hooks/use-users'
 import { cn } from '@/lib/utils'
@@ -14,6 +14,7 @@ interface DashboardHeaderProps {
 
 export function DashboardHeader({ timeRange, onTimeRangeChange }: DashboardHeaderProps) {
   const t = useTranslations('dashboard.redesign.header')
+  const locale = useLocale()
   const { activeStore } = useStoreState()
   const { data: currentUser, isLoading } = useCurrentUser()
 
@@ -26,7 +27,7 @@ export function DashboardHeader({ timeRange, onTimeRangeChange }: DashboardHeade
 
   // Format date
   const today = new Date()
-  const formattedDate = today.toLocaleDateString('en-US', {
+  const formattedDate = today.toLocaleDateString(locale, {
     weekday: 'long',
     year: 'numeric',
     month: 'long',

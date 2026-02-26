@@ -30,6 +30,7 @@ import { Package } from 'lucide-react'
 import Image from 'next/image'
 import { useTranslations } from 'next-intl'
 import { useEffect, useMemo, useState } from 'react'
+import { formatProductName } from '@/lib/utils/product-name'
 
 const VALID_COLUMN_IDS = [
   'name',
@@ -200,11 +201,12 @@ export function ProductsTable({
             : tTable('uncategorized')
 
           return (
-            <div
+            <button
               key={product.product_id}
+              type="button"
               onClick={() => handleProductClick(product)}
               onMouseEnter={() => handleProductHover(product.product_id)}
-              className="px-4 py-4 cursor-pointer transition-colors active:bg-muted/20"
+              className="w-full text-left px-4 py-4 cursor-pointer transition-colors active:bg-muted/20"
             >
               {/* Primary row: product image + name + category badge */}
               <div className="flex items-center justify-between gap-3 mb-2">
@@ -220,9 +222,7 @@ export function ProductsTable({
                       />
                     </div>
                   )}
-                  <span className="font-semibold truncate">
-                    {product.name?.replace(/ - /g, ' ')}
-                  </span>
+                  <span className="font-semibold truncate">{formatProductName(product.name)}</span>
                 </div>
                 <Badge
                   variant="successRounded"
@@ -254,7 +254,7 @@ export function ProductsTable({
                   <Typography variant="small">{missingExpiry}</Typography>
                 </div>
               </div>
-            </div>
+            </button>
           )
         })}
       </div>

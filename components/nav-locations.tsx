@@ -6,6 +6,7 @@ import { Typography } from '@/components/ui/typography'
 import { useStoreActions, useUserStores } from '@/hooks/use-stores'
 import { useStoreState } from '@/lib/stores/store-context'
 import { cn } from '@/lib/utils'
+import { useTranslations } from 'next-intl'
 
 // Derive up to 2 initials from a store name
 function getStoreInitials(name: string): string {
@@ -37,6 +38,7 @@ const AVATAR_COLORS = [
 ] as const
 
 export function NavLocations() {
+  const t = useTranslations('navigation')
   const { userStores, isLoading } = useUserStores()
   const { switchStore, isChangingStore } = useStoreActions()
   const { activeStore } = useStoreState()
@@ -49,7 +51,7 @@ export function NavLocations() {
           color="muted"
           className="uppercase text-slate-400/90 font-mono"
         >
-          Locations
+          {t('locations')}
         </Typography>
       </SidebarGroupLabel>
 

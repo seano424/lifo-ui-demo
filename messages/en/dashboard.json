@@ -223,6 +223,19 @@
         "tracked": "{count, plural, =1 {1 product} other {# products}} tracked",
         "remaining": "{count, plural, =1 {1 product} other {# products}} remaining"
       },
+      "autoTrackingBanner": {
+        "title": "Save time with auto-tracking",
+        "description": "Tell Lifo how long items last, and it will automatically set expiry dates for new deliveries.",
+        "cta": "Set up now",
+        "dismiss": "Dismiss"
+      },
+      "content": {
+        "expiringSoon": {
+          "title": "Expiring Soon",
+          "subtitle": "Batches closest to their expiry date",
+          "viewAll": "View all"
+        }
+      },
       "automation": {
         "title": "Expiry Automations",
         "subtitle": "We calculate expiry dates from the delivery date + shelf life you set. Nothing to enter on delivery.",
@@ -243,11 +256,73 @@
           "product": "Product"
         }
       },
+      "automations": {
+        "table": {
+          "activeRules": "Active rules",
+          "productsCovered": "Products covered",
+          "addRule": "Add rule",
+          "empty": "No automation rules yet. Add a rule to get started.",
+          "headers": {
+            "rule": "Rule",
+            "shelfLife": "Shelf Life",
+            "actions": "Actions"
+          }
+        },
+        "row": {
+          "typeProduct": "Product",
+          "typeCategory": "Category",
+          "items": "{count, plural, =1 {1 item} other {# items}}",
+          "shelfLifeDays": "{count} days",
+          "editLabel": "Edit {name}",
+          "deleteLabel": "Delete {name}"
+        },
+        "panel": {
+          "editTitle": "Edit automation rule",
+          "editTypeTitle": "Edit {type} rule",
+          "createTitle": "Create automation rule",
+          "ruleTypeHeading": "Rule type",
+          "typeCategory": "Category",
+          "typeProduct": "Product",
+          "categoryHeading": "Category",
+          "selectCategory": "Select a category...",
+          "availableGroup": "Available",
+          "alreadyHaveRulesGroup": "Already have rules",
+          "productCount": "{count, plural, =1 {1 product} other {# products}}",
+          "categoriesWithRulesNote": "Categories marked ✓ already have automation rules",
+          "productHeading": "Product",
+          "searchProducts": "Search products...",
+          "selectProduct": "Select a product...",
+          "productsWithRulesNote": "Products marked ✓ already have automation rules",
+          "shelfLifeHeading": "Shelf life (days)",
+          "shelfLifeExample": "Example: Delivered today → Expires {date}",
+          "productsCoveredHeading": "Products covered",
+          "andMore": "and {count} more",
+          "infoTitle": "These rules automatically add expiry dates to products.",
+          "infoDescription": "When deliveries are logged, expiry dates will be calculated using this shelf life instead of manual entry.",
+          "ruleTypeDisplayHeading": "Rule Type"
+        },
+        "deleteDialog": {
+          "title": "Delete rule?",
+          "description": "\"{name}\" will be removed. Products in this {type} will no longer have shelf life automatically assigned.",
+          "cancel": "Cancel",
+          "confirm": "Delete rule"
+        },
+        "actions": {
+          "deleteRule": "Delete rule",
+          "cancel": "Cancel",
+          "saveChanges": "Save changes",
+          "saving": "Saving\u2026",
+          "createRule": "Create rule",
+          "creating": "Creating\u2026"
+        }
+      },
       "expiringTable": {
         "daysLeft": {
           "singular": "day left",
           "plural": "Days remaining"
-        }
+        },
+        "description": "Batches closest to their expiry date",
+        "viewAll": "View all"
       }
     }
   },
@@ -417,6 +492,7 @@
   },
   "navigation": {
     "automations": "Automations",
+    "locations": "Locations",
     "dashboard-title": "Store",
     "dashboard": "Dashboard",
     "overview": "Overview",
