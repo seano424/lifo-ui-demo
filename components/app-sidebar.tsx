@@ -97,11 +97,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       className="bg-secondary-100/10 dark:bg-background border-l-none"
       {...props}
     >
-      <SidebarHeader className="hidden sm:flex gap-2 justify-center items-center h-16 border-b dark:bg-background">
+      <SidebarHeader className="hidden md:flex gap-2 justify-start items-center h-16 border-b dark:bg-background">
         {/* Desktop logo with text */}
         <Link
           href="/"
-          className="group-data-[collapsible=icon]:hidden hidden sm:flex items-center gap-2 hover:opacity-80 transition-opacity duration-200 ease-in-out text-4xl"
+          className="group-data-[collapsible=icon]:hidden gap-2 hover:opacity-80 transition-opacity duration-200 ease-in-out text-4xl px-2"
         >
           <Logo variant="svg" size="sm" priority withText />
         </Link>

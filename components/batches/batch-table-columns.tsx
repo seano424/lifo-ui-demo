@@ -79,7 +79,7 @@ function getAlignmentClasses(columnIndex: number): {
 }
 
 // Helper function to calculate days until expiry
-function getDaysLeft(expiryDate: Date): number {
+export function getDaysLeft(expiryDate: Date): number {
   const today = new Date()
   today.setHours(0, 0, 0, 0)
   const expiry = new Date(expiryDate)
@@ -88,7 +88,7 @@ function getDaysLeft(expiryDate: Date): number {
 }
 
 // Helper function to get urgency styling for Days remaining
-function getDaysLeftStyling(daysLeft: number): {
+export function getDaysLeftStyling(daysLeft: number): {
   textClass: string
   label: string
 } {

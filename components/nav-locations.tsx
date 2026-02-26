@@ -42,7 +42,7 @@ export function NavLocations() {
   const { activeStore } = useStoreState()
 
   return (
-    <SidebarGroup className="">
+    <SidebarGroup className="md:hidden">
       <SidebarGroupLabel className="mb-1 px-4">
         <Typography
           variant="extraSmall"

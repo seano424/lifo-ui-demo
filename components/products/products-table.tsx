@@ -2,6 +2,7 @@
 
 import { createProductTableColumns } from '@/components/products/product-table-columns'
 import { ProductDetailPanel } from '@/components/products/product-detail-panel'
+import { Badge } from '@/components/ui/badge'
 import { CardDescription, CardTitle } from '@/components/ui/card'
 import {
   Table,
@@ -11,6 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { Typography } from '@/components/ui/typography'
 import { useCategoryTranslation } from '@/hooks/use-category-translation'
 import { useQueryClient } from '@tanstack/react-query'
 import { fetchProductWithBatches } from '@/lib/queries/products'
@@ -25,6 +27,7 @@ import {
   useReactTable,
 } from '@tanstack/react-table'
 import { Package } from 'lucide-react'
+import Image from 'next/image'
 import { useTranslations } from 'next-intl'
 import { useEffect, useMemo, useState } from 'react'
 
@@ -129,57 +132,130 @@ export function ProductsTable({
 
   return (
     <>
-      <Table
-        style={{
-          tableLayout: 'fixed',
-          borderCollapse: 'separate',
-          borderSpacing: 0,
-        }}
-      >
-        <TableHeader>
-          {table.getHeaderGroups().map(headerGroup => (
-            <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map(header => (
-                <TableHead
-                  key={header.id}
-                  className="sticky top-0 bg-background z-10 py-3 px-2 sm:px-4 border-b border-muted"
-                  style={
-                    header.column.columnDef.size
-                      ? { width: header.column.columnDef.size }
-                      : undefined
-                  }
-                >
-                  {header.isPlaceholder
-                    ? null
-                    : flexRender(header.column.columnDef.header, header.getContext())}
-                </TableHead>
-              ))}
-            </TableRow>
-          ))}
-        </TableHeader>
-        <TableBody>
-          {table.getRowModel().rows.map(row => (
-            <TableRow
-              key={row.id}
-              onClick={() => handleProductClick(row.original)}
-              onMouseEnter={() => handleProductHover(row.original.product_id)}
-              className="cursor-pointer transition-all duration-100 ease-in-out hover:bg-muted/30"
+      {/* Desktop table — hidden on mobile */}
+      <div className="hidden sm:block">
+        <Table
+          style={{
+            tableLayout: 'fixed',
+            borderCollapse: 'separate',
+            borderSpacing: 0,
+            width: 'max-content',
+            minWidth: '100%',
+          }}
+        >
+          <TableHeader>
+            {table.getHeaderGroups().map(headerGroup => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map(header => (
+                  <TableHead
+                    key={header.id}
+                    className="sticky top-0 bg-background z-10 py-3 px-2 sm:px-4 border-b border-muted"
+                    style={
+                      header.column.columnDef.size
+                        ? { width: header.column.columnDef.size }
+                        : undefined
+                    }
+                  >
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(header.column.columnDef.header, header.getContext())}
+                  </TableHead>
+                ))}
+              </TableRow>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows.map(row => (
+              <TableRow
+                key={row.id}
+                onClick={() => handleProductClick(row.original)}
+                onMouseEnter={() => handleProductHover(row.original.product_id)}
+                className="cursor-pointer transition-all duration-100 ease-in-out hover:bg-muted/30"
+              >
+                {row.getVisibleCells().map(cell => (
+                  <TableCell
+                    key={cell.id}
+                    style={
+                      cell.column.columnDef.size ? { width: cell.column.columnDef.size } : undefined
+                    }
+                    className="py-3 px-2 sm:px-4"
+                  >
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+
+      {/* Mobile card list — hidden on sm+ */}
+      <div className="sm:hidden divide-y divide-muted">
+        {data.map(product => {
+          const storeQty = product.store_quantity ?? 0
+          const batchQty = product.batch_quantity ?? 0
+          const missingExpiry = Math.max(0, storeQty - batchQty)
+          const categoryName = product.category_code
+            ? getCategoryName(product)
+            : tTable('uncategorized')
+
+          return (
+            <div
+              key={product.product_id}
+              onClick={() => handleProductClick(product)}
+              onMouseEnter={() => handleProductHover(product.product_id)}
+              className="px-4 py-4 cursor-pointer transition-colors active:bg-muted/20"
             >
-              {row.getVisibleCells().map(cell => (
-                <TableCell
-                  key={cell.id}
-                  style={
-                    cell.column.columnDef.size ? { width: cell.column.columnDef.size } : undefined
-                  }
-                  className="py-3 px-2 sm:px-4"
+              {/* Primary row: product image + name + category badge */}
+              <div className="flex items-center justify-between gap-3 mb-2">
+                <div className="flex items-center gap-2 min-w-0">
+                  {product.image_url && (
+                    <div className="size-9 rounded-lg overflow-hidden shrink-0">
+                      <Image
+                        src={product.image_url}
+                        alt={product.name}
+                        width={36}
+                        height={36}
+                        className="object-cover w-full h-full"
+                      />
+                    </div>
+                  )}
+                  <span className="font-semibold truncate">{product.name}</span>
+                </div>
+                <Badge
+                  variant="successRounded"
+                  size="sm"
+                  className="shrink-0 font-light rounded-lg! border border-lime-200"
                 >
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </TableCell>
-              ))}
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+                  {categoryName}
+                </Badge>
+              </div>
+
+              {/* Secondary rows: label → value */}
+              <div className="space-y-1">
+                <div className="flex justify-between text-sm">
+                  <Typography variant="small" color="muted">
+                    {tTable('totalStock')}
+                  </Typography>
+                  <Typography variant="small">{storeQty}</Typography>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <Typography variant="small" color="muted">
+                    {tTable('totalUnitsWithExpiryDates')}
+                  </Typography>
+                  <Typography variant="small">{batchQty}</Typography>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <Typography variant="small" color="muted">
+                    {tTable('datesMissing')}
+                  </Typography>
+                  <Typography variant="small">{missingExpiry}</Typography>
+                </div>
+              </div>
+            </div>
+          )
+        })}
+      </div>
 
       {selectedProductId && (
         <ProductDetailPanel
