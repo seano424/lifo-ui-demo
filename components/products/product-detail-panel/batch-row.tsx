@@ -87,8 +87,15 @@ export function BatchRow({
   return (
     <>
       <div
+        role={!isExpired ? 'button' : undefined}
+        tabIndex={!isExpired ? 0 : undefined}
         onClick={isEditing ? onCancel : isExpired ? undefined : onStartEdit}
-        onKeyDown={e => e.key === 'Enter' && onStartEdit()}
+        onKeyDown={e => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            if (isEditing) onCancel()
+            else if (!isExpired) onStartEdit()
+          }
+        }}
         className={cn(
           'flex items-center gap-3 group',
           // 'bg-muted rounded-lg py-2 px-3',

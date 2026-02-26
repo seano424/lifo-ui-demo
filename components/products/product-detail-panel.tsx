@@ -118,7 +118,7 @@ export function ProductDetailPanel({
         </SheetHeader>
 
         {/* Scrollable content */}
-        <div className="flex-1 overflow-y-auto flex flex-col divide-y divide-border/20 pb-[50vh] scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent">
+        <div className="flex-1 overflow-y-auto flex flex-col divide-y divide-border/20 pb-24 scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent">
           {!isReady ? (
             <div className="px-6 py-6 flex flex-col gap-4">
               <Skeleton className="h-24 w-full rounded-3xl" />

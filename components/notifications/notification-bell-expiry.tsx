@@ -15,6 +15,7 @@ export function NotificationBellExpiry() {
         asLink
         className="rounded-full border size-10"
         href={'/dashboard/expiring'}
+        aria-label={expiryTodosCount > 0 ? `${expiryTodosCount} expiring items` : 'Expiring items'}
       >
         <BellIcon size={16} className="text-gray-700 dark:text-white" />
       </Button>
