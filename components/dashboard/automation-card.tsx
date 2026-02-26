@@ -171,7 +171,10 @@ export function AutomationCard({ showLinks = true }: { showLinks?: boolean }) {
                   </Typography>
                 </div>
               </div>
-              <Badge variant="primary" className="size-9 sm:size-auto rounded text-xs sm:text-sm">
+              <Badge
+                variant={rule.type === 'product' ? 'success' : 'primary'}
+                className="size-9 sm:size-auto rounded text-xs sm:text-sm"
+              >
                 {rule.shelf_life_days != null ? `${rule.shelf_life_days}d` : '—'}
               </Badge>
             </button>
