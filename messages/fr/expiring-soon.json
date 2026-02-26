@@ -1,7 +1,7 @@
 {
   "page": {
     "title": "Expire Bientôt",
-    "description": "Gérez les articles qui expirent bientôt et suivez vos progrès"
+    "description": "Suivez ce qui expire prochainement"
   },
   "tabs": {
     "pending": "En attente",
