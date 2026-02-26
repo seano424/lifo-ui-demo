@@ -82,7 +82,7 @@ export function ProductDetailPanel({
     })
   }, [batches])
 
-  const productName = product?.name || 'Product Details'
+  const productName = (product?.name || 'Product Details').replace(/ - /g, ' ')
 
   return (
     <Sheet open={isOpen} onOpenChange={open => !open && handleClose()}>
@@ -91,13 +91,15 @@ export function ProductDetailPanel({
           <div className="flex items-center gap-3">
             <ProductMonogram name={productName} imageUrl={product?.image_url} />
             <div className="flex-1 min-w-0">
-              <SheetTitle className="text-lg font-semibold text-left">
-                <div className="flex flex-col">
-                  <span>{productName}</span>
+              <SheetTitle className="text-left flex items-center gap-3">
+                <div>
+                  <Typography variant="h3" className="font-black font-heading">
+                    {productName}
+                  </Typography>
                   {(product?.brand || product?.category_display_name) && (
-                    <div className="flex items-center gap-1.5">
+                    <div className="hidden sm:flex flex-wrap items-center gap-1.5">
                       {product?.brand && (
-                        <Typography variant="small" color="muted">
+                        <Typography variant="small" color="muted" className="font-light">
                           {product.brand}
                         </Typography>
                       )}
@@ -105,7 +107,7 @@ export function ProductDetailPanel({
                         <span className="text-xs text-muted-foreground">·</span>
                       )}
                       {product?.category_display_name && (
-                        <Typography variant="small" color="muted">
+                        <Typography variant="small" color="muted" className="font-light">
                           {product.category_display_name}
                         </Typography>
                       )}
@@ -198,7 +200,7 @@ function getInitials(name: string): string {
 function ProductMonogram({ name, imageUrl }: { name: string; imageUrl?: string | null }) {
   if (imageUrl) {
     return (
-      <div className="size-9 rounded-lg overflow-hidden shrink-0 bg-primary/10">
+      <div className="size-12 rounded-lg overflow-hidden shrink-0 bg-primary/10">
         <Image
           src={imageUrl}
           alt={name}
@@ -213,9 +215,9 @@ function ProductMonogram({ name, imageUrl }: { name: string; imageUrl?: string |
   const initials = getInitials(name)
   return (
     <Typography
-      variant="extraSmall"
-      color="primary"
-      className="size-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0"
+      color="secondary"
+      variant="h4"
+      className="size-12 rounded bg-primary/10 flex items-center justify-center shrink-0 font-black font-heading"
     >
       {initials}
     </Typography>

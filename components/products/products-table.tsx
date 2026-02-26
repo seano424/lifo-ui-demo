@@ -220,7 +220,9 @@ export function ProductsTable({
                       />
                     </div>
                   )}
-                  <span className="font-semibold truncate">{product.name}</span>
+                  <span className="font-semibold truncate">
+                    {product.name?.replace(/ - /g, ' ')}
+                  </span>
                 </div>
                 <Badge
                   variant="successRounded"

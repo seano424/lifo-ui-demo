@@ -173,8 +173,11 @@ export function createBatchTableColumns({
               />
             </div>
           )}
-          <div className="truncate font-medium" title={row.original.products?.name}>
-            {row.original.products?.name}
+          <div
+            className="truncate font-medium"
+            title={row.original.products?.name?.replace(/ - /g, ' ')}
+          >
+            {row.original.products?.name?.replace(/ - /g, ' ')}
           </div>
         </div>
       ),

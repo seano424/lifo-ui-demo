@@ -7,9 +7,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-// import { Button } from '@/components/ui/button'
+
 import type { BatchSort, BatchSortField } from '@/lib/queries/batches'
-import { ArrowUpDownIcon } from 'lucide-react'
+import { ArrowUpDownIcon, ArrowUp, ArrowDown } from 'lucide-react'
 
 interface BatchListSortControlsProps {
   currentSort: BatchSort
@@ -25,16 +25,16 @@ export function BatchListSortControls({
   const t = useTranslations('batchSort')
 
   return (
-    <div className="flex items-center gap-2 flex-1">
+    <div className="flex items-center gap-1 border p-1 rounded-2xl">
       <Select
         value={currentSort.field}
         onValueChange={(field: BatchSortField) => updateSort(field)}
         disabled={isLoading}
       >
-        <SelectTrigger className="w-full sm:w-max" showChevron={false}>
-          <div className="flex items-center gap-1">
+        <SelectTrigger className="w-fit sm:w-max px-4" showChevron={false}>
+          <div className="flex items-center justify-between w-full gap-1">
             <SelectValue className="whitespace-nowrap" />
-            <ArrowUpDownIcon className="h-4 w-4 text-muted-foreground" />
+            <ArrowUpDownIcon className="h-4 w-4 text-muted-foreground hidden sm:block" />
           </div>
         </SelectTrigger>
         <SelectContent>
@@ -50,12 +50,11 @@ export function BatchListSortControls({
         </SelectContent>
       </Select>
 
-      {/* <Button
-        variant="ghost"
-        size="sm"
+      <button
+        type="button"
         onClick={() => updateSort(currentSort.field)}
         disabled={isLoading}
-        className="h-8 w-8 p-0"
+        className="size-8 rounded-full border border-border text-muted-foreground p-0 hover:bg-transparent hover:text-foreground flex items-center justify-center"
         title={currentSort.direction === 'asc' ? t('asc') : t('desc')}
       >
         {currentSort.direction === 'asc' ? (
@@ -63,7 +62,7 @@ export function BatchListSortControls({
         ) : (
           <ArrowDown className="h-4 w-4" />
         )}
-      </Button> */}
+      </button>
     </div>
   )
 }

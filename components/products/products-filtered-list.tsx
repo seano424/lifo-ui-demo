@@ -169,7 +169,7 @@ export function ProductsFilteredList({
           />
         </div>
 
-        <div className="flex items-center gap-2 justify-start w-full">
+        <div className="flex items-center gap-1 sm:justify-start justify-between w-full">
           {/* Filters */}
           <ProductListFilters
             filters={{

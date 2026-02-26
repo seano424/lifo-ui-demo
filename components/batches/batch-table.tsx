@@ -250,7 +250,9 @@ export function BatchTable({
                       />
                     </div>
                   )}
-                  <span className="font-semibold truncate">{batch.products?.name}</span>
+                  <span className="font-semibold truncate">
+                    {batch.products?.name?.replace(/ - /g, ' ')}
+                  </span>
                 </div>
                 {expiryDate && (
                   <Badge size="sm" variant={badgeVariant} className="shrink-0">

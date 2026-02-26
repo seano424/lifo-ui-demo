@@ -102,8 +102,8 @@ export function createProductTableColumns({
               />
             </div>
           )}
-          <div className="truncate font-medium" title={row.original.name}>
-            {row.original.name}
+          <div className="truncate font-medium" title={row.original.name?.replace(/ - /g, ' ')}>
+            {row.original.name?.replace(/ - /g, ' ')}
           </div>
         </div>
       ),
