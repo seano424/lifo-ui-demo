@@ -135,6 +135,7 @@ export default async function InventoryBatchesPage({ searchParams }: InventoryBa
       <div className="flex flex-col gap-6 container py-6">
         <DashboardInsetHeader title={t('title')} description={t('description')} />
         <BatchesFilteredList
+          highlightExpiring={true}
           initialFilters={{
             filter: params.filter,
             expiringDays: params.expiringDays,

@@ -117,7 +117,9 @@
     "price": "Prix",
     "activeBatches": "Lots actifs",
     "dateAdded": "Date d'ajout",
-    "lastUpdated": "Dernière mise à jour"
+    "lastUpdated": "Dernière mise à jour",
+    "asc": "ASC",
+    "desc": "DESC"
   },
   "productCategories": {
     "SQUARE_IMPORT": "Import Square",

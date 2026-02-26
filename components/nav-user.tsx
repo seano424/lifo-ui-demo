@@ -1,7 +1,6 @@
 'use client'
 
 import { LogoutButton } from '@/components/logout-button'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,7 +10,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { LanguageButtonGroup } from '@/components/ui/language-switcher'
 import {
   SidebarMenu,
   SidebarMenuButton,
@@ -20,17 +18,47 @@ import {
 } from '@/components/ui/sidebar'
 // import { ThemeSwitcherSelect } from '@/components/ui/theme-switcher-select'
 import type { User } from '@/lib/types/user'
-import {
-  BadgeCheck,
-  Bell,
-  ChevronsUpDown,
-  CreditCard,
-  Globe,
-  // Palette,
-  Sparkles,
-} from 'lucide-react'
+import { BadgeCheck, Bell, ChevronsUpDown, CreditCard, Sparkles } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import Link from 'next/link'
+import Image from 'next/image'
+import { useState } from 'react'
+
+function UserAvatar({
+  avatarUrl,
+  fullName,
+  className,
+}: {
+  avatarUrl: string | null | undefined
+  fullName: string | null | undefined
+  className?: string
+}) {
+  const [imgError, setImgError] = useState(false)
+  const initials =
+    fullName
+      ?.split(' ')
+      .map(n => n.charAt(0))
+      .join('') || 'CN'
+
+  if (avatarUrl && !imgError) {
+    return (
+      <Image
+        src={avatarUrl}
+        alt={fullName || ''}
+        width={32}
+        height={32}
+        className={className ?? 'rounded-2xl'}
+        onError={() => setImgError(true)}
+      />
+    )
+  }
+
+  return (
+    <div className="h-8 w-8 rounded-2xl bg-muted flex items-center justify-center text-xs font-medium shrink-0">
+      {initials}
+    </div>
+  )
+}
 
 export function NavUser({ user }: { user: User }) {
   const { isMobile } = useSidebar()
@@ -42,16 +70,7 @@ export function NavUser({ user }: { user: User }) {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
-              <Avatar className="h-8 w-8 rounded-2xl">
-                <AvatarImage src={user.avatar_url || ''} alt={user.full_name || ''} />
-                <AvatarFallback className="rounded-2xl">
-                  {/* First two letters of the full name */}
-                  {user.full_name
-                    ?.split(' ')
-                    .map(name => name.charAt(0))
-                    .join('') || 'CN'}
-                </AvatarFallback>
-              </Avatar>
+              <UserAvatar avatarUrl={user.avatar_url} fullName={user.full_name} />
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate ">{user.full_name}</span>
                 <span className="truncate text-xs">{user.email}</span>
@@ -60,23 +79,18 @@ export function NavUser({ user }: { user: User }) {
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
-            className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-2xl"
+            className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-2xl flex flex-col gap-1"
             side={isMobile ? 'bottom' : 'right'}
             align="end"
             sideOffset={4}
           >
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                <Avatar className="h-8 w-8 rounded-2xl">
-                  <AvatarImage src={user.avatar_url || ''} alt={user.full_name || ''} />
-                  <AvatarFallback className="rounded-2xl">
-                    {/* First two letters of the full name */}
-                    {user.full_name
-                      ?.split(' ')
-                      .map(name => name.charAt(0))
-                      .join('') || 'CN'}
-                  </AvatarFallback>
-                </Avatar>
+                <UserAvatar
+                  avatarUrl={user.avatar_url}
+                  fullName={user.full_name}
+                  className="rounded-2xl shrink-0"
+                />
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate ">{user.full_name}</span>
                   <span className="truncate text-xs">{user.email}</span>
@@ -91,9 +105,6 @@ export function NavUser({ user }: { user: User }) {
                   {t('upgradeToPro')}
                 </Link>
               </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
               <DropdownMenuItem asChild>
                 <Link href="/dashboard/settings?tab=account">
                   <BadgeCheck />
@@ -112,35 +123,10 @@ export function NavUser({ user }: { user: User }) {
                   {t('notifications')}
                 </Link>
               </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem className="flex-col items-start p-0 cursor-default">
-                <div className="flex items-center gap-2 px-2 py-1.5 w-full">
-                  <Globe className="h-4 w-4" />
-                  <span className="text-sm">{t('language')}</span>
-                </div>
-                <div className="px-2 pb-2">
-                  <LanguageButtonGroup />
-                </div>
+              <DropdownMenuItem className="cursor-default dark:text-foreground">
+                <LogoutButton />
               </DropdownMenuItem>
             </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            {/* <DropdownMenuGroup>
-              <DropdownMenuItem className="flex-col items-start p-0 cursor-default hover:!bg-transparent">
-                <div className="flex items-center gap-2 px-2 py-1.5 w-full hover:text-black group-hover:text-black">
-                  <Palette className="h-4 w-4" />
-                  <span className="text-sm">{t('theme')}</span>
-                </div>
-                <div className="px-2 pb-2">
-                  <ThemeSwitcherSelect />
-                </div>
-              </DropdownMenuItem>
-            </DropdownMenuGroup> */}
-            {/* <DropdownMenuSeparator /> */}
-            <DropdownMenuItem className="cursor-default dark:text-foreground">
-              <LogoutButton className="w-full bg-transparent text-foreground" />
-            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>

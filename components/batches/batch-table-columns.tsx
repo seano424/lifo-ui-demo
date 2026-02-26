@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { SortableHeader } from '@/components/batches/sortable-header'
 import type { BatchSort, BatchSortField, BatchWithProduct } from '@/lib/queries/batches'
 import { parseISODateAsLocal } from '@/lib/utils/date-conversion'
+import { formatProductName } from '@/lib/utils/product-name'
 import { Badge } from '../ui/badge'
 import { Typography } from '../ui/typography'
 
@@ -79,7 +80,7 @@ function getAlignmentClasses(columnIndex: number): {
 }
 
 // Helper function to calculate days until expiry
-function getDaysLeft(expiryDate: Date): number {
+export function getDaysLeft(expiryDate: Date): number {
   const today = new Date()
   today.setHours(0, 0, 0, 0)
   const expiry = new Date(expiryDate)
@@ -88,37 +89,40 @@ function getDaysLeft(expiryDate: Date): number {
 }
 
 // Helper function to get urgency styling for Days remaining
-function getDaysLeftStyling(daysLeft: number): {
+export function getDaysLeftStyling(
+  daysLeft: number,
+  t: (key: string, values?: Record<string, string | number | Date>) => string,
+): {
   textClass: string
   label: string
 } {
   if (daysLeft < 0) {
     return {
       textClass: 'text-destructive',
-      label: 'Expired',
+      label: t('expired'),
     }
   }
   if (daysLeft === 0) {
     return {
       textClass: 'text-destructive',
-      label: 'Today',
+      label: t('today'),
     }
   }
   if (daysLeft <= 3) {
     return {
       textClass: 'text-destructive',
-      label: `${daysLeft} ${daysLeft === 1 ? 'day' : 'days'}`,
+      label: t('days', { count: daysLeft }),
     }
   }
   if (daysLeft <= 7) {
     return {
       textClass: '',
-      label: `${daysLeft} days`,
+      label: t('days', { count: daysLeft }),
     }
   }
   return {
     textClass: 'text-muted-foreground',
-    label: `${daysLeft} days`,
+    label: t('days', { count: daysLeft }),
   }
 }
 
@@ -133,7 +137,7 @@ export function createBatchTableColumns({
   currentSort: BatchSort
   updateSort: (field: BatchSortField) => void
   t: (key: string) => string
-  tExpiry: (key: string, params?: { days: number }) => string
+  tExpiry: (key: string, params?: Record<string, string | number | Date>) => string
   tStatus: (key: string) => string
   storeName?: string
 }): ColumnDef<BatchWithProduct>[] {
@@ -173,8 +177,11 @@ export function createBatchTableColumns({
               />
             </div>
           )}
-          <div className="truncate font-medium" title={row.original.products?.name}>
-            {row.original.products?.name}
+          <div
+            className="truncate font-medium"
+            title={formatProductName(row.original.products?.name)}
+          >
+            {formatProductName(row.original.products?.name)}
           </div>
         </div>
       ),
@@ -204,7 +211,7 @@ export function createBatchTableColumns({
 
         const expiryDate = parseISODateAsLocal(row.original.expiry_date)
         const daysLeft = getDaysLeft(expiryDate)
-        const { label } = getDaysLeftStyling(daysLeft)
+        const { label } = getDaysLeftStyling(daysLeft, tExpiry)
 
         return (
           <div className={alignments.days_left.cellClass}>

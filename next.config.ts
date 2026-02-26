@@ -29,6 +29,12 @@ const nextConfig: NextConfig = {
         hostname: 'square-catalog-sandbox.s3.amazonaws.com',
         pathname: '/files/**',
       },
+      // Google user profile images (OAuth/Google sign-in avatars)
+      {
+        protocol: 'https',
+        hostname: 'lh3.googleusercontent.com',
+        pathname: '/**',
+      },
     ],
   },
 

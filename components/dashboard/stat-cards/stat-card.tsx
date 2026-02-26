@@ -23,7 +23,7 @@ interface StatCardProps {
 
 export function StatCard({ label, value, subtitle, trend, href, hrefLabel }: StatCardProps) {
   return (
-    <Card className="relative cursor-default p-5 transition-all duration-200 flex flex-col gap-3 flex-1 bg-card">
+    <Card className="relative cursor-default transition-all duration-200 flex flex-col gap-3 flex-1 bg-card">
       <Typography variant="p">{label}</Typography>
       <div className="flex flex-col gap-1 min-h-24">
         <Typography variant="h4">{value}</Typography>

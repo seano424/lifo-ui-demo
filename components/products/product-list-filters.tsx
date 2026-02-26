@@ -55,7 +55,7 @@ export function ProductListFilters({
   }
 
   return (
-    <div className="flex flex-wrap items-center gap-2">
+    <div className="flex flex-wrap items-center gap-1">
       <Select
         value={filters?.category || 'all'}
         onValueChange={value =>
@@ -66,7 +66,7 @@ export function ProductListFilters({
         }
         disabled={isLoading || categoriesLoading}
       >
-        <SelectTrigger className="w-[180px]" showChevron={false}>
+        <SelectTrigger className="w-fit flex gap-1 px-4" showChevron={false}>
           <SelectValue placeholder={t('categoryFilter')} />
         </SelectTrigger>
         <SelectContent>

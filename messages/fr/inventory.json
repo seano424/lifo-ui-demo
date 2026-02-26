@@ -170,6 +170,8 @@
     },
     "expiry": {
       "expired": "Expiré",
+      "today": "Aujourd'hui",
+      "days": "{count, plural, =1 {1 jour} other {# jours}}",
       "daysLeft": "{days}j restants",
       "noExpiryDate": "Aucune date d'expiration"
     }

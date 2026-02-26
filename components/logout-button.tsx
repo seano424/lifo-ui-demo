@@ -1,29 +1,15 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
-import { Button } from '@/components/ui/button'
 import { createClient } from '@/lib/supabase/client'
+import { cn } from '@/lib/utils'
+import { LogOutIcon } from 'lucide-react'
 
 interface LogoutButtonProps {
   className?: string
-  variant?:
-    | 'link'
-    | 'default'
-    | 'secondary'
-    | 'ghost'
-    | 'destructive'
-    | 'outline'
-    | 'subtle'
-    | 'subtleSecondary'
-    | 'brand'
-    | 'brandOutline'
-    | 'brandSecondaryOutline'
-    | 'gray'
-    | null
-    | undefined
 }
 
-export function LogoutButton({ className, variant = 'gray' }: LogoutButtonProps) {
+export function LogoutButton({ className }: LogoutButtonProps) {
   const t = useTranslations('marketing.auth')
 
   const logout = async () => {
@@ -33,8 +19,17 @@ export function LogoutButton({ className, variant = 'gray' }: LogoutButtonProps)
   }
 
   return (
-    <Button variant={variant} size="default" onClick={logout} className={className}>
+    <button
+      type="button"
+      onClick={logout}
+      className={cn(
+        'relative flex cursor-pointer select-none items-center gap-2 text-sm outline-hidden transition-colors focus:bg-background focus:text-accent-foreground data-disabled:pointer-events-none data-disabled:opacity-50 dark:text-foreground w-full px-0.5 py-1.5',
+        className,
+      )}
+      aria-label={t('logout')}
+    >
+      <LogOutIcon className="size-4 shrink-0" />
       {t('logout')}
-    </Button>
+    </button>
   )
 }

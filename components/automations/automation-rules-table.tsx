@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Plus } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Typography } from '@/components/ui/typography'
@@ -54,6 +55,7 @@ function TableSkeleton() {
 }
 
 export function AutomationRulesTable({ rules, isLoading }: AutomationRulesTableProps) {
+  const t = useTranslations('dashboard.redesign.automations')
   const { saveRule, deleteRule, createRule, isPending } = useAutomationRuleMutations()
 
   const [editingRule, setEditingRule] = useState<AutomationRule | null>(null)
@@ -111,7 +113,7 @@ export function AutomationRulesTable({ rules, isLoading }: AutomationRulesTableP
             {rules.length}
           </Typography>
           <Typography variant="small" color="muted">
-            Active rules
+            {t('table.activeRules')}
           </Typography>
         </div>
         <div className="flex items-center gap-2 px-4 py-2 bg-card rounded-lg border border-border">
@@ -119,13 +121,13 @@ export function AutomationRulesTable({ rules, isLoading }: AutomationRulesTableP
             {totalProducts}
           </Typography>
           <Typography variant="small" color="muted">
-            Products covered
+            {t('table.productsCovered')}
           </Typography>
         </div>
         <div className="ml-auto">
           <Button variant="default" size="sm" onClick={() => setIsAddPanelOpen(true)}>
             <Plus className="w-4 h-4" />
-            Add rule
+            {t('table.addRule')}
           </Button>
         </div>
       </div>
@@ -135,7 +137,7 @@ export function AutomationRulesTable({ rules, isLoading }: AutomationRulesTableP
         {rules.length === 0 ? (
           <div className="py-16 text-center">
             <Typography variant="p" color="muted">
-              No automation rules yet. Add a rule to get started.
+              {t('table.empty')}
             </Typography>
           </div>
         ) : (
@@ -143,13 +145,13 @@ export function AutomationRulesTable({ rules, isLoading }: AutomationRulesTableP
             <thead>
               <tr className="border-b border-border bg-muted/40">
                 <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                  Rule
+                  {t('table.headers.rule')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                  Shelf Life
+                  {t('table.headers.shelfLife')}
                 </th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                  Actions
+                  {t('table.headers.actions')}
                 </th>
               </tr>
             </thead>

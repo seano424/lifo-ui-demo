@@ -20,6 +20,7 @@ import { useEffect, useState } from 'react'
 import { Typography } from './ui/typography'
 
 import { NotificationCount } from '@/components/notifications/notification-count'
+import { NavLocations } from '@/components/nav-locations'
 
 // Badge component for navigation items
 function NavBadge({ count, className }: { count: number; className?: string }) {
@@ -111,6 +112,7 @@ export function NavMain({
 
   return (
     <div className="flex flex-col gap-6">
+      <NavLocations />
       {sections.map(section => (
         <SidebarGroup className="px-4" key={section.title}>
           <SidebarGroupLabel className="mb-1">
@@ -132,7 +134,7 @@ export function NavMain({
                   <SidebarMenuItem>
                     <CollapsibleTrigger asChild>
                       <SidebarMenuButton
-                        className="p-4  group-data-[collapsible=icon]:hidden"
+                        className="p-4 group-data-[collapsible=icon]:hidden"
                         tooltip={item.title}
                       >
                         {item.icon && <item.icon />}
@@ -172,7 +174,7 @@ export function NavMain({
                 <SidebarMenuItem className="flex flex-col items-center gap-2" key={item.title}>
                   <SidebarMenuButton
                     className={cn(
-                      'py-2 px-2 relative hover:text-primary-900 hover:bg-muted',
+                      'py-2 relative hover:text-primary-900 hover:bg-muted',
                       isPathActive(item.url) &&
                         'text-primary-900 hover:text-primary-900 hover:bg-primary-200/10',
                     )}

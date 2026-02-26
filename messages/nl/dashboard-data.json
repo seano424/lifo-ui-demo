@@ -117,7 +117,9 @@
     "price": "Prijs",
     "activeBatches": "Actieve batches",
     "dateAdded": "Datum toegevoegd",
-    "lastUpdated": "Laatst bijgewerkt"
+    "lastUpdated": "Laatst bijgewerkt",
+    "asc": "ASC",
+    "desc": "DESC"
   },
   "productCategories": {
     "SQUARE_IMPORT": "Square Import",

@@ -1,5 +1,5 @@
 import { BatchesFilteredList } from '@/components/batches/batches-filtered-list'
-// import DashboardInsetHeader from '@/components/dashboard/dashboard-inset-header'
+import DashboardInsetHeader from '@/components/dashboard/dashboard-inset-header'
 import { NoStoresError } from '@/components/dashboard/no-stores-error'
 import { type BatchFilters, type BatchSortField, fetchExpiringBatches } from '@/lib/queries/batches'
 import { fetchBatchesPageRPC } from '@/lib/queries/batches-rpc'
@@ -9,6 +9,7 @@ import { createPrefetchedQuery } from '@/lib/react-query/prefetch'
 import { createClient as createServerClient } from '@/lib/supabase/server'
 import { logger } from '@/lib/utils/logger'
 import { dehydrate, HydrationBoundary } from '@tanstack/react-query'
+import { getTranslations } from 'next-intl/server'
 import { redirect } from 'next/navigation'
 
 interface ExpiringSoonPageProps {
@@ -25,6 +26,7 @@ export default async function ExpiringSoonPage({ searchParams }: ExpiringSoonPag
   const params = await searchParams
   const { queryClient } = await createPrefetchedQuery()
   const serverClient = await createServerClient()
+  const t = await getTranslations('expiring-soon.page')
 
   const {
     data: { user },
@@ -113,7 +115,7 @@ export default async function ExpiringSoonPage({ searchParams }: ExpiringSoonPag
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <div className="flex flex-col gap-6 container py-6 min-h-screen">
-        {/* <DashboardInsetHeader page="expiring-soon" /> */}
+        <DashboardInsetHeader title={t('title')} description={t('description')} />
         <BatchesFilteredList
           highlightExpiring={true}
           initialFilters={{

@@ -2,6 +2,12 @@
   "settings": {
     "title": "Settings",
     "description": "Manage your preferences and account settings",
+    "automations": {
+      "page": {
+        "title": "Automations",
+        "description": "We calculate expiry dates from the delivery date + shelf life you set. Nothing to enter on delivery."
+      }
+    },
     "language": {
       "title": "Language",
       "description": "Choose your preferred language for the interface",

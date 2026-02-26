@@ -8,6 +8,7 @@ import { SortableHeader } from '@/components/products/sortable-header'
 import { Badge } from '@/components/ui/badge'
 import { Typography } from '@/components/ui/typography'
 import type { Product, ProductSort, SortField } from '@/lib/queries/products'
+import { formatProductName } from '@/lib/utils/product-name'
 
 // Export column metadata for use in skeleton
 export const PRODUCT_TABLE_COLUMN_CONFIG = [
@@ -102,8 +103,8 @@ export function createProductTableColumns({
               />
             </div>
           )}
-          <div className="truncate font-medium" title={row.original.name}>
-            {row.original.name}
+          <div className="truncate font-medium" title={formatProductName(row.original.name)}>
+            {formatProductName(row.original.name)}
           </div>
         </div>
       ),

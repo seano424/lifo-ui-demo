@@ -1,5 +1,8 @@
+'use client'
+
 import { useState } from 'react'
 import { Pencil, Trash2 } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { cn } from '@/lib/utils'
 import { Typography } from '@/components/ui/typography'
 import { buttonVariants } from '@/components/ui/button'
@@ -23,6 +26,7 @@ interface AutomationRuleRowProps {
 }
 
 export function AutomationRuleRow({ rule, onEdit, onDelete }: AutomationRuleRowProps) {
+  const t = useTranslations('dashboard.redesign.automations')
   const [deleteOpen, setDeleteOpen] = useState(false)
 
   return (
@@ -44,8 +48,8 @@ export function AutomationRuleRow({ rule, onEdit, onDelete }: AutomationRuleRowP
               {rule.name}
             </Typography>
             <Typography variant="small" color="muted">
-              {rule.type === 'product' ? 'Product' : 'Category'} · {rule.products_count}{' '}
-              {rule.products_count === 1 ? 'item' : 'items'}
+              {rule.type === 'product' ? t('row.typeProduct') : t('row.typeCategory')} ·{' '}
+              {t('row.items', { count: rule.products_count })}
             </Typography>
           </div>
         </div>
@@ -54,7 +58,9 @@ export function AutomationRuleRow({ rule, onEdit, onDelete }: AutomationRuleRowP
       {/* Shelf life */}
       <td className="px-6 py-4">
         <Typography variant="p" className="text-foreground">
-          {rule.shelf_life_days != null ? `${rule.shelf_life_days} days` : '—'}
+          {rule.shelf_life_days != null
+            ? t('row.shelfLifeDays', { count: rule.shelf_life_days })
+            : '—'}
         </Typography>
       </td>
 
@@ -63,7 +69,7 @@ export function AutomationRuleRow({ rule, onEdit, onDelete }: AutomationRuleRowP
         <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
           <button
             type="button"
-            aria-label={`Edit ${rule.name}`}
+            aria-label={t('row.editLabel', { name: rule.name })}
             onClick={e => {
               e.stopPropagation()
               onEdit(rule)
@@ -76,7 +82,7 @@ export function AutomationRuleRow({ rule, onEdit, onDelete }: AutomationRuleRowP
             <AlertDialogTrigger asChild onClick={e => e.stopPropagation()}>
               <button
                 type="button"
-                aria-label={`Delete ${rule.name}`}
+                aria-label={t('row.deleteLabel', { name: rule.name })}
                 className="p-1.5 rounded hover:bg-muted text-muted-foreground hover:text-destructive transition-colors"
               >
                 <Trash2 className="w-3.5 h-3.5" />
@@ -84,19 +90,18 @@ export function AutomationRuleRow({ rule, onEdit, onDelete }: AutomationRuleRowP
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>Delete rule?</AlertDialogTitle>
+                <AlertDialogTitle>{t('deleteDialog.title')}</AlertDialogTitle>
                 <AlertDialogDescription>
-                  &ldquo;{rule.name}&rdquo; will be removed. Products in this {rule.type} will no
-                  longer have shelf life automatically assigned.
+                  {t('deleteDialog.description', { name: rule.name, type: rule.type })}
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogCancel>{t('deleteDialog.cancel')}</AlertDialogCancel>
                 <AlertDialogAction
                   className={buttonVariants({ variant: 'destructive' })}
                   onClick={() => onDelete(rule)}
                 >
-                  Delete rule
+                  {t('deleteDialog.confirm')}
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>

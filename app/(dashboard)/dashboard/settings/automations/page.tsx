@@ -4,9 +4,14 @@ import { getActiveStoreCookie } from '@/lib/actions/store-actions'
 import { createPrefetchedQuery } from '@/lib/react-query/prefetch'
 import { queryKeys } from '@/lib/queries/query-keys'
 import AutomationsClient from './automations-client'
+import { AutomationCard } from '@/components/dashboard/automation-card'
+import DashboardInsetHeader from '@/components/dashboard/dashboard-inset-header'
+import { getTranslations } from 'next-intl/server'
 
 export default async function AutomationsPage() {
   const activeStoreId = await getActiveStoreCookie()
+  const tNav = await getTranslations('navigation')
+  const tAutomation = await getTranslations('dashboard.redesign.automation')
 
   if (!activeStoreId) {
     return <AutomationsClient />
@@ -30,7 +35,11 @@ export default async function AutomationsPage() {
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <AutomationsClient />
+      <div className="flex flex-col gap-6 container py-6">
+        <DashboardInsetHeader title={tNav('automations')} description={tAutomation('subtitle')} />
+
+        <AutomationCard showLinks={false} />
+      </div>
     </HydrationBoundary>
   )
 }

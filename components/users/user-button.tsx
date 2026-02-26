@@ -4,11 +4,12 @@ import { UserIcon } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { useCurrentUser } from '@/hooks/use-users'
+import Image from 'next/image'
 
 function UserButtonContent() {
   const { data: user, isLoading, isError } = useCurrentUser()
+  const [imgError, setImgError] = useState(false)
 
   if (isLoading) {
     return <Skeleton className="h-10 w-10 rounded-full" />
@@ -32,15 +33,18 @@ function UserButtonContent() {
       className="rounded-full border p-0 h-10 w-10"
       aria-label="Account settings"
     >
-      <Avatar className="h-9 w-9 rounded-full">
-        <AvatarImage src={user.avatar_url || ''} alt={user.full_name || ''} />
-        <AvatarFallback className="rounded-full">
-          {user.full_name
-            ?.split(' ')
-            .map(name => name.charAt(0))
-            .join('') || <UserIcon className="w-4 h-4" />}
-        </AvatarFallback>
-      </Avatar>
+      {user.avatar_url && !imgError ? (
+        <Image
+          src={user.avatar_url}
+          alt={user.full_name || ''}
+          width={36}
+          height={36}
+          className="rounded-full"
+          onError={() => setImgError(true)}
+        />
+      ) : (
+        <UserIcon className="w-4 h-4" />
+      )}
     </Button>
   )
 }

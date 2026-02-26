@@ -26,7 +26,7 @@ export function BatchListFilters({ filters, onFiltersChange, isLoading }: BatchL
   }
 
   return (
-    <div className="flex flex-wrap items-center gap-2">
+    <div className="flex flex-wrap items-center gap-1">
       {/* Date Filter Dropdown */}
       <Select
         value={filters?.expiringInDays?.toString() || '180'}
@@ -38,9 +38,11 @@ export function BatchListFilters({ filters, onFiltersChange, isLoading }: BatchL
         }
         disabled={isLoading}
       >
-        <SelectTrigger className="w-fit sm:w-[140px]">
+        <SelectTrigger className="w-fit sm:w-[140px] px-4" showChevron={false}>
           <div className="flex items-center gap-2">
-            <Typography variant="small">{t('date')}:</Typography>
+            <Typography className="hidden sm:block" variant="small">
+              {t('date')}:
+            </Typography>
             <SelectValue />
           </div>
         </SelectTrigger>
@@ -77,7 +79,7 @@ export function BatchListFilters({ filters, onFiltersChange, isLoading }: BatchL
         }
         disabled={isLoading}
       >
-        <SelectTrigger className="w-fit sm:w-[180px]" showChevron>
+        <SelectTrigger className="w-fit px-4" showChevron={false}>
           <div className="flex items-center gap-2">
             <Typography variant="small" className="hidden sm:block">
               {t('status')}:
