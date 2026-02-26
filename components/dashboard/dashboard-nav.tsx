@@ -27,9 +27,7 @@ export function DashboardNav() {
         </div>
         <NotificationBellExpiry />
         <TeamSwitcher compact />
-        <div className="hidden lg:block">
-          <UserButton />
-        </div>
+        <UserButton />
       </div>
     </header>
   )
