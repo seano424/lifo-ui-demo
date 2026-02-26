@@ -208,7 +208,9 @@
     "aria": {
       "toggleTheme": "Thema wisselen",
       "selectLanguage": "Taal selecteren",
-      "toggle": "Schakelen"
+      "toggle": "Schakelen",
+      "notificationBell": "Verlopen artikelen",
+      "notificationBellWithCount": "{count} verlopen artikelen"
     },
     "buttons": {
       "back": "Terug",

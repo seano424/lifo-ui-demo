@@ -208,7 +208,9 @@
     "aria": {
       "toggleTheme": "Toggle theme",
       "selectLanguage": "Select language",
-      "toggle": "Toggle"
+      "toggle": "Toggle",
+      "notificationBell": "Expiring items",
+      "notificationBellWithCount": "{count} expiring items"
     },
     "buttons": {
       "back": "Back",

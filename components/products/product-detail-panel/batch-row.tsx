@@ -92,6 +92,7 @@ export function BatchRow({
         onClick={isEditing ? onCancel : isExpired ? undefined : onStartEdit}
         onKeyDown={e => {
           if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
             if (isEditing) onCancel()
             else if (!isExpired) onStartEdit()
           }
