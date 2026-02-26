@@ -43,7 +43,7 @@ export function AutoTrackingBanner() {
   }
 
   return (
-    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 rounded-xl border border-border bg-card p-5 shadow-sm relative">
+    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 rounded-xl border border-border bg-card dark:bg-muted p-5 shadow-sm relative">
       <div className="flex flex-col md:flex-row md:items-center gap-4">
         <div className="flex items-center gap-4 justify-between w-full md:w-auto">
           <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-lime-300/10">

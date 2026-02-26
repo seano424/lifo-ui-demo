@@ -72,30 +72,39 @@ export function AutomationCard({ showLinks = true }: { showLinks?: boolean }) {
   // Empty state - no automation rules configured
   if (!hasRules) {
     return (
-      <Card className="p-6">
-        <div className="flex flex-col items-center text-center">
-          <Settings className="mb-3 h-12 w-12 text-gray-300" aria-hidden="true" />
-          <Typography variant="h4">{t('emptyState.title')}</Typography>
-          <Typography variant="p" color="muted">
-            {t('emptyState.description')}
-          </Typography>
-          {showLinks && (
-            <Link
-              href="/dashboard/settings/automations"
-              className="transition-colors hover:text-gray-900"
+      <>
+        <Card className="p-6 bg-card/0">
+          <div className="flex flex-col items-center text-center">
+            <Settings className="mb-3 h-12 w-12 text-gray-300" aria-hidden="true" />
+            <Typography variant="h4">{t('emptyState.title')}</Typography>
+            <Typography variant="p" color="muted">
+              {t('emptyState.description')}
+            </Typography>
+
+            <button
+              type="button"
+              onClick={() => setIsAddPanelOpen(true)}
+              className="transition-colors hover:text-gray-900 mt-4"
             >
               {t('addRule')}
-            </Link>
-          )}
-        </div>
-      </Card>
+            </button>
+          </div>
+        </Card>
+
+        <AddAutomationRulePanel
+          isOpen={isAddPanelOpen}
+          isSaving={isPending}
+          onClose={() => setIsAddPanelOpen(false)}
+          onCreate={handleCreate}
+        />
+      </>
     )
   }
 
   // Active state - show rules summary and list
   return (
     <>
-      <Card className="overflow-hidden flex flex-col gap-0 bg-card">
+      <Card className="overflow-hidden flex flex-col gap-0 bg-card/0">
         <div className="flex flex-col-reverse gap-4 sm:flex-row items-start justify-between py-4">
           <div className="flex flex-col gap-2">
             <Typography variant="h4">{t('title')}</Typography>

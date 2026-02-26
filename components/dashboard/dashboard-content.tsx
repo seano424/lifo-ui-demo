@@ -25,38 +25,39 @@ export function DashboardContent() {
       <DashboardHeader timeRange={timeRange} onTimeRangeChange={setTimeRange} />
 
       <StatCards daysFilter={daysFilter} />
-
-      <div className="flex items-center justify-between border-b border-muted">
-        <div className="flex flex-col gap-1">
-          <Typography variant="h4">{tNav('expiringSoon')}</Typography>
-          <Typography variant="p" color="muted" className="hidden sm:block">
-            {tTable('description')}
-          </Typography>
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-1">
+            <Typography variant="h4">{tNav('expiringSoon')}</Typography>
+            <Typography variant="p" color="muted" className="hidden sm:block">
+              {tTable('description')}
+            </Typography>
+          </div>
+          <Button
+            variant="ghost"
+            asLink
+            href="/dashboard/inventory/batches"
+            className="gap-2 flex items-center hover:text-secondary dark:hover:text-secondary px-0"
+          >
+            {tTable('viewAll')}
+            <ChevronRight className="h-4 w-4" />
+          </Button>
         </div>
-        <Button
-          variant="ghost"
-          asLink
-          href="/dashboard/inventory/batches"
-          className="gap-2 flex items-center hover:text-secondary dark:hover:text-secondary px-0"
-        >
-          {tTable('viewAll')}
-          <ChevronRight className="h-4 w-4" />
-        </Button>
-      </div>
 
-      <BatchesFilteredList
-        showControls={false}
-        highlightExpiring
-        expiringDays={daysFilter}
-        pageSize={500}
-        clientSideSort={true}
-        clientSideTimeFilter={true}
-        initialFilters={{
-          filter: 'expiring',
-          expiringDays: '90', // Always load 90 days, filter client-side
-          status: 'active',
-        }}
-      />
+        <BatchesFilteredList
+          showControls={false}
+          highlightExpiring
+          expiringDays={daysFilter}
+          pageSize={500}
+          clientSideSort={true}
+          clientSideTimeFilter={true}
+          initialFilters={{
+            filter: 'expiring',
+            expiringDays: '90', // Always load 90 days, filter client-side
+            status: 'active',
+          }}
+        />
+      </div>
       <CoverageBar />
       <AutomationCard />
     </div>

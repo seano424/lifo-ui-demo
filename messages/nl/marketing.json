@@ -91,22 +91,22 @@
       }
     },
     "features": {
-      "title": "Revolutioneer uw voorraadcontrole",
+      "title": "Batch-niveau zichtbaarheid voor Square retailers",
       "expiryTracking": {
-        "title": "Real-time houdbaarheidscontrole",
-        "description": "Mis nooit meer een houdbaarheidsdatum met geautomatiseerde monitoring van uw hele voorraad."
+        "title": "Houdbaarheidscontrole per batch",
+        "description": "Zie exact welke batches wanneer verlopen. Niet alleen het totale voorraadniveau. Weet of 20 eenheden over 2 dagen verlopen of 15 volgende week."
       },
       "predictiveAlerts": {
-        "title": "Voorspellende waarschuwingen",
-        "description": "Verminder uw verliezen aanzienlijk dankzij de meldingen die door AI worden gevoed vóór het verstrijken van de producten."
+        "title": "Actiegerichte verloopwaarschuwingen",
+        "description": "Ontvang een melding voordat batches verlopen met duidelijke vervolgstappen. Geef korting, doneer of geef prioriteit aan verkoop. Voordat het verspilling wordt."
       },
       "timeSaving": {
         "title": "Tijdsbesparing",
-        "description": "Enorme vermindering van de tijd die wordt besteed aan handmatig ontvangstbeheer en dagelijkse voorraden."
+        "description": "Stel houdbaarheidsduurregels eenmalig in per categorie en Lifo volgt vervaldatums automatisch voor elke toekomstige levering. Geen dagelijkse herinvoer."
       },
       "compatibility": {
-        "title": "Maximale compatibiliteit",
-        "description": "Verbind u met uw bestaande POS-systeem en ERP in enkele minuten"
+        "title": "Square-integratie",
+        "description": "Verbind uw POS-account met één klik. Producten, categorieën en verkoopdata worden automatisch gesynchroniseerd. Geen dubbele invoer."
       },
       "discoverButton": "Ontdek Lifo",
       "noCommitment": "Geen verplichtingen!"
@@ -123,12 +123,12 @@
       "lossReduction": {
         "label": "Verliesreductie",
         "description": "Verminder eenvoudig afval en bespaar geld",
-        "subtext": "Minder verlopen producten terwijl u minder aan voorraadbeheer doet."
+        "subtext": "Minder verlopen producten. Terwijl u minder aan voorraadbeheer doet."
       },
       "taxCredits": {
         "label": "Belastingvoordelen",
         "description": "Vanaf de eerste maand op donaties",
-        "subtext": "Verhoog uw fiscaal aftrekbare donaties door te verbinden met een non-profitorganisatie."
+        "subtext": "Verhoog uw fiscaal aftrekbare donaties. Door te verbinden met een non-profitorganisatie."
       }
     },
     "cta": {
@@ -165,30 +165,30 @@
   },
   "featurespage": {
     "title": "Krachtige functionaliteiten",
-    "subtitle": "Alles wat u nodig heeft om uw voorraad efficiënt te beheren met AI-aangedreven inzichten en realtime tracking.",
+    "subtitle": "Alles wat u nodig heeft om POS-voorraaddata om te zetten in houdbaarheidsintelligentie per batch.",
     "features": {
       "dashboard": {
         "title": "Realtime dashboard",
-        "description": "Krijg directe inzichten in uw voorraad met ons uitgebreide dashboard. Volg voorraadniveaus, monitor vervaldatums en identificeer trends in één oogopslag. Neem weloverwogen beslissingen met realtime datavisualisatie en geautomatiseerde waarschuwingen."
+        "description": "Krijg directe zichtbaarheid in uw voorraad per batch. Zie welke producten deze week, volgende week en daarna verlopen. Met duidelijke actie-indicatoren voor kortingen, donaties of verkoopprioriteit. Geen giswerk meer op basis van totaalaantallen."
       },
       "scanning": {
-        "title": "Slimme scanning",
-        "description": "Beheer moeiteloos uw voorraad met onze geavanceerde scantechnologie. Scan eenvoudig om voorraadniveaus bij te werken, vervaldatums te volgen en nauwkeurige records bij te houden. Werkt naadloos op elk mobiel apparaat."
+        "title": "Square-integratie",
+        "description": "Verbind uw POS-account met één klik. Producten, categorieën en verkoopgeschiedenis synchroniseren automatisch. Uw POS-catalogus wordt uw productdatabase. Geen dubbele invoer, geen nieuwe hardware vereist."
       },
       "analytics": {
         "title": "Prestatie analyses",
-        "description": "Begrijp uw bedrijfsprestaties met gedetailleerde analyses en rapportage. Volg afvalvermindering, omzetgroei en operationele efficiëntie. Krijg bruikbare inzichten om uw voorraadbeheerstrategie te optimaliseren."
+        "description": "Begrijp uw impact op afvalvermindering en omzet met gedetailleerde rapporten. Volg welke batches zijn verkocht of verlopen, identificeer patronen per categorie en meet de waarde die u bespaart met zichtbaarheid per batch."
       },
       "ai": {
-        "title": "AI-aangedreven inzichten",
-        "description": "Benut kunstmatige intelligentie om uw voorraadbeheer te optimaliseren. Krijg slimme aanbevelingen voor herbestelling, promotiestrategieën en afvalvermindering. Onze AI leert van uw patronen om gepersonaliseerde suggesties te bieden."
+        "title": "Automatische batchcreatie",
+        "description": "Stel houdbaarheidsduurregels eenmalig in \"Alle zuivel krijgt 14 dagen, Bakkerij 3\" en Lifo maakt automatisch batches aan voor elke toekomstige levering. Regels blijven voor altijd actief, zodat tracking automatisch verbetert."
       }
     },
     "additionalFeatures": {
       "title": "Alles wat u nodig heeft",
       "expiry": {
-        "title": "Vervaldatum tracking",
-        "description": "Mis nooit vervaldatums met geautomatiseerde waarschuwingen en lifo-beheer."
+        "title": "Batchtracking",
+        "description": "Groepeer voorraad op vervaldatum, niet alleen op SKU. Zie exact welke levering risico loopt en wanneer."
       },
       "security": {
         "title": "Gegevensbeveiliging",
@@ -199,12 +199,12 @@
         "description": "Bliksemsnelle verwerking en realtime updates voor naadloze operaties."
       },
       "tracking": {
-        "title": "Simpele integratie",
-        "description": "Verbind u met uw bestaande POS-systeem en ERP in enkele minuten"
+        "title": "Square-integratie",
+        "description": "Verbind uw bestaande POS-catalogus en verkoopdata in minuten. Geen nieuwe hardware of handmatige import vereist."
       },
       "timeSaving": {
         "title": "Tijdsbesparing",
-        "description": "Automatiseer routinetaken en bespaar uren handmatig voorraadbeheer."
+        "description": "Automatiseer het bijhouden van vervaldatums met categorieregels. Stel het eenmalig in en elke toekomstige levering wordt automatisch gevolgd."
       },
       "collaboration": {
         "title": "Teamsamenwerking",
@@ -214,37 +214,37 @@
     "mockData": {
       "dashboard": {
         "inventoryOverview": "Voorraad overzicht",
-        "items": "Artikelen",
+        "items": "Batches",
         "fromLastMonth": "van vorige maand",
         "expiringSoon": "Verloopt binnenkort",
-        "lowStock": "Lage voorraad",
+        "lowStock": "Risico deze week",
         "totalProducts": "Totaal producten",
-        "expiringItems": "Verlopende artikelen",
-        "wasteReduced": "Afval verminderd",
-        "revenueIncrease": "Omzetstijging",
-        "performanceAnalytics": "Prestatie analyses"
+        "expiringItems": "Verlopende batches",
+        "wasteReduced": "Verspilling voorkomen",
+        "revenueIncrease": "Omzet bespaard",
+        "performanceAnalytics": "Batchanalyses"
       },
       "scanning": {
-        "scanningActive": "Scannen actief",
-        "productScanned": "Gescand",
-        "productOne": "Biologische melk - 1L",
-        "productTwo": "Vers brood",
-        "productThree": "Griekse jogurt - 500g",
-        "productFour": "Kipfilet - 1kg",
-        "productFive": "Bananen - 1kg",
-        "expiryInfo": "Verv: {date} | Voorraad: {stock} stuks"
+        "scanningActive": "Automatiseringsregels actief",
+        "productScanned": "Categorieregel",
+        "productOne": "Zuivel. 14 dagen houdbaar",
+        "productTwo": "Bakkerij. 3 dagen houdbaar",
+        "productThree": "Groenten en fruit. 7 dagen houdbaar",
+        "productFour": "Delicatessen. 5 dagen houdbaar",
+        "productFive": "Diepvries. 90 dagen houdbaar",
+        "expiryInfo": "{stock} producten automatisch gevolgd"
       },
       "ai": {
-        "title": "AI Aanbevelingen",
-        "reorderMilk": "Zuivelproducten herbestellen",
-        "reorderMilkDesc": "Gebaseerd op consumptiepatronen",
-        "promoteExpiring": "Verlopende artikelen promoten",
-        "promoteExpiringDesc": "23 artikelen verlopen over 2 dagen"
+        "title": "Batchwaarschuwingen",
+        "reorderMilk": "Biologische melk. 20 eenheden",
+        "reorderMilkDesc": "Verlopen over 2 dagen. Geef nu korting",
+        "promoteExpiring": "Zuurdesembrood. 8 broden",
+        "promoteExpiringDesc": "Verlopen morgen. Korting of donatie"
       }
     },
     "cta": {
-      "title": "Klaar om uw voorraad te transformeren?",
-      "description": "Transformeer uw voorraadbeheer met lifo en begin vandaag nog met afvalvermindering.",
+      "title": "Klaar om uw voorraad per batch te bekijken?",
+      "description": "Verbind uw POS-account en begin vandaag nog met het bijhouden van vervaldatums per batch in slechts enkele minuten.",
       "button": "Start gratis proefperiode"
     }
   },
@@ -394,10 +394,10 @@
     }
   },
   "footer": {
-    "description": "Bedrijven helpen voorraad te optimaliseren met intelligente oplossingen om afval te verminderen en winst te maximaliseren.",
+    "description": "Wij helpen POS-retailers om precies te zien welke batches wanneer verlopen en actie te ondernemen voordat het te laat is.",
     "quickLinks": "Snelle Links",
     "links": {
-      "homepage": "Startpagina",
+      "homepage": "Home",
       "features": "Functies",
       "aboutUs": "Over Ons",
       "products": "Producten",

@@ -91,22 +91,22 @@
       }
     },
     "features": {
-      "title": "Révolutionnez votre gestion de stock",
+      "title": "Visibilité par lot pour les commerçants Square",
       "expiryTracking": {
-        "title": "Suivi des dates d'expiration en temps réel",
-        "description": "Ne manquez plus jamais une date d'expiration grâce à la surveillance automatisée de tout votre inventaire."
+        "title": "Suivi des dates d'expiration par lot",
+        "description": "Voyez exactement quels lots expirent et quand. Pas seulement le stock total. Sachez si 20 unités expirent dans 2 jours ou 15 la semaine prochaine."
       },
       "predictiveAlerts": {
-        "title": "Alertes prédictives",
-        "description": "Réduisez considérablement vos pertes grâce aux notifications alimentées par l'IA avant l'expiration des produits."
+        "title": "Alertes d'expiration actionnables",
+        "description": "Soyez notifié avant l'expiration des lots avec des prochaines étapes claires. Remisez, donnez ou priorisez pour la vente. Avant que cela devienne un déchet."
       },
       "timeSaving": {
         "title": "Gain de temps",
-        "description": "Réduction énorme du temps consacré à la gestion manuelle des reçus et aux inventaires quotidiens."
+        "description": "Définissez des règles de durée de vie une fois par catégorie et Lifo suit automatiquement les dates d'expiration pour chaque future livraison. Sans ressaisie quotidienne."
       },
       "compatibility": {
-        "title": "Compatibilité maximale",
-        "description": "Connectez-vous avec votre système de point de vente et votre ERP en quelques minutes"
+        "title": "Intégration Square",
+        "description": "Connectez votre compte POS en un clic. Produits, catégories et données de vente se synchronisent automatiquement. Sans double saisie."
       },
       "discoverButton": "Découvrir lifo",
       "noCommitment": "Sans engagement !"
@@ -118,17 +118,17 @@
       "revenue": {
         "label": "Augmentation des revenus",
         "description": "Augmentation moyenne des revenus commerciaux",
-        "subtext": "Remises et attirance des clients pour écouler rapidement les produits avant leur expiration."
+        "subtext": "Remises et attirance des clients pour écouler rapidement les produits. Avant leur expiration."
       },
       "lossReduction": {
         "label": "Réduction des pertes",
         "description": "Réduisez facilement les déchets et économisez de l'argent",
-        "subtext": "Moins de produits périmés tout en réduisant le travail de gestion des stocks."
+        "subtext": "Moins de produits périmés. Tout en réduisant le travail de gestion des stocks."
       },
       "taxCredits": {
         "label": "Crédits d'impôt",
         "description": "Dès le premier mois sur les dons",
-        "subtext": "Augmentez vos dons déductibles d'impôts en vous connectant avec une organisation à but non lucratif."
+        "subtext": "Augmentez vos dons déductibles d'impôts. En vous connectant avec une organisation à but non lucratif."
       }
     },
     "cta": {
@@ -165,30 +165,30 @@
   },
   "featurespage": {
     "title": "Fonctionnalités puissantes",
-    "subtitle": "Tout ce dont vous avez besoin pour gérer efficacement votre inventaire avec des insights alimentés par l'IA et un suivi en temps réel.",
+    "subtitle": "Tout ce dont vous avez besoin pour transformer vos données d'inventaire POS en intelligence d'expiration par lot.",
     "features": {
       "dashboard": {
         "title": "Tableau de bord en temps réel",
-        "description": "Obtenez des insights instantanés sur votre inventaire avec notre tableau de bord complet. Suivez les niveaux de stock, surveillez les dates d'expiration et identifiez les tendances d'un coup d'œil. Prenez des décisions éclairées avec la visualisation de données en temps réel et les alertes automatisées."
+        "description": "Obtenez une visibilité instantanée sur votre inventaire par lot. Voyez quels produits expirent cette semaine, la semaine prochaine et au-delà. Avec des indicateurs d'action clairs pour les remises, les dons ou la priorisation des ventes. Plus besoin de deviner à partir de totaux globaux."
       },
       "scanning": {
-        "title": "Scan intelligent",
-        "description": "Gérez facilement votre inventaire avec notre technologie de scan avancée. Scannez simplement pour mettre à jour les niveaux de stock, suivre les dates d'expiration et maintenir des enregistrements précis. Fonctionne parfaitement sur tout appareil mobile."
+        "title": "Intégration POS",
+        "description": "Connectez votre compte POS en un clic. Produits, catégories et historique des ventes se synchronisent automatiquement. Votre catalogue POS devient votre base de données produits. Aucune double saisie, aucun nouveau matériel requis."
       },
       "analytics": {
         "title": "Analyses de performance",
-        "description": "Comprenez les performances de votre entreprise avec des analyses et rapports détaillés. Suivez la réduction des déchets, la croissance des revenus et l'efficacité opérationnelle. Obtenez des insights exploitables pour optimiser votre stratégie de gestion d'inventaire."
+        "description": "Comprenez votre impact sur la réduction des déchets et les revenus grâce à des rapports détaillés. Suivez quels lots ont été vendus ou expirés, identifiez les tendances par catégorie et mesurez la valeur économisée grâce à la visibilité par lot."
       },
       "ai": {
-        "title": "Insights alimentés par l'IA",
-        "description": "Exploitez l'intelligence artificielle pour optimiser votre gestion d'inventaire. Obtenez des recommandations intelligentes pour les réapprovisionnements, les stratégies promotionnelles et la réduction des déchets. Notre IA apprend de vos habitudes pour fournir des suggestions personnalisées."
+        "title": "Création automatique de lots",
+        "description": "Définissez des règles de durée de vie une fois. \"Tous les produits laitiers ont 14 jours, la boulangerie 3\" et Lifo crée automatiquement des lots pour chaque future livraison. Les règles persistent indéfiniment, le suivi s'améliore donc automatiquement."
       }
     },
     "additionalFeatures": {
       "title": "Tout ce dont vous avez besoin",
       "expiry": {
-        "title": "Suivi d'expiration",
-        "description": "Ne manquez jamais les dates d'expiration avec les alertes automatisées et la gestion lifo."
+        "title": "Suivi par lot",
+        "description": "Regroupez l'inventaire par date d'expiration, pas seulement par référence. Voyez exactement quelle livraison est à risque et quand."
       },
       "security": {
         "title": "Sécurité des données",
@@ -199,12 +199,12 @@
         "description": "Traitement ultra-rapide et mises à jour en temps réel pour des opérations fluides."
       },
       "tracking": {
-        "title": "Intégration simple",
-        "description": "Connectez-vous avec votre système de point de vente et votre ERP en quelques minutes"
+        "title": "Intégration POS",
+        "description": "Connectez votre catalogue POS existant et vos données de vente en quelques minutes. Aucun nouveau matériel ni importation manuelle nécessaire."
       },
       "timeSaving": {
         "title": "Gain de temps",
-        "description": "Automatisez les tâches routinières et économisez des heures de gestion d'inventaire manuelle."
+        "description": "Automatisez le suivi des dates d'expiration avec des règles par catégorie. Configurez une fois, et chaque future livraison est automatiquement suivie."
       },
       "collaboration": {
         "title": "Collaboration d'équipe",
@@ -214,37 +214,37 @@
     "mockData": {
       "dashboard": {
         "inventoryOverview": "Aperçu de l'inventaire",
-        "items": "Articles",
+        "items": "Lots",
         "fromLastMonth": "du mois dernier",
         "expiringSoon": "Expire bientôt",
-        "lowStock": "Stock faible",
+        "lowStock": "À risque cette semaine",
         "totalProducts": "Produits totaux",
-        "expiringItems": "Articles expirants",
-        "wasteReduced": "Déchets réduits",
-        "revenueIncrease": "Augmentation des revenus",
-        "performanceAnalytics": "Analyses de performance"
+        "expiringItems": "Lots expirants",
+        "wasteReduced": "Déchets évités",
+        "revenueIncrease": "Revenus économisés",
+        "performanceAnalytics": "Analyses par lot"
       },
       "scanning": {
-        "scanningActive": "Scan actif",
-        "productScanned": "Scanné",
-        "productOne": "Lait bio - 1L",
-        "productTwo": "Pain frais",
-        "productThree": "Yaourt grec - 500g",
-        "productFour": "Blanc de poulet - 1kg",
-        "productFive": "Bananes - 1kg",
-        "expiryInfo": "Exp: {date} | Stock: {stock} unités"
+        "scanningActive": "Règles d'automatisation actives",
+        "productScanned": "Règle de catégorie",
+        "productOne": "Laiterie. Durée de vie 14 jours",
+        "productTwo": "Boulangerie. Durée de vie 3 jours",
+        "productThree": "Produits frais. Durée de vie 7 jours",
+        "productFour": "Traiteur. Durée de vie 5 jours",
+        "productFive": "Surgelés. Durée de vie 90 jours",
+        "expiryInfo": "{stock} produits suivis automatiquement"
       },
       "ai": {
-        "title": "Recommandations IA",
-        "reorderMilk": "Réapprovisionner les produits laitiers",
-        "reorderMilkDesc": "Basé sur les habitudes de consommation",
-        "promoteExpiring": "Promouvoir les articles expirants",
-        "promoteExpiringDesc": "23 articles expirent dans 2 jours"
+        "title": "Alertes par lot",
+        "reorderMilk": "Lait bio. 20 unités",
+        "reorderMilkDesc": "Expirent dans 2 jours. Remettre en vente",
+        "promoteExpiring": "Pain au levain. 8 pains",
+        "promoteExpiringDesc": "Expirent demain. Remise ou don"
       }
     },
     "cta": {
-      "title": "Prêt à transformer votre inventaire ?",
-      "description": "Transformez votre gestion d'inventaire avec lifo et commencez à réduire les déchets dès aujourd'hui.",
+      "title": "Prêt à voir votre inventaire par lot ?",
+      "description": "Connectez votre compte POS et commencez à suivre les dates d'expiration par lot en quelques minutes.",
       "button": "Commencer l'essai gratuit"
     }
   },
@@ -394,10 +394,10 @@
     }
   },
   "footer": {
-    "description": "Aidons les entreprises à optimiser la gestion des stocks avec des solutions intelligentes pour réduire les déchets et maximiser les profits.",
+    "description": "Aidons les commerçants POS à voir exactement quels lots expirent et quand et à agir avant qu'il ne soit trop tard.",
     "quickLinks": "Liens Rapides",
     "links": {
-      "homepage": "Accueil",
+      "homepage": "Home",
       "features": "Fonctionnalités",
       "aboutUs": "À Propos",
       "products": "Produits",

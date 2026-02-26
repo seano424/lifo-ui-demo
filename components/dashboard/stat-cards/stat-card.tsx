@@ -23,9 +23,9 @@ interface StatCardProps {
 
 export function StatCard({ label, value, subtitle, trend, href, hrefLabel }: StatCardProps) {
   return (
-    <Card className="relative cursor-default transition-all duration-200 flex flex-col gap-3 flex-1 bg-card">
+    <Card className="relative cursor-default transition-all duration-200 flex flex-col gap-3 flex-1 bg-card/0 p-2 border rounded-none sm:border-none sm:p-0">
       <Typography variant="p">{label}</Typography>
-      <div className="flex flex-col gap-1 min-h-24">
+      <div className="flex flex-col gap-1 sm:min-h-20">
         <Typography variant="h4">{value}</Typography>
         <Typography variant="h5" color="muted">
           {subtitle}

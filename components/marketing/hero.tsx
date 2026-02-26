@@ -15,7 +15,7 @@ export function Hero() {
       className="flex flex-col gap-4 items-center overflow-hidden w-full min-h-screen justify-center relative"
     >
       <div className="absolute inset-0 mask-[linear-gradient(to_bottom,black_50%,transparent)] dark:hidden">
-        <div className="absolute inset-0 bg-linear-to-b from-white/90 to-white/40 z-10" />
+        <div className="absolute inset-0 bg-linear-to-b from-white/95 to-white/50 z-10" />
         <Image
           src="/images/bg.svg"
           alt="Background"

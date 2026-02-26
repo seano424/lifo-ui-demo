@@ -35,7 +35,7 @@ export function CoverageBar() {
   const percent = total > 0 ? Math.round((covered / total) * 100) : 0
 
   return (
-    <Card className="bg-card">
+    <Card className="bg-card/0">
       {/* Header Row */}
       <div className="mb-4 flex items-center justify-between">
         <div>

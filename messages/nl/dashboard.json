@@ -672,7 +672,7 @@
   "setupFlow": {
     "welcome": {
       "title": "Welkom bij lifo AI, {name}!",
-      "subtitle": "We halen uw producten en voorraad uit Square — zodat u kunt beginnen met het volgen van wat verloopt en wanneer. Dit duurt ongeveer 10 seconden."
+      "subtitle": "We halen uw producten en voorraad uit Square. Zodat u kunt beginnen met het volgen van wat verloopt en wanneer. Dit duurt ongeveer 10 seconden."
     },
     "batchTracking": {
       "title": "Vervaldatum tracking instellen (aanbevolen)",

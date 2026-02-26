@@ -75,7 +75,7 @@
     "hero": {
       "title": "Expiry tracking that drives action",
       "subtitle": "Lifo helps food retailers turn expiration data into clear next steps, before it becomes waste.",
-      "subtitle2": "Lifo shows your team exactly which food batches need attention so you can discount, donate, or sell before it's too late.",
+      "subtitle2": "Lifo shows your team exactly which food products need attention so you can discount, donate, or sell before it's too late.",
       "buttons": {
         "freeTrial": "Start free trial",
         "explore": "Explore the platform",
@@ -91,22 +91,22 @@
       }
     },
     "features": {
-      "title": "Revolutionize Your Stock Control",
+      "title": "Expiration Visibility for POS Retailers",
       "expiryTracking": {
-        "title": "Real-time Expiry Tracking",
-        "description": "Never miss an expiration date with automated monitoring of your entire inventory."
+        "title": "Expiration Tracking for POS Retailers",
+        "description": "See exactly which products expire when. Not just total stock counts. Know if 20 units expire in 2 days or 15 expire next week."
       },
       "predictiveAlerts": {
-        "title": "Predictive Alerts",
-        "description": "Drastically reduce waste with AI-powered notifications before products expire."
+        "title": "Actionable Expiration Alerts",
+        "description": "Get notified before products expire with clear next steps. Discount, donate, or prioritize for sale before it becomes waste."
       },
       "timeSaving": {
         "title": "Time Saving",
-        "description": "Huge reduction in time spent on manual receipt management and daily inventories."
+        "description": "Set shelf life rules once per category and Lifo tracks expiry dates automatically for every future delivery. No daily re-entry."
       },
       "compatibility": {
-        "title": "Maximal Compatibility",
-        "description": "Connect with your existing POS system and ERP in minutes"
+        "title": "Square Integration",
+        "description": "Connect your POS account in one click. Products, categories, and sales data sync automatically. No duplicate entry."
       },
       "discoverButton": "Discover Lifo",
       "noCommitment": "No commitment!"
@@ -165,30 +165,30 @@
   },
   "featurespage": {
     "title": "Powerful Features",
-    "subtitle": "Everything you need to manage your inventory efficiently with AI-powered insights and real-time tracking.",
+    "subtitle": "Everything you need to turn POS inventory data into batch level expiry intelligence.",
     "features": {
       "dashboard": {
         "title": "Real-time Dashboard",
-        "description": "Get instant insights into your inventory with our comprehensive dashboard. Track stock levels, monitor expiration dates, and identify trends at a glance. Make informed decisions with real-time data visualization and automated alerts."
+        "description": "Get instant visibility into your inventory by batch. See which products expire this week, next week, and beyond. with clear action flags for discounting, donating, or prioritizing sales. No more guessing from aggregate stock counts."
       },
       "scanning": {
-        "title": "Smart Scanning",
-        "description": "Effortlessly manage your inventory with our advanced scanning technology. Simply scan to update stock levels, track expiration dates, and maintain accurate records. Works seamlessly on any mobile device."
+        "title": "Square Integration",
+        "description": "Connect your POS account with one click. Products, categories, and sales history sync automatically. Your POS catalog becomes your product database. No duplicate entry, no new hardware required."
       },
       "analytics": {
         "title": "Performance Analytics",
-        "description": "Understand your business performance with detailed analytics and reporting. Track waste reduction, revenue growth, and operational efficiency. Get actionable insights to optimize your inventory management strategy."
+        "description": "Understand your waste reduction and revenue impact with detailed reporting. Track which products sold versus expired, identify patterns by category, and measure the value you're saving."
       },
       "ai": {
-        "title": "AI-Powered Insights",
-        "description": "Leverage artificial intelligence to optimize your inventory management. Get smart recommendations for reordering, promotional strategies, and waste reduction. Our AI learns from your patterns to provide personalized suggestions."
+        "title": "Automated Batch Creation",
+        "description": "Set shelf life rules once. \"All Dairy gets 14 days, Bakery gets 3\" and Lifo automatically creates products for every future delivery. Rules persist forever, so tracking improves automatically over time."
       }
     },
     "additionalFeatures": {
       "title": "Everything You Need",
       "expiry": {
-        "title": "Expiry Tracking",
-        "description": "Never miss expiration dates with automated alerts and lifo management."
+        "title": "Batch Tracking",
+        "description": "Group inventory by expiration date, not just by SKU. See exactly which delivery is at risk and when."
       },
       "security": {
         "title": "Data Security",
@@ -199,12 +199,12 @@
         "description": "Lightning-fast processing and real-time updates for seamless operations."
       },
       "tracking": {
-        "title": "Simple Integration",
-        "description": "Connect with your existing POS system and ERP in minutes"
+        "title": "Square Integration",
+        "description": "Connect your existing POS catalog and sales data in minutes. No new hardware or manual import needed."
       },
       "timeSaving": {
         "title": "Time Savings",
-        "description": "Automate routine tasks and save hours of manual inventory management."
+        "description": "Automate expiry date tracking with category rules. Set it once, and every future delivery is tracked automatically."
       },
       "collaboration": {
         "title": "Team Collaboration",
@@ -214,37 +214,37 @@
     "mockData": {
       "dashboard": {
         "inventoryOverview": "Inventory Overview",
-        "items": "Items",
+        "items": "products",
         "fromLastMonth": "from last month",
         "expiringSoon": "Expiring Soon",
-        "lowStock": "Low Stock",
+        "lowStock": "At Risk This Week",
         "totalProducts": "Total Products",
-        "expiringItems": "Expiring Items",
-        "wasteReduced": "Waste Reduced",
-        "revenueIncrease": "Revenue Increase",
-        "performanceAnalytics": "Performance Analytics"
+        "expiringItems": "Expiring products",
+        "wasteReduced": "Waste Prevented",
+        "revenueIncrease": "Revenue Saved",
+        "performanceAnalytics": "Batch Analytics"
       },
       "scanning": {
-        "scanningActive": "Scanning Active",
-        "productScanned": "Scanned",
-        "productOne": "Organic Milk - 1L",
-        "productTwo": "Fresh Bread Loaf",
-        "productThree": "Greek Yogurt - 500g",
-        "productFour": "Chicken Breast - 1kg",
-        "productFive": "Bananas - 1kg",
-        "expiryInfo": "Exp: {date} | Stock: {stock} units"
+        "scanningActive": "Automation Rules Active",
+        "productScanned": "Category Rule",
+        "productOne": "Dairy. 14 day shelf life",
+        "productTwo": "Bakery. 3 day shelf life",
+        "productThree": "Produce. 7 day shelf life",
+        "productFour": "Deli. 5 day shelf life",
+        "productFive": "Frozen. 90 day shelf life",
+        "expiryInfo": "{stock} products tracked automatically"
       },
       "ai": {
-        "title": "AI Recommendations",
-        "reorderMilk": "Reorder milk products",
-        "reorderMilkDesc": "Based on consumption patterns",
-        "promoteExpiring": "Promote expiring items",
-        "promoteExpiringDesc": "23 items expire in 2 days"
+        "title": "Batch Alerts",
+        "reorderMilk": "Organic Milk. 20 units",
+        "reorderMilkDesc": "Expire in 2 days. discount now",
+        "promoteExpiring": "Sourdough Bread. 8 loaves",
+        "promoteExpiringDesc": "Expire tomorrow. discount or donate"
       }
     },
     "cta": {
-      "title": "Ready to Transform Your Inventory?",
-      "description": "Transform your inventory management with lifo and start reducing waste today.",
+      "title": "Ready to See Your Inventory by Batch?",
+      "description": "Connect your POS account and start tracking expiry dates by batch in minutes.",
       "button": "Start Free Trial"
     }
   },
@@ -394,10 +394,10 @@
     }
   },
   "footer": {
-    "description": "Helping businesses optimize inventory management with intelligent solutions to reduce waste and maximize profits.",
+    "description": "Helping POS retailers see exactly which products expire when and take action before it's too late.",
     "quickLinks": "Quick Links",
     "links": {
-      "homepage": "Homepage",
+      "homepage": "Home",
       "features": "Features",
       "aboutUs": "About Us",
       "products": "Products",

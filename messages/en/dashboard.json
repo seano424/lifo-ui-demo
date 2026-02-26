@@ -907,7 +907,7 @@
           "subtitle": "Connect your POS system to automatically import products and track inventory"
         },
         "storesConnected": "{count} stores connected from Square",
-        "helpNote": "Products and categories are imported from your Square catalog. Lifo adds batch-level expiry tracking on top of your existing product data."
+        "helpNote": "Products and categories are imported from your Square catalog. Lifo adds batch level expiry tracking on top of your existing product data."
       },
       "batchTracking": {
         "title": "Set up expiry date tracking (recommended)",

@@ -672,7 +672,7 @@
   "setupFlow": {
     "welcome": {
       "title": "Bienvenue sur lifo AI, {name} !",
-      "subtitle": "Nous récupérerons vos produits et inventaire depuis Square — vous pourrez commencer à suivre ce qui expire et quand. Prend environ 10 secondes."
+      "subtitle": "Nous récupérerons vos produits et inventaire depuis Square vous pourrez commencer à suivre ce qui expire et quand. Prend environ 10 secondes."
     },
     "batchTracking": {
       "title": "Configurer le suivi des dates d'expiration (recommandé)",
