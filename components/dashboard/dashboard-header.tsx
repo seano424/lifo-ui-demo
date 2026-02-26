@@ -40,7 +40,7 @@ export function DashboardHeader({ timeRange, onTimeRangeChange }: DashboardHeade
   ]
 
   return (
-    <div className="flex-col gap-4 items-center justify-center sm:flex-row flex sm:items-end sm:justify-between px-5">
+    <div className="flex-col gap-4 items-center justify-center sm:flex-row flex sm:items-end sm:justify-between">
       {/* Left: Greeting + Store/Date */}
       <div className="flex flex-col gap-2 text-center sm:text-left">
         {!isLoading ? (

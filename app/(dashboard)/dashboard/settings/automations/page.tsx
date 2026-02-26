@@ -4,6 +4,8 @@ import { getActiveStoreCookie } from '@/lib/actions/store-actions'
 import { createPrefetchedQuery } from '@/lib/react-query/prefetch'
 import { queryKeys } from '@/lib/queries/query-keys'
 import AutomationsClient from './automations-client'
+import { AutomationCard } from '@/components/dashboard/automation-card'
+import DashboardInsetHeader from '@/components/dashboard/dashboard-inset-header'
 
 export default async function AutomationsPage() {
   const activeStoreId = await getActiveStoreCookie()
@@ -30,7 +32,14 @@ export default async function AutomationsPage() {
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <AutomationsClient />
+      <div className="flex flex-col gap-6 container py-6">
+        <DashboardInsetHeader
+          title="Automations"
+          description="We calculate expiry dates from the delivery date + shelf life you set. Nothing to enter on delivery."
+        />
+
+        <AutomationCard showLinks={false} />
+      </div>
     </HydrationBoundary>
   )
 }
