@@ -3,6 +3,7 @@
 import Image from 'next/image'
 import { useMemo, useState } from 'react'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Typography } from '@/components/ui/typography'
 import { useProductWithBatches } from '@/hooks/use-products'
@@ -83,40 +84,54 @@ export function ProductDetailPanel({
   }, [batches])
 
   const productName = (product?.name || 'Product Details').replace(/ - /g, ' ')
+  const rawProductName = product?.name || ''
 
   return (
     <Sheet open={isOpen} onOpenChange={open => !open && handleClose()}>
       <SheetContent side="right" className="flex flex-col gap-0 p-0 w-full sm:max-w-[500px]">
         <SheetHeader className="px-6 py-4 border-b border-border/20">
-          <div className="flex items-center gap-3">
-            <ProductMonogram name={productName} imageUrl={product?.image_url} />
-            <div className="flex-1 min-w-0">
-              <SheetTitle className="text-left flex items-center gap-3">
-                <div>
-                  <Typography variant="h3" className="font-black font-heading">
-                    {productName}
-                  </Typography>
-                  {(product?.brand || product?.category_display_name) && (
-                    <div className="hidden sm:flex flex-wrap items-center gap-1.5">
-                      {product?.brand && (
-                        <Typography variant="small" color="muted" className="font-light">
-                          {product.brand}
-                        </Typography>
-                      )}
-                      {product?.brand && product?.category_display_name && (
-                        <span className="text-xs text-muted-foreground">·</span>
-                      )}
-                      {product?.category_display_name && (
-                        <Typography variant="small" color="muted" className="font-light">
-                          {product.category_display_name}
-                        </Typography>
-                      )}
-                    </div>
-                  )}
-                </div>
-              </SheetTitle>
+          {!isReady ? (
+            <div className="flex items-center gap-3">
+              <VisuallyHidden>
+                <SheetTitle>Product Details</SheetTitle>
+              </VisuallyHidden>
+              <Skeleton className="size-12 rounded-lg shrink-0" />
+              <div className="flex flex-col gap-1.5 flex-1 min-w-0">
+                <Skeleton className="h-5 w-40 rounded" />
+                <Skeleton className="h-3.5 w-24 rounded" />
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="flex items-center gap-3">
+              <ProductMonogram name={productName} imageUrl={product?.image_url} />
+              <div className="flex-1 min-w-0">
+                <SheetTitle className="text-left flex items-center gap-3">
+                  <div>
+                    <Typography variant="h3" className="font-black font-heading">
+                      {productName}
+                    </Typography>
+                    {(product?.brand || product?.category_display_name) && (
+                      <div className="hidden sm:flex flex-wrap items-center gap-1.5">
+                        {product?.brand && (
+                          <Typography variant="small" color="muted" className="font-light">
+                            {product.brand}
+                          </Typography>
+                        )}
+                        {product?.brand && product?.category_display_name && (
+                          <span className="text-xs text-muted-foreground">·</span>
+                        )}
+                        {product?.category_display_name && (
+                          <Typography variant="small" color="muted" className="font-light">
+                            {product.category_display_name}
+                          </Typography>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </SheetTitle>
+              </div>
+            </div>
+          )}
         </SheetHeader>
 
         {/* Scrollable content */}
@@ -177,7 +192,7 @@ export function ProductDetailPanel({
 
                 <ExpiryAutomationSection
                   productId={productId}
-                  productName={productName}
+                  productName={rawProductName}
                   categoryId={product?.category_id || ''}
                   categoryName={product?.category_display_name || 'Unknown'}
                 />

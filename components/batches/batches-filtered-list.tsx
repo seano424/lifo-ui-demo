@@ -247,11 +247,9 @@ export function BatchesFilteredList({
   }
 
   return (
-    <div className="flex flex-col gap-6">
-      {/* Control bar - Search, Filters, and Sort on same level */}
+    <div className="flex flex-col gap-2">
       {showControls && (
         <div className="flex flex-col lg:flex-row lg:items-center lg:gap-2 gap-3">
-          {/* Search Bar */}
           <div className="flex-1">
             <TodoSearchBar
               searchTerm={filters.search}
@@ -262,7 +260,6 @@ export function BatchesFilteredList({
             />
           </div>
           <div className="flex items-center gap-1 sm:justify-start justify-between w-full">
-            {/* Filters */}
             <BatchListFilters
               filters={{
                 expiringInDays: filters.expiringInDays,
@@ -272,22 +269,15 @@ export function BatchesFilteredList({
               isLoading={isLoading}
             />
 
-            {/* Sort Controls */}
             <BatchListSortControls
               currentSort={filters.sort || { field: 'expiry_date', direction: 'asc' }}
               updateSort={handleSortFieldChange}
               isLoading={isLoading}
             />
           </div>
-
-          {/* Add Batch Button */}
-          {/* <Link href="/dashboard/deliveries">
-          <Button>{tButtons('addBatch')}</Button>
-        </Link> */}
         </div>
       )}
 
-      {/* Table with horizontal scroll */}
       <div className="overflow-x-auto">
         <BatchTable
           data={data}

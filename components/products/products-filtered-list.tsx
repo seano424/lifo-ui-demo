@@ -155,10 +155,8 @@ export function ProductsFilteredList({
   }
 
   return (
-    <div className="flex flex-col gap-6">
-      {/* Control bar - Search, Filters, and Sort on same level */}
+    <div className="flex flex-col gap-2">
       <div className="flex flex-col lg:flex-row lg:items-center lg:gap-2 gap-3">
-        {/* Search Bar */}
         <div className="flex-1">
           <TodoSearchBar
             searchTerm={filters.search}
@@ -194,14 +192,8 @@ export function ProductsFilteredList({
             isLoading={isLoading}
           />
         </div>
-
-        {/* Add Product Button */}
-        {/* <Link href="/dashboard/deliveries">
-          <Button>{tButtons('addProduct')}</Button>
-        </Link> */}
       </div>
 
-      {/* Table with horizontal scroll */}
       <div className="overflow-x-auto">
         <ProductsTable
           data={data}

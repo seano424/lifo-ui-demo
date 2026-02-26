@@ -293,6 +293,7 @@ export function BatchTable({
 
       {selectedProductId && (
         <ProductDetailPanel
+          key={selectedProductId}
           isOpen={isBottomSheetOpen}
           onClose={() => {
             setIsBottomSheetOpen(false)

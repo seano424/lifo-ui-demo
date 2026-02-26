@@ -407,18 +407,22 @@ export function AddAutomationRulePanel({
           )}
 
           {/* Shelf life */}
-          <div className="flex flex-col gap-2">
-            <Typography variant="h5" className="font-semibold">
-              Shelf life (days)
-            </Typography>
-            <div className="flex items-center gap-2">
-              <input
-                type="number"
-                min="1"
-                value={draftDays}
-                onChange={e => setDraftDays(Math.max(1, Number.parseInt(e.target.value, 10) || 1))}
-                className="px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
-              />
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center justify-between">
+              <Typography variant="h5" className="font-semibold">
+                Shelf life (days)
+              </Typography>
+              <div className="flex items-center gap-2">
+                <input
+                  type="number"
+                  min="1"
+                  value={draftDays}
+                  onChange={e =>
+                    setDraftDays(Math.max(1, Number.parseInt(e.target.value, 10) || 1))
+                  }
+                  className="px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 w-24 text-center"
+                />
+              </div>
             </div>
             <Typography variant="small" color="muted">
               Example: Delivered today → Expires {expiryExample}

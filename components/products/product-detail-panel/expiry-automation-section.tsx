@@ -175,7 +175,7 @@ function RuleRow({
 
       <Typography
         variant="small"
-        className="text-muted-foreground/0 group-hover:text-foreground shrink-0 h-auto py-0 px-1 transition-all duration-100 ease-in-out"
+        className="text-muted-foreground sm:text-muted-foreground/0 group-hover:text-foreground shrink-0 h-auto py-0 px-1 transition-all duration-100 ease-in-out"
       >
         {actionLabel}
       </Typography>

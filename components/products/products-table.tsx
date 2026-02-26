@@ -261,6 +261,7 @@ export function ProductsTable({
 
       {selectedProductId && (
         <ProductDetailPanel
+          key={selectedProductId}
           isOpen={isModalOpen}
           onClose={() => {
             setIsModalOpen(false)
