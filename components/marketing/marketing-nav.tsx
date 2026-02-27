@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/accordion'
 import { Button } from '@/components/ui/button'
 import { CompactLanguageSwitcher } from '@/components/ui/compact-language-switcher'
+
 import { Logo } from '@/components/ui/logo'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import { hasEnvVars } from '@/lib/utils'
@@ -80,7 +81,9 @@ const MarketingNav = React.memo(() => {
               </Link>
             ))}
           </div>
-          <div className="place-self-end self-center">
+          <div className="place-self-end self-center flex items-center gap-2">
+            <CompactLanguageSwitcher hasBg={false} />
+
             {!hasEnvVars ? <EnvVarWarning /> : <AuthButton />}
           </div>
         </div>
