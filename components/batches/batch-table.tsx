@@ -237,7 +237,7 @@ export function BatchTable({
               onClick={() => handleBatchClick(batch)}
               className={cn(
                 'w-full text-left px-4 py-4 cursor-pointer transition-colors active:bg-muted/20 border border-b-muted-foreground/10 border-t-transparent border-x-transparent',
-                isExpiringSoon(batch) && 'border border-red-100/90',
+                isExpiringSoon(batch) && 'border border-red-100/90 dark:border-red-300',
               )}
             >
               {/* Primary row: product image + name + days badge */}

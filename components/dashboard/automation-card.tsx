@@ -105,15 +105,15 @@ export function AutomationCard({ showLinks = true }: { showLinks?: boolean }) {
   return (
     <>
       <Card className="overflow-hidden flex flex-col gap-0 bg-card/0">
-        <div className="flex flex-col-reverse gap-4 sm:flex-row items-start justify-between py-4">
-          <div className="flex flex-col gap-2">
-            <Typography variant="h4">{t('title')}</Typography>
-            <Typography variant="p" color="muted" className="max-w-md">
-              {t('subtitle')}
-            </Typography>
-          </div>
+        {showLinks && (
+          <div className="flex flex-col-reverse gap-4 sm:flex-row items-start justify-between py-4">
+            <div className="flex flex-col gap-2">
+              <Typography variant="h4">{t('title')}</Typography>
+              <Typography variant="p" color="muted" className="max-w-md">
+                {t('subtitle')}
+              </Typography>
+            </div>
 
-          {showLinks && (
             <Link href="/dashboard/settings/automations">
               <Typography
                 variant="p"
@@ -124,8 +124,8 @@ export function AutomationCard({ showLinks = true }: { showLinks?: boolean }) {
                 <Settings className="h-3.5 w-3.5" aria-hidden="true" />
               </Typography>
             </Link>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* Summary Stats Row */}
         <div className="flex flex-col sm:flex-row sm:items-center gap-4 border-b border-muted pb-4">
