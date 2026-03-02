@@ -144,8 +144,8 @@ const AutomationScheduleSchema = z.object({
 const BatchTrackingConfigSchema = z.object({
   enabled: z.boolean(),
   setup_completed: z.boolean(),
-  setup_completed_at: z.string().optional(),
-  product_selection_mode: z.enum(['all', 'by_category', 'individual']).optional(),
+  setup_completed_at: z.string().nullish(),
+  product_selection_mode: z.enum(['all', 'by_category', 'individual']).nullish(),
   selected_category_ids: z.array(z.string()).optional(),
   selected_product_ids: z.array(z.string()).optional(),
   automation_schedule: AutomationScheduleSchema.optional(),

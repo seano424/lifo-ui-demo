@@ -367,8 +367,8 @@ export interface AutomationSchedule {
 export interface BatchTrackingConfig {
   enabled: boolean
   setup_completed: boolean
-  setup_completed_at?: string
-  product_selection_mode?: 'all' | 'by_category' | 'individual'
+  setup_completed_at?: string | null
+  product_selection_mode?: 'all' | 'by_category' | 'individual' | null
   selected_category_ids?: string[]
   selected_product_ids?: string[]
   automation_schedule?: AutomationSchedule
