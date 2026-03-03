@@ -31,11 +31,14 @@ import {
   useReactTable,
 } from '@tanstack/react-table'
 import { useQueryClient } from '@tanstack/react-query'
+import { motion } from 'framer-motion'
 import { Package } from 'lucide-react'
 import Image from 'next/image'
 import { useTranslations } from 'next-intl'
 import { useEffect, useMemo, useState } from 'react'
 import { cn } from '@/lib/utils'
+
+const MotionTableBody = motion(TableBody)
 
 const VALID_COLUMN_IDS = [
   'product_name',
@@ -208,14 +211,19 @@ export function BatchTable({
               </TableRow>
             ))}
           </TableHeader>
-          <TableBody>
+          <MotionTableBody
+            key={data.map(b => b.batch_id).join(',')}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3, ease: 'easeOut' }}
+          >
             {table.getRowModel().rows.map(row => (
               <TableRow
-                key={row.id}
+                key={row.original.batch_id}
                 onClick={() => handleBatchClick(row.original)}
                 onMouseEnter={() => handleBatchHover(row.original.product_id)}
                 className={cn(
-                  'cursor-pointer transition-all duration-100 ease-in-out',
+                  'cursor-pointer transition-colors',
                   isExpiringSoon(row.original)
                     ? 'bg-red-50/20 hover:bg-red-50/40 dark:bg-red-900/10 dark:hover:bg-red-900/20'
                     : 'hover:bg-muted/30',
@@ -234,12 +242,18 @@ export function BatchTable({
                 ))}
               </TableRow>
             ))}
-          </TableBody>
+          </MotionTableBody>
         </Table>
       </div>
 
       {/* Mobile card list — hidden on sm+ */}
-      <div className="sm:hidden flex flex-col gap-2">
+      <motion.div
+        key={data.map(b => b.batch_id).join(',')}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3, ease: 'easeOut' }}
+        className="sm:hidden flex flex-col gap-2"
+      >
         {data.map(batch => {
           const expiryDate = batch.expiry_date ? parseISODateAsLocal(batch.expiry_date) : null
           const daysLeft = expiryDate ? getDaysLeft(expiryDate) : null
@@ -334,7 +348,7 @@ export function BatchTable({
             </button>
           )
         })}
-      </div>
+      </motion.div>
 
       {selectedProductId && (
         <ProductDetailPanel
