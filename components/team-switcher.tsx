@@ -73,9 +73,9 @@ export function TeamSwitcher({ compact = false }: TeamSwitcherProps) {
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground flex items-center gap-2 px-4 py-3 rounded-2xl border group-data-[state=collapsed]:border-none"
             >
               <StoreIcon className="w-4 h-4 text-muted-foreground" />
-              <div className="grid flex-1 text-left text-sm leading-tight">
+              {/* <div className="grid flex-1 text-left text-sm leading-tight">
                 <span>{t('noStoresAvailable')}</span>
-              </div>
+              </div> */}
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
