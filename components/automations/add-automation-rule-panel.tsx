@@ -67,6 +67,7 @@ export function AddAutomationRulePanel({
   const [ruleType, setRuleType] = useState<'category' | 'product'>('category')
   const [selectedKey, setSelectedKey] = useState('')
   const [draftDays, setDraftDays] = useState(14)
+  const [daysInput, setDaysInput] = useState('14')
   const [productSearch, setProductSearch] = useState('')
   const [debouncedProductSearch, setDebouncedProductSearch] = useState('')
   const initDoneRef = useRef(false)
@@ -166,7 +167,9 @@ export function AddAutomationRulePanel({
 
       // Seed shelf life from the rule for the starting tab (if it exists)
       const startRule = startType === 'product' ? productRule : categoryRule
-      setDraftDays(startRule?.shelf_life_days ?? 14)
+      const startDays = startRule?.shelf_life_days ?? 14
+      setDraftDays(startDays)
+      setDaysInput(String(startDays))
     }
 
     if (!isOpen) {
@@ -174,6 +177,7 @@ export function AddAutomationRulePanel({
       setRuleType('category')
       setSelectedKey('')
       setDraftDays(14)
+      setDaysInput('14')
       setProductSearch('')
       setDebouncedProductSearch('')
     }
@@ -201,7 +205,9 @@ export function AddAutomationRulePanel({
 
     // Update shelf life to match the new tab's existing rule (or reset to default)
     const tabRule = type === 'product' ? productRule : categoryRule
-    setDraftDays(tabRule?.shelf_life_days ?? 14)
+    const tabDays = tabRule?.shelf_life_days ?? 14
+    setDraftDays(tabDays)
+    setDaysInput(String(tabDays))
   }
 
   const canCreate = selectedKey !== '' && isAvailable
@@ -418,10 +424,13 @@ export function AddAutomationRulePanel({
                 <input
                   type="number"
                   min="1"
-                  value={draftDays}
-                  onChange={e =>
-                    setDraftDays(Math.max(1, Number.parseInt(e.target.value, 10) || 1))
-                  }
+                  value={daysInput}
+                  onChange={e => setDaysInput(e.target.value)}
+                  onBlur={() => {
+                    const parsed = Math.max(1, Number.parseInt(daysInput, 10) || 1)
+                    setDraftDays(parsed)
+                    setDaysInput(String(parsed))
+                  }}
                   className="px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 w-24 text-center"
                 />
               </div>

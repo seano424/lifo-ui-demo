@@ -48,10 +48,13 @@ export function AutomationRulePanel({
   )
 
   const [draftDays, setDraftDays] = useState(rule?.shelf_life_days ?? 14)
+  const [daysInput, setDaysInput] = useState(String(rule?.shelf_life_days ?? 14))
 
   useEffect(() => {
     if (isOpen && rule) {
-      setDraftDays(rule.shelf_life_days ?? 14)
+      const days = rule.shelf_life_days ?? 14
+      setDraftDays(days)
+      setDaysInput(String(days))
     }
   }, [isOpen, rule])
 
@@ -130,10 +133,13 @@ export function AutomationRulePanel({
                 <input
                   type="number"
                   min="1"
-                  value={draftDays}
-                  onChange={e =>
-                    setDraftDays(Math.max(1, Number.parseInt(e.target.value, 10) || 1))
-                  }
+                  value={daysInput}
+                  onChange={e => setDaysInput(e.target.value)}
+                  onBlur={() => {
+                    const parsed = Math.max(1, Number.parseInt(daysInput, 10) || 1)
+                    setDraftDays(parsed)
+                    setDaysInput(String(parsed))
+                  }}
                   className="px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 w-24 text-center"
                 />
               </div>

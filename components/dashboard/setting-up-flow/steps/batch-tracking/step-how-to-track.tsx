@@ -227,12 +227,15 @@ function CategoryEditSheet({
 }: CategoryEditSheetProps) {
   const [draftMode, setDraftMode] = useState<'auto' | 'manual'>(mode)
   const [draftDays, setDraftDays] = useState(days ?? DEFAULT_SHELF_LIFE)
+  const [daysInput, setDaysInput] = useState(String(days ?? DEFAULT_SHELF_LIFE))
 
   // Reset draft state whenever the sheet opens
   useEffect(() => {
     if (isOpen) {
       setDraftMode(mode)
-      setDraftDays(days ?? DEFAULT_SHELF_LIFE)
+      const resetDays = days ?? DEFAULT_SHELF_LIFE
+      setDraftDays(resetDays)
+      setDaysInput(String(resetDays))
     }
   }, [isOpen, mode, days])
 
@@ -371,10 +374,13 @@ function CategoryEditSheet({
             <input
               type="number"
               min="1"
-              value={draftDays}
-              onChange={e =>
-                setDraftDays(Number.parseInt(e.target.value, 10) || DEFAULT_SHELF_LIFE)
-              }
+              value={daysInput}
+              onChange={e => setDaysInput(e.target.value)}
+              onBlur={() => {
+                const parsed = Math.max(1, Number.parseInt(daysInput, 10) || DEFAULT_SHELF_LIFE)
+                setDraftDays(parsed)
+                setDaysInput(String(parsed))
+              }}
               className={cn(
                 'w-24 px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500',
               )}
