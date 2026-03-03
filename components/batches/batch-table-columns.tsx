@@ -85,12 +85,12 @@ const BATCH_TABLE_COLUMN_CONFIG = [
 ] as const
 
 // Helper function to get alignment classes from config
-function getAlignmentClasses(columnIndex: number): {
+function getAlignmentClasses(id: (typeof BATCH_TABLE_COLUMN_CONFIG)[number]['id']): {
   headerClass: string
   cellClass: string
 } {
-  const align = BATCH_TABLE_COLUMN_CONFIG[columnIndex].align
-  if (align === 'right') {
+  const config = BATCH_TABLE_COLUMN_CONFIG.find(c => c.id === id)
+  if (config?.align === 'right') {
     return {
       headerClass: 'justify-end',
       cellClass: 'text-right',
@@ -165,15 +165,15 @@ export function createBatchTableColumns({
   storeName?: string
 }): ColumnDef<BatchWithProduct>[] {
   const alignments = {
-    product_name: getAlignmentClasses(0),
-    status: getAlignmentClasses(1),
-    expiry_date: getAlignmentClasses(2),
-    days_left: getAlignmentClasses(3),
-    current_quantity: getAlignmentClasses(4),
-    location: getAlignmentClasses(5),
-    initial_quantity: getAlignmentClasses(6),
-    created_at: getAlignmentClasses(7),
-    updated_at: getAlignmentClasses(8),
+    product_name: getAlignmentClasses('product_name'),
+    status: getAlignmentClasses('status'),
+    expiry_date: getAlignmentClasses('expiry_date'),
+    days_left: getAlignmentClasses('days_left'),
+    current_quantity: getAlignmentClasses('current_quantity'),
+    location: getAlignmentClasses('location'),
+    initial_quantity: getAlignmentClasses('initial_quantity'),
+    created_at: getAlignmentClasses('created_at'),
+    updated_at: getAlignmentClasses('updated_at'),
   }
 
   return [
@@ -287,15 +287,9 @@ export function createBatchTableColumns({
         </SortableHeader>
       ),
       cell: ({ row }) => {
-        let expiryDate: Date | null = null
-        // let daysLeft = 0
-
-        if (row.original.expiry_date) {
-          expiryDate = parseISODateAsLocal(row.original.expiry_date)
-          const today = new Date()
-          today.setHours(0, 0, 0, 0)
-          // daysLeft = getDaysLeft(expiryDate)
-        }
+        const expiryDate = row.original.expiry_date
+          ? parseISODateAsLocal(row.original.expiry_date)
+          : null
 
         return (
           <Typography variant="small" color="muted" className={alignments.expiry_date.cellClass}>
@@ -399,19 +393,5 @@ export function createBatchTableColumns({
       },
       size: BATCH_TABLE_COLUMN_CONFIG[8].width,
     },
-    // {
-    //   id: 'location',
-    //   header: () => (
-    //     <div className={`flex items-center font-normal ${alignments.location.headerClass}`}>
-    //       {t('headers.location')}
-    //     </div>
-    //   ),
-    //   cell: () => (
-    //     <div className={`text-sm truncate ${alignments.location.cellClass}`}>
-    //       {storeName || '-'}
-    //     </div>
-    //   ),
-    //   size: BATCH_TABLE_COLUMN_CONFIG[5].width,
-    // },
   ]
 }

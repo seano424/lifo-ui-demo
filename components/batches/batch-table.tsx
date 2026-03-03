@@ -34,7 +34,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { Package } from 'lucide-react'
 import Image from 'next/image'
 import { useTranslations } from 'next-intl'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { cn } from '@/lib/utils'
 
 const VALID_COLUMN_IDS = [
@@ -138,14 +138,17 @@ export function BatchTable({
     }
   }, [currentSort])
 
-  const columns = createBatchTableColumns({
-    currentSort,
-    updateSort,
-    t,
-    tExpiry,
-    tStatus,
-    storeName: activeStore?.store_name,
-  })
+  const columns = useMemo(
+    () =>
+      createBatchTableColumns({
+        currentSort,
+        updateSort,
+        t,
+        tExpiry,
+        tStatus,
+      }),
+    [currentSort, updateSort, t, tExpiry, tStatus],
+  )
 
   const table = useReactTable({
     data,

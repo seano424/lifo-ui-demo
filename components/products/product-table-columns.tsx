@@ -69,12 +69,12 @@ const PRODUCT_TABLE_COLUMN_CONFIG = [
   },
 ] as const
 
-function getAlignmentClasses(columnIndex: number): {
+function getAlignmentClasses(id: (typeof PRODUCT_TABLE_COLUMN_CONFIG)[number]['id']): {
   headerClass: string
   cellClass: string
 } {
-  const align = PRODUCT_TABLE_COLUMN_CONFIG[columnIndex].align
-  if (align === 'right') {
+  const config = PRODUCT_TABLE_COLUMN_CONFIG.find(c => c.id === id)
+  if (config?.align === 'right') {
     return {
       headerClass: 'justify-end',
       cellClass: 'text-right',
@@ -98,13 +98,13 @@ export function createProductTableColumns({
   getCategoryName: (product: Product) => string
 }): ColumnDef<Product>[] {
   const alignments = {
-    name: getAlignmentClasses(0),
-    store_quantity: getAlignmentClasses(1),
-    active_batches_count: getAlignmentClasses(2),
-    active_batches: getAlignmentClasses(3),
-    needs_expiry: getAlignmentClasses(4),
-    category: getAlignmentClasses(5),
-    brand: getAlignmentClasses(6),
+    name: getAlignmentClasses('name'),
+    store_quantity: getAlignmentClasses('store_quantity'),
+    active_batches_count: getAlignmentClasses('active_batches_count'),
+    active_batches: getAlignmentClasses('active_batches'),
+    needs_expiry: getAlignmentClasses('needs_expiry'),
+    category: getAlignmentClasses('category'),
+    brand: getAlignmentClasses('brand'),
   }
 
   return [
@@ -281,7 +281,7 @@ export function createProductTableColumns({
       ),
       cell: ({ row }) => (
         <Typography variant="small" color="muted" className={alignments.brand.cellClass}>
-          {row.original.brand || 'NULL'}
+          {row.original.brand || '-'}
         </Typography>
       ),
       size: PRODUCT_TABLE_COLUMN_CONFIG[6].width,

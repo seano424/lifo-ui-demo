@@ -137,6 +137,8 @@ BEGIN
       AND (
         p_exclude_drafts IS NULL
         OR NOT p_exclude_drafts
+        -- If an explicit status filter for drafts/ignored is provided, allow it to override
+        -- exclusion (e.g. querying for drafts specifically still works with p_exclude_drafts=TRUE)
         OR p_status IN ('draft', 'ignored')
         OR b.status NOT IN ('draft', 'ignored')
       )

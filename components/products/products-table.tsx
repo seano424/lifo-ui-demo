@@ -22,7 +22,6 @@ import { useActiveStoreId } from '@/lib/stores/store-context'
 import {
   flexRender,
   getCoreRowModel,
-  getSortedRowModel,
   type SortingState,
   useReactTable,
 } from '@tanstack/react-table'
@@ -125,9 +124,7 @@ export function ProductsTable({
     state: {
       sorting,
     },
-    onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
     enableSorting: false,
   })
 
@@ -147,6 +144,14 @@ export function ProductsTable({
             minWidth: `max(${totalColumnsWidth}px, 100%)`,
           }}
         >
+          <colgroup>
+            {table.getVisibleLeafColumns().map(column => (
+              <col
+                key={column.id}
+                style={column.columnDef.size ? { width: column.columnDef.size } : undefined}
+              />
+            ))}
+          </colgroup>
           <TableHeader>
             {table.getHeaderGroups().map(headerGroup => (
               <TableRow key={headerGroup.id}>
@@ -154,11 +159,6 @@ export function ProductsTable({
                   <TableHead
                     key={header.id}
                     className="sticky top-0 bg-background z-10 py-3 border-b border-muted"
-                    style={
-                      header.column.columnDef.size
-                        ? { width: header.column.columnDef.size }
-                        : undefined
-                    }
                   >
                     {header.isPlaceholder
                       ? null
