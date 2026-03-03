@@ -252,9 +252,21 @@ export function ProductsTable({
                 </div>
                 <div className="flex justify-between text-sm">
                   <Typography variant="small" color="muted">
+                    {tTable('activeBatches')}
+                  </Typography>
+                  <Typography variant="small">{product.active_batches_count ?? 0}</Typography>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <Typography variant="small" color="muted">
                     {tTable('datesMissing')}
                   </Typography>
                   <Typography variant="small">{missingExpiry}</Typography>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <Typography variant="small" color="muted">
+                    {tTable('brand')}
+                  </Typography>
+                  <Typography variant="small">{product.brand || '-'}</Typography>
                 </div>
               </div>
             </button>

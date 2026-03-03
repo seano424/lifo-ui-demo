@@ -291,7 +291,7 @@ export function BatchTable({
                 </div>
                 <div className="flex justify-between text-sm">
                   <Typography variant="small" color="muted">
-                    {t('headers.quantity')}
+                    {t('headers.available')}
                   </Typography>
                   <Typography variant="small">
                     {Math.round(Number(batch.current_quantity)).toLocaleString()}
@@ -302,6 +302,30 @@ export function BatchTable({
                     {t('headers.status')}
                   </Typography>
                   <Typography variant="small">{tStatus(batch.status || 'active')}</Typography>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <Typography variant="small" color="muted">
+                    {t('headers.initialQuantity')}
+                  </Typography>
+                  <Typography variant="small">
+                    {Math.round(Number(batch.initial_quantity)).toLocaleString()}
+                  </Typography>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <Typography variant="small" color="muted">
+                    {t('headers.createdAt')}
+                  </Typography>
+                  <Typography variant="small">
+                    {batch.created_at ? new Date(batch.created_at).toLocaleDateString() : '-'}
+                  </Typography>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <Typography variant="small" color="muted">
+                    {t('headers.updatedAt')}
+                  </Typography>
+                  <Typography variant="small">
+                    {batch.updated_at ? new Date(batch.updated_at).toLocaleDateString() : '-'}
+                  </Typography>
                 </div>
               </div>
             </button>
