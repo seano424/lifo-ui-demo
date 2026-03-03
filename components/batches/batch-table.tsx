@@ -35,7 +35,7 @@ import { motion } from 'framer-motion'
 import { Package } from 'lucide-react'
 import Image from 'next/image'
 import { useTranslations } from 'next-intl'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { cn } from '@/lib/utils'
 
 const MotionTableBody = motion(TableBody)
@@ -170,6 +170,16 @@ export function BatchTable({
     .getVisibleLeafColumns()
     .reduce((sum, col) => sum + (col.columnDef.size ?? 0), 0)
 
+  const batchDataKey = data.map(b => b.batch_id).join(',')
+  const prevIsFetchingRef = useRef(false)
+  const prevDataKeyRef = useRef('')
+  const shouldAnimate = prevIsFetchingRef.current && batchDataKey !== prevDataKeyRef.current
+
+  useEffect(() => {
+    prevIsFetchingRef.current = isFetching
+    prevDataKeyRef.current = batchDataKey
+  })
+
   return (
     <>
       {/* Desktop table — hidden on mobile */}
@@ -212,10 +222,10 @@ export function BatchTable({
             ))}
           </TableHeader>
           <MotionTableBody
-            key={data.map(b => b.batch_id).join(',')}
-            initial={{ opacity: 0 }}
+            key={batchDataKey}
+            initial={shouldAnimate ? { opacity: 0 } : false}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.3, ease: 'easeOut' }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
           >
             {table.getRowModel().rows.map(row => (
               <TableRow
@@ -248,10 +258,10 @@ export function BatchTable({
 
       {/* Mobile card list — hidden on sm+ */}
       <motion.div
-        key={data.map(b => b.batch_id).join(',')}
-        initial={{ opacity: 0 }}
+        key={batchDataKey}
+        initial={shouldAnimate ? { opacity: 0 } : false}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.3, ease: 'easeOut' }}
+        transition={{ duration: 0.2, ease: 'easeOut' }}
         className="sm:hidden flex flex-col gap-2"
       >
         {data.map(batch => {

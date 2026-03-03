@@ -29,7 +29,7 @@ import { motion } from 'framer-motion'
 import { Package } from 'lucide-react'
 import Image from 'next/image'
 import { useTranslations } from 'next-intl'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { formatProductName } from '@/lib/utils/product-name'
 
 const MotionTableBody = motion(TableBody)
@@ -135,6 +135,16 @@ export function ProductsTable({
     .getVisibleLeafColumns()
     .reduce((sum, col) => sum + (col.columnDef.size ?? 0), 0)
 
+  const productDataKey = data.map(p => p.product_id).join(',')
+  const prevIsFetchingRef = useRef(false)
+  const prevDataKeyRef = useRef('')
+  const shouldAnimate = prevIsFetchingRef.current && productDataKey !== prevDataKeyRef.current
+
+  useEffect(() => {
+    prevIsFetchingRef.current = isFetching
+    prevDataKeyRef.current = productDataKey
+  })
+
   return (
     <>
       {/* Desktop table — hidden on mobile */}
@@ -172,8 +182,8 @@ export function ProductsTable({
             ))}
           </TableHeader>
           <MotionTableBody
-            key={data.map(p => p.product_id).join(',')}
-            initial={{ opacity: 0 }}
+            key={productDataKey}
+            initial={shouldAnimate ? { opacity: 0 } : false}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.2, ease: 'easeOut' }}
           >
@@ -203,8 +213,8 @@ export function ProductsTable({
 
       {/* Mobile card list — hidden on sm+ */}
       <motion.div
-        key={data.map(p => p.product_id).join(',')}
-        initial={{ opacity: 0 }}
+        key={productDataKey}
+        initial={shouldAnimate ? { opacity: 0 } : false}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.2, ease: 'easeOut' }}
         className="sm:hidden divide-y divide-muted"
