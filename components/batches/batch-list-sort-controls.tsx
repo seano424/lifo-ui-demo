@@ -31,7 +31,7 @@ export function BatchListSortControls({
         onValueChange={(field: BatchSortField) => updateSort(field)}
         disabled={isLoading}
       >
-        <SelectTrigger className="w-fit sm:w-max px-4" showChevron={false}>
+        <SelectTrigger className="w-fit sm:w-max sm:min-w-[150px] px-4" showChevron={false}>
           <div className="flex items-center justify-between w-full gap-1">
             <SelectValue className="whitespace-nowrap" />
             <ArrowUpDownIcon className="h-4 w-4 text-muted-foreground hidden sm:block" />
@@ -46,6 +46,18 @@ export function BatchListSortControls({
           </SelectItem>
           <SelectItem value="current_quantity" hideCheckIcon>
             {t('stockLevel')}
+          </SelectItem>
+          <SelectItem value="initial_quantity" hideCheckIcon>
+            {t('initialQuantity')}
+          </SelectItem>
+          <SelectItem value="status" hideCheckIcon>
+            {t('status')}
+          </SelectItem>
+          <SelectItem value="created_at" hideCheckIcon>
+            {t('createdDate')}
+          </SelectItem>
+          <SelectItem value="updated_at" hideCheckIcon>
+            {t('updatedDate')}
           </SelectItem>
         </SelectContent>
       </Select>

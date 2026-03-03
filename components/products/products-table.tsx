@@ -22,15 +22,17 @@ import { useActiveStoreId } from '@/lib/stores/store-context'
 import {
   flexRender,
   getCoreRowModel,
-  getSortedRowModel,
   type SortingState,
   useReactTable,
 } from '@tanstack/react-table'
+import { motion } from 'framer-motion'
 import { Package } from 'lucide-react'
 import Image from 'next/image'
 import { useTranslations } from 'next-intl'
 import { useEffect, useMemo, useState } from 'react'
 import { formatProductName } from '@/lib/utils/product-name'
+
+const MotionTableBody = motion(TableBody)
 
 const VALID_COLUMN_IDS = [
   'name',
@@ -125,11 +127,13 @@ export function ProductsTable({
     state: {
       sorting,
     },
-    onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
     enableSorting: false,
   })
+
+  const totalColumnsWidth = table
+    .getVisibleLeafColumns()
+    .reduce((sum, col) => sum + (col.columnDef.size ?? 0), 0)
 
   return (
     <>
@@ -140,10 +144,17 @@ export function ProductsTable({
             tableLayout: 'fixed',
             borderCollapse: 'separate',
             borderSpacing: 0,
-            width: 'max-content',
-            minWidth: '100%',
+            minWidth: `max(${totalColumnsWidth}px, 100%)`,
           }}
         >
+          <colgroup>
+            {table.getVisibleLeafColumns().map(column => (
+              <col
+                key={column.id}
+                style={column.columnDef.size ? { width: column.columnDef.size } : undefined}
+              />
+            ))}
+          </colgroup>
           <TableHeader>
             {table.getHeaderGroups().map(headerGroup => (
               <TableRow key={headerGroup.id}>
@@ -151,11 +162,6 @@ export function ProductsTable({
                   <TableHead
                     key={header.id}
                     className="sticky top-0 bg-background z-10 py-3 border-b border-muted"
-                    style={
-                      header.column.columnDef.size
-                        ? { width: header.column.columnDef.size }
-                        : undefined
-                    }
                   >
                     {header.isPlaceholder
                       ? null
@@ -165,13 +171,18 @@ export function ProductsTable({
               </TableRow>
             ))}
           </TableHeader>
-          <TableBody>
+          <MotionTableBody
+            key={data.map(p => p.product_id).join(',')}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+          >
             {table.getRowModel().rows.map(row => (
               <TableRow
-                key={row.id}
+                key={row.original.product_id}
                 onClick={() => handleProductClick(row.original)}
                 onMouseEnter={() => handleProductHover(row.original.product_id)}
-                className="cursor-pointer transition-all duration-100 ease-in-out hover:bg-muted/30"
+                className="cursor-pointer transition-colors hover:bg-muted/30"
               >
                 {row.getVisibleCells().map(cell => (
                   <TableCell
@@ -186,12 +197,18 @@ export function ProductsTable({
                 ))}
               </TableRow>
             ))}
-          </TableBody>
+          </MotionTableBody>
         </Table>
       </div>
 
       {/* Mobile card list — hidden on sm+ */}
-      <div className="sm:hidden divide-y divide-muted">
+      <motion.div
+        key={data.map(p => p.product_id).join(',')}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.2, ease: 'easeOut' }}
+        className="sm:hidden divide-y divide-muted"
+      >
         {data.map(product => {
           const storeQty = product.store_quantity ?? 0
           const batchQty = product.batch_quantity ?? 0
@@ -249,15 +266,27 @@ export function ProductsTable({
                 </div>
                 <div className="flex justify-between text-sm">
                   <Typography variant="small" color="muted">
+                    {tTable('activeBatches')}
+                  </Typography>
+                  <Typography variant="small">{product.active_batches_count ?? 0}</Typography>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <Typography variant="small" color="muted">
                     {tTable('datesMissing')}
                   </Typography>
                   <Typography variant="small">{missingExpiry}</Typography>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <Typography variant="small" color="muted">
+                    {tTable('brand')}
+                  </Typography>
+                  <Typography variant="small">{product.brand || '-'}</Typography>
                 </div>
               </div>
             </button>
           )
         })}
-      </div>
+      </motion.div>
 
       {selectedProductId && (
         <ProductDetailPanel

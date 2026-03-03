@@ -249,6 +249,9 @@ export function useBatchActions() {
         queryClient.invalidateQueries({
           queryKey: queryKeys.batches.byStore(activeStoreId),
         })
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.products.byStore(activeStoreId),
+        })
       }
 
       queryClient.invalidateQueries({
@@ -329,7 +332,7 @@ export function useBatchActions() {
 
         // Optimistically update batches.byProduct for all products
         queryClient.setQueriesData(
-          { queryKey: ['batches', 'byProduct', activeStoreId] },
+          { queryKey: [...queryKeys.batches.byStore(activeStoreId), 'byProduct'] },
           (oldData: unknown) => {
             if (!isInfiniteData(oldData)) return oldData
 
@@ -369,7 +372,7 @@ export function useBatchActions() {
             queryKey: queryKeys.batches.byStore(activeStoreId),
           })
           queryClient.invalidateQueries({
-            queryKey: ['batches', 'byProduct', activeStoreId],
+            queryKey: [...queryKeys.batches.byStore(activeStoreId), 'byProduct'],
           })
         }
       }
@@ -388,6 +391,9 @@ export function useBatchActions() {
       if (activeStoreId) {
         queryClient.invalidateQueries({
           queryKey: queryKeys.batches.byStore(activeStoreId),
+        })
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.products.byStore(activeStoreId),
         })
 
         // Invalidate todo-related queries that depend on batch data
@@ -442,11 +448,7 @@ export function useBatchActions() {
     },
 
     onSuccess: (_data, { batchId }) => {
-      // Immediately invalidate the batch todo query after successful update
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.batches.todo(batchId),
-      })
-      // Also force refetch
+      // Force refetch of the batch todo query (onSettled handles invalidation)
       queryClient.refetchQueries({
         queryKey: queryKeys.batches.todo(batchId),
       })
@@ -512,6 +514,9 @@ export function useBatchActions() {
         })
         queryClient.invalidateQueries({
           queryKey: queryKeys.products.detail(productId),
+        })
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.products.byStore(activeStoreId),
         })
       }
     },

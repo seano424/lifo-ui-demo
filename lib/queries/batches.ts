@@ -47,6 +47,8 @@ export type BatchSortField =
   | 'selling_price'
   | 'status'
   | 'created_at'
+  | 'initial_quantity'
+  | 'updated_at'
 
 export type BatchSortDirection = 'asc' | 'desc'
 
@@ -92,9 +94,7 @@ function applySingleColumnSort<
         ascending: sort.direction === 'asc',
       })
     case 'product_name':
-      // Product name sorting not supported in query builder (use fetchBatchesPageRPC instead)
-      // Fallback to expiry date
-      console.warn('product_name sorting only supported via RPC - use fetchBatchesPageRPC')
+      // Not supported in query builder - handled by fetchBatchesPageRPC
       return query.order('expiry_date', { ascending: true })
     case 'supplier':
       return query.order('supplier', { ascending: sort.direction === 'asc' })
@@ -122,6 +122,10 @@ function applySingleColumnSort<
       return query.order('status', { ascending: sort.direction === 'asc' })
     case 'created_at':
       return query.order('created_at', { ascending: sort.direction === 'asc' })
+    case 'initial_quantity':
+      return query.order('initial_quantity', { ascending: sort.direction === 'asc' })
+    case 'updated_at':
+      return query.order('updated_at', { ascending: sort.direction === 'asc' })
     default:
       // Fallback to expiry date
       return query.order('expiry_date', { ascending: true })

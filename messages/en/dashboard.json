@@ -601,6 +601,7 @@
     "stock": "Stock",
     "price": "Price",
     "activeBatches": "Active Batches",
+    "batchQuantity": "Dates Added",
     "dateAdded": "Date Added",
     "lastUpdated": "Last Updated"
   },
@@ -613,7 +614,7 @@
     "brand": "Brand",
     "totalStock": "Total Stock",
     "batchesTracked": "Batches Tracked",
-    "totalUnitsWithExpiryDates": "Total stock with expiry dates",
+    "totalUnitsWithExpiryDates": "Dates added",
     "datesMissing": "Dates Missing",
     "activeBatches": "Active Batches",
     "dateAdded": "Date Added",

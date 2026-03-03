@@ -31,11 +31,14 @@ import {
   useReactTable,
 } from '@tanstack/react-table'
 import { useQueryClient } from '@tanstack/react-query'
+import { motion } from 'framer-motion'
 import { Package } from 'lucide-react'
 import Image from 'next/image'
 import { useTranslations } from 'next-intl'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { cn } from '@/lib/utils'
+
+const MotionTableBody = motion(TableBody)
 
 const VALID_COLUMN_IDS = [
   'product_name',
@@ -44,6 +47,9 @@ const VALID_COLUMN_IDS = [
   'days_left',
   'current_quantity',
   'location',
+  'initial_quantity',
+  'created_at',
+  'updated_at',
 ]
 
 interface BatchTableProps {
@@ -135,14 +141,17 @@ export function BatchTable({
     }
   }, [currentSort])
 
-  const columns = createBatchTableColumns({
-    currentSort,
-    updateSort,
-    t,
-    tExpiry,
-    tStatus,
-    storeName: activeStore?.store_name,
-  })
+  const columns = useMemo(
+    () =>
+      createBatchTableColumns({
+        currentSort,
+        updateSort,
+        t,
+        tExpiry,
+        tStatus,
+      }),
+    [currentSort, updateSort, t, tExpiry, tStatus],
+  )
 
   const table = useReactTable({
     data,
@@ -157,6 +166,10 @@ export function BatchTable({
     manualSorting: !clientSideSort, // Server-side sorting when not client-side
   })
 
+  const totalColumnsWidth = table
+    .getVisibleLeafColumns()
+    .reduce((sum, col) => sum + (col.columnDef.size ?? 0), 0)
+
   return (
     <>
       {/* Desktop table — hidden on mobile */}
@@ -166,10 +179,17 @@ export function BatchTable({
             tableLayout: 'fixed',
             borderCollapse: 'separate',
             borderSpacing: 0,
-            width: 'max-content',
-            minWidth: '100%',
+            minWidth: `max(${totalColumnsWidth}px, 100%)`,
           }}
         >
+          <colgroup>
+            {table.getVisibleLeafColumns().map(column => (
+              <col
+                key={column.id}
+                style={column.columnDef.size ? { width: column.columnDef.size } : undefined}
+              />
+            ))}
+          </colgroup>
           <TableHeader>
             {table.getHeaderGroups().map(headerGroup => (
               <TableRow key={headerGroup.id}>
@@ -191,14 +211,19 @@ export function BatchTable({
               </TableRow>
             ))}
           </TableHeader>
-          <TableBody>
+          <MotionTableBody
+            key={data.map(b => b.batch_id).join(',')}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3, ease: 'easeOut' }}
+          >
             {table.getRowModel().rows.map(row => (
               <TableRow
-                key={row.id}
+                key={row.original.batch_id}
                 onClick={() => handleBatchClick(row.original)}
                 onMouseEnter={() => handleBatchHover(row.original.product_id)}
                 className={cn(
-                  'cursor-pointer transition-all duration-100 ease-in-out',
+                  'cursor-pointer transition-colors',
                   isExpiringSoon(row.original)
                     ? 'bg-red-50/20 hover:bg-red-50/40 dark:bg-red-900/10 dark:hover:bg-red-900/20'
                     : 'hover:bg-muted/30',
@@ -217,12 +242,18 @@ export function BatchTable({
                 ))}
               </TableRow>
             ))}
-          </TableBody>
+          </MotionTableBody>
         </Table>
       </div>
 
       {/* Mobile card list — hidden on sm+ */}
-      <div className="sm:hidden flex flex-col gap-2">
+      <motion.div
+        key={data.map(b => b.batch_id).join(',')}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3, ease: 'easeOut' }}
+        className="sm:hidden flex flex-col gap-2"
+      >
         {data.map(batch => {
           const expiryDate = batch.expiry_date ? parseISODateAsLocal(batch.expiry_date) : null
           const daysLeft = expiryDate ? getDaysLeft(expiryDate) : null
@@ -277,7 +308,7 @@ export function BatchTable({
                 </div>
                 <div className="flex justify-between text-sm">
                   <Typography variant="small" color="muted">
-                    {t('headers.quantity')}
+                    {t('headers.available')}
                   </Typography>
                   <Typography variant="small">
                     {Math.round(Number(batch.current_quantity)).toLocaleString()}
@@ -289,11 +320,35 @@ export function BatchTable({
                   </Typography>
                   <Typography variant="small">{tStatus(batch.status || 'active')}</Typography>
                 </div>
+                <div className="flex justify-between text-sm">
+                  <Typography variant="small" color="muted">
+                    {t('headers.initialQuantity')}
+                  </Typography>
+                  <Typography variant="small">
+                    {Math.round(Number(batch.initial_quantity)).toLocaleString()}
+                  </Typography>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <Typography variant="small" color="muted">
+                    {t('headers.createdAt')}
+                  </Typography>
+                  <Typography variant="small">
+                    {batch.created_at ? new Date(batch.created_at).toLocaleDateString() : '-'}
+                  </Typography>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <Typography variant="small" color="muted">
+                    {t('headers.updatedAt')}
+                  </Typography>
+                  <Typography variant="small">
+                    {batch.updated_at ? new Date(batch.updated_at).toLocaleDateString() : '-'}
+                  </Typography>
+                </div>
               </div>
             </button>
           )
         })}
-      </div>
+      </motion.div>
 
       {selectedProductId && (
         <ProductDetailPanel
