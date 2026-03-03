@@ -601,6 +601,7 @@
     "stock": "Stock",
     "price": "Prix",
     "activeBatches": "Lots actifs",
+    "batchQuantity": "Dates ajoutées",
     "dateAdded": "Date d'ajout",
     "lastUpdated": "Dernière mise à jour"
   },

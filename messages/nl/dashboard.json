@@ -601,6 +601,7 @@
     "stock": "Voorraad",
     "price": "Prijs",
     "activeBatches": "Actieve batches",
+    "batchQuantity": "Toegevoegde datums",
     "dateAdded": "Datum toegevoegd",
     "lastUpdated": "Laatst bijgewerkt"
   },

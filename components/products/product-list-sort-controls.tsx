@@ -29,8 +29,8 @@ export function ProductListSortControls({
         onValueChange={(field: SortField) => updateSort(field)}
         disabled={isLoading}
       >
-        <SelectTrigger className="w-max px-4" showChevron={false}>
-          <div className="flex items-center gap-2">
+        <SelectTrigger className="w-fit sm:w-max sm:min-w-[160px] px-4" showChevron={false}>
+          <div className="flex items-center justify-between w-full gap-1 min-h-[24px]">
             <SelectValue className="whitespace-nowrap" />
             <ArrowUpDownIcon className="h-4 w-4 text-muted-foreground hidden sm:block" />
           </div>
@@ -50,6 +50,9 @@ export function ProductListSortControls({
           </SelectItem>
           <SelectItem value="active_batches_count" hideCheckIcon>
             {t('activeBatches')}
+          </SelectItem>
+          <SelectItem value="batch_quantity" hideCheckIcon>
+            {t('batchQuantity')}
           </SelectItem>
           <SelectItem value="needs_expiry" hideCheckIcon>
             {t('datesMissing')}

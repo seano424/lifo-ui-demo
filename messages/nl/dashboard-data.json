@@ -116,6 +116,7 @@
     "stock": "Voorraad",
     "price": "Prijs",
     "activeBatches": "Actieve batches",
+    "batchQuantity": "Toegevoegde datums",
     "totalStock": "Totale voorraad",
     "datesMissing": "Datums ontbreken",
     "dateAdded": "Datum toegevoegd",

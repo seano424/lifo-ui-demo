@@ -116,6 +116,7 @@
     "stock": "Stock",
     "price": "Price",
     "activeBatches": "Active Batches",
+    "batchQuantity": "Dates Added",
     "totalStock": "Total Stock",
     "datesMissing": "Dates Missing",
     "dateAdded": "Date Added",
