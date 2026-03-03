@@ -47,6 +47,15 @@ export function BatchListSortControls({
           <SelectItem value="current_quantity" hideCheckIcon>
             {t('stockLevel')}
           </SelectItem>
+          <SelectItem value="initial_quantity" hideCheckIcon>
+            {t('initialQuantity')}
+          </SelectItem>
+          <SelectItem value="created_at" hideCheckIcon>
+            {t('createdDate')}
+          </SelectItem>
+          <SelectItem value="updated_at" hideCheckIcon>
+            {t('updatedDate')}
+          </SelectItem>
         </SelectContent>
       </Select>
 

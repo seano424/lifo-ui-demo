@@ -131,6 +131,10 @@ export function ProductsTable({
     enableSorting: false,
   })
 
+  const totalColumnsWidth = table
+    .getVisibleLeafColumns()
+    .reduce((sum, col) => sum + (col.columnDef.size ?? 0), 0)
+
   return (
     <>
       {/* Desktop table — hidden on mobile */}
@@ -140,8 +144,7 @@ export function ProductsTable({
             tableLayout: 'fixed',
             borderCollapse: 'separate',
             borderSpacing: 0,
-            width: 'max-content',
-            minWidth: '100%',
+            minWidth: `max(${totalColumnsWidth}px, 100%)`,
           }}
         >
           <TableHeader>

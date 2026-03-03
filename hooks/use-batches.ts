@@ -249,6 +249,9 @@ export function useBatchActions() {
         queryClient.invalidateQueries({
           queryKey: queryKeys.batches.byStore(activeStoreId),
         })
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.products.byStore(activeStoreId),
+        })
       }
 
       queryClient.invalidateQueries({
@@ -389,6 +392,9 @@ export function useBatchActions() {
         queryClient.invalidateQueries({
           queryKey: queryKeys.batches.byStore(activeStoreId),
         })
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.products.byStore(activeStoreId),
+        })
 
         // Invalidate todo-related queries that depend on batch data
         queryClient.invalidateQueries({
@@ -512,6 +518,9 @@ export function useBatchActions() {
         })
         queryClient.invalidateQueries({
           queryKey: queryKeys.products.detail(productId),
+        })
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.products.byStore(activeStoreId),
         })
       }
     },

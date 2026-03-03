@@ -79,7 +79,7 @@ export function BatchListFilters({ filters, onFiltersChange, isLoading }: BatchL
         }
         disabled={isLoading}
       >
-        <SelectTrigger className="w-fit px-4" showChevron={false}>
+        <SelectTrigger className="w-fit sm:w-[150px] px-4" showChevron={false}>
           <div className="flex items-center gap-2">
             <Typography variant="small" className="hidden sm:block">
               {t('status')}:

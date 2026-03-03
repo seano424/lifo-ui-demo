@@ -44,6 +44,9 @@ const VALID_COLUMN_IDS = [
   'days_left',
   'current_quantity',
   'location',
+  'initial_quantity',
+  'created_at',
+  'updated_at',
 ]
 
 interface BatchTableProps {
@@ -157,6 +160,10 @@ export function BatchTable({
     manualSorting: !clientSideSort, // Server-side sorting when not client-side
   })
 
+  const totalColumnsWidth = table
+    .getVisibleLeafColumns()
+    .reduce((sum, col) => sum + (col.columnDef.size ?? 0), 0)
+
   return (
     <>
       {/* Desktop table — hidden on mobile */}
@@ -166,10 +173,17 @@ export function BatchTable({
             tableLayout: 'fixed',
             borderCollapse: 'separate',
             borderSpacing: 0,
-            width: 'max-content',
-            minWidth: '100%',
+            minWidth: `max(${totalColumnsWidth}px, 100%)`,
           }}
         >
+          <colgroup>
+            {table.getVisibleLeafColumns().map(column => (
+              <col
+                key={column.id}
+                style={column.columnDef.size ? { width: column.columnDef.size } : undefined}
+              />
+            ))}
+          </colgroup>
           <TableHeader>
             {table.getHeaderGroups().map(headerGroup => (
               <TableRow key={headerGroup.id}>

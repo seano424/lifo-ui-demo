@@ -45,11 +45,14 @@ export function ProductListSortControls({
           <SelectItem value="brand" hideCheckIcon>
             {t('brand')}
           </SelectItem>
-          <SelectItem value="batch_quantity" hideCheckIcon>
-            {t('stock')}
+          <SelectItem value="store_quantity" hideCheckIcon>
+            {t('totalStock')}
           </SelectItem>
           <SelectItem value="active_batches_count" hideCheckIcon>
             {t('activeBatches')}
+          </SelectItem>
+          <SelectItem value="needs_expiry" hideCheckIcon>
+            {t('datesMissing')}
           </SelectItem>
           <SelectItem value="created_at" hideCheckIcon>
             {t('dateAdded')}

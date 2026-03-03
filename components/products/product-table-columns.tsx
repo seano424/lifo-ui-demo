@@ -10,8 +10,7 @@ import { Typography } from '@/components/ui/typography'
 import type { Product, ProductSort, SortField } from '@/lib/queries/products'
 import { formatProductName } from '@/lib/utils/product-name'
 
-// Export column metadata for use in skeleton
-export const PRODUCT_TABLE_COLUMN_CONFIG = [
+const PRODUCT_TABLE_COLUMN_CONFIG = [
   {
     id: 'name',
     headerKey: 'product',
@@ -31,7 +30,15 @@ export const PRODUCT_TABLE_COLUMN_CONFIG = [
   {
     id: 'active_batches_count',
     headerKey: 'totalUnitsWithExpiryDates',
-    width: 150,
+    width: 110,
+    align: 'right',
+    hasMultipleLines: false,
+    sortable: true,
+  },
+  {
+    id: 'active_batches',
+    headerKey: 'activeBatches',
+    width: 110,
     align: 'right',
     hasMultipleLines: false,
     sortable: true,
@@ -45,17 +52,9 @@ export const PRODUCT_TABLE_COLUMN_CONFIG = [
     sortable: true,
   },
   {
-    id: 'created_at',
-    headerKey: 'dateAdded',
-    width: 110,
-    align: 'right',
-    hasMultipleLines: false,
-    sortable: true,
-  },
-  {
     id: 'category',
     headerKey: 'category',
-    width: 240,
+    width: 150,
     align: 'right',
     hasMultipleLines: false,
     sortable: true,
@@ -63,12 +62,29 @@ export const PRODUCT_TABLE_COLUMN_CONFIG = [
   {
     id: 'brand',
     headerKey: 'brand',
-    width: 240,
+    width: 120,
     align: 'right',
     hasMultipleLines: false,
     sortable: true,
   },
 ] as const
+
+function getAlignmentClasses(columnIndex: number): {
+  headerClass: string
+  cellClass: string
+} {
+  const align = PRODUCT_TABLE_COLUMN_CONFIG[columnIndex].align
+  if (align === 'right') {
+    return {
+      headerClass: 'justify-end',
+      cellClass: 'text-right',
+    }
+  }
+  return {
+    headerClass: '',
+    cellClass: '',
+  }
+}
 
 export function createProductTableColumns({
   currentSort,
@@ -81,17 +97,32 @@ export function createProductTableColumns({
   t: ReturnType<typeof useTranslations>
   getCategoryName: (product: Product) => string
 }): ColumnDef<Product>[] {
+  const alignments = {
+    name: getAlignmentClasses(0),
+    store_quantity: getAlignmentClasses(1),
+    active_batches_count: getAlignmentClasses(2),
+    active_batches: getAlignmentClasses(3),
+    needs_expiry: getAlignmentClasses(4),
+    category: getAlignmentClasses(5),
+    brand: getAlignmentClasses(6),
+  }
+
   return [
     {
       id: 'name',
       accessorKey: 'name',
       header: () => (
-        <SortableHeader field="name" currentSort={currentSort} updateSort={updateSort}>
+        <SortableHeader
+          field="name"
+          currentSort={currentSort}
+          updateSort={updateSort}
+          className={alignments.name.headerClass}
+        >
           {t('product')}
         </SortableHeader>
       ),
       cell: ({ row }) => (
-        <div className="flex items-center gap-2">
+        <div className={`flex items-center gap-2 ${alignments.name.cellClass}`}>
           {row.original.image_url && (
             <div className="size-9 rounded-lg overflow-hidden shrink-0">
               <Image
@@ -108,7 +139,7 @@ export function createProductTableColumns({
           </div>
         </div>
       ),
-      size: 200,
+      size: PRODUCT_TABLE_COLUMN_CONFIG[0].width,
     },
     {
       id: 'store_quantity',
@@ -117,17 +148,21 @@ export function createProductTableColumns({
           field="store_quantity"
           currentSort={currentSort}
           updateSort={updateSort}
-          className="justify-end"
+          className={alignments.store_quantity.headerClass}
         >
           {t('totalStock')}
         </SortableHeader>
       ),
       cell: ({ row }) => (
-        <Typography variant="small" color="muted" className="text-right">
+        <Typography
+          variant="small"
+          color="muted"
+          className={`${alignments.store_quantity.cellClass} tabular-nums`}
+        >
           {row.original.store_quantity ?? 0}
         </Typography>
       ),
-      size: 180,
+      size: PRODUCT_TABLE_COLUMN_CONFIG[1].width,
     },
     {
       id: 'active_batches_count',
@@ -137,17 +172,45 @@ export function createProductTableColumns({
           field="batch_quantity"
           currentSort={currentSort}
           updateSort={updateSort}
-          className="justify-end"
+          className={alignments.active_batches_count.headerClass}
         >
           {t('totalUnitsWithExpiryDates')}
         </SortableHeader>
       ),
       cell: ({ row }) => (
-        <Typography variant="small" color="muted" className="text-right">
+        <Typography
+          variant="small"
+          color="muted"
+          className={`${alignments.active_batches_count.cellClass} tabular-nums`}
+        >
           {row.original.batch_quantity ?? 0}
         </Typography>
       ),
-      size: 300,
+      size: PRODUCT_TABLE_COLUMN_CONFIG[2].width,
+    },
+    {
+      id: 'active_batches',
+      accessorFn: row => row.active_batches_count,
+      header: () => (
+        <SortableHeader
+          field="active_batches_count"
+          currentSort={currentSort}
+          updateSort={updateSort}
+          className={alignments.active_batches.headerClass}
+        >
+          {t('activeBatches')}
+        </SortableHeader>
+      ),
+      cell: ({ row }) => (
+        <Typography
+          variant="small"
+          color="muted"
+          className={`${alignments.active_batches.cellClass} tabular-nums`}
+        >
+          {row.original.active_batches_count ?? 0}
+        </Typography>
+      ),
+      size: PRODUCT_TABLE_COLUMN_CONFIG[3].width,
     },
     {
       id: 'needs_expiry',
@@ -156,7 +219,7 @@ export function createProductTableColumns({
           field="needs_expiry"
           currentSort={currentSort}
           updateSort={updateSort}
-          className="justify-end"
+          className={alignments.needs_expiry.headerClass}
         >
           {t('datesMissing')}
         </SortableHeader>
@@ -166,35 +229,17 @@ export function createProductTableColumns({
         const batchQty = row.original.batch_quantity ?? 0
         const needsExpiry = Math.max(0, storeQty - batchQty)
         return (
-          <Typography variant="small" color="muted" className="text-right">
+          <Typography
+            variant="small"
+            color="muted"
+            className={`${alignments.needs_expiry.cellClass} tabular-nums`}
+          >
             {needsExpiry}
           </Typography>
         )
       },
-      size: 180,
+      size: PRODUCT_TABLE_COLUMN_CONFIG[4].width,
     },
-    // {
-    //   id: 'created_at',
-    //   accessorKey: 'created_at',
-    //   header: () => (
-    //     <SortableHeader
-    //       field="created_at"
-    //       currentSort={currentSort}
-    //       updateSort={updateSort}
-    //       className="justify-end"
-    //     >
-    //       {t('dateAdded')}
-    //     </SortableHeader>
-    //   ),
-    //   cell: ({ row }) => (
-    //     <Typography variant="small" color="muted" className="text-right">
-    //       {row.original.created_at
-    //         ? new Date(row.original.created_at).toLocaleDateString()
-    //         : t('notAvailable')}
-    //     </Typography>
-    //   ),
-    //   size: 150,
-    // },
     {
       id: 'category',
       accessorKey: 'category',
@@ -203,13 +248,13 @@ export function createProductTableColumns({
           field="category"
           currentSort={currentSort}
           updateSort={updateSort}
-          className="justify-end"
+          className={alignments.category.headerClass}
         >
           {t('category')}
         </SortableHeader>
       ),
       cell: ({ row }) => (
-        <div className="flex items-center justify-end text-right">
+        <div className={`flex items-center justify-end ${alignments.category.cellClass}`}>
           <Badge
             variant="successRounded"
             size="sm"
@@ -219,7 +264,27 @@ export function createProductTableColumns({
           </Badge>
         </div>
       ),
-      size: 240,
+      size: PRODUCT_TABLE_COLUMN_CONFIG[5].width,
+    },
+    {
+      id: 'brand',
+      accessorKey: 'brand',
+      header: () => (
+        <SortableHeader
+          field="brand"
+          currentSort={currentSort}
+          updateSort={updateSort}
+          className={alignments.brand.headerClass}
+        >
+          {t('brand')}
+        </SortableHeader>
+      ),
+      cell: ({ row }) => (
+        <Typography variant="small" color="muted" className={alignments.brand.cellClass}>
+          {row.original.brand || 'NULL'}
+        </Typography>
+      ),
+      size: PRODUCT_TABLE_COLUMN_CONFIG[6].width,
     },
   ]
 }

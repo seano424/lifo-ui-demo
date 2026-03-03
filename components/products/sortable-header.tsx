@@ -25,7 +25,7 @@ export function SortableHeader({
       <Button
         variant="ghost"
         onClick={() => updateSort(field)}
-        className="h-auto p-0 hover:bg-transparent hover:text-foreground flex items-center gap-1 font-medium"
+        className="h-auto p-0 hover:bg-transparent hover:text-foreground flex items-center gap-1 font-medium capitalize"
       >
         {children}
         <ArrowUpDown className="h-3.5 w-3.5" />

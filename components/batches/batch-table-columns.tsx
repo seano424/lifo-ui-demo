@@ -9,8 +9,7 @@ import { formatProductName } from '@/lib/utils/product-name'
 import { Badge } from '../ui/badge'
 import { Typography } from '../ui/typography'
 
-// Export column metadata for use in skeleton
-export const BATCH_TABLE_COLUMN_CONFIG = [
+const BATCH_TABLE_COLUMN_CONFIG = [
   {
     id: 'product_name',
     headerKey: 'headers.product',
@@ -45,7 +44,7 @@ export const BATCH_TABLE_COLUMN_CONFIG = [
   },
   {
     id: 'current_quantity',
-    headerKey: 'headers.quantity',
+    headerKey: 'headers.available',
     width: 110,
     align: 'right',
     hasMultipleLines: false,
@@ -58,6 +57,30 @@ export const BATCH_TABLE_COLUMN_CONFIG = [
     align: 'right',
     hasMultipleLines: false,
     sortable: false,
+  },
+  {
+    id: 'initial_quantity',
+    headerKey: 'headers.initialQuantity',
+    width: 100,
+    align: 'right',
+    hasMultipleLines: false,
+    sortable: true,
+  },
+  {
+    id: 'created_at',
+    headerKey: 'headers.createdAt',
+    width: 120,
+    align: 'right',
+    hasMultipleLines: false,
+    sortable: true,
+  },
+  {
+    id: 'updated_at',
+    headerKey: 'headers.updatedAt',
+    width: 120,
+    align: 'right',
+    hasMultipleLines: false,
+    sortable: true,
   },
 ] as const
 
@@ -148,6 +171,9 @@ export function createBatchTableColumns({
     days_left: getAlignmentClasses(3),
     current_quantity: getAlignmentClasses(4),
     location: getAlignmentClasses(5),
+    initial_quantity: getAlignmentClasses(6),
+    created_at: getAlignmentClasses(7),
+    updated_at: getAlignmentClasses(8),
   }
 
   return [
@@ -233,7 +259,7 @@ export function createBatchTableColumns({
           updateSort={updateSort}
           className={alignments.current_quantity.headerClass}
         >
-          {t('headers.quantity')}
+          {t('headers.available')}
         </SortableHeader>
       ),
       cell: ({ row }) => (
@@ -302,6 +328,76 @@ export function createBatchTableColumns({
         )
       },
       size: BATCH_TABLE_COLUMN_CONFIG[1].width,
+    },
+    {
+      id: 'initial_quantity',
+      accessorKey: 'initial_quantity',
+      header: () => (
+        <SortableHeader
+          field="initial_quantity"
+          currentSort={currentSort}
+          updateSort={updateSort}
+          className={alignments.initial_quantity.headerClass}
+        >
+          {t('headers.initialQuantity')}
+        </SortableHeader>
+      ),
+      cell: ({ row }) => (
+        <Typography
+          variant="small"
+          color="muted"
+          className={`${alignments.initial_quantity.cellClass} tabular-nums`}
+        >
+          {Math.round(Number(row.original.initial_quantity)).toLocaleString()}
+        </Typography>
+      ),
+      size: BATCH_TABLE_COLUMN_CONFIG[6].width,
+    },
+    {
+      id: 'created_at',
+      accessorKey: 'created_at',
+      header: () => (
+        <SortableHeader
+          field="created_at"
+          currentSort={currentSort}
+          updateSort={updateSort}
+          className={alignments.created_at.headerClass}
+        >
+          {t('headers.createdAt')}
+        </SortableHeader>
+      ),
+      cell: ({ row }) => {
+        const date = row.original.created_at ? new Date(row.original.created_at) : null
+        return (
+          <Typography variant="small" color="muted" className={alignments.created_at.cellClass}>
+            {date ? date.toLocaleDateString() : '-'}
+          </Typography>
+        )
+      },
+      size: BATCH_TABLE_COLUMN_CONFIG[7].width,
+    },
+    {
+      id: 'updated_at',
+      accessorKey: 'updated_at',
+      header: () => (
+        <SortableHeader
+          field="updated_at"
+          currentSort={currentSort}
+          updateSort={updateSort}
+          className={alignments.updated_at.headerClass}
+        >
+          {t('headers.updatedAt')}
+        </SortableHeader>
+      ),
+      cell: ({ row }) => {
+        const date = row.original.updated_at ? new Date(row.original.updated_at) : null
+        return (
+          <Typography variant="small" color="muted" className={alignments.updated_at.cellClass}>
+            {date ? date.toLocaleDateString() : '-'}
+          </Typography>
+        )
+      },
+      size: BATCH_TABLE_COLUMN_CONFIG[8].width,
     },
     // {
     //   id: 'location',
