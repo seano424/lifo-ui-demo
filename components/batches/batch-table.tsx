@@ -38,7 +38,7 @@ import { useTranslations } from 'next-intl'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { cn } from '@/lib/utils'
 
-const MotionTableBody = motion(TableBody)
+const MotionTableBody = motion.create(TableBody)
 
 const VALID_COLUMN_IDS = [
   'product_name',

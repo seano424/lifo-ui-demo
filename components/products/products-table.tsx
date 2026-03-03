@@ -32,7 +32,7 @@ import { useTranslations } from 'next-intl'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { formatProductName } from '@/lib/utils/product-name'
 
-const MotionTableBody = motion(TableBody)
+const MotionTableBody = motion.create(TableBody)
 
 const VALID_COLUMN_IDS = [
   'name',
