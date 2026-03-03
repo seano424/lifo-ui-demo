@@ -22,7 +22,7 @@ const PRODUCT_TABLE_COLUMN_CONFIG = [
   {
     id: 'store_quantity',
     headerKey: 'totalStock',
-    width: 100,
+    width: 150,
     align: 'right',
     hasMultipleLines: false,
     sortable: true,
@@ -30,7 +30,7 @@ const PRODUCT_TABLE_COLUMN_CONFIG = [
   {
     id: 'active_batches_count',
     headerKey: 'totalUnitsWithExpiryDates',
-    width: 110,
+    width: 150,
     align: 'right',
     hasMultipleLines: false,
     sortable: true,
@@ -38,7 +38,7 @@ const PRODUCT_TABLE_COLUMN_CONFIG = [
   {
     id: 'active_batches',
     headerKey: 'activeBatches',
-    width: 110,
+    width: 150,
     align: 'right',
     hasMultipleLines: false,
     sortable: true,
@@ -46,7 +46,7 @@ const PRODUCT_TABLE_COLUMN_CONFIG = [
   {
     id: 'needs_expiry',
     headerKey: 'datesMissing',
-    width: 110,
+    width: 150,
     align: 'right',
     hasMultipleLines: false,
     sortable: true,

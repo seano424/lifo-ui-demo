@@ -37,7 +37,7 @@ const BATCH_TABLE_COLUMN_CONFIG = [
   {
     id: 'days_left',
     headerKey: 'headers.daysLeft',
-    width: 110,
+    width: 150,
     align: 'right',
     hasMultipleLines: false,
     sortable: true,
