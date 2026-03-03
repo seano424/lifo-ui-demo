@@ -14,7 +14,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
       <QueryErrorBoundary>
         <SidebarProvider>
           <AppSidebar />
-          <SidebarInset className="flex flex-col">
+          <SidebarInset className="flex flex-col min-w-0">
             <DashboardNav />
             <DeletionWarningBanner />
             <div className="flex-1 overflow-y-auto">{children}</div>
