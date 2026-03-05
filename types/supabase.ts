@@ -1167,7 +1167,7 @@ export type Database = {
       product_integration_links: {
         Row: {
           claim_source: string | null
-          created_at: string | null
+          created_at: string
           external_id: string
           external_name: string | null
           external_parent_id: string | null
@@ -1179,27 +1179,27 @@ export type Database = {
           name_mismatch_logged: boolean | null
           product_id: string
           synced_at: string | null
-          updated_at: string | null
+          updated_at: string
         }
         Insert: {
           claim_source?: string | null
-          created_at?: string | null
+          created_at?: string
           external_id: string
           external_name?: string | null
           external_parent_id?: string | null
           external_sku?: string | null
           integration_type: string
           is_authoritative?: boolean | null
-          link_id: string
+          link_id?: string
           metadata?: Json | null
           name_mismatch_logged?: boolean | null
           product_id: string
           synced_at?: string | null
-          updated_at?: string | null
+          updated_at?: string
         }
         Update: {
           claim_source?: string | null
-          created_at?: string | null
+          created_at?: string
           external_id?: string
           external_name?: string | null
           external_parent_id?: string | null
@@ -1211,7 +1211,7 @@ export type Database = {
           name_mismatch_logged?: boolean | null
           product_id?: string
           synced_at?: string | null
-          updated_at?: string | null
+          updated_at?: string
         }
         Relationships: [
           {
