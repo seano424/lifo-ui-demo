@@ -223,7 +223,10 @@ export function useImmediateDeletion() {
             performed_by_user_id: user.id,
           }
 
-      const { data, error } = await supabase.rpc(rpcName, rpcParams)
+      // gdpr_delete_user / gdpr_delete_user_and_stores live in user_mgmt schema,
+      // not public, so they're absent from the public-schema type union.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data, error } = await supabase.rpc(rpcName as any, rpcParams)
 
       if (error) {
         console.error('RPC deletion error:', error)
