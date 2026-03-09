@@ -19,7 +19,6 @@ interface CompactLanguageSwitcherProps {
 const lifo_LANGUAGES = {
   fr: { name: 'Français' },
   en: { name: 'English' },
-  nl: { name: 'Nederlands' },
 } as const
 
 export function CompactLanguageSwitcher({ hasBg = true }: CompactLanguageSwitcherProps) {

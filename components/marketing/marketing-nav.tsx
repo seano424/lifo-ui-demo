@@ -34,15 +34,15 @@ const MarketingNav = React.memo(() => {
   const pathname = usePathname()
   const menuItems = [
     {
-      title: 'Home',
+      title: t('home'),
       url: '/',
     },
     {
-      title: 'Pricing',
+      title: t('pricing'),
       url: '/pricing',
     },
     {
-      title: 'Contact',
+      title: t('contact'),
       url: '/contact',
     },
   ]

@@ -14,7 +14,6 @@ import { type Language, useLanguageStore } from '@/lib/stores/language-store'
 const lifo_LANGUAGES = {
   fr: { name: 'Français' },
   en: { name: 'English' },
-  nl: { name: 'Nederlands' },
 } as const
 
 export function LanguageSwitcher() {
