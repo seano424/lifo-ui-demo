@@ -6,6 +6,7 @@
 'use client'
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { fastApiClient } from '@/lib/services/fastapi-client'
 import { createClient } from '@/lib/supabase/client'
@@ -321,6 +322,38 @@ export function useSyncSquareOrders() {
     },
     onError: (error: Error) => {
       if (process.env.NODE_ENV === 'development') console.error('Orders sync failed:', error)
+
+      const { title, description } = formatErrorForToast(error)
+      toast.error(title, { description })
+    },
+  })
+}
+
+/**
+ * Hook to create initial batches for a store after onboarding
+ * Returns mutation for triggering initial batch creation
+ */
+export function useCreateInitialBatches() {
+  const supabase = createClient()
+  const t = useTranslations('dashboard.redesign.automation.initialBatchPrompt')
+
+  return useMutation({
+    mutationFn: async ({ storeId }: { storeId: string }): Promise<void> => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
+      if (!session) {
+        throw new Error('Not authenticated')
+      }
+
+      await fastApiClient.createInitialBatches(storeId, session.access_token)
+    },
+    onSuccess: () => {
+      toast.success(t('successToast'))
+    },
+    onError: (error: Error) => {
+      if (process.env.NODE_ENV === 'development')
+        console.error('Initial batch creation failed:', error)
 
       const { title, description } = formatErrorForToast(error)
       toast.error(title, { description })

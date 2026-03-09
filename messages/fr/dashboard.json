@@ -254,6 +254,13 @@
         "ruleTypes": {
           "category": "Catégorie",
           "product": "Produit"
+        },
+        "initialBatchPrompt": {
+          "title": "Estimer les dates d'expiration de votre inventaire actuel ?",
+          "description": "Nous utiliserons vos nouveaux paramètres d'automatisation pour estimer les dates d'expiration des produits correspondants déjà dans votre inventaire. Vous pourrez réviser ou ajuster ces lots par la suite.",
+          "cancel": "Pas maintenant",
+          "confirm": "Oui, créer des lots",
+          "successToast": "Lots initiaux créés depuis votre inventaire actuel"
         }
       },
       "automations": {
@@ -311,9 +318,9 @@
           "deleteRule": "Supprimer la règle",
           "cancel": "Annuler",
           "saveChanges": "Enregistrer les modifications",
-          "saving": "Enregistrement\u2026",
+          "saving": "Enregistrement…",
           "createRule": "Créer la règle",
-          "creating": "Création\u2026"
+          "creating": "Création…"
         }
       },
       "expiringTable": {
@@ -832,6 +839,12 @@
             "step3": "Vous pouvez ajuster n'importe quelle catégorie ou durée de conservation à tout moment dans les Paramètres"
           },
           "goToDashboard": "Aller au tableau de bord"
+        },
+        "review": {
+          "initialBatches": {
+            "label": "Créer des lots initiaux depuis votre inventaire actuel",
+            "description": "Nous utiliserons vos paramètres d'automatisation pour estimer les dates d'expiration des produits correspondants déjà en stock. Vous pourrez réviser ou ajuster ces lots par la suite."
+          }
         }
       }
     },

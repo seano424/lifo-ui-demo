@@ -254,6 +254,13 @@
         "ruleTypes": {
           "category": "Categorie",
           "product": "Product"
+        },
+        "initialBatchPrompt": {
+          "title": "Vervaldatums schatten voor uw huidige voorraad?",
+          "description": "We gebruiken uw nieuwe automatiseringsinstellingen om vervaldatums te schatten voor overeenkomende producten die al in uw voorraad zijn. U kunt deze batches achteraf bekijken of aanpassen.",
+          "cancel": "Nu niet",
+          "confirm": "Ja, maak batches aan",
+          "successToast": "Initiële batches aangemaakt vanuit uw huidige voorraad"
         }
       },
       "automations": {
@@ -311,9 +318,9 @@
           "deleteRule": "Regel verwijderen",
           "cancel": "Annuleren",
           "saveChanges": "Wijzigingen opslaan",
-          "saving": "Opslaan\u2026",
+          "saving": "Opslaan…",
           "createRule": "Regel aanmaken",
-          "creating": "Aanmaken\u2026"
+          "creating": "Aanmaken…"
         }
       },
       "expiringTable": {
@@ -832,6 +839,12 @@
             "step3": "U kunt elke categorie of houdbaarheid op elk moment aanpassen in Instellingen"
           },
           "goToDashboard": "Ga naar dashboard"
+        },
+        "review": {
+          "initialBatches": {
+            "label": "Initiële batches aanmaken vanuit uw huidige voorraad",
+            "description": "We gebruiken uw automatiseringsinstellingen om vervaldatums te schatten voor overeenkomende producten die al op voorraad zijn. U kunt deze batches achteraf bekijken of aanpassen."
+          }
         }
       }
     },

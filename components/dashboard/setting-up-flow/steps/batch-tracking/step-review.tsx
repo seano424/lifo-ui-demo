@@ -1,8 +1,11 @@
 'use client'
 
+import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { Card } from '@/components/ui/card'
 import { Typography } from '@/components/ui/typography'
 import { Button } from '@/components/ui/button'
+import { Switch } from '@/components/ui/switch'
 import { Zap, Type, PartyPopper, Loader2 } from 'lucide-react'
 import type { ProcessedCategory } from '../batch-tracking-step'
 
@@ -12,7 +15,7 @@ interface StepReviewProps {
   shelfLifeDays: Record<string, number | null>
   isSaving?: boolean
   onBack: () => void
-  onConfirm: () => void
+  onConfirm: (createInitialBatches: boolean) => void
 }
 
 /**
@@ -30,6 +33,8 @@ export function StepReview({
   onBack,
   onConfirm,
 }: StepReviewProps) {
+  const t = useTranslations('setupFlow.batchTracking.steps.review')
+  const [createInitialBatches, setCreateInitialBatches] = useState(true)
   const autoCategories = enabledCategories.filter(c => categoryModes[c.id] === 'auto')
   const manualCategories = enabledCategories.filter(c => categoryModes[c.id] === 'manual')
 
@@ -119,12 +124,29 @@ export function StepReview({
         </div>
       </Card>
 
+      {/* Initial batch toggle */}
+      <div className="flex items-start justify-between gap-4 rounded-lg border border-border p-4">
+        <div className="flex flex-col gap-1">
+          <Typography variant="p" className="font-semibold">
+            {t('initialBatches.label')}
+          </Typography>
+          <Typography variant="small" color="muted">
+            {t('initialBatches.description')}
+          </Typography>
+        </div>
+        <Switch
+          checked={createInitialBatches}
+          onCheckedChange={setCreateInitialBatches}
+          disabled={isSaving}
+        />
+      </div>
+
       {/* Navigation */}
       <div className="flex justify-between">
         <Button variant="outline" onClick={onBack} disabled={isSaving}>
           Back
         </Button>
-        <Button onClick={onConfirm} disabled={isSaving}>
+        <Button onClick={() => onConfirm(createInitialBatches)} disabled={isSaving}>
           {isSaving ? (
             <Loader2 className="w-4 h-4 mr-2 animate-spin" />
           ) : (

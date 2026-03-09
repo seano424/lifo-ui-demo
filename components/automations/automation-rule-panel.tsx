@@ -28,6 +28,7 @@ interface AutomationRulePanelProps {
   onClose: () => void
   onSave: (rule: AutomationRule, shelfLifeDays: number) => void
   onDelete: (rule: AutomationRule) => void
+  onSaveSuccess?: () => void
 }
 
 export function AutomationRulePanel({
@@ -37,6 +38,7 @@ export function AutomationRulePanel({
   onClose,
   onSave,
   onDelete,
+  onSaveSuccess: _onSaveSuccess,
 }: AutomationRulePanelProps) {
   const t = useTranslations('dashboard.redesign.automations')
   const storeId = useActiveStoreId() || ''

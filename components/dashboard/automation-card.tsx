@@ -6,10 +6,22 @@ import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 import { useAutomationRules } from '@/hooks/use-dashboard-redesign'
 import { useAutomationRuleMutations } from '@/hooks/use-automation-rule-mutations'
+import { useCreateInitialBatches } from '@/hooks/use-square-integration'
+import { useActiveStoreId } from '@/lib/stores/store-context'
 import { Card } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Typography } from '../ui/typography'
 import { Badge } from '../ui/badge'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 import { AutomationRulePanel } from '@/components/automations/automation-rule-panel'
 import { AddAutomationRulePanel } from '@/components/automations/add-automation-rule-panel'
 import type { AutomationRule } from '@/lib/queries/dashboard'
@@ -17,8 +29,14 @@ import { cn } from '@/lib/utils'
 
 export function AutomationCard({ showLinks = true }: { showLinks?: boolean }) {
   const t = useTranslations('dashboard.redesign.automation')
+  const storeId = useActiveStoreId()
   const { data: rules, isLoading } = useAutomationRules()
-  const { saveRule, deleteRule, createRule, isPending } = useAutomationRuleMutations()
+
+  const [showInitialBatchPrompt, setShowInitialBatchPrompt] = useState(false)
+  const { saveRule, deleteRule, createRule, isPending } = useAutomationRuleMutations({
+    onSaveSuccess: () => setShowInitialBatchPrompt(true),
+  })
+  const createInitialBatches = useCreateInitialBatches()
 
   const [editingRule, setEditingRule] = useState<AutomationRule | null>(null)
   const [isPanelOpen, setIsPanelOpen] = useState(false)
@@ -96,6 +114,13 @@ export function AutomationCard({ showLinks = true }: { showLinks?: boolean }) {
           isSaving={isPending}
           onClose={() => setIsAddPanelOpen(false)}
           onCreate={handleCreate}
+          onSaveSuccess={() => setShowInitialBatchPrompt(true)}
+        />
+
+        <InitialBatchPrompt
+          open={showInitialBatchPrompt}
+          onOpenChange={setShowInitialBatchPrompt}
+          onConfirm={() => storeId && createInitialBatches.mutate({ storeId })}
         />
       </>
     )
@@ -209,6 +234,7 @@ export function AutomationCard({ showLinks = true }: { showLinks?: boolean }) {
         onClose={() => setIsPanelOpen(false)}
         onSave={handleSave}
         onDelete={handleDelete}
+        onSaveSuccess={() => setShowInitialBatchPrompt(true)}
       />
 
       <AddAutomationRulePanel
@@ -216,7 +242,40 @@ export function AutomationCard({ showLinks = true }: { showLinks?: boolean }) {
         isSaving={isPending}
         onClose={() => setIsAddPanelOpen(false)}
         onCreate={handleCreate}
+        onSaveSuccess={() => setShowInitialBatchPrompt(true)}
+      />
+
+      <InitialBatchPrompt
+        open={showInitialBatchPrompt}
+        onOpenChange={setShowInitialBatchPrompt}
+        onConfirm={() => storeId && createInitialBatches.mutate({ storeId })}
       />
     </>
+  )
+}
+
+function InitialBatchPrompt({
+  open,
+  onOpenChange,
+  onConfirm,
+}: {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  onConfirm: () => void
+}) {
+  const t = useTranslations('dashboard.redesign.automation.initialBatchPrompt')
+  return (
+    <AlertDialog open={open} onOpenChange={onOpenChange}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>{t('title')}</AlertDialogTitle>
+          <AlertDialogDescription>{t('description')}</AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
+          <AlertDialogAction onClick={onConfirm}>{t('confirm')}</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   )
 }

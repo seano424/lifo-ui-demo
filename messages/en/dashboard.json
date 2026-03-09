@@ -254,6 +254,13 @@
         "ruleTypes": {
           "category": "Category",
           "product": "Product"
+        },
+        "initialBatchPrompt": {
+          "title": "Estimate expiry dates for your current inventory?",
+          "description": "We'll use your new automation settings to estimate expiry dates for matching products already in your inventory. You can review or adjust these batches afterward.",
+          "cancel": "Not now",
+          "confirm": "Yes, create batches",
+          "successToast": "Initial batches created from your current inventory"
         }
       },
       "automations": {
@@ -311,9 +318,9 @@
           "deleteRule": "Delete rule",
           "cancel": "Cancel",
           "saveChanges": "Save changes",
-          "saving": "Saving\u2026",
+          "saving": "Saving…",
           "createRule": "Create rule",
-          "creating": "Creating\u2026"
+          "creating": "Creating…"
         }
       },
       "expiringTable": {
@@ -832,6 +839,12 @@
             "step3": "You can adjust any category or shelf life anytime in Settings"
           },
           "goToDashboard": "Go to Dashboard"
+        },
+        "review": {
+          "initialBatches": {
+            "label": "Create initial batches from your current inventory",
+            "description": "We'll use your automation settings to estimate expiry dates for matching products already in stock. You can review or adjust these batches afterward."
+          }
         }
       }
     },

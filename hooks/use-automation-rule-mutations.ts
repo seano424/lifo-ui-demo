@@ -25,7 +25,7 @@ import type { AutomationRule } from '@/lib/queries/dashboard'
  *   }
  * }
  */
-export function useAutomationRuleMutations() {
+export function useAutomationRuleMutations({ onSaveSuccess }: { onSaveSuccess?: () => void } = {}) {
   const storeId = useActiveStoreId() || ''
   const { data: batchSetup } = useBatchTrackingSetup(storeId)
   const saveMutation = useSaveBatchTrackingSetup()
@@ -74,6 +74,7 @@ export function useAutomationRuleMutations() {
         })
       }
       toast.success('Rule saved')
+      onSaveSuccess?.()
     } catch {
       toast.error('Failed to save rule')
       throw new Error('saveRule failed')
@@ -148,6 +149,7 @@ export function useAutomationRuleMutations() {
         })
       }
       toast.success(`${rule.name} rule created`)
+      onSaveSuccess?.()
     } catch {
       toast.error('Failed to create rule')
       throw new Error('createRule failed')

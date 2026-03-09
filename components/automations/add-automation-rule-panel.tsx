@@ -44,6 +44,7 @@ interface AddAutomationRulePanelProps {
   initialSelectedKey?: string
   initialProductName?: string
   initialCategoryKey?: string
+  onSaveSuccess?: () => void
 }
 
 export function AddAutomationRulePanel({
@@ -59,6 +60,7 @@ export function AddAutomationRulePanel({
   initialSelectedKey,
   initialProductName,
   initialCategoryKey,
+  onSaveSuccess: _onSaveSuccess,
 }: AddAutomationRulePanelProps) {
   const t = useTranslations('dashboard.redesign.automations')
   const activeStoreId = useActiveStoreId() || ''
