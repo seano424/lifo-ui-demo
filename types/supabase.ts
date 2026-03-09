@@ -2602,6 +2602,10 @@ export type Database = {
           store_products_linked: number
         }[]
       }
+      cancel_account_deletion: {
+        Args: { target_user_id: string }
+        Returns: Json
+      }
       check_bulk_duplicates: {
         Args: {
           p_barcodes: string[]
@@ -3206,6 +3210,7 @@ export type Database = {
         Args: { p_store_id: string }
         Returns: Json
       }
+      get_deletion_status: { Args: { target_user_id: string }; Returns: Json }
       get_donated_items: {
         Args: {
           p_days_back?: number
@@ -3833,6 +3838,31 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_user_store_overviews: {
+        Args: never
+        Returns: {
+          address: string
+          business_name: string
+          category_count: number
+          city: string
+          country: string
+          created_at: string
+          is_active: boolean
+          is_square_store: boolean
+          onboarding_completed: boolean
+          owner_id: string
+          permissions: Json
+          postal_code: string
+          product_count: number
+          role_in_store: string
+          store_code: string
+          store_id: string
+          store_name: string
+          store_type: string
+          timezone: string
+          updated_at: string
+        }[]
+      }
       get_user_store_role: {
         Args: { p_store_id: string; p_user_id: string }
         Returns: {
@@ -3921,6 +3951,10 @@ export type Database = {
       }
       remove_user_from_store: {
         Args: { p_store_id: string; p_target_user_id: string }
+        Returns: Json
+      }
+      request_account_deletion: {
+        Args: { deletion_type?: string; target_user_id: string }
         Returns: Json
       }
       reset_pin_attempts: { Args: { p_username: string }; Returns: Json }
