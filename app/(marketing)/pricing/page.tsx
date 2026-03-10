@@ -5,6 +5,7 @@ import { getTranslations } from 'next-intl/server'
 import { Typography } from '@/components/ui/typography'
 import { RevealAnimation } from '@/components/ui/reveal-animation'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { BILLING_LIVE } from '@/lib/config/billing'
 
 export const metadata: Metadata = {
@@ -129,13 +130,9 @@ export default async function PricingPage() {
                     {t('pro.ctaUpgrade')}
                   </Link>
                 ) : (
-                  <button
-                    disabled
-                    className="cursor-not-allowed text-gray-400 bg-gray-100 dark:bg-gray-700 dark:text-gray-500 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
-                    type="button"
-                  >
+                  <Button disabled variant="outline" className="w-full">
                     {t('pro.ctaComingSoon')}
-                  </button>
+                  </Button>
                 )}
                 {!BILLING_LIVE && (
                   <Typography variant="extraSmall" color="muted" className="text-center">

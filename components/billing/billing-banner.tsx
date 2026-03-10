@@ -10,7 +10,6 @@ import { BILLING_LIVE } from '@/lib/config/billing'
 const DISMISSED_KEY = 'billing_banner_dismissed'
 
 function getDismissed(): boolean {
-  if (typeof localStorage === 'undefined') return false
   return localStorage.getItem(DISMISSED_KEY) === '1'
 }
 
