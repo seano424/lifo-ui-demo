@@ -1103,7 +1103,7 @@ export class FastAPIClient {
   /**
    * Create initial batches for a store after onboarding
    */
-  async createInitialBatches(storeId: string, userToken: string): Promise<Record<string, unknown>> {
+  async createInitialBatches(storeId: string, userToken: string): Promise<void> {
     this.validateUUID(storeId, 'Store ID')
 
     const encodedStoreId = encodeURIComponent(storeId)
@@ -1135,7 +1135,7 @@ export class FastAPIClient {
         throw new Error(`Failed to create initial batches: ${errorDetails}`)
       }
 
-      return await response.json()
+      await response.json()
     } catch (error) {
       clearTimeout(timeoutId)
       throw this.handleFetchError(error, 'Square initial batch creation')

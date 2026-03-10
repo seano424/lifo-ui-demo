@@ -207,26 +207,20 @@ export function useImmediateDeletion() {
         throw new Error('Not authenticated')
       }
 
-      // Call the appropriate RPC function
-      const rpcName = deleteOwnedStores ? 'gdpr_delete_user_and_stores' : 'gdpr_delete_user'
-
-      const rpcParams = deleteOwnedStores
-        ? {
+      // gdpr_delete_user / gdpr_delete_user_and_stores live in user_mgmt schema
+      const userMgmt = supabase.schema('user_mgmt')
+      const { data, error } = await (deleteOwnedStores
+        ? userMgmt.rpc('gdpr_delete_user_and_stores', {
             target_user_id: user.id,
             delete_owned_stores: true,
             deletion_type: deletionType,
             performed_by_user_id: user.id,
-          }
-        : {
+          })
+        : userMgmt.rpc('gdpr_delete_user', {
             target_user_id: user.id,
             deletion_type: deletionType,
             performed_by_user_id: user.id,
-          }
-
-      // gdpr_delete_user / gdpr_delete_user_and_stores live in user_mgmt schema,
-      // not public, so they're absent from the public-schema type union.
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data, error } = await supabase.rpc(rpcName as any, rpcParams)
+          }))
 
       if (error) {
         console.error('RPC deletion error:', error)

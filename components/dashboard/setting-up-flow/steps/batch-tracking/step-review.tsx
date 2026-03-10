@@ -144,7 +144,7 @@ export function StepReview({
       {/* Navigation */}
       <div className="flex justify-between">
         <Button variant="outline" onClick={onBack} disabled={isSaving}>
-          Back
+          {t('back')}
         </Button>
         <Button onClick={() => onConfirm(createInitialBatches)} disabled={isSaving}>
           {isSaving ? (
@@ -152,7 +152,7 @@ export function StepReview({
           ) : (
             <PartyPopper className="w-4 h-4 mr-2" />
           )}
-          Turn on expiry tracking
+          {t('confirm')}
         </Button>
       </div>
     </div>

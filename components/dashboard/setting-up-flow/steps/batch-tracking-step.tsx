@@ -423,7 +423,7 @@ export function BatchTrackingStep() {
           shelfLifeDays={shelfLifeDays}
           isSaving={saveMutation.isPending}
           onBack={() => setSubStep('how-to-track')}
-          onConfirm={createInitialBatches => handleConfirm(createInitialBatches)}
+          onConfirm={handleConfirm}
         />
       )}
 

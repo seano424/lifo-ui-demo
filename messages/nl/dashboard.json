@@ -256,11 +256,11 @@
           "product": "Product"
         },
         "initialBatchPrompt": {
-          "title": "Vervaldatums schatten voor uw huidige voorraad?",
-          "description": "We gebruiken uw nieuwe automatiseringsinstellingen om vervaldatums te schatten voor overeenkomende producten die al in uw voorraad zijn. U kunt deze batches achteraf bekijken of aanpassen.",
+          "title": "Vervaldatums toevoegen aan nog niet gevolgde producten?",
+          "description": "We passen uw automatiseringsinstellingen toe op overeenkomende producten in uw voorraad die nog geen vervaldatum hebben. U kunt deze batches achteraf bekijken of aanpassen.",
           "cancel": "Nu niet",
-          "confirm": "Ja, maak batches aan",
-          "successToast": "Initiële batches aangemaakt vanuit uw huidige voorraad"
+          "confirm": "Ja, ontbrekende datums invullen",
+          "successToast": "Ontbrekende vervaldatums ingevuld voor uw huidige voorraad"
         }
       },
       "automations": {
@@ -841,9 +841,11 @@
           "goToDashboard": "Ga naar dashboard"
         },
         "review": {
+          "back": "Terug",
+          "confirm": "Vervaldatumtracking inschakelen",
           "initialBatches": {
-            "label": "Initiële batches aanmaken vanuit uw huidige voorraad",
-            "description": "We gebruiken uw automatiseringsinstellingen om vervaldatums te schatten voor overeenkomende producten die al op voorraad zijn. U kunt deze batches achteraf bekijken of aanpassen."
+            "label": "Vervaldatums toevoegen aan niet-gevolgde producten in uw huidige voorraad",
+            "description": "We passen uw automatiseringsinstellingen toe op overeenkomende producten die nog geen vervaldatum hebben. U kunt deze batches achteraf bekijken of aanpassen."
           }
         }
       }

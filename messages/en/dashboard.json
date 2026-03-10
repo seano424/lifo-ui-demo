@@ -256,11 +256,11 @@
           "product": "Product"
         },
         "initialBatchPrompt": {
-          "title": "Estimate expiry dates for your current inventory?",
-          "description": "We'll use your new automation settings to estimate expiry dates for matching products already in your inventory. You can review or adjust these batches afterward.",
+          "title": "Add expiry dates for products not yet tracked?",
+          "description": "We'll apply your automation settings to any matching products in your inventory that don't already have an expiry date. You can review or adjust these afterward.",
           "cancel": "Not now",
-          "confirm": "Yes, create batches",
-          "successToast": "Initial batches created from your current inventory"
+          "confirm": "Yes, fill in missing dates",
+          "successToast": "Missing expiry dates filled in for your current inventory"
         }
       },
       "automations": {
@@ -841,9 +841,11 @@
           "goToDashboard": "Go to Dashboard"
         },
         "review": {
+          "back": "Back",
+          "confirm": "Turn on expiry tracking",
           "initialBatches": {
-            "label": "Create initial batches from your current inventory",
-            "description": "We'll use your automation settings to estimate expiry dates for matching products already in stock. You can review or adjust these batches afterward."
+            "label": "Add expiry dates for untracked products in your current inventory",
+            "description": "We'll apply your automation settings to any matching products that don't already have an expiry date. You can review or adjust these afterward."
           }
         }
       }

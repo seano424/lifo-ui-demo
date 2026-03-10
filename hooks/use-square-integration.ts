@@ -6,7 +6,6 @@
 'use client'
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { fastApiClient } from '@/lib/services/fastapi-client'
 import { createClient } from '@/lib/supabase/client'
@@ -334,8 +333,8 @@ export function useSyncSquareOrders() {
  * Returns mutation for triggering initial batch creation
  */
 export function useCreateInitialBatches() {
+  const queryClient = useQueryClient()
   const supabase = createClient()
-  const t = useTranslations('dashboard.redesign.automation.initialBatchPrompt')
 
   return useMutation({
     mutationFn: async ({ storeId }: { storeId: string }): Promise<void> => {
@@ -349,7 +348,8 @@ export function useCreateInitialBatches() {
       await fastApiClient.createInitialBatches(storeId, session.access_token)
     },
     onSuccess: () => {
-      toast.success(t('successToast'))
+      queryClient.invalidateQueries({ queryKey: queryKeys.batches.all })
+      toast.success('Missing expiry dates filled in for your current inventory')
     },
     onError: (error: Error) => {
       if (process.env.NODE_ENV === 'development')

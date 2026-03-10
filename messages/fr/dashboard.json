@@ -256,11 +256,11 @@
           "product": "Produit"
         },
         "initialBatchPrompt": {
-          "title": "Estimer les dates d'expiration de votre inventaire actuel ?",
-          "description": "Nous utiliserons vos nouveaux paramètres d'automatisation pour estimer les dates d'expiration des produits correspondants déjà dans votre inventaire. Vous pourrez réviser ou ajuster ces lots par la suite.",
+          "title": "Ajouter des dates d'expiration aux produits non encore suivis ?",
+          "description": "Nous appliquerons vos paramètres d'automatisation aux produits correspondants de votre inventaire qui n'ont pas encore de date d'expiration. Vous pourrez réviser ou ajuster ces lots par la suite.",
           "cancel": "Pas maintenant",
-          "confirm": "Oui, créer des lots",
-          "successToast": "Lots initiaux créés depuis votre inventaire actuel"
+          "confirm": "Oui, compléter les dates manquantes",
+          "successToast": "Dates d'expiration manquantes complétées pour votre inventaire actuel"
         }
       },
       "automations": {
@@ -841,9 +841,11 @@
           "goToDashboard": "Aller au tableau de bord"
         },
         "review": {
+          "back": "Retour",
+          "confirm": "Activer le suivi des dates d'expiration",
           "initialBatches": {
-            "label": "Créer des lots initiaux depuis votre inventaire actuel",
-            "description": "Nous utiliserons vos paramètres d'automatisation pour estimer les dates d'expiration des produits correspondants déjà en stock. Vous pourrez réviser ou ajuster ces lots par la suite."
+            "label": "Ajouter des dates d'expiration aux produits non suivis de votre inventaire actuel",
+            "description": "Nous appliquerons vos paramètres d'automatisation aux produits correspondants qui n'ont pas encore de date d'expiration. Vous pourrez réviser ou ajuster ces lots par la suite."
           }
         }
       }
