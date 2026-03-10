@@ -13,6 +13,7 @@ import { StepIntro } from './batch-tracking/step-intro'
 import { StepReview } from './batch-tracking/step-review'
 import { ActivatingState } from './batch-tracking/activating-state'
 import { useActiveStoreId } from '@/lib/stores/store-context'
+import { useCreateInitialBatches } from '@/hooks/use-square-integration'
 import { logger } from '@/lib/utils/logger'
 import { useSetupFlowStore } from '@/lib/stores/setup-flow-store'
 // import { StoreIndicator } from '../store-indicator'
@@ -82,6 +83,7 @@ export function BatchTrackingStep() {
   // Fetch data from backend
   const { data: categories } = useCategoriesWithTrackingSettings(storeId || '')
   const saveMutation = useSaveBatchTrackingSetup()
+  const createInitialBatchesMutation = useCreateInitialBatches()
 
   // Process categories with shelf life lookup
   const processedCategories = useMemo(() => {
@@ -281,7 +283,7 @@ export function BatchTrackingStep() {
     setSubStep('review')
   }
 
-  const handleConfirm = async () => {
+  const handleConfirm = async (createInitialBatches: boolean) => {
     if (!storeId && !DEMO_MODE) {
       logger.error(context, 'Cannot confirm batch tracking without storeId')
       return
@@ -357,6 +359,11 @@ export function BatchTrackingStep() {
       // Show success animation for 1.5 seconds
       setShowSuccess(true)
       await new Promise(resolve => setTimeout(resolve, 1500))
+
+      // Fire-and-forget: create initial batches in background if requested
+      if (createInitialBatches && storeId) {
+        createInitialBatchesMutation.mutate({ storeId })
+      }
 
       // Setup flow will auto-exit to dashboard when it detects hasBatchTrackingSetup: true
       // No manual navigation needed - React Query invalidation handles it

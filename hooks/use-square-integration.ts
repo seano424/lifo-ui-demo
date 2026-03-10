@@ -329,6 +329,39 @@ export function useSyncSquareOrders() {
 }
 
 /**
+ * Hook to create initial batches for a store after onboarding
+ * Returns mutation for triggering initial batch creation
+ */
+export function useCreateInitialBatches() {
+  const queryClient = useQueryClient()
+  const supabase = createClient()
+
+  return useMutation({
+    mutationFn: async ({ storeId }: { storeId: string }): Promise<void> => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
+      if (!session) {
+        throw new Error('Not authenticated')
+      }
+
+      await fastApiClient.createInitialBatches(storeId, session.access_token)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.batches.all })
+      toast.success('Missing expiry dates filled in for your current inventory')
+    },
+    onError: (error: Error) => {
+      if (process.env.NODE_ENV === 'development')
+        console.error('Initial batch creation failed:', error)
+
+      const { title, description } = formatErrorForToast(error)
+      toast.error(title, { description })
+    },
+  })
+}
+
+/**
  * Helper hook to poll Square status during OAuth callback
  * Useful for checking connection completion after OAuth redirect
  */

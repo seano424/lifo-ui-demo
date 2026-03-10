@@ -254,6 +254,13 @@
         "ruleTypes": {
           "category": "Categorie",
           "product": "Product"
+        },
+        "initialBatchPrompt": {
+          "title": "Vervaldatums toevoegen aan nog niet gevolgde producten?",
+          "description": "We passen uw automatiseringsinstellingen toe op overeenkomende producten in uw voorraad die nog geen vervaldatum hebben. U kunt deze batches achteraf bekijken of aanpassen.",
+          "cancel": "Nu niet",
+          "confirm": "Ja, ontbrekende datums invullen",
+          "successToast": "Ontbrekende vervaldatums ingevuld voor uw huidige voorraad"
         }
       },
       "automations": {
@@ -311,9 +318,9 @@
           "deleteRule": "Regel verwijderen",
           "cancel": "Annuleren",
           "saveChanges": "Wijzigingen opslaan",
-          "saving": "Opslaan\u2026",
+          "saving": "Opslaan…",
           "createRule": "Regel aanmaken",
-          "creating": "Aanmaken\u2026"
+          "creating": "Aanmaken…"
         }
       },
       "expiringTable": {
@@ -832,6 +839,14 @@
             "step3": "U kunt elke categorie of houdbaarheid op elk moment aanpassen in Instellingen"
           },
           "goToDashboard": "Ga naar dashboard"
+        },
+        "review": {
+          "back": "Terug",
+          "confirm": "Vervaldatumtracking inschakelen",
+          "initialBatches": {
+            "label": "Vervaldatums toevoegen aan niet-gevolgde producten in uw huidige voorraad",
+            "description": "We passen uw automatiseringsinstellingen toe op overeenkomende producten die nog geen vervaldatum hebben. U kunt deze batches achteraf bekijken of aanpassen."
+          }
         }
       }
     },

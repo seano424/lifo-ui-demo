@@ -1099,6 +1099,48 @@ export class FastAPIClient {
       throw this.handleFetchError(error, 'Square orders sync')
     }
   }
+
+  /**
+   * Create initial batches for a store after onboarding
+   */
+  async createInitialBatches(storeId: string, userToken: string): Promise<void> {
+    this.validateUUID(storeId, 'Store ID')
+
+    const encodedStoreId = encodeURIComponent(storeId)
+    const url = `${this.baseUrl}/api/v1/integrations/square/stores/${encodedStoreId}/create-initial-batches`
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), this.timeout)
+
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+          'Content-Type': 'application/json',
+          ...this.ngrokHeaders,
+        },
+        signal: controller.signal,
+      })
+
+      clearTimeout(timeoutId)
+
+      if (!response.ok) {
+        let errorDetails = ''
+        try {
+          const errorData = await response.json()
+          errorDetails = errorData.detail || JSON.stringify(errorData)
+        } catch {
+          errorDetails = await response.text()
+        }
+        throw new Error(`Failed to create initial batches: ${errorDetails}`)
+      }
+
+      await response.json()
+    } catch (error) {
+      clearTimeout(timeoutId)
+      throw this.handleFetchError(error, 'Square initial batch creation')
+    }
+  }
 }
 
 // Response mapping utilities to maintain compatibility with existing Next.js API responses

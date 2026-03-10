@@ -254,6 +254,13 @@
         "ruleTypes": {
           "category": "Category",
           "product": "Product"
+        },
+        "initialBatchPrompt": {
+          "title": "Add expiry dates for products not yet tracked?",
+          "description": "We'll apply your automation settings to any matching products in your inventory that don't already have an expiry date. You can review or adjust these afterward.",
+          "cancel": "Not now",
+          "confirm": "Yes, fill in missing dates",
+          "successToast": "Missing expiry dates filled in for your current inventory"
         }
       },
       "automations": {
@@ -311,9 +318,9 @@
           "deleteRule": "Delete rule",
           "cancel": "Cancel",
           "saveChanges": "Save changes",
-          "saving": "Saving\u2026",
+          "saving": "Saving…",
           "createRule": "Create rule",
-          "creating": "Creating\u2026"
+          "creating": "Creating…"
         }
       },
       "expiringTable": {
@@ -832,6 +839,14 @@
             "step3": "You can adjust any category or shelf life anytime in Settings"
           },
           "goToDashboard": "Go to Dashboard"
+        },
+        "review": {
+          "back": "Back",
+          "confirm": "Turn on expiry tracking",
+          "initialBatches": {
+            "label": "Add expiry dates for untracked products in your current inventory",
+            "description": "We'll apply your automation settings to any matching products that don't already have an expiry date. You can review or adjust these afterward."
+          }
         }
       }
     },
