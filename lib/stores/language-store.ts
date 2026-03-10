@@ -17,7 +17,7 @@ interface LanguageState {
 export const useLanguageStore = create<LanguageState>()(
   persist(
     set => ({
-      currentLanguage: 'fr', // Default to French
+      currentLanguage: 'en', // Default to English
 
       isLoading: false,
 
@@ -63,8 +63,8 @@ export const useLanguageStore = create<LanguageState>()(
             if (savedLanguage && isSupportedLocale(savedLanguage)) {
               set({ currentLanguage: savedLanguage })
             } else {
-              // Default to French if no preference found
-              set({ currentLanguage: 'fr' })
+              // Default to English if no preference found
+              set({ currentLanguage: 'en' })
             }
           } else {
             // Not logged in - check localStorage first, then browser language
@@ -84,20 +84,20 @@ export const useLanguageStore = create<LanguageState>()(
 
             // Use browser language or default to French
             const browserLang = navigator.language.split('-')[0]
-            const supportedLanguage = isSupportedLocale(browserLang) ? browserLang : 'fr'
+            const supportedLanguage = isSupportedLocale(browserLang) ? browserLang : 'en'
 
             set({ currentLanguage: supportedLanguage })
           }
         } catch (error) {
           console.error('Failed to initialize language:', error)
-          set({ currentLanguage: 'fr' }) // Fallback to French
+          set({ currentLanguage: 'en' }) // Fallback to English
         } finally {
           set({ isLoading: false })
         }
       },
 
       resetLanguage: () => {
-        set({ currentLanguage: 'fr', isLoading: false })
+        set({ currentLanguage: 'en', isLoading: false })
       },
     }),
     {

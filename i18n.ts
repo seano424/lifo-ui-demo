@@ -9,7 +9,7 @@ async function detectLanguageFromHeaders(): Promise<SupportedLocale> {
     const headersList = await headers()
     const acceptLanguage = headersList.get('accept-language')
 
-    if (!acceptLanguage) return 'fr'
+    if (!acceptLanguage) return 'en'
 
     // Parse Accept-Language header (e.g., "en-US,en;q=0.9,fr;q=0.8")
     const languages = acceptLanguage
@@ -31,9 +31,9 @@ async function detectLanguageFromHeaders(): Promise<SupportedLocale> {
       }
     }
 
-    return 'fr'
+    return 'en'
   } catch {
-    return 'fr'
+    return 'en'
   }
 }
 
