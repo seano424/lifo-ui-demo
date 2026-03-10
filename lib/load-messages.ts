@@ -113,12 +113,12 @@ export async function loadMessages(locale: string): Promise<Record<string, unkno
   } catch (error) {
     console.error(`Failed to load messages for locale: ${locale}`, error)
 
-    // Fallback to French
-    if (locale !== 'fr') {
-      return loadMessages('fr')
+    // Fallback to English
+    if (locale !== 'en') {
+      return loadMessages('en')
     }
 
-    // If French also fails, return empty object
+    // If English also fails, return empty object
     return {}
   }
 }

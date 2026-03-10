@@ -43,10 +43,12 @@ export function useSquareStatus() {
     gcTime: 10 * 60 * 1000, // 10 minutes (formerly cacheTime)
     refetchOnMount: true, // Refetch on mount to ensure fresh data
     refetchOnWindowFocus: false,
+    throwOnError: false, // Don't crash the page — callers (useSetupProgress) handle error state
     retry: (failureCount, error: Error) => {
       // Don't retry auth errors
       if (error.message.includes('Not authenticated')) return false
-      // Retry server errors up to 2 times
+      // AUTH_004 (insufficient_permissions) can be transient for new signups —
+      // retry a few times to give the backend user record time to be created
       return failureCount < 2
     },
     retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
@@ -351,6 +353,7 @@ export function useSquareStatusPolling(enabled: boolean = false) {
     refetchInterval: enabled ? 2000 : false, // Poll every 2 seconds when enabled
     refetchOnMount: true,
     refetchOnWindowFocus: false,
+    throwOnError: false, // Don't crash the page during polling
     retry: (failureCount, error: Error) => {
       // Don't retry auth errors
       if (error.message.includes('Not authenticated')) return false
