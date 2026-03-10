@@ -137,7 +137,7 @@ export async function fetchDashboardRedesignSummary(
   pastStart.setDate(pastStart.getDate() - daysFilter)
   const pastStartStr = toDateStr(pastStart)
 
-  const [expiringResult, prevExpiringResult, activeBatchesResult, storeProductsResult] =
+  const [expiringResult, prevExpiringResult, activeBatchesResult, inventoryStatsResult] =
     await Promise.all([
       // 1. Batches expiring within the current daysFilter window
       supabase
@@ -161,22 +161,21 @@ export async function fetchDashboardRedesignSummary(
         .gte('expiry_date', pastStartStr)
         .lt('expiry_date', todayStr),
 
-      // 3. All currently active batches — used for act_on_today, coverage, and prev coverage
+      // 3. All currently active batches — used for act_on_today
       supabase
         .schema('inventory')
         .from('batches')
-        .select('batch_id, product_id, expiry_date, received_date')
+        .select('batch_id, expiry_date, current_quantity')
         .eq('store_id', storeId)
         .eq('status', 'active')
         .gt('current_quantity', 0),
 
-      // 4. Total products in the store's catalog
+      // 4. Store inventory stats — used for coverage (Lifo stock vs Square stock)
       supabase
         .schema('inventory')
-        .from('store_products')
-        .select('product_id')
-        .eq('store_id', storeId)
-        .eq('is_active', true),
+        .from('store_inventory_stats')
+        .select('total_stock, quantity')
+        .eq('store_id', storeId),
     ])
 
   if (expiringResult.error)
@@ -185,8 +184,8 @@ export async function fetchDashboardRedesignSummary(
     throw new Error(`Failed to fetch previous batches: ${prevExpiringResult.error.message}`)
   if (activeBatchesResult.error)
     throw new Error(`Failed to fetch active batches: ${activeBatchesResult.error.message}`)
-  if (storeProductsResult.error)
-    throw new Error(`Failed to fetch store products: ${storeProductsResult.error.message}`)
+  if (inventoryStatsResult.error)
+    throw new Error(`Failed to fetch inventory stats: ${inventoryStatsResult.error.message}`)
 
   // --- Expiring (current window) ---
   const expiringBatches = expiringResult.data ?? []
@@ -213,18 +212,16 @@ export async function fetchDashboardRedesignSummary(
     b => b.expiry_date !== null && b.expiry_date <= todayStr,
   ).length
 
-  // Coverage: unique products with at least one active batch
-  const uniqueActiveProducts = new Set(activeBatches.map(b => b.product_id))
-  const products_tracked = uniqueActiveProducts.size
-  const products_total = storeProductsResult.data?.length ?? products_tracked
-
-  // Previous coverage: products tracked from batches received before the current period
-  const prevActiveBatches = activeBatches.filter(
-    b => b.received_date !== null && b.received_date < pastStartStr,
+  // Coverage: Lifo-tracked stock vs Square's total stock
+  // Numerator (products_tracked): SUM(total_stock) from store_inventory_stats — Lifo batches
+  // Denominator (products_total): SUM(quantity) from store_inventory_stats — Square's source of truth
+  const inventoryStats = inventoryStatsResult.data ?? []
+  const products_tracked = inventoryStats.reduce(
+    (sum, row) => sum + Number(row.total_stock ?? 0),
+    0,
   )
-  const prevUniqueProducts = new Set(prevActiveBatches.map(b => b.product_id))
-  const coverage_percent_prev =
-    products_total > 0 ? Math.round((prevUniqueProducts.size / products_total) * 100) : null
+  const products_total = inventoryStats.reduce((sum, row) => sum + Number(row.quantity ?? 0), 0)
+  const coverage_percent_prev: number | null = null
 
   return {
     expiring_count,
