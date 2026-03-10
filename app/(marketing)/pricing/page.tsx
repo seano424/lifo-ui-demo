@@ -1,40 +1,26 @@
 import { Check } from 'lucide-react'
-import { getTranslations } from 'next-intl/server'
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import { Typography } from '@/components/ui/typography'
 import { RevealAnimation } from '@/components/ui/reveal-animation'
-
-type PlanFeatures = Record<string, string>
+import { Badge } from '@/components/ui/badge'
+import { BILLING_LIVE } from '@/lib/config/billing'
 
 export const metadata: Metadata = {
-  title: 'Pricing -Lifo.AI',
-  description:
-    'Choose the perfect plan for your food waste management needs. From free trial to enterprise solutions.',
+  title: 'Pricing - Lifo.AI',
+  description: 'Simple, transparent pricing for food waste management.',
 }
 
-export default async function PricingPage() {
-  const t = await getTranslations('pricingpage')
+const FREEMIUM_FEATURES = [
+  'Expiry date tracking',
+  'Unlimited users & stores',
+  '1 category automation',
+  '1 product automation',
+]
 
-  const plans = [
-    {
-      id: 'freeTrial',
-      ctaLink: '/signup',
-    },
-    {
-      id: 'light',
-      ctaLink: '/signup',
-    },
-    {
-      id: 'pro',
-      ctaLink: '/signup',
-    },
-    // {
-    //   id: 'enterprise',
-    //   ctaLink: '/contact',
-    // },
-  ]
+const PRO_FEATURES = ['Everything in Freemium', 'Unlimited automations', 'Priority support']
 
+export default function PricingPage() {
   return (
     <RevealAnimation direction="none">
       <section className="bg-white dark:bg-gray-900 min-h-screen pt-20 px-4 relative overflow-hidden">
@@ -42,74 +28,126 @@ export default async function PricingPage() {
           {/* Header */}
           <div className="flex flex-col gap-4 items-center justify-center">
             <Typography variant="h2" className="font-extrabold tracking-tight">
-              {t('title')}
+              Simple, transparent pricing
             </Typography>
-            <Typography variant="h5" className="max-w-xl text-center">
-              {t('subtitle')}
+            <Typography variant="h5" color="muted" className="max-w-xl text-center">
+              Lifo is free while we&apos;re getting started. Paid plans are coming soon.
             </Typography>
           </div>
 
-          {/* Pricing Cards Grid */}
-          <div className="space-y-8 lg:grid lg:grid-cols-3 sm:gap-6 xl:gap-10 lg:space-y-0">
-            {plans.map(plan => {
-              return (
-                <div
-                  key={plan.id}
-                  className="flex flex-col justify-between gap-4 p-6 mx-auto max-w-lg lg:text-center text-gray-900 bg-white rounded-lg border border-gray-100 shadow dark:border-gray-600 xl:p-8 dark:bg-gray-800 dark:text-white"
-                >
-                  <div className="flex flex-col gap-4">
-                    {/* Plan Title */}
-                    <Typography variant="h3" className="font-extrabold tracking-tight">
-                      {t(`plans.${plan.id}.title`)}
-                    </Typography>
+          {/* Plan Cards */}
+          <div className="flex flex-col lg:flex-row gap-6 justify-center lg:max-w-3xl mx-auto w-full">
+            {/* Freemium Card */}
+            <div className="flex flex-col justify-between gap-4 p-6 flex-1 max-w-lg mx-auto w-full text-gray-900 bg-white rounded-lg border border-gray-100 shadow dark:border-gray-600 xl:p-8 dark:bg-gray-800 dark:text-white">
+              <div className="flex flex-col gap-4">
+                <Typography variant="h3" className="font-extrabold tracking-tight">
+                  Freemium
+                </Typography>
+                <Typography variant="p" color="muted">
+                  Everything you need to get started with expiry tracking.
+                </Typography>
+              </div>
 
-                    {/* Description */}
-                    <Typography variant="p" color="muted">
-                      {t(`plans.${plan.id}.description`)}
-                    </Typography>
-                  </div>
-                  <div className="flex flex-col gap-4 lg:min-h-64">
-                    {/* Price */}
-                    <div className="flex justify-start lg:justify-center items-baseline">
-                      <Typography
-                        variant="h3"
-                        className="mr-2 font-extrabold tracking-tight"
-                        color="secondary"
-                      >
-                        {t(`plans.${plan.id}.price`)}
+              <div className="flex flex-col gap-4">
+                <div className="flex items-baseline gap-2">
+                  <Typography
+                    variant="h3"
+                    className="font-extrabold tracking-tight"
+                    color="secondary"
+                  >
+                    Free
+                  </Typography>
+                  <Typography variant="p" color="muted">
+                    forever
+                  </Typography>
+                </div>
+
+                <ul className="flex flex-col gap-3">
+                  {FREEMIUM_FEATURES.map(feature => (
+                    <li key={feature} className="flex items-center space-x-3">
+                      <Check className="shrink-0 w-5 h-5 text-slate-500 dark:text-slate-400" />
+                      <Typography variant="p" color="muted">
+                        {feature}
                       </Typography>
-                      {t.has(`plans.${plan.id}.period`) && (
-                        <Typography variant="p" color="muted">
-                          {t(`plans.${plan.id}.period`)}
-                        </Typography>
-                      )}
-                    </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
 
-                    {/* Features List */}
-                    <ul className="flex flex-col gap-4 text-left">
-                      {Object.entries(t.raw(`plans.${plan.id}.features`) as PlanFeatures).map(
-                        ([featureKey]) => (
-                          <li key={featureKey} className="flex items-center space-x-3">
-                            <Check className="shrink-0 w-5 h-5 text-green-500 dark:text-green-400" />
-                            <Typography variant="p" color="muted">
-                              {t(`plans.${plan.id}.features.${featureKey}`)}
-                            </Typography>
-                          </li>
-                        ),
-                      )}
-                    </ul>
-                  </div>
+              <Link
+                href="/auth/sign-up"
+                className="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-200 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:text-white dark:focus:ring-primary-900"
+              >
+                Get Started
+              </Link>
+            </div>
 
-                  {/* CTA Button */}
+            {/* Pro Card */}
+            <div className="flex flex-col justify-between gap-4 p-6 flex-1 max-w-lg mx-auto w-full text-gray-900 bg-white rounded-lg border border-gray-100 shadow dark:border-gray-600 xl:p-8 dark:bg-gray-800 dark:text-white">
+              <div className="flex flex-col gap-4">
+                <div className="flex items-center justify-between gap-2 flex-wrap">
+                  <Typography variant="h3" className="font-extrabold tracking-tight">
+                    Pro
+                  </Typography>
+                  <Badge variant="secondary" size="sm">
+                    Coming Soon
+                  </Badge>
+                </div>
+                <Typography variant="p" color="muted">
+                  For teams that want unlimited automation and priority support.
+                </Typography>
+              </div>
+
+              <div className="flex flex-col gap-4">
+                <div className="flex items-baseline gap-2">
+                  <Typography
+                    variant="h3"
+                    className="font-extrabold tracking-tight"
+                    color="secondary"
+                  >
+                    $39
+                  </Typography>
+                  <Typography variant="p" color="muted">
+                    /mo
+                  </Typography>
+                </div>
+
+                <ul className="flex flex-col gap-3">
+                  {PRO_FEATURES.map(feature => (
+                    <li key={feature} className="flex items-center space-x-3">
+                      <Check className="shrink-0 w-5 h-5 text-slate-500 dark:text-slate-400" />
+                      <Typography variant="p" color="muted">
+                        {feature}
+                      </Typography>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="flex flex-col gap-2">
+                {BILLING_LIVE ? (
                   <Link
-                    href={plan.ctaLink}
+                    href="/auth/sign-up"
                     className="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-200 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:text-white dark:focus:ring-primary-900"
                   >
-                    {t('common.getStarted')}
+                    Upgrade to Pro
                   </Link>
-                </div>
-              )
-            })}
+                ) : (
+                  <button
+                    disabled
+                    className="cursor-not-allowed text-gray-400 bg-gray-100 dark:bg-gray-700 dark:text-gray-500 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+                    type="button"
+                  >
+                    Coming Soon
+                  </button>
+                )}
+                {!BILLING_LIVE && (
+                  <Typography variant="extraSmall" color="muted" className="text-center">
+                    $39/mo when billing launches. All members get 30 days notice.
+                  </Typography>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       </section>
