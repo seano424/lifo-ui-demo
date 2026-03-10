@@ -126,7 +126,7 @@ export function AutomationCard({ showLinks = true }: { showLinks?: boolean }) {
                 </Typography>
               </div>
 
-              <Link href="/dashboard/settings/automations">
+              <Link href="/dashboard/inventory/products?sort=needs_expiry&direction=desc">
                 <Typography
                   variant="p"
                   color="muted"

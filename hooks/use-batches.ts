@@ -430,6 +430,9 @@ export function useBatchActions() {
         queryClient.invalidateQueries({
           queryKey: queryKeys.todos.dashboardSummary(activeStoreId),
         })
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.dashboard.all,
+        })
       }
 
       if (data) {
@@ -517,6 +520,9 @@ export function useBatchActions() {
         })
         queryClient.invalidateQueries({
           queryKey: queryKeys.products.byStore(activeStoreId),
+        })
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.dashboard.all,
         })
       }
     },

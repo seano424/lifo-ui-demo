@@ -217,11 +217,11 @@
         }
       },
       "coverage": {
-        "title": "Expiry Date Coverage",
-        "subtitle": "Products with tracked batches",
+        "title": "Inventory Coverage",
+        "subtitle": "Stock units tracked in Lifo vs total Square stock",
         "progressLabel": "{percent}% coverage",
-        "tracked": "{count, plural, =1 {1 product} other {# products}} tracked",
-        "remaining": "{count, plural, =1 {1 product} other {# products}} remaining"
+        "tracked": "{count, plural, =1 {1 unit} other {# units}} tracked in Lifo",
+        "remaining": "{count, plural, =1 {1 unit} other {# units}} not yet tracked"
       },
       "autoTrackingBanner": {
         "title": "Save time with auto-tracking",

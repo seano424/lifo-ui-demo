@@ -217,11 +217,11 @@
         }
       },
       "coverage": {
-        "title": "Vervaldatum Dekking",
-        "subtitle": "Producten met gevolgde batches",
+        "title": "Voorraadbeheer Dekking",
+        "subtitle": "Eenheden bijgehouden in Lifo vs totale Square voorraad",
         "progressLabel": "{percent}% dekking",
-        "tracked": "{count, plural, =1 {1 product} other {# producten}} gevolgd",
-        "remaining": "{count, plural, =1 {1 product} other {# producten}} resterend"
+        "tracked": "{count, plural, =1 {1 eenheid} other {# eenheden}} bijgehouden in Lifo",
+        "remaining": "{count, plural, =1 {1 eenheid} other {# eenheden}} nog niet bijgehouden"
       },
       "autoTrackingBanner": {
         "title": "Bespaar tijd met automatisch bijhouden",

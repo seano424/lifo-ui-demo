@@ -217,11 +217,11 @@
         }
       },
       "coverage": {
-        "title": "Couverture des Dates d'Expiration",
-        "subtitle": "Produits avec lots suivis",
+        "title": "Couverture des Stocks",
+        "subtitle": "Unités suivies dans Lifo vs stock total Square",
         "progressLabel": "{percent}% de couverture",
-        "tracked": "{count, plural, =1 {1 produit} other {# produits}} suivi",
-        "remaining": "{count, plural, =1 {1 produit} other {# produits}} restant"
+        "tracked": "{count, plural, =1 {1 unité} other {# unités}} suivie dans Lifo",
+        "remaining": "{count, plural, =1 {1 unité} other {# unités}} non encore suivie"
       },
       "autoTrackingBanner": {
         "title": "Gagnez du temps avec le suivi automatique",

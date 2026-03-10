@@ -27,6 +27,10 @@
       "supportDesc": "Contactez notre équipe de support ou visitez nos forums communautaires",
       "language": "Langue"
     },
+    "billingBanner": {
+      "message": "Lifo est gratuit pendant notre lancement. Les plans payants arrivent bientôt.",
+      "dismiss": "Fermer la bannière"
+    },
     "auth": {
       "login": "Connexion",
       "signup": "Inscription",
@@ -251,6 +255,32 @@
     }
   },
   "pricingpage": {
+    "header": "Une tarification simple et transparente",
+    "headerSubtitle": "Lifo est gratuit pendant notre lancement. Les plans payants arrivent bientôt.",
+    "freemium": {
+      "name": "Freemium",
+      "description": "Tout ce qu'il vous faut pour commencer le suivi des dates d'expiration.",
+      "price": "Gratuit",
+      "period": "pour toujours",
+      "features": [
+        "Suivi des dates d'expiration",
+        "Utilisateurs et magasins illimités",
+        "1 automatisation de catégorie",
+        "1 automatisation de produit"
+      ],
+      "cta": "Commencer"
+    },
+    "pro": {
+      "name": "Pro",
+      "description": "Pour les équipes qui souhaitent des automatisations illimitées et un support prioritaire.",
+      "price": "39 €",
+      "period": "/mois",
+      "badge": "Bientôt disponible",
+      "features": ["Tout de Freemium", "Automatisations illimitées", "Support prioritaire"],
+      "ctaComingSoon": "Bientôt disponible",
+      "ctaUpgrade": "Passer à Pro",
+      "finePrint": "39 €/mois au lancement de la facturation. Tous les membres reçoivent un préavis de 30 jours."
+    },
     "title": "Choisissez votre plan",
     "contactUs": "Contactez-nous pour vos questions",
     "subtitle": "Commencez avec notre essai gratuit et évoluez selon vos besoins. Sans engagement, support complet inclus.",
