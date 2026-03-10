@@ -1,6 +1,7 @@
 import { Check } from 'lucide-react'
 import Link from 'next/link'
 import type { Metadata } from 'next'
+import { getTranslations } from 'next-intl/server'
 import { Typography } from '@/components/ui/typography'
 import { RevealAnimation } from '@/components/ui/reveal-animation'
 import { Badge } from '@/components/ui/badge'
@@ -11,16 +12,11 @@ export const metadata: Metadata = {
   description: 'Simple, transparent pricing for food waste management.',
 }
 
-const FREEMIUM_FEATURES = [
-  'Expiry date tracking',
-  'Unlimited users & stores',
-  '1 category automation',
-  '1 product automation',
-]
+export default async function PricingPage() {
+  const t = await getTranslations('pricingpage')
+  const freemiumFeatures = t.raw('freemium.features') as string[]
+  const proFeatures = t.raw('pro.features') as string[]
 
-const PRO_FEATURES = ['Everything in Freemium', 'Unlimited automations', 'Priority support']
-
-export default function PricingPage() {
   return (
     <RevealAnimation direction="none">
       <section className="bg-white dark:bg-gray-900 min-h-screen pt-20 px-4 relative overflow-hidden">
@@ -28,10 +24,10 @@ export default function PricingPage() {
           {/* Header */}
           <div className="flex flex-col gap-4 items-center justify-center">
             <Typography variant="h2" className="font-extrabold tracking-tight">
-              Simple, transparent pricing
+              {t('header')}
             </Typography>
             <Typography variant="h5" color="muted" className="max-w-xl text-center">
-              Lifo is free while we&apos;re getting started. Paid plans are coming soon.
+              {t('headerSubtitle')}
             </Typography>
           </div>
 
@@ -41,10 +37,10 @@ export default function PricingPage() {
             <div className="flex flex-col justify-between gap-4 p-6 flex-1 max-w-lg mx-auto w-full text-gray-900 bg-white rounded-lg border border-gray-100 shadow dark:border-gray-600 xl:p-8 dark:bg-gray-800 dark:text-white">
               <div className="flex flex-col gap-4">
                 <Typography variant="h3" className="font-extrabold tracking-tight">
-                  Freemium
+                  {t('freemium.name')}
                 </Typography>
                 <Typography variant="p" color="muted">
-                  Everything you need to get started with expiry tracking.
+                  {t('freemium.description')}
                 </Typography>
               </div>
 
@@ -55,15 +51,15 @@ export default function PricingPage() {
                     className="font-extrabold tracking-tight"
                     color="secondary"
                   >
-                    Free
+                    {t('freemium.price')}
                   </Typography>
                   <Typography variant="p" color="muted">
-                    forever
+                    {t('freemium.period')}
                   </Typography>
                 </div>
 
                 <ul className="flex flex-col gap-3">
-                  {FREEMIUM_FEATURES.map(feature => (
+                  {freemiumFeatures.map(feature => (
                     <li key={feature} className="flex items-center space-x-3">
                       <Check className="shrink-0 w-5 h-5 text-slate-500 dark:text-slate-400" />
                       <Typography variant="p" color="muted">
@@ -78,7 +74,7 @@ export default function PricingPage() {
                 href="/auth/sign-up"
                 className="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-200 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:text-white dark:focus:ring-primary-900"
               >
-                Get Started
+                {t('freemium.cta')}
               </Link>
             </div>
 
@@ -87,14 +83,14 @@ export default function PricingPage() {
               <div className="flex flex-col gap-4">
                 <div className="flex items-center justify-between gap-2 flex-wrap">
                   <Typography variant="h3" className="font-extrabold tracking-tight">
-                    Pro
+                    {t('pro.name')}
                   </Typography>
                   <Badge variant="secondary" size="sm">
-                    Coming Soon
+                    {t('pro.badge')}
                   </Badge>
                 </div>
                 <Typography variant="p" color="muted">
-                  For teams that want unlimited automation and priority support.
+                  {t('pro.description')}
                 </Typography>
               </div>
 
@@ -105,15 +101,15 @@ export default function PricingPage() {
                     className="font-extrabold tracking-tight"
                     color="secondary"
                   >
-                    $39
+                    {t('pro.price')}
                   </Typography>
                   <Typography variant="p" color="muted">
-                    /mo
+                    {t('pro.period')}
                   </Typography>
                 </div>
 
                 <ul className="flex flex-col gap-3">
-                  {PRO_FEATURES.map(feature => (
+                  {proFeatures.map(feature => (
                     <li key={feature} className="flex items-center space-x-3">
                       <Check className="shrink-0 w-5 h-5 text-slate-500 dark:text-slate-400" />
                       <Typography variant="p" color="muted">
@@ -130,7 +126,7 @@ export default function PricingPage() {
                     href="/auth/sign-up"
                     className="text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:ring-primary-200 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:text-white dark:focus:ring-primary-900"
                   >
-                    Upgrade to Pro
+                    {t('pro.ctaUpgrade')}
                   </Link>
                 ) : (
                   <button
@@ -138,12 +134,12 @@ export default function PricingPage() {
                     className="cursor-not-allowed text-gray-400 bg-gray-100 dark:bg-gray-700 dark:text-gray-500 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
                     type="button"
                   >
-                    Coming Soon
+                    {t('pro.ctaComingSoon')}
                   </button>
                 )}
                 {!BILLING_LIVE && (
                   <Typography variant="extraSmall" color="muted" className="text-center">
-                    $39/mo when billing launches. All members get 30 days notice.
+                    {t('pro.finePrint')}
                   </Typography>
                 )}
               </div>

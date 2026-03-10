@@ -27,6 +27,10 @@
       "supportDesc": "Neem contact op met ons ondersteuningsteam of bezoek onze communityforums",
       "language": "Taal"
     },
+    "billingBanner": {
+      "message": "Lifo is gratis terwijl we op gang komen. Betaalde plannen komen binnenkort.",
+      "dismiss": "Banner sluiten"
+    },
     "auth": {
       "login": "Inloggen",
       "signup": "Registreren",
@@ -251,6 +255,32 @@
     }
   },
   "pricingpage": {
+    "header": "Eenvoudige, transparante prijzen",
+    "headerSubtitle": "Lifo is gratis terwijl we op gang komen. Betaalde plannen komen binnenkort.",
+    "freemium": {
+      "name": "Freemium",
+      "description": "Alles wat u nodig heeft om te beginnen met het bijhouden van vervaldatums.",
+      "price": "Gratis",
+      "period": "voor altijd",
+      "features": [
+        "Bijhouden van vervaldatums",
+        "Onbeperkt gebruikers & winkels",
+        "1 categorie-automatisering",
+        "1 product-automatisering"
+      ],
+      "cta": "Aan de slag"
+    },
+    "pro": {
+      "name": "Pro",
+      "description": "Voor teams die onbeperkte automatisering en prioritaire ondersteuning willen.",
+      "price": "€ 39",
+      "period": "/maand",
+      "badge": "Binnenkort beschikbaar",
+      "features": ["Alles in Freemium", "Onbeperkte automatiseringen", "Prioritaire ondersteuning"],
+      "ctaComingSoon": "Binnenkort beschikbaar",
+      "ctaUpgrade": "Upgraden naar Pro",
+      "finePrint": "€ 39/maand bij lancering van facturering. Alle leden krijgen 30 dagen van tevoren bericht."
+    },
     "title": "Kies uw plan",
     "contactUs": "Neem contact op voor vragen",
     "subtitle": "Begin met onze gratis proefperiode en schaal mee met uw groei. Geen vastlegging, volledige ondersteuning inbegrepen.",

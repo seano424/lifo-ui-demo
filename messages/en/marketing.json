@@ -27,6 +27,10 @@
       "supportDesc": "Get in touch with our support team or visit our community forums",
       "language": "Language"
     },
+    "billingBanner": {
+      "message": "Lifo is free while we're getting started. Paid plans coming soon.",
+      "dismiss": "Dismiss banner"
+    },
     "auth": {
       "login": "Login",
       "signup": "Signup",
@@ -251,6 +255,32 @@
     }
   },
   "pricingpage": {
+    "header": "Simple, transparent pricing",
+    "headerSubtitle": "Lifo is free while we're getting started. Paid plans are coming soon.",
+    "freemium": {
+      "name": "Freemium",
+      "description": "Everything you need to get started with expiry tracking.",
+      "price": "Free",
+      "period": "forever",
+      "features": [
+        "Expiry date tracking",
+        "Unlimited users & stores",
+        "1 category automation",
+        "1 product automation"
+      ],
+      "cta": "Get Started"
+    },
+    "pro": {
+      "name": "Pro",
+      "description": "For teams that want unlimited automation and priority support.",
+      "price": "$39",
+      "period": "/mo",
+      "badge": "Coming Soon",
+      "features": ["Everything in Freemium", "Unlimited automations", "Priority support"],
+      "ctaComingSoon": "Coming Soon",
+      "ctaUpgrade": "Upgrade to Pro",
+      "finePrint": "$39/mo when billing launches. All members get 30 days notice."
+    },
     "title": "Choose Your Plan",
     "contactUs": "Contact us for questions",
     "subtitle": "Start with our free trial and scale as you grow. No lock-in, full support included.",
