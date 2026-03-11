@@ -21,6 +21,7 @@ export function useStoreOverviews() {
     gcTime: 10 * 60 * 1000, // 10 minutes
     refetchOnMount: false,
     refetchOnWindowFocus: false,
+    throwOnError: false, // Don't crash the page — callers handle empty/error state
   })
 }
 

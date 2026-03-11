@@ -5,7 +5,6 @@ import { Typography } from '@/components/ui/typography'
 import { Button } from '@/components/ui/button'
 import { Zap, Type, Loader2, ArrowRight } from 'lucide-react'
 import type { ProcessedCategory } from '../batch-tracking-step'
-import { useTranslations } from 'next-intl'
 
 interface StepIntroProps {
   categories: ProcessedCategory[]
@@ -31,8 +30,6 @@ export function StepIntro({
   // Show up to 2 auto-matched categories as examples
   const autoExamples = categories.filter(c => c.mode === 'auto' && c.days).slice(0, 2)
   const manualExamples = categories.filter(c => c.mode === 'manual').slice(0, 1)
-
-  const t = useTranslations('setupFlow')
 
   return (
     <div className="flex flex-col gap-4">
@@ -124,7 +121,7 @@ export function StepIntro({
         )}
 
         <Button onClick={onSetup} className="w-fit" disabled={isSkipping}>
-          {t('steps.addStore.importSummary.continueButton')}
+          Continue
         </Button>
       </div>
     </div>
