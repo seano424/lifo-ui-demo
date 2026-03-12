@@ -141,7 +141,7 @@ export function StepHowToTrack({
 
 function ModeBadge({ mode }: { mode: 'auto' | 'manual' }) {
   return (
-    <span className="inline-flex justify-center items-center gap-1.5 p-2 text-sm font-medium rounded-lg border border-muted bg-secondary-50 text-secondary-700">
+    <span className="inline-flex justify-center items-center gap-1.5 p-2 text-sm font-medium rounded-lg border border-muted bg-secondary-50 text-secondary-700 dark:bg-black/30 dark:border-black/30 dark:text-secondary-300">
       {mode === 'auto' ? <Zap className="w-3 h-3" /> : <Type className="w-3 h-3" />}
       {mode === 'auto' ? 'Auto-track' : 'Manual entry'}
     </span>

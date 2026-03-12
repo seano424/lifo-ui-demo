@@ -41,11 +41,15 @@ export function IntlProvider({
       // Check if we need to load visitor language preference
       const storedLanguage = localStorage.getItem('lifo-language-preference')
       if (storedLanguage) {
-        const parsed = JSON.parse(storedLanguage)
-        if (parsed.state?.currentLanguage && parsed.state.currentLanguage !== 'fr') {
-          // Load the stored visitor language immediately
-          loadMessagesCallback(parsed.state.currentLanguage)
-          return
+        try {
+          const parsed = JSON.parse(storedLanguage)
+          if (parsed.state?.currentLanguage && parsed.state.currentLanguage !== 'fr') {
+            // Load the stored visitor language immediately
+            loadMessagesCallback(parsed.state.currentLanguage)
+            return
+          }
+        } catch {
+          // Invalid stored data, continue to browser detection
         }
       }
 

@@ -43,7 +43,7 @@ export function AddStoreStep() {
       <button
         type="button"
         onClick={handleSquareConnect}
-        className="group w-full max-w-[480px] flex gap-5 rounded-2xl p-7 bg-white cursor-pointer transition-all duration-250 ease-out hover:border-secondary hover:-translate-y-px hover:shadow-[0_0_0_3px_rgba(80,36,255,0.1),0_4px_12px_rgba(0,0,0,0.06)] focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
+        className="group w-full max-w-[480px] flex gap-5 rounded-2xl p-7 bg-white dark:bg-black/30 cursor-pointer transition-all duration-250 ease-out hover:border-secondary hover:-translate-y-px hover:shadow-[0_0_0_3px_rgba(80,36,255,0.1),0_4px_12px_rgba(0,0,0,0.06)] focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
       >
         <div className="p-2 bg-primary-50 rounded-lg h-fit">
           <Image src="/square/square-icon.svg" alt="Square" width={40} height={40} />
