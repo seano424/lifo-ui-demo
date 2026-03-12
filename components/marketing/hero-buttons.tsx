@@ -24,7 +24,7 @@ export const HeroButtons = memo(function HeroButtons() {
         </Button>
       )}
       {!currentUser && (
-        <div className="flex gap-2 flex-wrap">
+        <div className="flex gap-2 flex-col lg:flex-row">
           <Button
             asLink
             href="/auth/sign-up"
@@ -42,7 +42,7 @@ export const HeroButtons = memo(function HeroButtons() {
             rel="noopener noreferrer"
             href="https://calendar.app.google/on8fX3nrWppW7qow7"
             size="lg"
-            className="group flex items-center gap-1"
+            className="group hidden lg:flex items-center gap-1"
             hasArrowUpIcon
           >
             {t('bookDemo')}

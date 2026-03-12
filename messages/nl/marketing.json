@@ -94,6 +94,9 @@
         "square": "Werkt met Square",
         "noCreditCard": "Geen creditcard vereist",
         "connectSquare": "Verbind via Square"
+      },
+      "socialProof": {
+        "featuredOn": "Voorkomen op"
       }
     },
     "features": {

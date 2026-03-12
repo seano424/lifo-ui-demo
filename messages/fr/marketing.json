@@ -94,6 +94,9 @@
         "square": "Fonctionne avec Square",
         "noCreditCard": "Aucune carte de crédit requise",
         "connectSquare": "Connectez-vous via Square"
+      },
+      "socialProof": {
+        "featuredOn": "Présenté sur"
       }
     },
     "features": {
