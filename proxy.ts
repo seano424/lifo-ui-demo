@@ -41,43 +41,48 @@ export default async function proxy(request: NextRequest) {
     // Create response (will have cookies set on it by setAll)
     const response = NextResponse.redirect(new URL(redirectPath, request.url))
 
-    // Promise to track when setAll completes
-    let resolveCookies: () => void
-    const cookiesPromise = new Promise<void>(resolve => {
-      resolveCookies = resolve
-    })
+    try {
+      // Promise to track when setAll completes
+      let resolveCookies: () => void = () => {}
+      const cookiesPromise = new Promise<void>(resolve => {
+        resolveCookies = resolve
+      })
 
-    // Create Supabase client with cookie handler
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
-      {
-        cookies: {
-          getAll() {
-            return request.cookies.getAll()
-          },
-          setAll(cookiesToSet) {
-            // Set cookies directly on the existing response object
-            cookiesToSet.forEach(({ name, value, options }) => {
-              response.cookies.set(name, value, options)
-            })
-            // Signal that cookies are set
-            resolveCookies()
+      // Create Supabase client with cookie handler
+      const supabase = createServerClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
+        {
+          cookies: {
+            getAll() {
+              return request.cookies.getAll()
+            },
+            setAll(cookiesToSet) {
+              // Set cookies directly on the existing response object
+              cookiesToSet.forEach(({ name, value, options }) => {
+                response.cookies.set(name, value, options)
+              })
+              // Signal that cookies are set
+              resolveCookies()
+            },
           },
         },
-      },
-    )
+      )
 
-    const { error } = await supabase.auth.exchangeCodeForSession(code)
+      const { error } = await supabase.auth.exchangeCodeForSession(code)
 
-    if (error) {
+      if (error) {
+        return NextResponse.redirect(new URL('/auth/error', request.url))
+      }
+
+      // Wait for setAll to fire before returning response (5s timeout as safety)
+      await Promise.race([cookiesPromise, new Promise(resolve => setTimeout(resolve, 5000))])
+
+      return response
+    } catch (err) {
+      console.error('[proxy] OAuth code exchange failed:', err)
       return NextResponse.redirect(new URL('/auth/error', request.url))
     }
-
-    // Wait for setAll to fire before returning response (5s timeout as safety)
-    await Promise.race([cookiesPromise, new Promise(resolve => setTimeout(resolve, 5000))])
-
-    return response
   }
 
   return await updateSession(request)
