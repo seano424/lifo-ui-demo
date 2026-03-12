@@ -43,7 +43,7 @@ export default async function proxy(request: NextRequest) {
 
     try {
       // Promise to track when setAll completes
-      let resolveCookies!: () => void
+      let resolveCookies: () => void = () => {}
       const cookiesPromise = new Promise<void>(resolve => {
         resolveCookies = resolve
       })
@@ -79,7 +79,8 @@ export default async function proxy(request: NextRequest) {
       await Promise.race([cookiesPromise, new Promise(resolve => setTimeout(resolve, 5000))])
 
       return response
-    } catch {
+    } catch (err) {
+      console.error('[proxy] OAuth code exchange failed:', err)
       return NextResponse.redirect(new URL('/auth/error', request.url))
     }
   }
