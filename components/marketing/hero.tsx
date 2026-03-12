@@ -5,7 +5,9 @@ import { useTranslations } from 'next-intl'
 import { HeroButtons } from '@/components/marketing/hero-buttons'
 import { HeroDescription } from '@/components/marketing/hero-description'
 import { HeroHeading } from '@/components/marketing/hero-heading'
+import { HeroSocialProof } from '@/components/marketing/hero-social-proof'
 import { Badge } from '../ui/badge'
+import { Typography } from '../ui/typography'
 
 export function Hero() {
   const t = useTranslations('landingpage.hero.badge')
@@ -42,20 +44,30 @@ export function Hero() {
       </div>
 
       <div className="relative z-10 flex flex-col gap-4 items-center justify-center container">
-        <Badge font="mono" size="lg" variant="elevated" className="flex gap-1 items-center py-3">
-          <div className="mr-1 bg-white dark:bg-linear-to-br from-secondary-500 to-secondary-500 rounded p-1">
-            <Image src="/square/square-icon.svg" alt="Square" width={12} height={12} />
-          </div>
-          {t('connectSquare')}
-        </Badge>
+        <div className="flex items-center gap-2">
+          <Badge font="mono" size="lg" variant="elevated" className="flex gap-1 items-center py-3">
+            <div className="mr-1 bg-white dark:bg-linear-to-br from-secondary-500 to-secondary-500 rounded p-1">
+              <Image src="/square/square-icon.svg" alt="Square" width={12} height={12} />
+            </div>
+            {t('connectSquare')}
+          </Badge>
+          {/* <Typography variant="small" className='text-muted-foreground'>{t('noCreditCard')}</Typography> */}
+        </div>
         <HeroHeading />
         <HeroDescription />
 
-        <HeroButtons />
+        <div className="flex items-center gap-4 flex-col md:flex-row lg:flex-col">
+          <HeroButtons />
+          <Typography variant="p" color="muted">
+            {t('noCreditCard')}
+          </Typography>
+        </div>
 
-        <Badge variant="ghost" font="mono">
+        {/* <Badge className='rounded-sm' variant="successRounded" font="mono">
           {t('noCreditCard')}
-        </Badge>
+        </Badge> */}
+
+        <HeroSocialProof />
       </div>
     </section>
   )
