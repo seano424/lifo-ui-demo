@@ -14,7 +14,6 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
 import { useProductsForTrackingSetup } from '@/lib/queries/batch-tracking-onboarding'
 import { useActiveStoreId } from '@/lib/stores/store-context'
