@@ -9,6 +9,79 @@
     "uncategorized": "Non catégorisé",
     "notAvailable": "N/D",
     "unnamedProduct": "Produit sans nom",
+    "detailPanel": {
+      "sections": {
+        "coverage": "Couverture",
+        "automation": "Automatisation"
+      },
+      "batchRow": {
+        "noExpiryDate": "Pas de date d'expiration",
+        "status": {
+          "expired": "expiré",
+          "expiringToday": "expire aujourd'hui",
+          "expiringTomorrow": "expire demain",
+          "expiringSoon": "expire bientôt",
+          "expiringLater": "expire plus tard"
+        },
+        "labels": {
+          "expiryDate": "Date d'expiration",
+          "quantity": "Quantité"
+        },
+        "daysLeft": "{count}j restants",
+        "badge": {
+          "noDate": "Sans date",
+          "expired": "Expiré",
+          "today": "Aujourd'hui"
+        },
+        "delete": {
+          "confirm": "Confirmer ?",
+          "yes": "Oui, supprimer",
+          "no": "Non, annuler",
+          "removeBatch": "Supprimer le lot"
+        },
+        "actions": {
+          "cancel": "Annuler",
+          "save": "Enregistrer"
+        },
+        "errors": {
+          "quantityPositive": "La quantité doit être un nombre positif",
+          "quantityExceeded": "La quantité ne peut pas dépasser {max} (le total du magasin serait dépassé)"
+        }
+      },
+      "batchList": {
+        "groups": {
+          "expiringSoon": "expire bientôt (3 jours ou moins)",
+          "expiringLater": "expire plus tard",
+          "expired": "expiré"
+        },
+        "emptyState": {
+          "title": "Aucun lot suivi pour le moment",
+          "description": "Ajoutez une date d'expiration pour commencer à suivre l'inventaire de ce produit par lot."
+        }
+      },
+      "expiryAutomation": {
+        "productRule": {
+          "label": "Règle produit",
+          "sublabel": "S'applique uniquement à ce produit"
+        },
+        "categoryRule": {
+          "label": "Règle catégorie",
+          "sublabel": "S'applique à tous les produits {category}"
+        },
+        "status": {
+          "active": "Actif",
+          "overridden": "Remplacée"
+        },
+        "actions": {
+          "edit": "Modifier",
+          "add": "+ Ajouter"
+        },
+        "shelfLife": {
+          "days": "Durée de vie : {count} j",
+          "notAvailable": "N/D"
+        }
+      }
+    },
     "manualEntry": {
       "title": "Saisie manuelle",
       "manualSearch": "Recherche manuelle",

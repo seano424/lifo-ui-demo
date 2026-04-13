@@ -10,7 +10,7 @@ import { useTranslations } from 'next-intl'
 //   'opacity-35 hover:opacity-100 transition-all duration-300 ease-in-out text-foreground/50 hover:text-foreground'
 
 export function HeroSocialProof() {
-  const t = useTranslations('landingpage.hero.socialProof')
+  const _t = useTranslations('landingpage.hero.socialProof')
   return (
     <div className="flex flex-col items-center gap-4 py-6">
       {/* <Typography variant="p" className="font-fraunces uppercase tracking-tight" color="muted">

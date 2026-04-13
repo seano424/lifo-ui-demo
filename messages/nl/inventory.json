@@ -9,6 +9,79 @@
     "uncategorized": "Niet gecategoriseerd",
     "notAvailable": "N/B",
     "unnamedProduct": "Naamloos product",
+    "detailPanel": {
+      "sections": {
+        "coverage": "Dekking",
+        "automation": "Automatisering"
+      },
+      "batchRow": {
+        "noExpiryDate": "Geen vervaldatum",
+        "status": {
+          "expired": "verlopen",
+          "expiringToday": "verloopt vandaag",
+          "expiringTomorrow": "verloopt morgen",
+          "expiringSoon": "verloopt binnenkort",
+          "expiringLater": "verloopt later"
+        },
+        "labels": {
+          "expiryDate": "Vervaldatum",
+          "quantity": "Hoeveelheid"
+        },
+        "daysLeft": "{count}d over",
+        "badge": {
+          "noDate": "Geen datum",
+          "expired": "Verlopen",
+          "today": "Vandaag"
+        },
+        "delete": {
+          "confirm": "Bevestigen?",
+          "yes": "Ja, verwijderen",
+          "no": "Nee, annuleren",
+          "removeBatch": "Batch verwijderen"
+        },
+        "actions": {
+          "cancel": "Annuleren",
+          "save": "Opslaan"
+        },
+        "errors": {
+          "quantityPositive": "Hoeveelheid moet een positief getal zijn",
+          "quantityExceeded": "Hoeveelheid mag niet meer zijn dan {max} (totaal van de winkel zou worden overschreden)"
+        }
+      },
+      "batchList": {
+        "groups": {
+          "expiringSoon": "verloopt binnenkort (3 dagen of minder)",
+          "expiringLater": "verloopt later",
+          "expired": "verlopen"
+        },
+        "emptyState": {
+          "title": "Nog geen batches gevolgd",
+          "description": "Voeg een vervaldatum toe om de voorraad van dit product per batch bij te houden."
+        }
+      },
+      "expiryAutomation": {
+        "productRule": {
+          "label": "Productregel",
+          "sublabel": "Geldt alleen voor dit product"
+        },
+        "categoryRule": {
+          "label": "Categorieregel",
+          "sublabel": "Geldt voor alle {category} producten"
+        },
+        "status": {
+          "active": "Actief",
+          "overridden": "Overschreven"
+        },
+        "actions": {
+          "edit": "Bewerken",
+          "add": "+ Toevoegen"
+        },
+        "shelfLife": {
+          "days": "{count} d houdbaarheid",
+          "notAvailable": "N.v.t."
+        }
+      }
+    },
     "manualEntry": {
       "title": "Handmatige invoer",
       "manualSearch": "Handmatig zoeken",

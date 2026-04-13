@@ -2,6 +2,7 @@
 
 import Image from 'next/image'
 import { useMemo, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -26,6 +27,7 @@ export function ProductDetailPanel({
   productId,
   focusAddDate = false,
 }: ProductDetailPanelProps) {
+  const t = useTranslations('products.detailPanel.sections')
   const { data, isLoading } = useProductWithBatches(productId)
   const product = data?.product
   const batches = data?.batches
@@ -168,7 +170,7 @@ export function ProductDetailPanel({
                     color="muted"
                     className="uppercase italic tracking-wider mb-4"
                   >
-                    Coverage
+                    {t('coverage')}
                   </Typography>
                   <UntrackedAlert
                     count={untrackedQty}
@@ -188,7 +190,7 @@ export function ProductDetailPanel({
                   color="muted"
                   className="uppercase italic tracking-wider mb-4"
                 >
-                  Automation
+                  {t('automation')}
                 </Typography>
 
                 <ExpiryAutomationSection

@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations, useLocale } from 'next-intl'
 import { Typography } from '@/components/ui/typography'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -21,6 +22,8 @@ export function BatchRow({
   onCancel,
   onDelete,
 }: BatchRowProps) {
+  const t = useTranslations('products.detailPanel.batchRow')
+  const locale = useLocale()
   const [editedDate, setEditedDate] = useState(batch.expiry_date || '')
   const [editedQty, setEditedQty] = useState(
     batch.current_quantity != null ? String(batch.current_quantity) : '',
@@ -38,9 +41,9 @@ export function BatchRow({
   const daysToExpiry = calculateDaysToExpiry(batch.expiry_date)
 
   const formatDate = (date: string | null) => {
-    if (!date) return 'No expiry date'
+    if (!date) return t('noExpiryDate')
     const localDate = parseISODateAsLocal(date)
-    return localDate.toLocaleDateString('en-US', {
+    return localDate.toLocaleDateString(locale, {
       month: 'short',
       day: 'numeric',
       year: 'numeric',
@@ -57,12 +60,12 @@ export function BatchRow({
     const newQty = parseInt(editedQty, 10)
 
     if (Number.isNaN(newQty) || newQty < 0) {
-      toast.error('Quantity must be a positive number')
+      toast.error(t('errors.quantityPositive'))
       return
     }
 
     if (maxQuantity != null && newQty > maxQuantity) {
-      toast.error(`Quantity cannot exceed ${maxQuantity} (store total would be exceeded)`)
+      toast.error(t('errors.quantityExceeded', { max: maxQuantity }))
       return
     }
 
@@ -111,11 +114,15 @@ export function BatchRow({
           )}
         >
           <Typography variant="p">
-            {batch.current_quantity || 0} {daysToExpiry !== null && daysToExpiry < 0 && 'expired'}{' '}
-            {daysToExpiry !== null && daysToExpiry === 0 && 'expiring today'}{' '}
-            {daysToExpiry !== null && daysToExpiry === 1 && 'expiring tomorrow'}{' '}
-            {daysToExpiry !== null && daysToExpiry <= 3 && daysToExpiry > 1 && 'expiring soon'}{' '}
-            {daysToExpiry !== null && daysToExpiry > 3 && 'expiring later'}{' '}
+            {batch.current_quantity || 0}{' '}
+            {daysToExpiry !== null && daysToExpiry < 0 && t('status.expired')}{' '}
+            {daysToExpiry !== null && daysToExpiry === 0 && t('status.expiringToday')}{' '}
+            {daysToExpiry !== null && daysToExpiry === 1 && t('status.expiringTomorrow')}{' '}
+            {daysToExpiry !== null &&
+              daysToExpiry <= 3 &&
+              daysToExpiry > 1 &&
+              t('status.expiringSoon')}{' '}
+            {daysToExpiry !== null && daysToExpiry > 3 && t('status.expiringLater')}{' '}
           </Typography>
           <Typography variant="small" color="muted">
             {formatDate(batch.expiry_date)}
@@ -133,7 +140,7 @@ export function BatchRow({
           {/* Date + qty grid */}
           <div className="grid grid-cols-2 gap-2">
             <div className="flex flex-col gap-1">
-              <Label className="text-sm text-foreground">Expiry date</Label>
+              <Label className="text-sm text-foreground">{t('labels.expiryDate')}</Label>
               <Input
                 type="date"
                 value={editedDate}
@@ -142,7 +149,7 @@ export function BatchRow({
               />
             </div>
             <div className="flex flex-col gap-1">
-              <Label className="text-sm text-foreground">Quantity</Label>
+              <Label className="text-sm text-foreground">{t('labels.quantity')}</Label>
               <Input
                 type="number"
                 value={editedQty}
@@ -159,13 +166,13 @@ export function BatchRow({
             {/* Delete flow */}
             {confirmDelete ? (
               <div className="flex items-center w-full justify-between">
-                <Typography variant="small">Confirm?</Typography>
+                <Typography variant="small">{t('delete.confirm')}</Typography>
                 <div>
                   <Button variant="subtleDestructive" size="sm" onClick={handleDelete}>
-                    Yes, remove
+                    {t('delete.yes')}
                   </Button>
                   <Button variant="ghost" size="sm" onClick={() => setConfirmDelete(false)}>
-                    No, cancel
+                    {t('delete.no')}
                   </Button>
                 </div>
               </div>
@@ -177,7 +184,7 @@ export function BatchRow({
                 onClick={() => setConfirmDelete(true)}
               >
                 <TrashIcon className="w-4 h-4" />
-                Remove batch
+                {t('delete.removeBatch')}
               </Button>
             )}
 
@@ -185,10 +192,10 @@ export function BatchRow({
             {!confirmDelete && (
               <div className="flex items-center gap-1">
                 <Button variant="outline" size="sm" onClick={onCancel}>
-                  Cancel
+                  {t('actions.cancel')}
                 </Button>
                 <Button variant="black" size="sm" onClick={handleSave}>
-                  Save
+                  {t('actions.save')}
                 </Button>
               </div>
             )}
@@ -209,10 +216,12 @@ function calculateDaysToExpiry(expiryDate: string | null): number | null {
 }
 
 function DaysLeftLabel({ days }: { days: number | null }) {
+  const t = useTranslations('products.detailPanel.batchRow')
+
   if (days === null) {
     return (
       <Badge size="sm" variant={'muted'}>
-        No date
+        {t('badge.noDate')}
       </Badge>
     )
   }
@@ -220,7 +229,7 @@ function DaysLeftLabel({ days }: { days: number | null }) {
   if (days < 0) {
     return (
       <Badge size="sm" variant={'muted'}>
-        Expired
+        {t('badge.expired')}
       </Badge>
     )
   }
@@ -228,7 +237,7 @@ function DaysLeftLabel({ days }: { days: number | null }) {
   if (days === 0) {
     return (
       <Badge size="sm" variant={'danger'}>
-        Today
+        {t('badge.today')}
       </Badge>
     )
   }
@@ -236,14 +245,14 @@ function DaysLeftLabel({ days }: { days: number | null }) {
   if (days <= 3) {
     return (
       <Badge size="sm" variant={'danger'}>
-        {days}d left
+        {t('daysLeft', { count: days })}
       </Badge>
     )
   }
 
   return (
     <Badge size="sm" variant={'success'}>
-      {days}d left
+      {t('daysLeft', { count: days })}
     </Badge>
   )
 }

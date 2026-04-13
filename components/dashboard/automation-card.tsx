@@ -186,8 +186,10 @@ export function AutomationCard({ showLinks = true }: { showLinks?: boolean }) {
                       {rule.name}
                     </Typography>
                     <Typography variant="small" color="muted">
-                      {t(`ruleTypes.${rule.type}`)} · {rule.products_count} items ·{' '}
-                      {rule.shelf_life_days != null ? `${rule.shelf_life_days}d` : '—'}
+                      {t(`ruleTypes.${rule.type}`)} · {t('items', { count: rule.products_count })} ·{' '}
+                      {rule.shelf_life_days != null
+                        ? `${rule.shelf_life_days}${t('daysUnit')}`
+                        : '—'}
                     </Typography>
                   </div>
                 </div>
@@ -195,7 +197,7 @@ export function AutomationCard({ showLinks = true }: { showLinks?: boolean }) {
                   variant={rule.type === 'product' ? 'success' : 'primary'}
                   className="size-9 sm:size-auto rounded text-xs sm:text-sm"
                 >
-                  {rule.shelf_life_days != null ? `${rule.shelf_life_days}d` : '—'}
+                  {rule.shelf_life_days != null ? `${rule.shelf_life_days}${t('daysUnit')}` : '—'}
                 </Badge>
               </button>
             ))}
