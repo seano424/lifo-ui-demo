@@ -9,6 +9,79 @@
     "uncategorized": "Uncategorized",
     "notAvailable": "N/A",
     "unnamedProduct": "Unnamed Product",
+    "detailPanel": {
+      "sections": {
+        "coverage": "Coverage",
+        "automation": "Automation"
+      },
+      "batchRow": {
+        "noExpiryDate": "No expiry date",
+        "status": {
+          "expired": "expired",
+          "expiringToday": "expiring today",
+          "expiringTomorrow": "expiring tomorrow",
+          "expiringSoon": "expiring soon",
+          "expiringLater": "expiring later"
+        },
+        "labels": {
+          "expiryDate": "Expiry date",
+          "quantity": "Quantity"
+        },
+        "daysLeft": "{count}d left",
+        "badge": {
+          "noDate": "No date",
+          "expired": "Expired",
+          "today": "Today"
+        },
+        "delete": {
+          "confirm": "Confirm?",
+          "yes": "Yes, remove",
+          "no": "No, cancel",
+          "removeBatch": "Remove batch"
+        },
+        "actions": {
+          "cancel": "Cancel",
+          "save": "Save"
+        },
+        "errors": {
+          "quantityPositive": "Quantity must be a positive number",
+          "quantityExceeded": "Quantity cannot exceed {max} (store total would be exceeded)"
+        }
+      },
+      "batchList": {
+        "groups": {
+          "expiringSoon": "expiring soon (3 days or less)",
+          "expiringLater": "expiring later",
+          "expired": "expired"
+        },
+        "emptyState": {
+          "title": "No batches tracked yet",
+          "description": "Add an expiry date to start tracking this product's inventory by batch."
+        }
+      },
+      "expiryAutomation": {
+        "productRule": {
+          "label": "Product rule",
+          "sublabel": "Applies to this product only"
+        },
+        "categoryRule": {
+          "label": "Category rule",
+          "sublabel": "Applies to all {category} products"
+        },
+        "status": {
+          "active": "Active",
+          "overridden": "Overridden"
+        },
+        "actions": {
+          "edit": "Edit",
+          "add": "+ Add"
+        },
+        "shelfLife": {
+          "days": "{count}-day shelf life",
+          "notAvailable": "N/A"
+        }
+      }
+    },
     "manualEntry": {
       "title": "Manual Entry",
       "manualSearch": "Manual Search",

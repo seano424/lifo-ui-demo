@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { Badge } from '@/components/ui/badge'
 import { Typography } from '@/components/ui/typography'
 import { AddAutomationRulePanel } from '@/components/automations/add-automation-rule-panel'
@@ -23,6 +24,7 @@ export function ExpiryAutomationSection({
   categoryId,
   categoryName,
 }: ExpiryAutomationSectionProps) {
+  const t = useTranslations('products.detailPanel.expiryAutomation')
   const { data: allRules = [] } = useAutomationRules()
   const { saveRule, deleteRule, createRule, isPending } = useAutomationRuleMutations()
 
@@ -64,19 +66,19 @@ export function ExpiryAutomationSection({
               className={cn('size-4', productRule ? 'text-foreground' : 'text-muted-foreground')}
             />
           }
-          label="Product rule"
+          label={t('productRule.label')}
           shelfLifeDays={productRule?.shelf_life_days ?? null}
-          sublabel="Applies to this product only"
+          sublabel={t('productRule.sublabel')}
           badge={
             productRule ? (
               <Badge variant="success" size="compact">
-                Active
+                {t('status.active')}
               </Badge>
             ) : null
           }
           dimmed={false}
           onAction={() => openPanel('product')}
-          actionLabel={productRule ? 'Edit' : '+ Add'}
+          actionLabel={productRule ? t('actions.edit') : t('actions.add')}
         />
 
         {/* Category rule row — active only when no product rule overrides it */}
@@ -89,23 +91,23 @@ export function ExpiryAutomationSection({
               )}
             />
           }
-          label="Category rule"
+          label={t('categoryRule.label')}
           shelfLifeDays={categoryRule?.shelf_life_days ?? null}
-          sublabel={`Applies to all ${categoryName} products`}
+          sublabel={t('categoryRule.sublabel', { category: categoryName })}
           badge={
             categoryRule && productRule ? (
               <Badge variant="muted" size="compact">
-                Overridden
+                {t('status.overridden')}
               </Badge>
             ) : categoryRule ? (
               <Badge variant="success" size="compact">
-                Active
+                {t('status.active')}
               </Badge>
             ) : null
           }
           dimmed={!!productRule}
           onAction={() => openPanel('category')}
-          actionLabel={categoryRule ? 'Edit' : '+ Add'}
+          actionLabel={categoryRule ? t('actions.edit') : t('actions.add')}
         />
       </div>
 
@@ -148,6 +150,7 @@ function RuleRow({
   onAction,
   actionLabel,
 }: RuleRowProps) {
+  const t = useTranslations('products.detailPanel.expiryAutomation')
   return (
     <button
       type="button"
@@ -162,7 +165,9 @@ function RuleRow({
         <div className={cn('text-left', (shelfLifeDays === null || dimmed) && 'opacity-50')}>
           <div className="flex items-center gap-2">
             <Typography variant="p">
-              {shelfLifeDays !== null ? `${shelfLifeDays}-day shelf life` : 'N/A'}
+              {shelfLifeDays !== null
+                ? t('shelfLife.days', { count: shelfLifeDays })
+                : t('shelfLife.notAvailable')}
             </Typography>
             {badge}
           </div>

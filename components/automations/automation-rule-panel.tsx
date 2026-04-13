@@ -202,15 +202,15 @@ export function AutomationRulePanel({
         {/* Footer */}
         <div className="px-6 py-4 border-t border-border flex items-center justify-between">
           <AlertDialog>
-            <AlertDialogTrigger asChild>
+            {/* <AlertDialogTrigger asChild>
               <Button
                 variant="ghost"
                 disabled={isSaving}
-                className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                className="text-destructive hover:text-destructive hover:bg-destructive/10 capitalize"
               >
                 {t('actions.deleteRule')}
               </Button>
-            </AlertDialogTrigger>
+            </AlertDialogTrigger> */}
             <AlertDialogContent>
               <AlertDialogHeader>
                 <AlertDialogTitle>{t('deleteDialog.title')}</AlertDialogTitle>
@@ -232,7 +232,10 @@ export function AutomationRulePanel({
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
+            <Button variant="subtleDestructive" className="border" disabled={isSaving}>
+              {t('actions.deleteRule')}
+            </Button>
             <Button variant="outline" onClick={onClose} disabled={isSaving}>
               {t('actions.cancel')}
             </Button>

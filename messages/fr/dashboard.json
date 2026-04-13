@@ -261,7 +261,9 @@
           "cancel": "Pas maintenant",
           "confirm": "Oui, compléter les dates manquantes",
           "successToast": "Dates d'expiration manquantes complétées pour votre inventaire actuel"
-        }
+        },
+        "daysUnit": "j",
+        "items": "{count} articles"
       },
       "automations": {
         "table": {

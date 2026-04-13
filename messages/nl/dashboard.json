@@ -261,7 +261,9 @@
           "cancel": "Nu niet",
           "confirm": "Ja, ontbrekende datums invullen",
           "successToast": "Ontbrekende vervaldatums ingevuld voor uw huidige voorraad"
-        }
+        },
+        "daysUnit": "d",
+        "items": "{count} artikelen"
       },
       "automations": {
         "table": {

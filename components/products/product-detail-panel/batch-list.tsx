@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { Typography } from '@/components/ui/typography'
 import { BatchRow } from './batch-row'
 import type { BatchListProps } from './types'
@@ -30,6 +31,7 @@ export function BatchList({
   onStartEdit,
   onCancelEdit,
 }: BatchListProps) {
+  const t = useTranslations('products.detailPanel.batchList')
   const currencySymbol = useCurrency()
   const { updateBatch, deleteBatch } = useBatchActions()
 
@@ -79,7 +81,7 @@ export function BatchList({
     <div className="divide-y divide-border/20">
       {soonBatches.length > 0 && (
         <BatchGroup
-          label="expiring soon (3 days or less)"
+          label={t('groups.expiringSoon')}
           batches={soonBatches}
           batchRowProps={batchRowProps}
         />
@@ -87,14 +89,18 @@ export function BatchList({
 
       {upcomingBatches.length > 0 && (
         <BatchGroup
-          label="expiring later"
+          label={t('groups.expiringLater')}
           batches={upcomingBatches}
           batchRowProps={batchRowProps}
         />
       )}
 
       {expiredBatches.length > 0 && (
-        <BatchGroup label="expired" batches={expiredBatches} batchRowProps={batchRowProps} />
+        <BatchGroup
+          label={t('groups.expired')}
+          batches={expiredBatches}
+          batchRowProps={batchRowProps}
+        />
       )}
     </div>
   )
@@ -123,16 +129,17 @@ function BatchGroup({ label, batches, batchRowProps }: BatchGroupProps) {
 }
 
 function EmptyBatchesState() {
+  const t = useTranslations('products.detailPanel.batchList')
   return (
     <div className="px-5 py-10 text-center">
       <div className="w-10 h-10 mx-auto mb-3 rounded-xl bg-muted flex items-center justify-center">
         <Package className="h-5 w-5 text-muted-foreground" />
       </div>
       <Typography variant="p" className="font-medium mb-1">
-        No batches tracked yet
+        {t('emptyState.title')}
       </Typography>
       <Typography variant="p" className="text-muted-foreground mb-4">
-        Add an expiry date to start tracking this product's inventory by batch.
+        {t('emptyState.description')}
       </Typography>
     </div>
   )

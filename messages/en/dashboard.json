@@ -261,7 +261,9 @@
           "cancel": "Not now",
           "confirm": "Yes, fill in missing dates",
           "successToast": "Missing expiry dates filled in for your current inventory"
-        }
+        },
+        "daysUnit": "d",
+        "items": "{count} items"
       },
       "automations": {
         "table": {
