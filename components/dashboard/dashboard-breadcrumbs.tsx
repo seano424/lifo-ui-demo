@@ -12,11 +12,15 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb'
 
+const isDemo = process.env.NEXT_PUBLIC_DEMO_MODE === 'true'
+const base = isDemo ? '/demo' : '/dashboard'
+const baseSegment = isDemo ? 'demo' : 'dashboard'
+
 export default function DashboardBreadcrumbs() {
   const t = useTranslations('breadcrumbs')
   const pathname = usePathname()
   const pathSegments = pathname.split('/').filter(Boolean)
-  const dashboardIndex = pathSegments.indexOf('dashboard')
+  const dashboardIndex = pathSegments.indexOf(baseSegment)
   const subSegments = dashboardIndex >= 0 ? pathSegments.slice(dashboardIndex + 1) : []
   const isDashboardPage = subSegments.length === 0
 
@@ -43,11 +47,11 @@ export default function DashboardBreadcrumbs() {
           {isDashboardPage ? (
             <BreadcrumbPage>{t('dashboard')}</BreadcrumbPage>
           ) : (
-            <BreadcrumbLink href="/dashboard">{t('dashboard')}</BreadcrumbLink>
+            <BreadcrumbLink href={base}>{t('dashboard')}</BreadcrumbLink>
           )}
         </BreadcrumbItem>
         {subSegments.map((segment, index) => {
-          const href = `/dashboard/${subSegments.slice(0, index + 1).join('/')}`
+          const href = `${base}/${subSegments.slice(0, index + 1).join('/')}`
           const isLast = index === subSegments.length - 1
           return (
             <React.Fragment key={segment}>

@@ -7,6 +7,8 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { useCurrentUser } from '@/hooks/use-users'
 import Image from 'next/image'
 
+const isDemo = process.env.NEXT_PUBLIC_DEMO_MODE === 'true'
+
 function UserButtonContent() {
   const { data: user, isLoading, isError } = useCurrentUser()
   const [imgError, setImgError] = useState(false)
@@ -28,7 +30,7 @@ function UserButtonContent() {
     <Button
       asLink
       size="icon"
-      href="/dashboard/settings?tab=account"
+      href={isDemo ? '/demo/settings?tab=account' : '/dashboard/settings?tab=account'}
       variant="outline"
       className="rounded-full border p-0 h-10 w-10"
       aria-label="Account settings"

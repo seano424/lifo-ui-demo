@@ -5,6 +5,8 @@ import { BellIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useTranslations } from 'next-intl'
 
+const isDemo = process.env.NEXT_PUBLIC_DEMO_MODE === 'true'
+
 export function NotificationBellExpiry() {
   const { count: expiryTodosCount } = useExpiryTodosCount()
   const t = useTranslations('common.aria')
@@ -16,7 +18,7 @@ export function NotificationBellExpiry() {
         size="icon"
         asLink
         className="rounded-full border size-10"
-        href={'/dashboard/expiring'}
+        href={isDemo ? '/demo/expiring' : '/dashboard/expiring'}
         aria-label={
           expiryTodosCount > 0
             ? t('notificationBellWithCount', { count: expiryTodosCount })

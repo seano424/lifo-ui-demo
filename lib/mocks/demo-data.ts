@@ -9,6 +9,9 @@ import type { CompleteUserProfile } from '@/lib/types/complete-user-profile'
 
 export const DEMO_USER_ID = 'demo-user-001'
 export const DEMO_STORE_ID = 'demo-store-001'
+export const DEMO_STORE_ID_2 = 'demo-store-002'
+export const DEMO_STORE_ID_3 = 'demo-store-003'
+export const DEMO_STORE_ID_4 = 'demo-store-004'
 
 export const mockUser: User = {
   id: DEMO_USER_ID,
@@ -50,6 +53,51 @@ export const mockStore = {
   updated_at: '2024-01-01T00:00:00Z',
 } as unknown as Store
 
+export const mockStore2 = {
+  store_id: DEMO_STORE_ID_2,
+  store_name: 'Flour & Stone Bakery',
+  business_name: 'Flour & Stone LLC',
+  address: '47 Bleecker St',
+  city: 'New York',
+  country: 'US',
+  store_type: 'bakery',
+  currency: 'USD',
+  timezone: 'America/New_York',
+  is_active: true,
+  created_at: '2024-03-01T00:00:00Z',
+  updated_at: '2024-03-01T00:00:00Z',
+} as unknown as Store
+
+export const mockStore3 = {
+  store_id: DEMO_STORE_ID_3,
+  store_name: 'Wicker Park Deli',
+  business_name: 'Wicker Park Deli Inc.',
+  address: '1812 N Milwaukee Ave',
+  city: 'Chicago',
+  country: 'US',
+  store_type: 'deli',
+  currency: 'USD',
+  timezone: 'America/Chicago',
+  is_active: true,
+  created_at: '2024-05-15T00:00:00Z',
+  updated_at: '2024-05-15T00:00:00Z',
+} as unknown as Store
+
+export const mockStore4 = {
+  store_id: DEMO_STORE_ID_4,
+  store_name: 'Sunroot Natural Foods',
+  business_name: 'Sunroot Natural Foods Co.',
+  address: '2210 S Lamar Blvd',
+  city: 'Austin',
+  country: 'US',
+  store_type: 'health_food',
+  currency: 'USD',
+  timezone: 'America/Chicago',
+  is_active: true,
+  created_at: '2024-08-20T00:00:00Z',
+  updated_at: '2024-08-20T00:00:00Z',
+} as unknown as Store
+
 export const mockUserStores: UserStore[] = [
   {
     store: mockStore,
@@ -58,6 +106,33 @@ export const mockUserStores: UserStore[] = [
       can_upload_inventory: true,
       can_apply_discounts: true,
       can_view_analytics: true,
+    },
+  },
+  {
+    store: mockStore2,
+    role: 'manager',
+    permissions: {
+      can_upload_inventory: true,
+      can_apply_discounts: true,
+      can_view_analytics: true,
+    },
+  },
+  {
+    store: mockStore3,
+    role: 'manager',
+    permissions: {
+      can_upload_inventory: true,
+      can_apply_discounts: false,
+      can_view_analytics: true,
+    },
+  },
+  {
+    store: mockStore4,
+    role: 'employee',
+    permissions: {
+      can_upload_inventory: true,
+      can_apply_discounts: false,
+      can_view_analytics: false,
     },
   },
 ]
@@ -491,6 +566,72 @@ export const mockCompleteUserProfile: CompleteUserProfile = {
       pin_access_level: 'basic',
       joined_at: '2024-01-01T00:00:00Z',
     },
+    {
+      store_id: DEMO_STORE_ID_2,
+      store_name: 'Flour & Stone Bakery',
+      store_address: '47 Bleecker St',
+      store_phone: null,
+      store_email: null,
+      timezone: 'America/New_York',
+      is_active: true,
+      role_in_store: 'manager',
+      permissions: {
+        can_manage_users: false,
+        can_view_analytics: true,
+        can_apply_discounts: true,
+        can_scan_products: true,
+        can_upload_inventory: true,
+        can_manage_settings: false,
+      },
+      is_active_in_store: true,
+      can_use_pin_auth: false,
+      pin_access_level: 'basic',
+      joined_at: '2024-03-01T00:00:00Z',
+    },
+    {
+      store_id: DEMO_STORE_ID_3,
+      store_name: 'Wicker Park Deli',
+      store_address: '1812 N Milwaukee Ave',
+      store_phone: null,
+      store_email: null,
+      timezone: 'America/Chicago',
+      is_active: true,
+      role_in_store: 'manager',
+      permissions: {
+        can_manage_users: false,
+        can_view_analytics: true,
+        can_apply_discounts: false,
+        can_scan_products: true,
+        can_upload_inventory: true,
+        can_manage_settings: false,
+      },
+      is_active_in_store: true,
+      can_use_pin_auth: false,
+      pin_access_level: 'basic',
+      joined_at: '2024-05-15T00:00:00Z',
+    },
+    {
+      store_id: DEMO_STORE_ID_4,
+      store_name: 'Sunroot Natural Foods',
+      store_address: '2210 S Lamar Blvd',
+      store_phone: null,
+      store_email: null,
+      timezone: 'America/Chicago',
+      is_active: true,
+      role_in_store: 'employee',
+      permissions: {
+        can_manage_users: false,
+        can_view_analytics: false,
+        can_apply_discounts: false,
+        can_scan_products: true,
+        can_upload_inventory: true,
+        can_manage_settings: false,
+      },
+      is_active_in_store: true,
+      can_use_pin_auth: false,
+      pin_access_level: 'basic',
+      joined_at: '2024-08-20T00:00:00Z',
+    },
   ],
   current_store: {
     store_id: DEMO_STORE_ID,
@@ -525,7 +666,7 @@ export const mockCompleteUserProfile: CompleteUserProfile = {
   metadata: {
     query_timestamp: '2024-01-01T00:00:00Z',
     has_store_access: true,
-    total_stores: 1,
+    total_stores: 4,
     requested_store_id: DEMO_STORE_ID,
     has_current_store_access: true,
   },
