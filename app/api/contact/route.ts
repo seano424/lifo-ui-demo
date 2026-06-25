@@ -4,9 +4,6 @@ import { type NextRequest, NextResponse } from 'next/server'
 import { Resend } from 'resend'
 import { z } from 'zod'
 
-// Initialize Resend with your API key
-const resend = new Resend(process.env.RESEND_API)
-
 // Zod schema for contact form validation
 const ContactFormSchema = z.object({
   name: z
@@ -49,6 +46,7 @@ function sanitizeInput(input: string): string {
 }
 
 export async function POST(request: NextRequest) {
+  const resend = new Resend(process.env.RESEND_API)
   // Get translations
   const t = await getTranslations('contactpage.api')
 
