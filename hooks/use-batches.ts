@@ -1,3 +1,5 @@
+const isDemo = process.env.NEXT_PUBLIC_DEMO_MODE === 'true'
+
 import {
   type InfiniteData,
   useInfiniteQuery,
@@ -233,7 +235,42 @@ export function useBatchActions() {
   const activeStoreId = useActiveStoreId()
 
   const createMutation = useMutation({
-    mutationFn: (batchData: Database['inventory']['Tables']['batches']['Insert']) => {
+    mutationFn: async (batchData: Database['inventory']['Tables']['batches']['Insert']) => {
+      if (isDemo) {
+        const { mockBatches, DEMO_STORE_ID } = await import('@/lib/mocks/demo-data')
+        const existingBatch = mockBatches.find(b => b.product_id === batchData.product_id)
+        const newBatch = {
+          batch_id: `demo-batch-new-${batchData.product_id}`,
+          store_id: DEMO_STORE_ID,
+          product_id: batchData.product_id ?? '',
+          expiry_date: batchData.expiry_date ?? null,
+          current_quantity: batchData.current_quantity ?? 0,
+          initial_quantity: batchData.initial_quantity ?? batchData.current_quantity ?? 0,
+          selling_price: batchData.selling_price ?? null,
+          status: 'active' as const,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          products: existingBatch?.products ?? null,
+        } as unknown as BatchWithProduct
+
+        queryClient.setQueriesData(
+          { queryKey: queryKeys.batches.byStore(DEMO_STORE_ID) },
+          (oldData: unknown) => {
+            if (!isInfiniteData(oldData)) return oldData
+            return {
+              ...oldData,
+              pages: oldData.pages.map((page, i) =>
+                i === 0
+                  ? { ...page, data: [newBatch, ...page.data], count: (page.count || 0) + 1 }
+                  : page,
+              ),
+            }
+          },
+        )
+
+        return newBatch
+      }
+
       if (!activeStoreId) {
         throw new Error('No active store selected')
       }
@@ -245,24 +282,26 @@ export function useBatchActions() {
       return createBatch(batchWithStore)
     },
     onSuccess: newBatch => {
-      if (activeStoreId) {
+      if (!isDemo) {
+        if (activeStoreId) {
+          queryClient.invalidateQueries({
+            queryKey: queryKeys.batches.byStore(activeStoreId),
+          })
+          queryClient.invalidateQueries({
+            queryKey: queryKeys.products.byStore(activeStoreId),
+          })
+        }
+
         queryClient.invalidateQueries({
-          queryKey: queryKeys.batches.byStore(activeStoreId),
+          queryKey: queryKeys.batches.byProduct(activeStoreId || '', newBatch.product_id),
         })
+
+        queryClient.setQueryData(queryKeys.batches.detail(newBatch.batch_id), newBatch)
+
         queryClient.invalidateQueries({
-          queryKey: queryKeys.products.byStore(activeStoreId),
+          queryKey: queryKeys.products.detail(newBatch.product_id),
         })
       }
-
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.batches.byProduct(activeStoreId || '', newBatch.product_id),
-      })
-
-      queryClient.setQueryData(queryKeys.batches.detail(newBatch.batch_id), newBatch)
-
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.products.detail(newBatch.product_id),
-      })
 
       toast.success('Batch created successfully')
     },
@@ -286,7 +325,10 @@ export function useBatchActions() {
     }: {
       batchId: string
       updates: Database['inventory']['Tables']['batches']['Update']
-    }) => updateBatch(batchId, updates),
+    }) => {
+      if (isDemo) return Promise.resolve(undefined as unknown as BatchWithProduct)
+      return updateBatch(batchId, updates)
+    },
 
     onMutate: async ({ batchId, updates }) => {
       await queryClient.cancelQueries({
@@ -381,6 +423,7 @@ export function useBatchActions() {
     },
 
     onSettled: (data, _error, { batchId }) => {
+      if (isDemo) return
       // Invalidate batch-related queries
       queryClient.invalidateQueries({
         queryKey: queryKeys.batches.detail(batchId),
@@ -451,16 +494,21 @@ export function useBatchActions() {
     },
 
     onSuccess: (_data, { batchId }) => {
-      // Force refetch of the batch todo query (onSettled handles invalidation)
-      queryClient.refetchQueries({
-        queryKey: queryKeys.batches.todo(batchId),
-      })
+      if (!isDemo) {
+        // Force refetch of the batch todo query (onSettled handles invalidation)
+        queryClient.refetchQueries({
+          queryKey: queryKeys.batches.todo(batchId),
+        })
+      }
       toast.success('Batch updated successfully')
     },
   })
 
   const deleteMutation = useMutation({
-    mutationFn: ({ batchId }: { batchId: string; productId: string }) => deleteBatch(batchId),
+    mutationFn: ({ batchId }: { batchId: string; productId: string }) => {
+      if (isDemo) return Promise.resolve()
+      return deleteBatch(batchId)
+    },
 
     onMutate: async ({ batchId, productId }) => {
       await queryClient.cancelQueries({
@@ -508,6 +556,7 @@ export function useBatchActions() {
     },
 
     onSettled: (_data, _error, { productId }) => {
+      if (isDemo) return
       if (activeStoreId) {
         queryClient.invalidateQueries({
           queryKey: queryKeys.batches.byStore(activeStoreId),
@@ -638,7 +687,7 @@ export function useBatchActions() {
     deleteBatch: deleteMutation.mutate,
 
     // Loading states
-    isCreating: createMutation.isPending,
+    isCreating: isDemo ? false : createMutation.isPending,
     isUpdating: updateMutation.isPending,
     isDeleting: deleteMutation.isPending,
 

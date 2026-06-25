@@ -1,5 +1,7 @@
 // hooks/use-products.ts
 
+const isDemo = process.env.NEXT_PUBLIC_DEMO_MODE === 'true'
+
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useCallback, useState } from 'react'
 import { toast } from 'sonner'
@@ -121,13 +123,19 @@ export function useProductWithBatches(productId: string) {
 
   return useQuery({
     queryKey: queryKeys.products.detailWithBatches(productId, activeStoreId || ''),
-    queryFn: () => {
+    queryFn: async () => {
+      if (isDemo) {
+        const { mockProducts, mockBatches } = await import('@/lib/mocks/demo-data')
+        const product = mockProducts.find(p => p.product_id === productId) ?? mockProducts[0]
+        const batches = mockBatches.filter(b => b.product_id === productId)
+        return { product, batches: batches.length ? batches : mockBatches.slice(0, 2) }
+      }
       if (!activeStoreId) {
         throw new Error('No active store selected')
       }
       return fetchProductWithBatches(productId, activeStoreId)
     },
-    enabled: !!productId && !!activeStoreId,
+    enabled: !!productId && (isDemo || !!activeStoreId),
     // Match prefetch staleTime so the prefetched data isn't immediately refetched on modal open
     staleTime: 30_000,
   })

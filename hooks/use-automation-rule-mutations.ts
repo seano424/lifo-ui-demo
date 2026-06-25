@@ -1,10 +1,16 @@
+const isDemo = process.env.NEXT_PUBLIC_DEMO_MODE === 'true'
+
+import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import {
   useBatchTrackingSetup,
   useSaveBatchTrackingSetup,
 } from '@/lib/queries/batch-tracking-onboarding'
+import { queryKeys } from '@/lib/queries/query-keys'
 import { useActiveStoreId } from '@/lib/stores/store-context'
 import type { AutomationRule } from '@/lib/queries/dashboard'
+import type { CategoryWithTrackingSettings } from '@/types/rpc-returns'
+import { DEMO_STORE_ID } from '@/lib/mocks/demo-data'
 
 /**
  * Centralises the save/delete/create mutation logic for automation rules.
@@ -29,6 +35,7 @@ export function useAutomationRuleMutations({ onSaveSuccess }: { onSaveSuccess?: 
   const storeId = useActiveStoreId() || ''
   const { data: batchSetup } = useBatchTrackingSetup(storeId)
   const saveMutation = useSaveBatchTrackingSetup()
+  const queryClient = useQueryClient()
 
   // Preserve existing setup state rather than overwriting it.
   const buildConfig = () => {
@@ -44,6 +51,21 @@ export function useAutomationRuleMutations({ onSaveSuccess }: { onSaveSuccess?: 
   }
 
   const saveRule = async (rule: AutomationRule, shelfLifeDays: number): Promise<void> => {
+    if (isDemo) {
+      queryClient.setQueryData(
+        queryKeys.batchTrackingOnboarding.categories(DEMO_STORE_ID),
+        (old: CategoryWithTrackingSettings[] | undefined) =>
+          old?.map(cat =>
+            cat.category_id === rule.rule_id
+              ? { ...cat, default_shelf_life_days: shelfLifeDays, auto_create_batches: true }
+              : cat,
+          ) ?? old,
+      )
+      toast.success('Rule saved')
+      onSaveSuccess?.()
+      return
+    }
+
     try {
       if (rule.type === 'product') {
         await saveMutation.mutateAsync({
@@ -82,6 +104,20 @@ export function useAutomationRuleMutations({ onSaveSuccess }: { onSaveSuccess?: 
   }
 
   const deleteRule = async (rule: AutomationRule): Promise<void> => {
+    if (isDemo) {
+      queryClient.setQueryData(
+        queryKeys.batchTrackingOnboarding.categories(DEMO_STORE_ID),
+        (old: CategoryWithTrackingSettings[] | undefined) =>
+          old?.map(cat =>
+            cat.category_id === rule.rule_id
+              ? { ...cat, auto_create_batches: false, default_shelf_life_days: null }
+              : cat,
+          ) ?? old,
+      )
+      toast.success(`${rule.name} rule deleted`)
+      return
+    }
+
     try {
       if (rule.type === 'product') {
         await saveMutation.mutateAsync({
@@ -119,6 +155,25 @@ export function useAutomationRuleMutations({ onSaveSuccess }: { onSaveSuccess?: 
   }
 
   const createRule = async (rule: AutomationRule): Promise<void> => {
+    if (isDemo) {
+      queryClient.setQueryData(
+        queryKeys.batchTrackingOnboarding.categories(DEMO_STORE_ID),
+        (old: CategoryWithTrackingSettings[] | undefined) =>
+          old?.map(cat =>
+            cat.category_id === rule.rule_id
+              ? {
+                  ...cat,
+                  auto_create_batches: true,
+                  default_shelf_life_days: rule.shelf_life_days,
+                }
+              : cat,
+          ) ?? old,
+      )
+      toast.success(`${rule.name} rule created`)
+      onSaveSuccess?.()
+      return
+    }
+
     try {
       if (rule.type === 'product') {
         await saveMutation.mutateAsync({
@@ -156,5 +211,5 @@ export function useAutomationRuleMutations({ onSaveSuccess }: { onSaveSuccess?: 
     }
   }
 
-  return { saveRule, deleteRule, createRule, isPending: saveMutation.isPending }
+  return { saveRule, deleteRule, createRule, isPending: isDemo ? false : saveMutation.isPending }
 }
