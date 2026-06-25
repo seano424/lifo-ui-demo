@@ -19,6 +19,9 @@ import { useCurrentUser } from '@/hooks/use-users'
 
 import { Logo } from './ui/logo'
 
+const isDemo = process.env.NEXT_PUBLIC_DEMO_MODE === 'true'
+const base = isDemo ? '/demo' : '/dashboard'
+
 function useNavigationData() {
   const t = useTranslations('navigation')
   const { count: expiryTodosCount } = useExpiryTodosCount()
@@ -31,24 +34,24 @@ function useNavigationData() {
           items: [
             {
               title: t('overview'),
-              url: '/dashboard',
+              url: base,
               icon: ChartNoAxesCombined,
               isActive: true,
             },
             {
               title: t('all'),
-              url: '/dashboard/inventory/batches',
+              url: `${base}/inventory/batches`,
               icon: Layers,
             },
             {
               title: t('expiringSoon'),
-              url: '/dashboard/expiring',
+              url: `${base}/expiring`,
               icon: CalendarFold,
               badge: expiryTodosCount > 0 ? expiryTodosCount : undefined,
             },
             {
               title: t('products'),
-              url: '/dashboard/inventory/products?sort=active_batches_count&direction=desc',
+              url: `${base}/inventory/products?sort=active_batches_count&direction=desc`,
               icon: Package,
               isActive: true,
             },
@@ -59,17 +62,17 @@ function useNavigationData() {
           items: [
             {
               title: t('integrations'),
-              url: '/dashboard/integrations',
+              url: `${base}/integrations`,
               icon: Zap,
             },
             {
               title: t('settings'),
-              url: '/dashboard/settings',
+              url: `${base}/settings`,
               icon: SettingsIcon,
             },
             {
               title: t('automations'),
-              url: '/dashboard/settings/automations',
+              url: `${base}/settings/automations`,
               icon: Zap,
             },
           ],

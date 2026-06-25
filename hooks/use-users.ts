@@ -73,6 +73,11 @@ export function useCurrentUser() {
   return useQuery({
     queryKey: queryKeys.auth.currentUser(),
     queryFn: async (): Promise<User | null> => {
+      if (process.env.NEXT_PUBLIC_DEMO_MODE === 'true') {
+        const { mockUser } = await import('@/lib/mocks/demo-data')
+        return mockUser
+      }
+
       const supabase = createClient()
       const {
         data: { user },

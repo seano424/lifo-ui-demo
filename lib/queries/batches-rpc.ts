@@ -19,6 +19,10 @@ export async function hasBatchesRPC(
   storeId: string,
   serverClient?: ServerClient,
 ): Promise<boolean> {
+  if (process.env.NEXT_PUBLIC_DEMO_MODE === 'true') {
+    return true
+  }
+
   const supabase = serverClient || createClient()
   const context = 'hasBatchesRPC'
 
@@ -61,6 +65,11 @@ export async function fetchBatchesPageRPC(
 }> {
   const supabase = serverClient || createClient()
   const context = 'fetchBatchesPageRPC'
+
+  if (process.env.NEXT_PUBLIC_DEMO_MODE === 'true') {
+    const { mockBatches } = await import('@/lib/mocks/demo-data')
+    return { data: mockBatches, count: mockBatches.length, nextPage: undefined }
+  }
 
   return withPerformanceTracking(
     context,
@@ -167,6 +176,11 @@ export async function fetchExpiringBatchesRPC(
   daysAhead: number = 7,
   serverClient?: ServerClient,
 ): Promise<BatchWithProduct[]> {
+  if (process.env.NEXT_PUBLIC_DEMO_MODE === 'true') {
+    const { mockBatches } = await import('@/lib/mocks/demo-data')
+    return mockBatches
+  }
+
   const supabase = serverClient || createClient()
   const context = 'fetchExpiringBatchesRPC'
 
@@ -239,6 +253,11 @@ export async function fetchLowStockBatchesRPC(
   thresholdQuantity: number = 10,
   serverClient?: ServerClient,
 ): Promise<BatchWithProduct[]> {
+  if (process.env.NEXT_PUBLIC_DEMO_MODE === 'true') {
+    const { mockBatches } = await import('@/lib/mocks/demo-data')
+    return mockBatches
+  }
+
   const supabase = serverClient || createClient()
   const context = 'fetchLowStockBatchesRPC'
 

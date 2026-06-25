@@ -23,6 +23,11 @@ type ServerClient = Awaited<ReturnType<typeof createServerClient>>
 export async function fetchUserPreferencesRPC(
   serverClient?: ServerClient,
 ): Promise<UserPreferences | null> {
+  if (process.env.NEXT_PUBLIC_DEMO_MODE === 'true') {
+    const { mockUserPreferences } = await import('@/lib/mocks/demo-data')
+    return mockUserPreferences
+  }
+
   // IMPORTANT: serverClient must be provided in SSR context
   // createClient() uses createBrowserClient which fails in Node.js
   if (!serverClient && typeof window === 'undefined') {

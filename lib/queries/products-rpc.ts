@@ -27,6 +27,11 @@ export async function fetchProductsPageRPC(
   const supabase = serverClient || createClient()
   const context = 'fetchProductsPageRPC'
 
+  if (process.env.NEXT_PUBLIC_DEMO_MODE === 'true') {
+    const { mockProducts } = await import('@/lib/mocks/demo-data')
+    return { data: mockProducts, count: mockProducts.length, nextPage: undefined }
+  }
+
   return withPerformanceTracking(
     context,
     'Fetch products page via RPC',

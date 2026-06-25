@@ -18,7 +18,13 @@ export const HeroButtons = memo(function HeroButtons() {
   return (
     <>
       {currentUser && (
-        <Button size="lg" variant="secondary" asLink href="/dashboard" className="group">
+        <Button
+          size="lg"
+          variant="secondary"
+          asLink
+          href={process.env.NEXT_PUBLIC_DEMO_MODE === 'true' ? '/demo' : '/dashboard'}
+          className="group"
+        >
           {t('dashboard')}
           <ChevronRightIcon className="w-5 h-5 -rotate-45 transition-transform duration-300 ease-in-out group-hover:translate-x-px group-hover:-translate-y-px" />
         </Button>

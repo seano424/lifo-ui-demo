@@ -86,6 +86,29 @@ export async function fetchStoreSettings(
   storeId: string,
   serverClient?: ServerClient,
 ): Promise<StoreSettingsData> {
+  if (process.env.NEXT_PUBLIC_DEMO_MODE === 'true') {
+    return {
+      store_id: 'demo-store-001',
+      store_name: 'Green Basket Market',
+      business_name: 'Green Basket Market LLC',
+      store_code: 'GREEN-001',
+      store_type: 'organic' as const,
+      address: '123 Organic Ave',
+      city: 'San Francisco',
+      country: 'US',
+      timezone: 'America/Los_Angeles',
+      is_active: true,
+      onboarding_completed: true,
+      created_at: '2024-01-01T00:00:00Z',
+      updated_at: '2024-01-01T00:00:00Z',
+      settings: {
+        store_id: 'demo-store-001',
+        currency: 'USD',
+        updated_at: '2024-01-01T00:00:00Z',
+      },
+    }
+  }
+
   return withPerformanceTracking(
     'lib/queries/store-settings',
     'fetchStoreSettings',

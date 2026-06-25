@@ -24,6 +24,11 @@ export function useCompleteUserProfile() {
   const result = useQuery({
     queryKey: completeUserProfileQueryKey('current', activeStoreId),
     queryFn: async (): Promise<CompleteUserProfile> => {
+      if (process.env.NEXT_PUBLIC_DEMO_MODE === 'true') {
+        const { mockCompleteUserProfile } = await import('@/lib/mocks/demo-data')
+        return mockCompleteUserProfile
+      }
+
       const supabase = createClient()
 
       // Get current user ID first

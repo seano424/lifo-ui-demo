@@ -21,6 +21,27 @@ export const AuthButton = memo(function AuthButton({ isMobile }: AuthButtonProps
     window.location.href = '/'
   }, [])
 
+  if (process.env.NEXT_PUBLIC_DEMO_MODE === 'true') {
+    return (
+      <div
+        className={cn(
+          'flex items-center font-mono gap-2',
+          isMobile && 'flex-col gap-4 items-start',
+        )}
+      >
+        <Button
+          asLink
+          href="/demo"
+          size="sm"
+          variant="secondary"
+          className={cn(isMobile && 'w-full')}
+        >
+          {t('goToDashboard')}
+        </Button>
+      </div>
+    )
+  }
+
   // Reserve space to prevent layout shift - matches actual button sizes
   if (isLoading) {
     return (
