@@ -1,10 +1,7 @@
 import DashboardInsetHeader from '@/components/dashboard/dashboard-inset-header'
-import { getTranslations } from 'next-intl/server'
 import { Zap } from 'lucide-react'
 
 export default async function DemoIntegrationsPage() {
-  const tNav = await getTranslations('navigation')
-
   return (
     <div className="flex flex-col gap-6 container py-6 lg:py-8">
       <DashboardInsetHeader page="integrations" />
