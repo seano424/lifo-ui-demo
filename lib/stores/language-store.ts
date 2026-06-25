@@ -25,20 +25,18 @@ export const useLanguageStore = create<LanguageState>()(
         set({ isLoading: true })
 
         try {
-          const supabase = createClient()
-          const {
-            data: { user },
-          } = await supabase.auth.getUser()
+          if (process.env.NEXT_PUBLIC_DEMO_MODE !== 'true') {
+            const supabase = createClient()
+            const {
+              data: { user },
+            } = await supabase.auth.getUser()
 
-          if (user) {
-            // Use the existing language preference update function
-            await updateUserLanguagePreference(user.id, language)
+            if (user) {
+              await updateUserLanguagePreference(user.id, language)
+            }
           }
 
-          // Update local state
           set({ currentLanguage: language })
-
-          // No need to reload page - our IntlProvider will handle the dynamic switching
         } catch (error) {
           console.error('Failed to update language preference:', error)
         } finally {
@@ -47,6 +45,33 @@ export const useLanguageStore = create<LanguageState>()(
       },
 
       initializeLanguage: async () => {
+        if (process.env.NEXT_PUBLIC_DEMO_MODE === 'true') {
+          // Skip Supabase entirely — read localStorage then browser language
+          const stored =
+            typeof localStorage !== 'undefined'
+              ? localStorage.getItem('lifo-language-preference')
+              : null
+          if (stored) {
+            try {
+              const parsed = JSON.parse(stored)
+              const storedLang = parsed.state?.currentLanguage
+              if (storedLang && isSupportedLocale(storedLang)) {
+                set({ currentLanguage: storedLang, isLoading: false })
+                return
+              }
+            } catch {
+              // fall through
+            }
+          }
+          const browserLang =
+            typeof navigator !== 'undefined' ? navigator.language.split('-')[0] : 'en'
+          set({
+            currentLanguage: isSupportedLocale(browserLang) ? browserLang : 'en',
+            isLoading: false,
+          })
+          return
+        }
+
         set({ isLoading: true })
 
         try {

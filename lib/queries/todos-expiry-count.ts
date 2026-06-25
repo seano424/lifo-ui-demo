@@ -15,6 +15,10 @@ export async function fetchExpiryTodosCount(
   storeId: string,
   serverClient?: ServerClient,
 ): Promise<number> {
+  if (process.env.NEXT_PUBLIC_DEMO_MODE === 'true') {
+    return 4
+  }
+
   const supabase = serverClient || createClient()
   const context = 'fetchExpiryTodosCount'
 

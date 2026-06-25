@@ -42,36 +42,42 @@ export default getRequestConfig(async () => {
   let locale = await detectLanguageFromHeaders()
 
   try {
-    // 2. Try to get user's saved preference from Supabase
     const cookieStore = await cookies()
+    let resolvedFromSupabase = false
 
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
-      {
-        cookies: {
-          getAll() {
-            return cookieStore.getAll()
-          },
-          setAll(_cookiesToSet) {
-            // No-op in server context during static generation
+    if (process.env.NEXT_PUBLIC_DEMO_MODE !== 'true') {
+      // 2. Try to get user's saved preference from Supabase
+      const supabase = createServerClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
+        {
+          cookies: {
+            getAll() {
+              return cookieStore.getAll()
+            },
+            setAll(_cookiesToSet) {
+              // No-op in server context during static generation
+            },
           },
         },
-      },
-    )
+      )
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
 
-    // 3. User preference takes precedence
-    if (user?.user_metadata?.language_preference) {
-      const userLang = user.user_metadata.language_preference
-      if (isSupportedLocale(userLang)) {
-        locale = userLang
+      // 3. User preference takes precedence
+      if (user?.user_metadata?.language_preference) {
+        const userLang = user.user_metadata.language_preference
+        if (isSupportedLocale(userLang)) {
+          locale = userLang
+          resolvedFromSupabase = true
+        }
       }
-    } else {
-      // 4. For non-authenticated users, try to read from the language preference cookie
+    }
+
+    // 4. For non-authenticated users (or demo mode), try to read from the language preference cookie
+    if (!resolvedFromSupabase) {
       const langCookie = cookieStore.get('lifo-language-preference')
       if (langCookie?.value) {
         try {

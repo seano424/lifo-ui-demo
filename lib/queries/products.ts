@@ -1072,6 +1072,13 @@ export async function fetchProductWithBatches(
   productId: string,
   storeId: string,
 ): Promise<{ product: Product; batches: BatchWithProduct[] }> {
+  if (process.env.NEXT_PUBLIC_DEMO_MODE === 'true') {
+    const { mockBatches, mockProducts } = await import('@/lib/mocks/demo-data')
+    const product = mockProducts.find(p => p.product_id === productId) ?? mockProducts[0]
+    const batches = mockBatches.filter(b => b.product_id === productId)
+    return { product, batches: batches.length ? batches : mockBatches.slice(0, 2) }
+  }
+
   const supabase = createClient()
   const context = 'fetchProductWithBatches'
 

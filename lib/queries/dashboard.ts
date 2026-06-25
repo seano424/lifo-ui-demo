@@ -115,6 +115,11 @@ export async function fetchDashboardRedesignSummary(
   storeId: string,
   daysFilter: 7 | 30 | 90 = 7,
 ): Promise<DashboardRedesignSummary> {
+  if (process.env.NEXT_PUBLIC_DEMO_MODE === 'true') {
+    const { getMockDashboardSummary } = await import('@/lib/mocks/demo-data')
+    return getMockDashboardSummary(daysFilter)
+  }
+
   const supabase = createClient()
 
   const today = new Date()

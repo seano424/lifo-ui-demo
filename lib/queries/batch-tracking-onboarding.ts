@@ -74,6 +74,11 @@ export function useBatchTrackingSetup(storeId: string) {
   return useQuery({
     queryKey: queryKeys.batchTrackingOnboarding.config(storeId),
     queryFn: async () => {
+      if (process.env.NEXT_PUBLIC_DEMO_MODE === 'true') {
+        const { mockBatchTrackingSetup } = await import('@/lib/mocks/demo-data')
+        return mockBatchTrackingSetup
+      }
+
       const context = 'useBatchTrackingSetup'
 
       logger.log(context, 'Fetching batch tracking setup', { storeId })
@@ -118,6 +123,11 @@ export function useCategoriesWithTrackingSettings(storeId: string) {
   return useQuery({
     queryKey: queryKeys.batchTrackingOnboarding.categories(storeId),
     queryFn: async () => {
+      if (process.env.NEXT_PUBLIC_DEMO_MODE === 'true') {
+        const { mockCategories } = await import('@/lib/mocks/demo-data')
+        return mockCategories
+      }
+
       const context = 'useCategoriesWithTrackingSettings'
 
       logger.log(context, 'Fetching categories with tracking settings', { storeId })
@@ -188,6 +198,10 @@ export function useProductsForTrackingSetup(storeId: string, filters: ProductFil
       offset,
     }),
     queryFn: async () => {
+      if (process.env.NEXT_PUBLIC_DEMO_MODE === 'true') {
+        return []
+      }
+
       const context = 'useProductsForTrackingSetup'
 
       logger.log(context, 'Fetching products for tracking setup', {

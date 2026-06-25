@@ -4,6 +4,10 @@ import { createServerClient } from '@supabase/ssr'
 import { type NextRequest, NextResponse } from 'next/server'
 
 export async function updateSession(request: NextRequest) {
+  if (process.env.NEXT_PUBLIC_DEMO_MODE === 'true') {
+    return NextResponse.next({ request })
+  }
+
   let supabaseResponse = NextResponse.next({ request })
 
   const supabase = createServerClient(
@@ -54,7 +58,8 @@ function isPublicRoute(request: NextRequest): boolean {
     pathname.startsWith('/support') ||
     pathname.startsWith('/privacy') ||
     pathname.startsWith('/pricing') ||
-    pathname.startsWith('/terms')
+    pathname.startsWith('/terms') ||
+    pathname.startsWith('/demo')
   )
 }
 

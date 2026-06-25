@@ -33,6 +33,11 @@ export async function fetchUserStores(
   userId: string,
   serverClient?: ServerClient,
 ): Promise<UserStore[]> {
+  if (process.env.NEXT_PUBLIC_DEMO_MODE === 'true') {
+    const { mockUserStores } = await import('@/lib/mocks/demo-data')
+    return mockUserStores
+  }
+
   const supabase = serverClient || createClient()
   const context = 'fetchUserStores'
 
